@@ -2452,7 +2452,7 @@ static void f_envprepend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=%s\nelse\n  %s=\"%s%s${%s}\"\nfi\nexport %s\n#\n",
+      if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=\"%s\"\nelse\n  %s=\"%s%s${%s}\"\nfi\nexport %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1],
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
@@ -2465,7 +2465,7 @@ static void f_envprepend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s %s\nelse\n  setenv %s \"%s%s${%s}\"\nendif\n#\n",
+      if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s \"%s\"\nelse\n  setenv %s \"%s%s${%s}\"\nendif\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1], 
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
@@ -2511,7 +2511,7 @@ static void f_envremove( ACTION_PARAMS)
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-	      "setenv upstmp \"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s $upstmp\nunsetenv upstmp\n#\n",
+	     "setenv upstmp \"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s \"$upstmp\"\nunsetenv upstmp\n#\n",
 		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
 		  delimiter, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -3139,7 +3139,7 @@ static int csh_output_next_part(const FILE * const a_stream,
     } else {
       if (a_check_flag == DO_CHECK) {
 	if ((status = fprintf((FILE *)a_stream,
-	      "  setenv UPS_STATUS $status\n  if (\"$UPS_STATUS\" != \"0\") then\n    echo \"Error $UPS_STATUS while sourcing %s\n    unsetenv UPS_STATUS\n",
+	      "  setenv UPS_STATUS \"$status\"\n  if (\"$UPS_STATUS\" != \"0\") then\n    echo \"Error $UPS_STATUS while sourcing %s\n    unsetenv UPS_STATUS\n",
 		    a_data)) < 0) {
 	  FPRINTF_ERROR();
 	} else {
