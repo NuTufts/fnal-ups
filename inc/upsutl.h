@@ -62,7 +62,8 @@ int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
 			  const char *a_node);
 char *upsutl_get_hostname( void );
 t_upstyp_product *upsutl_get_config( const char * const a_db);
-char *upsutl_environment(const char * const a_env_var);
+t_upstyp_config *upsutl_free_config(
+				   const t_upstyp_config * const a_db_config);
 t_upslst_item *upsutl_free_matched_product_list(
 			   t_upslst_item ** const a_mproduct_list);
 t_upslst_item *upsutl_free_matched_instance_list(

@@ -234,36 +234,36 @@ int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
 t_upstyp_product *upsutl_get_config( const char * const a_db)
 {
   t_upstyp_product *read_product = NULL;
-  char *buffer = NULL;
+  static char buffer[MAX_LINE_LEN];
   
-  buffer = (char *)malloc(strlen(a_db) + (unsigned int )CONFIG_SIZE +
-			  (unsigned int ) 5);
-  if (buffer) {
-    sprintf(buffer, "%s/../%s", a_db, CONFIG_FILE);
+  if ((strlen(a_db) + (unsigned int )CONFIG_SIZE + (unsigned int ) 5) <=
+      MAX_LINE_LEN) {
+    sprintf(&buffer[0], "%s/../%s", a_db, CONFIG_FILE);
     read_product = upsfil_read_file(buffer);
     if (UPS_ERROR == UPS_NO_FILE) {
       upserr_backup();
       upserr_backup();
     }
   } else {
-    upserr_add(UPS_NO_MEMORY, UPS_WARNING, strlen(buffer));
+    upserr_add(UPS_NAME_TOO_LONG, UPS_WARNING, MAX_LINE_LEN);
   }
   
   return(read_product);
 }
-
 /*-----------------------------------------------------------------------
- * upsutl_environment
+ * upsutl_free_config
  *
- * Translate the name of an environmental variable and return the value.
+ * Free the configuration file memory
  *
- * Input : Name of the environmental variable
+ * Input : Configuration pointer
  * Output: none
- * Return: The value of the variable
+ * Return: NULL
  */
-char * upsutl_environment(const char * const a_env_var)
+t_upstyp_config *upsutl_free_config( const t_upstyp_config * const a_db_config)
 {
-  return (getenv(a_env_var));
+
+  upsmem_free((void *)a_db_config);
+  return((t_upstyp_config *)NULL);
 }
 
 /*-----------------------------------------------------------------------
