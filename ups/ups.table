@@ -10,11 +10,11 @@ Common:
    Action=configure
      doDefaults()
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
-      execute(${UPS_PROD_DIR}/ups/configure}, UPS_ENV)
+      execute(${UPS_PROD_DIR}/ups/configure, UPS_ENV)
    Action=current
      doDefaults()
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
-      execute(${UPS_PROD_DIR}/ups/current}, UPS_ENV)
+      execute(${UPS_PROD_DIR}/ups/current, UPS_ENV)
    Action=setup
      doDefaults()
      pathAppend(PATH, ${UPS_PROD_DIR}/bin, :)
