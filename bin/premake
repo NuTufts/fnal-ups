@@ -17,6 +17,7 @@ ccenv=""		# CCENV		Compilation environment
 cc=""			# CC		Compiler name
 cflags=""		# UPS_CFLAGS	C compiler flags
 dbg=""			# compile with debugger
+filter=""                # flag as to whether to use filterWarn
 mflags=""		# flags for the makefile
 opt=""			# compile with optimiser
 fullopt=""		# compile with all optimisations (may be undebuggable)
@@ -86,6 +87,8 @@ for a in "$@" ; do
 		positional=-cflags;;
 	  -deb*|-DEB*)
 		dbg=1;;
+	  -filter)
+		filter="yes";;
 	  -i)
 	        insight=1;;
 	  -FULLOPT*|-fullopt*)
@@ -100,6 +103,7 @@ Valid flags are:
 	-cflags str	Additional flags for the C compiler
 	-debug		Compile for a debugger
 	-f makefile	Alternate makefile name
+	-filter         Filter out certain warnings (those in filterWarn.dat)
 	-fulloptimise	Compile with full optimisation (may be undebuggable)
 	-help		Print this message
 	-optimise	Compile with optimisation
@@ -327,6 +331,10 @@ if [ "${logFile}" != "" ]; then
 fi
 
 echo "make $flags $target\n"
+
+if [ "$filter" != "" ]; then
+	makeCmd="$makeCmd 2>&1 | filterWarn -filter $ERUPT_DIR/bin/filterWarn.dat"
+fi
 
 eval $makeCmd ${logPipe:-}
 status=`cat .status.$$`
