@@ -88,14 +88,31 @@ $#FLAGS=2;     # flags                            - reqHash
 NEXTDB:
 
 foreach $db (@dbs) {
-   @files = glob ( "$db/$GetoptName" );
+#   print (glob ( "$db/$GetoptName" ));
+#   print <$db/$GetoptName>;
+#   @files = glob ( "$db/$GetoptName" );
 # I don't see another answer around a glob link problem
 #   @files = <$db/$GetoptName>;
 # this didn't work either!!!
+# glob just sucks...
+   if ( "$GetoptName" != "*" ) {
+      @files = glob ( "$db/$GetoptName" );
+   } else {
+      opendir DBDIR , "$db";
+      @files = readdir DBDIR;
+      closedir DBDIR;
+   }
    foreach $releaseName ( @files ) { 
-      if (!open(DBFILE, "$releaseName")) {
-         print STDERR "Can't open $releaseName\n";
-         NEXTDB;
+      if ("$GetoptName" == "*" ) {
+         if (!open(DBFILE, "$db/$releaseName")) {
+            print STDERR "Can't open $db/$releaseName\n";
+            NEXTDB;
+         }
+      } else { 
+         if (!open(DBFILE, "$releaseName")) {
+            print STDERR "Can't open $releaseName\n";
+            NEXTDB;
+         }
       }
       @P = split ( '/' , $releaseName );
       $PRODUCT ="$P[$#P]";
@@ -234,16 +251,15 @@ sub writeflvrReqs {
                 $lastType=$reqType;
              }
              if ( ! $CatFlag && $reqCat eq "POSTREQ" ) {
-                $flvrverHash{$flavor}{$version}{$reqType}.="doDefaults()\n";
-                $flvrverHash{$flavor}{$version}{$reqType}.="source(\${PROD_DIR}/ups/setup.\${SHELL})\n";
                 $CatFlaq=1;
+                $flvrverHash{$flavor}{$version}{$reqType}=&add_defaults;
              }
           }
           @use = sort keys %{ $reqHash{$reqType}{$reqCat} };
           foreach $reqName ( @use ) {
              @realname = split ( /\,/ , "$reqName" );
 #             $flvrverHash{$flavor}{$version}{$reqType}.="$reqCat=$realname[1]\n";
-             $flvrverHash{$flavor}{$version}{$reqType}.="setupRequired(\"";
+             $flvrverHash{$flavor}{$version}{$reqType}.="      setupRequired(\"";
              if ($reqHash{$reqType}{$reqCat}{$reqName}[$#FLAGS]) {
                 $flvrverHash{$flavor}{$version}{$reqType}.="$reqHash{$reqType}{$reqCat}{$reqName}[$#FLAGS] ";
              }
@@ -313,7 +329,7 @@ sub addReq {
               $reqName = sprintf "%2d,%s", $reqOrder, $ReqProd[0];
               $reqVer = "$ReqProd[1]";
               $reqOS = "$ReqProd[2]";
-              if ( $flavor eq $reqOS ) { $reqOS = "\${GROUP}"; }
+              if ( $flavor eq $reqOS ) { $reqOS = "\${UPS_PROD_FLAVOR}"; }
               $reqHash{$reqType}{$reqCat}{$reqName} = [ $reqVer, $reqOS, $reqFlag ];
              }
          }
@@ -330,9 +346,18 @@ sub WriteTableFile {
            if ("$opt_v") { 
               print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
               }
-           open( TableFile, ">>$ndbs/$PRODUCT/$version.tbl" );
+           open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
            $ReqHash{$flvr} = &table_file ("$reqType");
            delete $flvrverHash{$flvr}{$version}{"$reqType"};
+        } else {
+# Need for force table files even if there is no requirements - Sep 11
+          if ("$reqType" == "USE") { 
+             if ("$opt_v") { 
+                print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
+                }
+             open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
+             $ReqHash{$flvr} = &add_defaults;
+             }
         }
     }
     if ( ! $TableFileInfo ) { 
@@ -362,7 +387,7 @@ sub WriteTableFile {
           print TableFile "\n";
        }
        print TableFile "Common:\n";
-       print TableFile "Action=setup\n";
+       print TableFile "   Action=setup\n";
        print TableFile "$key";
        print TableFile "End:\n";
        print TableFile "# End Group definition\n";
@@ -391,11 +416,11 @@ sub OpenChainFile {
     $ChainHeaderInfo=1;
     if ( !-e "$ndbs/$PRODUCT/$chain" ) {
        $ChainHeaderInfo=0;
-       if ( !open(ChainFile, ">$ndbs/$PRODUCT/$chain") ) {
+       if ( !open(ChainFile, ">$ndbs/$PRODUCT/$chain.chain") ) {
           print "$errorMsg cannot make $pc $PRODUCT $chain chain file";
           exit 1;
        }
-    } elsif ( !open( ChainFile, ">>$ndbs/$PRODUCT/$chain" ) ) {
+    } elsif ( !open( ChainFile, ">>$ndbs/$PRODUCT/$chain.chain" ) ) {
             print  "$errorMsg cannot append in $pc $PRODUCT $chain chain file";
             exit 1;
     }
@@ -446,11 +471,11 @@ sub AddChainRec {
 sub OpenVersionFile {
     my ( $version ) = @_;
     if ( !-e "$ndbs/$PRODUCT/$version" ) {
-       if ( !open(VersionFile, ">$ndbs/$PRODUCT/$version") ) {
+       if ( !open(VersionFile, ">$ndbs/$PRODUCT/$version.version") ) {
           print "$errorMsg cannot make $pc $PRODUCT $version version file";
           exit 1;
        }
-    } elsif ( !open( VersionFile, ">>$ndbs/$PRODUCT/$version" ) ) {
+    } elsif ( !open( VersionFile, ">>$ndbs/$PRODUCT/$version.version" ) ) {
             print  "$errorMsg cannot append in $pc $PRODUCT $version version file";
             exit 1;
     }
@@ -508,15 +533,16 @@ sub WriteVersionRecs {
        print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
     }
     if ( &auth_nodes ) {
-       print VersionFile "   AUTH_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
+       print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
     }
     if ( &distribution ) {
        print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
     }
-    if ( &table_file ("USE")  ) {
-#       print VersionFile "   TABLE_DIR=$ndbs/$PRODUCT\n";
-       print VersionFile "   TABLE_FILE=$version.tbl\n";
-    }
+# Everbloody get's a table file for the conversion since it has to source
+# the old setup's....
+#    if ( &table_file ("USE")  ) {
+       print VersionFile "   TABLE_FILE=$version.table\n";
+#    }
     print VersionFile "End:\n";
     print VersionFile "# end of group definition\n";
     print VersionFile "#*************************************************\n\n";
@@ -544,7 +570,7 @@ sub WriteVersionRecs {
     }
     if ( &table_file  ("BUILD") ) {
 #       print VersionFile "   TABLE_DIR=$ndbs/$PRODUCT\n";
-       print VersionFile "   TABLE_FILE=$version.tbl\n";
+       print VersionFile "   TABLE_FILE=$version.table\n";
     }
     print VersionFile "End:\n";
     print VersionFile "# end of group definition\n";
@@ -600,6 +626,33 @@ sub use_flags { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAGS] }
 sub table_file { 
     my $type = $_[0];
     return $flvrverHash{$flvr}{$version}{$type} 
+}
+sub add_defaults {
+    my $value;
+    $value ="      doDefaults()\n";
+    $value.="      source(\${UPS_PROD_DIR}/ups/setup.\${UPS_SHELL})\n";
+    $basedir=&prod_dir;
+    if (open(TMPFILE,"${basedir}/ups/tailor")) {
+       close TMPFILE;
+       $value.="   Action=Tailor\n";
+       $value.="      source(\${UPS_PROD_DIR}/ups/tailor)\n";
+    }
+    if (open(TMPFILE,"${basedir}/ups/configure")) {
+       close TMPFILE;
+       $value.="   Action=condifure\n";
+       $value.="      source(\${UPS_PROD_DIR}/ups/configure)\n";
+    }
+    if (open(TMPFILE,"${basedir}/ups/start")) {
+       close TMPFILE;
+       $value.="   Action=start\n";
+       $value.="      source(\${UPS_PROD_DIR}/ups/start)\n";
+    }
+    if (open(TMPFILE,"${basedir}/ups/stop")) {
+       close TMPFILE;
+       $value.="   Action=stop\n";
+       $value.="      source(\${UPS_PROD_DIR}/ups/stop)\n";
+    }
+    return $value
 }
 sub split_os { 
       my $os = $_[0];
