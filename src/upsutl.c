@@ -40,6 +40,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <unistd.h>
 #include <netdb.h>        /* needed on SunOS to get MAXHOSTNAMELEN */
 /* #ifdef _SYSTYPE_SVR4 */
 #include <dirent.h>
@@ -720,7 +721,7 @@ void upsutl_get_files(const char * const a_dir,
 	if (strncmp(dir_line->d_name, ".", 1)) {
 	  /* if the pattern is there, make sure it is at the end of the
 	     string before removing it */
-	  if (substr = strstr(dir_line->d_name, a_pattern)) {
+	  if ((substr = strstr(dir_line->d_name, a_pattern))) {
 	    /* the pattern is in the string, now see if it is at the end */
 	    if ((int )(*(substr + plen)) == 0) {
 	      new_string = upsutl_strstr(dir_line->d_name, a_pattern);
@@ -1131,10 +1132,10 @@ char *upsutl_time_date(int a_flag)
   /* Get the current time and date */
   now = time(NULL);
   if (a_flag == STR_TRIM_DEFAULT) {
-    len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d %H.%M.%S GMT",
+    len = (time_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d %H.%M.%S GMT",
 			    gmtime(&now));
   } else {
-    len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d_%H.%M.%S_GMT",
+    len = (time_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d_%H.%M.%S_GMT",
 			    gmtime(&now));
   }
   if (len == 0) {
@@ -1407,7 +1408,7 @@ size_t upsutl_str_remove_end_quotes( char * str,
 
   len = (int)strlen( str );
   if ( !quotes || len < 2 )
-    return len;
+    return (size_t )len;
 
   for ( qu = quotes; qu && *qu; qu++ ) {
     if ( (str[0] == *qu && str[len-1] == *qu) ) {
@@ -1417,7 +1418,7 @@ size_t upsutl_str_remove_end_quotes( char * str,
       break;
     }
   }
-  return strlen( str );
+  return (size_t )strlen( str );
 }
 
 /*-----------------------------------------------------------------------

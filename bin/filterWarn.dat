@@ -164,6 +164,7 @@
 #   | OS       | cc  |source| sev  |number|xtra|fileRE:textRE:parseExpr
 
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0, "", "\\sNOTUSED\\s");
+&fe ('IRIX64' , undef, undef, 'W', 1196 , 2,  "upsutl.c", 'function declared implicitly');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "ups_create.c", 'parameter "a_ups_command" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "upsget.c", 'parameter \"command_line\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "ups_verify.c", 'parameter \"a_command_line|a_product_name|a_db|a_minst\" was declared');
