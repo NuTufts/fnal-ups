@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
   int rstatus = 0;              /* assume success */
   t_upslst_item *mproduct_list  = NULL;
   mode_t old_umask;
+  int need_help = 0;
+  char *on_what = NULL;
 
   if (argv[1] && (strcmp(argv[1],"-?"))) {
     /* Figure out which command was entered */
@@ -234,10 +236,13 @@ int main(int argc, char *argv[])
 	/* output help */
 	switch (g_cmd_info[i].cmd_index) {
 	case e_help:
-	case e_unk: (void )upshlp_command(NULL);       /* print out all help */
+	case e_unk:
+	  need_help = 1;
 	  break;
 	  /* specific help */
-	default:    (void )upshlp_command(g_cmd_info[i].cmd);
+	default:    
+	  need_help = 1;
+	  on_what = g_cmd_info[i].cmd;
 	}
       }
       if (command_line->ugo_Z) {
@@ -260,12 +265,17 @@ int main(int argc, char *argv[])
     }
   } else {
     /* no parameters were entered - give help */
-    (void )upshlp_command(NULL);       /* print out all help */
+    need_help = 1;
   }
 
   /* finish writing stuff to the temp file, close it and execute it or output
      it's name if necessary.  also flush the journal files. */
   upsutl_finish_up(temp_file, temp_shell, i, g_simulate);
+
+  /* output any help that was asked for */
+  if (need_help) {
+    (void )upshlp_command(on_what);       /* print out all help */
+  }
 
   /* output any errors and the timing information */
   upserr_output();
