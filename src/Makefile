@@ -39,12 +39,14 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 	  upsfil.o upsugo.o upsmat.o upskey.o upshlp.o \
 	  upsver.o upsact.o upsget.o
 
-COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_unk.o
+COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
+	          ups_unk.o
 
 CIAOBJECTS = upserr.a upslst.a upsmem.a upsutl.a upstyp.a \
 	     upsfil.a upsugo.a upsmat.a ups_list.a  \
 	     upskey.a upshlp.a ups_unk.a ups_setup.a \
-             upsver.a upsact.a upsget.a ups_start.a
+	     upsver.a upsact.a upsget.a ups_start.a \
+	     ups_stop.a
 
 LDFLAGS = $(LLIBS)
 
@@ -135,6 +137,8 @@ ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_start.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_stop.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_unk.h
@@ -178,6 +182,23 @@ ups_start.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_start.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_start.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_start.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_stop.o:	ups_stop.c
+ups_stop.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_stop.o:	$(ERUPT_DIR)/inc/ups_main.h
 ups_unk.o:	ups_unk.c
 ups_unk.o:	$(ERUPT_DIR)/inc/ups_unk.h
 ups_unk.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -234,6 +255,8 @@ upsact_premerge.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_setup.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_start.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_stop.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_list.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
