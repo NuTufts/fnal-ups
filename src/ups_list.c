@@ -57,19 +57,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
 { if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
   { if(instance->version)                               \
     { if (instance->version->ELEMENT)                   \
-      { printf("%s ",instance->version->ELEMENT);       \
-      } else {                                          \
-        printf("\"\" ");                                \
-      }                                                 \
-    } else {                                            \
-      printf("\"\" ");                                  \
-    }                                                   \
-  }                                                     \
-}
-#define FromVersionWQ(ELEMENT) \
-{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if(instance->version)                               \
-    { if (instance->version->ELEMENT)                   \
       { printf("\"%s\" ",instance->version->ELEMENT);   \
       } else {                                          \
         printf("\"\" ");                                \
@@ -83,7 +70,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
 { if (!upsutl_stricmp((l_ptr->data),STRING))            \
   { if(product->db_info)                                \
     { if (product->db_info->ELEMENT)                    \
-      { printf("%s ",product->db_info->ELEMENT);        \
+      { printf("\"%s\" ",product->db_info->ELEMENT);    \
       } else {                                          \
         printf("\"\" ");                                \
       }                                                 \
@@ -96,7 +83,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
 { if (!upsutl_stricmp((l_ptr->data),STRING))            \
   { if(config_ptr)                                      \
     { if (config_ptr->ELEMENT)                          \
-      { printf("%s ",config_ptr->ELEMENT);              \
+      { printf("\"%s\" ",config_ptr->ELEMENT);          \
       } else {                                          \
         printf("\"\" ");                                \
       }                                                 \
@@ -110,15 +97,15 @@ void list_K(const t_upstyp_matched_instance * const instance,
       !upsutl_stricmp(l_ptr->data,"+"))                 \
   { if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
-      { printf("%s ",instance->chain->ELEMENT);         \
+      { printf("\"%s\" ",instance->chain->ELEMENT);         \
       } else {                                          \
         if(instance->version)                           \
         { if (instance->version->ELEMENT)               \
-          { printf("%s ",instance->version->ELEMENT);   \
+          { printf("\"%s\" ",instance->version->ELEMENT);   \
           } else {                                      \
             if (instance->table)                        \
             { if (instance->table->ELEMENT)             \
-              { printf("%s ",instance->table->ELEMENT); \
+              { printf("\"%s\" ",instance->table->ELEMENT); \
               } else {                                  \
                 printf("\"\" ");                        \
               }                                         \
@@ -129,7 +116,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
         } else {                                        \
           if (instance->table)                          \
           { if (instance->table->ELEMENT)               \
-            { printf("%s ",instance->table->ELEMENT);   \
+            { printf("\"%s\" ",instance->table->ELEMENT);   \
             } else {                                    \
               printf("\"\" ");                          \
             }                                           \
@@ -141,11 +128,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
     } else {                                            \
       if(instance->version)                             \
       { if (instance->version->ELEMENT)                 \
-        { printf("%s ",instance->version->ELEMENT);     \
+        { printf("\"%s\" ",instance->version->ELEMENT);     \
         } else {                                        \
           if (instance->table)                          \
           { if (instance->table->ELEMENT)               \
-            { printf("%s ",instance->table->ELEMENT);   \
+            { printf("\"%s\" ",instance->table->ELEMENT);   \
             } else {                                    \
               printf("\"\" ");                          \
             }                                           \
@@ -156,7 +143,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
       } else {                                          \
         if (instance->table)                            \
         { if (instance->table->ELEMENT)                 \
-          { printf("%s ",instance->table->ELEMENT);     \
+          { printf("\"%s\" ",instance->table->ELEMENT);     \
           } else {                                      \
             printf("\"\" ");                            \
           }                                             \
@@ -451,7 +438,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(ups_dir)
     FromVersion(prod_dir)
     FromVersion(archive_file)
-    FromVersionWQ(description)
+    FromVersion(description)
 /*    FromVersion(db_dir) */
 /* DO NOT CHANGE ORDER here it's the default !!! */
     FromAny(product) 
