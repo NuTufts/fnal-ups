@@ -67,7 +67,7 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
   t_upstyp_matched_product *mproduct = NULL, *new_mproduct = NULL;
   t_upstyp_matched_instance *minst = NULL;
   t_upslst_item *cmd_list = NULL;
-  t_upsugo_command *new_command_line;
+  t_upsugo_command *new_command_line = NULL;
   char *dummy = NULL;
   int need_unique = 1;
 
@@ -103,26 +103,34 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	      /* make sure an instance was matched before proceeding */
 	      if (new_mproduct->minst_list) {
 		cmd_list = upsact_get_cmd(new_command_line, new_mproduct,
-					  g_cmd_info[e_unsetup].cmd, a_ups_command);
+					  g_cmd_info[e_unsetup].cmd,
+					  a_ups_command);
 	      }
-	      if (UPS_ERROR == UPS_SUCCESS) {
-		upsact_process_commands(cmd_list, a_temp_file);
-	      }
-	      /* now clean up the memory that we used */
-	      upsact_cleanup(cmd_list);
 	    }
-
-	    /* free allocated memory */
-	    (void )upsugo_free(new_command_line);
-	    if (new_mproduct_list) {
-	      new_mproduct_list = upsutl_free_matched_product_list(
-							   &new_mproduct_list);
-	    }
+	  } else {
+	    /* no SETUP_<prodname> variable was set, but we still need to check
+	       for unsetups of dependencies */
+	    cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
+				      mproduct, g_cmd_info[e_unsetup].cmd,
+				      a_ups_command);
 	  }
-	}
+	  if (UPS_ERROR == UPS_SUCCESS) {
+	    upsact_process_commands(cmd_list, a_temp_file);
+	  }
+	  /* now clean up the memory that we used */
+	  upsact_cleanup(cmd_list);
 
-	if (UPS_ERROR != UPS_SUCCESS) {	  
-	  upserr_add(UPS_UNSETUP_FAILED, UPS_WARNING, mproduct->product);
+	  /* free allocated memory */
+	  if (new_command_line) {
+	    (void )upsugo_free(new_command_line);
+	  }
+	  if (new_mproduct_list) {
+	    new_mproduct_list = upsutl_free_matched_product_list(
+							   &new_mproduct_list);
+	  }
+	  if (UPS_ERROR != UPS_SUCCESS) {	  
+	    upserr_add(UPS_UNSETUP_FAILED, UPS_WARNING, mproduct->product);
+	  }
 	}
 	/* Now process the setup actions */
 	cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
