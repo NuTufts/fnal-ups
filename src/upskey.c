@@ -84,10 +84,15 @@ static t_upskey_map g_key_map[] =
   { 19, "STATISTICS",       NO,   17,    3, 0x00001001 },
   { 20, "COMPILE_DIR",      NO,   18,   NO, 0x00000001 },
   { 21, "COMPILE_FILE",     NO,   19,   NO, 0x00000001 },
+  { 22, "CATMAN_FILES",     NO,   20,   NO, 0x00000010 },
+  { 22, "HTML_FILES",       NO,   21,   NO, 0x00000010 },
+  { 22, "INFO_FILES",       NO,   22,   NO, 0x00000010 },
+  { 22, "MAN_FILES",        NO,   23,   NO, 0x00000010 },
+  { 22, "NEWS_FILES",       NO,   24,   NO, 0x00000010 },
 
-  { 22, "DB_DIR",           NO,   20,   NO, 0x00000000 },
-  { 23, "ACTION",           NO,   21,   NO, 0x00000010 },
-  { 24, "USER",             NO,   22,   NO, 0x00000011 },
+  { 22, "DB_DIR",           NO,   25,   NO, 0x00000000 },
+  { 23, "ACTION",           NO,   26,   NO, 0x00000010 },
+  { 24, "USER",             NO,   27,   NO, 0x00000011 },
 
   { 25, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
   { 26, "MAN_PATH",         NO,   NO,    4, 0x00001000 },

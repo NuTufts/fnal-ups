@@ -69,6 +69,20 @@ void print_chain(const t_upstyp_matched_instance * const instance,
     }                                                   \
   }                                                     \
 }
+#define FromTable(ELEMENT) \
+{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
+  { valid=1; \
+    if(instance->table)                                 \
+    { if (instance->table->ELEMENT)                     \
+      { printf("\"%s\" ",instance->table->ELEMENT);     \
+      } else {                                          \
+        printf("\"\" ");                                \
+      }                                                 \
+    } else {                                            \
+      printf("\"\" ");                                  \
+    }                                                   \
+  }                                                     \
+}
 #define FromDatabase(ELEMENT,STRING) \
 { if (!upsutl_stricmp((l_ptr->data),STRING))            \
   { valid=1; \
@@ -505,7 +519,12 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(archive_file)
     FromVersion(compile_file)
     FromVersion(compile_dir)
-    FromVersion(description)
+    FromTable(description)
+    FromTable(man_files)
+    FromTable(catman_files)
+    FromTable(html_files)
+    FromTable(news_files)
+    FromTable(info_files)
     FromVersion(origin)
 /*    FromVersion(db_dir) */
 /* DO NOT CHANGE ORDER here it's the default !!! */

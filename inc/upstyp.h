@@ -103,6 +103,11 @@ typedef struct upstyp_instance
   char             *statistics;
   char             *compile_dir;
   char             *compile_file;
+  char             *catman_files;
+  char             *html_files;
+  char             *info_files;
+  char             *man_files;
+  char             *news_files;
   
   char             *db_dir;  
   

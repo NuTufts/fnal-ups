@@ -60,6 +60,11 @@ enum e_upskey_key {
   e_key_statistics,
   e_key_compile_dir,
   e_key_compile_file,
+  e_key_catman_files,
+  e_key_html_files,
+  e_key_info_files,
+  e_key_man_files,
+  e_key_news_files,
 
   e_key_db_dir,
   e_key_action,
