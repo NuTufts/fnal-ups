@@ -1,17 +1,19 @@
 #!/usr/bin/env perl
 
 $| = 1;
-$debug = 0;
-@tree = ();
-@visited = ();
+$debug = 1;
 @rootlist = parseargs();
 
 if ($#rootlist != -1) {
-    find_parents();
-    dump_tree() if $debug > 2;
+
     for $root (@rootlist) {
-       recurse_tree($root, '');
+	@tree = ();
+	@visited = ();
+	find_parents($root);
+	dump_tree() if $debug > 2;
+        recurse_tree($root, '');
     }
+
 }
 
 sub recurse_tree {
@@ -87,26 +89,45 @@ sub parseargs {
 }
 
 sub find_parents {
-    for ($i = 0; $i < 4; $i++) {
-        $cmd = "ups list -a -K+:database -$i |";
-        print "cmd is $cmd\n" if $debug;
-	open(LIST, $cmd);
+    my ($root) = @_;
+    $cmd = "ups list -a -K+:database |";
+    print "cmd is $cmd\n" if $debug;
+    open(LIST, $cmd);
 
-	while( <LIST> ) {
-           print "got $_" if $debug;
-	   @words = m/"(.*?)"/g;
-	   dodeps(@words);
-	}
-	close(LIST);
+    while( <LIST> ) {
+       print "got $_" if $debug;
+       @words = m/"(.*?)"/g;
+       dodeps($root, @words);
     }
+    close(LIST);
 }
 
 sub dodeps {
-   my (@words, $parent);
+   my (@words, $parent, $root);
 
+   $root = shift(@_);
    $parent = makenode(@_);
-   ($sp = $parent) =~ s/ -z .*//;
-   print "doing dependencies for $parent\n" if $debug;
+   $sp = $parent;
+   $sp =~ s/ -z .*//;
+   $sp =~ s/ -f ([^N]|N[^U]|NU[^L])/ -H $1/;
+   print "doing _all_ dependencies for $parent\n" if $debug;
+   $cmd = "ups depend -K+:database $sp |";
+   open(DEPEND, $cmd);
+   $useit = 0;
+   while(<DEPEND>) {
+       print "got $_" if $debug;
+       @words = m/"(.*?)"/g;
+       $child = makenode(@words);
+       if ( $child eq $root ) {
+           $useit = 1;
+	   print "found our $root" if $debug;
+       }
+   }
+   close(DEPEND);
+ 
+   return unless $useit;
+
+   print "doing _direct_ dependencies for $parent\n" if $debug;
    $cmd = "ups depend -j -K+:database $sp |";
    print "cmd is $cmd\n" if $debug;
    open(DEPEND, $cmd);
