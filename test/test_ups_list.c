@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "ups_list.h"
 #include "ups_memory.h"
 
-static void print_str_list( t_upslst_item *list_ptr );
+static void print_str_list( t_upslst_item * const list_ptr );
 
 #define DATA_COUNT 10
 
-void main( void )
+int main( void )
 {
   int i, d;
   char buf[32];
@@ -43,7 +44,7 @@ void main( void )
     if ( i < DATA_COUNT/2 ) d = i;
     else d = 1000 + i;
     sprintf( buf, "%d", d );
-    data[i] = (char *)upsmem_malloc( strlen( buf ) + 1 );
+    data[i] = (char *)upsmem_malloc( (int)strlen( buf ) + 1 );
     strcpy( data[i], buf );
   }
     
@@ -77,9 +78,11 @@ void main( void )
   printf( "\nDeleting the rest\n" );
   l_ptr1 = upslst_free( l_ptr1, 'd' );
   print_str_list( l_ptr1 );
+
+  return 0;
 }
 
-void print_str_list( t_upslst_item *list_ptr )
+void print_str_list( t_upslst_item * const list_ptr )
 {
   t_upslst_item *l_ptr;
   int count = 0;

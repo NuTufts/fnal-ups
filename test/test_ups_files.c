@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "ups_files.h"
 
-int  main( int argc, char* argv[] )
+int  main( const int argc, char * const argv[] )
 {
   int i = 0;
   FILE *fh = 0;
