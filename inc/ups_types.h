@@ -147,6 +147,7 @@ typedef struct ups_command
     int     ugo_O;           /* set UPS_OPTIONS to value             */
     char    *ugo_options; 
     int     ugo_p;           /* Product Description                  */
+    char    *ugo_description; 
     int     ugo_P;           /* override product name                */
     char    *ugo_override; 
     int     ugo_q;           /* CODE INCOMPLETE                      */
