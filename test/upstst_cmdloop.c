@@ -136,7 +136,9 @@ while(1)					/* Loop forever */
 
 /* check if this is a continuation line
    ------------------------------------ */
-
+/* quick hack to check my code */
+ if (line_length) 
+ {
    if (l_line[line_length-1] == '\\')			/* continuation */
       {
       cmdbuf[cmd_length+line_length-1] = 0;		/* remove \ */
@@ -153,6 +155,7 @@ while(1)					/* Loop forever */
    if (upstst_cmdproc(cmdbuf,cmdlist) == -1) break;
    ups_reset_to_top();					/* reset for top level*/
 
+ } /* hope (pray) it stops itself ... */
    } /* while(1)... */
 
 }
