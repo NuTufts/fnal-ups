@@ -1,6 +1,10 @@
-UPS v4_1
---------
-
-o fixed heading of help output
-o fixed -0, -1, -2, and -3 help text
-o upcased product name in error message
+<h1>UPS v4_1</h1>
+<p>
+<ul>
+<li>
+fixed heading of help output
+<li>
+fixed -0, -1, -2, and -3 help text
+<li>
+upcased product name in error message
+</ul>
