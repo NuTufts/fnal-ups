@@ -1216,7 +1216,6 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       continue;
     }
-    
     if ( i_cmd > e_unsetuprequired ) {
 
       /* EXECUTE another action
