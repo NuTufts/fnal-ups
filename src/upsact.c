@@ -438,7 +438,7 @@ t_cmd_map g_func_info[] = {
   { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 2, 3, e_sourceoptcheck, 0x00000001 },
   { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 2, 3, e_sourceoptcheck, 0x00000001 },
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd, 0x00000001 },
-  { "execute", e_execute, f_execute, 2, 2, e_invalid_cmd, 0x00000001 },
+  { "execute", e_execute, f_execute, 2, 3, e_invalid_cmd, 0x00000001 },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd, 0x00000001 },
   { "copyhtml", e_copyhtml, f_copyhtml, 0, 0, e_invalid_cmd, 0x00000000 },
   { "copyinfo", e_copyinfo, f_copyinfo, 0, 0, e_invalid_cmd, 0x00000000 },
