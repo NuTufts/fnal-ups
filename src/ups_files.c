@@ -89,8 +89,6 @@ static char           g_val[MAX_LINE_LENGTH] = "";   /* current value */
  */
 t_ups_product *upsfil_read_file( FILE *fh )
 {
-  int count = 0;
-  
   g_fh = fh;
   g_pd = ups_new_product();
 
@@ -100,7 +98,7 @@ t_ups_product *upsfil_read_file( FILE *fh )
   g_key[0] = 0;
   g_val[0] = 0;
   
-  count = read_file();
+  read_file();
 
   return g_pd;
 }
