@@ -130,7 +130,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 69 */  "%s: Unable to write statistics for product \'%s\'.\n",
 /* 70 */  "%s: Error occurred for product \'%s\' \'%s\' \'%s\' \'%s\'.\n",
 /* 71 */  "%s: \'VERSION\' keyword not allowed in Table file for product \'%s\'\n",
-/* 72 */  "%s: The following product has a \'%s\' chain instance but no matching version.\n"
+/* 72 */  "%s: The following product has a \'%s\' chain instance but no matching version.\n",
+/* 73 */  "%s: Unable to remove file %s.\n"
 };
 
 char *g_error_ascii[] = {
@@ -207,7 +208,8 @@ char *g_error_ascii[] = {
    /* UPS_PRODUCT_INFO        70 */ "UPS_PRODUCT_INFO",
    /* UPS_NO_VERSION          71 */ "UPS_NO_VERSION",
    /* UPS_DANGLING_CHAIN      72 */ "UPS_DANGLING_CHAIN",
-   /* UPS_NERR                73 */ "UPS_NERR",
+   /* UPS_REMOVE_FILE         73 */ "UPS_REMOVE_FILE", 
+   /* UPS_NERR                74 */ "UPS_NERR",
    0 };
 
 /*
