@@ -573,19 +573,11 @@ char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
     get_element(string,ups_dir);
   }
   if (UPSRELATIVE(string))
-  { if (db_info_ptr->config)
-    { if (db_info_ptr->config->prod_dir_prefix)
-      { prefix_string = upsutl_str_create(db_info_ptr->config->prod_dir_prefix,' '); 
-        prefix_string = upsutl_str_crecat(prefix_string,"/"); 
-        prefix_string = upsutl_str_crecat(prefix_string,string); 
-        return prefix_string;
-      } else { 
-        return string;
-      }
-    } else { 
-      return string;
-    }
-  } else {
+  { prefix_string = upsget_prod_dir(db_info_ptr, instance, command_line );
+    prefix_string = upsutl_str_crecat(prefix_string,"/"); 
+    prefix_string = upsutl_str_crecat(prefix_string,string); 
+    return prefix_string;
+  } else { 
     return string;
   }
 } 
