@@ -71,10 +71,10 @@ t_upslst_item *ups_create(const t_upsugo_command * const a_command_line,
   if (a_command_line->ugo_m) {
     /* see if the specified file exists. if so, error */
     if (a_command_line->ugo_M) {
-      sprintf(buffer, "%s/%s", a_command_line->ugo_tablefiledir,
-	                       a_command_line->ugo_tablefile);
+      (void )sprintf(buffer, "%s/%s", a_command_line->ugo_tablefiledir,
+		     a_command_line->ugo_tablefile);
     } else {
-      sprintf(buffer, "%s", a_command_line->ugo_tablefile);
+      (void )sprintf(buffer, "%s", a_command_line->ugo_tablefile);
     }
     if (upsutl_is_a_file(&buffer[0]) != UPS_SUCCESS) {
       /* if no qualifiers were entered, use "" */
