@@ -245,8 +245,15 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 void write_journal_file( const void *key, void ** prod, void *cl ) 
 {
   /* a little helper for upsfil_write_journal_files */
+
+  /* we will check that the product list is not empty before writing
+     the file. the reason is that upsfil_write_file will, for an empty
+     product, remove existing files and remove the product from the cache,
+     upstbl_map will produce a fatal error if table is been modified
+     during a traverse */
+
   t_upstyp_product *p = (t_upstyp_product *)*prod;
-  if ( p->journal == JOURNAL )
+  if ( p->journal == JOURNAL && upslst_count( p->instance_list ) > 0 )
     upsfil_write_file( p, key, 'd', NOJOURNAL );
 }
 /*-----------------------------------------------------------------------
@@ -260,7 +267,7 @@ void write_journal_file( const void *key, void ** prod, void *cl )
  */
 int upsfil_write_journal_files( void )
 {
-
+  
   if ( g_ft ) {
     P_VERB( 1, "Writing ALL journal files" );
     upstbl_map( g_ft, write_journal_file, NULL );
@@ -288,7 +295,7 @@ int upsfil_clear_journal_files( void )
 {
 
   if ( g_ft ) {
-    P_VERB_s( 1, "Clearing journal files" );
+    P_VERB( 1, "Clearing journal files" );
     upstbl_map( g_ft, clear_journal_file, NULL );
   }
 
@@ -362,6 +369,8 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 
     return UPS_SUCCESS;
   }
+
+  /* if we are a JOURNAL file we should not come here */
 
   /* check if prod_ptr is empty, if empty remove the file */
 
@@ -503,8 +512,14 @@ void flush_product( const void *key, void ** prod, void *cl )
 
   /* write the file to disk, if journal flag set */
 
+  /* we will check that the product list is not empty before writing
+     the file. the reason is that upsfil_write_file will, for an empty
+     product, remove existing files and remove the product from the cache,
+     upstbl_map will produce a fatal error if table is been modified
+     during a traverse */
+
   t_upstyp_product *p = (t_upstyp_product *)*prod;
-  if ( p->journal == JOURNAL )
+  if ( p->journal == JOURNAL && upslst_count( p->instance_list ) > 0 )
     upsfil_write_file( p, key, 'd', NOJOURNAL );
 
   /* free product */
@@ -518,7 +533,7 @@ void upsfil_flush( void )
   /* write journal files to disk and clean up cache */
 
   if ( g_ft ) {
-    P_VERB_s( 1, "Flushing cache" );
+    P_VERB( 1, "Flushing cache" );
     upstbl_map( g_ft, flush_product, NULL );
     upstbl_free( &g_ft );
     g_ft = 0;
