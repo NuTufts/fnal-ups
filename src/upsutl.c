@@ -251,7 +251,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
       break;
     }
   }
-  return 0;
+  return ((UPS_ERROR == UPS_SUCCESS) ? 0 : 1);
 }
 
 /*-----------------------------------------------------------------------
