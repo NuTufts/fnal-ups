@@ -11,6 +11,7 @@ UPSFIL: ../list/db1/lassie/lassie.table - Open file for read
 UPSFIL: ../list/db1/lassie/lassie.table - Read 5 item(s)
 UPSMAT: Found 1 instances in ../list/db1/lassie/lassie.table
 Name         = lassie	
+tilde        = /dir/filename	
 Version      = v2_0	
 Flavor       = NULL	
 Qualifiers   = nodbg:opt	
@@ -19,9 +20,8 @@ Shell        = csh
 Options      = -blah	
 Verbose      = 1	
 Extended     = 1	
-Flags        = 	
-Flags Depend = 	
-This Db      = 	
+This Db      = ../list/db1	
 Setup        = lassie v2_0 -f NULL -z ../list/db1 -q nodbg:opt -v  -O "-blah" -e 	
 Origin       = roddy@village.england	
+PRODUCTS     = ../list/db1	
 Junk         = ${JUNK}	
