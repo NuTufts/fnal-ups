@@ -2962,6 +2962,9 @@ static void f_filetest( ACTION_PARAMS)
 
 static void f_pathappend( ACTION_PARAMS)
 {
+    if (0 == strcmp(a_cmd->argv[0],"path")) {
+        (void)strcpy(a_cmd->argv[0],"PATH");
+    }
     f_envappend(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
     switch ( a_command_line->ugo_shell ) {
@@ -2975,6 +2978,9 @@ static void f_pathappend( ACTION_PARAMS)
 
 static void f_pathprepend( ACTION_PARAMS)
 {
+    if (0 == strcmp(a_cmd->argv[0],"path")) {
+        (void)strcpy(a_cmd->argv[0],"PATH");
+    }
     f_envprepend(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
     switch ( a_command_line->ugo_shell ) {
@@ -2988,6 +2994,9 @@ static void f_pathprepend( ACTION_PARAMS)
 
 static void f_pathremove( ACTION_PARAMS)
 {
+    if (0 == strcmp(a_cmd->argv[0],"path")) {
+        (void)strcpy(a_cmd->argv[0],"PATH");
+    }
     f_envremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
     switch ( a_command_line->ugo_shell ) {
@@ -3000,6 +3009,9 @@ static void f_pathremove( ACTION_PARAMS)
 }
 static void f_pathset( ACTION_PARAMS)
 {
+    if (0 == strcmp(a_cmd->argv[0],"path")) {
+        (void)strcpy(a_cmd->argv[0],"PATH");
+    }
     f_envset(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
     switch ( a_command_line->ugo_shell ) {

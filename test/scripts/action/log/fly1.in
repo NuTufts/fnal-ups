@@ -27,26 +27,43 @@ unsetenv OPERA
 #
 if (! ${?TMPDIR}) setenv TMPDIR "/tmp"
 #
-set path=(/bin:/usr/local/bin:/local/etc:/mybin)
+setenv PATH "/bin:/usr/local/bin:/local/etc:/mybin"
+#
 rehash
 #
-set path=($path emacs/bin)
+if (! ${?PATH}) then
+  setenv PATH "emacs/bin"
+else
+  setenv PATH "${PATH}emacs/etcemacs/bin"
+endif
+#
 rehash
 #
-set path=(emacs/test $path)
+if (! ${?PATH}) then
+  setenv PATH "emacs/test"
+else
+  setenv PATH "emacs/test:${PATH}"
+endif
+#
 rehash
 #
-setenv upstmp "emacs"
-setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' "$upstmp"`"
-if ($status == 0 && "$upstmp" != "") set path=($upstmp)
-rehash
-unsetenv upstmp
+if (${?PATH}) then
+  setenv upstmp "emacs"
+  setenv PATH "`$UPS_DIR/bin/dropit -e -p "'"$PATH"'" -i':' -d':' "'"$upstmp"'"`"
+  if ("${PATH}" == "") unsetenv PATH
+  unsetenv upstmp
+endif
 #
-setenv upstmp "bin"
-setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' "$upstmp"`"
-if ($status == 0 && "$upstmp" != "") set path=($upstmp)
 rehash
-unsetenv upstmp
+#
+if (${?PATH}) then
+  setenv upstmp "bin"
+  setenv PATH "`$UPS_DIR/bin/dropit -e -p "'"$PATH"'" -i':' -d':' "'"$upstmp"'"`"
+  if ("${PATH}" == "") unsetenv PATH
+  unsetenv upstmp
+endif
+#
+rehash
 #
 if ( ! r blah ) then
 echo "can't read file"

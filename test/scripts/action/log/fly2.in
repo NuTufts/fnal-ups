@@ -32,19 +32,35 @@ if [ "${TMPDIR:-}" = "" ]; then TMPDIR="/tmp"; export TMPDIR; fi;
 #
 PATH="/bin:/usr/local/bin:/local/etc:/mybin"; export PATH
 #
-PATH="${PATH-}:emacs/bin"; export PATH
+if [ "${PATH:-}" = "" ]; then
+  PATH="emacs/bin"
+else
+  PATH="${PATH}emacs/etcemacs/bin"
+fi
+export PATH
 #
-PATH="emacs/test:${PATH-}"; export PATH
+if [ "${PATH:-}" = "" ]; then
+  PATH="emacs/test"
+else
+  PATH="emacs/test:${PATH}"
+fi
+export PATH
 #
-upstmp=emacs
-upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' "$upstmp"`";
-if [ $? -eq 0 -a "$upstmp" != "" ]; then PATH=$upstmp; fi
-unset upstmp;
+if [ "${PATH:-}" != "" ]
+then
+  upstmp=emacs
+  PATH="`$UPS_DIR/bin/dropit -e -p "$PATH" -i':' -d':' "$upstmp"`";
+  if [ "${PATH:-}" = "" ]; then unset PATH; fi
+  unset upstmp
+fi
 #
-upstmp=bin
-upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' "$upstmp"`";
-if [ $? -eq 0 -a "$upstmp" != "" ]; then PATH=$upstmp; fi
-unset upstmp;
+if [ "${PATH:-}" != "" ]
+then
+  upstmp=bin
+  PATH="`$UPS_DIR/bin/dropit -e -p "$PATH" -i':' -d':' "$upstmp"`";
+  if [ "${PATH:-}" = "" ]; then unset PATH; fi
+  unset upstmp
+fi
 #
 if [ ! r blah ]; then
 echo "can't read file";
