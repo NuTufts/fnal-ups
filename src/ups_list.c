@@ -184,23 +184,23 @@ void list_K(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define defaults(INSTANCE) \
-{   printf("	VERSION=%s", minst_ptr->INSTANCE->version);          \
-    printf("	FLAVOR=%s\n", minst_ptr->INSTANCE->flavor);          \
+{   printf("\tVERSION=%s", minst_ptr->INSTANCE->version);          \
+    printf("\tFLAVOR=%s\n", minst_ptr->INSTANCE->flavor);          \
     if (minst_ptr->INSTANCE->qualifiers &&                           \
        strlen(minst_ptr->INSTANCE->qualifiers))                      \
-    { printf("	QUALIFIERS=%s", minst_ptr->INSTANCE->qualifiers);    \
+    { printf("\t\tQUALIFIERS=%s", minst_ptr->INSTANCE->qualifiers);    \
     } else {                                                         \
-      printf("	QUALIFIERS=\"\"");                                   \
+      printf("\t\tQUALIFIERS=\"\"");                                   \
     }                                                                \
     if (minst_ptr->xtra_chains)                                      \
-    { printf("	CHAINS=%s", minst_ptr->INSTANCE->chain);             \
+    { printf("\tCHAINS=%s", minst_ptr->INSTANCE->chain);             \
       for (clist = minst_ptr->xtra_chains ;                          \
            clist ; clist = clist->next)                              \
       { cinst_ptr = (t_upstyp_instance *)clist->data;                \
         printf(",%s", cinst_ptr->chain );                            \
       }                                                              \
     } else {                                                         \
-      printf("	CHAIN=%s", minst_ptr->INSTANCE->chain);              \
+      printf("\tCHAIN=%s", minst_ptr->INSTANCE->chain);              \
     } printf("\n");                                                  \
 }
 int product_cmp ( const void * const d1, const void * const d2 )
@@ -323,7 +323,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         } else {
           printf("\"\" ");
         } printf("\n");
-        printf("	PRODUCT=%s",mproduct->product);
+        printf("\t%s",mproduct->product);
         if (minst_ptr->chain) 
         { defaults(chain)
         } else { 
@@ -336,7 +336,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           }
         }
         if (a_command_line->ugo_l && minst_ptr->version )
-        { printf("	HOME=");
+        { printf("\t\tHOME=");
           if (mproduct->db_info) 
           { config_ptr = mproduct->db_info->config;
             if (config_ptr) 
@@ -346,27 +346,27 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           }
           printf("%s\n", minst_ptr->version->prod_dir);
           if (minst_ptr->version->ups_dir)
-          { printf("	UPS=%s\n", minst_ptr->version->ups_dir);
+          { printf("\t\tUPS=%s\n", minst_ptr->version->ups_dir);
           } else {
-            printf("	UPS=\"\"\n");
+            printf("\t\tUPS=\"\"\n");
           }
           if (minst_ptr->version->table_dir)
-          { printf("	TABLE_DIR=%s\n", minst_ptr->version->table_dir);
+          { printf("\t\tTABLE_DIR=%s\n", minst_ptr->version->table_dir);
           } else {
-            printf("	TABLE_DIR=\"\"\n");
+            printf("\t\tTABLE_DIR=\"\"\n");
           }
           if (minst_ptr->version->table_file)
-          { printf("	TABLE_FILE=%s\n", minst_ptr->version->table_file);
+          { printf("\t\tTABLE_FILE=%s\n", minst_ptr->version->table_file);
           } else {
-            printf("	TABLE_FILE=\"\"\n");
+            printf("\t\tTABLE_FILE=\"\"\n");
           }
           if (minst_ptr->version->description)
-          { printf("	DESCRIPTION=%s\n", minst_ptr->version->description);
+          { printf("\t\tDESCRIPTION=%s\n", minst_ptr->version->description);
           } else {
-            printf("	DESCRIPTION=\"\"\n");
+            printf("\t\tDESCRIPTION=\"\"\n");
           }
         }
-        printf("\n\n");
+        printf("\n");
       } else { 
           list_K(minst_ptr,a_command_line,mproduct);
       }
