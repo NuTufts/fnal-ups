@@ -268,6 +268,7 @@ int ups_free_instance( t_upstyp_instance * const inst_ptr )
     if ( inst_ptr->declared ) { upsmem_free( inst_ptr->declared ); }
     if ( inst_ptr->modifier ) { upsmem_free( inst_ptr->modifier ); }
     if ( inst_ptr->modified ) { upsmem_free( inst_ptr->modified ); }
+    if ( inst_ptr->origin ) { upsmem_free( inst_ptr->origin ); }
     if ( inst_ptr->prod_dir ) { upsmem_free( inst_ptr->prod_dir ); }
     if ( inst_ptr->ups_dir ) { upsmem_free( inst_ptr->ups_dir ); }
     if ( inst_ptr->table_dir ) { upsmem_free( inst_ptr->table_dir ); }

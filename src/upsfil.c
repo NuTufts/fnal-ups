@@ -388,6 +388,7 @@ int write_version_file( void )
     put_key( "DECLARER", inst_ptr->declarer );
     put_key( "MODIFIED", inst_ptr->modified );
     put_key( "MODIFIER", inst_ptr->modifier );
+    put_key( "ORIGON", inst_ptr->origin );
     put_key( "PROD_DIR", inst_ptr->prod_dir );
     put_key( "UPS_DIR", inst_ptr->ups_dir );
     put_key( "TABLE_DIR", inst_ptr->table_dir );
@@ -395,7 +396,13 @@ int write_version_file( void )
     put_key( "ARCHIVE_FILE", inst_ptr->archive_file );
     put_key( "AUTHORIZED_NODES", inst_ptr->authorized_nodes );
     if ( inst_ptr->statistics )
-      put_key( 0, "STATISTICS" );    
+      put_key( 0, "STATISTICS" );
+    if ( inst_ptr->user_list ) {
+      t_upslst_item *l_ptr = upslst_first( inst_ptr->user_list );
+      for ( ; l_ptr; l_ptr = l_ptr->next ) {
+	put_key( 0, l_ptr->data );
+      }
+    }
     g_imargin -= 2;
   }  
 
@@ -1234,8 +1241,8 @@ void print_instance( t_upstyp_instance * const inst_ptr )
   printf( "modifier = %s\nmodified= %s\n",
 	  inst_ptr->modifier, inst_ptr->modified );
   
-  printf( "prod_dir = %s\nups_dir = %s\n",
-	  inst_ptr->prod_dir, inst_ptr->ups_dir );
+  printf( "origin = %s\nprod_dir = %s\nups_dir = %s\n",
+	  inst_ptr->origin, inst_ptr->prod_dir, inst_ptr->ups_dir );
   
   printf( "table_dir = %s\ntable_file = %s\narchive_file = %s\nauthorized_nodes = %s\n",
 	  inst_ptr->table_dir, inst_ptr->table_file, inst_ptr->archive_file,

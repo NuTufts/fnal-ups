@@ -90,6 +90,7 @@ typedef struct upstyp_instance
   char             *declared;
   char             *modifier;
   char             *modified;
+  char             *origin;
   char             *prod_dir;
   char             *ups_dir;
   char             *table_dir;
