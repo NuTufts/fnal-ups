@@ -114,7 +114,7 @@ static t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 static t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 				    t_upstyp_matched_product *mat_prod,
 				    const char * const act_name );
-static t_upsugo_command *get_ugo( t_upsact_cmd * const p_cmd, 
+static t_upsugo_command *get_dependent( t_upsact_cmd * const p_cmd, 
 				  int is_act_build,
 				  int * const unsetup_flag );
 static int is_prod_done( const char *const prod_name );
@@ -1181,17 +1181,15 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
   int i_act = e_invalid_action;
   int i_cmd = e_invalid_cmd;
 
+  P_VERB_s_s_s_s( 3, "Action top(", act_name, ") for:", actitem2str( p_act_itm ) );
+
   if ( p_act_itm && p_act_itm->act ) {
     i_act = upsact_action2enum( act_name );
     l_cmd = p_act_itm->act->command_list;
   }
   else {
-    P_VERB_s_s_s_s_s( 3, "Action top(", act_name, ") for:", actitem2str( p_act_itm ),
-		      "(null)" );
     return top_list;
   }
-
-  P_VERB_s_s_s_s( 3, "Action top(", act_name, ") for:", actitem2str( p_act_itm ) );
 
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
 
@@ -1205,7 +1203,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
     p_cmd = upsact_parse_cmd( p_line );
     i_cmd = p_cmd ? p_cmd->icmd : e_invalid_cmd;
 
-    if ( !p_cmd || p_cmd->icmd == e_invalid_cmd ) {
+    if ( i_cmd == e_invalid_cmd ) {
       SET_PARSE_ERROR( p_line );
       continue;
     }
@@ -1268,7 +1266,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       /* get the ugo command */
 
-      new_ugo = get_ugo( p_cmd, 0, &unsetup_flag ); 
+      new_ugo = get_dependent( p_cmd, 0, &unsetup_flag ); 
 
       /* get the action item */
 
@@ -1492,7 +1490,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       
       /* get the ugo command */
 
-      new_ugo = get_ugo( p_cmd, is_act_build, &unsetup_flag ); 
+      new_ugo = get_dependent( p_cmd, is_act_build, &unsetup_flag ); 
 
       /* new_ugo can be null if doing unsetup
 	 not any more !!!
@@ -1792,17 +1790,16 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
   return 0;
 }
 
-t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
+/* it will, for un/setup functions build the corresponding
+   ugo command structure, using upsugo_bldcmd */
+
+t_upsugo_command *get_dependent( t_upsact_cmd *const p_cmd,
 			   int is_act_build,
 			   int * const unsetup_flag )
 {
-  /* it will, for un/setup/chain action functions build the corresponding
-     ugo command structure, using upsugo_bldcmd */
-
 
   t_upslst_item *l_itm = 0;
   t_upsugo_command *a_ugo = 0;
-  int i_act = p_cmd->iact;
   int i_cmd = p_cmd->icmd;
 
   *unsetup_flag = 0;
@@ -1813,18 +1810,38 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
 
   if ( (i_cmd & 2) && (g_ups_cmd != e_depend) && !g_COMPILE_FLAG ) {
 
-    if ( (a_ugo = get_SETUP_prod( p_cmd, /* i_act, */ is_act_build )) )
+    if ( (a_ugo = get_SETUP_prod( p_cmd, is_act_build )) )
+    {
+
+  /* Go ahead and parse the unSetupReq/Opt buffer for the few extra options
+     we could possibly care about.  Include them all in case we've gotten
+     here from an automatic reversal of a setup action */
+
+      t_upsugo_command *temp_ugo = 0;
+      if (temp_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[e_setup].valid_opts ))
+      {
+	if (temp_ugo->ugo_e)
+	  a_ugo->ugo_e = temp_ugo->ugo_e;
+	if (temp_ugo->ugo_j)
+	  a_ugo->ugo_j = temp_ugo->ugo_j;
+	if (temp_ugo->ugo_v)
+	  a_ugo->ugo_v = temp_ugo->ugo_v;
+
+	(void) upsugo_free( temp_ugo );
+      }
+
       *unsetup_flag = 1;
+    }
   }
 
   if ( !a_ugo ) {
 
-    /* if no flavor was spcified by the action function (H) and a -H
+    /* if no flavor was specified by the action function (H) and a -H
        flavor was specified on the command line, we will pass that on */
 
     (void) strcpy( g_buff, p_cmd->argv[0] );
     if ( !strstr( g_buff, "-H" ) && g_ugo_cmd->ugo_H ) {
-      (void) strcat( g_buff, " -H" );
+      (void) strcat( g_buff, " -H " );
       l_itm = upslst_first( g_ugo_cmd->ugo_osname );
       for ( ; l_itm; l_itm = l_itm->next ) {
 	(void) strcat( g_buff, l_itm->data );
@@ -1833,14 +1850,10 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
       }
     }      
 
-    {
-      int real_act=i_act;
-      if ((real_act == e_current) || (real_act == e_development) || (real_act == e_new) || 
-          (real_act == e_old) || (real_act == e_test)) real_act=e_declare;
-      if ((real_act == e_uncurrent) || (real_act == e_undevelopment) || (real_act == e_unnew) || 
-          (real_act == e_unold) || (real_act == e_untest)) real_act=e_undeclare;
-      a_ugo = upsugo_bldcmd( g_buff, g_cmd_info[real_act].valid_opts );
-    }
+  /* At this point, we only have to deal with setup actions,
+     regardless of what action or chain kicked things off */
+
+    a_ugo = upsugo_bldcmd( g_buff, g_cmd_info[e_setup].valid_opts );
   }
 
   /* ignore UPS_NO_DATABASE if we have one from command line */
@@ -2656,7 +2669,7 @@ static void f_envset( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=\"%s\";export %s\n#\n", a_cmd->argv[0],
+      if (fprintf((FILE *)a_stream, "%s=\"%s\"; export %s\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
@@ -2695,7 +2708,7 @@ static void f_envsetifnotset( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "if [ \"${%s:-}\" = \"\" ]; then %s=\"%s\";export %s;fi;\n#\n",
+		  "if [ \"${%s:-}\" = \"\" ]; then %s=\"%s\"; export %s; fi;\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0],
 		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2837,7 +2850,7 @@ static void f_execute( ACTION_PARAMS)
 	    FPRINTF_ERROR();
 	  }
 	} else {
-	  if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n",
+	  if (fprintf((FILE *)a_stream, "%s=`%s`; export %s\n#\n",
 		      a_cmd->argv[2], a_cmd->argv[0], a_cmd->argv[2]) < 0) {
 	    FPRINTF_ERROR();
 	  }
@@ -2940,7 +2953,7 @@ static void f_pathappend( ACTION_PARAMS)
 	   stuff */
 	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\";export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\"; export %s\n#\n",
 		  pathPtr, pathPtr, delimiter, a_cmd->argv[1], pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
@@ -2996,7 +3009,7 @@ static void f_pathprepend( ACTION_PARAMS)
 	   stuff */
 	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\";export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\"; export %s\n#\n",
 		  pathPtr, a_cmd->argv[1], delimiter, pathPtr, pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
@@ -3111,7 +3124,7 @@ static void f_pathset( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       CHECK_FOR_PATH(g_shPath, g_shDelimiter);
-      if (fprintf((FILE *)a_stream, "%s=\"%s\";export %s\n#\n", pathPtr,
+      if (fprintf((FILE *)a_stream, "%s=\"%s\"; export %s\n#\n", pathPtr,
 		  a_cmd->argv[1], pathPtr) < 0) {
 	FPRINTF_ERROR();
       }

@@ -142,7 +142,7 @@ void upscpy_info(UPSCPY_PARAMS)
             }
           }
           upsver_mes(1,"%s: Copying info from %s\n","UPSCPY",info_source);
-          (void) sprintf(buffer,"umask 003;cp %s/* %s\n", info_source,
+          (void) sprintf(buffer,"umask 003; cp %s/* %s\n", info_source,
                   a_db_info->config->info_target_dir);
           if (system(buffer))
           { SYSTEM_ERROR();
@@ -180,7 +180,7 @@ void upscpy_info(UPSCPY_PARAMS)
         }                                                              \
       }                                                                \
       /* now add the copy line to the temp file */                     \
-      (void) sprintf(buffer, "umask 003;cp %s %s\n", filename, dest);  \
+      (void) sprintf(buffer, "umask 003; cp %s %s\n", filename, dest); \
       if (system(buffer)) { SYSTEM_ERROR(); }                          \
     }
 
@@ -204,7 +204,7 @@ void upscpy_info(UPSCPY_PARAMS)
            we just need to copy the entire contents of this dir          \
            (of the form *.*) to the appropriate destination */           \
         upsver_mes(1,"%s: Copying %s files\n","UPSCPY",type);            \
-        (void) sprintf(buffer, "umask 003;cp %s/*.* %s/%s/ \n", filename,\
+        (void) sprintf(buffer, "umask 003; cp %s/*.* %s/%s/ \n", filename,\
                 a_db_info->config->keyword, dir_line->d_name);           \
         if (system(buffer)) { SYSTEM_ERROR(); }                          \
       }                                                                  \
