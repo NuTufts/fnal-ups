@@ -18,7 +18,7 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	when looking for the table file (i.e.
 	table_resorder=(database:product:ups:home)
 
-7. Support the -B comman line parameter.  This allows a user to override the
+7. Support the -B command line parameter.  This allows a user to override the
 	information in the table file for a specific ups dependent product.
 	For example - if a table file for product pearl had a line in it like -
 
@@ -32,5 +32,7 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 8. Write and debug 'ups parent' command.  This is the command which will
 	list all the products that depend on the given instance.
+
+9. Expand the functionality of the fileTest action.
 
 
