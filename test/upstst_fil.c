@@ -70,7 +70,7 @@ status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 
-status = upsfil_write_file(upstst_file,filename,' ');
+status = upsfil_write_file(upstst_file,filename,' ',NOJOURNAL);
 UPSTST_CHECK_CALL(UPSTST_ZEROSUCCESS,status,estatus);
 return (0);
 }
