@@ -15,7 +15,7 @@ PATH=${ERUPT_DIR}/bin:${PATH}; export PATH
 # Save the old value of $PRODUCTS so it can be restored later.  Only save it
 # if it does not already exist
 #
-if [ ! ${PRODUCTS_SAVE-} ]; then
+if [ "${PRODUCTS_SAVE:-1}" != "1" ]; then
     PRODUCTS_SAVE=${PRODUCTS}; export PRODUCTS_SAVE
 fi
 
