@@ -91,7 +91,7 @@ char * upsutl_environment(const char * const a_env_var)
  * Output: none
  * Return: Null
  */
-t_upslst_item *upsutl_free_inst_list( t_upslst_item **a_inst_list)
+t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
 {
   t_upslst_item *list_item = NULL, *tmp_inst_list = NULL;
   
@@ -100,9 +100,8 @@ t_upslst_item *upsutl_free_inst_list( t_upslst_item **a_inst_list)
 
   /* free the instances */
   tmp_inst_list = *a_inst_list;
-  for (list_item = tmp_inst_list; tmp_inst_list;
-       tmp_inst_list = tmp_inst_list->next) {
-    ups_free_instance((t_ups_instance *)(tmp_inst_list->data));
+  for (list_item = tmp_inst_list; list_item; list_item = list_item->next) {
+    ups_free_instance((t_ups_instance *)(list_item->data));
   }
 
   /* Now free the list */
@@ -195,7 +194,7 @@ char *upsutl_get_prod_dir(const char * const a_db,
   /* make sure a_db and a_prod_name are not both NULL */
   if (a_db || a_prod_name) {
     prod_dir = (char *)upsmem_malloc((int )(strlen(a_db) + 
-					    strlen(prod_name)) + 2);
+					    strlen(a_prod_name)) + 2);
     if (a_db) {
       prod_dir = strcpy(prod_dir, a_db);       /* add the db directory */
     }
@@ -206,7 +205,7 @@ char *upsutl_get_prod_dir(const char * const a_db,
     }
 
     if (a_prod_name) {
-      prod_dir = strcat(prod_dir, prod_name);  /* and the product name */
+      prod_dir = strcat(prod_dir, a_prod_name);  /* and the product name */
     }
   }
 
@@ -497,7 +496,8 @@ char *upsutl_str_crecat( char * const str1, char * const str2 )
     new_str = upsutl_str_create( str1, ' ' );
   }
   else {
-    new_str = (char *)malloc( (int)strlen( str1 ) + (int)strlen( str2 ) + 1 );
+    new_str = (char *)malloc( strlen( str1 ) + strlen( str2 ) +
+			      (unsigned int )1 );
     strcpy( new_str, str1 );
     strcat( new_str, str2 );
   }
