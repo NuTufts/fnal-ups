@@ -535,12 +535,16 @@ void list_K(const t_upstyp_matched_instance * const instance,
       FromAny(flavor) 
       strcpy(buffer,"qualifiers");
       FromAny(qualifiers)
-    } else {
-      FromAny(product) 
-      FromAny(version) 
-      FromAny(flavor) 
-      FromAny(qualifiers)
+      strcpy(buffer,"chain");
+      print_chain(instance,buffer);
+      strcpy(buffer,"+");
     }
+    FromAny(product) 
+    FromAny(version) 
+    FromAny(flavor) 
+    FromAny(qualifiers)
+    if (!upsutl_stricmp(buffer,"chain")) { valid=1; }
+    print_chain(instance,buffer);
     FromVersion(table_file)
     FromVersion(table_dir)
     FromVersion(ups_dir)
@@ -556,8 +560,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromTable(info_files)
     FromVersion(origin)
     /* FromChain(chain) */
-    if (!upsutl_stricmp(buffer,"chain")) { valid=1; }
-    print_chain(instance,buffer);
     FromBoth(declarer)
     FromBoth(declared)
     FromBoth(modifier)
@@ -658,8 +660,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
                  char * const string)
 { t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
-  if (!upsutl_stricmp(string,"chain") ||
-      !upsutl_stricmp(string,"+"))
+  if (!upsutl_stricmp(string,"chain"))
   { printf("\""); /* first " */
     if(instance->chain)
     { printf("%s",instance->chain->chain);
