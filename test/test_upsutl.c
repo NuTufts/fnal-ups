@@ -25,6 +25,7 @@
 #include "upsutl.h"
 #include "upserr.h"
 #include "upsmat.h"
+#include "upstyp.h"
 
 /*
  * Definition of public variables.

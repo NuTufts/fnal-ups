@@ -111,7 +111,7 @@ t_upslst_item 		*table_ptr;		/* table ptr */
 t_upstyp_match_product	*product;		/* product match */
 t_upstyp_instance		*instance;		/* instance match */
 #define upstst_dump_instance()	{					\
-   fprintf(fd,"C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,\
+   fprintf(fd,"PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,\
      instance->chain, instance->version);				\
    fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n",instance->flavor,		\
       instance->qualifiers);						\
@@ -122,15 +122,13 @@ if(!mp) return;
 for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
    product = (t_upstyp_match_product *) prod_ptr->data;
-   printf("CHAIN\n=====\n");
-   for (chain_ptr = product->chain_list; 
-        chain_ptr; 
-        chain_ptr = chain_ptr->next)
+   printf("CHAIN:\n");
+   for (chain_ptr = product->chain_list; chain_ptr; chain_ptr = chain_ptr->next)
       {
       instance = (t_upstyp_instance *) chain_ptr->data;
       upstst_dump_instance();
       }
-   printf("VERSION\n=======\n");
+   printf("VERSION:\n");
    for (version_ptr = product->version_list; 
         version_ptr; 
         version_ptr = version_ptr->next)
@@ -138,8 +136,8 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
       instance = (t_upstyp_instance *) version_ptr->data;
       upstst_dump_instance();
       }
-   printf("TABLE\n======\n");
-   for (table_ptr = product->table_list; table_ptr; table_ptr->next)
+   printf("TABLE:\n");
+   for (table_ptr = product->table_list; table_ptr; table_ptr = table_ptr->next)
       {
       instance = (t_upstyp_instance *) table_ptr->data;
       upstst_dump_instance();

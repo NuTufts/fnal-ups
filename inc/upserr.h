@@ -33,7 +33,7 @@
  */
 
 /* Error Messages */
-/* CAREFUL!! When adding errors, you must also edit ../src/ups_error.c.
+/* CAREFUL!! When adding errors, you must also edit ../src/upserr.c.
    There are two ascii arrays that will also need to be modified, one for 
    a long description (g_error_messages) and one for an ascii version of 
    the #define (g_error_ascii) 
@@ -63,7 +63,8 @@
 #define UPS_TO_MANY_ACTION_ARG  20
 #define UPS_INVALID_SHELL       21
 #define UPS_NEED_UNIQUE         22
-#define UPS_NERR                23      /*  this one must always be last */
+#define UPS_SYSTEM_ERROR        23
+#define UPS_NERR                24      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"

@@ -47,7 +47,7 @@
 
 /* a matched ups product. a list of all the instances that could pertain to
    the product/ */
-typedef struct ups_match_product
+typedef struct upstyp_match_product
 {
   char             *db;
   
@@ -57,7 +57,7 @@ typedef struct ups_match_product
 } t_upstyp_match_product;
 
 /* a db config file */
-typedef struct ups_config {
+typedef struct upstyp_config {
   char             *ups_db_version;
   char             *prod_dir_prefix;
   char             *authorized_nodes;
@@ -68,7 +68,7 @@ typedef struct ups_config {
 } t_upstyp_config;
 
 /* a product instance */
-typedef struct ups_instance
+typedef struct upstyp_instance
 {
   char             *product;
   char             *version;
@@ -96,14 +96,14 @@ typedef struct ups_instance
 } t_upstyp_instance;
 
 /* an action */
-typedef struct ups_action
+typedef struct upstyp_action
 {
   char             *action;
   t_upslst_item    *command_list;
 } t_upstyp_action;
 
 /* any ups file */
-typedef struct ups_product
+typedef struct upstyp_product
 {
   char             *file;
   char             *product;

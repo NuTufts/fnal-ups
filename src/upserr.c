@@ -79,8 +79,9 @@ static char *g_error_messages[UPS_NERR] = {
 /* 19 */  "%s: Invalid argument to action - %s\n",
 /* 20 */  "%s: Too many arguments to action - %s\n",
 /* 21 */  "%s: Invalid shell - %s\n",
-/* 22 */  "%s: Need unique instance but multiple \"%s\" found \n"
-/* 23 this is the last */
+/* 22 */  "%s: Need unique instance but multiple \"%s\" found \n",
+/* 23 */  "%s: Error in call to %s: %s\n"
+/* 24 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -107,7 +108,8 @@ char *g_error_ascii[] = {
    /* UPS_TO_MANY_ACTION_ARG  20 */ "UPS_TO_MANY_ACTION_ARG",
    /* UPS_INVALID_SHELL       21 */ "UPS_INVALID_SHELL",
    /* UPS_NEED_UNIQUE         22 */ "UPS_NEED_UNIQUE",
-   /* UPS_NERR                23 */ "UPS_NERR",
+   /* UPS_SYSTEM_ERROR        23 */ "UPS_SYSTEM_ERROR",
+   /* UPS_NERR                24 */ "UPS_NERR",
    0 };
 
 /*

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
 
 /* ups specific include files */
 #include "upsutl.h"
@@ -134,7 +135,12 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
   g_fh = fopen ( ups_file, "r" );
   if ( ! g_fh ) {
-    upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
+    upserr_vplace();
+    upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
+    if (errno == ENOENT)
+       upserr_add( UPS_NO_FILE, UPS_FATAL, ups_file );
+    else
+       upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return 0;
   }
   
@@ -177,6 +183,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   
   g_fh = fopen ( ups_file, "w" );
   if ( ! g_fh ) {
+    upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return UPS_OPEN_FILE;
   }    
