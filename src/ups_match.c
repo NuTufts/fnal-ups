@@ -33,6 +33,7 @@
 #include "ups_types.h"
 #include "ups_memory.h"
 #include "ups_files.h"
+#include "ups_utils.h"
 
 /*
  * Definition of public variables.
@@ -283,11 +284,12 @@ static t_ups_match_product *match_instance_core(
 				   a_need_unique, a_command_line->ugo_flavor,
 				   a_command_line->ugo_qualifiers,
 				   &tinst_list);
-    
-    /* if we got some matches, fill out our matched product structure */
-    if (num_matches != 0) {
-      tinst_list = upslst_first(tinst_list);        /* back up to start */
-      mproduct = upsmat_mp_new(a_db, NULL, NULL, tinst_list);
+    if (UPS_ERROR == UPS_SUCCESS) {
+      /* if we got some matches, fill out our matched product structure */
+      if (num_matches != 0) {
+	tinst_list = upslst_first(tinst_list);        /* back up to start */
+	mproduct = upsmat_mp_new(a_db, NULL, NULL, tinst_list);
+      }
     }
     
   /* see if we were passed a version. if so, don't worry
@@ -300,14 +302,12 @@ static t_ups_match_product *match_instance_core(
 				     a_need_unique, a_command_line->ugo_flavor,
 				     a_command_line->ugo_qualifiers, 
 				     &vinst_list, &tinst_list);
-    
-
-    /* We went thru the list of version instances, get a matched product
-       structure if we got no errors */
     if (UPS_ERROR == UPS_SUCCESS) {
-      tinst_list = upslst_first(tinst_list);        /* back up to start */
-      vinst_list = upslst_first(vinst_list);        /* back up to start */
-      mproduct = upsmat_mp_new(a_db, NULL, vinst_list, tinst_list);
+      if (num_matches > 0) {
+	tinst_list = upslst_first(tinst_list);        /* back up to start */
+	vinst_list = upslst_first(vinst_list);        /* back up to start */
+	mproduct = upsmat_mp_new(a_db, NULL, vinst_list, tinst_list);
+      }
     }
 
   } else {
@@ -323,15 +323,21 @@ static t_ups_match_product *match_instance_core(
 				     a_need_unique, a_command_line->ugo_flavor,
 				     a_command_line->ugo_qualifiers, 
 				     &cinst_list, &vinst_list, &tinst_list);
+      if (UPS_ERROR != UPS_SUCCESS) {
+	/* we had an error - get out */
+	break;
+      }
     }
 
     /* We went thru the list of version instances, get a matched product
        structure if we got no errors */
     if (UPS_ERROR == UPS_SUCCESS) {
-      tinst_list = upslst_first(tinst_list);        /* back up to start */
-      vinst_list = upslst_first(vinst_list);        /* back up to start */
-      cinst_list = upslst_first(cinst_list);        /* back up to start */
-      mproduct = upsmat_mp_new(a_db, cinst_list, vinst_list, tinst_list);
+      if (num_matches > 0) {
+	tinst_list = upslst_first(tinst_list);        /* back up to start */
+	vinst_list = upslst_first(vinst_list);        /* back up to start */
+	cinst_list = upslst_first(cinst_list);        /* back up to start */
+	mproduct = upsmat_mp_new(a_db, cinst_list, vinst_list, tinst_list);
+      }
     }
       
   }
@@ -375,6 +381,7 @@ static int match_from_chain( const char * const a_product,
   t_ups_instance *inst;
   char *first_flavor, *first_quals;
   char *tmp_upsdir, *tmp_productdir;
+  int do_need_unique = 1;
 
   /* Get total length of chain file name including path */
   file_chars = (int )(strlen(a_chain) + strlen(a_product) + strlen(a_db) + 
@@ -409,7 +416,7 @@ static int match_from_chain( const char * const a_product,
 
 	tmp_num_matches = match_from_version(inst->product, inst->version,
 					     tmp_upsdir, tmp_productdir, a_db,
-					     a_need_unique, tmp_flavor_list,
+					     do_need_unique, tmp_flavor_list,
 					     tmp_quals_list, a_vinst_list,
 					     a_tinst_list);
 	if (tmp_num_matches == 0) {
@@ -419,8 +426,7 @@ static int match_from_chain( const char * const a_product,
 
 	  /* clean up */
 	  num_matches = 0;
-	  *a_cinst_list = upslst_first(*a_cinst_list);   /* back up to start */
-	  *a_cinst_list = upslst_free(*a_cinst_list, 'd');
+	  *a_cinst_list = upsutl_free_inst_list(a_cinst_list);
 
 	  break;                        /* stop any search */
 	}
@@ -479,6 +485,7 @@ static int match_from_version( const char * const a_product,
   t_ups_instance *inst;
   char *first_flavor, *first_quals;
   char *tmp_upsdir, *tmp_productdir;
+  int do_need_unique = 1;
 
   /* Get total length of version file name including path */
   file_chars = (int )(strlen(a_version) + strlen(a_product) + strlen(a_db) + 
@@ -515,20 +522,17 @@ static int match_from_version( const char * const a_product,
 
 	tmp_num_matches = match_from_table(inst->product, inst->table_file,
 					   inst->table_dir, tmp_upsdir,
-					   tmp_productdir, a_db, a_need_unique,
-					   tmp_flavor_list, tmp_quals_list,
-					   a_tinst_list);
+					   tmp_productdir, a_db,
+					   do_need_unique, tmp_flavor_list, 
+					   tmp_quals_list, a_tinst_list);
 	if (tmp_num_matches == 0) {
 	  /* We should have had a match, this is an error */
 	  upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer, inst->table_file);
 
 	  /* clean up */
 	  num_matches = 0;
-	  *a_vinst_list = upslst_first(*a_vinst_list);    /* go to beginning */
-	  *a_vinst_list = upslst_free(*a_vinst_list, 'd');
-	  *a_tinst_list = upslst_first(*a_tinst_list);    /* go to beginning */
-	  *a_tinst_list = upslst_free(*a_tinst_list, 'd');
-
+	  *a_vinst_list = upsutl_free_inst_list(a_vinst_list);
+	  *a_tinst_list = upsutl_free_inst_list(a_tinst_list);
 	  break;                        /* stop any search */
 	}
 
