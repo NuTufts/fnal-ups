@@ -108,7 +108,7 @@ t_upslst_item 		*prod_ptr;		/* product ptr */
 t_upslst_item 		*chain_ptr;		/* chain ptr */
 t_upslst_item 		*version_ptr;		/* version ptr */
 t_upslst_item 		*table_ptr;		/* table ptr */
-t_upstyp_match_product	*product;		/* product match */
+t_upstyp_matched_product	*product;		/* product match */
 t_upstyp_instance		*instance;		/* instance match */
 #define upstst_dump_instance()	{					\
    fprintf(fd,"PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,\
@@ -121,7 +121,7 @@ t_upstyp_instance		*instance;		/* instance match */
 if(!mp) return;
 for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
-   product = (t_upstyp_match_product *) prod_ptr->data;
+   product = (t_upstyp_matched_product *) prod_ptr->data;
    fprintf(fd,"CHAIN:\n");
    for (chain_ptr = product->chain_list; chain_ptr; chain_ptr = chain_ptr->next)
       {
