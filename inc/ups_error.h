@@ -37,7 +37,8 @@
 #define UPS_READ_FILE       1
 #define UPS_INVALID_KEYWORD 2
 #define UPS_NO_DATABASE     3
-#define UPS_NERR            4
+#define UPS_TIME            4
+#define UPS_NERR            5
 
 
 #define UPS_ERROR           1
