@@ -162,6 +162,7 @@ static int g_ups_error;
 	  /* we need a unique instance, make sure we only have one */  \
   	  if (a_list->next) {                                          \
 	    /* we have more than one, this is an error */              \
+            upserr_vplace();                                           \
 	    upserr_add(UPS_NEED_UNIQUE, UPS_FATAL, type);              \
 	    break;                                                     \
 	  }                                                            \
@@ -173,6 +174,7 @@ static int g_ups_error;
 	upserr_clear();						\
       }                                                         \
       else {							\
+        upserr_vplace();                                        \
         upserr_add(UPS_NO_FILE, UPS_FATAL, file);               \
       }								\
 
@@ -420,6 +422,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
     MATCH_TABLE_ONLY();
   } else {
     /* we have no db and no table file or no product name, this is an error */
+    upserr_vplace();
     upserr_add(UPS_NO_DATABASE, UPS_FATAL);
   }
 
@@ -747,6 +750,7 @@ static int match_from_chain( const char * const a_product,
 					     tmp_quals_list, a_minst_list);
 	if (tmp_num_matches == 0) {
 	  /* We should have had a match, this is an error */
+	  upserr_vplace();
 	  upserr_add(UPS_NO_VERSION_MATCH, UPS_FATAL, buffer,
 		     inst->version);
 
@@ -873,6 +877,7 @@ static int match_from_version( const char * const a_product,
 						 tmp_quals_list, a_minst_list);
 	      if (tmp_num_matches == 0) {
 		/* We should have had a match, this is an error */
+		upserr_vplace();
 		upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer,
 			   inst->table_file);
 
@@ -906,6 +911,7 @@ static int match_from_version( const char * const a_product,
       CHECK_NO_FILE(&buffer[0]);
     }
   } else {
+    upserr_vplace();
     upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
   }
 
@@ -1134,6 +1140,7 @@ t_upstyp_product *read_chain(const char * const a_db,
     read_product = upsfil_read_file(&buffer[0]);
     *a_buffer = buffer;
   } else {
+    upserr_vplace();
     upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
     *a_buffer = 0;
   }
