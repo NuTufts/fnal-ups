@@ -1361,7 +1361,7 @@ else
 #
 # If we can't remove the file, print error message and fail.
 #
-    echo '****' Cannot remove \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR
+    echo '****' Cannot remove \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
     echo '****' Insuffient privilege.
     echo '****'
     echo '****' If this is being executed as part of the process of making 
