@@ -2050,7 +2050,7 @@ int add_to_instance( t_upstyp_instance * const inst,
 
       else {
 	char *val;
-	if ( (val = UPSKEY_INST2ARR( inst )[ *ikeys ]) ) {
+	if ( (val = UPSKEY_INST2ARR( inst )[ index ]) ) {
 	  upsmem_free( val );
 	}
 	UPSKEY_INST2ARR( inst )[ index ] = upsutl_str_create( val_add, ' ' );
