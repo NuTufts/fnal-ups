@@ -85,29 +85,29 @@ static t_upskey_map g_key_map[] =
   { 20, "COMPILE_DIR",      NO,   18,   NO, 0x00000001 },
   { 21, "COMPILE_FILE",     NO,   19,   NO, 0x00000001 },
   { 22, "CATMAN_FILES",     NO,   20,   NO, 0x00000010 },
-  { 22, "HTML_FILES",       NO,   21,   NO, 0x00000010 },
-  { 22, "INFO_FILES",       NO,   22,   NO, 0x00000010 },
-  { 22, "MAN_FILES",        NO,   23,   NO, 0x00000010 },
-  { 22, "NEWS_FILES",       NO,   24,   NO, 0x00000010 },
+  { 23, "HTML_FILES",       NO,   21,   NO, 0x00000010 },
+  { 24, "INFO_FILES",       NO,   22,   NO, 0x00000010 },
+  { 25, "MAN_FILES",        NO,   23,   NO, 0x00000010 },
+  { 26, "NEWS_FILES",       NO,   24,   NO, 0x00000010 },
 
-  { 22, "DB_DIR",           NO,   25,   NO, 0x00000000 },
-  { 23, "ACTION",           NO,   26,   NO, 0x00000010 },
-  { 24, "USER",             NO,   27,   NO, 0x00000011 },
+  { 27, "DB_DIR",           NO,   25,   NO, 0x00000000 },
+  { 28, "ACTION",           NO,   26,   NO, 0x00000010 },
+  { 29, "USER",             NO,   27,   NO, 0x00000011 },
 
-  { 25, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
-  { 26, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
-  { 27, "CATMAN_PATH",      NO,   NO,    5, 0x00001000 },
-  { 28, "INFO_PATH",        NO,   NO,    6, 0x00001000 },
-  { 29, "HTML_PATH",        NO,   NO,    7, 0x00001000 },
-  { 30, "NEWS_PATH",        NO,   NO,    8, 0x00001000 },
-  { 31, "UPD_USERCODE",     NO,   NO,    9, 0x00001000 },
+  { 30, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
+  { 31, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
+  { 32, "CATMAN_PATH",      NO,   NO,    5, 0x00001000 },
+  { 33, "INFO_PATH",        NO,   NO,    6, 0x00001000 },
+  { 34, "HTML_PATH",        NO,   NO,    7, 0x00001000 },
+  { 35, "NEWS_PATH",        NO,   NO,    8, 0x00001000 },
+  { 36, "UPD_USERCODE",     NO,   NO,    9, 0x00001000 },
   
 
-  { 32, "GROUP:",           NO,   NO,   NO, 0x00000010 },
-  { 33, "COMMON:",          NO,   NO,   NO, 0x00000010 },
-  { 34, "END:",             NO,   NO,   NO, 0x00000010 },
+  { 37, "GROUP:",           NO,   NO,   NO, 0x00000010 },
+  { 38, "COMMON:",          NO,   NO,   NO, 0x00000010 },
+  { 39, "END:",             NO,   NO,   NO, 0x00000010 },
 
-  { 35,0,0,0,0 },
+  { 40,0,0,0,0 },
 };
 
 /*
