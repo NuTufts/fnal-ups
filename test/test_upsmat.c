@@ -91,7 +91,7 @@ int match_from_chain( const char * const a_product,
 			t_upslst_item ** const a_tinst_list);
 #endif
 
-static void test_match(const int argc, char *argv[]);
+static void test_match(int argc, char *argv[]);
 static void print_inst(t_upslst_item * const inst_list);
 static char *get_ups_string(const char * const old_string);
 
@@ -112,67 +112,43 @@ int main(const int argc, char *argv[])
   return 1;
 }
 
-static void test_match(const int argc, char *argv[])
+static void test_match(int argc, char *argv[])
 {
+  t_upsugo_command *command_line = NULL;
+  char *list_valid_opts = "a?cdDf:g:h:K:lm:M:noq:r:tU:vVz:Z";
+  int need_unique = 0;
+  t_upslst_item *mproduct_list, *mproduct_item;
   t_upstyp_match_product *mproduct = NULL;
-  t_upslst_item *mproduct_list = NULL, *mproduct_item;
-  t_upslst_item *flavor_list = NULL, *quals_list = NULL;
-  int need_unique = 0, i;
-  char *new_string = NULL;
-  char *ups_db = "/home/t2/berman/work/erupt/erupt_database/db";
-  t_upsugo_command command_line;
 
-  /* Calling structure:
-     test_upsmat unique chain product version flavor quals flavor quals */
-
+  /* Figure out which command was entered TBD and avoid the need_unique flag */
+  argc -= 2;
 
   if (! strcmp(argv[1],"1")) {
     need_unique = 1;
   }
 
-  for (i = 5; i < argc; i += 2) {
-    new_string = get_ups_string(argv[i]);
-    flavor_list = upslst_add(flavor_list, new_string);
-    new_string = get_ups_string(argv[i+1]);
-    quals_list = upslst_add(quals_list, new_string);
-  }
-
-  /* point back to the first elements of the list */
-  flavor_list = upslst_first(flavor_list);
-  quals_list = upslst_first(quals_list);
-
-  command_line.ugo_product = get_ups_string(argv[3]);
-  if (strcmp(argv[4], "")) {
-    command_line.ugo_version = get_ups_string(argv[4]);
-  } else {
-    command_line.ugo_version = NULL;
-  }
-  command_line.ugo_flavor = flavor_list;
-  command_line.ugo_qualifiers = quals_list;
-  new_string = get_ups_string(ups_db);
-  command_line.ugo_db = upslst_new(new_string);
-  command_line.ugo_tablefile = (char *)NULL;
-  command_line.ugo_tablefiledir = (char *)NULL;
-  command_line.ugo_productdir = (char *)NULL;
-  command_line.ugo_upsdir = (char *)NULL;
-  new_string = get_ups_string(argv[2]);
-  command_line.ugo_chain = upslst_new(new_string);
-
-  mproduct_list = upsmat_match_instance(&command_line, need_unique);
-  if (mproduct_list) {
-    mproduct_list = upslst_first(mproduct_list);
-    for (mproduct_item = mproduct_list ; mproduct_item ; 
-	 mproduct_item = mproduct_item->next) {
-      mproduct = (t_upstyp_match_product *)mproduct_item->data;
-      printf("\nChain Instances:\n");
-      print_inst(mproduct->chain_list);
-      printf("\nVersion Instances:\n");
-      print_inst(mproduct->version_list);
-      printf("\nTable Instances:\n");
-      print_inst(mproduct->table_list);
+ /* get the options for each iteration of the command and do it */
+  while (command_line = upsugo_next(argc, &argv[2], (char *)list_valid_opts)) {
+    mproduct_list = upsmat_match_instance(command_line, need_unique);
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_output();
+      break;
     }
-  } else {
-    printf("No instances matched\n");
+    if (mproduct_list) {
+      mproduct_list = upslst_first(mproduct_list);
+      for (mproduct_item = mproduct_list ; mproduct_item ; 
+	   mproduct_item = mproduct_item->next) {
+	mproduct = (t_upstyp_match_product *)mproduct_item->data;
+	printf("\nChain Instances:\n");
+	print_inst(mproduct->chain_list);
+	printf("\nVersion Instances:\n");
+	print_inst(mproduct->version_list);
+	printf("\nTable Instances:\n");
+	print_inst(mproduct->table_list);
+      }
+    } else {
+      printf("No instances matched\n");
+    }
   }
 }
 
