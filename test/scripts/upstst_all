@@ -35,3 +35,9 @@ upstst_copy
 echo "======================================================================"
 echo "Testing compile routines"
 upstst_compile
+echo "======================================================================"
+echo "Testing ups start"
+upstst_start
+echo "======================================================================"
+echo "Testing ups stop routines"
+upstst_stop
