@@ -335,11 +335,9 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                         UPS_UNDECLARE, g_cmd_info[ups_command].cmd, uc->ugo_product, vinst->version);
         }
         if (uc->ugo_Y && product_home) 
-        { (void) fprintf((FILE *)tmpfile,"rm -rf %s\n",
-                   product_home,product_home);
+        { (void) fprintf((FILE *)tmpfile,"rm -rf %s\n", product_home);
           if (archive[0] != '\0')
-          { (void) fprintf((FILE *)tmpfile,"rm -f %s\n",
-                   archive,archive);
+          { (void) fprintf((FILE *)tmpfile,"rm -f %s\n", archive);
           }
         }
       } else {
