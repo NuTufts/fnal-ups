@@ -1346,6 +1346,7 @@ fi
 # Don't  try to remove a non-existant file
 #
 if [ ! -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR} ]
+then
     exit 0
 fi
 
