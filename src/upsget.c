@@ -104,6 +104,7 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_FLAGS", 0 },
   { "${UPS_FLAGSDEPEND", 0 },
   { "${UPS_THIS_DB", upsget_database },
+  { "${UPS_SETUP", upsget_envstr },
   {  0, 0 }
 } ;
 
@@ -146,6 +147,22 @@ char *upsget_remall(const FILE * const stream,
     }
   }
 }
+
+char *upsget_envout(const FILE * const stream, 
+                    const t_upstyp_db * const db,
+                    const t_upstyp_matched_instance * const instance,
+                    const t_upsugo_command * const command_line )
+{ char *name;
+  get_element(name,product);
+  if (command_line->ugo_shell == e_BOURNE )
+  { fprintf((FILE *)stream,"SETUP_%s=%s;export SETUP_%s\n",
+    name,upsget_envstr(db,instance,command_line),name);
+  } else {
+    fprintf((FILE *)stream,"setenv SETUP_%s=%s\n",
+    name,upsget_envstr(db,instance,command_line));
+  }
+}
+ 
 char *upsget_allout(const FILE * const stream, 
                     const t_upstyp_db * const db,
                     const t_upstyp_matched_instance * const instance,
@@ -267,6 +284,38 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   } else {
     return oldstr;
   }
+}
+
+char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
+                    const t_upstyp_matched_instance * const instance,
+                    const t_upsugo_command * const command_line )
+{
+  static char newstr[4096];
+  static char *string = 0;
+  get_element(string,product);
+  strcpy(newstr,string);
+  strcat(newstr," ");
+  get_element(string,version);
+  strcat(newstr,string);
+  strcat(newstr," -f ");
+  get_element(string,flavor);
+  strcat(newstr,string);
+  if ( db_info_ptr )
+  { strcat(newstr," -z ");
+    strcat(newstr,db_info_ptr->name);
+  }
+  get_element(string,qualifiers);
+  if ( *string != 0 )
+  { strcat(newstr," -q ");
+    strcat(newstr,string);
+  }
+  if ( command_line->ugo_v)
+  { strcat(newstr," -v "); }
+  if ( command_line->ugo_r)
+  { strcat(newstr," -r ");
+    strcat(newstr,command_line->ugo_productdir);
+  }
+  return newstr;
 }
 
 char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
