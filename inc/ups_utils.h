@@ -24,9 +24,11 @@
 #define _UPS_UTILS_H_
 
 /* standard include files, if needed for .h file */
+#include <sys/types.h>
 
 /* ups specific include files, if needed for .h file */
 #include "ups_types.h"
+#include "ups_list.h"
 
 /*
  * Constans.
@@ -42,10 +44,13 @@
  */
 
 char *upsutl_environment(const char * const a_env_var);
+t_upslst_item *upsutl_get_files(const char * const a_dir,
+				const char * const a_pattern);
 void upsutl_start_timing(void);
 void upsutl_stop_timing(void);
 int upsutl_statistics(t_ups_instance const * const a_instance,
 		      char const * const a_dir, char const * const a_command);
+char *upsutl_strstr( const char * const a_str, const char * const a_pattern);
 char *upsutl_time_date(void);
 char *upsutl_user(void);
 

@@ -29,6 +29,11 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <unistd.h>
+#ifdef _SYSTYPE_SVR4
+#include <dirent.h>
+#else
+#include <sys/dir.h>
+#endif
 
 /* ups specific include files */
 #include "ups_utils.h"
@@ -72,6 +77,66 @@ static char g_unknown_user[] = "UNKNOWN";
 char * upsutl_environment(const char * const a_env_var)
 {
   return (getenv(a_env_var));
+}
+
+/*-----------------------------------------------------------------------
+ * upsutl_get_files
+ *
+ * Given a directory, return a listing of all the files which
+ * have the specified character string in them.  The character string is
+ * removed from the returned string.
+ * 
+ * Input : Directory where to get files, pattern to match in files
+ * Output: none
+ * Return: A list of the file names
+ */
+t_upslst_item * upsutl_get_files(const char * const a_dir,
+				 const char * const a_pattern)
+{
+#ifdef _SYSTYPE_SVR4
+  struct dirent *dir_line = NULL;
+#else
+  struct direct *dir_line = NULL;
+#endif
+  t_upslst_item *file_list = NULL;
+  DIR *dir = NULL;
+  char *new_string = NULL;
+  
+  if (dir = opendir(a_dir)) {
+    if (a_pattern == ANY_MATCH) {
+      /* read each directory item and add it to the list */
+      while ((dir_line = readdir(dir)) != NULL) {
+	if (new_string = upsutl_str_create(dir_line->d_name)) {
+	  file_list = upslst_add(file_list, (void *)new_string);
+	} else {
+	  /* the only error from upsutl_str_create is a memory error, clean up
+	     and get out */
+	  upslst_free(file_list, 'd');
+	  break;
+	}
+      }
+    } else {
+      /* read each directory item and if it contains the pattern, remove
+	 the pattern from the file name and add it to the list */
+      while ((dir_line = readdir(dir)) != NULL) {
+	if (new_string = upsutl_strstr(dir_line->d_name, a_pattern)) {
+	  file_list = upslst_add(file_list, (void *)new_string);
+	} else {
+	  /* the only error from upsutl_strstr is a memory error, clean up
+	     and get out */
+	  upslst_free(file_list, 'd');
+	  break;
+	}
+      }
+    }
+    closedir(dir);
+
+    /* point back to the beginning of the list */
+    file_list = upslst_first(file_list);
+  } else {
+    upserr_add(UPS_OPEN_FILE, UPS_ERROR, a_dir);
+  }
+  return (file_list);
 }
 
 /*-----------------------------------------------------------------------
@@ -214,6 +279,42 @@ int upsutl_statistics(t_ups_instance const * const a_instance,
   return(return_status);
 }
 
+/*-----------------------------------------------------------------------
+ * upsutl_strstr
+ *
+ * Search for the specified pattern in the string.  If it is not there,
+ * return NULL, else copy the string to a new string, remove the pattern
+ * and return the new string.
+ *
+ * Input : A string to search, a pattern to search for.
+ * Output: none
+ * Return: A pointer to a new string without the pattern or NULL.
+ */
+char *upsutl_strstr( const char * const a_str, const char * const a_pattern)
+{
+  char *substr = NULL, *new_string = NULL;
+  int pat_len, str_len, substr_pos;
+  int i, j;
+
+  if (substr = strstr(a_str, a_pattern)) {
+    /* The pattern was found */
+    str_len = (int )strlen(a_str);
+    if (new_string = upsutl_str_create((char *)a_str)) {
+      /* create a new string without the pattern */
+      pat_len = (int )strlen(a_pattern);
+      substr_pos = (int )(substr - a_str);   /* char position of sub string */
+      for (i = substr_pos, j = substr_pos + pat_len ; j <= str_len ;
+	   ++i, ++j ) {
+	new_string[i] = new_string[j];
+      }
+
+    } else {
+      upserr_add(UPS_NO_MEMORY, UPS_FATAL, str_len);
+    }
+  }
+
+  return new_string;
+}
 /*-----------------------------------------------------------------------
  * upsutl_time_date
  *
