@@ -81,7 +81,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
   char *file=buffer;
   char *the_chain=0;
   char *product_home=0;          /* product home to be deleted (-y or -Y) */
-  char *input = "   ";           /* yes or no */
+  char input[4];                 /* yes or no */
   char *archive=0;
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
@@ -301,7 +301,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         if (uc->ugo_Y && product_home) 
         { fprintf((FILE *)tmpfile,"touch %s;rm -rf %s\n",
                    product_home,product_home);
-          if (archive)
+          if (archive[0] != '\0')
           { fprintf((FILE *)tmpfile,"touch %s;rm %s\n",
                    archive,archive);
           }
