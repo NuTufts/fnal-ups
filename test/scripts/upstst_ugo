@@ -43,7 +43,7 @@ upsugo_next -out rest.out -diff rest.in -a -A hercules:neptune:zeus -B -C -D -e 
 upsugo_next -out proda.out -diff proda.in -fIRIX:AIX ProdA
 upsugo_next -out prodb.out -diff prodb.in -f"IRIX:AIX" ProdB
 upsugo_next -out prodc.out -diff prodc.in -f "IRIX :AIX" ProdC
-upsugo_next -out prodd.out -diff prodd.in -p"EEK! I haven't a clue scooby doo" ProdD
+upsugo_next -out prodd.out -diff prodd.in -H IRIX+5.3 -p"EEK! I haven't a clue scooby doo" ProdD
 upsugo_next -out prode.out -diff prode.in -H IRIX+5.3 -q?cat ProdE
 upsugo_next -out prodf.out -diff prodf.in -H IRIX+5.3 -q"?cat:dog" ProdF
 upsugo_next -out prodg.out -diff prodg.in -H IRIX+5.3 -q"?mouse : ?cat :dog" ProdG

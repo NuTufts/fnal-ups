@@ -1,3 +1,6 @@
 D:NAME=../db1
-V:PRODUCT=lassie, VERSION=v2_0, FLAVOR=NULL, QUALIFIERS=nodbg:opt
-T:PRODUCT=lassie, VERSION=(null), FLAVOR=NULL, QUALIFIERS=nodbg:opt
+C:PRODUCT=         lassie, VERSION=      v2_0, FLAVOR=        NULL, QUALIFIERS=nodbg:opt, CHAIN=current
+C:PRODUCT=         lassie, VERSION=      v2_0, FLAVOR=        NULL, QUALIFIERS=nodbg:opt, CHAIN=mydog
+C:PRODUCT=         lassie, VERSION=      v2_0, FLAVOR=        NULL, QUALIFIERS=nodbg:opt, CHAIN=test
+V:PRODUCT=         lassie, VERSION=      v2_0, FLAVOR=        NULL, QUALIFIERS=nodbg:opt
+T:PRODUCT=         lassie, VERSION=    (null), FLAVOR=        NULL, QUALIFIERS=nodbg:opt
