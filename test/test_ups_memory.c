@@ -24,6 +24,8 @@
 
 /* ups specific include files */
 #include "ups_memory.h"
+#include "ups_utils.h"
+#include "ups_error.h"
 
 /*
  * Definition of public variables.
@@ -46,6 +48,8 @@ int main(void)
   char *myc, *myc2, *myc3, *myc4, *myc5, *myc6;
   int myc_bytes = 20, myc2_bytes = 30, myc3_bytes = 40, myc4_bytes = 50;
   int myc5_bytes = 60, myc6_bytes = 70;
+
+  upsutl_start_timing();
 
   printf("\nPrint out the memory list before adding anything, should get nothing\n");
   upsmem_print();
@@ -113,6 +117,10 @@ int main(void)
 
   /* Do an extra free - see if we blow up */
   upsmem_free(myc);
+
+  upsutl_stop_timing();
+  upserr_output();
+
 
   return 0;
 }
