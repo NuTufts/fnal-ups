@@ -477,6 +477,7 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
     }
     *eaddr = '\0';
     found=0;
+    value = NULL;
     uservar=upto+2;
     if (minstance->chain)
     {  value = upskey_inst_getuserval( minstance->chain,uservar);
