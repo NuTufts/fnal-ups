@@ -29,43 +29,43 @@ COMMANDS    :
 compile     :?bBcdefgHjkmMnoOqrtUvVzZ: Ignored stuf
 : The compile command creates a "snapshot" of environment 
 : and blaa blaa 
-configure   :?cdfgmMnoOpPqrtUvVzZ: 
+configure   :?cdfgHmMnoOqrtUvVzZ: 
 : The configure command 
-copy        :?AcCdfgmMnoOpPqrtTUvVWXzZ:
+copy        :?AcCdfgHmMnoOpPqrtTUvVWXzZ:
 : The copy command 
-create      :?fmMpqvxZ:
+create      :?fHmMpqvZ:
 : The Create command blaa blaa
-declare     :?AcCdfgmMnoOpPqrtTUvV:
+declare     :?AcCdfgHmMnoOpqrtTUvVzZ:
 : The Declare command blaa blaa
-depend      :?fKmMqrUvVzZ:
+depend      :?fHKmMqrUvVzZ:
 : The Depend command blaa blaa
-exist       :?aBcdefgjkmMnoOqrtTUvVzZ:
+exist       :?BcdefgHjkmMoOqrtUvVzZ:
 : The Exist command blaa blaa
-get         :?cdfFgmnoqrtUvVzZ:
+get         :?cdfFgHmMnoqrtUvVzZ:
 : The Get command blaa blaa
 help        :?:This is sort of a special case since it will accept commands
 : The Help command blaa blaa
-list        :?acdDfghKlmMnoqrtUvVzZ:
+list        :a?cdDfghHKlmMnoqrtUvVzZ:
 : The List command blaa blaa
-modify      :?AEfghpqrTUvVxzZ:
+modify      :?AEfHmMopqrTUvVxzZ:
 : The Modify command blaa blaa
-setup       :?BcdefgjkmMnoOqrtUvVzZ:
+setup       :?BcdefgHjkmMnoOqrtUvVzZ:
 : The Setup command blaa blaa
-start       :?cdfgmMnoOpPqrtUvVzZ: 
+start       :?cdfgHmMnoOqrtUvVwzZ: 
 : The Start command blaa blaa
-stop        :?cdfgmMnoOpPqrtUvVzZ: 
+stop        :?cdfgHmMnoOqrtUvVzZ: 
 : The Stop command blaa blaa
-tailor      :?cdfghmMnoOpPqrtUvVzZ: 
+tailor      :?cdfghHKmMnoOqrtUvVzZ: 
 : The Tailor command blaa blaa
-unconfigure :?cdfgmMnoOpPqrtUvVzZ: 
+unconfigure :?cdfgHmMnoOqrtUvVzZ: 
 : The unconfigure command blaa blaa
-undeclare   :?AcdfgmMnoOpPqrtTUvV:
+undeclare   :?cdfgHmMnoOqrtUvVyYzZ:
 : The undeclare command blaa blaa
-unsetup     :?BcdefgjkmMnoOqrtUvVzZ:
+unsetup     :?cdefgHjmMnoOqtUvVzZ:
 : The unsetup command blaa blaa
-validate    :?cdfghlmMnNoqrStUvVzZ:
+validate    :?cdfghHlmMnNoqrStUvVzZ:
 : The valid command blaa blaa
-# from : to EOL, lines no starting with - are continuation.
+# from : to EOL, lines not starting with - are continuation.
 OPTIONS     :
 -? :print out usage information 
 -a :include all instances 
@@ -84,6 +84,7 @@ OPTIONS     :
 :do not live in the products' area 
 -g :chainName : chain to use 
 -h :nodeName : use this node 
+-H :flavor : use this as the flavor and build a flavor table from it 
 -j :applies to top level product and not UPS product requirements 
 -k :do not execute unsetup files first 
 -K :"keywords" : return information from these keywords only 
