@@ -61,11 +61,14 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
  * Definition of global variables.
  */
 static char *g_dollarsign = "$";
-#define VERIFY_DIR_SPEC(dir)   \
+#define VERIFY_DIR_SPEC(dir, tran)   \
     if (dir) {                                                              \
       char *trans_dir;                                                      \
       struct stat file_stat;                                                \
-      trans_dir = upsget_translation(a_minst, a_db, a_command_line, dir);   \
+      if ( tran )                                                           \
+	trans_dir = upsget_translation(a_minst, a_db, a_command_line, dir); \
+      else                                                                  \
+	trans_dir = dir;                                                    \
       if (strstr(trans_dir, g_dollarsign)) {                                \
         upserr_add(UPS_VERIFY_ENV_VAR, UPS_WARNING, dir);                   \
       }                                                                     \
@@ -76,7 +79,6 @@ static char *g_dollarsign = "$";
       } else {                                                              \
         upserr_add(UPS_NO_FILE, UPS_WARNING, trans_dir);                    \
       }                                                                     \
-      upsmem_free(trans_dir);                                               \
     }
 
 #define VERIFY_FILE_SPEC(file)   \
@@ -89,7 +91,6 @@ static char *g_dollarsign = "$";
       if (upsutl_is_a_file(trans_file) == UPS_NO_FILE) {                     \
         upserr_add(UPS_NO_FILE, UPS_WARNING, trans_file);                    \
       }                                                                      \
-      upsmem_free(trans_file);                                               \
     }
 
 #define g_COMMA ","
@@ -120,15 +121,15 @@ void ups_verify_dbconfig(const t_upstyp_db * const a_db,
      valid directory spec */
   if (a_db && a_db->config) {
     /* if we are checking syntax only, do not look for external files */
-    if (! a_command_line->ugo_S) {
-      VERIFY_DIR_SPEC(a_db->config->prod_dir_prefix);
-      VERIFY_DIR_SPEC(a_db->config->man_target_dir);
-      VERIFY_DIR_SPEC(a_db->config->catman_target_dir);
-      VERIFY_DIR_SPEC(a_db->config->info_target_dir);
-      VERIFY_DIR_SPEC(a_db->config->html_target_dir);
-      VERIFY_DIR_SPEC(a_db->config->news_target_dir);
-      VERIFY_DIR_SPEC(a_db->config->upd_usercode_dir);
-      VERIFY_DIR_SPEC(a_db->config->setups_dir);
+    if ( a_command_line && ! a_command_line->ugo_S) {
+      VERIFY_DIR_SPEC(a_db->config->prod_dir_prefix, a_minst);
+      VERIFY_DIR_SPEC(a_db->config->man_target_dir, a_minst);
+      VERIFY_DIR_SPEC(a_db->config->catman_target_dir, a_minst);
+      VERIFY_DIR_SPEC(a_db->config->info_target_dir, a_minst);
+      VERIFY_DIR_SPEC(a_db->config->html_target_dir, a_minst);
+      VERIFY_DIR_SPEC(a_db->config->news_target_dir, a_minst);
+      VERIFY_DIR_SPEC(a_db->config->upd_usercode_dir, a_minst);
+      VERIFY_DIR_SPEC(a_db->config->setups_dir, a_minst);
     }
     /* make sure that these keywords do not contain a comma separated list */
     CHECK_FOR_COMMA(a_db->config->authorized_nodes);
@@ -217,7 +218,7 @@ static void ups_verify_version_instance(VERIFY_INST_PARAMS)
   if (! a_command_line->ugo_S) {
     /* Make sure the following files exist */
     VERIFY_FILE_SPEC(a_inst->archive_file);
-    VERIFY_DIR_SPEC(a_inst->compile_dir);
+    VERIFY_DIR_SPEC(a_inst->compile_dir, a_minst);
   }
 }
 /*-----------------------------------------------------------------------
@@ -258,11 +259,11 @@ static void ups_verify_table_instance(VERIFY_INST_PARAMS)
     VERIFY_FILE_SPEC(a_inst->description);
 
     /* make sure all of these directories exist */
-    VERIFY_DIR_SPEC(a_inst->catman_source_dir);
-    VERIFY_DIR_SPEC(a_inst->html_source_dir);
-    VERIFY_DIR_SPEC(a_inst->info_source_dir);
-    VERIFY_DIR_SPEC(a_inst->man_source_dir);
-    VERIFY_DIR_SPEC(a_inst->news_source_dir);
+    VERIFY_DIR_SPEC(a_inst->catman_source_dir, a_minst);
+    VERIFY_DIR_SPEC(a_inst->html_source_dir, a_minst);
+    VERIFY_DIR_SPEC(a_inst->info_source_dir, a_minst);
+    VERIFY_DIR_SPEC(a_inst->man_source_dir, a_minst);
+    VERIFY_DIR_SPEC(a_inst->news_source_dir, a_minst);
   }
   /* now verify the actions.  we will do this by parsing each action and
      checking for errors */
