@@ -1335,9 +1335,9 @@ t_upstyp_action *read_action( void )
 
   next_key( 1 );
 
-  while ( !is_stop_key() && g_ikey != e_key_action ) {
+  while ( !is_stop_key() && g_ikey == e_key_unknown ) {
 
-    if ( g_ikey == e_key_unknown && strlen( g_line ) > 0 ) {
+    if ( strlen( g_line ) > 0 ) {
       cmd_ptr = upsutl_str_create( g_line, ' ' );
       if ( cmd_ptr )
 	l_cmd = upslst_add( l_cmd, cmd_ptr );
