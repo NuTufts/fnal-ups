@@ -177,7 +177,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
            uc->ugo_chain=chain_list;
          mproduct_list = upsmat_instance(uc, db_list , need_unique);
          if (UPS_ERROR != UPS_SUCCESS) 
-         { upsfil_clear_journal_files();
+         { (void) upsfil_clear_journal_files();
            upserr_vplace();
            return 0; 
          }
@@ -192,7 +192,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
          product = upsget_chain_file(db_info->name,
                                      uc->ugo_product,
                                      the_chain, &file);
-         strcpy(buffer,file);
+         (void) strcpy(buffer,file);
          if ((UPS_ERROR == UPS_SUCCESS) && product )
          { cinst_list=upsmat_match_with_instance( cinst, product );
            cinst=cinst_list->data;
@@ -201,7 +201,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
            (void )upsfil_write_file(product, buffer,' ',JOURNAL);
          } else {
            if (UPS_ERROR != UPS_SUCCESS) /* just an error */
-           { upsfil_clear_journal_files();
+           { (void) upsfil_clear_journal_files();
              upserr_vplace();
              return 0; 
            }
@@ -221,7 +221,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
                                    uc->ugo_product,
                                    uc->ugo_version,
                                    &file);
-     strcpy(buffer,file);
+     (void) strcpy(buffer,file);
      if ((UPS_ERROR == UPS_SUCCESS) && product )
      { vinst_list=upsmat_match_with_instance( vinst, product );
        vinst=vinst_list->data;
@@ -230,7 +230,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
        (void )upsfil_write_file(product, buffer,' ',JOURNAL);
      } else { 
        if (UPS_ERROR != UPS_SUCCESS) /* just an error */
-       { upsfil_clear_journal_files();
+       { (void) upsfil_clear_journal_files();
          upserr_vplace();
          return 0; 
        }
