@@ -53,7 +53,7 @@ test_ups_error : $$@.o $(LIB)/libups.a
 #
 clean :
 	@ upsClean
-	@ rm test_ups_clean
+	@ rm test_ups_error
 
 install :
 	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
