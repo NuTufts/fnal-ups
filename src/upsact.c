@@ -492,9 +492,10 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
     t_upsact_item *act0 = find_product_str( dep_list, ugo_cmd->ugo_product );
 
     /* add parent product to 'already done list' */
-
+    /* NO
     if ( act0 )
       didit_list = upslst_add( didit_list, act0 );
+    */
 
     for ( ; dep_list; dep_list = dep_list->next ) {
       t_upsact_item *act_ptr = (t_upsact_item *)dep_list->data;
