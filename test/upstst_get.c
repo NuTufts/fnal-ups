@@ -128,6 +128,7 @@ static char 			*string =
 	\nThis Db      = ${UPS_THIS_DB}\
 	\nSetup        = ${UPS_SETUP}\
 	\nOrigin       = ${UPS_ORIGIN}\
+	\nPRODUCTS     = ${PRODUCTS}\
 	\nJunk         = ${JUNK}\
 	";
 
