@@ -453,13 +453,23 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           FromBoth(modifier);
           printf("\n");
           printf("\t\tHome=");
-          if (mproduct->db_info) 
+          if (UPSRELATIVE(instance->version->prod_dir))
+          { if (mproduct->db_info) 
+            { config_ptr = mproduct->db_info->config;
+              if (config_ptr) 
+              { if (config_ptr->prod_dir_prefix) 
+                { printf("%s/",config_ptr->prod_dir_prefix); }
+              }
+            }
+          }
+/*          if (mproduct->db_info) 
           { config_ptr = mproduct->db_info->config;
             if (config_ptr) 
             { if (config_ptr->prod_dir_prefix) 
               { printf("%s",config_ptr->prod_dir_prefix); }
             }
           }
+*/
           if (instance->version->prod_dir)
           { printf("%s", instance->version->prod_dir);
           }
