@@ -53,75 +53,7 @@
 			X = 0;		\
 			}
 
-	char	*ugo_product,
-		*ugo_version;
-
-/* Chain flags, still setting them in addition to chain list 
-** to be consistant and possibly could be used				*/
-
-	int	ugo_a = 0;	/* All include				*/
-	int	ugo_A = 0;	/* Authorized Host(s) 			*/
-/*	int	ugo_b = 0;	UNDEFINED				*/
-/*	int	ugo_B = 0;	/* CODE INCOMPLETE			*/
-	int	ugo_c = 0;	/* current specified			*/
-	int	ugo_C = 0;	/* Don't do Configure			*/
-	int	ugo_d = 0;	/* development chain			*/
-	int	ugo_D = 0;	/* list all versions with archive file	*/
-	int	ugo_e = 0;	/* Define ups_extended			*/
-	int	ugo_E = 0;	/* Run Editor 				*/
-	int	ugo_f = 0;	/* Flavor(s) specified			*/
-	int	ugo_F = 0;	/* Return list of files not in product	*/
-/*	int	ugo_G = 0;	UNDEFINED				*/
-	int	ugo_g = 0;	/* Did they request a "special" chain?	*/
-	int	ugo_h = 0;	/* Host(s) specified			*/
-/*	int	ugo_H = 0;	UNDEFINED				*/
-	int	ugo_j = 0;	/* applies to top level product		*/
-/*	int	ugo_J = 0;	UNDEFINED				*/
-	int	ugo_k = 0;	/* Don't do unsetup first		*/
-	int	ugo_K = 0;	/* Keywords				*/
-	int	ugo_l = 0;	/* long (listing)			*/
-/*	int	ugo_L = 0;	UNDEFINED				*/
-	int	ugo_n = 0;	/* new chain				*/
-/*	int	ugo_N = 0;	/* CODE INCOMPLETE			*/
-	int	ugo_o = 0;	/* old chain				*/
-/*	int	ugo_O = 0;	/* CODE INCOMPLETE			*/
-/*	int	ugo_p = 0;	/* CODE INCOMPLETE			*/
-/*	int	ugo_P = 0;	/* CODE INCOMPLETE			*/
-/*	int	ugo_q = 0;	/* CODE INCOMPLETE			*/
-/*	int	ugo_Q = 0;	UNDEFINED				*/
-/*	int	ugo_r = 0;	/* CODE INCOMPLETE			*/
-/*	int	ugo_R = 0;	UNDEFINED				*/
-	int	ugo_S = 0;	/* Syntax Checking			*/
-/*	int	ugo_s = 0;	UNDEFINED				*/
-	int	ugo_t = 0;	/* test chain				*/
-/*	int	ugo_T = 0;	/* CODE INCOMPLETE			*/
-	int	ugo_u = 0;	/* uncompile first			*/
-/*	int	ugo_U = 0;	/* CODE INCOMPLETE			*/
-	int	ugo_v = 0;	/* verbose				*/
-	int	ugo_V = 0;	/* Don't delete temp file(s)		*/
-	int	ugo_w = 0;	/* stop first then start		*/
-	int	ugo_W = 0;	/* use environment variables		*/
-	int	ugo_x = 0;	/* CODE INCOMPLETE			*/
-	int	ugo_X = 0;	/* execute instead of echo??		*/
-	int	ugo_y = 0;	/* delete home dir, no query		*/
-	int	ugo_Y = 0;	/* delete home dir, query		*/
-	int	ugo_z = 0;	/* Database(s) were specified		*/
-	int	ugo_Z = 0;	/* Time this command			*/
-
 	int	errflg = 0;
-
-struct ups_list_item * ugo_chain_first;
-struct ups_list_item * ugo_chain_last;
-struct ups_list_item * ugo_flavor_first;
-struct ups_list_item * ugo_flavor_last;
-struct ups_list_item * ugo_host_first;
-struct ups_list_item * ugo_host_last;
-struct ups_list_item * ugo_auth_first;
-struct ups_list_item * ugo_auth_last;
-struct ups_list_item * ugo_db_first;
-struct ups_list_item * ugo_db_last;
-struct ups_list_item * ugo_key_first;
-struct ups_list_item * ugo_key_last;
 
 char    *       upsugo_getarg          (int, char **, char **);
 struct	ups_list_item	*	ugo_make_next	
@@ -139,7 +71,7 @@ struct	ups_list_item	*	ugo_make_next
 **                                                                           
 ** ==========================================================================
 */                                                                           
-int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
+struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 /*   int   ups_argc;
    char   *ups_argv[];
    char   *validopts;
@@ -163,12 +95,66 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 
 /* Initialize those pesky variables
     -------------------------------- */
-   ugo_product = 0;
-   ugo_version = 0;
-   ugo_chain_first = 0;
-   ugo_flavor_first = 0;
-   ugo_chain_last = 0;
-   ugo_flavor_last = 0;
+   struct ups_command * uc;
+   uc=(struct ups_command *)malloc( sizeof(struct ups_command));
+   uc->ugo_product = 0;
+   uc->ugo_version = 0;
+/* Chain flags, still setting them in addition to chain list 
+** to be consistant and possibly could be used				*/
+
+	uc->ugo_a = 0;	/* All include				*/
+	uc->ugo_A = 0;	/* Authorized Host(s) 			*/
+/*	uc->ugo_b = 0;	UNDEFINED				*/
+/*	uc->ugo_B = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_c = 0;	/* current specified			*/
+	uc->ugo_C = 0;	/* Don't do Configure			*/
+	uc->ugo_d = 0;	/* development chain			*/
+	uc->ugo_D = 0;	/* list all versions with archive file	*/
+	uc->ugo_e = 0;	/* Define ups_extended			*/
+	uc->ugo_E = 0;	/* Run Editor 				*/
+	uc->ugo_f = 0;	/* Flavor(s) specified			*/
+	uc->ugo_F = 0;	/* Return list of files not in product	*/
+/*	uc->ugo_G = 0;	UNDEFINED				*/
+	uc->ugo_g = 0;	/* Did they request a "special" chain?	*/
+	uc->ugo_h = 0;	/* Host(s) specified			*/
+/*	uc->ugo_H = 0;	UNDEFINED				*/
+	uc->ugo_j = 0;	/* applies to top level product		*/
+/*	uc->ugo_J = 0;	UNDEFINED				*/
+	uc->ugo_k = 0;	/* Don't do unsetup first		*/
+	uc->ugo_K = 0;	/* Keywords				*/
+	uc->ugo_l = 0;	/* long (listing)			*/
+/*	uc->ugo_L = 0;	UNDEFINED				*/
+	uc->ugo_n = 0;	/* new chain				*/
+/*	uc->ugo_N = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_o = 0;	/* old chain				*/
+/*	uc->ugo_O = 0;	/* CODE INCOMPLETE			*/
+/*	uc->ugo_p = 0;	/* CODE INCOMPLETE			*/
+/*	uc->ugo_P = 0;	/* CODE INCOMPLETE			*/
+/*	uc->ugo_q = 0;	/* CODE INCOMPLETE			*/
+/*	uc->ugo_Q = 0;	UNDEFINED				*/
+/*	uc->ugo_r = 0;	/* CODE INCOMPLETE			*/
+/*	uc->ugo_R = 0;	UNDEFINED				*/
+	uc->ugo_S = 0;	/* Syntax Checking			*/
+/*	uc->ugo_s = 0;	UNDEFINED				*/
+	uc->ugo_t = 0;	/* test chain				*/
+/*	uc->ugo_T = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_u = 0;	/* uncompile first			*/
+/*	uc->ugo_U = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_v = 0;	/* verbose				*/
+	uc->ugo_V = 0;	/* Don't delete temp file(s)		*/
+	uc->ugo_w = 0;	/* stop first then start		*/
+	uc->ugo_W = 0;	/* use environment variables		*/
+	uc->ugo_x = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_X = 0;	/* execute instead of echo??		*/
+	uc->ugo_y = 0;	/* delete home dir, no query		*/
+	uc->ugo_Y = 0;	/* delete home dir, query		*/
+	uc->ugo_z = 0;	/* Database(s) were specified		*/
+	uc->ugo_Z = 0;	/* Time this command			*/
+
+   uc->ugo_chain_first = 0;
+   uc->ugo_chain_last = 0;
+   uc->ugo_flavor_first = 0;
+   uc->ugo_flavor_last = 0;
    argbuf = (char **)malloc(sizeof(char *)+1);
    *argbuf = 0;
 
@@ -180,85 +166,85 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
        }
        switch(*(arg_str+1))      /* which flag was specified */
        { case 'a':
-              ugo_a = 1;
+              uc->ugo_a = 1;
               break;
          case 'C':
-              ugo_C = 1;
+              uc->ugo_C = 1;
               break;
          case 'D':
-              ugo_D = 1;
+              uc->ugo_D = 1;
               break;
          case 'e':
-              ugo_e = 1;
+              uc->ugo_e = 1;
               break;
          case 'E':
-              ugo_E = 1;
+              uc->ugo_E = 1;
               break;
          case 'F':
-              ugo_F = 1;
+              uc->ugo_F = 1;
               break;
          case 'j':
-              ugo_j = 1;
+              uc->ugo_j = 1;
               break;
          case 'k':
-              ugo_k = 1;
+              uc->ugo_k = 1;
               break;
          case 'l':
-              ugo_l = 1;
+              uc->ugo_l = 1;
               break;
          case 'S':
-              ugo_S = 1;
+              uc->ugo_S = 1;
               break;
          case 'u':
-              ugo_u = 1;
+              uc->ugo_u = 1;
               break;
          case 'v':
-              ugo_v = 1;
+              uc->ugo_v = 1;
               break;
          case 'V':
-              ugo_V = 1;
+              uc->ugo_V = 1;
               break;
          case 'w':
-              ugo_w = 1;
+              uc->ugo_w = 1;
               break;
          case 'W':
-              ugo_W = 1;
+              uc->ugo_W = 1;
               break;
          case 'x':		/* This command is incomplete */
-              ugo_x = 1;
+              uc->ugo_x = 1;
               break;
          case 'y':
-              ugo_y = 1;
+              uc->ugo_y = 1;
               break;
          case 'Y':
-              ugo_Y = 1;
+              uc->ugo_Y = 1;
               break;
          case 'Z':
-              ugo_Z = 1;
+              uc->ugo_Z = 1;
               break;
          case 'c':
-              ugo_c = 1;
-              ugo_make_next("current",&ugo_chain_last,&ugo_chain_first);
+              uc->ugo_c = 1;
+              ugo_make_next("current",&uc->ugo_chain_last,&uc->ugo_chain_first);
               break;
          case 'n':
-              ugo_n = 1;
-              ugo_make_next("new",&ugo_chain_last,&ugo_chain_first);
+              uc->ugo_n = 1;
+              ugo_make_next("new",&uc->ugo_chain_last,&uc->ugo_chain_first);
               break;
          case 'd':
-              ugo_d = 1;
-              ugo_make_next("development",&ugo_chain_last,&ugo_chain_first);
+              uc->ugo_d = 1;
+              ugo_make_next("development",&uc->ugo_chain_last,&uc->ugo_chain_first);
          case 't':
-              ugo_t = 1;
-              ugo_make_next("test",&ugo_chain_last,&ugo_chain_first);
+              uc->ugo_t = 1;
+              ugo_make_next("test",&uc->ugo_chain_last,&uc->ugo_chain_first);
               break;
          case 'o':
-              ugo_o = 1;
-              ugo_make_next("old",&ugo_chain_last,&ugo_chain_first);
+              uc->ugo_o = 1;
+              ugo_make_next("old",&uc->ugo_chain_last,&uc->ugo_chain_first);
               break;
          case 'g':
-              ugo_g = 1;
+              uc->ugo_g = 1;
               if ( *argbuf ) 
-              {  ugo_make_next(*argbuf,&ugo_chain_last,&ugo_chain_first);
+              {  ugo_make_next(*argbuf,&uc->ugo_chain_last,&uc->ugo_chain_first);
                  *argbuf = 0;
                  break;
               }
@@ -267,15 +253,15 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                 { errflg = 1;
                   break;
                 }
-                ugo_make_next(arg_str,&ugo_chain_last,&ugo_chain_first);
+                ugo_make_next(arg_str,&uc->ugo_chain_last,&uc->ugo_chain_first);
                 break;
               }
               errflg = 1;
               break;
          case 'f':
-              ugo_f = 1;
+              uc->ugo_f = 1;
               if ( *argbuf ) 
-              {  ugo_make_next(*argbuf,&ugo_flavor_last,&ugo_flavor_first);
+              {  ugo_make_next(*argbuf,&uc->ugo_flavor_last,&uc->ugo_flavor_first);
                  *argbuf = 0;
                  break;
               }
@@ -284,21 +270,21 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                 { errflg = 1;
                   break;
                 }
-                ugo_make_next(arg_str,&ugo_flavor_last,&ugo_flavor_first);
+                ugo_make_next(arg_str,&uc->ugo_flavor_last,&uc->ugo_flavor_first);
                 break;
               }
               errflg = 1;
               break;
          case 'h':
-              ugo_h = 1;
+              uc->ugo_h = 1;
               if ( *argbuf ) 
               { while((loc=strchr(*argbuf,','))!=0) {
                   addr=*argbuf;
                   *argbuf=loc+1;
                   *loc = 0;
-                  ugo_make_next(addr,&ugo_host_last,&ugo_host_first);
+                  ugo_make_next(addr,&uc->ugo_host_last,&uc->ugo_host_first);
                }
-               ugo_make_next(*argbuf,&ugo_host_last,&ugo_host_first);
+               ugo_make_next(*argbuf,&uc->ugo_host_last,&uc->ugo_host_first);
                *argbuf = 0;
                break;
                }
@@ -311,23 +297,23 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    ugo_make_next(addr,&ugo_host_last,&ugo_host_first);
+                    ugo_make_next(addr,&uc->ugo_host_last,&uc->ugo_host_first);
                  }
-                 ugo_make_next(arg_str,&ugo_host_last,&ugo_host_first);
+                 ugo_make_next(arg_str,&uc->ugo_host_last,&uc->ugo_host_first);
                  break;
                }
                  errflg = 1;
                  break;
          case 'A':
-              ugo_A = 1;
+              uc->ugo_A = 1;
               if ( *argbuf ) 
               {  while((loc=strchr(*argbuf,','))!=0) {
                     addr=*argbuf;
                     *argbuf=loc+1;
                     *loc = 0;
-                    ugo_make_next(addr,&ugo_auth_last,&ugo_auth_first);
+                    ugo_make_next(addr,&uc->ugo_auth_last,&uc->ugo_auth_first);
                  }
-                 ugo_make_next(*argbuf,&ugo_auth_last,&ugo_auth_first);
+                 ugo_make_next(*argbuf,&uc->ugo_auth_last,&uc->ugo_auth_first);
                  *argbuf = 0;
                  break;
               }
@@ -340,23 +326,23 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                    addr=arg_str;
                    arg_str=loc+1;
                    *loc = 0;
-                   ugo_make_next(addr,&ugo_auth_last,&ugo_auth_first);
+                   ugo_make_next(addr,&uc->ugo_auth_last,&uc->ugo_auth_first);
                 }
-                ugo_make_next(arg_str,&ugo_auth_last,&ugo_auth_first);
+                ugo_make_next(arg_str,&uc->ugo_auth_last,&uc->ugo_auth_first);
                 break;
               }
               errflg = 1;
               break;
          case 'K':
-              ugo_K = 1;
+              uc->ugo_K = 1;
               if ( *argbuf ) 
               {  while((loc=strchr(*argbuf,','))!=0) {
                     addr=*argbuf;
                     *argbuf=loc+1;
                     *loc = 0;
-                    ugo_make_next(addr,&ugo_key_last,&ugo_key_first);
+                    ugo_make_next(addr,&uc->ugo_key_last,&uc->ugo_key_first);
                  }
-                 ugo_make_next(*argbuf,&ugo_key_last,&ugo_key_first);
+                 ugo_make_next(*argbuf,&uc->ugo_key_last,&uc->ugo_key_first);
                  *argbuf = 0;
                  break;
               }
@@ -369,23 +355,23 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                    addr=arg_str;
                    arg_str=loc+1;
                    *loc = 0;
-                   ugo_make_next(addr,&ugo_key_last,&ugo_key_first);
+                   ugo_make_next(addr,&uc->ugo_key_last,&uc->ugo_key_first);
                 }
-                ugo_make_next(arg_str,&ugo_key_last,&ugo_key_first);
+                ugo_make_next(arg_str,&uc->ugo_key_last,&uc->ugo_key_first);
                 break;
               }
               errflg = 1;
               break;
          case 'z':
-              ugo_z = 1;
+              uc->ugo_z = 1;
               if ( *argbuf ) 
               {  while((loc=strchr(*argbuf,','))!=0) {
                     addr=*argbuf;
                     *argbuf=loc+1;
                     *loc = 0;
-                    ugo_make_next(addr,&ugo_db_last,&ugo_db_first);
+                    ugo_make_next(addr,&uc->ugo_db_last,&uc->ugo_db_first);
                  }
-                 ugo_make_next(*argbuf,&ugo_db_last,&ugo_db_first);
+                 ugo_make_next(*argbuf,&uc->ugo_db_last,&uc->ugo_db_first);
                  *argbuf = 0;
                  break;
               }
@@ -398,9 +384,9 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                    addr=arg_str;
                    arg_str=loc+1;
                    *loc = 0;
-                   ugo_make_next(addr,&ugo_db_last,&ugo_db_first);
+                   ugo_make_next(addr,&uc->ugo_db_last,&uc->ugo_db_first);
                 }
-                ugo_make_next(arg_str,&ugo_db_last,&ugo_db_first);
+                ugo_make_next(arg_str,&uc->ugo_db_last,&uc->ugo_db_first);
                 break;
               }
               errflg = 1;
@@ -409,15 +395,18 @@ int upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
             errflg = 1;
        }
      } else {
-       ugo_product = arg_str;
+       uc->ugo_product = arg_str;
        if((arg_str = upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)
        if(*arg_str == '-')   errflg = 1;
-       ugo_version = arg_str;
+       uc->ugo_version = arg_str;
      }
    }
    if ((errflg ))
    {   fprintf(stderr, "Valid options are %s\n",validopts); }
+/*
    return errflg;
+*/
+   return uc;
 }
 /* ===========================================================================
 ** ROUTINE	upsugo_getarg( int argc, char * argv[])
