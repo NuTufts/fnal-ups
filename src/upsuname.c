@@ -128,6 +128,9 @@ ups_append_release(char *buf)
    (void) strcat(buf,baseuname.release);     /* add in release */
 }
 
+/*
+** just thinking about this for now...
+*/
 void
 ups_append_default_quals(char *buf) {
    char **p;
