@@ -1193,7 +1193,9 @@ char *upsugo_getenv( char * const prod_name )
 ** DESCRIPTION                                                               
 **
 ** This routine get the value of the environment setup and converts it
-** to a ugo command structure. 
+** to a ugo command structure.  It constructs an argc/argv[] combo, using
+** spaces or tabs as delimiters.  It can also handle simple quoted strings,
+** using either pairs of quotes or apostrophes.
 **                                                                           
 ** VALUES RETURNED                                                           
 **      +++                                                                  
@@ -1217,10 +1219,12 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
 /* I'm going to count the number of spaces in the environment variable
 ** there cannot be more arguments than spaces...
 */
+       setup_env += strspn(setup_env, " \t");	/* Skip leading whitespace */
        waddr=setup_env;
-       while ((waddr != 0) && (strlen(waddr) > 0))
-             { if ((waddr = strchr(waddr,' ')) != 0) 
-                  { for( ; (*waddr == ' ') ; waddr++ ) ; }
+       while ((waddr != 0) && (*waddr != '\0'))
+             {
+                waddr += strcspn(waddr, " \t");	/* Find next whitespace */
+                waddr += strspn(waddr, " \t");	/* Skip next whitespace */
                 count++;
              }
        count++;  /* add one more for the program who called */
@@ -1229,14 +1233,26 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
        (void) strcpy(argv[0],"upsugo_env");
        waddr=setup_env;
        for (argc = 1;argc < count;argc++)
-           { length = (int)strcspn(waddr," ");
+           {
+             char * delim;		/* Pointer to delimiter string */
+             delim = " \t";
+             if (*waddr == '\0') break;
+             if (*waddr == '\'')
+	     {
+               delim = "'";
+               waddr++;
+             }
+             if (*waddr == '"')
+	     {
+               delim = "\"";
+               waddr++;
+             }
+             length = (int)strcspn(waddr, delim);
              argv[argc] = (char *) malloc((size_t)(length + 1));
              (void) strncpy(argv[argc],waddr,(size_t)length);
              argv[argc][length] = '\0';
-             if ((waddr = strchr(waddr, ' ')) != 0) 
-                { waddr++;
-                  for( ; (*waddr == ' ') ; waddr++ ) ;
-                }
+             waddr += length+1;
+             waddr += strspn(waddr, " \t");
            }
        hold=ugo_commands;
        ugo_commands=0;
