@@ -99,6 +99,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
     "Specify a version, which will remove ALL chains, or chains(s) not both");
     return 0;
   }
+/*
   if (!uc->ugo_chain)
   { if ((int)(upslst_count(uc->ugo_flavor) != 2 ) )
     { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
@@ -106,6 +107,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
       return 0;
     }
   }
+*/
   mproduct_list = upsmat_instance(uc, db_list , not_unique);
   if (!mproduct_list)
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
