@@ -1,14 +1,18 @@
 Changes made in the v4_5_1 release of ups:
 
 Changed the umask setting during temporary file creation to have group
-and world write access disabled, instead of all access enabled.  Some
-shells won't execute world-writable files from the root account.
+and world write access disabled, instead of all access enabled.  Fixed
+the final chmod to not allow group or world write access either.
 
 Fixed the problem in the Bourne shell with defining aliases which end
 with an ampersand.
 
 Added a test for the sourceCompileOpt and sourceCompileReq routines to
 prevent attempts to delete /dev/null.
+
+Inhibited the attempt to report the unknown command name from errors
+encountered when executing the temporary file.  This happens when user-
+defined actions use commands like FileTest and there's an error.
 
 Fixed the ups/dbconfig.template file's definition of PROD_DIR_PREFIX
 to include the prd subdirectory; commented out the definition of
