@@ -122,7 +122,9 @@ static char *g_error_messages[UPS_NERR] = {
 /* 61 */  "%s: Name of created temp file is %s\n",
 /* 62 */  "%s: File %s must have %s keyword equal to %s in it\n",
 /* 63 */  "%s: Action function \'%s\' is not supported in %s\n",
-/* 64 */  "%s: The \'execute\' function must have \'UPS_ENV\' or \'NO_UPS_ENV\' as a second parameter, not \'%s\'\n"
+/* 64 */  "%s: The \'execute\' function must have \'UPS_ENV\' or \'NO_UPS_ENV\' as a second parameter, not \'%s\'\n",
+/* 65 */  "%s: Flavor=ANY is not allowed in a %s file\n",
+/* 66 */  "%s: Qualifiers=ANY is not allowed in a %s file\n"
 };
 
 char *g_error_ascii[] = {
@@ -191,7 +193,9 @@ char *g_error_ascii[] = {
    /* UPS_NO_KEYWORD          62 */ "UPS_NO_KEYWORD",
    /* UPS_ACTION_PARSE_INVALID 63 */ "UPS_ACTION_PARSE_INVALID",
    /* UPS_EXECUTE_ARG2        64 */ "UPS_EXECUTE_ARG2",
-   /* UPS_NERR                65 */ "UPS_NERR",
+   /* UPS_INVALID_ANY_FLAVOR  65 */ "UPS_INVALID_ANY_FLAVOR",
+   /* UPS_INVALID_ANY_QUALS   66 */ "UPS_INVALID_ANY_QUALS",
+   /* UPS_NERR                67 */ "UPS_NERR",
    0 };
 
 /*

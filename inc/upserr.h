@@ -105,7 +105,9 @@
 #define UPS_NO_KEYWORD          62
 #define UPS_ACTION_PARSE_INVALID 63
 #define UPS_EXECUTE_ARG2        64
-#define UPS_NERR                65      /*  this one must always be last */
+#define UPS_INVALID_ANY_FLAVOR  65
+#define UPS_INVALID_ANY_QUALS   66
+#define UPS_NERR                67      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
