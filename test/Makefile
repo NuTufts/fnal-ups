@@ -31,7 +31,7 @@ OBJECTS =
 
 LDFLAGS = $(LLIBS)
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
-	upstst_misc.o upstst_parse.o upstst_error.o
+	upstst_misc.o upstst_parse.o upstst_error.o upstst_files.o
 #=============================================================================
 # TARGETS
 #=============================================================================
@@ -81,6 +81,9 @@ upstst_cmdloop.o : upstst_cmdloop.c
 	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
 
 upstst_error.o : upstst_error.c
+	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
+
+upstst_files.o : upstst_files.c
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
 #

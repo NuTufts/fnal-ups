@@ -1,6 +1,5 @@
 /*
 
-
 Authors:        Margaret Votava
 e-mail:         "votava@fnal.gov"
  
@@ -13,9 +12,6 @@ Include files:-
 #include <time.h>
 #include "upstst_parse.h"
 #include "upstst_macros.h"
-#include "ups_error.h"
-
-int strcasecmp (const char *s1, const char *s2);
 
 
 /* ============================================================================
