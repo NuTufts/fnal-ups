@@ -1818,7 +1818,7 @@ t_upsugo_command *get_dependent( t_upsact_cmd *const p_cmd,
      here from an automatic reversal of a setup action */
 
       t_upsugo_command *temp_ugo = 0;
-      if (temp_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[e_setup].valid_opts ))
+      if ((temp_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[e_setup].valid_opts)) != 0)
       {
 	if (temp_ugo->ugo_e)
 	  a_ugo->ugo_e = temp_ugo->ugo_e;
