@@ -50,12 +50,12 @@ extern t_cmd_map g_cmd_maps[];
       const t_upstyp_instance *const a_inst,            \
       const t_upstyp_db * const a_db,                   \
       const t_upstyp_matched_instance * const a_minst,  \
-      const t_upsugo_command * const a_command_line,    \
-      const char * const a_product_name
+      const t_upsugo_command * const a_command_line
 
 static void ups_verify_version_instance(VERIFY_INST_PARAMS);
 static void ups_verify_table_instance(VERIFY_INST_PARAMS);
-static void ups_verify_generic_instance(VERIFY_INST_PARAMS);
+static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
+					const char * const a_product_name);
 
 /*
  * Definition of global variables.
@@ -168,13 +168,12 @@ void ups_verify_matched_instance(const t_upstyp_db * const a_db,
       ups_verify_generic_instance(a_minst->version, a_db, a_minst,
 				  a_command_line, a_product_name);
       ups_verify_version_instance(a_minst->version, a_db, a_minst, 
-				  a_command_line, a_product_name);
+				  a_command_line);
     }
     if (a_minst->table) {
       ups_verify_generic_instance(a_minst->table, a_db, a_minst,
 				  a_command_line, a_product_name);
-      ups_verify_table_instance(a_minst->table, a_db, a_minst, a_command_line,
-				a_product_name);
+      ups_verify_table_instance(a_minst->table, a_db, a_minst, a_command_line);
     }
   }
 }
@@ -297,7 +296,8 @@ static void ups_verify_table_instance(VERIFY_INST_PARAMS)
  * Output: none
  * Return: none
  */
-static void ups_verify_generic_instance(VERIFY_INST_PARAMS)
+static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
+					const char * const a_product_name)
 {
   /* the following elements of an instance structure are verified here -
                product
