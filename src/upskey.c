@@ -103,24 +103,24 @@ t_upskey_map g_key_info[] =
   { e_key_statistics,       "STATISTICS",       NO,   17,    3, 0x00001001 },
   { e_key_compile_dir,      "COMPILE_DIR",      NO,   18,   NO, 0x00010001 },
   { e_key_compile_file,     "COMPILE_FILE",     NO,   19,   NO, 0x00000001 },
-  { e_key_catman_source_dir,"CATMAN_SOURCE_DIR",NO,   20,   NO, 0x00000010 },
-  { e_key_html_source_dir,  "HTML_SOURCE_DIR",  NO,   21,   NO, 0x00000010 },
-  { e_key_info_source_dir,  "INFO_SOURCE_DIR",  NO,   22,   NO, 0x00000010 },
-  { e_key_man_source_dir,   "MAN_SOURCE_DIR",   NO,   23,   NO, 0x00000010 },
-  { e_key_news_source_dir,  "NEWS_SOURCE_DIR",  NO,   24,   NO, 0x00000010 },
+  { e_key_catman_source_dir,"CATMAN_SOURCE_DIR",NO,   20,   NO, 0x00010010 },
+  { e_key_html_source_dir,  "HTML_SOURCE_DIR",  NO,   21,   NO, 0x00010010 },
+  { e_key_info_source_dir,  "INFO_SOURCE_DIR",  NO,   22,   NO, 0x00010010 },
+  { e_key_man_source_dir,   "MAN_SOURCE_DIR",   NO,   23,   NO, 0x00010010 },
+  { e_key_news_source_dir,  "NEWS_SOURCE_DIR",  NO,   24,   NO, 0x00010010 },
 
-  { e_key_db_dir,           "DB_DIR",           NO,   25,   NO, 0x00000000 },
+  { e_key_db_dir,           "DB_DIR",           NO,   25,   NO, 0x00010000 },
   { e_key_action,           "ACTION",           NO,   26,   NO, 0x00000010 },
   { e_key_user_defined,     "USER",              6,   27,   NO, 0x00001111 },
 
   { e_key_prod_dir_prefix,  "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00011000 },
-  { e_key_man_target_dir,   "MAN_TARGET_DIR",   NO,   NO,    4, 0x00001000 },
-  { e_key_catman_target_dir,"CATMAN_TARGET_DIR",NO,   NO,    5, 0x00001000 },
-  { e_key_info_target_dir,  "INFO_TARGET_DIR",  NO,   NO,    6, 0x00001000 },
-  { e_key_html_target_dir,  "HTML_TARGET_DIR",  NO,   NO,    7, 0x00001000 },
-  { e_key_news_target_dir,  "NEWS_TARGET_DIR",  NO,   NO,    8, 0x00001000 },
-  { e_key_upd_usercode_dir, "UPD_USERCODE_DIR", NO,   NO,    9, 0x00001000 },
-  { e_key_setups_dir,       "SETUPS_DIR",       NO,   NO,   10, 0x00001000 },
+  { e_key_man_target_dir,   "MAN_TARGET_DIR",   NO,   NO,    4, 0x00011000 },
+  { e_key_catman_target_dir,"CATMAN_TARGET_DIR",NO,   NO,    5, 0x00011000 },
+  { e_key_info_target_dir,  "INFO_TARGET_DIR",  NO,   NO,    6, 0x00011000 },
+  { e_key_html_target_dir,  "HTML_TARGET_DIR",  NO,   NO,    7, 0x00011000 },
+  { e_key_news_target_dir,  "NEWS_TARGET_DIR",  NO,   NO,    8, 0x00011000 },
+  { e_key_upd_usercode_dir, "UPD_USERCODE_DIR", NO,   NO,    9, 0x00011000 },
+  { e_key_setups_dir,       "SETUPS_DIR",       NO,   NO,   10, 0x00011000 },
 
   { e_key_group,            "GROUP:",           NO,   NO,   NO, 0x00000010 },
   { e_key_common,           "COMMON:",          NO,   NO,   NO, 0x00000010 },
@@ -260,6 +260,10 @@ char *upskey_inst_getuserval( t_upstyp_instance * const inst,
   usr_l = upslst_first( inst->user_list );
   for ( ; usr_l; usr_l = usr_l->next ) {
     sp_d = (char *)usr_l->data;
+
+    /* we can be strict with the format, since we are passing an
+       already passed and rewritten user key/val */
+    
     if ( (sp_e = strstr( sp_d, " = " )) ) {
       if ( (len == (size_t )(sp_e - sp_d)) && 
 	   !upsutl_strincmp( sp_d, skey, len ) )
