@@ -45,6 +45,7 @@
 #define STR_TRIM 't'
 #define STR_TRIM_PACK 'p'
 #define STR_TRIM_DEFAULT ' '
+#define UPS_SEPARATOR ":"
 
 /*
  * Types.
