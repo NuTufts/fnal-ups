@@ -1208,10 +1208,10 @@ static int match_from_table( const char * const a_product,
   t_upstyp_product *read_product;
   int num_matches = 0;
 
-  full_table_file = upsutl_get_table_file_path(a_product, a_tablefile,
-					       a_tablefiledir, a_upsdir,
-					       a_productdir, a_db_info,
-					       MUST_EXIST);
+  full_table_file = upsget_table_file(a_product, a_tablefile,
+				      a_tablefiledir, a_upsdir,
+				      a_productdir, a_db_info,
+				      MUST_EXIST);
 
   if (full_table_file != NULL) {
     if ((read_product = upsfil_read_file(full_table_file)) != NULL) {

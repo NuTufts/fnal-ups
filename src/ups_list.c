@@ -688,13 +688,13 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
       { valid=1;
         if (instance->version)
-        { addr=upsutl_get_table_file_path(product->product,
-                                          instance->version->table_file,
-                                          instance->version->table_dir,
-                                          instance->version->ups_dir,
-                                          instance->version->prod_dir,
-                                          product->db_info,
-                                          exists);
+        { addr=upsget_table_file(product->product,
+                                 instance->version->table_file,
+                                 instance->version->table_dir,
+                                 instance->version->ups_dir,
+                                 instance->version->prod_dir,
+                                 product->db_info,
+                                 exists);
           if(addr)
           { printf("\"%s\" ",addr);
           } else { 

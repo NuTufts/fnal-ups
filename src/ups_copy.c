@@ -30,6 +30,7 @@
 #include "upserr.h"
 #include "upsugo.h"
 #include "upsutl.h"
+#include "upsget.h"
 #include "upsmat.h"
 #include "upsact.h"
 #include "upsmem.h"
@@ -379,10 +380,10 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	  /* we will be changing things so get the real thing. we need to get
 	     a few more pieces of info. */
 	  if ((tmp_buf2 = 
-	       upsutl_get_table_file_path(new_instance->product,
-					  new_table_file, new_table_dir,
-					  new_ups_dir, new_prod_dir,
-					  new_db_info_ptr, MUST_EXIST))
+	       upsget_table_file(new_instance->product,
+				 new_table_file, new_table_dir,
+				 new_ups_dir, new_prod_dir,
+				 new_db_info_ptr, MUST_EXIST))
 	      != NULL) {
 	    /* file exists */
 	    write_product_ptr = upsfil_read_file(tmp_buf2);
@@ -407,11 +408,11 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	  } else {
 	    /* file does not exist, so we must figure out where it is
 	       supposed to go */
-	    tmp_buf2 = upsutl_get_table_file_path(new_instance->product,
-						  new_table_file,
-						  new_table_dir, new_ups_dir,
-						  new_prod_dir,
-						  new_db_info_ptr, NOT_EXIST);
+	    tmp_buf2 = upsget_table_file(new_instance->product,
+					 new_table_file,
+					 new_table_dir, new_ups_dir,
+					 new_prod_dir,
+					 new_db_info_ptr, NOT_EXIST);
 	  }
 	}
 	/* if there is no write_product_ptr yet, the table file does not
