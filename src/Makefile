@@ -65,12 +65,15 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : library main
+all : library main old
 
 tag_file : 
 	$(EMACS_DIR)/bin/etags -t *.c ../inc/*.h
 
 main : $(BIN)/ups
+
+# Old stuff people just expect to work that really isn't part of ups
+old: $(BIN)/funame
 
 library : $(LIB)/libups.a
 
@@ -83,6 +86,10 @@ cia :	$(CIAOBJECTS)
 $(BIN)/ups : ups_main.o library
 	$(CC) ups_main.o -o $@  $(CFLAGS) $(LDFLAGS)
 
+#
+# Build the old products people expect that arn't really dependencies
+$(BIN)/funame : 
+	$(CC) funame.c -o $@ $(OLD_LIBS)
 #
 # Compile UPS library source
 #
