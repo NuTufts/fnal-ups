@@ -411,7 +411,7 @@ sub WriteTableFile {
           ( $sos, $qual ) = &split_os ( $os );
           print TableFile "Flavor=$sos\n";
           if ( $reqType eq "BUILD" ) {
-             if ( $qual ) { 
+             if ( $qual ne "" ) { 
                 $qual="build:$qual";
              } else { 
                 $qual="build";
@@ -509,7 +509,11 @@ sub AddChainRec {
 # Add another chain because build attributes will now be a qualifier...
     if ( &build_reqs ) { 
     print ChainFile "Flavor=$sos\n";
-    print ChainFile "Qualifiers=\"build:$qual\"\n";
+    if ( $qual ne "" ) { 
+       print ChainFile "Qualifiers=\"build:$qual\"\n";
+    } else { 
+       print ChainFile "Qualifiers=\"build\"\n";
+    }
     print ChainFile "Version=$ver\n";
     print ChainFile "Declarer=$who\n";
     print ChainFile "Declared=$when\n";
@@ -600,7 +604,11 @@ sub WriteVersionRecs {
     print VersionFile "# Starting group definition\n";
     print VersionFile "Group:\n";
     print VersionFile "   FLAVOR=$sos\n";
-    print VersionFile "   QUALIFIERS=\"build:$qual\"\n";
+    if ( $qual ne "" ) { 
+       print VersionFile "   QUALIFIERS=\"build:$qual\"\n";
+    } else { 
+       print VersionFile "   QUALIFIERS=\"build\"\n";
+    }
     print VersionFile "   DECLARED=$instanceHash{$flvr}{$version}[$#WHEN]\n";
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
@@ -612,7 +620,7 @@ sub WriteVersionRecs {
        print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
     }
     if ( &auth_nodes ) {
-       print VersionFile "   AUTH_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
+       print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
     }
     if ( &distribution ) {
        print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
