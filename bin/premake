@@ -46,8 +46,8 @@ elif [ $arch = Linux -o $arch = linux ]; then
 	ccenv="Linux"
 elif [ $arch = AIX ]; then
         ccenv="AIX"
-elif [ $arch = CYGWIN32/NT ]; then
-        ccenv="CYGWIN32/NT"
+elif expr "$arch" : "CYGWIN" >/dev/null; then
+        ccenv="CYGWIN"
 else
 	echo "Unknown architecture \`$arch'" >&2
 	ccenv=notvalid
@@ -185,7 +185,7 @@ case $ccenv in
 		defs="$defs CCCHK=\"-Wall\""
 		;;
 
-	CYGWIN32/NT)			# Running cygwin32 under Windows NT
+	CYGWIN*)			# Running cygwin32 under Windows NT
 		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
 		cc="gcc"
 		if [ "$opt" != "" ]; then
