@@ -77,6 +77,12 @@ static mode_t g_umask = 0;
 #ifndef NULL
 #define NULL 0
 #endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef TRUE
+#define TRUE 1
+#endif
 
 /*
  * And now for something completely different
@@ -148,7 +154,8 @@ int main(int argc, char *argv[])
 	if (UPS_ERROR == UPS_SUCCESS) {
 	  switch (g_cmd_info[i].cmd_index) {
 	  case e_setup: mproduct_list = 
-			  ups_setup(command_line, temp_file, e_setup);
+			  ups_setup(command_line, temp_file, e_setup,
+				    (int )FALSE);
 	    break;
 	  case e_unsetup: mproduct_list = 
 			    ups_unsetup(command_line, temp_file, e_unsetup);
@@ -168,7 +175,8 @@ int main(int argc, char *argv[])
 			   ups_depend(command_line, argv[1], e_depend);
 	    break;
 	  case e_exist: mproduct_list = 
-			  ups_setup(command_line, temp_file, e_setup);
+			  ups_setup(command_line, temp_file, e_setup,
+				    (int )TRUE);
 	    break;
 	  case e_modify: mproduct_list = 
 			   ups_modify(command_line, temp_file, e_modify);

@@ -61,7 +61,7 @@ extern t_cmd_info g_cmd_info[];
  */
 t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 			 const FILE * const a_temp_file,
-			 const int a_ups_command)
+			 const int a_ups_command, const int a_exist_cmd)
 {
   t_upslst_item *mproduct_list = NULL, *new_mproduct_list = NULL;
   t_upstyp_matched_product *mproduct = NULL, *new_mproduct = NULL;
@@ -138,15 +138,19 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
       }
     }
   } else {
-    if (a_command_line->ugo_version && 
-	(NOT_EQUAL_ANY_MATCH(a_command_line->ugo_version))) {
-      upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
-		 a_command_line->ugo_product,
-		 a_command_line->ugo_version, "version");
-    } else if (a_command_line->ugo_chain) {
-      upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
-		 a_command_line->ugo_product,
-		 (char *)a_command_line->ugo_chain->data, "chain");
+    /* do not add any errors to the stack if we were called because of the
+       ups exist command */
+    if (! a_exist_cmd) {
+      if (a_command_line->ugo_version && 
+	  (NOT_EQUAL_ANY_MATCH(a_command_line->ugo_version))) {
+	upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
+		   a_command_line->ugo_product,
+		   a_command_line->ugo_version, "version");
+      } else if (a_command_line->ugo_chain) {
+	upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
+		   a_command_line->ugo_product,
+		   (char *)a_command_line->ugo_chain->data, "chain");
+      }
     }
   }
   
