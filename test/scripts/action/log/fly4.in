@@ -9,6 +9,9 @@ if ("x${OPERA}" == "x") unsetenv OPERA
 #
 unsetenv OPERA
 #
+setenv SYMPHONY "`$UPS_DIR/bin/dropit -e -p "'"$SYMPHONY"'" -i' ' -d';' EROICA`"
+if ("x${SYMPHONY}" == "x") unsetenv SYMPHONY
+#
 unsetenv FLY_DIR
 #
 unsetenv SETUP_FLY

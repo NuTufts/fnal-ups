@@ -6,6 +6,7 @@ QUALIFIERS = ""
 
 ACTION = SETUP
    doDefaults()
+   envAppend(SYMPHONY,"EROICA",";")
    envset(OPERA,"AIDA FAUST")
    envappend(OPERA,"MADAM_BUTTERFLY CARMEN"," ")
    envprepend(OPERA,FIDELIO,' ')
