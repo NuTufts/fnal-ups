@@ -360,7 +360,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
              minst_list = (t_upslst_item *)mproduct->minst_list;
              minst = (t_upstyp_matched_instance *)(minst_list->data);
              cinst = (t_upstyp_instance *)minst->chain;
-             if(strstr(cinst->flavor,the_flavor)) /* there's a better flavor match */
+/* there's a better flavor match */
+             if(the_flavor && strstr(cinst->flavor,the_flavor)) 
              { the_flavor=cinst->flavor;
                product = upsget_chain_file(db_info->name,
                                            uc->ugo_product,
