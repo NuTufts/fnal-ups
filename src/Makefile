@@ -16,7 +16,7 @@ SHELL = /bin/sh
 .SUFFIXES :	.A
 
 .c.o :
-	$(CC) -c $(CCCHK) $(CFLAGS) $*.c
+	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $*.c
 
 .c.A :
 	@ echo '        $(CIA_DIR)/bin/cia -c $(CFLAGScia) $*.c'
@@ -37,8 +37,10 @@ CFLAGScia = $(INCDIRS)
 OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.o \
 	  ups_files.o upsugo.o ups_match.o
 
+COMMAND_OBJECTS = ups_c_list.o
+
 CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a ups_types.a \
-	     ups_files.a upsugo.a ups_match.a
+	     ups_files.a upsugo.a ups_match.a ups_c_list.a
 
 LDFLAGS = $(LLIBS)
 
@@ -50,10 +52,12 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : library
+all : library main
 
 tag_file : 
 	$(EMACS_DIR)/bin/etags -t *.c ../inc/*.h
+
+main : $(BIN)/ups
 
 library : $(LIB)/libups.a
 
@@ -61,9 +65,15 @@ cia :	$(CIAOBJECTS)
 	cia $(CIAOBJECTS)
 
 #
+# Build main line executable
+#
+$(BIN)/ups : ups_main.o library
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) ups_main.o $(LDFLAGS)
+
+#
 # Compile UPS library source
 #
-$(LIB)/libups.a : $(OBJECTS)
+$(LIB)/libups.a : $(OBJECTS) $(COMMAND_OBJECTS)
 	@echo "=== UPS BUILD : Building Unix library (libups.a) ==="
 	$(AR) $(ARFLAGS) $(LIB)/libups.a $?
 	- if [ "$(RANLIB)" != "" -a -x "$(RANLIB)" ]; then \
@@ -115,18 +125,40 @@ make :
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
 # src DIRECTORY TO GENERATE IT
 #START_DEPEND
+ups_c_list.o:	ups_c_list.c
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_memory.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_utils.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_match.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_files.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/ups_commands.h
 ups_error.o:	ups_error.c
 ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_files.o:	ups_files.c
-ups_files.o:	$(ERUPT_DIR)/inc/ups_files.h
+ups_files.o:	$(ERUPT_DIR)/inc/ups_utils.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_files.o:	$(ERUPT_DIR)/inc/ups_files.h
+ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_memory.h
 ups_list.o:	ups_list.c
 ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_list.o:	$(ERUPT_DIR)/inc/ups_memory.h
+ups_main.o:	ups_main.c
+ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_commands.h
 ups_match.o:	ups_match.c
 ups_match.o:	$(ERUPT_DIR)/inc/ups_match.h
 ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
@@ -149,8 +181,11 @@ ups_utils.o:	ups_utils.c
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_utils.o:	$(ERUPT_DIR)/inc/ups_memory.h
 upsugo.o:	upsugo.c
 upsugo.o:	$(ERUPT_DIR)/inc/ups_types.h
 upsugo.o:	$(ERUPT_DIR)/inc/ups_list.h
+upsugo.o:	$(ERUPT_DIR)/inc/ups_memory.h
