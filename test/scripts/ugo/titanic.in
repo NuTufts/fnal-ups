@@ -3,6 +3,7 @@ Flavor:           IRIX+5
                   IRIX
                   NULL
                   ANY
+Osname:           IRIX+5
 Qualifiers:       
 DB:               /thunder
                   /lightening

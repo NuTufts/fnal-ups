@@ -4,6 +4,7 @@ Flavor:           IRIX+5.3
                   IRIX
                   NULL
                   ANY
+Osname:           IRIX+5.3
 Qualifiers:       cat
                   
 DB:               /thunder
