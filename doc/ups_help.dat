@@ -27,42 +27,62 @@
 #Information about command presented EXACTLY as typed line for
 #line until OPTIONS or a : not found 
 COMMANDS    :
-configure   :?cdfgHmMnoOqrtUvVzZ: 
+configure   :?cdfgHmMnoOqrtUvVzZ: < unprinted comments go here >
 : Environmentally configure a product instance.
 copy        :?AcCdfgHmMnoOpqrtTUvVWXzZ:
-: Allow one instance of a product to be declared "like" another.
+: Allow one instance of a product to be declared 
+: "like" another.
 create      :?fHmMpqvZ:
 : Create a template UPS table file.
 declare     :?AcCdfgHmMnoOpqrtTUvVzZ:
 : Add a product instance or a chain to a UPS Database.
 depend      :?cdotgfHKmMqrUvVzZ:
-: List (for a specified UPS product instance) UPS product requirements or all UPS product instances that have the specified UPS product instance as a requirement.
+: List (for a specified UPS product instance) 
+: UPS product requirements or all UPS product instances 
+: that have the specified UPS product instance as a 
+: requirement.
 exist       :?BcdefgHjkmMoOqrtUvVzZ:
-: Determine if a setup command with the same options would likely succeed.
+: Determine if a setup command with the same options 
+: would likely succeed.
+flavor      :?fHl0123:
+: Print flavor of a machine, optionally by 
+: level, or table generated for searching
 get         :?cdfFgHmMnoqrtUvVzZ:
-: Return a list of all files that are needed by a product instance and do not live under the product root directory.
+: Return a list of all files that are needed 
+: by a product instance and do not live under 
+: the product root directory.
 help        :?:This is sort of a special case since it will accept commands
 : Output help information for all UPS commands
 list        :a?cdfghHKlmMnoqrtUvVzZ:
 : List UPS Database information about product instances.
 modify      :?AEfHmMopqrTUvVxzZ:
-: Allow editor modification of the UPS Database files.  The altered files are verified before being rewritten.
+: Allow editor modification of the UPS Database files.  
+: The altered files are verified before being rewritten.
 setup       :?BcdefgHjkmMnoOqrtUvVzZ:
-: Prepare the environment in order to be able to use a product instance.
+: Prepare the environment in order to be able 
+: to use a product instance.
 start       :?cdfgHmMnoOqrtUvVwzZ: 
-: Perform any necessary actions for a product instance at system boot time.
+: Perform any necessary actions for a product 
+: instance at system boot.
 stop        :?cdfgHmMnoOqrtUvVzZ: 
-: Perform any necessary actions for a product instance at system shutdown.
+: Perform any necessary actions for a product 
+: instance at system shutdown.
 tailor      :?cdfghHKmMnoOqrtUvVzZ: 
-: Perform any product instance tailoring that needs to be done once (specify hardware device location) or needs user input.
+: Perform any product instance tailoring that needs 
+: to be done once (specify hardware device location)
+: or needs user input.
 unconfigure :?cdfgHmMnoOqrtUvVzZ: 
 : Undo any actions performed by the configure command.
 undeclare   :?cdfgHmMnoOqrtUvVyYzZ:
-: Remove a product instance from a UPS Database.  Any associated chains are removed as well.
+: Remove a product instance from a UPS Database. 
+: if chain(s) are specified ONLY the chain(s) will 
+: be removed if a version is specified ALL chain and 
+: version will be removed
 unsetup     :?cdefgHjmMnoOqtUvVzZ:
 : Return the environment to a pre-setup state.
 validate    :?cdfghHlmMnNoqrStUvVzZ:
-: Check the specified files for correct formatting and information.
+: Check the specified files for correct formatting 
+: and information.
 # from : to EOL, lines not starting with - are continuation.
 OPTIONS     :
 -? :print out usage information 
@@ -112,3 +132,8 @@ OPTIONS     :
 -Y :delete home directory, no query 
 -z :database : use this database to get instance information 
 -Z :time this command 
+-0 :Pick most specific flavor for operating system (includes minor 
+:version numbers
+-1 :Pick flavor for operating system to level of major version number
+-2 :Pick flavor for operating system generic to the vendor
+-3 :Pick flavor for operating system generic to any UNIX or comparable 
