@@ -620,9 +620,9 @@ ugo_old2newquals( const char *inaddr, int declflag ) {
     if (declflag) {
 	/* just remove + signs */
 	while( 0 != (*p2 = *p1 )) {
-	    p1++;
             if (*p1 != '+')
 		p2++;
+	    p1++;
         }
         return buf;
     }
