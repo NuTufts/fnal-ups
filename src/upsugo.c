@@ -92,24 +92,22 @@ int upsugo_bldfvr(struct ups_command * uc)
    The difference between 64 and 32 bit machines is ignored
    The real old machines return R2300 - But I don't care...
 */
-   if ((strncmp(baseuname->machine,"IP",2)) == 0)
-   { if ((baseuname->machine[2] >= '0') && (baseuname->machine[2] <= '9'))
-     { (void) strcpy(baseuname->sysname,"IRIX+");
-       (void) strcat(baseuname->sysname,baseuname->release);
-        addr=str_create(baseuname->sysname);
-        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-        loc=strchr(baseuname->sysname,'.');
-        *loc = 0;
-        addr=str_create(baseuname->sysname);
-        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-        loc=strchr(baseuname->sysname,'+');
-        *loc = 0;
-        addr=str_create(baseuname->sysname);
-        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-        addr=str_create("NULL");
-        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-        return(0);
-     }
+   if ((strncmp(baseuname->sysname,"IRIX",4)) == 0)
+   { (void) strcpy(baseuname->machine,"IRIX+");
+     (void) strcat(baseuname->machine,baseuname->release);
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'.');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'+');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     addr=str_create("NULL");
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     return(0);
    }
 /* Linux - which I know very little about...
    It has been suggested to drop down on odd version I don't know
@@ -138,6 +136,7 @@ int upsugo_bldfvr(struct ups_command * uc)
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      return(0);
    }
+/* Sun Microsystems SunOS - Solaris */
    if ((strncmp(baseuname->sysname,"SunOS",5)) == 0)
    { (void) strcpy(baseuname->machine,"SunOS+");
      (void) strcat(baseuname->machine,baseuname->release);
@@ -161,10 +160,63 @@ int upsugo_bldfvr(struct ups_command * uc)
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      return(0);
    }
-
+/* International Buisness Machines - AIX */
+   if ((strncmp(baseuname->sysname,"AIX",3)) == 0)
+   { (void) strcpy(baseuname->machine,"AIX+");
+     (void) strcat(baseuname->machine,baseuname->version);
+     (void) strcat(baseuname->machine,".");
+     (void) strcat(baseuname->machine,baseuname->release);
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'.');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'+');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     addr=str_create("NULL");
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     return(0);
+   }
    return(-1);
 }
-
+/* ===========================================================================
+** ROUTINE	upsugo_ifornota()
+**
+*/
+/* I could use the same address for the "*" string but I don't think the
+** extra code would justify it.
+*/
+int upsugo_ifornota(struct ups_command * uc)
+{
+   char   * addr;
+   if (uc->ugo_a)                   /* did the user specify -a */
+   { if (!uc->ugo_chain)            /* If no chain all chains  */
+     { addr=str_create("*");
+       uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+     }
+     if (!uc->ugo_qualifiers) 
+     { addr=str_create("*");
+       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+     }
+     if (!uc->ugo_version)          /* This will cause a slight memory */
+     { addr=str_create("*");        /* leak if version is specified    */
+       uc->ugo_version = addr;      /* at this point I may not know... */
+     }
+   } else {                         /* not -a but give defaults */
+     if (!uc->ugo_chain)            /* If no chain current      */
+     { addr=str_create("current");
+       uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+     }
+     if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
+     { addr=str_create("");
+     uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+     }
+   }
+   return(0);
+}
 /* ===========================================================================
 ** ROUTINE	upsugo_getarg( int argc, char * argv[])
 **
@@ -828,25 +880,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
          } else { 
            uc->ugo_product = addr;
              if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
-             if (uc->ugo_a)                   /* did the user specify -a */
-             { if (!uc->ugo_chain)            /* If no chain all chains  */
-               { addr=str_create("*");
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-               }
-               if (!uc->ugo_qualifiers) 
-               { addr=str_create("*");
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-               }
-             } else {                         /* not -a but give defaults */
-               if (!uc->ugo_chain)            /* If no chain current      */
-               { addr=str_create("current");
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-               }
-               if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
-               { addr=str_create("");
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-               }
-             }
+             test = upsugo_ifornota(uc);
            luc=uc;
            add_ver=1;
            ugo_commands = upslst_add(ugo_commands,uc);
@@ -876,25 +910,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
            } else { 
              uc->ugo_product = addr;
              if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
-             if (uc->ugo_a)                   /* did the user specify -a */
-             { if (!uc->ugo_chain)            /* If no chain all chains  */
-               { addr=str_create("*");
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-               }
-               if (!uc->ugo_qualifiers) 
-               { addr=str_create("*");
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-               }
-             } else {                         /* not -a but give defaults */
-               if (!uc->ugo_chain)            /* If no chain current      */
-               { addr=str_create("current");
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-               }
-               if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
-               { addr=str_create("");
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-               }
-             }
+             test = upsugo_ifornota(uc);
              ugo_commands = upslst_add(ugo_commands,uc);
              uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
              luc=uc;
@@ -920,26 +936,8 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    if (!ugo_commands) 
    { addr=str_create("*");
      uc->ugo_product = addr;
-             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
-             if (uc->ugo_a)                   /* did the user specify -a */
-             { if (!uc->ugo_chain)            /* If no chain all chains  */
-               { addr=str_create("*");
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-               }
-               if (!uc->ugo_qualifiers) 
-               { addr=str_create("*");
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-               }
-             } else {                         /* not -a but give defaults */
-               if (!uc->ugo_chain)            /* If no chain current      */
-               { addr=str_create("current");
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-               }
-               if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
-               { addr=str_create("");
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-               }
-             }
+     if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
+     test = upsugo_ifornota(uc);             
 /* need more ?? ... */
      ugo_commands = upslst_add(ugo_commands,uc);
    }
