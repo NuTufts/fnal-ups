@@ -143,8 +143,8 @@ fi
 #
 if [ -s reqcheck2 ]; then
   UPS_PROD_NAME=fly;export UPS_PROD_NAME
-  UPS_PROD_VERSION=v1_0;export UPS_PROD_VERSION
-  UPS_PROD_DIR=/NULL/fly;export UPS_PROD_DIR
+  UPS_PROD_VERSION="v1_0";export UPS_PROD_VERSION
+  UPS_PROD_DIR="/NULL/fly";export UPS_PROD_DIR
   unset UPS_VERBOSE
   unset UPS_EXTENDED
   UPS_THIS_DB=../db1;export UPS_THIS_DB

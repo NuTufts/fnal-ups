@@ -146,8 +146,8 @@ endif
 #
 if (-e reqcheck2) then
   setenv UPS_PROD_NAME fly
-  setenv UPS_PROD_VERSION v1_0
-  setenv UPS_PROD_DIR /NULL/fly
+  setenv UPS_PROD_VERSION "v1_0"
+  setenv UPS_PROD_DIR "/NULL/fly"
   unsetenv UPS_VERBOSE
   unsetenv UPS_EXTENDED
   setenv UPS_THIS_DB ../db1
