@@ -25,6 +25,7 @@
 #include <errno.h>
 
 /* ups specific include files */
+#include "ups_main.h"
 #include "upslst.h"
 #include "upstyp.h"
 #include "ups_setup.h"
@@ -58,27 +59,7 @@ typedef struct s_cmd_info {
   char *valid_opts;
 } t_cmd_info;
 
-enum {
-  e_setup,
-  e_unsetup,
-  e_list,
-  e_configure,
-  e_copy,
-  e_declare,
-  e_depend,
-  e_exist,
-  e_modify,
-  e_start,
-  e_stop,
-  e_tailor,
-  e_unconfigure,
-  e_undeclare,
-  e_create,
-  e_get,
-  e_validate,
-  e_unk
-};
-
+/* The enum is defined in ups_main.h */
 t_cmd_info g_cmd_info[] = {
   {e_setup,       "setup",       "?B:cde:f:g:jkm:M:noO:q:r:tU:vVz:Z"},
   {e_unsetup,     "unsetup",     "?cde:f:g:jm:M:noO:q:tU:vVz:Z"},
