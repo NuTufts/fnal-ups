@@ -200,7 +200,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
                 upsfil_flush();
               } else {
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
-			   strerror(errno));
+			   "error from subprocess");
 		upserr_add(UPS_COMMAND_FAILED, UPS_FATAL,
 			  g_cmd_info[a_command_index].cmd);
 		KEEP_OR_REMOVE_FILE();
