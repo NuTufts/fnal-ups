@@ -56,7 +56,7 @@ int main (argc,argv)
 	signal(SIGSEGV, ups_signal_handler);
 */
 
-	uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPrTuU");
+	uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU");
 	fprintf(stdout,"product: %s\n",uc->ugo_product);
 	fprintf(stdout,"version: %s\n",uc->ugo_version);
 	if (uc->ugo_C) {
@@ -112,6 +112,11 @@ int main (argc,argv)
 	if (uc->ugo_chain) {
 	    fprintf(stdout,"chain\n");
             print_list( uc->ugo_chain );
+	    fprintf(stdout,"\n");
+	}
+	if (uc->ugo_qualifiers) {
+	    fprintf(stdout,"qualifiers\n");
+            print_list( uc->ugo_qualifiers );
 	    fprintf(stdout,"\n");
 	}
 /*
