@@ -264,8 +264,6 @@ int upsfil_write_journal_files( void )
   if ( g_ft ) {
     P_VERB( 1, "Writing ALL journal files" );
     upstbl_map( g_ft, write_journal_file, NULL );
-    upstbl_free( &g_ft );
-    g_ft = 0;
   }
 
   return UPS_SUCCESS;
@@ -292,8 +290,6 @@ int upsfil_clear_journal_files( void )
   if ( g_ft ) {
     P_VERB_s( 1, "Clearing journal files" );
     upstbl_map( g_ft, clear_journal_file, NULL );
-    upstbl_free( &g_ft );
-    g_ft = 0;
   }
 
   return UPS_SUCCESS;
