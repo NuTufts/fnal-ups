@@ -119,8 +119,8 @@ t_ups_product *upsfil_read_file( FILE * const fh )
  */
 int read_file( void )
 {
-  int count = 0;
-
+  t_upslst_item *l_ptr = NULL;
+  
   /* advance to something useful */
   
   next_key();
@@ -135,15 +135,19 @@ int read_file( void )
   /* from here on, we expect only to see FLAVOR or GROUP: */
   
   while ( !strcmp( g_key, "FLAVOR") || !strcmp( g_key, "GROUP:" ) ) {
-    if ( !strcmp( g_key, "FLAVOR" ) ) {
-      g_pd->instance_list = read_instances();
-    }
-    else if ( !strcmp( g_key, "GROUP:" ) ) {
-      g_pd->instance_list = read_groups();
-    }
+    l_ptr = NULL;
+    
+    if ( !strcmp( g_key, "FLAVOR" ) )
+      l_ptr =  read_instances();
+    
+    else if ( !strcmp( g_key, "GROUP:" ) )
+      l_ptr = read_groups();
+    
+    if ( l_ptr ) 
+      g_pd->instance_list = upslst_merge( g_pd->instance_list, l_ptr );
   }
 	  
-  return count;
+  return 1;
 }
 
 /*-----------------------------------------------------------------------
@@ -226,7 +230,9 @@ t_ups_instance *read_instance( void )
 
   inst_ptr = ups_new_instance();
 
-  inst_ptr->product = str_create( g_pd->product );
+  /* fill information from file descriptor */
+  
+  inst_ptr->product = str_create( g_pd->product );  
   if ( !strcmp( g_pd->file, "CHAIN" ) ) {
     inst_ptr->chain = str_create( g_pd->chaver );
   }
@@ -234,6 +240,8 @@ t_ups_instance *read_instance( void )
     inst_ptr->version = str_create( g_pd->chaver );
   }
     
+  /* fill information from found key words */
+  
   inst_ptr->flavor = str_create( g_val );
     
   while ( next_key() ) {
@@ -497,16 +505,19 @@ char *get_key( void )
   int count = 0;
 
   /* check if line is not empty (again) */
+  
   if ( strlen( g_line ) < 1 ) return 0;
   if ( g_line[0] == '#' ) return 0;
     
   /* check if line has a key/value pair */
+  
   if ( !strchr( g_line, '=' ) ) {
     strcpy( g_key, g_line );
     return g_key;
   }
 
   /* split line into key/value pair */
+  
   count = 0;
   while ( cp && *cp && !is_space( *cp ) && *cp != '=' ) {
     g_key[count] = *cp;
@@ -579,7 +590,7 @@ int is_stop_key( void )
 {
   if ( is_start_key() )
     return 1;
-  if ( strcmp( g_key, "END:" ) == 0 )
+  if ( !strcmp( g_key, "END:" ) )
     return 1;
 
   return 0;
