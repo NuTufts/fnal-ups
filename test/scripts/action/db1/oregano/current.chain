@@ -1,0 +1,13 @@
+FILE = chain
+PRODUCT = oregano
+CHAIN = current
+
+#*************************************************
+#
+FLAVOR = NULL
+VERSION = v1_0
+QUALIFIERS = ""
+  DECLARER = basil
+  DECLARED = 1998-06-10
+  MODIFIER = rosemary
+  MODIFIED = 1998-06-10
