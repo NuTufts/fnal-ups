@@ -145,6 +145,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	upsmem_free(location);
 
 #define CHECK_UNIQUE(a_list) \
+      a_list = upslst_first(a_list);                                 \
       if (a_need_unique) {                                           \
 	/* we need a unique instance, make sure we only have one */  \
 	if (a_list->next) {                                          \
@@ -173,12 +174,12 @@ t_upslst_item *upsmat_match_instance(
 				   const t_ups_command * const a_command_line,
 				   const int a_need_unique)
 {
-  t_upslst_item *db_item, *all_products, *tmp_products;
-  t_upslst_item *all_versions;
-  t_upslst_item *tmp_chains, *all_chains = NULL, *all_tmp_chains = NULL;
+  t_upslst_item *db_item, *all_products = NULL, *product_item;
+  t_upslst_item *all_versions = NULL;
+  t_upslst_item *chain_item, *all_chains = NULL, *all_tmp_chains = NULL;
   t_ups_match_product *mproduct = NULL;
   t_upslst_item *mproduct_list = NULL;
-  char *the_db, *prod_name, *tmp_chain, *new_string = NULL, *location = NULL;
+  char *the_db, *prod_name, *the_chain, *new_string = NULL, *location = NULL;
   char do_delete = 'd';
 
   if (a_command_line->ugo_db) {
@@ -202,15 +203,13 @@ t_upslst_item *upsmat_match_instance(
       }
 
       if (all_products) {
-	/* start at the beginning of the list */
-	all_products = upslst_first(all_products);
-
+	/* make sure if we need a unique instance that we only have one */
 	CHECK_UNIQUE(all_products);
 
 	/* for each product, get all the requested instances */
-	for (tmp_products = all_products ; tmp_products ;
-	     tmp_products = tmp_products->next) {
-	  prod_name = (char *)tmp_products->data;
+	for (product_item = all_products ; product_item ;
+	     product_item = product_item->next) {
+	  prod_name = (char *)product_item->data;
 	  
 	  if (UPS_VERBOSE) {
 	    printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
@@ -229,8 +228,7 @@ t_upslst_item *upsmat_match_instance(
 	    }
 
 	    if (all_versions) {
-	      /* start at the beginning of the list */
-	      all_versions = upslst_first(all_versions);
+	      /* make sure if we need unique instance that we only have one */
 	      CHECK_UNIQUE(all_versions);
 	 
 	      /* now do the instance matching */
@@ -251,26 +249,26 @@ t_upslst_item *upsmat_match_instance(
 	    
 	  } else {
 	    /* Check if chains were requested */
-	    for (tmp_chains = a_command_line->ugo_chain ; tmp_chains ;
-		 tmp_chains = tmp_chains->next) {
-	      tmp_chain = (char *)(tmp_chains->data);
+	    for (chain_item = a_command_line->ugo_chain ; chain_item ;
+		 chain_item = chain_item->next) {
+	      the_chain = (char *)(chain_item->data);
 
-	      if (! strcmp(tmp_chain, ANY_MATCH)) {
+	      if (! strcmp(the_chain, ANY_MATCH)) {
 		/* get all the chains in the current product area */
-		GET_ALL_FILES((char *)CHAIN_SUFFIX, all_chains);
+		GET_ALL_FILES((char *)CHAIN_SUFFIX, all_tmp_chains);
 		
 		/* Now add these chains to the master list */
 		all_chains = upslst_insert_list(all_chains, all_tmp_chains);
+		all_tmp_chains = 0;
 	      } else {
 		/* Now add this chain to the master list */
-		all_chains = upslst_add(all_chains, tmp_chain);
+		all_chains = upslst_add(all_chains, the_chain);
 	      }
 	    }
 	    
 	    /* get chains. just do match, it will check for chains or not */
 	    if (all_chains) {
-	      /* start at the beginning of the list */
-	      all_chains = upslst_first(all_chains);
+	      /* make sure if we need unique instance that we only have one */
 	      CHECK_UNIQUE(all_chains);
 	    
 	      mproduct = match_instance_core(a_command_line, the_db,
@@ -302,7 +300,7 @@ t_upslst_item *upsmat_match_instance(
     }
     mproduct = match_instance_core(a_command_line, NULL,
 				   a_command_line->ugo_product,
-				   /*???*/				   all_chains, all_versions, a_need_unique);
+				   NULL, NULL, a_need_unique);
   } else {
     /* we have no db and no table file or no product name, this is an error */
     upserr_add(UPS_NO_DATABASE);
@@ -383,8 +381,7 @@ static t_ups_match_product *match_instance_core(
     
   /* see if we were passed a version. if so, don't worry
      about chains, just read the associated version file */
-/*  } else if (a_version_list) { */
-  } else if (!a_chain_list) {
+  } else if (a_version_list) { 
     for (version_list = (t_upslst_item *)a_version_list; version_list;
 	 version_list = version_list->next) {
       /* get the version */
