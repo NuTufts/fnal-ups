@@ -108,6 +108,8 @@ else
     ECHO=echo
 fi
 
+Setups_Products_List_Home=$Setups_Home
+
 if test `echo $Setups_Home|cut -c1` != '/'
 then
     TeMp=/tmp
