@@ -36,6 +36,6 @@
  * Declaration of public functions.
  */
 
-t_upslst_item *ups_declare(t_upsugo_command * const a_command_line);
+void ups_declare(t_upsugo_command * const a_command_line);
 
 #endif /* _UPS_DECLARE_H_ */
