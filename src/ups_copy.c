@@ -499,14 +499,18 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
       }
     }
 
-  /* memory clean up time still needs to be done. do not free anything that
-     is a result of reading/writing a file. that file is in the cache. */
+    /* memory clean up time still needs to be done. do not free anything that
+       is a result of reading/writing a file. that file is in the cache. */
     if (new_command_line) {
       (void )upsugo_free(new_command_line);
     }
     if (new_dclr_instance) {
       new_dclr_instance = free_new_dclr_instance(new_dclr_instance);
     }
+  } else {
+    /* we did not get a match, so at least warn the user */
+    upserr_add(UPS_NO_MATCH, UPS_WARNING,
+	     (a_command_line->ugo_product ? a_command_line->ugo_product : ""));
   }
   return(mproduct_list);
 }
