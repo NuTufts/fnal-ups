@@ -440,7 +440,7 @@ if (!uc->ugo_H)
    uc->ugo_osname=0;
  } 
  if (uc->ugo_number)
- { count = 1;
+ { count = upslst_count(uc->ugo_flavor);
    if(uc->ugo_number > upslst_count(uc->ugo_flavor))
    { uc->ugo_number=upslst_count(uc->ugo_flavor); }
    l_ptr = upslst_first(uc->ugo_flavor);
@@ -448,11 +448,11 @@ if (!uc->ugo_H)
    { if( uc->ugo_number != count )
      { upsver_mes(3,"%sNumber specified deleting %s from flavor list\n",
                   UPSUGO,l_ptr->data); 
-       l_ptr = upslst_delete_safe( l_ptr, l_ptr->data, 'd' );
+       l_ptr = upslst_delete_safe( l_ptr, l_ptr->data, 'd' ); 
      } else {
        uc->ugo_flavor=l_ptr;
        l_ptr=l_ptr->next;
-     } count++;
+     } count--;
    } 
  } 
  return(0);
