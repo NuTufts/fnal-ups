@@ -133,7 +133,7 @@ char *upsget_allout(const FILE * const stream,
       fprintf((FILE *)stream,"UPS_PROD_DIR=%s;export UPS_PROD_DIR\n",
                upsget_prod_dir(db,instance,command_line));
       fprintf((FILE *)stream,"%s=%s;export %s\n",work,
-               upsget_prod_dir(db,instance,command_line));
+               upsget_prod_dir(db,instance,command_line),work);
       addr=upsget_verbose(db,instance,command_line);
       if (addr) 
       { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr); }
@@ -265,7 +265,7 @@ char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
 { char string[2];
   if (command_line->ugo_v)
   { sprintf(string,"%.1d",command_line->ugo_v);
-    return string;
+    return (string);
   } else {
     return 0;
   } 
