@@ -156,14 +156,15 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	  if (a_simulate_flag) {
 	    /* yes, output this to short circuit the automatic sourcing */
 	    printf("/dev/null\n");
+	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
+	  } else {
+	    /* output the name of the temp file that was created */
+	    (void )printf("%s\n", g_temp_file_name);
 	  }
-	  /* output the name of the temp file that was created */
-	  (void )printf("%s\n", g_temp_file_name);
-	  
 	  /* if we were asked to save the file, output the name again so the
 	     user can see it. the first output was eaten by the sourcing */
 	  if (g_keep_temp_file) {
-	    (void )printf("%s\n", g_temp_file_name);
+	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
 	  }
 	  break;
 	case e_exist:
@@ -176,7 +177,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	     report that it is there. */
 	  if (a_simulate_flag) {
 	    /* simulation only, print the file name */
-	    (void )printf("%s\n", g_temp_file_name);
+	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
 	  } else {	
 	    /* make sure the file is executable */
 	    if (! chmod(g_temp_file_name, mode)) {
