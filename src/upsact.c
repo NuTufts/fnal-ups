@@ -1905,8 +1905,7 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 	setup_ugo_cmd = upsugo_env( pname, g_cmd_info[e_unsetup].valid_opts );
 
       if ( setup_ugo_cmd ) {
-	if ( !setup_ugo_cmd->ugo_j )
-	  setup_ugo_cmd->ugo_j = ugo_cmd->ugo_j; 
+	setup_ugo_cmd->ugo_j = ugo_cmd->ugo_j; 
 	the_ugo_cmd = setup_ugo_cmd;
 
 	/* since we have to remach, 
