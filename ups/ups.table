@@ -50,3 +50,4 @@ action=setup
   setupenv()
   pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
   setupOptional (egcs)
+  setupOptional (upd)
