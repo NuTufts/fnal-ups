@@ -662,8 +662,9 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   FILE *file_stream = 0;
   char mode[] = "a,access=lock";              /* create new file or append
 						 to existing one */
-  char *time_date, *user;
+  char *time_date, *user, *ptr;
   mode_t old_umask;
+  int len;
 
   /* Get the current time and date (with spaces) */
   time_date = upsutl_time_date(STR_TRIM_DEFAULT);
@@ -676,9 +677,25 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
     mproduct = (t_upstyp_matched_product *)mproduct_item->data;
     if ((mproduct->db_info) && (mproduct->db_info->config) && 
 	(tmp_stat = mproduct->db_info->config->statistics)) {
-      if ((! NOT_EQUAL_ANY_MATCH(tmp_stat)) ||
-	  (strstr(tmp_stat, mproduct->product))) {
+      if (! NOT_EQUAL_ANY_MATCH(tmp_stat)) {
 	global_yes = 1;      /* write statistics for everything in this db */
+      } else {
+	global_yes = 0;
+	len = strlen(mproduct->product);
+	ptr = strstr(tmp_stat, mproduct->product);
+	/*	if (((tmp_stat == ptr) && 
+	     (((ptr + len) ==  '\0') || ((ptr + len) == UPS_SEPARATOR ))) ||
+	    (((ptr - 1) == UPS_SEPARATOR) && (((ptr + 1) == UPS_SEPARATOR) ||
+	     ((ptr + 1) == '\0')))) {*/
+	if (tmp_stat == ptr) {
+	  if (((ptr + len)[0] ==  '\0') || ((int )(ptr + len)[0] == ':')) {
+	    global_yes = 1;
+	  }
+	} else if ((int )(ptr - 1)[0] == ':') {
+	  if (((int )(ptr + len)[0] == ':') || ((ptr + len)[0] == '\0')) {
+	    global_yes = 1;
+	  }
+	}
       }
     }
     for (minst_item = (t_upslst_item *)mproduct->minst_list ;
