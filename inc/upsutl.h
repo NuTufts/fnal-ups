@@ -36,6 +36,7 @@
 /* ups specific include files, if needed for .h file */
 #include "upstyp.h"
 #include "upslst.h"
+#include "upsugo.h"
 
 /*
  * Constans.
