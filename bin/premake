@@ -45,6 +45,8 @@ elif [ $arch = OSF1 ]; then
 	ccenv="OSF1"
 elif [ $arch = Linux -o $arch = linux ]; then
 	ccenv="Linux"
+elif [ $arch = AIX ]; then
+        ccenv="AIX"
 else
 	echo "Unknown architecture \`$arch'" >&2
 	ccenv=notvalid
@@ -266,6 +268,18 @@ case $ccenv in
 		fi
 		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -migrate -check\""
 		llibs="-lots"
+		;;
+	aix|AIX)			# IBM's AIX
+		defs="$defs AR=ar ARFLAGS=r RANLIB=:"
+		cc="cc"
+ 		cflags="$cflags"
+		if [ "$opt" != "" ]; then
+			cflags="$cflags -O4" 
+		fi
+		if [ "$dbg" != "" ]; then 
+			cflags="$cflags -g" 
+		fi
+		defs="$defs CCCHK=\"-D_POSIX_SOURCE\""
 		;;
 
 	*)
