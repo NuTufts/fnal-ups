@@ -135,7 +135,7 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
       /* read each directory item and add it to the list */
       while ((dir_line = readdir(dir)) != NULL) {
 	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
-	  if ((new_string = upsutl_str_create(dir_line->d_name))) {
+	  if ((new_string = upsutl_str_create(dir_line->d_name, ' '))) {
 	    file_list = upslst_add(file_list, (void *)new_string);
 	  } else {
 	    /* the only error from upsutl_str_create is a memory error, clean
@@ -334,7 +334,7 @@ char *upsutl_strstr( const char * const a_str, const char * const a_pattern)
   if ((substr = strstr(a_str, a_pattern))) {
     /* The pattern was found */
     str_len = (int )strlen(a_str);
-    if ((new_string = upsutl_str_create((char *)a_str))) {
+    if ((new_string = upsutl_str_create((char *)a_str, ' '))) {
       /* create a new string without the pattern */
       pat_len = (int )strlen(a_pattern);
       substr_pos = (int )(substr - a_str);   /* char position of sub string */
@@ -395,23 +395,40 @@ char *upsutl_user(void)
   return (username);
 }
 
-
 /*-----------------------------------------------------------------------
  * upsutl_str_create
  *
  * Will create a sring on the heap, using upsmem. 
  *
  * Input : char *, string to be copied.
+ *         char, options, 't' will trim edges of passed string.
  * Output: none
  * Return: char *, new string.
  */
-char *upsutl_str_create( char * const str )
+char *upsutl_str_create( char * const str, const char copt )
 {
   char *new_str = 0;
+  
+  if ( ! str ) return 0;
+
+  if ( copt == 't' ) {
     
-  if ( str ) {
+    /* copy overhead only when option 't' is passed */
+    
+    static char buf[MAX_LINE_LEN];
+    if ( strlen( str ) >= MAX_LINE_LEN ) {    
+      upserr_add( UPS_LINE_TOO_LONG, UPS_FATAL, "upsutl_str_create" );
+      return 0;
+    }    
+    strcpy( buf, str );
+    upsutl_str_remove_edges( buf, " \t\n\r\f\"" );
+    
+    new_str = (char *)upsmem_malloc( (int)strlen( buf ) + 1 );
+    strcpy( new_str, buf );      
+  }
+  else {      
     new_str = (char *)upsmem_malloc( (int)strlen( str ) + 1 );
-    strcpy( new_str, str );
+    strcpy( new_str, str );      
   }
   
   return new_str;
@@ -558,9 +575,3 @@ int qsort_cmp_string( const void * c1, const void * c2 )
 {
   return strcmp( (const char *)c1, (const char *)c2 );
 }
-
-
-
-
-
-

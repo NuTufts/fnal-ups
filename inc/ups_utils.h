@@ -55,7 +55,7 @@ char *upsutl_time_date(void);
 char *upsutl_user(void);
 
 char  *upsutl_strstr( const char * const a_str, const char * const a_pattern);
-char  *upsutl_str_create( char * const str );
+char  *upsutl_str_create( char * const str, const char copt );
 int    upsutl_str_sort( char * const, const char );
 size_t upsutl_str_remove( char * const str, const char * const ct );
 size_t upsutl_str_remove_edges( char * const str, const char * const ct );

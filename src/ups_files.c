@@ -346,7 +346,6 @@ int write_table_file( void )
       return 0;
     }
 
-
     put_key( 0, "" );
     put_key( "FLAVOR", inst_ptr->flavor );
     put_key( "QUALIFIERS", inst_ptr->qualifiers );
@@ -450,7 +449,7 @@ t_upslst_item *read_comments( void )
 
     if ( !upsutl_str_remove_edges( g_line, CHAR_REMOVE ) ) continue;   
     if ( g_line[0] == '#' ) {
-      l_ptr = upslst_add( l_ptr, upsutl_str_create( g_line ) );
+      l_ptr = upslst_add( l_ptr, upsutl_str_create( g_line, ' ' ) );
     }
     else {
       get_key();
@@ -478,7 +477,7 @@ int read_file_desc( void )
     return 0;
   }
   
-  g_pd->file = upsutl_str_create( g_val );
+  g_pd->file = upsutl_str_create( g_val, ' ' );
   
   /* translate file type to an enum */
   
@@ -492,16 +491,16 @@ int read_file_desc( void )
     switch( g_ikey ) {
 
     case e_key_product:
-      g_pd->product = upsutl_str_create( g_val );
+      g_pd->product = upsutl_str_create( g_val, ' ' );
       break;
 
     case e_key_version:
     case e_key_chain:
-      g_pd->chaver = upsutl_str_create( g_val );
+      g_pd->chaver = upsutl_str_create( g_val, ' ' );
       break;
       
     case e_key_ups_db_version:
-      g_pd->ups_db_version = upsutl_str_create( g_val );
+      g_pd->ups_db_version = upsutl_str_create( g_val, ' ' );
       break;
     }
 		 
@@ -558,15 +557,15 @@ t_ups_instance *read_instance( void )
 
   /* fill information from file descriptor */
   
-  inst_ptr->product = upsutl_str_create( g_pd->product );
+  inst_ptr->product = upsutl_str_create( g_pd->product, ' ' );
   if ( g_ifile == e_file_chain )
-    inst_ptr->chain = upsutl_str_create( g_pd->chaver );
+    inst_ptr->chain = upsutl_str_create( g_pd->chaver, ' ' );
   else
-    inst_ptr->version = upsutl_str_create( g_pd->chaver );
+    inst_ptr->version = upsutl_str_create( g_pd->chaver, ' ' );
     
   /* fill information from file ... we still need a map */
   
-  inst_ptr->flavor = upsutl_str_create( g_val );
+  inst_ptr->flavor = upsutl_str_create( g_val, ' ' );
     
   while ( next_key() != e_key_eof ) {
 
@@ -578,63 +577,63 @@ t_ups_instance *read_instance( void )
 
     case e_key_qualifiers:
       trim_qualifiers( g_val );
-      inst_ptr->qualifiers = upsutl_str_create( g_val );
+      inst_ptr->qualifiers = upsutl_str_create( g_val, ' ' );
       break;
     
     case e_key_version:
-      inst_ptr->version = upsutl_str_create( g_val );
+      inst_ptr->version = upsutl_str_create( g_val, ' ' );
       break;
     
     case e_key_declarer: 
       if ( g_ifile == e_file_chain  ) 
-	inst_ptr->chain_declarer = upsutl_str_create( g_val );
+	inst_ptr->chain_declarer = upsutl_str_create( g_val, ' ' );
       else 
-	inst_ptr->declarer = upsutl_str_create( g_val );
+	inst_ptr->declarer = upsutl_str_create( g_val, ' ' );
       break;
     		 
     case e_key_declared:
       if ( g_ifile == e_file_chain  ) 
-	inst_ptr->chain_declared = upsutl_str_create( g_val );
+	inst_ptr->chain_declared = upsutl_str_create( g_val, ' ' );
       else 
-	inst_ptr->declared = upsutl_str_create( g_val );
+	inst_ptr->declared = upsutl_str_create( g_val, ' ' );
       break;
 		 
     case e_key_prod_dir:
-      inst_ptr->prod_dir = upsutl_str_create( g_val );
+      inst_ptr->prod_dir = upsutl_str_create( g_val, ' ' );
       break;
 		 
     case e_key_ups_dir:
-      inst_ptr->ups_dir = upsutl_str_create( g_val );
+      inst_ptr->ups_dir = upsutl_str_create( g_val, ' ' );
       break;
 		 
     case e_key_table_dir:
-      inst_ptr->table_dir = upsutl_str_create( g_val );
+      inst_ptr->table_dir = upsutl_str_create( g_val, ' ' );
       break;
 		 
     case e_key_table_file:
-      inst_ptr->table_file = upsutl_str_create( g_val );
+      inst_ptr->table_file = upsutl_str_create( g_val, ' ' );
       break;
 		 
     case e_key_archive_file:      
-      inst_ptr->archive_file = upsutl_str_create( g_val );
+      inst_ptr->archive_file = upsutl_str_create( g_val, ' ' );
       break;
     
     case e_key_authorized_nodes:
-      inst_ptr->authorized_nodes = upsutl_str_create( g_val );
+      inst_ptr->authorized_nodes = upsutl_str_create( g_val, ' ' );
       break;
       
     case e_key_description:
-      inst_ptr->description = upsutl_str_create( g_val );
+      inst_ptr->description = upsutl_str_create( g_val, ' ' );
       break;
     
     case e_key_statistics:
-      inst_ptr->statistics = upsutl_str_create( "on" );
+      inst_ptr->statistics = upsutl_str_create( "on", ' ' );
       break;
     
     case e_key_unknown:
       if ( g_line[0] == '_' ) {	
 	inst_ptr->unknown_list = upslst_add( inst_ptr->unknown_list,
-					     upsutl_str_create( g_line ) );
+					     upsutl_str_create( g_line, ' ' ) );
       }
       break;
 
@@ -694,12 +693,12 @@ t_ups_action *read_action( void )
     return 0;
 
   act_ptr = ups_new_action();
-  act_ptr->action = upsutl_str_create( g_val );
+  act_ptr->action = upsutl_str_create( g_val, ' ' );
 
   while ( next_key() != e_key_eof ) {
 
     if ( g_ikey == e_key_unknown && strlen( g_line ) > 0 ) {
-      cmd_ptr = upsutl_str_create( g_line );
+      cmd_ptr = upsutl_str_create( g_line, ' ' );
       if ( cmd_ptr )
 	l_cmd = upslst_add( l_cmd, cmd_ptr );
     }
