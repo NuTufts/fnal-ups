@@ -27,6 +27,9 @@ char *upsget_translation_env( char * const oldstr );
 char *upsget_prod_dir(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
+char *upsget_ups_dir(const t_upstyp_db * const,
+                      const t_upstyp_matched_instance * const ,
+                      const t_upsugo_command * const );
 char *upsget_source(const t_upstyp_db * const,
 		    const t_upstyp_matched_instance * const ,
 		    const t_upsugo_command * const );
