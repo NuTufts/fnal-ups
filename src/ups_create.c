@@ -97,9 +97,9 @@ static void create_core(const t_upsugo_command * const a_command_line,
   char *flavor, *quals;
 
   /* make sure at least a name of a table file was passed */
-  if (a_command_line->ugo_M) {
+  if (a_command_line->ugo_m) {
     /* see if the specified file exists. if so, error */
-    if (a_command_line->ugo_m) {
+    if (a_command_line->ugo_M) {
       sprintf(buffer, "%s/%s", a_command_line->ugo_tablefiledir,
 	                       a_command_line->ugo_tablefile);
     } else {

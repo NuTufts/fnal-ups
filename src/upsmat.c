@@ -337,7 +337,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   }
 
   if (db_list) {
-    if (a_command_line->ugo_M && a_command_line->ugo_product) {
+    if (a_command_line->ugo_m && a_command_line->ugo_product) {
      /* We have a table file  and we have a product name, we do not need the
         db. */
       if (UPS_VERBOSE) {
@@ -491,7 +491,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	FREE_CONFIG_FILE();
       }
     }
-  } else if (a_command_line->ugo_M && a_command_line->ugo_product) {
+  } else if (a_command_line->ugo_m && a_command_line->ugo_product) {
     /* We have a table file and no db, that is ok */
     if (UPS_VERBOSE) {                                                 
       printf("%sNo UPS Database, using Table File - %s\n", VPREFIX,    
@@ -577,7 +577,7 @@ static t_upstyp_matched_product *match_instance_core(
 
   /* see if we were passed a table file. if so, don't worry about
      version and chain files, just read the table file */
-  if (a_command_line->ugo_M) {
+  if (a_command_line->ugo_m) {
     if (UPS_VERBOSE) {
       printf("%sMatching with Table file  - %s\n", VPREFIX,
 	     a_command_line->ugo_tablefile);
