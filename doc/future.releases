@@ -37,3 +37,5 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 10. Full support for environment variables in table files.
 
+11. Change the single function doDefaults to be a separate one for each
+	supported action (i.e. - doDefaultSetup())
