@@ -121,7 +121,7 @@ typedef struct s_var_sub {
 #define DO_UNSET_IF_NULL 1
 #define DO_NOT_UNSET_IF_NULL 0
 #define DO_QUOTE_STRING 1
-#define DO_NOT_QUOTE_STRING 0
+#define DO_NOT_QUOTE_STRING 1        /* Always quote, for now */
 
 static t_var_sub g_var_subs[] = {
   { "${UPS_PROD_NAME", upsget_product, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
@@ -208,11 +208,11 @@ void upsget_envout(const FILE * const stream,
   name = upsutl_upcase( name );
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    (void) fprintf((FILE *)stream,"SETUP_%s=\"%s\"; export SETUP_%s\n#\n",
+    (void) fprintf((FILE *)stream,"SETUP_%s='%s'; export SETUP_%s\n#\n",
       name,upsget_envstr(db,instance,command_line),name);
     break;
   case e_CSHELL:
-    (void) fprintf((FILE *)stream,"setenv SETUP_%s \"%s\"\n#\n",
+    (void) fprintf((FILE *)stream,"setenv SETUP_%s '%s'\n#\n",
     name,upsget_envstr(db,instance,command_line));
     break;
   default:
@@ -253,7 +253,7 @@ void upsget_allout(const FILE * const stream,
       if (g_var_subs[idx].include_in_env)
       {
         char *the_string = g_var_subs[idx].string+2;
-        char *a_quote = g_var_subs[idx].quote_string ? "\"" : "";
+        char *a_quote = g_var_subs[idx].quote_string ? "'" : "";
         char *the_value = "";
 
         if (g_var_subs[idx].func)
