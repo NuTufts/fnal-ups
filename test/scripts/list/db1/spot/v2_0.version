@@ -18,7 +18,6 @@ QUALIFIERS = "long"
   UPS_DIR = ups
   TABLE_FILE = spot.table
   AUTHORIZED_NODES = backyard
-  DESCRIPTION = "spot is a good dog who loves me the best."
   ARCHIVE_FILE = akc.tar.z
   _DUMMY = "this should be recognized"
   MODIFIED = 1-12-98

@@ -10,7 +10,8 @@ DATABASE=db1
 		Authorized, Nodes=*
 		UPS_Dir="ups" 
 		Table_Dir="" 
-		Table_File"spot.table" 
+		Table_File="spot.table" 
+		Archive_File="" 
 		Description="" 
 		Action=SETUP
 			ya hey der
@@ -30,7 +31,8 @@ DATABASE=db1
 		NOT Authorized, Nodes=backyard
 		UPS_Dir="ups" 
 		Table_Dir="" 
-		Table_File"spot.table" 
+		Table_File="spot.table" 
+		Archive_File="akc.tar.z" 
 		Description="spot is a good dog who loves me the best." 
 		_DUMMY=this should be recognized 
 		Action=SETUP

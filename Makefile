@@ -37,6 +37,7 @@ DISTRIBUTIONFILE=$(DEFAULT_DISTRIBFILE)
               OS=$(DEFAULT_OS)
            QUALS=
             CUST=$(DEFAULT_CUST)
+          PREFIX=/dev/null
 
 #------------------------------------------------------------------
 # Files to include in Distribution
@@ -76,7 +77,7 @@ all: 	proddir_is_set
 	cd src; premake $(UPSDBG) $(INSIGHT)
 	cd test; premake $(UPSDBG) $(INSIGHT)
 
-test:
+test: FORCE
 	cd test/scripts; upstst_all
 
 debug: 	

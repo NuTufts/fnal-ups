@@ -22,4 +22,5 @@ ACTION=CONFIGURE
 ACTION=BLAH
 	more junk
 
+DESCRIPTION = "spot is a good dog who loves me the best."
 END:

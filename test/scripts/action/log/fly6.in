@@ -5,12 +5,12 @@ set path=($path emacs)
 rehash
 #
 setenv upstmp "`dropit -p "'"$path"'" -i' ' -d' ' emacs/test`"
-if ($status == 0 && "$upstmp" != "") set path=$upstmp
+if ($status == 0 && "$upstmp" != "") set path=($upstmp)
 rehash
 unsetenv upstmp
 #
 setenv upstmp "`dropit -p "'"$path"'" -i' ' -d' ' emacs/bin`"
-if ($status == 0 && "$upstmp" != "") set path=$upstmp
+if ($status == 0 && "$upstmp" != "") set path=($upstmp)
 rehash
 unsetenv upstmp
 #

@@ -484,9 +484,11 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           strcpy(buffer,"table_dir");
           FromVersion(table_dir);
           printf("\n");
-          printf("\t\tTable_File");
+          printf("\t\tTable_File=");
           strcpy(buffer,"table_file");
           FromVersion(table_file);
+          printf("\n");
+          printf("\t\tArchive_File=");
           strcpy(buffer,"archive_file");
           FromVersion(archive_file)
           printf("\n");
