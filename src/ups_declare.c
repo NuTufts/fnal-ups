@@ -287,9 +287,10 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                    db_info->name,
                    uc->ugo_product,
                    the_chain,CHAIN_SUFFIX);
-           product->file = CHAIN;
-           product->product=uc->ugo_product;
-           product->chain = the_chain;
+           product->file = upsutl_str_create( CHAIN, ' ' );
+           product->product=upsutl_str_create( uc->ugo_product, ' ' );
+           product->chain = upsutl_str_create( the_chain, ' ' );
+           product->version = upsutl_str_create( save_version, ' ' );
          }
          /* build new chain instance */
          new_cinst=ups_new_instance();
@@ -309,7 +310,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                     new_cinst->version,
                     buffer);
          (void )upsfil_write_file(product, buffer,' ',JOURNAL);  
-         product->instance_list=upslst_free(product->instance_list,'d'); 
         }
       }
 /************************************************************************
