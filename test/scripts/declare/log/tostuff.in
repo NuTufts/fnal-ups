@@ -1,13 +1,11 @@
 tostuff/info/info.file
 
-tostuff/catman/cat7:
-genlock.7
+tostuff/catman/cat1:
+gencat.1
 
-tostuff/catman/cat8:
-eehoor.8
-
-tostuff/man/man6:
-poohbear.6
+tostuff/catman/cat2:
+gendit.2
 
 tostuff/man/man8:
-sudo.8
+bootpd.8
+telnetd.8
