@@ -62,6 +62,8 @@ int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
 char *upsutl_get_hostname( void );
 t_upstyp_product *upsutl_get_config( const char * const a_db);
 char *upsutl_environment(const char * const a_env_var);
+t_upslst_item *upsutl_free_matched_product_list(
+			   t_upslst_item ** const a_mproduct_list);
 t_upslst_item *upsutl_free_matched_instance_list(
 					   t_upslst_item ** const a_inst_list);
 t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list);
@@ -79,6 +81,7 @@ char *upsutl_user(void);
 int   upsutl_stricmp( const char *s1, const char *s2 );
 int   upsutl_strincmp( const char *s1, const char *s2, const size_t n );
 char  *upsutl_strstr( const char * const a_str, const char * const a_pattern);
+char  *upsutl_upcase(const char * const a_str);
 char  *upsutl_str_create( char * const str, const char copt );
 char  *upsutl_str_crecat( char * const str1, char * const str2 );
 int    upsutl_str_sort( char * const, const char );
