@@ -690,7 +690,6 @@ t_upslst_item *upsmat_match_with_instance(
     for (instance_list = a_product->instance_list ; instance_list ;
 	 instance_list = instance_list->next) {
       inst = (t_upstyp_instance *)instance_list->data;
-      inst->flag = 0;
       if (inst->version) {       /* make sure we have one */
 	if (! strcmp(a_instance->version, inst->version)) {
 	  /* they are the same version */
