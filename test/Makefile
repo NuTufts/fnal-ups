@@ -39,7 +39,7 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : test_ups_error test_ups_list test_ups_memory
+all : test_ups_error test_ups_list test_ups_memory test_ups_utils
 
 #
 # Main programs.
@@ -54,13 +54,16 @@ test_ups_list : test_ups_list.o $(LIB)/libups.a
 test_ups_memory : test_ups_memory.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
+test_ups_utils : test_ups_utils.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
+
 #
 # Now standard targets
 #
 clean :
 	@ upsClean
 	@ rm -f test_ups_error test_ups_memory
-	@ rm -f test_ups_list
+	@ rm -f test_ups_list test_ups_utils
 
 install :
 	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
@@ -88,9 +91,18 @@ make :
 test_ups_error.o:	test_ups_error.c
 test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
 test_ups_list.o:	test_ups_list.c
-test_ups_list.o:	./../inc/ups_list.h
+test_ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_memory.o:	test_ups_memory.c
 test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
+test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_utils.h
+test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_types.h
+test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_list.h
+test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_error.h
+test_ups_utils.o:	test_ups_utils.c
+test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
+test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
+test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
+test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
 test_upsugo_utils.o:	test_upsugo_utils.c
 test_upsugo_utils.o:	./../inc/ups_types.h
 test_upsugo_utils.o:	./../inc/ups_list.h
