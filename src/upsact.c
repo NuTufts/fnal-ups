@@ -80,7 +80,7 @@ typedef struct s_cmd_map {
 int parse_params( const char * const a_params,
 		   char *argv[] );
 
-t_upslst_item *next_cmd( t_upslst_item *top_list,
+t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 t_upslst_item *dep_list,
 			 t_upsact_item * const p_cur,
 			 const char * const act_name, 
@@ -411,7 +411,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
  * Return: t_upsact_tree *,
  */
 t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
-			       t_upstyp_matched_product *mat_prod,
+			       t_upstyp_matched_product * const mat_prod,
 			       const char * const act_name )
 {
   t_upsact_item *new_cur;
@@ -459,8 +459,8 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 
   /* create a new command structure */
   
-  pcmd = (t_upsact_cmd *)malloc( sizeof( t_upsact_cmd ) );
-  pcmd->pmem = (char *)malloc( strlen( act_s ) + 1 );  
+  pcmd = (t_upsact_cmd *)malloc( sizeof( t_upsact_cmd ) + strlen( act_s ) + 1 );
+  pcmd->pmem = (char *)(pcmd + 1);
   
   strcpy( pcmd->pmem, act_s );
   act_s = pcmd->pmem;
@@ -496,7 +496,6 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
     return pcmd;
   }
   else {
-    free( pcmd->pmem );
     free( pcmd );
     return 0;
   }
@@ -557,6 +556,12 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
       printf( " %s,", cmd_cur->argv[i] );
   }
   printf( ")\n" ); 
+}
+
+void upsact_free_upsact_cmd( t_upsact_cmd * const act_cmd )
+{
+  if ( act_cmd ) 
+    free( act_cmd );
 }
 
 /*
@@ -644,7 +649,7 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
  * Output: none
  * Return: t_upsact_cmd *,
  */
-t_upslst_item *next_cmd( t_upslst_item *top_list,
+t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 t_upslst_item *dep_list,
 			 t_upsact_item *const p_cur,
 			 const char *const act_name,
