@@ -413,8 +413,8 @@ char *upsget_translation_tilde( char * const oldstr )
     }
     return buf;
   } else {
-    return 0;
   }
+  return 0;
 }
 char *upsget_translation( const t_upstyp_matched_instance * const minstance,
 			  const t_upstyp_db *const db_info_ptr,
@@ -735,8 +735,8 @@ char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
     prefix_string = upsutl_str_crecat(prefix_string,string); 
     return prefix_string;
   } else { 
-    return string;
   }
+  return string;
 } 
 
 char *upsget_compile(const t_upstyp_db * const db_info_ptr,
@@ -874,8 +874,8 @@ char *upsget_shell(const t_upstyp_db * const db_info_ptr,
     return (CSH);
     break;
   default:
-    return (0);
   }
+  return (0);
 }
 char *upsget_source(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
@@ -890,8 +890,8 @@ char *upsget_source(const t_upstyp_db * const db_info_ptr,
     return (CSH);
     break;
   default:
-    return (0);
   }
+  return (0);
 }
 char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
@@ -902,8 +902,8 @@ char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
   { (void) sprintf(string,"%.1d",command_line->ugo_v);
     return (string);
   } else {
-    return(NOT);
   } 
+  return(NOT);
 }
 char *upsget_extended(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
