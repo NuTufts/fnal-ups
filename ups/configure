@@ -15,6 +15,7 @@
 # represents that its use would not infringe privately owned rights.
 #
 
+#Setups_Flag=SETUPS_PATH
 Setups_Flag=SETUPS_DIR
 
 StartUp_Flag=UPS_START
@@ -63,11 +64,11 @@ else
     Name_Of_Sh=/bin/sh
 fi
 #
-# Parse the SETUPS_DIR from the dbconfig file
+# Parse the SETUPS_PATH from the dbconfig file
 #
 if [ -f $Ups_DB_Path/.upsfiles/dbconfig ]
 then
-    Setups_Home=`grep $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'`
+    Setups_Home=`grep -i $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'`
 fi
 if [ x${Setups_Home:-} = x ]
 then
@@ -81,8 +82,8 @@ fi
 # directory as the startup and shutdown lists.
 #
 
-Startup_Home=$Setups_Home
-#Startup_Home=${Ups_DB_Path}/.upsfiles/\${Start_Or_Stop}
+#Startup_Home=$Setups_Home
+Startup_Home=${Ups_DB_Path}/.upsfiles
 
 Configure_Date=`date`
 #
@@ -189,7 +190,7 @@ then
 # are likely to be less than desired.
 #
 cat <<XEoF >$Ups_Dir/bootstrap/$Setups_Products_Script 
-#!$Name_Of_Sh
+#!${Name_Of_Sh}
 #
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
@@ -639,11 +640,11 @@ unset Flavor
 unset Setups_Home
 unset Name_Of_Ups
 XEoF
-#
 #
 # End of the creation of the setups.sh script.  
 #
 fi
+#
 #
 # Create the startup and shutdown scripts.
 #
@@ -721,6 +722,11 @@ if [ \`echo \$MACH_OS|cut -c1-4\` = IRIX ]
 then                                          
     MACH_OS=IRIX                              
 fi                                            
+
+Boot_Start=''
+Boot_Start=\`grep -i \$StartUp_Flag \$Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'\`
+if [ x\${Boot_Start:-} = xyes ]
+then
                                               
 #for starts in \$Startup_Home
 for starts in \`echo \${PRODUCTS}|tr ':' ' '\`
@@ -772,6 +778,7 @@ then
     '****' No $Start_Or_Stop files were found - nothing done.
     '****'
 EoF
+fi
 fi
 XEoF
 chmod 0771 $Ups_Dir/ups/ups_${Start_Or_Stop}

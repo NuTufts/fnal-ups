@@ -20,6 +20,10 @@ NEWS_SOURCE_DIR = /dev/null
 #  and cached files to this directory
 SETUPS_DIR = /usr/local/etc
 
+# Set the flag to control the ups start and stop
+# feature
+UPS_START=no
+
 # this db contains the upd product; look for the upd
 #  user callouts here:
 UPD_USERCODE_DIR = /usr/products/ups_database/upd/usercode
