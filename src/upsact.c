@@ -33,6 +33,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 /* ups specific include files */
 #include "upsact.h"
@@ -93,6 +96,9 @@ int g_COMPILE_FLAG = 0;
 int parse_params( const char * const a_params,
 		   char *argv[] );
 
+static int not_yet_created(const int * const array, const int index,
+			   const char element);
+static char get_man_subdir(char * const a_man_file);
 t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 t_upslst_item *dep_list,
 			 t_upsact_item * const p_act_itm,
@@ -139,7 +145,7 @@ int do_exit_action( const t_upsact_cmd * const a_cmd );
 /* functions to handle specific action commands */
 
 #define ACTION_PARAMS \
-  const t_upstyp_matched_instance * const a_inst,  \
+  const t_upstyp_matched_instance * const a_minst, \
   const t_upstyp_db * const a_db_info,             \
   const t_upsugo_command * const a_command_line,   \
   const FILE * const a_stream,                     \
@@ -190,12 +196,14 @@ static void f_dodefaults( ACTION_PARAMS);
 		 a_cmd->argc);                                  \
     }
 
+#define ACT_PREFIX "UPSACT: "
+
 #define OUTPUT_VERBOSE_MESSAGE(cmd)  \
-    if (a_inst->version && a_inst->version->product) {                       \
-      upsver_mes(1, "UPSACT: Processing action \'%s\' for product \'%s\'\n", \
-                 cmd, a_inst->version->product);                             \
-    } else {                                                                 \
-      upsver_mes(1, "UPSACT: Processing action \'%s\'\n", cmd);              \
+    if (a_minst->version && a_minst->version->product) {                 \
+      upsver_mes(1, "%sProcessing action \'%s\' for product \'%s\'\n",   \
+                 ACT_PREFIX, cmd, a_minst->version->product);            \
+    } else {                                                             \
+      upsver_mes(1, "%sProcessing action \'%s\'\n", ACT_PREFIX, cmd);    \
     }
 
 #define GET_DELIMITER() \
@@ -258,17 +266,8 @@ static void f_dodefaults( ACTION_PARAMS);
      FPRINTF_ERROR();                                  \
    }
 
-#define GET_MAN_SOURCE(pages)      \
-   if (a_cmd->argc == 1) {                                  \
-     /* the user specified a source in the action */        \
-     buf = (char *)a_cmd->argv[0];                          \
-   } else {                                                 \
-     /* we have to construct a source */                    \
-     buf = upsutl_find_manpages(a_inst, a_db_info, pages);  \
-   }
-
 #define SET_SETUP_PROD() \
-   upsget_envout(a_stream, a_db_info, a_inst, a_command_line);
+   upsget_envout(a_stream, a_db_info, a_minst, a_command_line);
 
 #define DO_SYSTEM_MOVE(move_flag)  \
    if (system(g_buff) != 0) {                                               \
@@ -400,13 +399,13 @@ t_cmd_map g_cmd_maps[] = {
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
   { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
-  { "copyhtml", e_copyhtml, f_copyhtml, 1, 1, e_invalid_cmd },
-  { "copyinfo", e_copyinfo, f_copyinfo, 1, 1, e_invalid_cmd },
-  { "copyman", e_copyman, f_copyman, 0, 1, e_uncopyman },
-  { "uncopyman", e_uncopyman, f_uncopyman, 0, 1, e_copyman},
-  { "copycatman", e_copycatman, f_copycatman, 0, 1, e_uncopycatman },
-  { "uncopycatman", e_uncopycatman, f_uncopycatman, 0, 1, e_copycatman},
-  { "copynews", e_copynews, f_copynews, 1, 1, e_invalid_cmd },
+  { "copyhtml", e_copyhtml, f_copyhtml, 0, 0, e_invalid_cmd },
+  { "copyinfo", e_copyinfo, f_copyinfo, 0, 0, e_invalid_cmd },
+  { "copyman", e_copyman, f_copyman, 0, 0, e_uncopyman },
+  { "uncopyman", e_uncopyman, f_uncopyman, 0, 0, e_copyman},
+  { "copycatman", e_copycatman, f_copycatman, 0, 0, e_uncopycatman },
+  { "uncopycatman", e_uncopycatman, f_uncopycatman, 0, 0, e_copycatman},
+  { "copynews", e_copynews, f_copynews, 0, 0, e_invalid_cmd },
   { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd },
   { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults },
   { "setupenv", e_setupenv, f_setupenv, 0, 0, e_unsetupenv },
@@ -2108,32 +2107,7 @@ static void f_copyhtml( ACTION_PARAMS)
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-
-    /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config || !a_db_info->config->html_path) {
-      upserr_vplace();
-      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "html");
-    } else {  
-      switch ( a_command_line->ugo_shell ) {
-      case e_BOURNE:
-      case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-		    a_cmd->argv[0], a_db_info->config->html_path) < 0) {
-	  FPRINTF_ERROR();
-	}
-	break;
-      default:
-	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-      }
-      if (UPS_ERROR != UPS_SUCCESS) {
-	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
-      }
-    }
-  }
+  upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
 }
 
 static void f_copyinfo( ACTION_PARAMS)
@@ -2146,16 +2120,15 @@ static void f_copyinfo( ACTION_PARAMS)
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
-    /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config || !a_db_info->config->info_path) {
-      upserr_vplace();
-      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "info");
-    } else {  
+    /* Make sure we have somewhere to copy the files to and a source. */
+    if (a_db_info->config && a_db_info->config->info_path &&
+	a_minst->table && a_minst->table->info_files) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
 	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-		    a_cmd->argv[0], a_db_info->config->info_path) < 0) {
+		    a_minst->table->info_files,
+		    a_db_info->config->info_path) < 0) {
 	  FPRINTF_ERROR();
 	}
 	break;
@@ -2168,13 +2141,89 @@ static void f_copyinfo( ACTION_PARAMS)
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_cmd_maps[a_cmd->icmd].cmd);
       }
+    } else {
+      if (a_minst->table && a_minst->table->info_files) {
+	/* there was a source but no destination.  if we have no source then
+	   there are no info files and that is not an error */
+	upsver_mes(1, "%sNo destination in dbconfig file for info files\n",
+		   ACT_PREFIX); 
+      }
     }
   }
 }
 
+#define COPY_FILES(filename, dest_path, type)  \
+    /* figure out sectional sub directory (based on file extension) */ \
+    if (subdir = get_man_subdir(filename)) {                           \
+      sprintf(dest, "%s/%s%c", dest_path, type, subdir);               \
+      /* see if the sectional subdir exists.  if not, create it. */    \
+      if (stat(dest, &file_stat) == (int )-1) {                        \
+        /* make sure we have not created it before */                  \
+        if (not_yet_created(subdirs_made, subdirs_index, subdir)) {    \
+          /* we must create the directory first */                     \
+          fprintf((FILE *)a_stream, "/bin/mkdir -p %s\n", dest);       \
+          /* now keep a record so we only create it once */            \
+          subdirs_made[subdirs_index++] = (int )subdir;                \
+	}                                                              \
+      }                                                                \
+      /* now add the copy line to the temp file */                     \
+      fprintf((FILE *)a_stream, "cp %s %s\n", filename, dest);         \
+    }
+
+#define GET_SOURCE(source, keyword)  \
+    if (!a_minst->table || !a_minst->table->keyword) {                     \
+      source = upsutl_find_manpages(a_minst, a_db_info);                   \
+    } else {                                                               \
+      t_upstyp_matched_product mproduct;                                   \
+      t_upslst_item minst_list = {NULL, NULL, NULL};                       \
+      /* the *MAN_FILES keyword must have been specified, use it but we    \
+	 must translate any local ups environment variables in it. since   \
+	 upsget_translation takes a matched product structure, we must     \
+	 cobble that together first */                                     \
+      minst_list.data = (void *)a_minst;                                   \
+      mproduct.minst_list = &minst_list;                                   \
+      mproduct.db_info = (t_upstyp_db *)a_db_info;                         \
+      source = upsget_translation(&mproduct, a_command_line,               \
+	  			  a_minst->table->keyword);                \
+    }
+      
+#define PROCESS_DIR(dir_name, dir_size, type, keyword)   \
+    if (! strncmp(dir_line->d_name, dir_name, dir_size)) {               \
+      DIR *file_dir = NULL;                                              \
+      struct dirent *file_dir_line = NULL;                               \
+      if (dir_size == strlen(dir_line->d_name)) {                        \
+	/* the directory is = to dir_name */                             \
+	if ((file_dir = opendir(filename))) {                            \
+	  while ((file_dir_line = readdir(file_dir))) {                  \
+	    if (file_dir_line->d_name[0] != '.') {                       \
+	      sprintf(g_buff, "%s/%s", filename, file_dir_line->d_name); \
+	      COPY_FILES(g_buff, a_db_info->config->keyword, type);      \
+	    }                                                            \
+	  }                                                              \
+	}                                                                \
+      } else {                                                           \
+	/* the directory is XXX#, where # is the subdir spec.            \
+	   we just need to copy the entire contents of this dir          \
+	   (of the form *.*) to the appropriate destination */           \
+	fprintf((FILE *)a_stream, "cp %s/*.* %s/%s/ \n", filename,       \
+		a_db_info->config->keyword, dir_line->d_name);           \
+      }                                                                  \
+    }
+
+#define MAX_ARRAY_SIZE 100   /* can only be all alphanumeric characters */
+#define FIRST_MAN_CHAR '.'
 static void f_copyman( ACTION_PARAMS)
 {
-  char *buf = NULL;
+  char c = '0';
+  struct dirent *dir_line = NULL;
+  DIR *dir = NULL;
+  char filename[MAX_LINE_LEN], *man_source;
+  char dest[MAX_LINE_LEN], subdir;
+  struct stat file_stat;
+  int subdirs_made[MAX_ARRAY_SIZE];
+  int subdirs_index = (int )0;
+  int man_size = 3;           /* size of the string "man" */
+  FILE *file = NULL;
 
   CHECK_NUM_PARAM("copyMan");
 
@@ -2184,19 +2233,41 @@ static void f_copyman( ACTION_PARAMS)
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
-    /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config || !a_db_info->config->man_path) {
-      upserr_vplace();
-      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "man");
-    } else {  
+    /* Make sure we have somewhere to copy the files to and a source. */
+    if (a_db_info->config && a_db_info->config->man_path) {
+      /* ok we have a destination, now see if we have a source, if not
+	 assume the default */
+      GET_SOURCE(man_source, man_files);
+
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	GET_MAN_SOURCE(MANPAGES);
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-		    buf, a_db_info->config->man_path) < 0) {
-	  FPRINTF_ERROR();
-	}
+	/* open the source directory and see what type of structure we have */
+	if ((dir = opendir(man_source))) {
+	  /* read each directory item and figure out what to do with it */
+	  while ((dir_line = readdir(dir))) {
+	    if (dir_line->d_name[0] != '.') {   /* skip any . file */
+	      sprintf(filename, "%s/%s", man_source, dir_line->d_name);
+	      if (! stat(filename, &file_stat)) {
+		if (S_ISDIR(file_stat.st_mode)) {
+		  /* this is a directory.  so we need to process the files in
+		     it */
+		  PROCESS_DIR("man", man_size, "man", man_path);
+		} else {
+		  /* this is a file, if it is a man file, copy it to the man
+		     area */
+		  if ((file = fopen(filename, "r"))) {
+		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    if (c == FIRST_MAN_CHAR) {
+		      COPY_FILES(filename, a_db_info->config->man_path, "man");
+		    }
+		    fclose(file);
+		  }
+		}
+	      }
+	    }
+	  }   /* while ((dir_line ... */
+	}  /* if ((dir = ... */
 	break;
       default:
 	upserr_vplace();
@@ -2207,13 +2278,25 @@ static void f_copyman( ACTION_PARAMS)
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_cmd_maps[a_cmd->icmd].cmd);
       }
+    } else {
+      upsver_mes(1, "%sNo destination in dbconfig file for man files\n",
+		 ACT_PREFIX); 
     }
   }
 }
 
 static void f_copycatman( ACTION_PARAMS)
 {
-  char *buf = NULL;
+  char c = '0';
+  struct dirent *dir_line = NULL;
+  DIR *dir = NULL;
+  char filename[MAX_LINE_LEN], *catman_source;
+  char dest[MAX_LINE_LEN], subdir;
+  struct stat file_stat;
+  int subdirs_made[MAX_ARRAY_SIZE];
+  int subdirs_index = (int )0;
+  int cat_size = 6;           /* size of the string "catman" */
+  FILE *file = NULL;
 
   CHECK_NUM_PARAM("copyCatMan");
 
@@ -2223,19 +2306,42 @@ static void f_copycatman( ACTION_PARAMS)
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
-    /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config || !a_db_info->config->catman_path) {
-      upserr_vplace();
-      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "catman");
-    } else {  
+    /* Make sure we have somewhere to copy the files to and a source. */
+    if (a_db_info->config && a_db_info->config->catman_path) {
+      /* ok we have a destination, now see if we have a source, if not
+	 assume the default */
+      GET_SOURCE(catman_source, catman_files);
+
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	GET_MAN_SOURCE(CATMANPAGES);
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-		    buf, a_db_info->config->catman_path) < 0) {
-	  FPRINTF_ERROR();
-	}
+	/* open the source directory and see what type of structure we have */
+	if ((dir = opendir(catman_source))) {
+	  /* read each directory item and figure out what to do with it */
+	  while ((dir_line = readdir(dir))) {
+	    if (dir_line->d_name[0] != '.') {   /* skip any . file */
+	      sprintf(filename, "%s/%s", catman_source, dir_line->d_name);
+	      if (! stat(filename, &file_stat)) {
+		if (S_ISDIR(file_stat.st_mode)) {
+		  /* this is a directory.  so we need to process the files in
+		     it */
+		  PROCESS_DIR("catman", cat_size, "cat", catman_path);
+		} else {
+		  /* this is a file, if it is a catman file, copy it to the man
+		     area */
+		  if ((file = fopen(filename, "r"))) {
+		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    if (c != FIRST_MAN_CHAR) {
+		      COPY_FILES(filename, a_db_info->config->catman_path,
+				 "cat");
+		    }
+		    fclose(file);
+		  }
+		}
+	      }
+	    }
+	  }   /* while ((dir_line ... */
+	}  /* if ((dir = ... */
 	break;
       default:
 	upserr_vplace();
@@ -2246,14 +2352,48 @@ static void f_copycatman( ACTION_PARAMS)
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_cmd_maps[a_cmd->icmd].cmd);
       }
+    } else {
+      upsver_mes(1, "%sNo destination in dbconfig file for catman files\n",
+		 ACT_PREFIX); 
     }
   }
 }
 
+#define REMOVE_FILES(filename, dest_path, type)  \
+    /* figure out sectional sub directory (based on file extension) */ \
+    if (subdir = get_man_subdir(filename)) {                           \
+      sprintf(dest, "%s/%s%c", dest_path, type, subdir);               \
+      /* see if the sectional subdir exists.  if not, ignore this. */  \
+      if (stat(dest, &file_stat) != (int )-1) {                        \
+        /* now add the remove line to the temp file */                 \
+        fprintf((FILE *)a_stream, "rm -f %s/%s\n", dest, filename);    \
+      }                                                                \
+    }
+
+#define UNPROCESS_DIR(dir_name, dir_size, type, keyword)   \
+    if (! strncmp(dir_line->d_name, dir_name, dir_size)) {             \
+      DIR *file_dir = NULL;                                            \
+      struct dirent *file_dir_line = NULL;                             \
+      if ((file_dir = opendir(filename))) {                            \
+	while ((file_dir_line = readdir(file_dir))) {                  \
+	  if (file_dir_line->d_name[0] != '.') {                       \
+	    REMOVE_FILES(file_dir_line->d_name,                        \
+		         a_db_info->config->keyword, type);            \
+	  }                                                            \
+	}                                                              \
+      }                                                                \
+    }
+
 static void f_uncopyman( ACTION_PARAMS)
 {
-  char *buf = NULL;
-  t_upslst_item *man_item, *man_list = NULL;
+  char c = '0';
+  struct dirent *dir_line = NULL;
+  DIR *dir = NULL;
+  char filename[MAX_LINE_LEN], *man_source;
+  char dest[MAX_LINE_LEN], subdir;
+  struct stat file_stat;
+  int man_size = 3;           /* size of the string "man" */
+  FILE *file = NULL;
 
   CHECK_NUM_PARAM("uncopyMan");
 
@@ -2263,31 +2403,42 @@ static void f_uncopyman( ACTION_PARAMS)
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
-    /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config || !a_db_info->config->man_path) {
-      upserr_vplace();
-      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "man");
-    } else {  
+    /* Make sure we have somewhere to remove the files from. */
+    if (a_db_info->config && a_db_info->config->man_path) {
+      /* ok we have a destination, now see if we have a source, if not
+	 assume the default */
+      GET_SOURCE(man_source, man_files);
+
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	GET_MAN_SOURCE(MANPAGES);
-
-	/* Get a list of all the files in the specified directory */
-	upsutl_get_files(buf, ANY_MATCH, &man_list);
-
-	for (man_item = man_list ; man_item ; man_item = man_item->next) {
-	  if (fprintf((FILE *)a_stream, "rm %s/%s\n", 
-		      a_db_info->config->man_path, (char *)man_item->data)
-	      < 0) {
-	    FPRINTF_ERROR();
-	    break;
-	  }
-	}
-	/* cleanup memory */
-	man_list = upslst_free(man_list, 'd');
-
-	fprintf((FILE *)a_stream, "#\n");
+	/* open the source directory and see what type of structure we have */
+	if ((dir = opendir(man_source))) {
+	  /* read each directory item and figure out what to do with it */
+	  while ((dir_line = readdir(dir))) {
+	    if (dir_line->d_name[0] != '.') {   /* skip any . file */
+	      sprintf(filename, "%s/%s", man_source, dir_line->d_name);
+	      if (! stat(filename, &file_stat)) {
+		if (S_ISDIR(file_stat.st_mode)) {
+		  /* this is a directory.  so we need to process the files in
+		     it */
+		  UNPROCESS_DIR("man", man_size, "man", man_path);
+		} else {
+		  /* this is a file, if it is a man file, remove it from the
+		     man area */
+		  if ((file = fopen(filename, "r"))) {
+		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    if (c == FIRST_MAN_CHAR) {
+		      REMOVE_FILES(dir_line->d_name, 
+				   a_db_info->config->man_path, "man");
+		    }
+		    fclose(file);
+		  }
+		}
+	      }
+	    }
+	  }   /* while ((dir_line ... */
+	}  /* if ((dir = ... */
 	break;
       default:
 	upserr_vplace();
@@ -2298,14 +2449,23 @@ static void f_uncopyman( ACTION_PARAMS)
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_cmd_maps[a_cmd->icmd].cmd);
       }
+    } else {
+      upsver_mes(1, "%sNo destination in dbconfig file for man files\n",
+		 ACT_PREFIX); 
     }
   }
 }
 
 static void f_uncopycatman( ACTION_PARAMS)
 {
-  char *buf = NULL;
-  t_upslst_item *man_item, *man_list = NULL;
+  char c = '0';
+  struct dirent *dir_line = NULL;
+  DIR *dir = NULL;
+  char filename[MAX_LINE_LEN], *catman_source;
+  char dest[MAX_LINE_LEN], subdir;
+  struct stat file_stat;
+  int cat_size = 3;           /* size of the string "cat" */
+  FILE *file = NULL;
 
   CHECK_NUM_PARAM("uncopyCatMan");
 
@@ -2316,30 +2476,41 @@ static void f_uncopycatman( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config || !a_db_info->config->catman_path) {
-      upserr_vplace();
-      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "catman");
-    } else {  
+    if (a_db_info->config && a_db_info->config->catman_path) {
+      /* ok we have a destination, now see if we have a source, if not
+	 assume the default */
+      GET_SOURCE(catman_source, man_files);
+
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	GET_MAN_SOURCE(CATMANPAGES);
-
-	/* Get a list of all the files in the specified directory */
-	upsutl_get_files(buf, ANY_MATCH, &man_list);
-
-	for (man_item = man_list ; man_item ; man_item = man_item->next) {
-	  if (fprintf((FILE *)a_stream, "rm %s/%s\n", 
-		      a_db_info->config->catman_path, (char *)man_item->data)
-	      < 0) {
-	    FPRINTF_ERROR();
-	    break;
-	  }
-	}
-	/* cleanup memory */
-	man_list = upslst_free(man_list, 'd');
-
-	fprintf((FILE *)a_stream, "#\n");
+	/* open the source directory and see what type of structure we have */
+	if ((dir = opendir(catman_source))) {
+	  /* read each directory item and figure out what to do with it */
+	  while ((dir_line = readdir(dir))) {
+	    if (dir_line->d_name[0] != '.') {   /* skip any . file */
+	      sprintf(filename, "%s/%s", catman_source, dir_line->d_name);
+	      if (! stat(filename, &file_stat)) {
+		if (S_ISDIR(file_stat.st_mode)) {
+		  /* this is a directory.  so we need to process the files in
+		     it */
+		  UNPROCESS_DIR("cat", cat_size, "cat", catman_path);
+		} else {
+		  /* this is a file, if it is a man file, remove it from the
+		     man area */
+		  if ((file = fopen(filename, "r"))) {
+		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    if (c != FIRST_MAN_CHAR) {
+		      REMOVE_FILES(dir_line->d_name, 
+				   a_db_info->config->catman_path, "cat");
+		    }
+		    fclose(file);
+		  }
+		}
+	      }
+	    }
+	  }   /* while ((dir_line ... */
+	}  /* if ((dir = ... */
 	break;
       default:
 	upserr_vplace();
@@ -2350,6 +2521,9 @@ static void f_uncopycatman( ACTION_PARAMS)
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_cmd_maps[a_cmd->icmd].cmd);
       }
+    } else {
+      upsver_mes(1, "%sNo destination in dbconfig file for man files\n",
+		 ACT_PREFIX); 
     }
   }
 }
@@ -2362,32 +2536,7 @@ static void f_copynews( ACTION_PARAMS)
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-
-    /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config || !a_db_info->config->news_path) {
-      upserr_vplace();
-      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "news");
-    } else {  
-      switch ( a_command_line->ugo_shell ) {
-      case e_BOURNE:
-      case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-		    a_cmd->argv[0], a_db_info->config->news_path) < 0) {
-	  FPRINTF_ERROR();
-	}
-	break;
-      default:
-	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-      }
-      if (UPS_ERROR != UPS_SUCCESS) {
-	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
-      }
-    }
-  }
+  upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
 }
 
 static void f_envappend( ACTION_PARAMS)
@@ -2410,7 +2559,7 @@ static void f_envappend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_envremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=\"%s\"\nelse\n  %s=\"${%s}%s%s\"\nfi\nexport %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1],
@@ -2423,7 +2572,7 @@ static void f_envappend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_envremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s \"%s\"\nelse\n  setenv %s \"${%s}%s%s\"\nendif\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1], 
@@ -2464,7 +2613,7 @@ static void f_envprepend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_envremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=\"%s\"\nelse\n  %s=\"%s%s${%s}\"\nfi\nexport %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1],
@@ -2477,7 +2626,7 @@ static void f_envprepend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_envremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s \"%s\"\nelse\n  setenv %s \"%s%s${%s}\"\nendif\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1], 
@@ -2798,7 +2947,7 @@ static void f_pathappend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\";export %s\n#\n",
 		  pathPtr, pathPtr, delimiter, a_cmd->argv[1], pathPtr) < 0) {
@@ -2810,7 +2959,7 @@ static void f_pathappend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n#\n",
 		  pathPtr, pathPtr, a_cmd->argv[1]) < 0) {
@@ -2851,7 +3000,7 @@ static void f_pathprepend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\";export %s\n#\n",
 		  pathPtr, a_cmd->argv[1], delimiter, pathPtr, pathPtr) < 0) {
@@ -2863,7 +3012,7 @@ static void f_pathprepend( ACTION_PARAMS)
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
-	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n#\n",
 		  pathPtr, a_cmd->argv[1], pathPtr) < 0) {
@@ -3060,9 +3209,7 @@ static void f_unalias( ACTION_PARAMS)
 }
 
 static int sh_output_first_check(const FILE * const a_stream,
-				 const char * const a_data,
-				 const int a_exit_flag, 
-				 const t_upsugo_command * const a_command_line)
+				 const char * const a_data)
 {
   int status;
 
@@ -3078,7 +3225,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 			       const int a_exit_flag, 
 			       const int a_check_flag,
 			       const int a_ups_env_flag,
-			       const t_upstyp_matched_instance * const a_inst,
+			       const t_upstyp_matched_instance * const a_minst,
 			       const t_upstyp_db * const a_db_info,
 			       const t_upsugo_command * const a_command_line)
 {
@@ -3086,7 +3233,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 
   /* define all of the UPS local variables that the user may need. */
   if (a_ups_env_flag == DO_UPS_ENV) {
-    upsget_allout(a_stream, a_db_info, a_inst, a_command_line, "  ");
+    upsget_allout(a_stream, a_db_info, a_minst, a_command_line, "  ");
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
   }
   if (UPS_ERROR == UPS_SUCCESS) {
@@ -3118,9 +3265,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 }
 
 static int csh_output_first_check(const FILE * const a_stream,
-				 const char * const a_data,
-				 const int a_exit_flag, 
-				 const t_upsugo_command * const a_command_line)
+				 const char * const a_data)
 {
   int status;
 
@@ -3136,7 +3281,7 @@ static int csh_output_next_part(const FILE * const a_stream,
 				const int a_exit_flag, 
 				const int a_check_flag,
 				const int a_ups_env_flag,
-				const t_upstyp_matched_instance * const a_inst,
+				const t_upstyp_matched_instance * const a_minst,
 				const t_upstyp_db * const a_db_info,
 				const t_upsugo_command * const a_command_line)
 {
@@ -3144,7 +3289,7 @@ static int csh_output_next_part(const FILE * const a_stream,
 
   /* define all of the UPS local variables that the user may need. */
   if (a_ups_env_flag == DO_UPS_ENV) {
-    upsget_allout(a_stream, a_db_info, a_inst, a_command_line, "  ");
+    upsget_allout(a_stream, a_db_info, a_minst, a_command_line, "  ");
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
   }
   if (UPS_ERROR == UPS_SUCCESS) {
@@ -3224,10 +3369,9 @@ static void f_sourcecompilereq( ACTION_PARAMS)
     if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
-	if (sh_output_first_check(a_stream, a_cmd->argv[0], DO_EXIT,
-				  a_command_line) >= 0) {
+	if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (sh_output_next_part(a_stream, a_cmd->argv[0], DO_EXIT,
-				  NO_CHECK, DO_NO_UPS_ENV, a_inst, a_db_info,
+				  NO_CHECK, DO_NO_UPS_ENV, a_minst, a_db_info,
 				  a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3237,10 +3381,9 @@ static void f_sourcecompilereq( ACTION_PARAMS)
 	}
 	break;
       case e_CSHELL:
-	if (csh_output_first_check(a_stream, a_cmd->argv[0], DO_EXIT,
-				   a_command_line) >= 0) {
+	if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (csh_output_next_part(a_stream, a_cmd->argv[0], DO_EXIT,
-				   NO_CHECK, DO_NO_UPS_ENV, a_inst,
+				   NO_CHECK, DO_NO_UPS_ENV, a_minst,
 				   a_db_info, a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3276,10 +3419,9 @@ static void f_sourcecompileopt( ACTION_PARAMS)
     if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
-	if (sh_output_first_check(a_stream, a_cmd->argv[0], NO_EXIT,
-				  a_command_line) >= 0) {
+	if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (sh_output_next_part(a_stream, a_cmd->argv[0], DO_EXIT,
-				  NO_CHECK, DO_NO_UPS_ENV, a_inst, a_db_info,
+				  NO_CHECK, DO_NO_UPS_ENV, a_minst, a_db_info,
 				  a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3288,10 +3430,9 @@ static void f_sourcecompileopt( ACTION_PARAMS)
 	}
 	break;
       case e_CSHELL:
-	if (csh_output_first_check(a_stream, a_cmd->argv[0], NO_EXIT,
-				   a_command_line) >= 0) {
+	if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (csh_output_next_part(a_stream, a_cmd->argv[0], DO_EXIT,
-				   NO_CHECK, DO_NO_UPS_ENV, a_inst, a_db_info,
+				   NO_CHECK, DO_NO_UPS_ENV, a_minst, a_db_info,
 				   a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3331,10 +3472,9 @@ static void f_sourcerequired( ACTION_PARAMS)
     if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
-	if (sh_output_first_check(a_stream, a_cmd->argv[0], DO_EXIT,
-				  a_command_line) >= 0) {
+	if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				  NO_CHECK, no_ups_env_flag, a_inst, a_db_info,
+				  NO_CHECK, no_ups_env_flag, a_minst, a_db_info,
 				  a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3344,10 +3484,9 @@ static void f_sourcerequired( ACTION_PARAMS)
 	}
 	break;
       case e_CSHELL:
-	if (csh_output_first_check(a_stream, a_cmd->argv[0], DO_EXIT,
-				   a_command_line) >= 0) {
+	if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				   NO_CHECK, no_ups_env_flag, a_inst,
+				   NO_CHECK, no_ups_env_flag, a_minst,
 				   a_db_info, a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3389,10 +3528,9 @@ static void f_sourceoptional( ACTION_PARAMS)
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (sh_output_first_check(a_stream, a_cmd->argv[0], NO_EXIT,
-				a_command_line) >= 0) {
+      if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				NO_CHECK, no_ups_env_flag, a_inst, a_db_info,
+				NO_CHECK, no_ups_env_flag, a_minst, a_db_info,
 				a_command_line) < 0) {
 	  FPRINTF_ERROR();
 	} else {
@@ -3401,10 +3539,9 @@ static void f_sourceoptional( ACTION_PARAMS)
       }
       break;
     case e_CSHELL:
-      if (csh_output_first_check(a_stream, a_cmd->argv[0], NO_EXIT,
-				a_command_line) >= 0) {
+      if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				NO_CHECK, no_ups_env_flag, a_inst, a_db_info,
+				NO_CHECK, no_ups_env_flag, a_minst, a_db_info,
 				a_command_line) < 0) {
 	  FPRINTF_ERROR();
 	} else {
@@ -3442,10 +3579,9 @@ static void f_sourcereqcheck( ACTION_PARAMS)
     if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
-	if (sh_output_first_check(a_stream, a_cmd->argv[0], DO_EXIT,
-				  a_command_line) >= 0) {
+	if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				  DO_CHECK, no_ups_env_flag, a_inst, a_db_info,
+				  DO_CHECK, no_ups_env_flag, a_minst, a_db_info,
 				  a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3455,10 +3591,9 @@ static void f_sourcereqcheck( ACTION_PARAMS)
 	}
 	break;
       case e_CSHELL:
-	if (csh_output_first_check(a_stream, a_cmd->argv[0], DO_EXIT,
-				  a_command_line) >= 0) {
+	if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				  DO_CHECK, no_ups_env_flag, a_inst, a_db_info,
+				  DO_CHECK, no_ups_env_flag, a_minst, a_db_info,
 				  a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
@@ -3500,10 +3635,9 @@ static void f_sourceoptcheck( ACTION_PARAMS)
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (sh_output_first_check(a_stream, a_cmd->argv[0], NO_EXIT,
-				a_command_line) >= 0) {
+      if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				DO_CHECK, no_ups_env_flag, a_inst, a_db_info,
+				DO_CHECK, no_ups_env_flag, a_minst, a_db_info,
 				a_command_line) < 0) {
 	  FPRINTF_ERROR();
 	} else {
@@ -3512,10 +3646,9 @@ static void f_sourceoptcheck( ACTION_PARAMS)
       }
       break;
     case e_CSHELL:
-      if (csh_output_first_check(a_stream, a_cmd->argv[0], NO_EXIT,
-				a_command_line) >= 0) {
+      if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				DO_CHECK, no_ups_env_flag, a_inst, a_db_info,
+				DO_CHECK, no_ups_env_flag, a_minst, a_db_info,
 				a_command_line) < 0) {
 	  FPRINTF_ERROR();
 	} else {
@@ -3570,7 +3703,7 @@ static void f_writecompilescript(ACTION_PARAMS)
       
       mproduct->db_info = (t_upstyp_db *)a_db_info;
       upsmem_inc_refctr(a_db_info);
-      mproduct->minst_list = upslst_new((void *)a_inst);
+      mproduct->minst_list = upslst_new((void *)a_minst);
     
       /*       get the action command list */
       cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, mproduct,
@@ -3690,11 +3823,11 @@ static void f_unsetupenv( ACTION_PARAMS)
     lcl_cmd.icmd = e_envunset;
     lcl_cmd.argv[0] = g_buff;
 
-    if (a_inst->version && a_inst->version->product) {
-      uprod_name = upsutl_upcase(a_inst->version->product);
+    if (a_minst->version && a_minst->version->product) {
+      uprod_name = upsutl_upcase(a_minst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
 	sprintf(g_buff, "%s%s", SETUPENV,uprod_name);
-	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+	f_envunset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
     }
   }
@@ -3723,16 +3856,16 @@ static void f_proddir( ACTION_PARAMS)
        if the user entered one that we have to use */
     if (a_command_line->ugo_productdir) {
       tmp_prod_dir = a_command_line->ugo_productdir;
-    } else if (a_inst->version && a_inst->version->prod_dir) {
-      tmp_prod_dir = a_inst->version->prod_dir;
+    } else if (a_minst->version && a_minst->version->prod_dir) {
+      tmp_prod_dir = a_minst->version->prod_dir;
     }
-    if (a_inst->version && tmp_prod_dir && a_inst->version->product) {
-      uprod_name = upsutl_upcase(a_inst->version->product);
+    if (a_minst->version && tmp_prod_dir && a_minst->version->product) {
+      uprod_name = upsutl_upcase(a_minst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
 	sprintf(g_buff, "%s_DIR", uprod_name);
 	
 	lcl_cmd.argv[1] = tmp_prod_dir;
-	f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+	f_envset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
     }
 
@@ -3757,11 +3890,11 @@ static void f_unproddir( ACTION_PARAMS)
     lcl_cmd.icmd = e_envunset;
     lcl_cmd.argv[0] = g_buff;
 
-    if (a_inst->version && a_inst->version->product) {
-      uprod_name = upsutl_upcase(a_inst->version->product);
+    if (a_minst->version && a_minst->version->product) {
+      uprod_name = upsutl_upcase(a_minst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
 	sprintf(g_buff, "%s_DIR", uprod_name);
-	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+	f_envunset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
     }
   }
@@ -3770,7 +3903,6 @@ static void f_unproddir( ACTION_PARAMS)
 static void f_dodefaults( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
-  char *uprod_name;
 
   OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
@@ -3783,7 +3915,7 @@ static void f_dodefaults( ACTION_PARAMS)
       lcl_cmd.iact = a_cmd->iact;
       lcl_cmd.argc = g_cmd_maps[e_proddir].min_params;   /* # of args */
       lcl_cmd.icmd = e_proddir;
-      f_proddir(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      f_proddir(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 
       SET_SETUP_PROD();
       break;
@@ -3799,8 +3931,9 @@ static void f_dodefaults( ACTION_PARAMS)
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
       lcl_cmd.argc = g_cmd_maps[e_copyman].min_params;   /* # of args */
-      f_copyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
-      f_copycatman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+      f_copyman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
+      f_copycatman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
+      f_copyinfo(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_declare:	/* None */
       break;
@@ -3836,7 +3969,8 @@ static void f_dodefaults( ACTION_PARAMS)
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
       lcl_cmd.argc = g_cmd_maps[e_uncopyman].min_params;   /* # of args */
-      f_uncopyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+      f_uncopyman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
+      f_uncopycatman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_undeclare:	/* None */
       break;
@@ -3853,10 +3987,10 @@ static void f_dodefaults( ACTION_PARAMS)
       lcl_cmd.iact = a_cmd->iact;
       lcl_cmd.argc = g_cmd_maps[e_unproddir].min_params;   /* # of args */
       lcl_cmd.icmd = e_unproddir;
-      f_unproddir(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      f_unproddir(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       lcl_cmd.argc = g_cmd_maps[e_unsetupenv].min_params;   /* # of args */
       lcl_cmd.icmd = e_unsetupenv;
-      f_unsetupenv(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      f_unsetupenv(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       break;
     case e_untest:	/* None */
       break;
@@ -3872,5 +4006,84 @@ static void f_dodefaults( ACTION_PARAMS)
 		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
+}
+
+/***  (copied from the original ups )
+ * get_man_subdir() - Determine the sectional sub directory where
+ *                    a product man page should reside in.
+ *
+ * DESCRIPTION:
+ *   ups_uti_get_man_subdir() determines the sectional sub directory where a
+ *   product man page should be copied to. This sub directory is determined
+ *   from man_file, which is a pointer to the name of a product man file.
+ *   It is in the format:
+ *        <prod>.[1-8,l][a-z][.z,Z]
+ *   Examples:
+ *      man_file        sectional sub directory
+ *      --------        -----------------------
+ *      foo.1                     1
+ *      foo.3a                    3
+ *      foo.b                     l (el)
+ *      foo.8a.Z                  8
+ *
+ * INPUT  : man_file - name of the product man file
+ * OUTPUT : none
+ * RETURNS:
+ *   the sectional sub directory letter which could be one of 1-8, or l (el).
+ *   or 0 if this file did not have a file extension
+ ***/
+#define NO_EXTENSION '\0'
+static char get_man_subdir(char * const a_man_file)
+{
+   char *sp;
+   char ret_val = NO_EXTENSION;
+
+   for (sp = a_man_file; *sp != NULL; sp++) {
+     if (*sp == '.')  {
+       ret_val = *++sp;
+       /* check to see if this file extension is of the possible man types -
+	  i.e. - '0-9' or '0-9[a-zA-Z]' or 'n' or 'l'.  if not, ignore this
+	  file it is probably not a man or catman file. */
+       if (! isdigit((int )*sp)) {
+	 if ((*sp != 'n') && (*sp != 'l')) {
+	   /* this character was not a digit or a 'n' or a 'l' */
+	   ret_val = NO_EXTENSION;
+	   break;
+	 }
+       } else if ((*++sp != '\0') && (*++sp != '\0')) {
+	 /* the file extension is longer than 2 characters , not a man file */
+	 ret_val = NO_EXTENSION;
+	 break;
+       }
+       break;
+     }
+   }
+   return(ret_val);
+}
+
+/*-----------------------------------------------------------------------
+ * not_yet_created
+ *
+ * see if the passed character is already a member of the passed array
+ *
+ * Input : an integer array, an index indicating the maximum number of elements
+ *         of the array that are valid and the character to look for
+ * Output: none
+ * Return: 1 if not present in the array, else 0
+ */
+static int not_yet_created(const int * const array, const int index, 
+			   const char element)
+{
+  int i = 0;
+  int ret = 1;  /* assume not present */
+
+  for ( ; i < index ; ++i) {
+    if (array[i] == (int )element) {
+      /* found a match */
+      ret = 0;
+      break;
+    }
+  }
+  return(ret);
 }
 
