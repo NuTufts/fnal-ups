@@ -36,7 +36,7 @@ declare rover v2_0 -f NULL -A backyard -b mycompile -D akc@kennel -g leash -L -m
 #
 declare spot v1_0 -f NULL -r \${UPS_DIR}/test/scripts/declare/products/spot -M ups -m spot.table -c -d -o -t -n -g leash -actout log/tmp.out -out log/spot1.out -diff log/spot1.in
 declare spot v1_0 -f NULL -c -d -o -t -n -g leash -actout log/tmp.out -out log/spot2.out -diff log/spot2.in 
-declare spot v2_0 -f IRIX -r \${UPS_DIR}/test/scripts/declare/products/spot -C -c -M ups -m spot.table -T \${UPS_DIR}/test/scripts/declare/products/spot/archive.file
+declare spot v2_0 -f IRIX -r \${UPS_DIR}/test/scripts/declare/products/spot -C -c -M ups -m spot.table -T ftp://sillyhostname\${UPS_DIR}/test/scripts/declare/products/spot/archive.file
 quit
 EOD
 ls tostuff/*/* > log/tostuff.out

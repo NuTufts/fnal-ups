@@ -12,5 +12,5 @@ QUALIFIERS = ""
   MODIFIED = 1998-04-09 23.01.02 GMT
   PROD_DIR = ${UPS_DIR}/test/scripts/undeclare/products/spot
   TABLE_FILE = spot.table
-# NOTE DECLARE AREA NOT UNDECLARE
-  ARCHIVE_FILE = ${UPS_DIR}/test/scripts/declare/products/spot/archive.file
+# NOTE DECLARE AREA NOT UNDECLARE and no / should translate...
+  ARCHIVE_FILE = ftp://sillyhostname${UPS_DIR}/test/scripts/declare/products/spot/archive.file
