@@ -63,12 +63,12 @@ static int g_MATCH_DONE = 0;
   { valid=1; \
     if(instance->version)                               \
     { if (instance->version->ELEMENT)                   \
-      { printf("\"%s\" ",instance->version->ELEMENT);   \
+      { (void) printf("\"%s\" ",instance->version->ELEMENT);\
       } else {                                          \
-        printf("\"\" ");                                \
+        (void) printf("\"\" ");                         \
       }                                                 \
     } else {                                            \
-      printf("\"\" ");                                  \
+      (void) printf("\"\" ");                           \
     }                                                   \
   }                                                     \
 }
@@ -77,12 +77,12 @@ static int g_MATCH_DONE = 0;
   { valid=1; \
     if(instance->table)                                 \
     { if (instance->table->ELEMENT)                     \
-      { printf("\"%s\" ",instance->table->ELEMENT);     \
+      { (void) printf("\"%s\" ",instance->table->ELEMENT);\
       } else {                                          \
-        printf("\"\" ");                                \
+        (void) printf("\"\" ");                         \
       }                                                 \
     } else {                                            \
-      printf("\"\" ");                                  \
+      (void) printf("\"\" ");                           \
     }                                                   \
   }                                                     \
 }
@@ -91,12 +91,12 @@ static int g_MATCH_DONE = 0;
   { valid=1;                                            \
     if(product->db_info)                                \
     { if (product->db_info->ELEMENT)                    \
-      { printf("\"%s\" ",product->db_info->ELEMENT);    \
+      { (void) printf("\"%s\" ",product->db_info->ELEMENT);\
       } else {                                          \
-        printf("\"\" ");                                \
+        (void) printf("\"\" ");                         \
       }                                                 \
     } else {                                            \
-      printf("\"\" ");                                  \
+      (void) printf("\"\" ");                           \
     }                                                   \
   }                                                     \
 }
@@ -105,12 +105,12 @@ static int g_MATCH_DONE = 0;
   { valid=1;                                            \
     if(config_ptr)                                      \
     { if (config_ptr->ELEMENT)                          \
-      { printf("\"%s\" ",config_ptr->ELEMENT);          \
+      { (void) printf("\"%s\" ",config_ptr->ELEMENT);   \
       } else {                                          \
-        printf("\"\" ");                                \
+        (void) printf("\"\" ");                         \
       }                                                 \
     } else {                                            \
-      printf("\"\" ");                                  \
+      (void) printf("\"\" ");                           \
     }                                                   \
   }                                                     \
 }
@@ -130,58 +130,58 @@ static int g_MATCH_DONE = 0;
   { valid=1;                                            \
     if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
-      { printf("\"%s\" ",instance->chain->ELEMENT);         \
+      { (void) printf("\"%s\" ",instance->chain->ELEMENT);\
       } else {                                          \
         if(instance->version)                           \
         { if (instance->version->ELEMENT)               \
-          { printf("\"%s\" ",instance->version->ELEMENT);   \
+          { (void) printf("\"%s\" ",instance->version->ELEMENT);\
           } else {                                      \
             if (instance->table)                        \
             { if (instance->table->ELEMENT)             \
-              { printf("\"%s\" ",instance->table->ELEMENT); \
+              { (void) printf("\"%s\" ",instance->table->ELEMENT);\
               } else {                                  \
-                printf("\"\" ");                        \
+                (void) printf("\"\" ");                 \
               }                                         \
             } else {                                    \
-              printf("\"\" ");                          \
+              (void) printf("\"\" ");                   \
             }                                           \
           }                                             \
         } else {                                        \
           if (instance->table)                          \
           { if (instance->table->ELEMENT)               \
-            { printf("\"%s\" ",instance->table->ELEMENT);   \
+            { (void) printf("\"%s\" ",instance->table->ELEMENT);\
             } else {                                    \
-              printf("\"\" ");                          \
+              (void) printf("\"\" ");                   \
             }                                           \
           } else {                                      \
-            printf("\"\" ");                            \
+            (void) printf("\"\" ");                     \
           }                                             \
         }                                               \
       }                                                 \
     } else {                                            \
       if(instance->version)                             \
       { if (instance->version->ELEMENT)                 \
-        { printf("\"%s\" ",instance->version->ELEMENT);     \
+        { (void) printf("\"%s\" ",instance->version->ELEMENT);\
         } else {                                        \
           if (instance->table)                          \
           { if (instance->table->ELEMENT)               \
-            { printf("\"%s\" ",instance->table->ELEMENT);   \
+            { (void) printf("\"%s\" ",instance->table->ELEMENT);\
             } else {                                    \
-              printf("\"\" ");                          \
+              (void) printf("\"\" ");                   \
             }                                           \
           } else {                                      \
-            printf("\"\" ");                            \
+            (void) printf("\"\" ");                     \
           }                                             \
         }                                               \
       } else {                                          \
         if (instance->table)                            \
         { if (instance->table->ELEMENT)                 \
-          { printf("\"%s\" ",instance->table->ELEMENT);     \
+          { (void) printf("\"%s\" ",instance->table->ELEMENT);\
           } else {                                      \
-            printf("\"\" ");                            \
+            (void) printf("\"\" ");                     \
           }                                             \
         } else {                                        \
-          printf("\"\" ");                              \
+          (void) printf("\"\" ");                       \
         }                                               \
       }                                                 \
     }                                                   \
@@ -190,12 +190,12 @@ static int g_MATCH_DONE = 0;
 #define FromBoth(ELEMENT) \
 { if (!upsutl_stricmp(buffer,"" #ELEMENT ""))    \
   { valid=1; \
-    printf("\"");                                       \
+    (void) printf("\"");                                \
     if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
-      { printf("%s:",instance->chain->ELEMENT);         \
+      { (void) printf("%s:",instance->chain->ELEMENT);  \
       } else {                                          \
-        printf(":");                                    \
+        (void) printf(":");                             \
       }                                                 \
     }                                                   \
     if (instance->xtra_chains)                          \
@@ -203,88 +203,88 @@ static int g_MATCH_DONE = 0;
            clist ; clist = clist->next)                 \
       { cinst_ptr = (t_upstyp_instance *)clist->data;   \
         if(cinst_ptr->ELEMENT)                          \
-        { printf("%s:", cinst_ptr->ELEMENT);            \
+        { (void) printf("%s:", cinst_ptr->ELEMENT);     \
         } else {                                        \
-          printf(":");                                  \
+          (void) printf(":");                           \
         }                                               \
       }                                                 \
     }                                                   \
     if(instance->version)                               \
     { if (instance->version->ELEMENT)                   \
-      { printf("%s",instance->version->ELEMENT);        \
+      { (void) printf("%s",instance->version->ELEMENT); \
       }                                                 \
     }                                                   \
-    printf("\" ");                                      \
+    (void) printf("\" ");                               \
   }                                                     \
 }
 #define defaults(INSTANCE) \
-{   printf("\tVersion=%s",                                          \
-           (instance->INSTANCE->version ? instance->INSTANCE->version : "")); \
-    printf("\tFlavor=%s\n", instance->INSTANCE->flavor);            \
-    if (instance->INSTANCE->qualifiers)                             \
-    { if(strlen(instance->INSTANCE->qualifiers))                    \
-      { printf("\t\tQualifiers=\"%s\"", instance->INSTANCE->qualifiers);  \
-      } else {      /* damn inconsistant if you ask me */              \
-        printf("\t\tQualifiers=\"\"");                                 \
-      }                                                                \
+{   (void) printf("\tVersion=%s",                                    \
+           (instance->INSTANCE->version ? instance->INSTANCE->version : ""));\
+    (void) printf("\tFlavor=%s\n", instance->INSTANCE->flavor);      \
+    if (instance->INSTANCE->qualifiers)                              \
+    { if(strlen(instance->INSTANCE->qualifiers))                     \
+      { (void) printf("\t\tQualifiers=\"%s\"", instance->INSTANCE->qualifiers);\
+      } else {      /* damn inconsistant if you ask me */            \
+        (void) printf("\t\tQualifiers=\"\"");                        \
+      }                                                              \
     } else {                                                         \
-      printf("\t\tQualifiers=\"\"");                                 \
+      (void) printf("\t\tQualifiers=\"\"");                          \
     }                                                                \
-    if (instance->xtra_chains)                                      \
-    { printf("\tChains=");                                           \
+    if (instance->xtra_chains)                                       \
+    { (void) printf("\tChains=");                                    \
     } else {                                                         \
-      printf("\tChain=");                                            \
+      (void) printf("\tChain=");                                     \
     }                                                                \
-    if ( instance->INSTANCE->chain )                                \
-    { printf("%s", instance->INSTANCE->chain);                      \
+    if ( instance->INSTANCE->chain )                                 \
+    { (void) printf("%s", instance->INSTANCE->chain);                \
     } else {                                                         \
-      printf("\"\"");                                                \
+      (void) printf("\"\"");                                         \
     }                                                                \
-    if (instance->xtra_chains)                                      \
-    { for (clist = instance->xtra_chains ;                          \
+    if (instance->xtra_chains)                                       \
+    { for (clist = instance->xtra_chains ;                           \
            clist ; clist = clist->next)                              \
       { cinst_ptr = (t_upstyp_instance *)clist->data;                \
-        printf(",%s", cinst_ptr->chain );                            \
+        (void) printf(",%s", cinst_ptr->chain );                     \
       }                                                              \
-    } printf("\n");                                                  \
+    } (void) printf("\n");                                           \
 }
 #define WAW(WHAT) \
-{    if (instance->version)                                         \
-    { if (instance->version->WHAT)                                  \
-      { printf("%s", instance->version->WHAT);                      \
+{    if (instance->version)                                          \
+    { if (instance->version->WHAT)                                   \
+      { (void) printf("%s", instance->version->WHAT);                \
       } else {                                                       \
-        printf("\"\"");                                              \
+        (void) printf("\"\"");                                       \
       }                                                              \
     } else {                                                         \
-      printf("\"\"");                                                \
+      (void) printf("\"\"");                                         \
     }                                                                \
-    if (instance->chain)                                            \
-    { if (instance->chain->WHAT)                                    \
-      { printf(",%s", instance->chain->WHAT);                       \
+    if (instance->chain)                                             \
+    { if (instance->chain->WHAT)                                     \
+      { (void) printf(",%s", instance->chain->WHAT);                 \
       } else {                                                       \
-        printf(",\"\"");                                             \
+        (void) printf(",\"\"");                                      \
       }                                                              \
-      if (instance->xtra_chains)                                    \
-      { for (clist = instance->xtra_chains ;                        \
+      if (instance->xtra_chains)                                     \
+      { for (clist = instance->xtra_chains ;                         \
              clist ; clist = clist->next)                            \
         { cinst_ptr = (t_upstyp_instance *)clist->data;              \
           if (cinst_ptr->WHAT)                                       \
-          { printf(",%s", cinst_ptr->WHAT);                          \
+          { (void) printf(",%s", cinst_ptr->WHAT);                   \
           } else {                                                   \
-            printf(",\"\"");                                         \
+            (void) printf(",\"\"");                                  \
           }                                                          \
         }                                                            \
       }                                                              \
-    } printf("\n");                                                  \
+    } (void) printf("\n");                                           \
 }
 
 #define PRINT_DB(dbname) \
-{    printf("\nDATABASE=");                                            \
+{    (void) printf("\nDATABASE=");                                   \
      if (dbname)                                                     \
-     { printf("%s ",dbname);                                         \
+     { (void) printf("%s ",dbname);                                  \
      } else {                                                        \
-       printf("\"\" ");                                              \
-     } printf("\n");                                                 \
+       (void) printf("\"\" ");                                       \
+     } (void) printf("\n");                                          \
 }
 
 /* int list_error=UPS_SUCCESS;  */
@@ -540,7 +540,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
     { instance = (t_upstyp_matched_instance *)(tmp_minst_list->data);
 /* A as in a single product loop */
       if (!a_command_line->ugo_K)
-      { printf("\tProduct=%s",mproduct->product);
+      { (void) printf("\tProduct=%s",mproduct->product);
         if (instance->chain) 
         { defaults(chain)
         } else { 
@@ -553,29 +553,29 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           }
         }
         if (a_command_line->ugo_l && instance->version )
-        { printf("\t\tDeclared=");
-          strcpy(buffer,"declared");
+        { (void) printf("\t\tDeclared=");
+          (void) strcpy(buffer,"declared");
           FromBoth(declared);
-          printf("\n");
-          printf("\t\tDeclarer=");
-          strcpy(buffer,"declarer");
+          (void) printf("\n");
+          (void) printf("\t\tDeclarer=");
+          (void) strcpy(buffer,"declarer");
           FromBoth(declarer);
-          printf("\n");
-          printf("\t\tModified=");
-          strcpy(buffer,"modified");
+          (void) printf("\n");
+          (void) printf("\t\tModified=");
+          (void) strcpy(buffer,"modified");
           FromBoth(modified);
-          printf("\n");
-          printf("\t\tModifier=");
-          strcpy(buffer,"modifier");
+          (void) printf("\n");
+          (void) printf("\t\tModifier=");
+          (void) strcpy(buffer,"modifier");
           FromBoth(modifier);
-          printf("\n");
-          printf("\t\tHome=");
+          (void) printf("\n");
+          (void) printf("\t\tHome=");
           if (UPSRELATIVE(instance->version->prod_dir))
           { if (mproduct->db_info) 
             { config_ptr = mproduct->db_info->config;
               if (config_ptr) 
               { if (config_ptr->prod_dir_prefix) 
-                { printf("%s/",config_ptr->prod_dir_prefix); }
+                { (void) printf("%s/",config_ptr->prod_dir_prefix); }
               }
             }
           }
@@ -583,54 +583,54 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           { config_ptr = mproduct->db_info->config;
             if (config_ptr) 
             { if (config_ptr->prod_dir_prefix) 
-              { printf("%s",config_ptr->prod_dir_prefix); }
+              { (void) printf("%s",config_ptr->prod_dir_prefix); }
             }
           }
 */
           if (instance->version->prod_dir)
-          { printf("%s", instance->version->prod_dir);
+          { (void) printf("%s", instance->version->prod_dir);
           }
-          printf("\n");
+          (void) printf("\n");
 
           if (instance->version->compile_dir || 
               instance->version->compile_file)
-          { printf("\t\tCompile=");
+          { (void) printf("\t\tCompile=");
             if (instance->version->compile_dir)
-            { printf("%s",instance->version->compile_dir); }
+            { (void) printf("%s",instance->version->compile_dir); }
             if (instance->version->compile_file)
-            { printf("/%s",instance->version->compile_file); }
-            printf("\n");
+            { (void) printf("/%s",instance->version->compile_file); }
+            (void) printf("\n");
           } else {
-            printf("\t\tNo Compile Directive\n"); /* ;) */
+            (void) printf("\t\tNo Compile Directive\n"); /* ;) */
           }
           if (upsutl_is_authorized( instance, mproduct->db_info,&nodes))
-          { printf("\t\tAuthorized, Nodes=%s\n",nodes);
+          { (void) printf("\t\tAuthorized, Nodes=%s\n",nodes);
           } else {
-            printf("\t\tNOT Authorized, Nodes=%s\n",nodes);
+            (void) printf("\t\tNOT Authorized, Nodes=%s\n",nodes);
           }
-          printf("\t\tUPS_Dir=");
-          strcpy(buffer,"ups_dir");
+          (void) printf("\t\tUPS_Dir=");
+          (void) strcpy(buffer,"ups_dir");
           FromVersion(ups_dir);
-          printf("\n");
-          printf("\t\tTable_Dir=");
-          strcpy(buffer,"table_dir");
+          (void) printf("\n");
+          (void) printf("\t\tTable_Dir=");
+          (void) strcpy(buffer,"table_dir");
           FromVersion(table_dir);
-          printf("\n");
-          printf("\t\tTable_File=");
-          strcpy(buffer,"table_file");
+          (void) printf("\n");
+          (void) printf("\t\tTable_File=");
+          (void) strcpy(buffer,"table_file");
           FromVersion(table_file);
-          printf("\n");
-          printf("\t\tArchive_File=");
-          strcpy(buffer,"archive_file");
+          (void) printf("\n");
+          (void) printf("\t\tArchive_File=");
+          (void) strcpy(buffer,"archive_file");
           FromVersion(archive_file)
-          printf("\n");
-          printf("\t\tDescription=");
-          strcpy(buffer,"description");
+          (void) printf("\n");
+          (void) printf("\t\tDescription=");
+          (void) strcpy(buffer,"description");
           FromTable(description);
-          printf("\n");
+          (void) printf("\n");
           for ( ul_ptr = upslst_first( instance->version->user_list ); 
                 ul_ptr; ul_ptr = ul_ptr->next, count++ )
-          { printf("\t\t%s \n",(char *)ul_ptr->data); /* Give keys and values */
+          { (void) printf("\t\t%s \n",(char *)ul_ptr->data); /* Give keys and values */
           }
         }
         if (a_command_line->ugo_l) 
@@ -638,17 +638,17 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           { for ( al_ptr = upslst_first( instance->table->action_list ); 
                   al_ptr; al_ptr = al_ptr->next, count++ )
             { ac_ptr=al_ptr->data;
-              printf("\t\tAction=%s\n",ac_ptr->action);
+              (void) printf("\t\tAction=%s\n",ac_ptr->action);
               if ( ac_ptr->command_list )
               { l_ptr = upslst_first( ac_ptr->command_list );
                 for ( ; l_ptr; l_ptr = l_ptr->next )
-                { printf( "\t\t\t%s\n", (char*)l_ptr->data );
+                { (void) printf( "\t\t\t%s\n", (char*)l_ptr->data );
                 }
               }
             }
           }
         }
-        printf("\n");
+        (void) printf("\n");
       } else {
         list_K(instance,a_command_line,mproduct,g_MATCH_DONE);
       }
@@ -694,19 +694,19 @@ void list_K(const t_upstyp_matched_instance * const instance,
   { for ( l_ptr = upslst_first( command->ugo_key ); 
 	  l_ptr; l_ptr = l_ptr->next, count++ )
     { valid=0;
-      strcpy(buffer,l_ptr->data);
+      (void) strcpy(buffer,l_ptr->data);
       if(!upsutl_stricmp(l_ptr->data,"+"))
-      { strcpy(buffer,"product");
+      { (void) strcpy(buffer,"product");
         FromAny(product) 
-	strcpy(buffer,"version");
+	(void) strcpy(buffer,"version");
 	FromAny(version) 
-	strcpy(buffer,"flavor");
+	(void) strcpy(buffer,"flavor");
 	FromAny(flavor) 
-	strcpy(buffer,"qualifiers");
+	(void) strcpy(buffer,"qualifiers");
 	FromAny(qualifiers)
-	strcpy(buffer,"chain");
+	(void) strcpy(buffer,"chain");
         print_chain(instance,buffer);
-        strcpy(buffer,"+");
+        (void) strcpy(buffer,"+");
       }
       FromAny(product) 
       FromAny(version) 
@@ -735,7 +735,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
       FromBoth(modified)
       if (!upsutl_stricmp(buffer,"authorized_nodes")) 
       { (void)(upsutl_is_authorized(instance, product->db_info,&nodes));
-        printf("\"%s\" ",nodes);
+        (void) printf("\"%s\" ",nodes);
         valid=1;
       }
       if(!upsutl_strincmp(buffer,"action",6))
@@ -746,21 +746,21 @@ void list_K(const t_upstyp_matched_instance * const instance,
                   al_ptr; al_ptr = al_ptr->next, count++ )
           { ac_ptr=al_ptr->data;
             if(!upsutl_stricmp(buffer,"actions"))
-            { printf("\"%s:%d\" ",ac_ptr->action,
+            { (void) printf("\"%s:%d\" ",ac_ptr->action,
                      upslst_count(ac_ptr->command_list));
               found=1;
             } else { 
               if(strlen(buffer)<8) /* action only or action= (nothing) */
               { valid=0;
               }
-              sprintf(actbuf1,"action=%s",ac_ptr->action);
-              sprintf(actbuf2,"action=\"%s\"",ac_ptr->action);
+              (void) sprintf(actbuf1,"action=%s",ac_ptr->action);
+              (void) sprintf(actbuf2,"action=\"%s\"",ac_ptr->action);
               if(!upsutl_stricmp(actbuf1,buffer) ||
                  !upsutl_stricmp(actbuf2,buffer))
               { if ( ac_ptr->command_list )
                 { ald_ptr = upslst_first( ac_ptr->command_list );
                   for ( ; ald_ptr; ald_ptr = ald_ptr->next )
-                  { printf( "\"%s\" ", (char*)ald_ptr->data );
+                  { (void) printf( "\"%s\" ", (char*)ald_ptr->data );
                     found=1;
                   }
                 }
@@ -768,7 +768,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
             }
           }
           if (!found) /* action=something but no something */
-          { printf( "\"\" ");
+          { (void) printf( "\"\" ");
           }
         }
       }
@@ -776,15 +776,15 @@ void list_K(const t_upstyp_matched_instance * const instance,
       { if (config_ptr)
         { if (config_ptr->statistics)
           { if (strstr(config_ptr->statistics,product->product))
-            { printf("\"statistics\" ");
+            { (void) printf("\"statistics\" ");
             } else { 
-              printf("\"\" ");
+              (void) printf("\"\" ");
             }
           } else {
-            printf("\"\" ");
+            (void) printf("\"\" ");
           }
         } else {
-          printf("\"\" ");
+          (void) printf("\"\" ");
         }
         valid=1;
       }
@@ -793,7 +793,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
       OutputConfig();
       if (!strcmp(l_ptr->data,"key"))
       { valid=1; 
-        printf("\"%d\"",upsget_key(instance->version)); /* test */ 
+        (void) printf("\"%d\"",upsget_key(instance->version)); /* test */ 
       }
       if (!strncmp(l_ptr->data,"_",1))
       { str_val=0;
@@ -805,12 +805,12 @@ void list_K(const t_upstyp_matched_instance * const instance,
 	if (instance->table && !str_val )
 	   str_val = upskey_inst_getuserval( instance->table,l_ptr->data);
 	if (!str_val) 
-	{ printf("\"\" ");  /* this gives them "" for a invalid _key */
+	{ (void) printf("\"\" ");  /* this gives them "" for a invalid _key */
 	} else {
 	  if (strlen(str_val))
-          { printf("\"%s\" ",str_val);
+          { (void) printf("\"%s\" ",str_val);
 	  } else { 
-	    printf("\"%s\" ",(char *)l_ptr->data);
+	    (void) printf("\"%s\" ",(char *)l_ptr->data);
 	  }
 	} 
       }
@@ -827,26 +827,26 @@ void list_K(const t_upstyp_matched_instance * const instance,
                                    product->db_info,
                                    exists);
             if(addr)
-            { printf("\"%s\" ",addr);
+            { (void) printf("\"%s\" ",addr);
             } else { 
-              printf("\"\" "); 
+              (void) printf("\"\" "); 
             }
           } else {
-            printf("\"\" "); 
+            (void) printf("\"\" "); 
           }
         }
         if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
         { valid=1;
-          printf("\"%s\" ", 
+          (void) printf("\"%s\" ", 
                  upsget_prod_dir(product->db_info,instance,command));
         } 
         if(!upsutl_stricmp(l_ptr->data,"@ups_dir"))
         { valid=1;
-          printf("\"");
+          (void) printf("\"");
           if (UPSRELATIVE(instance->version->ups_dir))
-          { printf("%s/", upsget_prod_dir(product->db_info,instance,command));
+          { (void) printf("%s/", upsget_prod_dir(product->db_info,instance,command));
           } 
-          printf("%s\" ", instance->version->ups_dir ? instance->version->ups_dir : "" );
+          (void) printf("%s\" ", instance->version->ups_dir ? instance->version->ups_dir : "" );
         } 
       }
       if (!valid) 
@@ -858,35 +858,35 @@ void list_K(const t_upstyp_matched_instance * const instance,
     for ( l_ptr = upslst_first( command->ugo_key ); 
 	  l_ptr; l_ptr = l_ptr->next, count++ )
     { valid=0;
-      strcpy(buffer,(char *)l_ptr->data);
+      (void) strcpy(buffer,(char *)l_ptr->data);
       OutputConfig();
       if (!upsutl_stricmp((buffer),"database"))
       { valid=1;
-        printf("\"%s\" ",db_ptr->name);
+        (void) printf("\"%s\" ",db_ptr->name);
       }
       if (!valid) 
       { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
       }
     }
   }
-  printf("\n");
+  (void) printf("\n");
 }
 void print_chain(const t_upstyp_matched_instance * const instance,
                  char * const string)
 { t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   if (!upsutl_stricmp(string,"chain"))
-  { printf("\""); /* first " */
+  { (void) printf("\""); /* first " */
     if(instance->chain)
-    { printf("%s",instance->chain->chain);
+    { (void) printf("%s",instance->chain->chain);
       if (instance->xtra_chains)
       { for (clist = instance->xtra_chains ;
              clist ; clist = clist->next)
         { cinst_ptr = (t_upstyp_instance *)clist->data;
           if(cinst_ptr->chain)
-          { printf(":%s", cinst_ptr->chain);
+          { (void) printf(":%s", cinst_ptr->chain);
     } } } } 
-    printf("\" "); /* end " */
+    (void) printf("\" "); /* end " */
   }
 }
 

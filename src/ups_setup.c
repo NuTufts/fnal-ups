@@ -93,7 +93,7 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
              prod_only_ugo =(struct ups_command *)
                             upsmem_malloc( sizeof(struct ups_command));
 /*	  prod_only_ugo = upsmem_malloc( sizeof( t_upsugo_command ) ); */
-	  memset(prod_only_ugo, 0, sizeof(t_upsugo_command));
+	  (void) memset(prod_only_ugo, 0, sizeof(t_upsugo_command));
 	  prod_only_ugo->ugo_product = a_command_line->ugo_product;
 	  if (a_command_line->ugo_j) {
 	    prod_only_ugo->ugo_j = a_command_line->ugo_j;
