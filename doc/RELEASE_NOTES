@@ -9,4 +9,6 @@ fixed -0, -1, -2, and -3 help text
 upcased product name in error message
 <li>
 fix problem with 'setup -r ...' giving an error the second time it is done
+<li>
+minor documentation fixes
 </ul>
