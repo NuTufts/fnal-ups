@@ -6,28 +6,34 @@ $^W=1;
 $debug = 0;
 $| = 1;
 
-print 1, "\% completed.  \r";
+print STDERR 1, "\% completed.  \r";
 make_hflavorlist();
-print int(30*100/$entries), "\% completed.  \r";
+print STDERR int(30*100/$entries), "\% completed.  \r";
 
-@rootlist = parseargs();
+#
+# we will have a tree for each product...
+#
+%trees = ();
 
-if ($#rootlist != -1) {
+#
+# this builds a parent tree for *everything* now
+#
+find_parents();
 
-    # build a fresh tree each time, since we only put things in the tree
-    # that involve the target in a ups depend.
-
-    for $root (@rootlist) {
-	@tree = ();
-	@visited = ();
-	find_parents($root);
-	dump_tree() if $debug > 2;
-        print "\n";
-        recurse_tree($root, '');
+#
+# Now we dump each tree...
+#
+if ($debug) {
+    for $prod (keys(%trees)) {
+	print "product $prod\n";
+	dump_tree($trees{$prod});
     }
-    exit(0);
-} else {
-    exit(1);
+}
+
+for $prod (sort(keys(%trees))) {
+    print "\n";
+    %visited = ();
+    recurse_tree($trees{$prod}, $prod, '');
 }
 
 #--------------------------------------------------
@@ -40,6 +46,7 @@ if ($#rootlist != -1) {
 #
 
 %plus_three_guess = (
+ 	"IRIX+5" => "IRIX+5.4",
  	"IRIX+6" => "IRIX+6.5",
 	"SunOS+5" => "SunOS+5.6",
         "Linux+2" => "Linux+2.2",
@@ -77,13 +84,13 @@ sub make_hflavorlist {
 # do it's kids again...
 #
 sub recurse_tree {
-    my ($node, $prefix) = @_;
+    my ($tree, $node, $prefix) = @_;
     my ($n, @kids, $pre, $k, $i);
 
     ($pre = $prefix) =~ s/.  $/|__/;
      
-    if ( ! $visited{$node} ) {
-	@kids = sort(keys(%{$tree{$node}}));
+    if ( !defined($visited{$node}) ) {
+	@kids = sort(keys(%{$tree->{$node}}));
 	print $pre, $node, "\n";
 	$visited{$node} = 1;
 	$k = $#kids;
@@ -91,9 +98,9 @@ sub recurse_tree {
 	foreach $n (@kids) {
 	    # visit it..
 	    if ( $i == $k ) {
-		recurse_tree( $n, $prefix . "   " );
+		recurse_tree( $tree, $n, $prefix . "   " );
 	    } else {
-		recurse_tree( $n, $prefix . "|  " );
+		recurse_tree( $tree, $n, $prefix . "|  " );
 	    }
 	    $i++;
 	}
@@ -106,9 +113,11 @@ sub recurse_tree {
 # Debug dump of the whole tree graph data structure
 #
 sub dump_tree {
+    my ($tree) = $@;
+
     print "Tree:\n";
-    foreach $k (keys(%tree)) {
-        @kids = keys(%{$tree{$k}});
+    foreach $k (keys(%{$tree})) {
+        @kids = keys(%{$tree->{$k}});
 	foreach $n (@kids) {
 	    print "$k -> $n\n";
 	}
@@ -117,59 +126,10 @@ sub dump_tree {
 }
 
 #
-# pick on a few arguments, and run ups list...
-#
-sub parseargs {
-    my ($a, $root, @stuff, @rest, @res);
-
-    @res = ();
-    $a = join(' ', @ARGV);
-    $dashz=0;
-
-    #
-    # if they gave us a -z, set $PRODUCTS, and whine if they used -K
-    #
-    for (@ARGV) {
-        if ($dashz) {
- 	   $::ENV{'PRODUCTS'} = $_;
-	   $dashz = 0
-        }
-	if (/^-.*z/) {
-	   $dashz = 1
-        }
-	if (/^-.*K/) {
-	    print STDERR "ERROR: -K not supported\n";
-	    return ();
-        }
-    }
-
-    # don't redirect stderr, this is how they find out about 
-    # command line errors, etc.
-    $cmd = "ups list -K+:database $a |";
-    print "cmd is $cmd\n" if $debug > 1;
-    open(LIST, $cmd);
-
-    while (<LIST>) {
-	print "got $_" if $debug > 3;
-	@stuff = m/"(.*?)"/g;
-	@rest = <LIST>;
-	push(@res, makenode(@stuff));
-    }
-
-    # close will be false if the ups list had errors...
-    if (close(LIST)) {
-        return @res;
-    } else {
-	return ();
-    }
-}
-
-#
 # go through the whole database, and look at each product with
 # dodeps
 #
 sub find_parents {
-    my ($root) = @_;
     my ($count, $cmd);
 
     $cmd = "ups list -a -K+:database 2>/dev/null |";
@@ -180,9 +140,9 @@ sub find_parents {
     while( <LIST> ) {
        print "got $_" if $debug;
        @words = m/"(.*?)"/g;
-       dodeps($root, @words);
+       dodeps(@words);
        $count++;
-       print int($count*100/$entries), "\% completed.  \r";
+       print STDERR int($count*100/$entries), "\% completed.  \r";
     }
     close(LIST);
 }
@@ -194,11 +154,12 @@ sub find_parents {
 # dump the direct dependencies into the tree (backwards)
 #
 %didthat = ();
+
 sub dodeps {
    my (@words, $parent, $root);
-   my ($cmd,$hflavorpat, $hflavor,$sp);
+   my ($cmd,$hflavorpat, $hflavor,$sp, $direct);
+   my (@direct, @addto);
 
-   $root = shift(@_);
    $parent = makenode(@_);
 
    #
@@ -233,8 +194,8 @@ sub dodeps {
 	   $sp =~ s/ -z .*//o;
 	   $sp =~ s/ -f \S+/ -H $hflavor/;
 
-	   print "doing _all_ dependencies for $sp\n" if $debug;
-	   $cmd = "ups depend -K+:database $sp 2>/dev/null |";
+	   print "doing dependencies for $sp\n" if $debug;
+	   $cmd = "ups depend $sp 2>/dev/null |";
 
 	   # weed out duplicates!
            # this rewriting to -H stuff could give duplicates, and
@@ -247,48 +208,50 @@ sub dodeps {
 	   open(DEPEND, $cmd);
 
 	   $useit = 0;
+           @direct = ();
+           @addto = ();
 	   while(<DEPEND>) {
 	       print "got $_" if $debug;
-	       @words = m/"(.*?)"/g;
-	       $child = makenode(@words);
-	       if ( $child eq $root ) {
-		   # we found our base product in the full dependency tree
-		   $useit = 1;
-		   print "found our $root" if $debug;
-	       }
+               chomp();
+
+ 	       if ( m/\A\|__/o ) {
+                  $direct = 1;
+               }
+
+	       s/\A[|_ ]*//o;
+	       s/ -g .*//o;
+	       push(@addto, $_);
+
+               if ($direct) {
+		  print "first level...\n" if $debug;
+	          push(@direct, $_);
+               }
 	   }
 	   close(DEPEND);
 	 
-	   next unless $useit;
-
-	   print "doing _direct_ dependencies for $sp\n" if $debug;
-	   $cmd = "ups depend -j -K+:database $sp 2>/dev/null |";
-
-           next if $didthat{$cmd};
-           $didthat{$cmd} = 1;
-
-	   print "cmd is $cmd\n" if $debug;
-	   open(DEPEND, $cmd);
-
-	   while(<DEPEND>) {
-	       print "got $_" if $debug;
-	       @words = m/"(.*?)"/g;
-	       $child = makenode(@words);
-	       addedge($parent, $child);
-	   }
-	   close(DEPEND);
+	   print "from depend on $parent:\n" if $debug;
+           for $root (@addto) {
+	        print "entries for $root:\n" if $debug;
+		for $child (@direct) {
+	            addedge($root, $parent, $child);
+                }
+           }
        }
    }
 }
 
 sub addedge {
-    my ($parent, $child) = @_;
+    my ($root, $parent, $child) = @_;
+    if (! defined($trees{$root}) ) {
+       $trees{$root} = {};
+    }
+    $tree = $trees{$root};
     return if ($parent eq $child);
     print "adding $child -> $parent\n" if $debug;
-    if (!defined $tree{$child}) {
-       $tree{$child} = {};
+    if (!defined $tree->{$child}) {
+       $tree->{$child} = {};
     }
-    $tree{$child}->{$parent} = 1;
+    $tree->{$child}->{$parent} = 1;
 }
 
 sub makenode {
