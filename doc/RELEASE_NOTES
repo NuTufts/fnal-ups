@@ -1,3 +1,53 @@
+Changes made in the v4_6 release of ups (2001-08-26): 
+
+  * ups table file actions extended -- added:
+	If( command )
+	  ...
+	Else()
+	  ...
+	EndIf( command )
+     and
+	Unless( command )
+	  ...
+	Else()
+	  ...
+	EndUnless( command )
+    where the two commands *must* match.  
+
+  * ${UPS_UPS_DIR} is now defined when a ${UPS_PROD_DIR}/ups directory 
+    exists, even if is not otherwise declared in the database or command
+    line.
+
+  * The list of flavors that will be tried for matching a product has
+    been expanded.  Previous to this release, on a Linux+2.4.whatever host
+    we would have tried to match flavors:
+        Linux+2.4.whatever
+ 	Linux+2.4
+ 	Linux+2
+ 	Linux
+	NULL
+    The list is now expanded to attempt to guess previous releases:
+        Linux+2.4.whatever
+ 	Linux+2.4
+ 	Linux+2.4
+ 	Linux+2.3
+ 	Linux+2.2
+ 	Linux+2.1
+ 	Linux+2.0
+ 	Linux+2
+ 	Linux+1
+ 	Linux+0
+ 	Linux
+	NULL
+    Where we simply count down if the last character of a sub-flavor
+    is a digit.
+
+Changes made in the v4_5_4 release of ups (2000-10-06): 
+
+* corrects some problems with ups parent
+* Fixes setups.sh and setups.csh problems on Linux+2.4
+* fixes crashes if UPS_OVERRIDE is incorrectly set
+
 Changes made in the v4_5_3 release of ups (2000-10-06): 
 
 Added "ups parent" command, which takes the same options as "ups list".  
