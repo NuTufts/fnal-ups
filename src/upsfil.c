@@ -1400,7 +1400,6 @@ t_upstyp_config *read_config( void )
     }
   }
 
-  fclose( g_fh );  
   return conf_ptr;
 }
 
