@@ -73,8 +73,8 @@ int main(void)
   upsmem_inc_refctr((void *)myc6);
   upsmem_inc_refctr((void *)myc6);
 
-  printf("\nIncremented reference counters, should be 1, 0, 3, 0, 5, 3\n");
-  printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
+  (void) printf("\nIncremented reference counters, should be 1, 0, 3, 0, 5, 3\n");
+  (void) printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
 	 upsmem_get_refctr((void *)myc), upsmem_get_refctr((void *)myc2),
 	 upsmem_get_refctr((void *)myc3), upsmem_get_refctr((void *)myc4),
 	 upsmem_get_refctr((void *)myc5), upsmem_get_refctr((void *)myc6));
@@ -87,8 +87,8 @@ int main(void)
   upsmem_dec_refctr((void *)myc5);
   upsmem_dec_refctr((void *)myc5);
 
-  printf("\nDecremented counters, now have 6 items with reference counters - 1, -1, 2, 0, 2, 3\n");
-  printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
+  (void) printf("\nDecremented counters, now have 6 items with reference counters - 1, -1, 2, 0, 2, 3\n");
+  (void) printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
 	 upsmem_get_refctr((void *)myc), upsmem_get_refctr((void *)myc2),
 	 upsmem_get_refctr((void *)myc3), upsmem_get_refctr((void *)myc4),
 	 upsmem_get_refctr((void *)myc5), upsmem_get_refctr((void *)myc6));
@@ -102,8 +102,8 @@ int main(void)
   upsmem_dec_refctr((void *)myc6);
   upsmem_dec_refctr((void *)myc6);
   upsmem_dec_refctr((void *)myc6);
-  printf("\nDecremented all counters, now have 6 items with reference counters < 0\n");
-  printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
+  (void) printf("\nDecremented all counters, now have 6 items with reference counters < 0\n");
+  (void) printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
 	 upsmem_get_refctr((void *)myc), upsmem_get_refctr((void *)myc2),
 	 upsmem_get_refctr((void *)myc3), upsmem_get_refctr((void *)myc4),
 	 upsmem_get_refctr((void *)myc5), upsmem_get_refctr((void *)myc6));

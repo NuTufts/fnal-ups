@@ -43,17 +43,17 @@
 
 int main(void)
 {
-  fprintf(stderr, "\nOutputing with an empty stack - expect nothing.\n");
+  (void) fprintf(stderr, "\nOutputing with an empty stack - expect nothing.\n");
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE1");
   upserr_add(UPS_READ_FILE, UPS_FATAL, "FILE2");
   upserr_add(UPS_INVALID);
 
-  fprintf(stderr, "\nOutputing 3 messages.\n");
+  (void) fprintf(stderr, "\nOutputing 3 messages.\n");
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
   upserr_clear();
 
@@ -64,9 +64,9 @@ int main(void)
   upserr_add(UPS_NO_DATABASE, UPS_INFORMATIONAL);
   UPS_VERBOSE = 0;
 
-  fprintf(stderr, "\nOutputing 2 messages.\n");
+  (void) fprintf(stderr, "\nOutputing 2 messages.\n");
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
   upserr_vplace();
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE1");
@@ -102,34 +102,34 @@ int main(void)
   upserr_vplace();
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD10", "FILE30");
 
-  fprintf(stderr, "\nOutputing 30 messages.\n");
+  (void) fprintf(stderr, "\nOutputing 30 messages.\n");
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD11", "FILE31");
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD12", "FILE32");
 
-  fprintf(stderr, "\nOutputing 30 messages. The oldest 2 from above have popped off\n");
+  (void) fprintf(stderr, "\nOutputing 30 messages. The oldest 2 from above have popped off\n");
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
   upserr_clear();
-  fprintf(stderr, "\nOutputing with an empty stack - expect nothing.\n");
+  (void) fprintf(stderr, "\nOutputing with an empty stack - expect nothing.\n");
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
-  fprintf(stderr, "\nOutputing 2 messages.\n");
+  (void) fprintf(stderr, "\nOutputing 2 messages.\n");
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD8", "FILE28");
   UPS_VERBOSE = 1;
   upserr_vplace();
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD9", "FILE29");
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
-  fprintf(stderr, "\nAnd now backup over the last one.\n");
+  (void) fprintf(stderr, "\nAnd now backup over the last one.\n");
   upserr_backup();
   upserr_output();
-  fprintf(stderr, "-------------------------------------------------\n");
+  (void) fprintf(stderr, "-------------------------------------------------\n");
 
   return 0;
 }

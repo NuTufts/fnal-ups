@@ -63,14 +63,14 @@ void main (argc,argv)
 */
         uc=upsugo_env("TEST","AacCdfghKtmMNoOPqrTuU");
         if (uc) 
-	{ upsugo_dump(uc,TRUE);
-          upsugo_free(uc);
+	{ (void) upsugo_dump(uc,TRUE);
+          (void) upsugo_free(uc);
         }
         uc=0;
 while ((uc = upsugo_next(argc,argv,"0123AacCdfghHKtmMNoOpPqrTuUv?z")) != 0 )
-      { upsugo_dump(uc,TRUE); 
+      { (void) upsugo_dump(uc,TRUE); 
         upserr_output();
-        fprintf(stderr, "-------------------------------------------------\n");
+        (void) fprintf(stderr, "-------------------------------------------------\n");
         upserr_clear();
       }
 /* prove to myself subsequent calls with new arguments will work 
@@ -82,14 +82,14 @@ while ((uc = upsugo_next(argc,argv,"0123AacCdfghHKtmMNoOpPqrTuUv?z")) != 0 )
       argv[2]="adprod";
       argv[3]="ver";
 while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
-      { upsugo_dump(uc,TRUE); }
+      { (void) upsugo_dump(uc,TRUE); }
 /*
-	if (status != UPS_SUCCESS) fprintf(stderr," %s \n", UPS_ERRTXT[status]);
+	if (status != UPS_SUCCESS) (void) fprintf(stderr," %s \n", UPS_ERRTXT[status]);
 */
         uc=upsugo_bldcmd(cmdline,"AacCdfghKtmMNoOpPqrTuU");
         if (uc) 
-	{ upsugo_dump(uc,TRUE);
-          upsugo_free(uc); 
+	{ (void) upsugo_dump(uc,TRUE);
+          (void) upsugo_free(uc); 
         }
         uc=0;
 	exit(status);

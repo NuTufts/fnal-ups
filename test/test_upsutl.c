@@ -75,59 +75,59 @@ static void test_find_manpages(void)
 
   /* Test 1 : with no prod_dir_prefix */
   db.config->prod_dir_prefix = NULL;
-  printf("Test with NO prod_dir_prefix\n");
+  (void) printf("Test with NO prod_dir_prefix\n");
 
   /* Test 1a: with both prod_dir and ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = "upsDir";
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
 
   /* Test 1b: with neither prod_dir or ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = NULL;
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
 
   /* Test 1c: with a prod_dir and no ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = NULL;
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
 
   /* Test 1d: with no prod_dir and a ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = "upsDir";
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
 
 
   /* Test 2 : with prod_dir_prefix */
   db.config->prod_dir_prefix = "prodDirPrefix";
-  printf("Test with prod_dir_prefix = %s\n", db.config->prod_dir_prefix);
+  (void) printf("Test with prod_dir_prefix = %s\n", db.config->prod_dir_prefix);
 
   /* Test 2a: with both prod_dir and ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = "upsDir";
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
 
   /* Test 2b: with neither prod_dir or ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = NULL;
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
 
   /* Test 2c: with a prod_dir and no ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = NULL;
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
 
   /* Test 2d: with no prod_dir and a ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = "upsDir";
   buf = upsget_man_source_dir(&inst, &db, 0);
-  printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
+  (void) printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
 
 }
