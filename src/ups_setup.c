@@ -70,8 +70,6 @@ void ups_setup( const t_upsugo_command * const a_command_line,
 
   /* check if we got an error */
   if (UPS_ERROR == UPS_SUCCESS) {
-    /* write the closing information to the temp file */
-
     /* write statistics information */
     if (mproduct_list) {
       upsutl_statistics(mproduct_list, g_cmd_info[a_ups_command].cmd);
@@ -83,6 +81,10 @@ void ups_setup( const t_upsugo_command * const a_command_line,
 
 /*
  * Definition of private globals.
+ */
+
+/*
+ * Definition of private functions.
  */
 
 /*-----------------------------------------------------------------------
@@ -151,9 +153,5 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
   return(mproduct_list);
 
 }
-
-/*
- * Definition of private functions.
- */
 
 
