@@ -153,9 +153,6 @@ case $ccenv in
 		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
 		cc="cc"
 		cflags="$cflags"
-		if [ "$opt" != "" ]; then
-			cflags="$cflags -O2" 
-		fi
 		if [ "$dbg" != "" ]; then 
 			cflags="$cflags -g" 
 		fi
