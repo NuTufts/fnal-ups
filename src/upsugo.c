@@ -58,17 +58,25 @@
     int argindx;
 
 /* ===========================================================================
+ * Private function declarations
+ */
+char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf);
+int upsugo_bldfvr(struct ups_command * const uc);
+int upsugo_ifornota(struct ups_command * const uc);
+int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
+
+
+/* ===========================================================================
 ** ROUTINE	upsugo_bldfvr()
 **
 */
-int upsugo_bldfvr(struct ups_command * uc)
+int upsugo_bldfvr(struct ups_command * const uc)
 {
-   int      c=0;
    char   * addr;
    char   * loc;
    struct utsname *baseuname;
    baseuname=(struct utsname *) malloc( sizeof(struct utsname));
-   if ( (c = uname(baseuname)) == -1) return(-1);
+   if ( (uname(baseuname)) == -1) return(-1);
 
 /* Silicon Graphics IRIX machines
    The difference between 64 and 32 bit machines is ignored
@@ -190,7 +198,7 @@ int upsugo_bldfvr(struct ups_command * uc)
 /* I could use the same address for the "*" string but I don't think the
 ** extra code would justify it.
 */
-int upsugo_ifornota(struct ups_command * uc)
+int upsugo_ifornota(struct ups_command * const uc)
 {
    char   * addr;
    if (uc->ugo_a)                   /* did the user specify -a */
@@ -222,7 +230,7 @@ int upsugo_ifornota(struct ups_command * uc)
 ** ROUTINE	upsugo_bldqual()
 **
 */
-int upsugo_bldqual(struct ups_command * uc, char * inaddr)
+int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
 {
  char * addr;                          /* required qualifier string */
  char * oaddr;                         /* optional qualifier string */
@@ -234,7 +242,7 @@ int upsugo_bldqual(struct ups_command * uc, char * inaddr)
  int onc=0;                            /* parsing a , element */
  int done=0;
  int qcount=0;                         /* number of optional qualifiers */
- int i,j,k;
+ int i,j;
  int opinit=0;
  char * optionals[10]; /* OH NO!! artifical limit of 10 optionals */
 
@@ -363,14 +371,11 @@ int upsugo_bldqual(struct ups_command * uc, char * inaddr)
 ** ==========================================================================
 */
 
-char * upsugo_getarg(argc,argv,argbuf)
-int argc;
-char *  argv[];
-char ** argbuf;
+char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
 {
 
     static int	arg_end;
-    static char **   argpt = 0;
+    static char ** argpt = 0;
     static char * buff = 0;
     char * c;
     static char d[3];
@@ -414,7 +419,7 @@ char ** argbuf;
 	    {
 	    if((*argv[argindx] == '-') && (strlen(argv[argindx]) >2))
 		{
-		buff = (char *) malloc((int)strlen(argv[argindx]) +1);
+		buff = (char *) malloc((size_t)(strlen(argv[argindx]) +1));
 		strcpy(buff, argv[argindx]);
 		*argbuf = buff + 2;
 		}
@@ -452,7 +457,7 @@ char ** argbuf;
 **                                                                           
 ** ==========================================================================
 */                                                                           
-t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
+t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const validopts)
 {
    char   *arg_str;
 
@@ -462,7 +467,6 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    int my_argc=0;
    int test=0;
    
-   char   **savbuf;
    char   **argbuf;		/* String to hold residual argv stuff*/
 				/* returned by upsugo_getarg */
 				/* if contents are used is reset to */
@@ -470,10 +474,8 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 /* Initialize those pesky variables
     -------------------------------- */
    struct ups_command * uc;
-   struct ups_command * luc;
-   t_upslst_item *my_qualifiers=0;
+   struct ups_command * luc=0;
    uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-   my_qualifiers=0;
    uc->ugo_product = 0;
    uc->ugo_version = 0;
    uc->ugo_key = 0;
@@ -553,7 +555,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    while ((arg_str= upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)
    { my_argc=+1; 
      if(*arg_str == '-')      /* is it an option */
-     { if (!strchr(validopts,*(arg_str+1))) { 
+     { if (!strchr(validopts,(int)*(arg_str+1))) { 
           upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, arg_str+1);
 /*          errflg=1; */
        }
@@ -864,7 +866,6 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               { test=upsugo_bldqual(uc,*argbuf); *argbuf=0; break; }
 /*
               { addr=upsutl_str_create(*argbuf,'t');
-                my_qualifiers = upslst_add(my_qualifiers,addr);
                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
                 *argbuf = 0;
                 break;
@@ -877,7 +878,6 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                  }
 /*
                  addr=upsutl_str_create(arg_str,'t');
-                 my_qualifiers = upslst_add(my_qualifiers,addr);
                  uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
                  break;
 */

@@ -198,6 +198,9 @@ t_ups_match_product *ups_new_mp(const char * const a_db,
 t_ups_match_product *ups_free_mp(t_ups_match_product *a_mproduct);
 
 
-t_ups_command     *upsugo_next(int ups_argc, char *ups_argv[], char *validopts);
+t_ups_command     *upsugo_next(const int ups_argc,
+			       char *ups_argv[],
+			       char * const validopts);
 
 #endif /* _UPS_TYPES_H_ */
+
