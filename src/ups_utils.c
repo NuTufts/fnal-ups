@@ -275,8 +275,8 @@ int upsutl_str_sort( char * const str, const char c )
   static char buf[MAX_LINE_LEN];
   char *cp, *cp0;  
   char ct[2] = "\0\0";
-  size_t max_len = 0;
-  int count = 0, i = 0;
+  size_t max_len = 0, count = 0;
+  unsigned int i = 0;
 
   if ( !str || strlen( str ) <= 0 ) return 0;
   
@@ -286,8 +286,8 @@ int upsutl_str_sort( char * const str, const char c )
   /* get max len of an item */
 
   cp0 = str;
-  while ( (cp = strchr( cp0, c )) ) {
-    if ( max_len < (cp-cp0) ) max_len = cp-cp0;
+  while ( (cp = strchr( cp0, (int)c )) ) {
+    if ( max_len < (size_t)(cp-cp0) ) max_len = (size_t)(cp-cp0);
     cp0 = cp+1;
     count++;
   }
@@ -322,7 +322,7 @@ int upsutl_str_sort( char * const str, const char c )
     strcat( str, &buf[i*max_len] );
   }
 
-  return count;
+  return (int)count;
 }
 
 /*-----------------------------------------------------------------------
@@ -342,7 +342,7 @@ size_t upsutl_str_remove( char * const str, const char * const str_remove )
   if ( !str || strlen( str ) <= 0 ) return 0;
 
   while ( cpf && *cpf ) {
-    if ( ! strchr( str_remove, *cpf ) ) {
+    if ( ! strchr( str_remove, (int)*cpf ) ) {
       *cp = *cpf;
       cp++;
     }
@@ -370,15 +370,15 @@ size_t upsutl_str_remove_edges( char * const str, const char * const str_remove 
   char *cstart = 0, *cend = 0;
   size_t count = 0;
   
-  while ( cp && strchr( str_remove, *cp ) ){ cp++; }
+  while ( cp && strchr( str_remove, (int)*cp ) ){ cp++; }
   cstart = cp;
   count = strlen( str );
   cp = &str[count - 1];
-  while ( count && strchr( str_remove, *cp ) ){ cp--; count--; }
+  while ( count && strchr( str_remove, (int)*cp ) ){ cp--; count--; }
   cend = cp;
 
   if ( cend >= cstart && cstart >= str ) {
-    count = cend-cstart + 1;
+    count = (size_t)(cend-cstart) + 1;
     memmove( str, cstart, count );
     str[count] = 0;
   }
@@ -394,8 +394,7 @@ size_t upsutl_str_remove_edges( char * const str, const char * const str_remove 
  */
 
 /* used by qsort */
-int qsort_cmp_string( const void *c1, const void *c2 )
+int qsort_cmp_string( const void * c1, const void * c2 )
 {
   return strcmp( (const char *)c1, (const char *)c2 );
 }
-
