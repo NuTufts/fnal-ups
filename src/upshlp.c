@@ -79,7 +79,7 @@ int upshlp_command(const char * const what)
   erupt_dir = getenv("UPS_DIR");
   if (erupt_dir) {
      /* we got one */
-     sprintf(buff, "%s/doc/ups_help.dat", erupt_dir);
+     (void) sprintf(buff, "%s/doc/ups_help.dat", erupt_dir);
   } else {
      /* the environment variable could not be translated.  bail. */
      return 1;
@@ -124,8 +124,8 @@ int upshlp_command(const char * const what)
                 }
 
              } else {
-                fprintf(stderr,"Unrecognized data in UPS help file\n");
-                fprintf(stderr,"%s\n",line);
+                (void) fprintf(stderr,"Unrecognized data in UPS help file\n");
+                (void) fprintf(stderr,"%s\n",line);
                 return 1;
              }
            }
@@ -134,31 +134,31 @@ int upshlp_command(const char * const what)
     }
   }
   if ( !what || strlen( what ) <= 0 ) 
-  { fprintf(stderr,"UPS commands:\n\n");
-    fprintf(stderr,"for specific command options use \"ups COMMAND -?\"\n\n");
+  { (void) fprintf(stderr,"UPS commands:\n\n");
+    (void) fprintf(stderr,"for specific command options use \"ups COMMAND -?\"\n\n");
     for ( l_ptr = upslst_first(command_description); 
           l_ptr; l_ptr = l_ptr->next, count++ )
     { if (strncmp(last,l_ptr->data,12)) {
-         fprintf(stderr,"          %s",(char *)l_ptr->data ); 
+         (void) fprintf(stderr,"          %s",(char *)l_ptr->data ); 
       } else {
-         fprintf(stderr,"                       %s",(char *)l_ptr->data+13 ); 
-      } strncpy(last,l_ptr->data,12);
+         (void) fprintf(stderr,"                       %s",(char *)l_ptr->data+13 ); 
+      } (void) strncpy(last,l_ptr->data,12);
     }
   } else { 
-    fprintf(stderr,"UPS help command: %s\n\n",what);
+    (void) fprintf(stderr,"UPS help command: %s\n\n",what);
     for ( l_ptr = upslst_first(command_description); 
           l_ptr; l_ptr = l_ptr->next, count++ )
     { if (!strncmp(l_ptr->data,what,strlen(what))) {
-         fprintf(stderr,"          %s",(char *)l_ptr->data+13 );
+         (void) fprintf(stderr,"          %s",(char *)l_ptr->data+13 );
          found=1;
       }
     }
     if (found) {
-       fprintf(stderr,"\n     Valid Options:\n");
+       (void) fprintf(stderr,"\n     Valid Options:\n");
        for ( l_ptr = upslst_first(command_options); 
              l_ptr; l_ptr = l_ptr->next, count++ )
        { if (!strncmp(l_ptr->data,what,strlen(what))) {
-/*            fprintf(stderr,"          %s",(char *)l_ptr->data+13 ); */
+/*            (void) fprintf(stderr,"          %s",(char *)l_ptr->data+13 ); */
             addr=l_ptr->data;
             option=addr+12;
          }
@@ -174,11 +174,11 @@ int upshlp_command(const char * const what)
               } else { 
                 *last=*(addr+1);
               }
-              fprintf(stderr,"          %s",(char *)l_ptr->data);
+              (void) fprintf(stderr,"          %s",(char *)l_ptr->data);
            }
        }
     } else {
-      fprintf(stderr,"No help information available\n");
+      (void) fprintf(stderr,"No help information available\n");
     }
   }
 /* test dump...
