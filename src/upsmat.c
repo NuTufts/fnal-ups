@@ -157,11 +157,14 @@ static int get_instance(const t_upslst_item * const a_read_instances,
       }
 
 #define CHECK_NO_FILE() \
-      if (UPS_ERROR != UPS_SUCCESS) {                                    \
-         if ((UPS_ERROR != UPS_NO_FILE) || (a_need_unique == 1)) {       \
-           local_error = 1;                                              \
-	   break;                                                        \
-	 }                                                               \
+      if (UPS_ERROR != UPS_SUCCESS) {                                   \
+         if (UPS_ERROR == UPS_NO_FILE && ! a_need_unique) {       	\
+	   upserr_clear();						\
+	 }                                                              \
+         else {								\
+           local_error = 1;                                             \
+	   break;                                                       \
+         }								\
       }
 
 /*
@@ -205,7 +208,8 @@ t_upslst_item *upsmat_match_instance(
   
   /* In order to avoid doing this for each database, if a version was
      entered, create a list (with 1 element) here */
-  if (strcmp(a_command_line->ugo_version, ANY_MATCH)) {
+  if (a_command_line->ugo_version &&
+      strcmp(a_command_line->ugo_version, ANY_MATCH)) {
     /* we only have one to list out */
     if ((new_string = upsutl_str_create(a_command_line->ugo_version,  ' '))) {
       all_versions = upslst_add(all_versions, new_string);
