@@ -20,10 +20,7 @@ all :
 clean :
 	@../bin/upsClean
 
-spotless :
-	@../bin/upsClean
+spotless : clean
 	@/bin/rm -f ups
 	@/bin/rm -f dropit
 	@/bin/rm -f funame
-
-

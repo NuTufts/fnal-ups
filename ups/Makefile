@@ -17,10 +17,5 @@ all :
 #
 # Now standard targets
 #
-clean :
+clean spotless :
 	@../bin/upsClean
-
-spotless :
-	@../bin/upsClean
-
-

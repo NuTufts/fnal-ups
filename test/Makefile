@@ -114,8 +114,7 @@ clean :
 	@ rm -rf scripts/declare/products/spot/ups/toinfo
 	@ rm -rf scripts/undeclare/dbclean
 
-spotless :
-	@ ../bin/upsClean
+spotless : clean
 	@ rm -f $(UNIT_TESTS)
 	@ rm -f ups_test libups_test.a
 
