@@ -278,8 +278,7 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
  * Return: static string containing the location of the products' man pages
  */
 char *upsutl_find_manpages( const t_upstyp_matched_instance * const a_inst,
-			    const t_upstyp_db * const a_db_info,
-			    const char * const a_man_type)
+			    const t_upstyp_db * const a_db_info)
 {
   t_upstyp_instance *vinst;
 
@@ -314,7 +313,6 @@ char *upsutl_find_manpages( const t_upstyp_matched_instance * const a_inst,
       }
       strcat(g_buffer, "ups/toman/");
     }
-    strcat(g_buffer, a_man_type);
   }
   
   return ((char *)(&g_buffer[0]));

@@ -79,25 +79,25 @@ static void test_find_manpages(void)
   /* Test 1a: with both prod_dir and ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = "upsDir";
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
 
   /* Test 1b: with neither prod_dir or ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = NULL;
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
 
   /* Test 1c: with a prod_dir and no ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = NULL;
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
 
   /* Test 1d: with no prod_dir and a ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = "upsDir";
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
 
 
@@ -108,25 +108,25 @@ static void test_find_manpages(void)
   /* Test 2a: with both prod_dir and ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = "upsDir";
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
 
   /* Test 2b: with neither prod_dir or ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = NULL;
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
 
   /* Test 2c: with a prod_dir and no ups_dir */
   vinst.prod_dir = "prodDir";
   vinst.ups_dir = NULL;
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
 
   /* Test 2d: with no prod_dir and a ups_dir */
   vinst.prod_dir = NULL;
   vinst.ups_dir = "upsDir";
-  buf = upsutl_find_manpages(&inst, &db, "man");
+  buf = upsutl_find_manpages(&inst, &db);
   printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
 
 }
