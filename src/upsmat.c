@@ -294,7 +294,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   char do_delete = 'd';
   int got_all_products = 0, got_all_versions = 0, got_all_chains = 0;
   int need_all_chains = 0;
-  int any_version = 0, any_chain = 0;
+  int any_version = 0, any_chain = 0, allocate_new_chain = 0;
   void *saved_next = NULL;
 
   /* initialize this to success */
@@ -478,11 +478,12 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 			 all chains that point to the specified version */
 		      chain_item = upslst_new(upsutl_str_create(ANY_MATCH,
 							    STR_TRIM_DEFAULT));
+		      allocate_new_chain = 1;
 		    } else {
 		      chain_item = a_command_line->ugo_chain;
 		    }
-		    for ( tmp_chain = chain_item ; chain_item ;
-			  chain_item = chain_item->next) {
+		    for ( tmp_chain = chain_item ; tmp_chain ;
+			  tmp_chain = tmp_chain->next) {
 		      the_chain = (char *)(tmp_chain->data);
 		      
 		      if (! NOT_EQUAL_ANY_MATCH(the_chain)) {
@@ -495,6 +496,11 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 			/* Now add this chain to the master list */
 			all_chains = upslst_add(all_chains, the_chain);
 		      }
+		    }
+
+		    /* clean up memory */
+		    if (allocate_new_chain) {
+		      chain_item = upslst_free(chain_item, 'd');
 		    }
 		  }
 		  /* make sure if we need unique instance we only have one */
