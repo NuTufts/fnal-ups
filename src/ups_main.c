@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/file.h>
 
 /* ups specific include files */
 #include "ups_main.h"
@@ -98,6 +99,7 @@ int main(int argc, char *argv[])
   mode_t old_umask;
   int need_help = 0;
   char *on_what = NULL;
+  int temp_desc;
 
   if (argv[1] && (strcmp(argv[1],"-?"))) {
     /* Figure out which command was entered */
@@ -142,7 +144,10 @@ int main(int argc, char *argv[])
 	    /* See if we can open the file (rw) to write to. */
 	    old_umask = umask(g_umask);
 
-	    if ((temp_file = fopen(g_temp_file_name,"w")) == NULL)
+	/*  if ((temp_file = fopen(g_temp_file_name,"w")) == NULL)	*/
+
+	    if (((temp_desc = open(g_temp_file_name,O_RDWR|O_CREAT,0744)) <= 0) ||
+	        ((temp_file = fdopen(temp_desc,"w")) == NULL))
 	    {
 	      /* error in open */
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
