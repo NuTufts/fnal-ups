@@ -55,7 +55,8 @@ static char *g_error_messages[] = {
   "%s: Unable to open file %s.\n",
   "%s: Unable to read file %s.\n",
   "%s: Invalid keyword - %s, in %s found.\n",
-  "%s: No database specified on command line or in \$PRODUCTS.\n"
+  "%s: No database specified on command line or in \$PRODUCTS.\n",
+  "%s: CPU time used - %f, Wall clock time used %f.\n"
 };
 
 static int g_buf_counter = G_ERROR_INIT;   /* pointer to current message */
