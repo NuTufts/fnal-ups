@@ -69,7 +69,6 @@ test_upsugo: test_upsugo.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
 
 ups_test : ups_test.o $(UPS_TEST_OBJECTS)
-	echo "objs = $(UPS_TEST_OBJECTS)"
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(UPS_TEST_OBJECTS) $(LDFLAGS)
 
 upstst_cmdline.o : upstst_cmdline.c

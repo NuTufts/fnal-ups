@@ -40,16 +40,16 @@ Revision history:-
 #include <signal.h>
 #include <fcntl.h>
  
-#include "ups_t_cmdline.h"
-#include "ups_t_parse.h"
-#include "ups_t_cmdtable.h"
+#include "upstst_cmdline.h"
+#include "upstst_parse.h"
+#include "upstst_cmdtable.h"
 
-int ups_t_cmdproc (const char *, ups_t_cmd_table_t const *);
+int upstst_cmdproc (const char *, upstst_cmd_table_t const *);
 
-#define UPS_MAXCOMMAND		1024
+#define UPSTST_MAXCOMMAND		1024
 
-int ups_t_istty = FALSE;
-int ups_t_debug = 0;			/* debug level */
+int upstst_istty = FALSE;
+int upstst_debug = 0;			/* debug level */
 
 /*
  *----------------------------------------------------------------------
@@ -65,12 +65,12 @@ int ups_t_debug = 0;			/* debug level */
  */
 
 
-void ups_t_commandloop (const char * const prompt,
-   const ups_t_cmd_table_t * const cmdlist)
+void upstst_commandloop (const char * const prompt,
+   const upstst_cmd_table_t * const cmdlist)
 {
 ups_cmd_edithndl_t	cmdHandle;		/* command edit handle */
 ups_cmd_t		l_line;			/* single line */
-char	   		cmdbuf[UPS_MAXCOMMAND];	/* complete command */
+char	   		cmdbuf[UPSTST_MAXCOMMAND];	/* complete command */
 int 			lineEntered;		/* line entered flag */
 int        		topLevel = TRUE;	/* top level flag */
 int			cmd_length, line_length;/* string lengths */
@@ -86,12 +86,12 @@ int			line_number = 0;	/* line number */
 /* ---------------------------------------------------------------------------*/
 
 ups_reset_to_top();				/* init var */
-ups_t_interrupt_dec(2);				/* init interrupt handler */
-ups_t_istty = (int) isatty((int)fileno(stdin));		/* input from tty? */
+upstst_interrupt_dec(2);				/* init interrupt handler */
+upstst_istty = (int) isatty((int)fileno(stdin));		/* input from tty? */
 
 while(1)					/* Loop forever */
    {
-   if (ups_t_interrupt_chk() )			/* signal came in */
+   if (upstst_interrupt_chk() )			/* signal came in */
       ups_reset_to_top();			/* drop any pending command */
 
    clearerr (stdin);
@@ -102,9 +102,9 @@ while(1)					/* Loop forever */
    ---------------------------------------------------------------------- */
 
    if (topLevel == FALSE) 
-      {(ups_t_linestart(&cmdHandle, "=> ") );}
+      {(upstst_linestart(&cmdHandle, "=> ") );}
    if (topLevel == TRUE) 
-      {(ups_t_linestart(&cmdHandle, prompt) );}
+      {(upstst_linestart(&cmdHandle, prompt) );}
 
 
 /* loop until line entry is complete 
@@ -114,8 +114,8 @@ while(1)					/* Loop forever */
    do
       {
 
-       ups_t_getchar(&cmdHandle);			/* get char from stdin*/
-       lineEntered = ups_t_procchar(&cmdHandle, l_line);/* process char */
+       upstst_getchar(&cmdHandle);			/* get char from stdin*/
+       lineEntered = upstst_procchar(&cmdHandle, l_line);/* process char */
 
        } while (!lineEntered);				/* Complete line   */
 
@@ -125,7 +125,7 @@ while(1)					/* Loop forever */
    ------------------------- */
 
    cmd_length = (int) strlen(cmdbuf); line_length = (int) strlen(l_line);
-   if ((cmd_length + line_length) > UPS_MAXCOMMAND)
+   if ((cmd_length + line_length) > UPSTST_MAXCOMMAND)
       {
       fprintf (stderr,"ups_test: Command is too long: %d characters\n",
 	 cmd_length + line_length);
@@ -146,11 +146,11 @@ while(1)					/* Loop forever */
       continue;  					/* get next line */
       }
 
-   if (ups_t_debug >= 1)
+   if (upstst_debug >= 1)
       fprintf (stderr,"command %d is: %s\n",
 	 line_number,cmdbuf);          			/* debug message */
  
-   if (ups_t_cmdproc(cmdbuf,cmdlist) == -1) break;
+   if (upstst_cmdproc(cmdbuf,cmdlist) == -1) break;
    ups_reset_to_top();					/* reset for top level*/
 
    } /* while(1)... */

@@ -13,18 +13,18 @@
 **
 **   ENTRY POINT	SCOPE	DESCRIPTION
 **   -------------------------------------------------------------------------
-**   ups_t_linestart	public	Initialize, setup to read command line and 
+**   upstst_linestart	public	Initialize, setup to read command line and 
 **				print prompt.
-**   ups_t_cmdreset	public	Restore original terminal characteristics.
-**   ups_t_getchar	public	Get next character from command line.
-**   ups_t_procchar	public	Process single character input from command
+**   upstst_cmdreset	public	Restore original terminal characteristics.
+**   upstst_getchar	public	Get next character from command line.
+**   upstst_procchar	public	Process single character input from command
 **				line.
 **
-**   ups_t_cmdint	local	Signal handler called for Ctrl C interrupts.
-**   ups_t_cmdtstp	local	Signal handler called for Ctrl Z interrupts. 
-**   ups_t_cmdcont	local	Signal handler called for continuation.
-**   ups_t_interrupt_dec	public	Declare interrupt handler.
-**   ups_t_interrupt_chk	public	Check if interrupt occurred.
+**   upstst_cmdint	local	Signal handler called for Ctrl C interrupts.
+**   upstst_cmdtstp	local	Signal handler called for Ctrl Z interrupts. 
+**   upstst_cmdcont	local	Signal handler called for continuation.
+**   upstst_interrupt_dec	public	Declare interrupt handler.
+**   upstst_interrupt_chk	public	Check if interrupt occurred.
 **
 ** ENVIRONMENT: ANSI C.
 **
@@ -44,9 +44,9 @@
 #include <signal.h>     /* Needed for signal function */
 #include <sys/types.h>
 
-#include "ups_t_cmdline.h"
+#include "upstst_cmdline.h"
 
-extern int	ups_t_istty;
+extern int	upstst_istty;
 
 
 /*============================================================================
@@ -62,8 +62,8 @@ extern int	ups_t_istty;
 **
 ** LOCAL FUNCTION PROTOTYPES
 */
-static void ups_t_cmdint(void);
-static void ups_t_cmdtstp(void);
+static void upstst_cmdint(void);
+static void upstst_cmdtstp(void);
 
 /*---------------------------------------------------------------------
 **
@@ -136,18 +136,18 @@ struct sigaction	g_sigterm_old;
    }
 
 
-static void ups_t_exithandler(void);	/* forward declaration */
+static void upstst_exithandler(void);	/* forward declaration */
 
 
 /*============================================================================  
 
-ROUTINE: ups_t_linestart
+ROUTINE: upstst_linestart
 
 DESCRIPTION:
 	Initialize the structure (handle) used by ftclCmd_ routines,
 	setup to read characters from standard input, and print the line
 	prompt to standard output.  This routine is to be used in conjunction
-	with ups_t_getchar and ups_t_procchar, and must be called
+	with upstst_getchar and upstst_procchar, and must be called
 	prior to line entry, for each line that is entered.
 
 GLOBALS REFERENCED
@@ -155,7 +155,7 @@ GLOBALS REFERENCED
 	g_sigint_flag 
 
 ============================================================================ */
-void ups_t_linestart ( ups_cmd_edithndl_t * const a_hl, const char * const a_prompt)   
+void upstst_linestart ( ups_cmd_edithndl_t * const a_hl, const char * const a_prompt)   
 {
 
 /* SETUP EXIT HANDLER
@@ -165,7 +165,7 @@ if (g_exit_flag == 0)
    {
    g_exit_flag++;
    g_exit_pid = getpid();
-   atexit(ups_t_exithandler);
+   atexit(upstst_exithandler);
    }
 
 /* SETUP THE BEGINNING OF THE LINE
@@ -200,14 +200,14 @@ a_hl->nextchar = 0;
 /* PRINT PROMPT TO STANDARD OUTPUT
    -------------------------------- */
 
-if (ups_t_istty)
+if (upstst_istty)
    PRINTLINE;
 }
 
 
 /*============================================================================  
 
-ROUTINE: ups_t_cmdreset
+ROUTINE: upstst_cmdreset
 
 DESCRIPTION:
 	Restore the original terminal characteristics.
@@ -216,7 +216,7 @@ GLOBALS REFERENCED
 	g_ed_savearg
 
 ============================================================================ */
-void ups_t_cmdreset (void)   
+void upstst_cmdreset (void)   
 {
 /* Reset terminal characteristics */
 ED_OFF(&g_ed_savearg);
@@ -224,7 +224,7 @@ ED_OFF(&g_ed_savearg);
 
 /*============================================================================  
 
-ROUTINE: ups_t_getchar
+ROUTINE: upstst_getchar
 
 DESCRIPTION:
 	Get next character from command line (stdin).  The returned value
@@ -234,11 +234,11 @@ RETURN VALUES:
 	An integer value representing the character just obtained is returned.
 	Note that this value is for information purposes only - the caller may
 	ignore it.  If an error occurred, then the subsequent call to 
-	ups_t_procchar will reflect the error, so the user need only check
-	the return status from ups_t_procchar.
+	upstst_procchar will reflect the error, so the user need only check
+	the return status from upstst_procchar.
 
 ============================================================================ */
-int ups_t_getchar (ups_cmd_edithndl_t  * const a_hl)   
+int upstst_getchar (ups_cmd_edithndl_t  * const a_hl)   
 {
 errno = 0;
 a_hl->nextchar = getchar();
@@ -263,16 +263,16 @@ return(a_hl->nextchar);
 
 /*============================================================================  
 
-ROUTINE: ups_t_procchar
+ROUTINE: upstst_procchar
 
 DESCRIPTION
       Processes a single character input from the command line (stdin).
-	This routine must be preceded by a call to ups_t_linestart (to
-	initialize) and ups_t_getchar (to get the next character
-	from the command line).  ups_t_getchar and this routine
+	This routine must be preceded by a call to upstst_linestart (to
+	initialize) and upstst_getchar (to get the next character
+	from the command line).  upstst_getchar and this routine
 	should be called repeatedly until command line entry is complete
 	(return value = 1), at which time the output parameter a_line is
-	set.  Once line entry is complete, ups_t_linestart must be invoked
+	set.  Once line entry is complete, upstst_linestart must be invoked
 	again, if additional lines are expected.
       There are lots of things that we need to do if stdin is a tty for
 	command line editing. These thing don't need to be done if stdin
@@ -284,7 +284,7 @@ RETURN VALUES:
 	-1 - End-of-file detected (all processing is complete).
 
 ============================================================================ */
-int ups_t_procchar (ups_cmd_edithndl_t * const a_hl,char * const a_line)   
+int upstst_procchar (ups_cmd_edithndl_t * const a_hl,char * const a_line)   
 {
 ups_cmd_t 	tmpline;
 int 		rstatus, i, foundSpace, foundChar;
@@ -309,7 +309,7 @@ entry = a_hl->nextchar;	/* Get local copy of entered character */
 **
 ** IF ESCAPE SEQUENCE STARTED - CATCH THE WHOLE THING
 */
-if (ups_t_istty)
+if (upstst_istty)
    {
    if (a_hl->escmode)
       {
@@ -360,7 +360,7 @@ switch(entry)
    case L_CR:
    case L_LF:
 
-      if (ups_t_istty)
+      if (upstst_istty)
          {
          PRINTLINE;
          fputc('\n', stdout);
@@ -391,7 +391,7 @@ switch(entry)
    let's do things that are unique for ttys.
    ---------------------------------------------------------------- */
 
-if (ups_t_istty)
+if (upstst_istty)
    {
    switch(entry)
       {
@@ -579,7 +579,7 @@ if (isprint((char)entry))
    {
 
    /* Make sure the line is not full */
-   if ((a_hl->lndx + 1) < UPS_MAXLINE)
+   if ((a_hl->lndx + 1) < UPSTST_MAXLINE)
       {
       if (a_hl->cndx < a_hl->lndx)
          {
@@ -591,7 +591,7 @@ if (isprint((char)entry))
          a_hl->lndx++;
          a_hl->line[a_hl->lndx]   = (char)0;	/* Null terminate */
          a_hl->linemodified = 1;
-	 if (ups_t_istty)
+	 if (upstst_istty)
  	    {
             PRINTLINE;
             MOVECRSR;
@@ -605,34 +605,34 @@ if (isprint((char)entry))
          a_hl->lndx++;
          a_hl->line[a_hl->lndx]   = (char)0;	/* Null terminate */
          a_hl->linemodified = 1;
-         if (ups_t_istty) fputc((int)entry, stdout);
+         if (upstst_istty) fputc((int)entry, stdout);
          }
       }
 
    /* Uh oh, the line is full - scream at the user */
    else
       {
-      if (ups_t_istty) fputc(L_BELL, stdout);
+      if (upstst_istty) fputc(L_BELL, stdout);
       else fprintf (stderr, "line is full! \n");
       }
    }
 
 return(rstatus);
 
-} /* ups_t_procchar */
+} /* upstst_procchar */
 
 
 
 /*============================================================================  
 
-ROUTINE: ups_t_cmdint
+ROUTINE: upstst_cmdint
 
 DESCRIPTION:
 	Signal handler routine that is called to cleanup when an interrupt
 	signal (e.g., Ctrl C) occurs.  This routine restores the original
 	terminal characteristics and then sets a global flag (g_sigint_flag) 
 	indicating the interrupt occurred.  This flag can be checked
-	(via ups_t_interrupt_chk) by the user to determine when an interrupt
+	(via upstst_interrupt_chk) by the user to determine when an interrupt
 	occurred.
 
 GLOBALS REFERENCED
@@ -642,7 +642,7 @@ GLOBALS REFERENCED
 	g_sigint_old
 
 ============================================================================ */
-static void ups_t_cmdint(void)
+static void upstst_cmdint(void)
 {
 struct sigaction    act;
 
@@ -691,11 +691,11 @@ if (g_sigint_flag >= g_sigint_flag_max)
 
 
 
-static void ups_t_cmdcont(void);	/* forward declaration */
+static void upstst_cmdcont(void);	/* forward declaration */
 /*============================================================================  
 **============================================================================
 **
-** ROUTINE: ups_t_cmdtstp
+** ROUTINE: upstst_cmdtstp
 */
 /*
 ** DESCRIPTION:
@@ -713,8 +713,8 @@ static void ups_t_cmdcont(void);	/* forward declaration */
 **	None.
 **
 ** DEFINED AS SIGNAL HANDLER BY:
-**	ups_t_interrupt_dec
-**	ups_t_cmdcont
+**	upstst_interrupt_dec
+**	upstst_cmdcont
 **
 ** GLOBALS REFERENCED
 **	g_ed_savearg
@@ -723,7 +723,7 @@ static void ups_t_cmdcont(void);	/* forward declaration */
 **
 **============================================================================
 */
-static void ups_t_cmdtstp(void)
+static void upstst_cmdtstp(void)
 {
 struct sigaction    act;
 
@@ -737,7 +737,7 @@ ED_OFF(&g_ed_savearg);
 */
 sigemptyset(&act.sa_mask);
 act.sa_flags = 0;
-act.sa_handler = (void (*)(int))ups_t_cmdcont;
+act.sa_handler = (void (*)(int))upstst_cmdcont;
 sigaction(SIGCONT, &act, &g_sigcont_old);   /* Continue from CTRL Z interrupt */
 
 /*
@@ -752,14 +752,14 @@ raise(SIGTSTP);
 /*============================================================================  
 **============================================================================
 **
-** ROUTINE: ups_t_cmdcont
+** ROUTINE: upstst_cmdcont
 */
-static void ups_t_cmdcont(void)
+static void upstst_cmdcont(void)
 /*
 ** DESCRIPTION:
 **	Signal handler routine that is called once the process is resumed from
 **	a Ctrl Z interrupt signal (SIGTSTP).  This routine simply redeclares
-**	ups_t_cmdtstp as the Ctrl Z interrupt handler, sets the terminal
+**	upstst_cmdtstp as the Ctrl Z interrupt handler, sets the terminal
 **	characteristics back to command line input, then re-issues the SIGCONT
 **	signal with the previous handler.
 **
@@ -767,7 +767,7 @@ static void ups_t_cmdcont(void)
 **	None.
 **
 ** DEFINED AS SIGNAL HANDLER BY:
-**	ups_t_cmdtstp
+**	upstst_cmdtstp
 **
 ** GLOBALS REFERENCED
 **	g_ed_savearg
@@ -785,7 +785,7 @@ struct sigaction    act;
 */
 sigemptyset(&act.sa_mask);
 act.sa_flags = 0;
-act.sa_handler = (void (*)(int))ups_t_cmdtstp;
+act.sa_handler = (void (*)(int))upstst_cmdtstp;
 sigaction(SIGTSTP, &act, &g_sigtstp_old);    /* CTRL Z interrupt */
 
 /*
@@ -807,7 +807,7 @@ raise(SIGCONT);
 /*============================================================================  
 **============================================================================
 **
-** ROUTINE: ups_t_cmdterm
+** ROUTINE: upstst_cmdterm
 */
 /*
 ** DESCRIPTION:
@@ -819,7 +819,7 @@ raise(SIGCONT);
 **	None.
 **
 ** DEFINED AS SIGNAL HANDLER BY:
-**	ups_t_interrupt_dec
+**	upstst_interrupt_dec
 **
 ** GLOBALS REFERENCED
 **	g_ed_savearg
@@ -827,7 +827,7 @@ raise(SIGCONT);
 **
 **============================================================================
 */
-static void ups_t_cmdterm(void)
+static void upstst_cmdterm(void)
 {
 /*
 ** RESTORE THE ORIGINAL TERMINAL CHARACTERISTICS
@@ -846,10 +846,10 @@ raise(SIGTERM);
 /*============================================================================  
 **============================================================================
 
-ROUTINE: ups_t_interrupt_dec
+ROUTINE: upstst_interrupt_dec
 
 DESCRIPTION:
-	Declare the ups_t_cmdint routine as a signal handler and set the
+	Declare the upstst_cmdint routine as a signal handler and set the
 	number of successive interrupts allowed before we exit the program.
 
 GLOBALS REFERENCED
@@ -862,7 +862,7 @@ GLOBALS REFERENCED
 	g_sigterm_old
 
 ============================================================================ */
-void ups_t_interrupt_dec (int a_cnt)   
+void upstst_interrupt_dec (int a_cnt)   
 {
 struct sigaction act, curHndlr;
 
@@ -876,31 +876,31 @@ g_sigint_flag_max = a_cnt;
 
 /* Set SIGINT handler (if we're not already the handler) */
 sigaction(SIGINT, NULL, &curHndlr);		/* Get current handler */
-if (curHndlr.sa_handler != (void (*)(int))ups_t_cmdint)
+if (curHndlr.sa_handler != (void (*)(int))upstst_cmdint)
    {
    sigemptyset(&act.sa_mask);
    act.sa_flags = 0;
-   act.sa_handler = (void (*)(int))ups_t_cmdint;
+   act.sa_handler = (void (*)(int))upstst_cmdint;
    sigaction(SIGINT, &act, &g_sigint_old);	/* CTRL C interrupt */
    }
 
 /* Set SIGTSTP handler (if we're not already the handler) */
 sigaction(SIGTSTP, NULL, &curHndlr);		/* Get current handler */
-if (curHndlr.sa_handler != (void (*)(int))ups_t_cmdtstp)
+if (curHndlr.sa_handler != (void (*)(int))upstst_cmdtstp)
    {
    sigemptyset(&act.sa_mask);
    act.sa_flags = 0;
-   act.sa_handler = (void (*)(int))ups_t_cmdtstp;
+   act.sa_handler = (void (*)(int))upstst_cmdtstp;
    sigaction(SIGTSTP, &act, &g_sigtstp_old);   /* CTRL Z interrupt */
    }
 
 /* Set SIGTERM handler (if we're not already the handler) */
 sigaction(SIGTERM, NULL, &curHndlr);		/* Get current handler */
-if (curHndlr.sa_handler != (void (*)(int))ups_t_cmdterm)
+if (curHndlr.sa_handler != (void (*)(int))upstst_cmdterm)
    {
    sigemptyset(&act.sa_mask);
    act.sa_flags = 0;
-   act.sa_handler = (void (*)(int))ups_t_cmdterm;
+   act.sa_handler = (void (*)(int))upstst_cmdterm;
    sigaction(SIGTERM, &act, &g_sigterm_old);   /* KILL */
    }
 }
@@ -909,11 +909,11 @@ if (curHndlr.sa_handler != (void (*)(int))ups_t_cmdterm)
 
 /*============================================================================  
 
-ROUTINE: ups_t_interrupt_chk
+ROUTINE: upstst_interrupt_chk
 
 DESCRIPTION:
 	Check if a interrupt signal (i.e., Ctrl C) occurred since the last
-	call to ups_t_linestart.
+	call to upstst_linestart.
 
 RETURN VALUES:
 	0 - No interrupt occurred.
@@ -923,7 +923,7 @@ GLOBALS REFERENCED
 	g_sigint_flag 
 
 ============================================================================ */
-int ups_t_interrupt_chk (void)   
+int upstst_interrupt_chk (void)   
 {
 /* If the global SIGINT flag is non-zero, then an interrupt occurred */
 if (g_sigint_flag)
@@ -936,7 +936,7 @@ else
 
 /*============================================================================  
 
- ROUTINE: ups_t_exithandler
+ ROUTINE: upstst_exithandler
 
 DESCRIPTION:
 	This routine is used as the exit handler for the command line
@@ -950,16 +950,16 @@ DESCRIPTION:
 	for all child processes).
 
 DEFINED AS EXIT HANDLER BY:
-	ups_t_linestart
+	upstst_linestart
 
 GLOBALS REFERENCED
 	g_exit_pid
 
 **============================================================================
 */
-static void ups_t_exithandler (void)   
+static void upstst_exithandler (void)   
 {
 if (g_exit_pid == getpid())
-   {ups_t_cmdreset();}
+   {upstst_cmdreset();}
 }
 

@@ -1,5 +1,5 @@
-#ifndef UPSTCMDLINE_HEADER
-#define UPSTCMDLINE_HEADER
+#ifndef UPSTSTCMDLINE_HEADER
+#define UPSTSTCMDLINE_HEADER
 /*****************************************************************************
 Authors:        Margaret Votava
 e-mail:         "votava@fnal.gov"
@@ -16,8 +16,8 @@ Revision history:-
 #include <sys/types.h>
 #endif
 
-#define UPS_MAXLINE	132
-typedef char ups_cmd_t[UPS_MAXLINE];
+#define UPSTST_MAXLINE	132
+typedef char ups_cmd_t[UPSTST_MAXLINE];
 
 /*
 ** COMMAND EDIT STRUCTURE (HANDLE)
@@ -56,12 +56,12 @@ typedef struct ups_cmd_edithndl
 **
 ** FUNCTION PROTOTYPES
 */
-void ups_t_linestart(ups_cmd_edithndl_t * const, const char * const);
-int  ups_t_getchar(ups_cmd_edithndl_t * const);
-int  ups_t_procchar(ups_cmd_edithndl_t* const, char * const);
+void upstst_linestart(ups_cmd_edithndl_t * const, const char * const);
+int  upstst_getchar(ups_cmd_edithndl_t * const);
+int  upstst_procchar(ups_cmd_edithndl_t* const, char * const);
 
-void ups_t_cmdreset(void);
-void ups_t_interrupt_dec(int);
-int  ups_t_interrupt_chk(void);
+void upstst_cmdreset(void);
+void upstst_interrupt_dec(int);
+int  upstst_interrupt_chk(void);
 
-#endif /* !UPSTCMDLINE_HEADER */
+#endif /* !UPSTSTCMDLINE_HEADER */

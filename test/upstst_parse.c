@@ -8,9 +8,9 @@ Revision history:-
 10-Oct-1995 MEV	created - stolen from ftcl_ParseArgv which was heavily 
 		inspired by the Tk command line parser.
 
-ups_t_parse()  - Parse command line options
-ups_t_print_usage()- Get the usage string for a command
-ups_t_split()	- split command line into argv and arc like stuff
+upstst_parse()  - Parse command line options
+upstst_print_usage()- Get the usage string for a command
+upstst_split()	- split command line into argv and arc like stuff
 
 Include files:-
 ===============
@@ -21,7 +21,7 @@ Include files:-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "ups_t_parse.h"
+#include "upstst_parse.h"
 
 /* Global variables:-
    ================== */
@@ -36,22 +36,22 @@ static char g_Specified_args[ARGSIZ];
 /* Forward declarations
    ==================== */
 
-static int 	ups_t_pass1 (int * const, char ** const, ups_t_argt * const);
-static int  	ups_t_pass2 (int * const, char **, ups_t_argt * const);
-static int   	assign_defaults(ups_t_argt * const);
+static int 	upstst_pass1 (int * const, char ** const, upstst_argt * const);
+static int  	upstst_pass2 (int * const, char **, upstst_argt * const);
+static int   	assign_defaults(upstst_argt * const);
 
 /* define names of tcl array where ups_ParseArgv values will be stored 
  * and define the array element names for each value
  */
-#define UPS_T_INDENT		"     "
+#define UPSTST_INDENT		"     "
 
 
 /*==============================================================================
-ROUTINE: ups_t_parse
+ROUTINE: upstst_parse
 
 Process an argv array according to a table of expected command-line options.
 
- (int ) ups_t_parse(int *argcPtr, char **argv, shArgvInfo *argTable)
+ (int ) upstst_parse(int *argcPtr, char **argv, shArgvInfo *argTable)
           argcPtr  - Pointer to the argument count address
           argv     - Command line argument array
           argTable - Table of expected command-line options
@@ -63,14 +63,14 @@ DESCRIPTION:
   be somewhere under $FTCL_DIR)
 
 RETURNS:
-   UPS_T_SUCCESS 	: if command-line options parsed successfully
-   UPS_T_BADSYNTAX 	: on error. 
+   UPSTST_SUCCESS 	: if command-line options parsed successfully
+   UPSTST_BADSYNTAX 	: on error. 
 */
-int ups_t_parse(int * const argcPtr, char ** const argv, 
-   ups_t_argt * const argTable)
+int upstst_parse(int * const argcPtr, char ** const argv, 
+   upstst_argt * const argTable)
 {
 int 			retValue, length;
-register ups_t_argt 	*ptr;
+register upstst_argt 	*ptr;
 
 /* Populate g_Specified_args, the buffer that holds all recognized command
    line options and  parameters. We want to make sure that we do not
@@ -79,7 +79,7 @@ register ups_t_argt 	*ptr;
    (since g_Specified_args is dimensioned for ARGSIZ)
    ------------------------------------------------------------------------  */
 
-for (length = 0, ptr = argTable; ptr->type != UPS_T_ARGV_END; ptr++)
+for (length = 0, ptr = argTable; ptr->type != UPSTST_ARGV_END; ptr++)
    {      
    if (ptr->key) length += (int) (strlen(ptr->key) + 1);
    }
@@ -94,36 +94,36 @@ if (length >= ARGSIZ)
 
 g_Specified_args[0] = NULL;
 
-retValue = ups_t_pass1(argcPtr, argv, argTable);	/* take out switch */
+retValue = upstst_pass1(argcPtr, argv, argTable);	/* take out switch */
 if (retValue) return (retValue);			/* return error */
 
-retValue = ups_t_pass2(argcPtr, argv, argTable);	/* take out param */
+retValue = upstst_pass2(argcPtr, argv, argTable);	/* take out param */
 if (retValue) return (retValue);			/* return error */
 
 if (*argcPtr > 1)  					/* no leftovers! */
    {         
    fprintf (stderr,"Syntax Error: unprocessed command line parameters remain ");
    fprintf (stderr,"\n    (check for extra parameters or invalid options)\n");
-   return UPS_T_BADSYNTAX;
+   return UPSTST_BADSYNTAX;
    }
 
-return UPS_T_SUCCESS;
+return UPSTST_SUCCESS;
 }
 
 /*==============================================================================
 ROUTINE
-  ups_t_pass1 - Do a first pass through argv[], weeding out all known 
+  upstst_pass1 - Do a first pass through argv[], weeding out all known 
                switches specified in argTable[].
 
 CALL: 
-  (static int) ups_t_pass1 (int *argcPtr,
-                          char **argv, ups_t_argt *argTable)
+  (static int) upstst_pass1 (int *argcPtr,
+                          char **argv, upstst_argt *argTable)
                argcPtr  - Pointer to the address of argument count
                argv     - Command line argument array
                argTable - Table of known arguments
 
 DESCRIPTION:
-  ups_t_pass1() performs a first pass through the command line arguments
+  upstst_pass1() performs a first pass through the command line arguments
   specified in argv[]. As it goes thru it's motions, it strips out all
   known arguments. Known arguments are specified in argTable[]. As an
   argument is recognized and processed, it is removed from argv[]. 
@@ -151,15 +151,15 @@ DESCRIPTION:
   argcPtr will have been modified to contain 6.
 
 RETURNS:
-   UPS_T_SUCCESS   : if command-line options parsed successfully
-   UPS_T_BADSYNTAX : on error. Reason for error is put in interp->result
+   UPSTST_SUCCESS   : if command-line options parsed successfully
+   UPSTST_BADSYNTAX : on error. Reason for error is put in interp->result
 ============================================================================= */
-static int ups_t_pass1(int * const argcPtr, char ** const argv, ups_t_argt * const argTable)
+static int upstst_pass1(int * const argcPtr, char ** const argv, upstst_argt * const argTable)
 {
-ups_t_argt *infoPtr;
+upstst_argt *infoPtr;
 				/* Pointer to the current entry in the
 				 * table of argument descriptions. */
-ups_t_argt *matchPtr;	/* Descriptor that matches current argument. */
+upstst_argt *matchPtr;	/* Descriptor that matches current argument. */
 char *curArg;		/* Current argument */
 int srcIndex;		/* Location from which to read next argument
 				 * from argv. */
@@ -169,13 +169,13 @@ int dstIndex;		/* Index into argv to which next unused
 int length;			/* Number of characters in current argument. */
 char tmpKeyBuf[30];
 
-#define ups_t_missing_arg(myarg) {					\
+#define upstst_missing_arg(myarg) {					\
    fprintf(stderr,"Syntax Error: %s option requires an additional argument\n",\
     myarg);								\
-   return UPS_T_BADSYNTAX;						\
+   return UPSTST_BADSYNTAX;						\
    }
 
-if (assign_defaults(argTable) == 0) return UPS_T_BADSYNTAX;
+if (assign_defaults(argTable) == 0) return UPSTST_BADSYNTAX;
 
     /*
      * Do the real parsing, skipping over first arg (ie command)
@@ -201,9 +201,9 @@ for (srcIndex = dstIndex = 1; srcIndex < *argcPtr; )
 	 * matchPtr.
 	 */
 
-    if (!strcmp(curArg,"-usage")) return UPS_T_USAGE;
+    if (!strcmp(curArg,"-usage")) return UPSTST_USAGE;
    matchPtr = NULL;
-   for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)
+   for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
 
       {
       if (infoPtr->key == NULL)  continue;
@@ -216,7 +216,7 @@ for (srcIndex = dstIndex = 1; srcIndex < *argcPtr; )
       if (matchPtr != NULL) 
 	 {
 	 fprintf (stderr, "Syntax Error: ambiguous option %s ", curArg); 
-	 return UPS_T_BADSYNTAX;
+	 return UPSTST_BADSYNTAX;
 	 }
       matchPtr = infoPtr;
       }
@@ -239,23 +239,23 @@ gotMatch:
    infoPtr = matchPtr;
    switch (infoPtr->type) {
 
-      case UPS_T_ARGV_CONSTANT:
+      case UPSTST_ARGV_CONSTANT:
  	 *((int *) infoPtr->dst) = (int) infoPtr->src;
          sprintf(tmpKeyBuf, "%s,", infoPtr->key);
          strcat(g_Specified_args, tmpKeyBuf);
 	 break;
 
-      case UPS_T_ARGV_INT:
+      case UPSTST_ARGV_INT:
          {
 	 char *endPtr;
-	 if (srcIndex == *argcPtr) ups_t_missing_arg(curArg);
+	 if (srcIndex == *argcPtr) upstst_missing_arg(curArg);
 
 	 *((int *) infoPtr->dst) = (int) strtoul(argv[srcIndex], &endPtr, 0);
 	 if ((endPtr == argv[srcIndex]) || (*endPtr != 0)) 
 	    {
 	    fprintf (stderr,"Syntax Error: expected integer argument "
 	 	"for %s but got %s \n", infoPtr->key,argv[srcIndex]);
-	    return UPS_T_BADSYNTAX;
+	    return UPSTST_BADSYNTAX;
 	    }
 	 srcIndex++;
          sprintf(tmpKeyBuf, "%s,", infoPtr->key);
@@ -263,26 +263,26 @@ gotMatch:
 	 break;
 	 }
 
-      case UPS_T_ARGV_STRING:
+      case UPSTST_ARGV_STRING:
 
-	 if (srcIndex == *argcPtr) ups_t_missing_arg(curArg);
+	 if (srcIndex == *argcPtr) upstst_missing_arg(curArg);
 	 *((char **)infoPtr->dst) = argv[srcIndex];
 	 srcIndex++;
          sprintf(tmpKeyBuf, "%s,", infoPtr->key);
          strcat(g_Specified_args, tmpKeyBuf);
 	 break;
 
-      case UPS_T_ARGV_DOUBLE :
+      case UPSTST_ARGV_DOUBLE :
 
 	 {
 	 char *endPtr;
-	 if (srcIndex == *argcPtr) ups_t_missing_arg(curArg);
+	 if (srcIndex == *argcPtr) upstst_missing_arg(curArg);
 	 *((double *) infoPtr->dst) = strtod(argv[srcIndex], &endPtr);
 	 if ((endPtr == argv[srcIndex]) || (*endPtr != 0)) 
 	    {
 	    fprintf(stderr,"Syntax Error: expected floating-point argument ");
 	    fprintf(stderr," for %s but got %s\n",infoPtr->key, argv[srcIndex]);
-	    return UPS_T_BADSYNTAX;
+	    return UPSTST_BADSYNTAX;
 	    }
 	 srcIndex++;
          sprintf(tmpKeyBuf, "%s,", infoPtr->key);
@@ -294,7 +294,7 @@ gotMatch:
 	 
 	 fprintf(stderr,"Programmer Error: bad argument type %d in arg table",
 	    infoPtr->type);
-	  return UPS_T_BADSYNTAX;
+	  return UPSTST_BADSYNTAX;
       }
    }
 
@@ -305,25 +305,25 @@ for (;srcIndex < *argcPtr; argv[dstIndex++] = argv[srcIndex++]);
 argv[dstIndex] = (char *) NULL;
 *argcPtr = dstIndex;
 
-return UPS_T_SUCCESS;
+return UPSTST_SUCCESS;
 
 }
 
 /*=============================================================================
 ROUTINE
-  ups_t_pass2 - Do a second pass through argv[], weeding out all known
+  upstst_pass2 - Do a second pass through argv[], weeding out all known
                positional parameters specified in argTable[].
 
 CALL:
-  (static int) ups_t_pass2(int *argcPtr, char **argv, ups_t_argt *argTable)
+  (static int) upstst_pass2(int *argcPtr, char **argv, upstst_argt *argTable)
                argcPtr  - Pointer to the address of argument count
                argv     - Command line argument array
                argTable - Table of known arguments
 
 DESCRIPTION:
-  ups_t_pass2() performs a second pass through the command line arguments
+  upstst_pass2() performs a second pass through the command line arguments
   specified in argv[]. Note that this argv[] has been (probably) modified
-  by ups_t_pass1(). Thus all known switches have been stripped out of argv.
+  by upstst_pass1(). Thus all known switches have been stripped out of argv.
   As pass2 goes thru it's motions, it strips out all positional
   parameters. Positional parameters are specified in argTable[]. As an
   parameter is recognized and processed, it is removed from argv[].
@@ -350,13 +350,13 @@ DESCRIPTION:
   argcPtr will have been modified to contain 6.
 
 RETURNS:
-  UPS_T_SUCCESS 	: on success
-  UPS_T_BADSYNTAX  	: otherwise
+  UPSTST_SUCCESS 	: on success
+  UPSTST_BADSYNTAX  	: otherwise
 ============================================================================= */
-static int ups_t_pass2(int * const argcPtr, char **argv, 
-   ups_t_argt * const argTable)
+static int upstst_pass2(int * const argcPtr, char **argv, 
+   upstst_argt * const argTable)
 {
-ups_t_argt 	*infoPtr;
+upstst_argt 	*infoPtr;
 int      	reqPosParams,	/* Count of required positional params */
 		optPosParams,	/* Count of optional positional params */
 		i;
@@ -369,7 +369,7 @@ flag = 0;
     * Do some housekeeping first: see how many positional parameters
     * are needed.
     */
-for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)  
+for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)  
    {
    if (infoPtr->key == NULL)  
       {
@@ -399,22 +399,22 @@ if (flag)
    fprintf (stderr, "Programmer Error: %s argument table key must be -null",p);
    fprintf (stderr, " non-null and begin with\n");
    fprintf (stderr, "either '<', '[', or '-' only\n");
-   return UPS_T_BADSYNTAX;
+   return UPSTST_BADSYNTAX;
    }
  
 if (reqPosParams == 0 && optPosParams == 0) /* No sense sticking around */
-   return UPS_T_SUCCESS;               /* if pos. params. not needed */
+   return UPSTST_SUCCESS;               /* if pos. params. not needed */
  
 if (reqPosParams && *argcPtr <= 1)  
    {
    fprintf (stderr, "Syntax Error: expected at least one positional parameter\n");
-   return UPS_T_BADSYNTAX;
+   return UPSTST_BADSYNTAX;
    }
 
 if (*argcPtr <= 1)     /* Boundary case: if by this pass only argv[0]  */
-   return UPS_T_SUCCESS;                   /* remains, return now */
+   return UPSTST_SUCCESS;                   /* remains, return now */
 
-for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)  
+for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)  
    {
    if (infoPtr->key == NULL) continue;
 
@@ -465,7 +465,7 @@ for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)
          {
          fprintf (stderr,"Syntax Error: expected %d more", reqPosParams); 
          fprintf (stderr," required positional parameters\n");
-         return UPS_T_BADSYNTAX;
+         return UPSTST_BADSYNTAX;
          }
       reqPosParams--;
       }
@@ -477,40 +477,40 @@ for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)
    switch (infoPtr->type)  {
       char keyBuf[50], *pSp;
 
-      case UPS_T_ARGV_INT :
+      case UPSTST_ARGV_INT :
 
          *((int *) infoPtr->dst) = (int) strtoul(argv[i], &sp, 0);
          if (sp == argv[i] || *sp != 0)  
 	    {
 	    fprintf(stderr,"Syntax Error: expected integer positional\n"); 
 	    fprintf(stderr,"parameter for %s but got %s", infoPtr->key,argv[i]);
-            return UPS_T_BADSYNTAX;
+            return UPSTST_BADSYNTAX;
 	    }
          sprintf(keyBuf, "%s,", infoPtr->key);
          strcat(g_Specified_args, keyBuf);
          break;
 
-      case UPS_T_ARGV_DOUBLE :
+      case UPSTST_ARGV_DOUBLE :
 
          *((double *) infoPtr->dst) = strtod(argv[i], &sp);
          if (sp == argv[i] || *sp != 0)  
 	    {
 	    fprintf(stderr,"Syntax Error: expected floating point positional\n"); 
 	    fprintf(stderr,"parameter for %s but got %s", infoPtr->key,argv[i]);
-            return UPS_T_BADSYNTAX;
+            return UPSTST_BADSYNTAX;
             }
          sprintf(keyBuf, "%s,", infoPtr->key);
          strcat(g_Specified_args, keyBuf);
          break;
 
-      case UPS_T_ARGV_STRING :
+      case UPSTST_ARGV_STRING :
 
          *((char **) infoPtr->dst) = argv[i];
          sprintf(keyBuf, "%s,", infoPtr->key);
          strcat(g_Specified_args, keyBuf);
          break;
 
-      case UPS_T_ARGV_CONSTANT :
+      case UPSTST_ARGV_CONSTANT :
                  /*
                   * None of these types can have positional parameters.
                   * Get rid of positional parameter delimiters '<...>' or
@@ -522,12 +522,12 @@ for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)
 
          fprintf(stderr,"Programmer Error: %s is not a ", infoPtr->key);
          fprintf(stderr,"supported object for positional\n parameters. ");
-	 fprintf(stderr,"Positional parameters must be of type UPS_T_ARGV_INT");
-	 fprintf(stderr,",\nUPS_T_ARGV_DOUBLE, or UPS_T_ARGV_STRING only.");
+	 fprintf(stderr,"Positional parameters must be of type UPSTST_ARGV_INT");
+	 fprintf(stderr,",\nUPSTST_ARGV_DOUBLE, or UPSTST_ARGV_STRING only.");
 	 fprintf(stderr," Please modify your argument\ntable and declare %s",
 	    infoPtr->key);
          fprintf(stderr," as %s instead\n",keyBuf);
-         return UPS_T_BADSYNTAX;
+         return UPSTST_BADSYNTAX;
          break; /* NOTREACHED */
       }
       
@@ -550,7 +550,7 @@ for (i = 0; argv[i] != NULL; i++)   /* Set *argcPtr to contain the number */
         ;                              /* of elements in argv[] */
 *argcPtr = i;
  
-return UPS_T_SUCCESS;
+return UPSTST_SUCCESS;
 }
 
 
@@ -558,7 +558,7 @@ return UPS_T_SUCCESS;
  * NAME: assign_defaults()
  *
  * CALL:
- *   (int) assign_defaults(Tcl_Interp *a_interp, ups_t_argt *argTable)
+ *   (int) assign_defaults(Tcl_Interp *a_interp, upstst_argt *argTable)
  *         a_interp - TCL Interpreter
  *         argTable - Argument table
  *
@@ -576,9 +576,9 @@ return UPS_T_SUCCESS;
  *   1 : on success
  *   0 : on failure. TCL Interp will contain the result of the failure.
  */
-static int assign_defaults(ups_t_argt * const argTable)
+static int assign_defaults(upstst_argt * const argTable)
 {
-ups_t_argt *infoPtr;
+upstst_argt *infoPtr;
 
    /*
     * Go thru the table assigning default values if specified. Default
@@ -590,16 +590,16 @@ ups_t_argt *infoPtr;
     * default values can always be overwritten later. If the user did not
     * specify a command line value, it will be properly defaulted.
     */
-for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)  
+for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)  
    {
    char   *pSrc, *pEnd;
 
    pSrc = (char *) infoPtr->src;
 
    switch (infoPtr->type)  {
-      case UPS_T_ARGV_CONSTANT :
+      case UPSTST_ARGV_CONSTANT :
          break;
-      case UPS_T_ARGV_INT      :
+      case UPSTST_ARGV_INT      :
          if (pSrc != NULL)  
 	    {
             *((int *) infoPtr->dst) = (int) strtoul(pSrc, &pEnd, 0);
@@ -611,7 +611,7 @@ for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)
                }
             }
          break;
-      case UPS_T_ARGV_DOUBLE   :
+      case UPSTST_ARGV_DOUBLE   :
          if (pSrc != NULL)  
 	    {
             *((double *)infoPtr->dst) = strtod(pSrc, &pEnd);
@@ -623,7 +623,7 @@ for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++)
                }
             }
          break;
-      case UPS_T_ARGV_STRING  :
+      case UPSTST_ARGV_STRING  :
          if (pSrc != NULL) *((char **)infoPtr->dst) = pSrc;
          break;
       }
@@ -634,27 +634,27 @@ return TRUE;
 
 /*==============================================================================
 ROUTINE:
-  void ups_t_print_usage
+  void upstst_print_usage
 
       routine to print a brief usage statement from argTable info.
 
 CALL:
-   ups_print_usage (ups_t_argt *argTable,  char *cmd_name);
+   ups_print_usage (upstst_argt *argTable,  char *cmd_name);
 
           argTable      - Table of known command-line options
           cmd_name      - name of command giving usage for
 
 ==============================================================================*/
-void ups_t_print_usage(const ups_t_argt * const argTable, const char *cmd_name)
+void upstst_print_usage(const upstst_argt * const argTable, const char *cmd_name)
 {
-register const ups_t_argt 	*infoPtr; 	/* ptr to entry in argTable */
+register const upstst_argt 	*infoPtr; 	/* ptr to entry in argTable */
 
 if (NULL == cmd_name) cmd_name = "";		/* blank command */
 
-fprintf (stderr,"%s Usage: %s",UPS_T_INDENT,
+fprintf (stderr,"%s Usage: %s",UPSTST_INDENT,
    cmd_name);					/* main usage line */
 
-for (infoPtr = argTable; infoPtr->type != UPS_T_ARGV_END; infoPtr++) 
+for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++) 
    {
    if (infoPtr->key == NULL) continue;	/* no key */
    fprintf (stderr," %s",infoPtr->key);	/* print key */
@@ -666,7 +666,7 @@ fprintf (stderr,"\n");				/* end with new line */
 
 /* ============================================================================
 ROUTINE:
-   ups_t_split
+   upstst_split
  
 splits the input string into argc and argv like information based on
 whitespace as the delimiter. things within "" are considered as one
@@ -678,7 +678,7 @@ call it again its previous return value points to the new data...
 
 ============================================================================= */
 
-int ups_t_split(char *input, int * const argc, char *** const argv)
+int upstst_split(char *input, int * const argc, char *** const argv)
 {
 static char *tmp_argv[255];
 

@@ -9,29 +9,29 @@ Include files:-
 */
 
 #include <time.h>
-#include "ups_t_parse.h"
-#include "ups_t_macros.h"
+#include "upstst_parse.h"
+#include "upstst_macros.h"
 
 
 /* ============================================================================
 
 ROUTINE:
-	ups_t_date
+	upstst_date
  	
 	print date to stderr
 ==============================================================================*/
-int	ups_t_date		(int argc, char ** const argv)
+int	upstst_date		(int argc, char ** const argv)
 {
 
 time_t	stime;			/* time */
 int 		status;
-ups_t_argt	argt[] = {{NULL, UPS_T_ARGV_END, NULL, NULL}};
+upstst_argt	argt[] = {{NULL, UPSTST_ARGV_END, NULL, NULL}};
 
 /* parse command line
    ------------------ */
 
-status = ups_t_parse (&argc, argv, argt);
-UPS_T_CHECK_PARSE(status,argt,argv[0]);
+status = upstst_parse (&argc, argv, argt);
+UPSTST_CHECK_PARSE(status,argt,argv[0]);
 
 /* echo date
    --------- */
@@ -45,24 +45,24 @@ return 0;						/* success */
 /* ============================================================================
 
 ROUTINE:
-	ups_t_echo
+	upstst_echo
  	
 	print string to stderr
 ==============================================================================*/
-int	ups_t_echo		(int argc, char ** const argv)
+int	upstst_echo		(int argc, char ** const argv)
 {
 int 		status;				/* status */
 static char	*mystring;			/* string */
-ups_t_argt	argt[] = {
-	{"<mystring>",	UPS_T_ARGV_STRING,	NULL,		&mystring},
-	{NULL,		UPS_T_ARGV_END,		NULL,		NULL}};
+upstst_argt	argt[] = {
+	{"<mystring>",	UPSTST_ARGV_STRING,	NULL,		&mystring},
+	{NULL,		UPSTST_ARGV_END,		NULL,		NULL}};
 
 /* parse command line
    ------------------ */
 
 mystring = NULL;
-status = ups_t_parse (&argc, argv, argt);
-UPS_T_CHECK_PARSE (status, argt, argv[0]);
+status = upstst_parse (&argc, argv, argt);
+UPSTST_CHECK_PARSE (status, argt, argv[0]);
 
 /* echo string to stderr
    --------------------- */
@@ -74,34 +74,34 @@ return 0;
 /* ============================================================================
 
 ROUTINE:
-	ups_t_debug_level
+	upstst_debug_level
  	
 	set/display the debug level
 
 ==============================================================================*/
-int	ups_t_debug_level	(int argc, char ** const argv)
+int	upstst_debug_level	(int argc, char ** const argv)
 {
 int 		status;			/* status */
 static int	testflag;		/* test flag */
 static int	level;			/* string */
-ups_t_argt	argt[] = {
-	{"[level]",	UPS_T_ARGV_INT,		NULL,		&level},
-	{"-test",	UPS_T_ARGV_CONSTANT,	(char *)TRUE,	&testflag},
-	{NULL,		UPS_T_ARGV_END,		NULL,		NULL}};
+upstst_argt	argt[] = {
+	{"[level]",	UPSTST_ARGV_INT,		NULL,		&level},
+	{"-test",	UPSTST_ARGV_CONSTANT,	(char *)TRUE,	&testflag},
+	{NULL,		UPSTST_ARGV_END,		NULL,		NULL}};
 
 /* parse command line
    ------------------ */
 
 level = -1; testflag = FALSE;
-status = ups_t_parse (&argc, argv, argt);
-UPS_T_CHECK_PARSE (status, argt, argv[0]);
+status = upstst_parse (&argc, argv, argt);
+UPSTST_CHECK_PARSE (status, argt, argv[0]);
 
 /* either set or show debug level
    ------------------------------ */
 
 if (level == -1)					/* show current level */
    {
-   printf ("Current test debug level is: %d\n",ups_t_debug);
+   printf ("Current test debug level is: %d\n",upstst_debug);
 #if 0
    printf ("Current ups debug level is: %d\n",ups_debug);
 #endif
@@ -109,7 +109,7 @@ if (level == -1)					/* show current level */
 else							/* change level */
    {
    if (testflag)
-      ups_t_debug = level;
+      upstst_debug = level;
 #if 0
    else
       ups_debug = level;

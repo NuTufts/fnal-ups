@@ -1,5 +1,5 @@
-#ifndef UPSTCMDTABLE
-#define UPSTCMDTABLE
+#ifndef UPSTSTCMDTABLE
+#define UPSTSTCMDTABLE
 /*****************************************************************************
 Authors:        Margaret Votava
 e-mail:         "votava@fnal.gov"
@@ -15,7 +15,7 @@ Revision history:-
 typedef struct {
    char	*cmdname;
    int	(*func)(int argc, char **argv);
-   } ups_t_cmd_table_t;
+   } upstst_cmd_table_t;
 
 #endif
 

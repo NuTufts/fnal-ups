@@ -13,14 +13,14 @@ Revision history:-
 #include <stdio.h>
 #include <string.h>
  
-#include "ups_t_cmdline.h"
-#include "ups_t_parse.h"
-#include "ups_t_cmdtable.h"
+#include "upstst_cmdline.h"
+#include "upstst_parse.h"
+#include "upstst_cmdtable.h"
 
 /*=============================================================================
 ROUTINE:
 
-ups_t_cmdproc
+upstst_cmdproc
 
    process command line
 
@@ -32,12 +32,12 @@ RETURNS:
 
 ==============================================================================*/
 
-int ups_t_cmdproc	(char * const cmdbuf, ups_t_cmd_table_t * const cmdlist)
+int upstst_cmdproc	(char * const cmdbuf, upstst_cmd_table_t * const cmdlist)
 {
 int			myargc;			/* argc */
 char			**myargv;		/* argv */
-ups_t_cmd_table_t	*cmd;			/* command and function ptr */
-ups_t_cmd_table_t	*match = NULL;		/* command and function ptr */
+upstst_cmd_table_t	*cmd;			/* command and function ptr */
+upstst_cmd_table_t	*match = NULL;		/* command and function ptr */
 char 			*usrcmd;		/* command name */
 unsigned int		cmd_length;		/* command length */
 
@@ -48,7 +48,7 @@ if ( (!strcmp(cmdbuf, "exit")) |
 
 if (cmdbuf[0] == '#')  return 0;			/* comment, return */
    
-if (ups_t_split (cmdbuf, &myargc, &myargv))		/* split command */ 
+if (upstst_split (cmdbuf, &myargc, &myargv))		/* split command */ 
    {
    fprintf (stderr, "could not split line \n");
    return (1);
