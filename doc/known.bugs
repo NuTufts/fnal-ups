@@ -39,5 +39,3 @@ Fix problem removing string from CLASSPATH with semicolon as delimiter.
 
 Appending to a previously undefined path/variable string yields
 "<path_or_variable_name>: Undefined variable." warning in t/csh.
-
-Better use of dropit should probably be made in PathAp/Prepend.
