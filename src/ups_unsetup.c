@@ -83,6 +83,8 @@ t_upslst_item *ups_unsetup( const t_upsugo_command * const a_command_line,
       new_command_line = upsugo_env(a_command_line->ugo_product,
                                     g_cmd_info[e_setup].valid_opts);
       got_new_cmd_line = 1;
+      if (new_command_line)      /* Use the command line's -j setting */
+        new_command_line->ugo_j = a_command_line->ugo_j;
     }
     if (new_command_line) {
       /* get all the requested instances */
