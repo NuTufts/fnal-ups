@@ -5,6 +5,11 @@
 #include "upslst.h"
 #include "upsmem.h"
 
+static int sort_strcmp( const void * const d1, const void * const d2 )
+{
+  return strcmp( (const char *)d1, (const char *)d2 );
+}
+
 static void print_str_list( t_upslst_item * const list_ptr );
 
 #define DATA_COUNT 10
@@ -65,7 +70,7 @@ int main( void )
   }
   
   printf( "\nSort the list\n" );
-  upslst_sort0( l_ptr2, strcmp );
+  upslst_sort0( l_ptr2, sort_strcmp );
   print_str_list( l_ptr2 );
   
   printf( "\nInserting lists\n" );
