@@ -63,15 +63,13 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 			 const FILE * const a_temp_file,
 			 const int a_ups_command, const int a_exist_cmd)
 {
-  t_upslst_item *mproduct_list = NULL, *new_mproduct_list = NULL;
-  t_upstyp_matched_product *mproduct = NULL, *new_mproduct = NULL;
+  t_upstyp_matched_product *mproduct = NULL;
   t_upstyp_matched_instance *minst = NULL;
-  t_upslst_item *cmd_list = NULL;
-  t_upsugo_command *new_command_line = NULL;
+  t_upslst_item *cmd_list = NULL, *mproduct_list = NULL;
   char *dummy = NULL;
-  int need_unique = 1;
+  int need_unique = 1, top_unsetup = 0;
 
-  /* get all the requested instances */
+  /* get the requested instance */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
 				  NULL, need_unique);
   if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
@@ -86,48 +84,28 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
       if (upsutl_is_authorized(minst, mproduct->db_info, &dummy)) {
 	/* Check if we need to unsetup this product first.  */
 	if (a_command_line->ugo_k == 0) {
-	  /* the command line says it is ok to do the unsetup.  we must
-	     get the value of the env variable SETUP_<prodname> and use
-	     it to locate the instance that was previously set up.  if
-	     this variable does not exist, we cannot do the unsetup. */
-	  if ((new_command_line = upsugo_env(mproduct->product,
-					   g_cmd_info[e_setup].valid_opts))) {
-	    /* we found the SETUP_<PROD> so get a new instance based on the
-	       env variable. */
-	    new_mproduct_list = upsmat_instance(new_command_line, NULL,
-						need_unique);
-	    if (new_mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
-	      /* get the product to be set up */
-	      new_mproduct =
-		(t_upstyp_matched_product *)new_mproduct_list->data;
-	      /* make sure an instance was matched before proceeding */
-	      if (new_mproduct->minst_list) {
-		cmd_list = upsact_get_cmd(new_command_line, new_mproduct,
-					  g_cmd_info[e_unsetup].cmd,
-					  a_ups_command);
-	      }
-	    }
-	  } else {
-	    /* no SETUP_<prodname> variable was set, but we still need to check
-	       for unsetups of dependencies */
-	    cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
-				      mproduct, g_cmd_info[e_unsetup].cmd,
-				      a_ups_command);
+	  /* get all the unsetup commands */
+	  cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
+				    mproduct, g_cmd_info[e_unsetup].cmd,
+				    a_ups_command);
+	  /* the above routine will return all of the commands associated with
+	     the matched instance.  including commands associated with
+	     dependencies that may not be setup.  so we need to weed those
+	     commands out.  we do not want to unsetup an instance that has not
+	     been setup.  e.g. - if A depends on B and you do a 
+	                     setup A
+			     unsetup B
+			     unsetup A
+             you do not want to unsetup B again, you only want to unsetup A. */
+	  if ((UPS_ERROR == UPS_SUCCESS) && cmd_list) {
+	    cmd_list = upsact_trim_unsetup(cmd_list, &top_unsetup);
 	  }
-	  if (UPS_ERROR == UPS_SUCCESS) {
+	  if ((UPS_ERROR == UPS_SUCCESS) && cmd_list) {
 	    upsact_process_commands(cmd_list, a_temp_file);
 	  }
 	  /* now clean up the memory that we used */
 	  upsact_cleanup(cmd_list);
 
-	  /* free allocated memory */
-	  if (new_command_line) {
-	    (void )upsugo_free(new_command_line);
-	  }
-	  if (new_mproduct_list) {
-	    new_mproduct_list = upsutl_free_matched_product_list(
-							   &new_mproduct_list);
-	  }
 	  if (UPS_ERROR != UPS_SUCCESS) {	  
 	    upserr_add(UPS_UNSETUP_FAILED, UPS_WARNING, mproduct->product);
 	  }
