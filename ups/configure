@@ -752,9 +752,11 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	    setenv MACH_OS \`uname -s\`
 	    set mach=\`echo \$MACH_OS|cut -c1-4\`
 	    if ( \$mach == IRIX ) setenv MACH_OS IRIX
+	    if ( \$mach == CYGW ) setenv MACH_OS CYGWIN32_NT
 	    set Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
 	    if ( \$MACH_OS == AIX ) set Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
 	    if ( \$MACH_OS == Linux ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	    if ( \$MACH_OS == CYGWIN32_NT ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`
 	endif
 
 	#======================================================================
@@ -1033,13 +1035,17 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	    then
 		MACH_OS=IRIX
 	    fi
+	    if test \`echo \$MACH_OS|cut -c1-4\` = CYGW
+	    then
+		MACH_OS=CYGWIN32_NT
+	    fi
 	    export MACH_OS
 	    Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
 	    if test \$MACH_OS = AIX
 	    then
 		Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
 	    fi
-	    if test \$MACH_OS = Linux
+	    if test \$MACH_OS = Linux -o $MACH_OS = CYGWIN32_NT
 	    then
 		Full_Flavor=\$MACH_OS'+'\`uname -r\`
 	    fi
