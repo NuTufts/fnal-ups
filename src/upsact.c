@@ -866,8 +866,8 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   else {
     upsmem_free( pcmd );
     P_VERB_s( 3, "Parsed line: (null)" );
-    return 0;
   }
+  return 0;
 }
 
 void upsact_cleanup( t_upslst_item *dep_list )
@@ -1746,12 +1746,7 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 
   }
 
-  if ( use_cmd ) {
-
-    return a_cmd_ugo;
-  }
-  else {
-
+  if ( !use_cmd ) {
     (void) upsugo_free( a_cmd_ugo );
     pname = upsutl_upcase( s_pname );
 
@@ -1759,6 +1754,7 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 
     return upsugo_env( pname, g_cmd_info[e_unsetup].valid_opts );
   }
+  return a_cmd_ugo;
 }
 
 /*-----------------------------------------------------------------------
