@@ -41,8 +41,6 @@
 void ups_tailor( const t_upsugo_command * const a_command_line, 
 		 const FILE * const a_temp_file, 
 		 const int a_ups_command);
-void ups_tailor_cleanup(void);
-void ups_tailor_update_nodes(void);
 
 /*
  * Declaration of private globals.
