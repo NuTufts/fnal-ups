@@ -430,7 +430,7 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
   if (string) strcpy(newstr,string);
   get_element(string,compile_file);
   if (string) strcat(newstr,string);
-  return string;
+  return newstr;
 }
 char *upsget_origin(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
