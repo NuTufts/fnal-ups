@@ -79,7 +79,6 @@ int ups_free_product( t_ups_product *prod_ptr )
   if ( !prod_ptr ) return 0;
 
   if ( all_gone( prod_ptr ) ) {
-    printf( "Freeing Product\n" );
     if ( prod_ptr->file ) { upsmem_free( prod_ptr->file ); }
     if ( prod_ptr->product ) { upsmem_free( prod_ptr->product); }
     if ( prod_ptr->chaver ) { upsmem_free( prod_ptr->chaver ); }
@@ -132,7 +131,6 @@ int ups_free_instance( t_ups_instance *inst_ptr )
   if ( !inst_ptr ) return 0;
 
   if ( all_gone( inst_ptr ) ) {
-    printf( "Freeing Instance\n" );
     if ( inst_ptr->product ) { upsmem_free( inst_ptr->product); }
     if ( inst_ptr->version ) { upsmem_free( inst_ptr->version ); }
     if ( inst_ptr->flavor ) { upsmem_free( inst_ptr->flavor ); }
@@ -198,7 +196,6 @@ int ups_free_action( t_ups_action *act_ptr )
   if ( !act_ptr ) return 0;
 
   if ( all_gone( act_ptr ) ) {
-    printf( "Freeing Action\n" );
     if ( act_ptr->action ) { upsmem_free( act_ptr->action ); }
     if ( act_ptr->command_list ) { upslst_free( act_ptr->command_list, 'd' ); }
 
