@@ -239,6 +239,33 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   return g_pd;
 }
 
+void write_journal_file( const void *key, void ** prod, void *cl ) 
+{
+  /* a little helper for upsfil_write_journal_files */
+  upsfil_write_file( *prod, key, 'd', NOJOURNAL );   
+}
+/*-----------------------------------------------------------------------
+ * upsfil_write_journal_files
+ *
+ * Will write all journal files in cache to disk.
+ *
+ * Input : none
+ * Output: none
+ * Return: int, UPS_SUCCESS just fine, else UPS_<error> number.
+ */
+int upsfil_write_journal_files( void )
+{
+
+  if ( g_ft ) {
+    P_VERB_s( 1, "Writing journal files" );
+    upstbl_map( g_ft, write_journal_file, NULL );
+    upstbl_free( &g_ft );
+    g_ft = 0;
+  }
+
+  return UPS_SUCCESS;
+}
+
 /*-----------------------------------------------------------------------
  * upsfil_write_file
  *
@@ -252,8 +279,9 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
  * Return: int, UPS_SUCCESS just fine, else UPS_<error> number.
  */
 int upsfil_write_file( t_upstyp_product * const prod_ptr,
-		       const char * const ups_file,
-		       const char copt )
+		       const char * const ups_file,		       
+		       const char copt,
+		       const int journal )
 {
   const char *key = 0;
   static char buff[MAX_LINE_LEN];
@@ -268,6 +296,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 				 "product pointer" );
     return UPS_NOVALUE_ARGUMENT;
   }
+
   g_pd = prod_ptr;
 
   if ( !ups_file || strlen( ups_file ) <= 0 ) {
@@ -278,9 +307,31 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   /* get table key */
 
   if ( g_use_cache ) {
-    if ( !g_ft )
+    if ( !g_ft ) {
       g_ft = upstbl_new( 300 );
+    }
     key = upstbl_atom_string( ups_file );
+  }
+
+  /* handle journal files */
+
+  if ( journal == JOURNAL ) {
+    prod_ptr->journal = JOURNAL;
+
+    /* add file to cache */
+
+    if ( g_use_cache ) {
+      if ( !g_ft ) {
+	g_ft = upstbl_new( 300 );
+      }
+      key = upstbl_atom_string( ups_file );
+      if ( !upstbl_get( g_ft, key ) ) {
+	upstbl_put( g_ft, key, g_pd );
+	P_VERB_s( 1, "New (journal) product added to cache" );
+      }
+    }
+
+    return UPS_SUCCESS;
   }
 
   /* check if prod_ptr is empty, if empty remove the file */
@@ -333,6 +384,9 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   if ( g_pd->file ) {
     put_key( "FILE", g_pd->file );
   }
+
+  /* set file type (g_ifile) */
+
   cfilei();
 
   if ( g_ifile == e_file_unknown ) {
@@ -373,9 +427,6 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     if ( !upstbl_get( g_ft, key ) ) {
       upstbl_put( g_ft, key, g_pd );
       P_VERB_s( 1, "New product added to cache" );
-    }
-    else {
-      P_VERB_s( 1, "New product already in cache" );
     }
   }    
 

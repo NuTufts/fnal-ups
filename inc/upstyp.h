@@ -148,6 +148,7 @@ typedef struct upstyp_product
   t_upslst_item    *instance_list;
   t_upslst_item    *comment_list;
   t_upstyp_config  *config;
+  int              journal;
 } t_upstyp_product;
 
 /* 
@@ -162,6 +163,9 @@ typedef struct upstyp_product
 #define ANY_FLAVOR "ANY"
 #define MAX_LINE_LEN 1024
 #define INVALID_INDEX -1
+
+#define JOURNAL 1
+#define NOJOURNAL 0
 
 /*
  * Declaration of public functions.

@@ -36,7 +36,9 @@
 t_upstyp_product  *upsfil_read_file( const char * const ups_file );
 int               upsfil_write_file( t_upstyp_product * const prod_ptr,
 				     const char * const ups_file,
-				     const char copt );
+				     const char copt,
+				     const int journal );
+int               upsfil_write_journal_files( void );
 int               upsfil_exist( const char * const ups_file );
 void              upsfil_flush( void );
 void              upsfil_stat( const int iopt );
