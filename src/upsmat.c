@@ -233,7 +233,7 @@ static int g_ugo_version = 0;
 	  minst_list = upslst_delete_safe(minst_list, minst, ' ');       \
 	  /* just free the structure around the instance as the rest is  \
              in the cache */                                             \
-          ups_free_matched_instance_structure(minst);                    \
+          (void) ups_free_matched_instance_structure(minst);             \
 	} else {                                                         \
           tmp_list = minst_list;                                         \
           minst_list = minst_list->next;                                 \
@@ -656,7 +656,7 @@ t_upstyp_instance *upsmat_version(t_upstyp_instance * const a_inst,
       minst = (t_upstyp_matched_instance *)minst_list->data;
       tinst = minst->table;
       upsmem_free(minst);
-      upslst_free(minst_list, ' ');
+      (void) upslst_free(minst_list, ' ');
     }
   }
   return(tinst);
@@ -1087,7 +1087,7 @@ static int match_from_version( const char * const a_product,
   file_chars = (int )(strlen(tmp_version) + strlen(a_product) +
 		      strlen(a_db_info->name) + sizeof(VERSION_SUFFIX) + 4);
   if (file_chars <= FILENAME_MAX) {
-    sprintf(buffer, "%s/%s/%s%s", a_db_info->name, a_product, tmp_version,
+    (void) sprintf(buffer, "%s/%s/%s%s", a_db_info->name, a_product, tmp_version,
 	    VERSION_SUFFIX);
     read_product = upsfil_read_file(&buffer[0]);
     if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
