@@ -8,6 +8,13 @@ let the user know when the instance was not matched.
 Added support for -0123 to most of the commands.
 <li>
 Fixed problem with ups undeclare checking for the existence of an archive file.
+<li>
+Only output any help information after [un]setup has been short circuited.
+<li>
+Fixed envSetIfNotSet so now when the product is getting unsetup, the opposite
+of this function is envRemove, not envUnset.
+<li>
+improved output of errors from ups verify.
 </ul>
 
 <h1>UPS v4_2</h1>

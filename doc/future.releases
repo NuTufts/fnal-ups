@@ -107,4 +107,7 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	be set something like -
      COMPILE_FILE=${UPS_PROD_NAME}_${UPS_PROD_VERSION}.setup-compiled
   
-22.
+22. Provide a text version of the RELEASE_NOTES
+
+23. Add an INSTALL_NOTE to the top level.
+
