@@ -120,6 +120,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                "Specification must include a flavor");
     return 0;
   }
+/*
   mproduct_list = upsmat_instance(uc, db_list , need_unique);
   if (UPS_ERROR != UPS_SUCCESS) 
   {  return 0; 
@@ -129,6 +130,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                "Exact product definition exists");
     return 0;
   }
+*/
   save_chain=uc->ugo_chain;
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
