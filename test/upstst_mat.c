@@ -122,13 +122,13 @@ if(!mp) return;
 for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
    product = (t_upstyp_match_product *) prod_ptr->data;
-   printf("CHAIN:\n");
+   fprintf(fd,"CHAIN:\n");
    for (chain_ptr = product->chain_list; chain_ptr; chain_ptr = chain_ptr->next)
       {
       instance = (t_upstyp_instance *) chain_ptr->data;
       upstst_dump_instance();
       }
-   printf("VERSION:\n");
+   fprintf(fd,"VERSION:\n");
    for (version_ptr = product->version_list; 
         version_ptr; 
         version_ptr = version_ptr->next)
@@ -136,7 +136,7 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
       instance = (t_upstyp_instance *) version_ptr->data;
       upstst_dump_instance();
       }
-   printf("TABLE:\n");
+   fprintf(fd,"TABLE:\n");
    for (table_ptr = product->table_list; table_ptr; table_ptr = table_ptr->next)
       {
       instance = (t_upstyp_instance *) table_ptr->data;
