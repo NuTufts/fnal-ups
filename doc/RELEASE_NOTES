@@ -41,5 +41,6 @@ Now the steps are:
 <li>
 ups copy command now uses -G in order to pass options to the declare.  -O is
 no longer used.
-
+<li>
+The 'ups create' command had been removed.
 </ul>
