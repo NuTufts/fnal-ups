@@ -105,7 +105,7 @@ typedef struct ups_command
     int     ugo_Z;           /* Time this command                    */
 /* these are associated with n,o,d,c,t,and g chains                  */
     t_upslst_item *ugo_chain;
-    int     ugo_?;           /* Help flag                            */
+    int     ugo_help;        /* Help flag                            */
 } t_upsugo_command;
 
 /* 
