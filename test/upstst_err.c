@@ -77,20 +77,22 @@ int 		status;
 static char	*funcname = "upserr_add";
 static char	*severity;
 static char	*error_str;
+static char	*extra_str;
 int		error;
 upstst_argt	argt[] = {{"<error>",  UPSTST_ARGV_STRING,NULL,&error_str},
 			  {"-severity",UPSTST_ARGV_STRING,NULL,&severity},
+			  {"[<extra>]",  UPSTST_ARGV_STRING,NULL,&extra_str},
 			  {NULL,       UPSTST_ARGV_END,   NULL,NULL}};
 
 /* parse command line
    ------------------ */
 
-severity = UPS_INFORMATIONAL; error_str = NULL;
+severity = UPS_INFORMATIONAL; error_str = NULL; extra_str = UPS_UNKNOWN_TEXT;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 
 UPSTST_CHECK_ESTATUS (error_str,error);			/* get error */
-upserr_add(error,severity);				/* clear buffer */
+upserr_add(error,severity,extra_str);			/* clear buffer */
 return 0;						/* success */
 }
 
