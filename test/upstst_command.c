@@ -80,7 +80,7 @@ stdout_dup = dup(STDOUT_FILENO);		/* dup stdout */
    --------------------- */
 
 UPS_ERROR = UPS_SUCCESS;
-while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
+while ((uc = upsugo_next(argc,argv,UPSTST_ALLOPTS)) != 0) /* for all commands */
    {
    if (UPS_ERROR != UPS_SUCCESS)
       {
