@@ -403,6 +403,9 @@ int upsugo_bldfvr(struct ups_command * const uc)
 if (!uc->ugo_H)
  { if (uname(&baseuname) == -1) return(-1);	/* do uname */
    (void) strcpy (flavor,baseuname.sysname);	/* get sysname */
+   if (!strncmp(flavor,"IRIX",4))		/* Slam all IRIXanything */
+   { strcpy(flavor,"IRIX");
+   }
    (void) strcat (flavor,"+");			/* add plus */
    if (strncmp(baseuname.sysname,"AIX",3) == 0)	/* because AIX is different */
       {
