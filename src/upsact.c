@@ -130,6 +130,8 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     const int mode,
 			     const char * const act_name );
 t_upsact_item *copy_act_item( const t_upsact_item * const act_itm );
+void copy_ugo_db( t_upsugo_command * const u_i,
+		  t_upsugo_command * const u_o );
 t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm, 
 				     const char * const act_name, 
 				     const int iact );
@@ -1499,9 +1501,10 @@ int parse_params( const char * const a_params, char **argv )
 /*-----------------------------------------------------------------------
  * get_SETUP_prod
  *
- * Will create an ugo command from the env. variable SETUP_prodname.
- * It will compare if the passed command line correspond to the product
- * defined by SETUP_prod.
+ * Will (maybe) create an ugo command from the env. variable SETUP_prodname.
+ *
+ * If product defined on the action line have onw of the switches: version, 
+ * q, f, z, H, r, m or M, then SETUP_prodname will _not_ be used. 
  *
  * Input : t_upsact_cmd *, action command line
  *         int, enum of main line action
@@ -1515,6 +1518,7 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
   char *pname = 0;
   t_upsugo_command *a_cmd_ugo = 0;
   t_upsugo_command *a_setup_ugo = 0;
+  int use_cmd = 0;
   int i_cmd = 0;
   char *cmd_line = 0;
 
@@ -1533,51 +1537,33 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
   else {
     a_cmd_ugo = upsugo_bldcmd( cmd_line, g_cmd_info[e_unsetup].valid_opts );
     strcpy( s_pname, a_cmd_ugo->ugo_product );
-    upsugo_free( a_cmd_ugo );
+
+    /* check if instance can differ from SETUP_prod, if it can we will use 
+       that instance */
+
+    if ( a_cmd_ugo->ugo_version || a_cmd_ugo->ugo_q || a_cmd_ugo->ugo_f ||
+	 a_cmd_ugo->ugo_z || a_cmd_ugo->ugo_H || a_cmd_ugo->ugo_r ||
+	 a_cmd_ugo->ugo_m || a_cmd_ugo->ugo_M ) {
+      use_cmd = 1;
+    }
+    else {
+      upsugo_free( a_cmd_ugo );
+    }
   }
   pname = upsutl_upcase( s_pname );
 
-  /* fetch, from the environment the product defined in 
-     $SETUP_prod */
+  /* fetch, from the environment the product defined in $SETUP_prod */
 
-  a_setup_ugo = upsugo_env( pname, g_cmd_info[e_unsetup].valid_opts );
+  if ( use_cmd ) {
 
-  /* check if instance is the same */
+    /* maybe set a warning ? */
 
-  /*
-  if ( a_cmd_ugo && a_setup_ugo ) {
-    int ohoh = 0;
-    if ( a_cmd_ugo->ugo_qualifiers &&
-	 lst_cmp_str( a_cmd_ugo->ugo_qualifiers, a_setup_ugo->ugo_qualifiers ) ) {
-      ohoh = 1;
-    }
-    else if ( a_cmd_ugo->ugo_version  &&
-	      strcmp( a_cmd_ugo->ugo_version, a_setup_ugo->ugo_version ) ) {
-	ohoh = 1;
-    }
-    else if ( a_cmd_ugo->ugo_chain ) {
-      if ( lst_cmp_str( a_cmd_ugo->ugo_chain, a_setup_ugo->ugo_chain ) )
-	ohoh = 1;
-    }
-
-    if ( ohoh )
-      upserr_add( UPS_UNSETUP_CLASH, UPS_WARNING, pname );
-
+    a_setup_ugo = a_cmd_ugo;
   }
-  
-  
-  if ( ! a_setup_ugo ) {
+  else {
 
-    switch ( i_cmd ) {
-    case e_unsetuprequired:      
-      upserr_add( UPS_NO_SETUP_ENV, UPS_WARNING, pname );
-      break;
-    case e_unsetupoptional:
-      break;
-    }
+    a_setup_ugo = upsugo_env( pname, g_cmd_info[e_unsetup].valid_opts );
   }
-
-  */
 
   return a_setup_ugo;
 }
@@ -1646,8 +1632,6 @@ t_upsugo_command *get_ugosetup( t_upsact_item *p_act_itm,
   /* it will, for un/setup commmand lines build the corresponding
      ugo commans structure, using upsugo_bldcmd */
 
-  static char s_cmd[MAX_LINE_LEN] = "";
-
   t_upsugo_command *a_ugo = 0;
   int i_act = p_cmd->iact;
   int i_cmd = p_cmd->icmd;
@@ -1662,33 +1646,13 @@ t_upsugo_command *get_ugosetup( t_upsact_item *p_act_itm,
   }
   else {
 
-    char *p_cmd_argv = p_cmd->argv[0];
+    a_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
+  }
 
-    /* if no database defined on command line, add '-z db:db..' to the 
-       un/setup command, also be sure that there is a database defined
-       in current ugo */
+  /* if no database specified, and we have one, add it */
 
-    if ( ! strstr( p_cmd_argv, "-z" ) && p_act_itm->ugo->ugo_z &&
-	  p_act_itm->ugo->ugo_db && p_act_itm->ugo->ugo_db->data ) {
-
-      t_upslst_item *l_item = upslst_first( p_act_itm->ugo->ugo_db );
-
-      /* from a list of typ_db items it will create a string of databases
-	 including the -z string */
-
-      strcpy( s_cmd, p_cmd->argv[0] ); 
-      strcat( s_cmd, " -z " );
-      for ( ; l_item && l_item->data; l_item = l_item->next ) {
-	t_upstyp_db * db = (t_upstyp_db *)l_item->data;
-	strcat( s_cmd, db->name );
-	if ( l_item->next && l_item->next->data )
-	  strcat( s_cmd, ":" );
-      }
-
-      p_cmd_argv = s_cmd;
-    }
-	
-    a_ugo = upsugo_bldcmd( p_cmd_argv, g_cmd_info[i_act].valid_opts );
+  if ( (! a_ugo->ugo_z) && p_act_itm->ugo && p_act_itm->ugo->ugo_z ) {
+    copy_ugo_db( p_act_itm->ugo, a_ugo );
   }
 
   return a_ugo;
@@ -1820,48 +1784,45 @@ t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
   return 0;    
 }
 
-char *actitem2str( const t_upsact_item *const p_act_itm )
+void copy_ugo_db( t_upsugo_command * const u_i,
+		  t_upsugo_command * const u_o )
 {
-  /* given an act_item it will create a string representing the 
-     corresponding product instance. the result is the string
-     from upsget_envstr with chain information appended */
+  /* it will copy ugo database information from u_i to u_o, if any */
 
-  static char buf[MAX_LINE_LEN];
-  t_upstyp_matched_instance *mat_inst;
-  t_upslst_item *l_item;
-  
-  if ( !p_act_itm )
-    return 0;
+  char buf[255] = "";
 
-  /* instance id */
+  if ( u_i->ugo_z && 
+       u_i->ugo_db && 
+       u_i->ugo_db->data ) {
 
-  l_item = upslst_first( p_act_itm->mat->minst_list );
-  mat_inst = (t_upstyp_matched_instance *)l_item->data;
-  strcpy( buf, upsget_envstr( p_act_itm->mat->db_info, mat_inst, p_act_itm->ugo ) );
+    t_upslst_item *l_i = upslst_first( u_i->ugo_db );
+    t_upslst_item *l_o = 0;
 
-
-  /* chain information */
-
-  l_item = upslst_first( p_act_itm->ugo->ugo_chain );
-  if ( l_item && l_item->data ) {
-    strcat( buf, " -g " );
-    strcat( buf, (char *)l_item->data );
+    u_o->ugo_z = u_i->ugo_z;
     
-    /* the following should in princip never happen: a dependency should
-       only be reachable by a single chain, so maybe we should print an
-       error here */
+    /* cleanup old database information, if any */
 
-    for ( l_item = l_item->next; l_item; l_item = l_item->next ) {
-      if ( l_item->data ) {
-	strcat( buf, ":" );
-	strcat( buf, (char *)l_item->data );
-      }
-    } 
+    if ( u_o->ugo_db ) 
+      upslst_free( u_o->ugo_db, 'd' );
+    u_o->ugo_db = 0;
+
+    /* copy database list */
+
+    for ( ; l_i && l_i->data; l_i = l_i->next ) {
+      t_upstyp_db *db_i = (t_upstyp_db *)l_i->data;
+      t_upstyp_db *db_o = (t_upstyp_db *)upsmem_malloc( sizeof( t_upstyp_db ) );
+
+      memset( db_o, 0, sizeof( t_upstyp_db ) );
+      db_o->name = upsutl_str_create( db_i->name, ' ' );
+      l_o = upslst_add( l_o, db_o );
+      strcat( buf, db_o->name );
+      strcat( buf, ":" );
+    }
+    
+    u_o->ugo_db = upslst_first( l_o );
   }
-
-  return buf;
 }
-
+		 
 t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
 {
   /* from a passed upsact_item it will make a copy */
@@ -1903,8 +1864,10 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
     return 0;
 
   if ( !mat_prod ) {
+
     t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
     if ( !l_mproduct || !l_mproduct->data ) {
+
       upserr_vplace();
       upserr_add( UPS_NO_MATCH, UPS_FATAL, ugo_cmd->ugo_product );
       return 0;
@@ -1913,6 +1876,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
     upslst_free( l_mproduct, ' ' );
   }
   else {
+
     upsmem_inc_refctr( mat_prod );
   }
 
@@ -2058,7 +2022,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	}
 	strcat( buf, ")" );
 
-	/* use insert, to reverse the order of commands */
+	/* use _insert (and not _add), to reverse the order of commands */
 
 	l_ucmd = upslst_insert( l_ucmd, 
 				upsutl_str_create( buf, ' ' ) );
@@ -2079,7 +2043,7 @@ int do_exit_action( const t_upsact_cmd * const a_cmd )
         - by default sourcecompile has always EXIT flag set.
 	- we will only exit for required commands, the decision
           to exit for optional commands are taken in the produced
-          script itself.
+          shell script itself.
   */
 
 
@@ -2096,7 +2060,6 @@ int do_exit_action( const t_upsact_cmd * const a_cmd )
 
   case e_sourcecompilereq:
       return 1;
-      break;
 
   case e_sourcerequired:
   case e_sourcereqcheck:
@@ -2110,6 +2073,48 @@ int do_exit_action( const t_upsact_cmd * const a_cmd )
   }
 
   return 0;
+}
+
+char *actitem2str( const t_upsact_item *const p_act_itm )
+{
+  /* given an act_item it will create a string representing the 
+     corresponding product instance. the result is a string
+     like upsget_envstr but with chain information appended */
+
+  static char buf[MAX_LINE_LEN];
+  t_upstyp_matched_instance *mat_inst;
+  t_upslst_item *l_item;
+  
+  if ( !p_act_itm )
+    return 0;
+
+  /* instance id */
+
+  l_item = upslst_first( p_act_itm->mat->minst_list );
+  mat_inst = (t_upstyp_matched_instance *)l_item->data;
+  strcpy( buf, upsget_envstr( p_act_itm->mat->db_info, mat_inst, p_act_itm->ugo ) );
+
+
+  /* chain information */
+
+  l_item = upslst_first( p_act_itm->ugo->ugo_chain );
+  if ( l_item && l_item->data ) {
+    strcat( buf, " -g " );
+    strcat( buf, (char *)l_item->data );
+    
+    /* the following should in princip never happen: a dependency should
+       only be reachable by a single chain, so maybe we should print an
+       error here */
+
+    for ( l_item = l_item->next; l_item; l_item = l_item->next ) {
+      if ( l_item->data ) {
+	strcat( buf, ":" );
+	strcat( buf, (char *)l_item->data );
+      }
+    } 
+  }
+
+  return buf;
 }
 
 /*-----------------------------------------------------------------------
