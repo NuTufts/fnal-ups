@@ -41,7 +41,8 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
 	          ups_configure.o ups_unconfigure.o ups_unsetup.o \
-	          ups_tailor.o ups_create.o ups_unk.o ups_declare.o
+	          ups_tailor.o ups_create.o ups_unk.o ups_declare.o \
+                  ups_depend.o
 
 CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsfil.A upsugo.A upsmat.A ups_list.A  \
@@ -49,7 +50,7 @@ CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsver.A upsact.A upsget.A ups_start.A \
 	     ups_stop.A ups_configure.A ups_unconfigure.A \
 	     ups_unsetup.A ups_tailor.A ups_create.A upstbl.A \
-             ups_list.A
+             ups_list.A ups_depend.A
 
 LDFLAGS = $(LLIBS)
 
@@ -474,3 +475,8 @@ upsutl.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsver.o:	upsver.c
 upsver.o:	$(ERUPT_DIR)/inc/upserr.h
 upsver.o:	$(ERUPT_DIR)/inc/upsver.h
+ups_depend.o:	ups_depend.c
+ups_depend.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_depend.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_depend.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_depend.o:	$(ERUPT_DIR)/inc/upsact.h

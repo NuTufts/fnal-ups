@@ -90,12 +90,15 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
 t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 			  t_upstyp_matched_product * mat_prod,
 			  const char * const act_name );
-t_upsact_item *find_product( const t_upslst_item *const dep_list,
+t_upsact_item *find_product( t_upslst_item *const dep_list,
 			     const char *const prod_name );
+t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
+				 const t_upsact_item* const act_item );
 t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     t_upstyp_matched_product *mat_prod,
 			     const int level,
 			     const char * const act_name );
+char *action2inst( const t_upsact_item *const p_cur );
 
 /* functions to handle specific action commands */
 
@@ -347,6 +350,50 @@ static t_cmd_map g_cmd_maps[] = {
  */
 
 /*-----------------------------------------------------------------------
+ * upsact_print_inst
+ *
+ * Input : t_upsugo_command *,
+ *         t_upstyp_matched_product *,
+ *         char *,
+ * Output: none
+ * Return: t_upsact_tree *,
+ */
+int upsact_print( t_upsugo_command * const ugo_cmd,
+		  t_upstyp_matched_product *mat_prod,
+		  const char * const act_name,
+		  const char * const sopt )
+{
+  t_upslst_item *dep_list = 0;
+  t_upsugo_command *cur_ugo = 0;
+  t_upslst_item *didit_list = 0;
+  int doact = strchr( sopt, 'a' ) ? 1 : 0;
+
+  if ( !ugo_cmd || !act_name )
+    return 0;
+
+  dep_list = upsact_get_cmd( ugo_cmd, mat_prod, act_name );
+
+  for ( ; dep_list; dep_list = dep_list->next ) {
+    t_upsact_item *act_ptr = dep_list->data;
+    if ( doact ) {
+      upsact_print_item( act_ptr, sopt );
+    }
+    else {
+      if ( act_ptr->ugo == cur_ugo )
+	continue;
+      if ( ! find_product_ptr( didit_list, act_ptr ) ) {
+	didit_list = upslst_add( didit_list, act_ptr );
+	upsact_print_item( act_ptr, sopt );
+	cur_ugo = act_ptr->ugo;
+      }
+    }
+    
+  }
+
+  return 1;
+}
+
+/*-----------------------------------------------------------------------
  * upsact_get_cmd
  *
  * Input : t_upsugo_command *,
@@ -366,8 +413,11 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   if ( !ugo_cmd || !act_name )
     return 0;
 
-  new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name );
-  top_list = get_top_prod( new_cur, act_name );
+  if ( !(new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name )) ) 
+    return 0;
+  if ( !(top_list = get_top_prod( new_cur, act_name )) )
+    return 0;
+
   dep_list = next_cmd( top_list, dep_list, new_cur, act_name, ' ' );
 
   return upslst_first( dep_list );
@@ -450,31 +500,36 @@ void upsact_cleanup( t_upslst_item *dep_list )
   /* here you should cleanup dep_list */
 }
 
-void upsact_print_item( const t_upsact_item *const p_cur )
+
+/*-----------------------------------------------------------------------
+ * upsact_print_item
+ *
+ * options (sopt):
+ *    always : print correspoding product instance.
+ *    'l'    : also print instance level
+ *    'a'    : also print corresponding action command
+ *    't'    : also print indentions (corresponding to level)
+ *
+ * Input : action item
+ *         iopt
+ * Output: none
+ * Return: none
+ */
+void upsact_print_item( const t_upsact_item *const p_cur, const char * const sopt )
 {
-  t_upstyp_matched_instance *mat_inst;
-  t_upstyp_instance *inst;
   int i;
-  
+
   if ( !p_cur )
     return;
   
-  mat_inst = (t_upstyp_matched_instance *)(upslst_first( p_cur->mat->minst_list ))->data;
-  if ( mat_inst->chain )
-    inst = mat_inst->chain;
-  else if ( mat_inst->version )
-    inst = mat_inst->version;
-  else if ( mat_inst->table )
-    inst = mat_inst->table;
-  else {
-    printf( "%s: No matched instance found\n", p_cur->mat->product );
-    return;
+  if ( strchr( sopt, 't' ) ) for ( i=0; i<p_cur->level; i++ ) { printf( "   " ); }
+  if ( strchr( sopt, 'l' ) ) printf( "%d:", p_cur->level );
+  printf( "%s", action2inst( p_cur ) );
+  if ( strchr( sopt, 'a' ) ) {
+    printf( ":" );
+    upsact_print_cmd( p_cur->cmd );
   }
-
-  for ( i=0; i<p_cur->level; i++ ) { printf( "\t" ); }
-  printf( "%d:( %s, %s, %s, \"%s\" ):", p_cur->level, inst->product,
-	  inst->flavor, inst->version, inst->qualifiers );
-  upsact_print_cmd( p_cur->cmd );  
+  else printf( "\n" );
 }
 
 void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
@@ -612,7 +667,6 @@ t_upslst_item *next_cmd( t_upslst_item *top_list,
 	continue;
       }
       else if ( copt != 't' ) { /* here we go again */
-	t_upstyp_matched_product *new_mat = 0;
 	t_upsact_item *new_cur = 0;
 	t_upsugo_command *new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
 
@@ -662,18 +716,49 @@ t_upslst_item *next_cmd( t_upslst_item *top_list,
   return dep_list;
 }
 
-t_upsact_item *find_product( const t_upslst_item* const dep_list,
+t_upsact_item *find_product( t_upslst_item* const dep_list,
 			     const char *const prod_name )
 {
   t_upslst_item *l_ptr = upslst_first( (t_upslst_item *)dep_list );
-
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     t_upsact_item *p_item = (t_upsact_item *)l_ptr->data;
     if ( upsutl_stricmp( prod_name, p_item->ugo->ugo_product ) == 0 )
       return p_item;
   }
-
   return 0;    
+}
+
+t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
+				 const t_upsact_item* const act_item )
+{
+  t_upslst_item *l_ptr = (t_upslst_item *)upslst_first( dep_list );
+  for ( ; l_ptr; l_ptr = l_ptr->next ) {
+    t_upsact_item *act_ptr = (t_upsact_item *)l_ptr->data;
+    if ( act_item->ugo == act_ptr->ugo )
+      return act_ptr;
+  }
+  return 0;    
+}
+
+char *action2inst( const t_upsact_item *const p_cur )
+{
+  static char buf[MAX_LINE_LEN];
+  t_upstyp_matched_instance *mat_inst;
+  t_upslst_item *l_item;
+  
+  if ( !p_cur )
+    return 0;
+
+  l_item = upslst_first( p_cur->mat->minst_list );
+  mat_inst = (t_upstyp_matched_instance *)l_item->data;
+  strcpy( buf, upsget_envstr( 0, mat_inst, p_cur->ugo ) );
+  l_item = upslst_first( p_cur->ugo->ugo_chain );
+  if ( l_item && l_item->data ) {
+    strcat( buf, " -g " );
+    strcat( buf, (char *)l_item->data );
+  }
+
+  return buf;
 }
 
 /*-----------------------------------------------------------------------

@@ -66,10 +66,14 @@ void upsact_process_commands( const t_upslst_item * const a_cmd_list,
 t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product *mat_prod,
 			       const char * const act_name );
+int upsact_print( t_upsugo_command * const ugo_cmd,
+		  t_upstyp_matched_product *mat_prod,
+		  const char * const act_name,
+		  const char * const sopt );
 t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str );
 void upsact_cleanup( t_upslst_item *dep_list );
 void upsact_print_cmd( const t_upsact_cmd * const cmd_cur );
-void upsact_print_item( const t_upsact_item *const p_cur );
+void upsact_print_item( const t_upsact_item *const p_cur, const char * const sopt );
 
 #endif /* _UPSACT_H_ */
 

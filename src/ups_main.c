@@ -39,6 +39,7 @@
 #include "ups_create.h"
 #include "ups_tailor.h"
 #include "ups_unk.h"
+#include "ups_depend.h"
 #include "upserr.h"
 #include "upsutl.h"
 #include "upshlp.h"
@@ -71,7 +72,7 @@ t_cmd_info g_cmd_info[] = {
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
   {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z"},
   {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z"},
-  {e_depend,      "depend",      "?f:H:K:m:M:q:r:U:vVz:Z"},
+  {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z"},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z"},
   {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z"},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z"},
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_copy: ups_unk(command_line, argv[1], e_copy);
 	    break;
-	  case e_depend: ups_unk(command_line, argv[1], e_depend);
+	  case e_depend: ups_depend(command_line, argv[1], e_depend);
 	    break;
 	  case e_exist: ups_setup(command_line, temp_file, e_exist);
 	    break;
