@@ -2818,7 +2818,7 @@ static void f_envsetifnotset( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "if [ ! ${%s-} ]; then %s=\"%s\";export %s\n#\n",
+		  "if [ ! ${%s-} ]; then %s=\"%s\";export %s;fi;\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0],
 		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
