@@ -85,6 +85,7 @@ static void           print_action( t_upstyp_action * const act_ptr );
 
 /* enum of some extra keys */
 enum {
+  e_key_err = -3,
   e_key_eol = -2,
   e_key_eof = -1
 };
@@ -92,16 +93,17 @@ enum {
 #define CHAR_REMOVE " \t\n\r\f\""
 
 static t_upstyp_product  *g_pd = 0; /* current product to fill */
-static FILE           *g_fh = 0; /* file handle */
+static FILE              *g_fh = 0; /* file handle */
 
-static char           g_line[MAX_LINE_LEN] = "";  /* current line */
-static char           g_key[MAX_LINE_LEN] = "";   /* current key */
-static char           g_val[MAX_LINE_LEN] = "";   /* current value */
-static t_upskey_map   *g_mkey = 0;                /* current map */
-static int            g_ikey = e_key_unknown;     /* current key as enum */  
-static int            g_ifile = e_file_unknown;   /* current file type as enum */
+static char              g_line[MAX_LINE_LEN] = "";  /* current line */
+static char              g_key[MAX_LINE_LEN] = "";   /* current key */
+static char              g_val[MAX_LINE_LEN] = "";   /* current value */
+static t_upskey_map      *g_mkey = 0;                /* current map */
+static int               g_ikey = e_key_unknown;     /* current key as enum */  
+static int               g_ifile = e_file_unknown;   /* current file type as enum */
 
-static int            g_imargin = 0;
+static int               g_imargin = 0;
+static const char        *g_filename = 0;
 
 /*
  * Definition of public functions
@@ -120,6 +122,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 {
 
   UPS_ERROR = UPS_SUCCESS;
+  g_filename = ups_file;
 
   if ( !ups_file || strlen( ups_file ) <= 0 ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
@@ -142,8 +145,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
     if ( !read_file() ) {
       
       /* file was empty */      
-      upserr_vplace();
-      upserr_add( UPS_READ_FILE, UPS_WARNING, ups_file );
+      upserr_vplace(); upserr_add( UPS_READ_FILE, UPS_WARNING, ups_file );
       
       ups_free_product( g_pd );
       g_pd = 0;
@@ -169,9 +171,11 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 		       const char * const ups_file )
 {
   t_upslst_item *l_ptr = 0;
+  g_filename = ups_file;
   
   if ( ! prod_ptr ) {
-    upserr_vplace(); upserr_add( UPS_NOVALUE_ARGUMENT, UPS_FATAL, "0", "product pointer" );
+    upserr_vplace(); upserr_add( UPS_NOVALUE_ARGUMENT, UPS_FATAL, "0",
+				 "product pointer" );
     return UPS_NOVALUE_ARGUMENT;
   }
   g_pd = prod_ptr;
@@ -632,6 +636,12 @@ t_upstyp_instance *read_instance( void )
 	inst_ptr->unknown_list = upslst_add( inst_ptr->unknown_list,
 					     upsutl_str_create( g_line, ' ' ) );
       }
+      else {
+	upserr_vplace(); upserr_add( UPS_INVALID_KEYWORD, UPS_FATAL,
+				     g_key, g_filename );
+	ups_free_instance( inst_ptr );
+	return 0;
+      }
       break;
       
     default:
@@ -730,7 +740,7 @@ t_upstyp_config *read_config( void )
 
     if ( g_ikey == e_key_statistics ) {
       upsutl_str_remove( g_val, CHAR_REMOVE );  
-      upsutl_str_sort( g_val, ',' );
+      upsutl_str_sort( g_val, ':' );
     }
       
     if ( g_mkey && g_mkey->c_index != INVALID_INDEX ) 
@@ -900,7 +910,7 @@ int get_key( void )
   
     while( cp && *cp && *cp != '=' ) { cp++; }
     cp++;
-    while( cp && *cp && (isspace( *cp ) || *cp == '"') ) { cp++; }
+    while( cp && *cp && (isspace( (int)*cp ) || *cp == '"') ) { cp++; }
     count = 0;
     while( cp && *cp && *cp != '\n' ) {
       g_val[count] = *cp;
@@ -1027,7 +1037,7 @@ int trim_qualifiers( char * const str )
     str[i] = (char)tolower( (int)str[i] );
   
   upsutl_str_remove( str, CHAR_REMOVE );  
-  upsutl_str_sort( str, ',' );
+  upsutl_str_sort( str, ':' );
 
   return (int)strlen( str );
 }
