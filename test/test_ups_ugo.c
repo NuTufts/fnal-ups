@@ -62,6 +62,16 @@ int main (argc,argv)
         uc=0;
 while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
       { upsugo_dump(uc); }
+/* prove to myself subsequent calls with new arguments will work 
+** for Margrets regression testing
+*/
+      argc=4;
+      argv[0]="yoyoman";
+      argv[1]="-firix";
+      argv[2]="adprod";
+      argv[3]="ver";
+while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
+      { upsugo_dump(uc); }
 /*
 	if (status != UPS_SUCCESS) fprintf(stderr," %s \n", UPS_ERRTXT[status]);
 */
