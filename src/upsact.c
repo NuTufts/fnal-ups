@@ -308,33 +308,33 @@ static void f_dodefaults( ACTION_PARAMS);
 
 #define P_VERB_s( iver, str ) \
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s\n", \
-				  str ? str : "(null)" )
+				  (str != 0) ? str : "(null)" )
 
 #define P_VERB_s_s( iver, str1, str2 ) \
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s\n", \
-				  str1 ? str1 : "(null)", \
-				  str2 ? str2 : "(null)" )
+				  (str1 != 0) ? str1 : "(null)", \
+				  (str2 != 0) ? str2 : "(null)" )
 
 #define P_VERB_s_s_s( iver, str1, str2, str3 ) \
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s %s\n", \
-				  str1 ? str1 : "(null)", \
-				  str2 ? str2 : "(null)", \
-				  str3 ? str3 : "(null)" )
+				  (str1 != 0) ? str1 : "(null)", \
+				  (str2 != 0) ? str2 : "(null)", \
+				  (str3 != 0) ? str3 : "(null)" )
 
 #define P_VERB_s_s_s_s( iver, str1, str2, str3, str4 ) \
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s %s %s\n", \
-				  str1 ? str1 : "(null)", \
-				  str2 ? str2 : "(null)", \
-				  str3 ? str3 : "(null)", \
-				  str4 ? str4 : "(null)" )
+				  (str1 != 0) ? str1 : "(null)", \
+				  (str2 != 0) ? str2 : "(null)", \
+				  (str3 != 0) ? str3 : "(null)", \
+				  (str4 != 0) ? str4 : "(null)" )
      
 #define P_VERB_s_s_s_s_s( iver, str1, str2, str3, str4, str5 ) \
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s %s %s %s\n", \
-				  str1 ? str1 : "(null)", \
-				  str2 ? str2 : "(null)", \
-				  str3 ? str3 : "(null)", \
-				  str4 ? str4 : "(null)", \
-				  str5 ? str5 : "(null)" )
+				  (str1 != 0) ? str1 : "(null)", \
+				  (str2 != 0) ? str2 : "(null)", \
+				  (str3 != 0) ? str3 : "(null)", \
+				  (str4 != 0) ? str4 : "(null)", \
+				  (str5 != 0) ? str5 : "(null)" )
 
 /*
  * Definition of global variables.
