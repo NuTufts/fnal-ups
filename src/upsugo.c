@@ -54,6 +54,20 @@
 			free( X );		\
 			X = 0;		\
 			}
+#define flavor_sub() \
+{  while (loc = strrchr(flavor,'.')) \
+      { *loc = 0; \
+        addr=upsutl_str_create(flavor,' '); \
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
+      } \
+   if (loc = strrchr(flavor,'+')) \
+      { *loc = 0; \
+        addr=upsutl_str_create(flavor,' '); \
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
+      } \
+   addr=upsutl_str_create("NULL",' '); \
+   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
+}
 #define case_help \
          case '?':      \
          uc->ugo_help = 1; \
@@ -81,10 +95,6 @@
 #define case_F \
          case 'F':      \
          uc->ugo_F = 1; \
-         break;
-#define case_H \
-         case 'H':      \
-         uc->ugo_H = 1; \
          break;
 #define case_j \
          case 'j':      \
@@ -250,6 +260,10 @@
          case 'f':       \
          uc->ugo_f = 1;  \
          build_list (uc->ugo_flavor , "f") 
+#define case_H \
+         case 'H':      \
+         uc->ugo_H = 1; \
+         build_list (uc->ugo_osname , "H") 
 #define case_h \
          case 'h':       \
          uc->ugo_h = 1;  \
@@ -334,13 +348,14 @@ int upsugo_bldfvr(struct ups_command * const uc)
    char			uname_flavor[80];	/* put together from uname */
    struct utsname 	baseuname;		/* returned from uname */
    char			*flavor;		/* flavor ptr */
-
+   t_upslst_item        *l_ptr;
+   int count = 0;
+   flavor = uname_flavor;			/* init pointer */
 /* get the flavor info from the os basically adding release name to sysname,
    but some OS's are funny
    ------------------------------------------------------------------------*/
-
-   flavor = uname_flavor;			/* init pointer */
-   if (uname(&baseuname) == -1) return(-1);	/* do uname */
+if (!uc->ugo_H)
+ { if (uname(&baseuname) == -1) return(-1);	/* do uname */
    (void) strcpy (flavor,baseuname.sysname);	/* get sysname */
    (void) strcat (flavor,"+");			/* add plus */
    if (strncmp(baseuname.sysname,"AIX",3) == 0)	/* because AIX is different */
@@ -354,33 +369,20 @@ int upsugo_bldfvr(struct ups_command * const uc)
    we well build the flavor table by successively removing '.'
    from the end of the string.
    -------------------------------------------------------------- */
-
    addr=upsutl_str_create(flavor,' ');		/* first add full */
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
-
-   while (loc = strrchr(flavor,'.'))
-      {
-      *loc = 0;
-      addr=upsutl_str_create(flavor,' ');
-      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-      }
-
-/* remove the '+' too 
---------------------- */
-
-   if (loc = strrchr(flavor,'+'))
-      {
-      *loc = 0;
-      addr=upsutl_str_create(flavor,' ');
-      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-      }
-
-/* add in NULL
-   ----------- */
-
-   addr=upsutl_str_create("NULL",' ');
-   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-   return(0);
+   flavor_sub()
+ } else { 
+   for ( l_ptr = upslst_first(uc->ugo_osname); 
+       l_ptr; l_ptr = l_ptr->next, count++ )
+   {   addr=upsutl_str_create(l_ptr->data,' ');
+       uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+       strcpy(flavor,l_ptr->data);
+       flavor_sub()
+   }
+   uc->ugo_osname=0;
+ } 
+ return(0);
 }
 /* ===========================================================================
 ** ROUTINE	upsugo_ifornota()
@@ -486,7 +488,6 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  char * addr;                          /* required qualifier string */
  char * oaddr;                         /* optional qualifier string */
  char * naddr;                         /* address for build red,opt */
- int test;
  char * waddr;                         /* work address string */
  char * loc;
  int onq=0;                            /* parsing a ? element */
@@ -499,7 +500,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
 
  if ( strchr(inaddr,'?') == 0) {       /* no optional qualifiers */
   addr=upsutl_str_create(inaddr,'p');
-  test=upsutl_str_sort(addr,':');
+  upsutl_str_sort(addr,':');
   uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
  } else {
   addr=upsutl_str_create(inaddr,'p');
@@ -564,7 +565,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   waddr=upsutl_str_create(oaddr,'p');   /* new list trimed */
   upsmem_free(oaddr);                   /* disgard work string */
   oaddr=waddr;                          /* optional string in oaddr */
-  test=upsutl_str_sort(oaddr,'?');
+  upsutl_str_sort(oaddr,'?');
   optionals[0]=oaddr;
   ++qcount;
   waddr=oaddr;
@@ -611,7 +612,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
             naddr=addr; /* should be a null string yes? */
           }
       }
-      test=upsutl_str_sort(naddr,':'); 
+      upsutl_str_sort(naddr,':'); 
       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
     }
  }
@@ -1146,7 +1147,6 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
 
    char   * addr;
    char   * loc;
-   int test=0;
    int				ups_argc;	/* argv and argc with white 
 							space and commas    */
    char				*ups_argv[MAX_ARGS]; /* reformatted */
@@ -1182,7 +1182,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
    argindx=0;
    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
-   test = upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
+   upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
    while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
    { if(*arg_str == '-')      /* is it an option */
      { if (!strchr(validopts,(int)*(arg_str+1))) { 
@@ -1191,40 +1191,40 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        switch(*(arg_str+1))      /* which flag was specified */
        { /* Single flag cases */
          case_a case_C case_D case_e case_E
-         case_F case_H case_j case_k case_l case_S
+         case_F case_j case_k case_l case_S
          case_u case_v case_V case_w case_W
          case_x case_y case_Y case_Z case_help
          /* Chain cases */ 
          case_c case_d case_n case_t case_o
          /* List elements */
          case_g            /* also a chain */
-         case_f case_K case_A case_h
+         case_f case_K case_A case_h case_H
          /* single values */ 
          case_m case_M case_N case_O case_p
          case_P case_r case_T case_U
          case 'q':
               uc->ugo_q = 1;
               if ( *argbuf ) 
-              { test=upsugo_bldqual(uc,*argbuf); *argbuf=0; break; }
+              { upsugo_bldqual(uc,*argbuf); *argbuf=0; break; }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
               { if(*arg_str == '-')
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" );
                   break;
                 }
-                test=upsugo_bldqual(uc,arg_str); break;
+                upsugo_bldqual(uc,arg_str); break;
               }
               errflg = 1;
               break;
          case 'z':
               uc->ugo_z = 1;
               if ( *argbuf ) 
-              { test=upsugo_blddb(uc,*argbuf); *argbuf=0; break; }
+              { upsugo_blddb(uc,*argbuf); *argbuf=0; break; }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
               { if(*arg_str == '-')
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "z" );
                   break;
                 }
-                test=upsugo_blddb(uc,arg_str); break;
+                upsugo_blddb(uc,arg_str); break;
               }
               errflg = 1;
               break;
@@ -1233,7 +1233,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        }
      } else {
        if ( strchr(arg_str,',') != 0 )
-       { test = upsugo_ifornota(uc);
+       { upsugo_ifornota(uc);
          ugo_commands = upslst_add(ugo_commands,uc);
          uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
        } else { 
@@ -1257,8 +1257,8 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
    if (!ugo_commands) 
    { addr=upsutl_str_create("*",' ');
      uc->ugo_product = addr;
-/*     if (!uc->ugo_flavor) test=upsugo_bldfvr(uc); */
-     test = upsugo_ifornota(uc);             
+/*     if (!uc->ugo_flavor) upsugo_bldfvr(uc); */
+     upsugo_ifornota(uc);             
 /* need more ?? ... */
      ugo_commands = upslst_add(ugo_commands,uc);
    }
