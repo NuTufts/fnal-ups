@@ -733,65 +733,58 @@ sub table_file {
 }
 sub add_setup {
     my $value;
-#    $value ="      doDefaults()\n";
-#    $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/setup.\${UPS_SHELL})\n";
     $value="DaSeTuP"
-} 
-sub add_unsetup {
-    my $value;
-    $value ="      doDefaults()\n";
-    $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/unsetup.\${UPS_SHELL})\n";
 } 
 sub add_misactions { 
     $value="";
     if (checkfor("${basedir}/ups/tailor")) {
        $value.="   Action=Tailor\n";
-       $value.="      proddir()\n";
+#       $value.="      proddir()\n";
        $value.="      execute(\${UPS_PROD_DIR}/ups/tailor,UPS_ENV)\n";
-       $value.="      doDefaults()\n";
-       $value.="      unproddir()\n"
+#       $value.="      doDefaults()\n";
+#       $value.="      unproddir()\n"
     }
     if (checkfor("${basedir}/ups/tailor.sh}")) {
        $value.="   Action=Tailor\n";
-       $value.="      proddir()\n";
+#       $value.="      proddir()\n";
        $value.="      execute(\${UPS_PROD_DIR}/ups/tailor.\${UPS_SHELL},UPS_ENV)\n";
-       $value.="      doDefaults()\n";
-       $value.="      unproddir()\n"
+#       $value.="      doDefaults()\n";
+#       $value.="      unproddir()\n"
     }
     if (checkfor("${basedir}/ups/configure")) {
        $value.="   Action=Configure\n";
-       $value.="      proddir()\n";
+#       $value.="      proddir()\n";
        $value.="      execute(\${UPS_PROD_DIR}/ups/configure,UPS_ENV)\n";
-       $value.="      doDefaults()\n";
-       $value.="      unproddir()\n"
+#       $value.="      doDefaults()\n";
+#       $value.="      unproddir()\n"
     }
     if (checkfor("${basedir}/ups/configure.sh")) {
        $value.="   Action=Configure\n";
-       $value.="      proddir()\n";
+#       $value.="      proddir()\n";
        $value.="      execute(\${UPS_PROD_DIR}/ups/configure.\${UPS_SHELL},UPS_ENV)\n";
-       $value.="      doDefaults()\n";
-       $value.="      unproddir()\n"
+#       $value.="      doDefaults()\n";
+#       $value.="      unproddir()\n"
     }
     if (checkfor("${basedir}/ups/start")) {
        $value.="   Action=start\n";
-       $value.="      proddir()\n";
-       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/start)\n";
-       $value.="      doDefaults()\n";
-       $value.="      unproddir()\n";
+#       $value.="      proddir()\n";
+       $value.="      execute(\${UPS_PROD_DIR}/ups/start,UPS_ENV)\n";
+#       $value.="      doDefaults()\n";
+#       $value.="      unproddir()\n";
     }
     if (checkfor("${basedir}/ups/stop")) {
        $value.="   Action=stop\n";
-       $value.="      proddir()\n";
-       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/stop)\n";
-       $value.="      doDefaults()\n";
-       $value.="      unproddir()\n";
+#       $value.="      proddir()\n";
+       $value.="      execute(\${UPS_PROD_DIR}/ups/stop,UPS_ENV)\n";
+#       $value.="      doDefaults()\n";
+#       $value.="      unproddir()\n";
     }
     if (checkfor("${basedir}/ups/current")) {
        $value.="   Action=Current\n";
-       $value.="      proddir()\n";
-       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/current)\n";
-       $value.="      doDefaults()\n";
-       $value.="      unproddir()\n";
+#       $value.="      proddir()\n";
+       $value.="      execute(\${UPS_PROD_DIR}/ups/current,UPS_ENV)\n";
+#       $value.="      doDefaults()\n";
+#       $value.="      unproddir()\n";
     }
     return $value
 }

@@ -12,8 +12,7 @@
  *       Lars Rasmussen
  *
  *       Fermilab Computing Division
- *       Batavia, Il 60510, U.S.A.                                               *
- * MODIFICATIONS:
+ *       Batavia, Il 60510, U.S.A.                                              * MODIFICATIONS:
  *       06 Oct 1997, DjF First 
  *
  ***********************************************************************/
@@ -47,6 +46,9 @@ char *upsget_qualifiers(const t_upstyp_db * const,
                         const t_upstyp_matched_instance * const ,
                         const t_upsugo_command * const );
 char *upsget_shell(const t_upstyp_db * const,
+                   const t_upstyp_matched_instance * const ,
+                   const t_upsugo_command * const );
+char *upsget_source(const t_upstyp_db * const,
                    const t_upstyp_matched_instance * const ,
                    const t_upsugo_command * const );
 char *upsget_verbose(const t_upstyp_db * const,

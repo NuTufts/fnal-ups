@@ -137,11 +137,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   }
   if (mproduct_list)
   { if (uc->ugo_chain) { uc->ugo_version=0; }
-    ups_undeclare(uc, tmpfile, e_undeclare);
+/* Don't do this */
+/*    ups_undeclare(uc, tmpfile, e_undeclare); */
     uc->ugo_version=save_version;
-/*  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
-               "Exact product definition exists");
-    return 0; */
   }
   username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
   seconds=time(0);
@@ -224,7 +222,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
            uc->ugo_chain=chain_list;
+           chain_list->next=0; /* undeclare bug */
+           chain_list->prev=0; /* undeclare bug */
            mproduct_list = upsmat_instance(uc, db_list , need_unique);
+           chain_list->next = save_next; /* undeclare bug */
+           chain_list->prev = save_prev; /* undeclare bug */
            if (UPS_ERROR != UPS_SUCCESS) 
            { upsfil_clear_journal_files();
              upserr_vplace();
