@@ -50,16 +50,17 @@ static t_upslst_item  *read_groups( void );
 /* Line parsing*/
 static char*          get_key( void );
 static char*          next_key( void );
-static int            trim_line( void );
+static size_t         trim_line( void );
 static int            is_stop_key( void );
 static int            is_start_key( void );
 
 /* Utils */
-static char           *str_create( char *str );
+static char           *str_create( char * const str );
+static int            is_space( const char c );
 
 /* Print stuff */
-static void           print_instance( t_ups_instance *inst_ptr );
-static void           print_action( t_ups_action* act_ptr );
+static void           print_instance( t_ups_instance * const inst_ptr );
+static void           print_action( t_ups_action * const act_ptr );
 /* print_product has gone semi public */
 
 /*
@@ -87,7 +88,7 @@ static char           g_val[MAX_LINE_LENGTH] = "";   /* current value */
  * Output: none
  * Return: t_ups_product *, a pointer to a product
  */
-t_ups_product *upsfil_read_file( FILE *fh )
+t_ups_product *upsfil_read_file( FILE * const fh )
 {
   g_fh = fh;
   g_pd = ups_new_product();
@@ -507,7 +508,7 @@ char *get_key( void )
 
   /* split line into key/value pair */
   count = 0;
-  while ( cp && *cp && !isspace( *cp ) && *cp != '=' ) {
+  while ( cp && *cp && !is_space( *cp ) && *cp != '=' ) {
     g_key[count] = *cp;
     count++; cp++;
   }
@@ -516,7 +517,7 @@ char *get_key( void )
   
   while( cp && *cp && *cp != '=' ) { cp++; }
   cp++;
-  while( cp && *cp && isspace( *cp ) ) { cp++; }
+  while( cp && *cp && is_space( *cp ) ) { cp++; }
   count = 0;
   while( cp && *cp && *cp != '\n' ) {
     g_val[count] = *cp;
@@ -536,17 +537,17 @@ char *get_key( void )
  * Output: none
  * Return: int, length of trimmed line
  */
-int trim_line()
+size_t trim_line( void )
 {
   char *cp = g_line;
   char *cstart = NULL;
   char *cend = NULL;
   int count = 0;
   
-  while ( cp && isspace( *cp ) ){ cp++; }
+  while ( cp && is_space( *cp ) ){ cp++; }
   cstart = cp;
   cp = &g_line[strlen( g_line ) - 1];
-  while ( cp && isspace( *cp ) ){ cp--; }
+  while ( cp && is_space( *cp ) ){ cp--; }
   cend = cp;
 
   count = 0;
@@ -588,23 +589,35 @@ int is_stop_key( void )
  * Utils
  */
 
-char *str_create( char *str )
+char *str_create( char * const str )
 {
   char *new_str = NULL;
     
   if ( str ) {
-    new_str = (char *)upsmem_malloc( strlen( str ) + 1 );
+    new_str = (char *)upsmem_malloc( (int)strlen( str ) + 1 );
     strcpy( new_str, str );
   }
   
   return new_str;
 }
 
+int is_space( const char c )
+{
+  if ( c == ' ' ) return 1;
+  if ( c == '\t' ) return 1;
+  if ( c == '\n' ) return 1;
+  if ( c == '\r' ) return 1;
+  if ( c == '\f' ) return 1;
+
+  return 0;
+}
+
+
 /*
  * Print stuff
  */
 
-void print_instance( t_ups_instance *inst_ptr )
+void print_instance( t_ups_instance * const inst_ptr )
 {
   t_upslst_item *l_ptr = NULL;
   
@@ -640,7 +653,7 @@ void print_instance( t_ups_instance *inst_ptr )
   }
 }
 
-void print_action( t_ups_action* act_ptr )
+void print_action( t_ups_action * const act_ptr )
 {
   t_upslst_item *l_ptr = NULL;
   
@@ -660,7 +673,7 @@ void print_action( t_ups_action* act_ptr )
   }
 }
 
-void g_print_product( t_ups_product *prod_ptr )
+void g_print_product( t_ups_product * const prod_ptr )
 {
   t_upslst_item *l_ptr = NULL;
   int count = 0;

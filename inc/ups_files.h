@@ -34,8 +34,8 @@
  * Declaration of public functions
  */
 
-t_ups_product *upsfil_read_file( FILE *fh );
-void          g_print_product( t_ups_product *prod_ptr );
+t_ups_product *upsfil_read_file( FILE * const fh );
+void          g_print_product( t_ups_product * const prod_ptr );
 
 /*
  * Declarations of public variables
