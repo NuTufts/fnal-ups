@@ -81,7 +81,7 @@ test: FORCE
 	cd test/scripts; upstst_all
 
 debug: 	
-	make UPSDBG=-debug all
+	make UPSDBG="-debug -filter" all
 
 insight: 	
 	make INSIGHT=-i UPSDBG=-debug all
