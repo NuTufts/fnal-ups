@@ -5,7 +5,7 @@ FLAVOR = ANY
 QUALIFIERS = ""
 INFO_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/info
 HTML_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/html
-MAN_SOURCE_DIR = ${UPS_DIR}/test/scripts/prod/action
+MAN_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/man
 CATMAN_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/catman
 
 ACTION = SETUP
