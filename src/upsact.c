@@ -115,6 +115,7 @@ static t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 				    t_upstyp_matched_product *mat_prod,
 				    const char * const act_name );
 static t_upsugo_command *get_ugo( t_upsact_cmd * const p_cmd, 
+				  int is_act_build,
 				  int * const unsetup_flag );
 static int is_prod_done( const char *const prod_name );
 static t_upsact_item *find_prod_name( t_upslst_item *const dep_list,
@@ -137,7 +138,8 @@ static t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 					    t_upslst_item *const cmd_list );
 static char *actitem2str( const t_upsact_item *const p_act_itm );
 static t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
-					 const int i_act );
+					 const int i_act,
+					 const int i_build );
 static int do_exit_action( const t_upsact_cmd * const a_cmd );
 
 /* functions to handle specific action commands */
@@ -1263,7 +1265,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       /* get the ugo command */
 
-      new_ugo = get_ugo( p_cmd, &unsetup_flag ); 
+      new_ugo = get_ugo( p_cmd, 0, &unsetup_flag ); 
 
       /* new_ugo can be null if doing unsetup
 	 not any more !!!
@@ -1334,6 +1336,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
   char *p_line = 0;
   int i_act = e_invalid_action;
   int i_cmd = e_invalid_cmd;
+  int is_act_build = 0;
 
   if ( !p_act_itm )
     return dep_list;
@@ -1359,6 +1362,8 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			  "(null)" );
 	return dep_list;
       }
+
+      is_act_build = 1;
     }
   }
   
@@ -1498,7 +1503,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       
       /* get the ugo command */
 
-      new_ugo = get_ugo( p_cmd, &unsetup_flag ); 
+      new_ugo = get_ugo( p_cmd, is_act_build, &unsetup_flag ); 
 
       /* new_ugo can be null if doing unsetup
 	 not any more !!!
@@ -1702,7 +1707,8 @@ int parse_params( const char * const a_params, char **argv )
  * Return: t_upsugo_command *, a ugo command
  */
 t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
-				  const int i_act )
+				  const int i_act,
+				  const int i_build )
 {
   static char s_pname[256];
   char *pname = 0;
@@ -1716,7 +1722,7 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
   cmd_line = p_cmd->argv[0];
 
   /* fetch product name,
-     if it's not a simple command, let ugo do it */
+     if it's not a simple command, let ugo do it. */
 
   if ( ! strchr( cmd_line, ' ' ) ) {
 
@@ -1728,9 +1734,10 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
     strcpy( s_pname, a_cmd_ugo->ugo_product );
 
     /* check if instance can differ from SETUP_prod, if it can we will use 
-       that instance */
+       that instance, except if the instance is created from a setup action */
 
-    use_cmd = TOO_MUCH_FOR_UNSETUP( a_cmd_ugo );
+    if ( !i_build )
+      use_cmd = TOO_MUCH_FOR_UNSETUP( a_cmd_ugo );
 
   }
 
@@ -1800,6 +1807,7 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 }
 
 t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
+			   int is_act_build,
 			   int * const unsetup_flag )
 {
   /* it will, for un/setup action functions build the corresponding
@@ -1819,7 +1827,7 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
 
   if ( (i_cmd & 2) && g_ups_cmd != e_depend ) {
 
-    if ( (a_ugo = get_SETUP_prod( p_cmd, i_act )) )
+    if ( (a_ugo = get_SETUP_prod( p_cmd, i_act, is_act_build )) )
       *unsetup_flag = 1;
   }
 
