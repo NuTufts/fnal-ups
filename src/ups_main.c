@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
   --argc;
 
   /* get the options for each iteration of the command and do it */
-  while (command_line = upsugo_next(argc, &argv[1],
-				    g_cmd_info[i].valid_opts)) {
+  while ((command_line = upsugo_next(argc, &argv[1],
+				    g_cmd_info[i].valid_opts))) {
 
     if (command_line->ugo_Z) {
       upsutl_start_timing();
