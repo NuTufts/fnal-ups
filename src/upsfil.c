@@ -98,7 +98,6 @@ static void              print_action( t_upstyp_action * const act_ptr );
 
 /* enum of some extra keys */
 enum {
-  e_key_err = -3,
   e_key_eol = -2,
   e_key_eof = -1
 };
@@ -712,6 +711,7 @@ t_upslst_item *read_comments( void )
   t_upslst_item *l_ptr = 0;
   
   while ( fgets( g_line, MAX_LINE_LEN, g_fh ) ) {
+    g_line_count++;
 
     if ( !upsutl_str_remove_edges( g_line, WCHARS ) ) continue;   
     if ( g_line[0] == '#' ) {
@@ -780,9 +780,13 @@ int read_file_desc( void )
 
     if ( is_stop_key() ) break;
     
-    if ( g_mkey && g_mkey->p_index != INVALID_INDEX ) 
+    if ( g_mkey && g_mkey->p_index != INVALID_INDEX ) {
       UPSKEY_PROD2ARR( g_pd )[g_mkey->p_index] = upsutl_str_create( g_val, ' ' );
-    
+    }
+    else if ( UPS_VERIFY ) {
+      upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
+				   g_key, g_filename, g_line_count );
+    }
   }
 
   return 1;
@@ -937,16 +941,16 @@ t_upstyp_instance *read_instance( void )
 					  upsutl_str_create( g_line, ' ' ) );
       }
       else {
-	upserr_vplace(); upserr_add( UPS_INVALID_KEYWORD, UPS_FATAL,
-				     g_key, g_filename );
-	ups_free_instance( inst_ptr );
-	return 0;
+	upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
+				     g_key, g_filename, g_line_count );
+	/* ups_free_instance( inst_ptr ); 
+	   return 0; */
       }
       break;
       
     default:
-      if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) 
-      { if (UPS_VERIFY) 
+      if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) { 
+	if (UPS_VERIFY) 
         { if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0)
           { printf("duplicate key in file %s line %d\n", 
                     g_filename, g_line_count); 
@@ -956,6 +960,10 @@ t_upstyp_instance *read_instance( void )
         }
 	UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = 
                       upsutl_str_create( g_val, ' ' );
+      }
+      else if ( UPS_VERIFY ) {
+	upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
+				     g_key, g_filename, g_line_count );
       }
       break;    
 
@@ -1183,7 +1191,13 @@ int find_start_key( void )
 {
   /* skip to next start key */
 
-  while ( !is_start_key() && next_key() != e_key_eof ) {}
+  while ( !is_start_key() && g_ikey != e_key_eof ) {
+    if ( UPS_VERIFY ) {
+      upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
+				   g_key, g_filename, g_line_count );
+    }
+    next_key();
+  }
   return g_ikey;
 }
  
@@ -1310,6 +1324,8 @@ int put_key( const char * const key, const char * const val )
   if ( !val && upsutl_stricmp( "QUALIFIERS", key ) )
     return 0;
 
+  g_line_count++;
+
   for ( i=0; i<g_imargin; i++ )
     fputc( ' ', g_fh );
   if ( key && strlen( key ) > 0 ) {
@@ -1354,6 +1370,8 @@ int is_stop_key( void )
   if ( is_start_key() )
     return 1;
   if ( g_ikey == e_key_end ) 
+    return 1;
+  if ( g_ikey < 0 )
     return 1;
 
   return 0;
