@@ -29,6 +29,9 @@
 #include "upsact.h"
 #include "upslst.h"
 #include "upsact.h"
+#include "upsugo.h"
+#include "upsmat.h"
+#include "ups_list.h"
 
 /*
  * Definition of public variables.
@@ -49,6 +52,18 @@ static void print_action( const char * const a_action_line,
 #ifndef NULL
 #define NULL 0
 #endif
+
+void print_cmd( t_upsact_cmd *cmd )
+{
+  int i = 0;
+  if ( !cmd )
+    return;
+
+  printf( "\nicmd = %d\n", cmd->icmd );
+  for ( i=0; i<cmd->argc; i++ ) {
+    printf( "   %d = %s\n", i, cmd->argv[i] );
+  }
+}
 
 /*
  * Definition of public functions.
@@ -124,6 +139,7 @@ static void test_upsact_parse(void)
   char *params = NULL;
   int action_val = -1, i;
   char *action_line[] = {
+    "FILETEST(myfile  ,\"-w  \",  \"can't touch this\"  )",
     "SETUPOPTIONAL(\"-d -f purina -q siamese kitty \")",
     "SETUPREQUIRED(\"-d -f purina -q \"tabby, tiger\" kitty \")",
     "UNSETUPOPTIONAL(\"-d -f $OS_FLAVOR -q siamese kitty \")",
@@ -138,7 +154,6 @@ static void test_upsact_parse(void)
     "SOURCE(myscript.$UPS_SHELL)",
     "SOURCECHECK(myscriptcheck.$UPS_SHELL)",
     "EXECUTE(onlythis)",
-    "FILETEST(myfile, \"-w\", \"can't touch this\")",
     "COPYHTML()",
     "COPYINFO($PROD_DIR/info)",
     "COPYMAN($PROD_DIR/man)",
@@ -150,11 +165,31 @@ static void test_upsact_parse(void)
     "COPYNEWS",
     NULL
 };
-
+t_upsact_cmd *cmd;
+t_upsugo_command *ugo_cmd = 0;
+t_upslst_item *mproduct_list;
+t_upstyp_action *act;
+t_upslst_item *l_dep;
+  
   for ( i = 0; action_line[i]; i++ ) {  
-    if (upsact_translate_cmd( action_line[i] ) != UPS_SUCCESS) {
+    if ( !(cmd = upsact_parse_cmd( action_line[i] )) ) {
       printf("\nInvalid action - %s\n", action_line[i]);
     }
+    else {
+      /* print_cmd( cmd ); */
+    }
+  }
+  ugo_cmd = upsugo_bldcmd( "-c -f IRIX  exmh",
+			   "zAacCdfghKtmMNoOPqrTuUv?" );
+  
+  upsugo_dump( ugo_cmd, 1, stdout );
+  mproduct_list = upsmat_instance( ugo_cmd, 1 );
+  list_output( upslst_first( mproduct_list ), ugo_cmd);
+
+  l_dep = upsact_get_cmd( ugo_cmd, 0, "setup" );
+  l_dep = upslst_first( l_dep );
+  for ( ; l_dep; l_dep = l_dep->next ) {
+    upsact_print_item( l_dep->data );
   }
 }
 
@@ -193,6 +228,7 @@ static void test_upsact_params(void)
 }
 */
 /*-----------------------------------------------------------------------
+
  * print_action_info
  *
  * print the passed in action information
@@ -215,4 +251,8 @@ static void print_action( const char * const a_action_line,
     }
   }
 }
+
+
+
+
 
