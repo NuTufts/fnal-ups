@@ -51,6 +51,7 @@ int g_LOCAL_VARS_DEF = 0;
 #define COMMA ','
 #define OPEN_PAREN '('
 #define CLOSE_PAREN ')'
+#define SLASH "/"
 #define WSPACE " \t\n\r\f\""
 
 /*
@@ -299,9 +300,7 @@ enum {
   e_dodefaults,
   e_nodefaults,
   e_nosetupenv,
-  e_noproddir,
-  e_forkactions,
-  e_sourceactions
+  e_noproddir
 };
 
 /* These action commands are listed in order of use.  Hopefully the more
@@ -340,8 +339,6 @@ static t_cmd_map g_cmd_maps[] = {
   { "nodefaults", e_nodefaults, NULL, 0, 0 },
   { "nosetupenv", e_nosetupenv, NULL, 0, 0 },
   { "noproddir", e_noproddir, NULL, 0, 0 },
-  { "forkactions", e_forkactions, NULL, 0, 0 },
-  { "sourceactions", e_sourceactions, NULL, 0, 0 },
   { 0,0,0,0,0 }
 };
 
@@ -556,6 +553,98 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
       printf( " %s,", cmd_cur->argv[i] );
   }
   printf( ")\n" ); 
+}
+
+/*-----------------------------------------------------------------------
+ * upsact_check_files
+ *
+ * Check to see if the passed action command contains references to any
+ * files.  
+ *
+ * Input : an action command
+ * Output: none
+ * Return: pointer to a list of file names
+ */
+t_upslst_item *upsact_check_files( const char * const a_cmd)
+{
+  t_upsact_cmd *parsed_cmd = NULL;
+  t_upslst_item *file_list = NULL;
+  char *new_string = NULL;
+  
+  if (a_cmd) {
+    /* first parse the command */
+    parsed_cmd = upsact_parse_cmd(a_cmd);
+    if (parsed_cmd) {
+      /* command was successfully parsed.  if there were no arguments, none 
+	 of them can be files (;-) */
+      if (parsed_cmd->argc > 0) {
+	/* there are arguments, now depending on the command, one of these
+	   arguments may or may not be a file. only look at the argument if
+	   the action parsed is capable of having a file as an argument */
+	switch (parsed_cmd->icmd) {
+	  /* none of these actions have associated files with them */
+	case e_invalid_cmd :
+	case e_setupoptional:
+	case e_setuprequired:
+	case e_unsetupoptional:
+	case e_unsetuprequired:
+	case e_envappend:
+	case e_envremove:
+	case e_envprepend:
+	case e_envset:
+	case e_envunset:
+	case e_pathappend:
+	case e_pathremove:
+	case e_pathprepend:
+	case e_pathset:
+	case e_filetest:
+	case e_dodefaults:
+	case e_nodefaults:
+	case e_nosetupenv:
+	case e_noproddir:
+	case e_exeaccess:
+	case e_uncopyman:
+	  break;
+	  /* the following actions contain a file or directory path.  return
+	     this value to the calling routine as a list element. */
+	case e_sourcerequired:
+	case e_sourceoptional:
+	case e_sourcereqcheck:
+	case e_sourceoptcheck:
+	case e_copyhtml:
+	case e_copyinfo:
+	case e_copyman:
+	case e_copynews:
+	  if (parsed_cmd->argv[0]) {
+	    new_string = upsutl_str_create(parsed_cmd->argv[0],
+					   STR_TRIM_DEFAULT);
+	    file_list = upslst_insert(file_list, new_string);
+	  }
+	  break;
+	  /* if there is a path included when specifying the command to execute
+	     then include this file, else we don't know the location as the
+	     executable is assumed to be in the user's path. in the last case,
+	     do not report any files mentioned here. */
+	case e_execute:
+	  if (parsed_cmd->argv[0] && 
+	      (! strncmp(parsed_cmd->argv[0], SLASH, 1))) {
+	    /* the first letter was a slash, so we assume that this string
+	       contains a directory spec and a file name.  we return this to
+	       the calling routine.  if the first letter was not a slash then
+	       we cannot really tell where the binary is located as it is
+	       either a relative path or assumed to be in the PATH environment
+	       variable */
+	    new_string = upsutl_str_create(parsed_cmd->argv[0],
+					   STR_TRIM_DEFAULT);
+	    file_list = upslst_insert(file_list, new_string);
+	  }
+	  break;
+	}
+      }
+    }
+  }
+
+  return(file_list);
 }
 
 void upsact_free_upsact_cmd( t_upsact_cmd * const act_cmd )
