@@ -54,14 +54,16 @@ static int all_gone( const void * const ptr );
  * Output: none
  * Return: t_upstyp_matched_product *, a pointer to a matched product structure
  */
-t_upstyp_matched_product *ups_new_matched_product(const char * const a_db,
+t_upstyp_matched_product *ups_new_matched_product(
+				      const t_upstyp_db * const a_db_info,
 				      const char * const a_prod_name,
 				      const t_upslst_item * const a_minst_list)
 {
   t_upstyp_matched_product *mprod_ptr =
    (t_upstyp_matched_product *)upsmem_malloc(sizeof(t_upstyp_matched_product));
 
-  mprod_ptr->db = (char *)a_db;
+  mprod_ptr->db_info = (t_upstyp_db *)a_db_info;
+  upsmem_inc_refctr((void *)a_db_info);
   mprod_ptr->product = (char *)a_prod_name;
   mprod_ptr->minst_list = (t_upslst_item *)a_minst_list;
 
@@ -84,7 +86,9 @@ t_upstyp_matched_product *ups_free_matched_product(
     /* we incremented the ref counter in the ups_new_matched_product function,
        doing a free here will decrement it or free it */
     if (all_gone(a_mproduct)) {
-      upsmem_free(a_mproduct->db);
+      upsmem_free(a_mproduct->db_info);
+      upsmem_free(a_mproduct->product);
+      upsutl_free_matched_instance_list(&(a_mproduct->minst_list));
     }
     upsmem_free((void *)a_mproduct);
   }

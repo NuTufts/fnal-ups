@@ -46,16 +46,6 @@
  * Public typdef's
  */
 
-/* a matched ups product. a list of all the instances that could pertain to
-   the product/ */
-typedef struct upstyp_matched_product
-{
-  char             *db;
-  char             *product;
-  
-  t_upslst_item    *minst_list;
-} t_upstyp_matched_product;
-
 /* a db config file */
 typedef struct upstyp_config {
   char             *ups_db_version;
@@ -75,6 +65,16 @@ typedef struct upstyp_db
   char             *name;
   t_upstyp_config  *config;
 } t_upstyp_db;
+
+/* a matched ups product. a list of all the instances that could pertain to
+   the product/ */
+typedef struct upstyp_matched_product
+{
+  t_upstyp_db      *db_info;
+  char             *product;
+  
+  t_upslst_item    *minst_list;
+} t_upstyp_matched_product;
 
 /* a product instance */
 typedef struct upstyp_instance
@@ -145,7 +145,8 @@ typedef struct upstyp_product
 /*
  * Declaration of public functions.
  */
-t_upstyp_matched_product *ups_new_matched_product(const char * const a_db,
+t_upstyp_matched_product *ups_new_matched_product(
+				     const t_upstyp_db * const a_db_info,
 			  	     const char * const a_prod_name,
 			             const t_upslst_item * const a_minst_list);
 t_upstyp_matched_product *ups_free_matched_product(
