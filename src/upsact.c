@@ -300,34 +300,34 @@ static void f_dodefaults( ACTION_PARAMS);
     upserr_add( UPS_NO_ACTION, UPS_FATAL, str );
 
 #define P_VERB_s( iver, str ) \
-  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s\n", \
-				str ? str : "(null)" )
+  if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s\n", \
+				  str ? str : "(null)" )
 
 #define P_VERB_s_s( iver, str1, str2 ) \
-  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s\n", \
-				str1 ? str1 : "(null)", \
-				str2 ? str2 : "(null)" )
+  if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s\n", \
+				  str1 ? str1 : "(null)", \
+				  str2 ? str2 : "(null)" )
 
 #define P_VERB_s_s_s( iver, str1, str2, str3 ) \
-  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %s\n", \
-				str1 ? str1 : "(null)", \
-				str2 ? str2 : "(null)", \
-				str3 ? str3 : "(null)" )
+  if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s %s\n", \
+				  str1 ? str1 : "(null)", \
+				  str2 ? str2 : "(null)", \
+				  str3 ? str3 : "(null)" )
 
 #define P_VERB_s_s_s_s( iver, str1, str2, str3, str4 ) \
-  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %s %s\n", \
-				str1 ? str1 : "(null)", \
-				str2 ? str2 : "(null)", \
-				str3 ? str3 : "(null)", \
-				str4 ? str4 : "(null)" )
-
+  if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s %s %s\n", \
+				  str1 ? str1 : "(null)", \
+				  str2 ? str2 : "(null)", \
+				  str3 ? str3 : "(null)", \
+				  str4 ? str4 : "(null)" )
+     
 #define P_VERB_s_s_s_s_s( iver, str1, str2, str3, str4, str5 ) \
-  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %s %s %s\n", \
-				str1 ? str1 : "(null)", \
-				str2 ? str2 : "(null)", \
-				str3 ? str3 : "(null)", \
-				str4 ? str4 : "(null)", \
-				str5 ? str5 : "(null)" )
+  if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s %s %s %s\n", \
+				  str1 ? str1 : "(null)", \
+				  str2 ? str2 : "(null)", \
+				  str3 ? str3 : "(null)", \
+				  str4 ? str4 : "(null)", \
+				  str5 ? str5 : "(null)" )
 
 /*
  * Definition of global variables.
@@ -3084,7 +3084,6 @@ static void f_filetest( ACTION_PARAMS)
 static void f_pathappend( ACTION_PARAMS)
 {
   char *delimiter;
-  char *env_to_set;
   char *pathPtr;
   
   CHECK_NUM_PARAM("pathAppend");
@@ -3281,8 +3280,8 @@ static void f_pathset( ACTION_PARAMS)
 }
 
 #define g_SHPARAM "$@"
-#define g_CSHPARAM "\!*"
 #define g_ACTPARAM "%s"
+#define g_CSHPARAM "\!*"
 
 static void f_addalias( ACTION_PARAMS)
 {
