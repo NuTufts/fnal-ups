@@ -495,7 +495,6 @@ upstst_interrupt_chk  926 test/upstst_cmdline.c int upstst_interrupt_chk (void)
 upstst_interrupt_dec  865 test/upstst_cmdline.c void upstst_interrupt_dec (int a_cnt)   
 upstst_linestart  158 test/upstst_cmdline.c void upstst_linestart ( ups_cmd_edithndl_t * const a_hl, const char * const a_prompt)   
 upstst_procchar   287 test/upstst_cmdline.c int upstst_procchar (ups_cmd_edithndl_t * const a_hl,char * const a_line)   
-for               197 test/test_upsact.c   for ( i = 0; action_line[i]; i++ ) {  
 main               82 test/test_upsact.c int  main( const int argc, char * const argv[] )
 print_action      259 test/test_upsact.c static void print_action( const char * const a_action_line,
 print_cmd          56 test/test_upsact.c void print_cmd( t_upsact_cmd *cmd )
