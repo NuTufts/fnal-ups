@@ -25,7 +25,7 @@
 /* standard include files, if needed for .h file */
 
 /* ups specific include files, if needed for .h file */
-#include "ups_types.h"
+#include "upstyp.h"
 
 /*
  * Constans.
