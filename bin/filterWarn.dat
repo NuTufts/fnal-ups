@@ -136,7 +136,7 @@
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "ups_create.c", 	'function parameter \'a_ups_command\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  undef, 	'function parameter \'a_inst\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  undef, 	'function parameter \'a_db_info\' is not used in function');
-&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   821, 2,  "ups_depend.c", 	'\'s_cmd\' set but unused in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "ups_depend.c", 	'function parameter \'s_cmd\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   821, 2,  "upsact.c", 	'\'exit_flag\' set but unused in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsact.c", 	'width of octal constant is smaller than size of type (int)');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "ups_touch.c", 	'function parameter \'ups_command|tmpfile\' is not used in function');
