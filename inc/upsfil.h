@@ -56,7 +56,6 @@ void              g_print_product( t_upstyp_product * const prod_ptr );
 #define CONFIG_FILE     "dbconfig"
 #define CONFIG_FILE_LEN 8
 #define CONFIG_SIZE     UPS_FILES_LEN + CONFIG_FILE_LEN + 1
-#define JOURNAL         1 /* mark file for write only wait for journal write */
 
 /* enum of known file types (changes here should be reflected in cfilei) */
 enum e_ups_file {
