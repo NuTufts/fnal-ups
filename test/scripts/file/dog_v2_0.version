@@ -3,7 +3,7 @@ PRODUCT = puffin
 VERSION = v2_0
 
 FLAVOR = IRIX
-QUALIFIERS = "nodebug,superoptimized"
+QUALIFIERS = "nodebug:superoptimized"
   DECLARED = 1-1-98
   DECLARER = jetson
   PROD_DIR = /usr/prod/IRIX/puffin/v2_0

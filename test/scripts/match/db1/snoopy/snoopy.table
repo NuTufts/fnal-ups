@@ -15,8 +15,5 @@ QUALIFIERS = ""
 FLAVOR = NULL
 QUALIFIERS = "pigpen"
 
-FLAVOR = NULL
-QUALIFIERS = "violet:charlie:lucy:linus:pigpen"
-
 COMMON:
 END:

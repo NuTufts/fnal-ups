@@ -7,7 +7,7 @@ GROUP:
   QUALIFIERS = ""
   
   FLAVOR = IRIX
-  QUALIFIERS = "nodebug,superoptimized"
+  QUALIFIERS = "nodebug:superoptimized"
   
 COMMON:
   ACTION = CONFIGURE

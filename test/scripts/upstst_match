@@ -3,7 +3,7 @@
 # test the file routines
 # ============================================================================
 PRODUCTS=""
-cd $ERUPT_DIR/test/scripts/match
+cd $ERUPT_DIR/test/scripts/match/log
 $ERUPT_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 #
@@ -11,38 +11,38 @@ upsmat_match_instance -status UPS_OPEN_FILE
 #
 # see if things work without a table file specified
 #
-upsmat_match_instance -status UPS_NO_TABLE_MATCH -z db1 notable v2_0
-upsmat_match_instance -out notable.out -diff notable.in -z db1 notable v1_0
+upsmat_match_instance -status UPS_NO_TABLE_MATCH -z ../db1 notable v2_0
+upsmat_match_instance -out notable.out -diff notable.in -z ../db1 notable v1_0
 # 
 # simple tests with rover
 #
-upsmat_match_instance -out rover1.out -diff rover1.in -z db1 -a rover v2_0 
-upsmat_match_instance -out rover2.out -diff rover2.in -z db1 -H IRIX+5.3 -a -q"nodbg:opt" rover v2_0
-upsmat_match_instance -out rover3.out -diff rover3.in -z db1 -H IRIX+5.3 -a -q"nodbg:opt" rover v2_0 -unique
-upsmat_match_instance -out rover4.out -diff rover4.in -z db1 -H IRIX+5.3.1 -q"nodbg:opt" rover v2_0 -unique
-upsmat_match_instance -out rover4.out -diff rover4.in -z db1 -f IRIX+5.3 -q"nodbg:opt" rover v2_0 -unique
+upsmat_match_instance -out rover1.out -diff rover1.in -z ../db1 -a rover v2_0 
+upsmat_match_instance -out rover2.out -diff rover2.in -z ../db1 -H IRIX+5.3 -a -q"nodbg:opt" rover v2_0
+upsmat_match_instance -out rover3.out -diff rover3.in -z ../db1 -H IRIX+5.3 -a -q"nodbg:opt" rover v2_0 -unique
+upsmat_match_instance -out rover4.out -diff rover4.in -z ../db1 -H IRIX+5.3.1 -q"nodbg:opt" rover v2_0 -unique
+upsmat_match_instance -out rover4.out -diff rover4.in -z ../db1 -f IRIX+5.3 -q"nodbg:opt" rover v2_0 -unique
 #
 # table file tests with spot
 #
-upsmat_match_instance -out spot1.out -diff spot1.in -H IRIX+5 -M db1/spot/spot.table -q"nodbg:opt" spot
-upsmat_match_instance -out spot1.out -diff spot1.in -H IRIX+5 -m db1/spot -M spot.table -q"nodbg:opt" spot
-upsmat_match_instance -out spot2.out -diff spot2.in -H IRIX+5 -M db1/spot/spot.table -q"nodbg:opt" -unique spot
+upsmat_match_instance -out spot1.out -diff spot1.in -H IRIX+5 -M ../db1/spot/spot.table -q"nodbg:opt" spot
+upsmat_match_instance -out spot1.out -diff spot1.in -H IRIX+5 -m ../db1/spot -M spot.table -q"nodbg:opt" spot
+upsmat_match_instance -out spot2.out -diff spot2.in -H IRIX+5 -M ../db1/spot/spot.table -q"nodbg:opt" -unique spot
 #
 # chain tests with lassie
 #
-upsmat_match_instance -out lassie1.out -diff lassie1.in -z db1 -H IRIX+5 -a -c lassie
-upsmat_match_instance -out lassie1.out -diff lassie1.in -z db1 -H IRIX+5 -a -g current lassie
-upsmat_match_instance -out lassie2.out -diff lassie2.in -z db1 -H IRIX+5 -a -g current:test lassie
-upsmat_match_instance -out lassie3.out -diff lassie3.in -z db1 -H IRIX+5 -a -t lassie
-upsmat_match_instance -out lassie4.out -diff lassie4.in -z db1 -H IRIX+5 -c -q"nodbg:opt" -unique lassie
-upsmat_match_instance -out lassie5.out -diff lassie5.in -z db1 -H IRIX+5 -g mydog  -q"nodbg:opt" -unique lassie
+upsmat_match_instance -out lassie1.out -diff lassie1.in -z ../db1 -H IRIX+5 -a -c lassie
+upsmat_match_instance -out lassie1.out -diff lassie1.in -z ../db1 -H IRIX+5 -a -g current lassie
+upsmat_match_instance -out lassie2.out -diff lassie2.in -z ../db1 -H IRIX+5 -a -g current:test lassie
+upsmat_match_instance -out lassie3.out -diff lassie3.in -z ../db1 -H IRIX+5 -a -t lassie
+upsmat_match_instance -out lassie4.out -diff lassie4.in -z ../db1 -H IRIX+5 -c -q"nodbg:opt" -unique lassie
+upsmat_match_instance -out lassie5.out -diff lassie5.in -z ../db1 -H IRIX+5 -g mydog  -q"nodbg:opt" -unique lassie
 #
 # qualifier tests with snoopy
 #
-upsmat_match_instance -z db1 -H IRIX+5 snoopy v1_0 -a
-upsmat_match_instance -z db1 -H IRIX+5 snoopy v1_0 -q ?pigpen
-upsmat_match_instance -z db1 -H IRIX+5 snoopy v1_0 -q pigpen
-upsmat_match_instance -z db1 -H IRIX+5 snoopy v1_0 -q pigpen -unique
-upsmat_match_instance -z db1 -H IRIX+5 snoopy v1_0 -q lucy:linus:pigpen:violet 
+upsmat_match_instance -out snoopy1.out -diff snoopy1.in -z ../db1 -H IRIX+5 snoopy v1_0 -a
+upsmat_match_instance -out snoopy2.out -diff snoopy2.in -z ../db1 -H IRIX+5 snoopy v1_0 -q ?pigpen
+upsmat_match_instance -out snoopy3.out -diff snoopy3.in -z ../db1 -H IRIX+5 snoopy v1_0 -q pigpen
+upsmat_match_instance -out snoopy4.out -diff snoopy4.in -z ../db1 -H IRIX+5 snoopy v1_0 -q ?pigpen -unique
+upsmat_match_instance -out snoopy5.out -diff snoopy5.in -z ../db1 -H IRIX+5 snoopy v1_0 -q lucy:linus:pigpen:violet 
 quit
 EOD
