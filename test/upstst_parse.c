@@ -536,7 +536,7 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
 	    infoPtr->key);
          (void) fprintf(stderr," as %s instead\n",keyBuf);
          return UPSTST_BADSYNTAX;
-         break; /* NOTREACHED */
+         /* break; */ /* NOTREACHED */
       }
       
         /* 
