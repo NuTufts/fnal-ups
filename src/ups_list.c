@@ -790,7 +790,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
         valid=1;
       }
       FromDatabase(name,"Database")
-      FromDatabase(name,"db")
+      FromDatabase(name,"Db")
       OutputConfig();
       if (!strcmp(l_ptr->data,"key"))
       { valid=1; 
@@ -861,7 +861,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { valid=0;
       (void) strcpy(buffer,(char *)l_ptr->data);
       OutputConfig();
-      if (!upsutl_stricmp((buffer),"database"))
+      if ((!upsutl_stricmp((buffer),"Db")) || (!upsutl_stricmp((buffer),"Database")))
       { valid=1;
         (void) printf("\"%s\" ",db_ptr->name);
       }
