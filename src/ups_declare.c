@@ -70,6 +70,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upslst_item *minst_list = NULL;
   t_upslst_item *chain_list = NULL;
   t_upslst_item *cmd_list = NULL;
+  t_upslst_item *auth_list=0;
+  char *allauthnodes=0;
+  int count=0;
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
@@ -109,7 +112,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   save_table_file=uc->ugo_tablefile;
   uc->ugo_tablefile=0;
   uc->ugo_tablefiledir=0;
-  save_chain=uc->ugo_chain;
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
@@ -120,14 +122,20 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     return 0;
   }
   if ((int)(upslst_count(uc->ugo_flavor) != 2) ) /* remember any */
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
-               "Specification must include a single flavor");
-    return 0;
+  { if(!uc->ugo_chain) /* not possibly just defining a chain */
+    { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+                 "Specification must include a single flavor");
+      return 0;
+    } else {  /* if just defining a chain it be there */
+      mproduct_list = upsmat_instance(uc, db_list , not_unique);
+      if (!mproduct_list)
+      { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+                   "Specification must include a single flavor");
+        return 0;
+      }
+    }
   }
-  mproduct_list = upsmat_instance(uc, db_list , not_unique);
-  if (UPS_ERROR != UPS_SUCCESS) 
-  {  return 0; 
-  }
+  save_chain=uc->ugo_chain;
 /* if they are defining a version ONLY and it allready exists fail */
   if ( !uc->ugo_chain && uc->ugo_version) 
   if (mproduct_list)
@@ -389,6 +397,17 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       new_vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
       new_vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
       new_vinst->archive_file=upsutl_str_create(uc->ugo_archivefile,' ');
+      if (uc->ugo_A)
+      { allauthnodes=upsutl_str_create("",' ');
+      }
+      for ( auth_list = upslst_first(uc->ugo_auth ); auth_list; 
+            auth_list = auth_list->next, count++ )
+      { allauthnodes=upsutl_str_crecat(allauthnodes,auth_list->data);
+        if (auth_list->next != 0) 
+        { allauthnodes=upsutl_str_crecat(allauthnodes,":");
+        }
+      }
+      new_vinst->authorized_nodes=allauthnodes;
 /* If I'm creating a totally matched version I have to create the matched 
    product structure by hand since it really doesn't exist yet on disk
    and a call to get it will fail
