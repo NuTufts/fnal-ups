@@ -294,6 +294,12 @@ int product_cmp ( const void * const d1, const void * const d2 )
 
     return upsutl_stricmp( a1->product, a2->product );
 }
+int product_name ( const void * const d1, const void * const d2 )
+{
+    char *a1 = (char *)d1;
+    char *a2 = (char *)d2;
+    return upsutl_stricmp( a1, a2 );
+}
 /*
  * Definition of public functions.
  */
@@ -316,80 +322,92 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
   int verify_db_done = 0;
+  t_upslst_item *all_products = 0;
+  t_upslst_item *name=0;
 
   /* Get all the requested instances */
   UPS_VERIFY=verify;		/* this is REALLY the ups verify command */ 
   for (db_list = a_command_line->ugo_db ; db_list ; db_list=db_list->next) 
   { db_info = (t_upstyp_db *)db_list->data;
-    mproduct_list = ups_list_core(a_command_line,db_list);
-    /*  upsugo_prtlst(mproduct_list,"the products");*/
-    upsver_mes(2,"%sFrom Database %s\n",VPREFIX,db_info->name);
-    mproduct_list = upslst_first(mproduct_list);  /* point to the start */
-    if (g_MATCH_DONE)
-    { upsver_mes(2,"%sStarting sort of product list\n",VPREFIX);
-      mproduct_list = upslst_sort0( mproduct_list , product_cmp );
-      upsver_mes(2,"%sEnding sort of product list\n",VPREFIX);
-      mproduct_list = upslst_first(mproduct_list);  /* point to the start */
-    }
-    if(!verify)  /* verify is list with NO output */
-    {
-      /* Output the requested information from the instances */
-      /*  upsugo_dump(a_command_line);*/
-      if (!a_command_line->ugo_K)
-      { if (db_info && db_info->name)
-	{ PRINT_DB(db_info->name);
-	}
-      }
-      list_output(mproduct_list, a_command_line);
-      if (UPS_ERROR==UPS_SUCCESS)
-      { if (mproduct_list) 
-	{ upsutl_statistics(mproduct_list, g_cmd_info[e_list].cmd);
-	}
-      } else { 
-	/*      upserr_output(); 
-		upserr_clear(); 
-		UPS_ERROR=list_error; */
-	return 0; 
-      }
+    if (NOT_EQUAL_ANY_MATCH(a_command_line->ugo_product)) 
+    { all_products=upslst_add(all_products,a_command_line->ugo_product);
     } else {
-      /* now we must do the extra verify things - 
-	 o verify the info in the dbconfig file
-	 o verify the information in the instances
-      */
-      for (mproduct_item = mproduct_list ; mproduct_item ; 
-	   mproduct_item = mproduct_item->next) 
-      { mproduct = (t_upstyp_matched_product *)mproduct_item->data;
-        if (! verify_db_done) 
-        { if (mproduct->db_info && mproduct->db_info->name)
-	  { PRINT_DB(mproduct->db_info->name);
-	  }
-	  ups_verify_dbconfig(mproduct->db_info, 
-		       (t_upstyp_matched_instance *)mproduct->minst_list->data,
-		       a_command_line);
-	  ++verify_db_done;
-	  /* there may be lots of messages so output them on a per product
-	     basis */
-	  upserr_output();
-	  upserr_clear();
-	}
-	for (minst_item = mproduct->minst_list ; minst_item ;
-	     minst_item = minst_item->next)
-	{ upserr_add(UPS_VERIFY_PRODUCT, UPS_INFORMATIONAL,
-		     mproduct->product);
-	  ups_verify_matched_instance(mproduct->db_info,
-				 (t_upstyp_matched_instance *)minst_item->data,
-				 a_command_line, mproduct->product);
-	}
-	/* there may be lots of messages so output them on a per product
-	   basis */
-	upserr_output();
-	upserr_clear();
-      }
-      /* reset for the next time around the loop */
-      verify_db_done = 0;
+      upsutl_get_files(db_info->name, (char *)ANY_MATCH, 
+                       &all_products);
+      upsver_mes(2,"%sStarting sort of product list\n",VPREFIX);
+      all_products = upslst_sort0( all_products , product_name );
+      upsver_mes(2,"%sEnding sort of product list\n",VPREFIX);
+      all_products = upslst_first(all_products);  /* point to the start */
     }
-    /* free the matched products */
-    (void )upsutl_free_matched_product_list(&mproduct_list);
+    for (name= all_products ; name; name=name->next) 
+    { a_command_line->ugo_product=name->data;
+       mproduct_list = ups_list_core(a_command_line,db_list);
+       /*  upsugo_prtlst(mproduct_list,"the products");*/
+       upsver_mes(2,"%sFrom Database %s\n",VPREFIX,db_info->name);
+       if(!verify)  /* verify is list with NO output */
+       {
+         /* Output the requested information from the instances */
+         /*  upsugo_dump(a_command_line);*/
+         if (!a_command_line->ugo_K)
+         { if (db_info && db_info->name)
+   	   { if (!name->prev)           /* only the first time !!! */
+             { PRINT_DB(db_info->name);
+             }
+   	   }
+         }
+         list_output(mproduct_list, a_command_line);
+         if (UPS_ERROR==UPS_SUCCESS)
+         { if (mproduct_list) 
+   	{ upsutl_statistics(mproduct_list, g_cmd_info[e_list].cmd);
+   	}
+         } else { 
+   	/*      upserr_output(); 
+   		upserr_clear(); 
+   		UPS_ERROR=list_error; */
+   	return 0; 
+         }
+       } else {
+         /* now we must do the extra verify things - 
+   	 o verify the info in the dbconfig file
+   	 o verify the information in the instances
+         */
+         for (mproduct_item = mproduct_list ; mproduct_item ; 
+   	   mproduct_item = mproduct_item->next) 
+         { mproduct = (t_upstyp_matched_product *)mproduct_item->data;
+           if (! verify_db_done) 
+           { if (mproduct->db_info && mproduct->db_info->name)
+   	     { if(!name->prev)
+               { PRINT_DB(mproduct->db_info->name);
+               }
+   	     }
+   	  ups_verify_dbconfig(mproduct->db_info, 
+   		       (t_upstyp_matched_instance *)mproduct->minst_list->data,
+   		       a_command_line);
+   	  ++verify_db_done;
+   	  /* there may be lots of messages so output them on a per product
+   	     basis */
+   	  upserr_output();
+   	  upserr_clear();
+   	}
+   	for (minst_item = mproduct->minst_list ; minst_item ;
+   	     minst_item = minst_item->next)
+   	{ upserr_add(UPS_VERIFY_PRODUCT, UPS_INFORMATIONAL,
+   		     mproduct->product);
+   	  ups_verify_matched_instance(mproduct->db_info,
+   				 (t_upstyp_matched_instance *)minst_item->data,
+   				 a_command_line, mproduct->product);
+   	}
+   	/* there may be lots of messages so output them on a per product
+   	   basis */
+   	upserr_output();
+   	upserr_clear();
+         }
+         /* reset for the next time around the loop */
+         verify_db_done = 0;
+       }
+       /* free the matched products */
+       (void )upsutl_free_matched_product_list(&mproduct_list);
+     }
   }
 /*  UPS_ERROR=list_error; */
   return 0;
@@ -447,6 +465,13 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
     /* Get all the instances that the user requested */
     mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
     if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); upserr_clear(); }
+/*  sorted before now... 
+    mproduct_list = upslst_first(mproduct_list);   point to the start
+    upsver_mes(2,"%sStarting sort of product list\n",VPREFIX);
+    mproduct_list = upslst_sort0( mproduct_list , product_cmp );
+    upsver_mes(2,"%sEnding sort of product list\n",VPREFIX);
+    mproduct_list = upslst_first(mproduct_list);   point to the start
+*/
   } else {
     g_MATCH_DONE = 0;
     cli_db = (t_upstyp_db *)db_list->data;
