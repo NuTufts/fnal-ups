@@ -30,6 +30,7 @@
 #include "ups_types.h"
 #include "ups_memory.h"
 #include "ups_list.h"
+#include "ups_error.h"
 
 /*
  * Definition of public variables
@@ -215,6 +216,62 @@ int ups_free_action( t_ups_action * const act_ptr )
   }
 
   return 1;
+}
+
+/*-----------------------------------------------------------------------
+ * ups_new_mp
+ *
+ * Return an initialized matched product structure.
+ *
+ * Input : db name, list of chain instances, list of version intances,
+ *         list of table intsances, list of matched flavors, 
+ *         list of matched qualifiers
+ * Output: none
+ * Return: pointer to matched product structure, NULL if error.
+ */
+t_ups_match_product *ups_new_mp(const char * const a_db,
+				t_upslst_item * const a_chain_list,
+				t_upslst_item * const a_vers_list,
+				t_upslst_item * const a_table_list)
+{
+  t_ups_match_product *mproduct;
+  
+  mproduct = (t_ups_match_product *)upsmem_malloc(sizeof(t_ups_match_product));
+  if (mproduct != NULL) {
+    upsmem_inc_refctr(a_db);      /* don't free db till we no longer need it */
+    mproduct->db = (char *)a_db;
+    mproduct->chain_list = a_chain_list;
+    mproduct->version_list = a_vers_list;
+    mproduct->table_list = a_table_list;
+  } else {
+    upserr_vplace();
+    upserr_add(UPS_NO_MEMORY, UPS_FATAL, sizeof(t_ups_match_product));
+  }
+
+  return mproduct;
+}
+
+/*-----------------------------------------------------------------------
+ * ups_free_mp
+ *
+ * Free a matched product structure.
+ *
+ * Input : pointer to matched product structure
+ * Output: none
+ * Return: NULL
+ */
+t_ups_match_product *ups_free_mp(t_ups_match_product *a_mproduct)
+{
+  if (! a_mproduct) {
+    /* we incremented the ref counter in the ups_new_mp function, doing a
+       free here will decrement it or free it */
+    if (all_gone(a_mproduct)) {
+      upsmem_free(a_mproduct->db);
+    }
+    upsmem_free((void *)a_mproduct);
+  }
+
+  return NULL;
 }
 
 /*

@@ -67,7 +67,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
  * Output: 
  * Return: 
  */
-void ups_c_list( t_ups_command *a_command_line )
+void ups_c_list( t_ups_command * const a_command_line )
 {
   t_upslst_item *mproduct_list = NULL, *db_item= NULL;
   t_upslst_item *tmp_mprod_list = NULL;
@@ -88,7 +88,7 @@ void ups_c_list( t_ups_command *a_command_line )
     for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
 	 tmp_mprod_list = tmp_mprod_list->next) {
       mproduct = (t_ups_match_product *)tmp_mprod_list->data;
-      upsmat_mp_free(mproduct);      /* free the data */
+      ups_free_mp(mproduct);      /* free the data */
     }
     /* now free the list */
     tmp_mprod_list = upslst_free(tmp_mprod_list, ' ');

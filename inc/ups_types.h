@@ -191,6 +191,12 @@ t_ups_instance    *ups_new_instance( void );
 int               ups_free_instance( t_ups_instance * const inst_ptr );
 t_ups_action      *ups_new_action( void );
 int               ups_free_action( t_ups_action * const act_ptr );
+t_ups_match_product *ups_new_mp(const char * const a_db,
+				t_upslst_item * const a_chain_list,
+				t_upslst_item * const a_vers_list,
+				t_upslst_item * const a_table_list);
+t_ups_match_product *ups_free_mp(t_ups_match_product *a_mproduct);
+
 
 t_ups_command     *upsugo_next(int ups_argc, char *ups_argv[], char *validopts);
 

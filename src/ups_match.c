@@ -187,61 +187,6 @@ t_ups_match_product *upsmat_match_instance(
   return mproduct;
 }
 
-/*-----------------------------------------------------------------------
- * upsmat_mp_new
- *
- * Return an initialized matched product structure.
- *
- * Input : db name, list of chain instances, list of version intances,
- *         list of table intsances, list of matched flavors, 
- *         list of matched qualifiers
- * Output: none
- * Return: pointer to matched product structure, NULL if error.
- */
-t_ups_match_product *upsmat_mp_new(const char * const a_db,
-				   t_upslst_item * const a_chain_list,
-				   t_upslst_item * const a_vers_list,
-				   t_upslst_item * const a_table_list)
-{
-  t_ups_match_product *mproduct;
-  
-  mproduct = (t_ups_match_product *)upsmem_malloc(sizeof(t_ups_match_product));
-  if (mproduct != NULL) {
-    upsmem_inc_refctr(a_db);      /* don't free db till we no longer need it */
-    mproduct->db = (char *)a_db;
-    mproduct->chain_list = a_chain_list;
-    mproduct->version_list = a_vers_list;
-    mproduct->table_list = a_table_list;
-  } else {
-    upserr_vplace();
-    upserr_add(UPS_NO_MEMORY, UPS_FATAL, sizeof(t_ups_match_product));
-  }
-
-  return mproduct;
-}
-
-/*-----------------------------------------------------------------------
- * upsmat_mp_free
- *
- * Free a matched product structure.
- *
- * Input : pointer to matched product structure
- * Output: none
- * Return: NULL matched product pointer
- */
-t_ups_match_product *upsmat_mp_free(t_ups_match_product *a_mproduct)
-{
-
-  /* we incremented this in the upsmat_mp_new function */
-  upsmem_dec_refctr(a_mproduct->db);
-  upsmem_free((void *)a_mproduct);
-
-  /* avoid people using this address again */
-  a_mproduct = NULL;
-
-  return a_mproduct;
-}
-
 /*
  * Definition of private globals.
  */
@@ -288,7 +233,7 @@ static t_ups_match_product *match_instance_core(
       /* if we got some matches, fill out our matched product structure */
       if (num_matches != 0) {
 	tinst_list = upslst_first(tinst_list);        /* back up to start */
-	mproduct = upsmat_mp_new(a_db, NULL, NULL, tinst_list);
+	mproduct = ups_new_mp(a_db, NULL, NULL, tinst_list);
       }
     }
     
@@ -306,7 +251,7 @@ static t_ups_match_product *match_instance_core(
       if (num_matches > 0) {
 	tinst_list = upslst_first(tinst_list);        /* back up to start */
 	vinst_list = upslst_first(vinst_list);        /* back up to start */
-	mproduct = upsmat_mp_new(a_db, NULL, vinst_list, tinst_list);
+	mproduct = ups_new_mp(a_db, NULL, vinst_list, tinst_list);
       }
     }
 
@@ -336,7 +281,7 @@ static t_ups_match_product *match_instance_core(
 	tinst_list = upslst_first(tinst_list);        /* back up to start */
 	vinst_list = upslst_first(vinst_list);        /* back up to start */
 	cinst_list = upslst_first(cinst_list);        /* back up to start */
-	mproduct = upsmat_mp_new(a_db, cinst_list, vinst_list, tinst_list);
+	mproduct = ups_new_mp(a_db, cinst_list, vinst_list, tinst_list);
       }
     }
       
