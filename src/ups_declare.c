@@ -300,13 +300,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     db_info = (t_upstyp_db *)db_list->data;
   } 
 /* restore everything */
-  uc->ugo_chain=upslst_free(uc->ugo_chain,'d');
-  uc->ugo_chain=save_chain;
   uc->ugo_version=save_version;
   uc->ugo_flavor=upslst_free(uc->ugo_flavor,'d');
   uc->ugo_flavor=save_flavor;
   uc->ugo_qualifiers=upslst_free(uc->ugo_qualifiers,'d');
   uc->ugo_qualifiers=save_qualifiers;
+  uc->ugo_chain=upslst_free(uc->ugo_chain,'d');
+  uc->ugo_chain=save_chain;
 /************************************************************************
  *
  * If there was any chain specified at all we need to look at chain files
@@ -319,13 +319,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          chain_list = chain_list->next) 
        { the_chain = (char *)(chain_list->data);
          uc->ugo_version=0;
-         uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
+         uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' ')); 
          uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
-           save_next = chain_list->next;
-           save_prev = chain_list->prev;
-           chain_list->next=0;
-           chain_list->prev=0;
-           uc->ugo_chain=chain_list;
+         save_next = chain_list->next;
+         save_prev = chain_list->prev;
+         chain_list->next=0;
+         chain_list->prev=0;
+         uc->ugo_chain=chain_list;
          mproduct_list = upsmat_instance(uc, db_list , not_unique);
          if (UPS_ERROR != UPS_SUCCESS) 
          { upsfil_clear_journal_files(); 
@@ -339,11 +339,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
            uc->ugo_chain=chain_list;
-           chain_list->next=0; /* undeclare bug */
-           chain_list->prev=0; /* undeclare bug */
+           chain_list->next=0;
+           chain_list->prev=0;
            mproduct_list = upsmat_instance(uc, db_list , need_unique);
-           chain_list->next = save_next; /* undeclare bug */
-           chain_list->prev = save_prev; /* undeclare bug */
+           chain_list->next = save_next;
+           chain_list->prev = save_prev;
            if (UPS_ERROR != UPS_SUCCESS) 
            { upsfil_clear_journal_files();
              upserr_vplace();
@@ -356,33 +356,42 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
              minst_list = (t_upslst_item *)mproduct->minst_list;
              minst = (t_upstyp_matched_instance *)(minst_list->data);
              cinst = (t_upstyp_instance *)minst->chain;
-             the_flavor=cinst->flavor;
-             product = upsget_chain_file(db_info->name,
-                                         uc->ugo_product,
-                                         the_chain, &file);
-             strcpy(buffer,file);
-             if ((UPS_ERROR == UPS_SUCCESS) && product )
-             { cinst_list=upsmat_match_with_instance( cinst, product );
-               cinst=cinst_list->data;
-               product->instance_list = 
-                  upslst_delete(product->instance_list,cinst,'d');
-               upsver_mes(1,"%sDeleting %s chain of version %s\n",
-                             UPS_DECLARE,
-                             the_chain,
-                             cinst->version);
-               (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
-               unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
-               sprintf(unchain,"un%s",the_chain);
-               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                          mproduct, unchain,ups_command);
-               if (UPS_ERROR == UPS_SUCCESS) 
-               { upsact_process_commands(cmd_list, tmpfile); 
-                 upsact_cleanup(cmd_list);
-               } else {
-                 upsfil_clear_journal_files();
-                 upserr_vplace();
-                 return 0 ;
+             if(strstr(cinst->flavor,the_flavor)) /* there's a better flavor match */
+             { the_flavor=cinst->flavor;
+               product = upsget_chain_file(db_info->name,
+                                           uc->ugo_product,
+                                           the_chain, &file);
+               strcpy(buffer,file);
+               if ((UPS_ERROR == UPS_SUCCESS) && product )
+               { cinst_list=upsmat_match_with_instance( cinst, product );
+                 cinst=cinst_list->data;
+                 product->instance_list = 
+                    upslst_delete(product->instance_list,cinst,'d');
+                 upsver_mes(1,"%sDeleting %s chain of version %s\n",
+                               UPS_DECLARE,
+                               the_chain,
+                               cinst->version);
+                 (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
+                 unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
+                 sprintf(unchain,"un%s",the_chain);
+                 cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                            mproduct, unchain,ups_command);
+                 if (UPS_ERROR == UPS_SUCCESS) 
+                 { upsact_process_commands(cmd_list, tmpfile); 
+                   upsact_cleanup(cmd_list);
+                 } else {
+                   upsfil_clear_journal_files();
+                   upserr_vplace();
+                   return 0 ;
+                 }
                }
+             } else { 
+               /* this is a better match */
+               /* i.e. was a irix flavor but a null chain match */
+               product = upsget_chain_file(db_info->name,
+                                           uc->ugo_product,
+                                           the_chain, &file);
+               strcpy(buffer,file);
              }
            } /* Get chain file (maybe again) */
            sprintf(buffer,"%s/%s/%s%s",
