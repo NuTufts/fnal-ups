@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ups_error.h"
-#include "ups_files.h"
+#include "upserr.h"
+#include "upsfil.h"
 
 int  main( const int argc, char * const argv[] )
 {
@@ -9,7 +9,7 @@ int  main( const int argc, char * const argv[] )
   t_ups_product *prod_ptr = NULL;
 
   if ( argc <= 1 ) {
-    printf( "Usage: test_ups_files file_name\n" );
+    printf( "Usage: test_upsfil file_name\n" );
     exit( 1 );
   }
 

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ups_list.h"
-#include "ups_memory.h"
+#include "upslst.h"
+#include "upsmem.h"
 
 static void print_str_list( t_upslst_item * const list_ptr );
 
@@ -42,13 +42,12 @@ int main( void )
   
   for ( i=0; i<DATA_COUNT; i++ ) {
     if ( i < DATA_COUNT/2 ) d = i;
-    else d = 1000 + i;
+    else d = 1000 - i;
     sprintf( buf, "%d", d );
     data[i] = (char *)upsmem_malloc( (int)strlen( buf ) + 1 );
     strcpy( data[i], buf );
   }
-    
-  
+
   printf( "\nCreating a list" );
 
   for ( i=0; i<DATA_COUNT/2; i++ ) {
@@ -64,6 +63,10 @@ int main( void )
     l_ptr2 = upslst_add( l_ptr2, data[i]  );
     print_str_list( l_ptr2 );
   }
+  
+  printf( "\nSort the list\n" );
+  upslst_sort0( l_ptr2, strcmp );
+  print_str_list( l_ptr2 );
   
   printf( "\nInserting lists\n" );
   l_ptr1 = upslst_first( l_ptr1 );
