@@ -119,7 +119,7 @@ static char 			*tostring;
    your call marge...                                                   */
 static char 			*string = 
 	 "Name         = ${UPS_PROD_NAME}\
-	\ntilde        = ~lp/filename\
+	\ntilde        = ~root/dir/filename\
 	\nVersion      = ${UPS_PROD_VERSION}\
 	\nFlavor       = ${UPS_PROD_FLAVOR}\
 	\nQualifiers   = ${UPS_PROD_QUALIFIERS}\
@@ -216,7 +216,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    UPSTST_CHECK_UPS_ERROR(estatus);
    prod = (t_upstyp_matched_product *) mp->data;
    inst = (t_upstyp_matched_instance *)prod->minst_list->data;
-   upsget_allout(stdout, NULL, inst, uc);
+   upsget_allout(stdout, prod->db_info, inst, uc);
    }
 
 /* dump the output to specified file and compare
