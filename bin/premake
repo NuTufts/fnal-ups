@@ -1,0 +1,321 @@
+#!/bin/sh
+
+#------------------------------------------------------------------------
+# This file executes the bourne shell and any changes to be made should 
+# have bourne shell syntax. This file helps in defining the libraries or
+# any machine dependent items.
+#
+#------------------------------------------------------------------------
+
+#------------------------------------------------------------------------
+# INITIAL SETUP
+#------------------------------------------------------------------------
+#
+llibs=""		# LLIBS		Miscellaneous link libraries
+incdirs=""		# INCDIRS	Include paths
+ccenv=""		# CCENV		Compilation environment
+cc=""			# CC		Compiler name
+cflags=""		# ERUPT_CFLAGS	C compiler flags
+dbg=""			# compile with debugger
+mflags=""		# flags for the makefile
+opt=""			# compile with optimiser
+fullopt=""		# compile with all optimisations (may be undebuggable)
+positional="";		# previous argument expected an argument
+makefile_file=""        # User supplied makefile name
+needEmacs=""            # used to check for EMACS_DIR if target is tag_file
+logFile=""		# Log make output?
+defs="$defs SHELL=/bin/sh"	# misc. definitions to pass to make
+
+
+#------------------------------------------------------------------------
+#  MAKE SURE WE ARE BUILDING ON A SUPPORTED ARCHITECTURE
+#------------------------------------------------------------------------
+arch=`uname -s`
+if [ $arch = SunOS ]; then
+	ccenv="ACC"
+elif [ $arch = IRIX -o $arch = IRIX64 ]; then
+	if [ "$arch" = "IRIX64" ]; then
+	    ccenv=IRIX6
+	else
+	    ccenv="$arch"
+	fi
+elif [ $arch = OSF1 ]; then
+	ccenv="OSF1"
+elif [ $arch = Linux -o $arch = linux ]; then
+	ccenv="Linux"
+else
+	echo "Unknown architecture \`$arch'" >&2
+	ccenv=notvalid
+fi
+
+#------------------------------------------------------------------------
+# PARSE SWITCHES
+#------------------------------------------------------------------------
+#
+for a in "$@" ; do
+	# we parsed the option, now save the value
+	case "$positional" in
+	  -cc)
+		ccenv="$a"
+	  -cflags)
+		cflags="$cflags $a";;
+	  -f)
+		makefile_file="-f $a";;
+	  -log)
+		logFile="$a"
+		logPipe="2>&1 | tee -a ${logFile}";;
+	  "")
+		;;
+	  *)
+		echo "Unknown positional flag $positional" >&2;;
+	esac
+
+	# we parsed the option, saved the value, get the next option
+	if [ X"$positional" != X"" ]; then
+		positional=""
+		continue
+	fi
+		
+	case $a in
+	  -f)
+	    	positional=-f;;
+	  -cc|-CC)
+		positional=-cc;;
+	  -cfl*|-CFL)
+		positional=-cflags;;
+	  -deb*|-DEB*)
+		dbg=1;;
+	  -FULLOPT*|-fullopt*)
+		$opt=1
+		fullopt=1;;
+	  -\?|-HEL*|-hel*)
+		cat <<'dd.sysin'
+Usage: premake [premakeflags] [targets]
+Valid flags are:
+	-?		Print this message
+	-cc env		Choose a compilation environment (ACC, GCC, IRIX,)
+	-cflags str	Additional flags for the C compiler
+	-debug		Compile for a debugger
+	-f makefile	Alternate makefile name
+	-fulloptimise	Compile with full optimisation (may be undebuggable)
+	-help		Print this message
+	-optimise	Compile with optimisation
+	-log file	Log make output to a file
+
+flags may be upper of lower case, and may be truncated. All other
+flags are passed to make. The make variable $(PMFLAGS) is set to the options
+passed to make, which allows makefiles to themselves call make.
+dd.sysin
+		exit 1;;
+	  -OPT*|-opt*)
+		opt=1;;
+	  -LOG|-log)
+		positional=-log;;
+	  -*)
+		mflags="$mflags $a";;
+	  *=*)
+		mflags="$mflags $a";;
+	  *)
+                if [ "$a" = "tag_file" ]; then
+                        needEmacs="yes"
+                fi
+		if [ "$a" != "" ]; then
+			if expr "$a" : '.* .*' > /dev/null 2>&1 ; then
+				target="$target '$a'"
+			else			
+				target="$target $a"
+			fi
+		fi;;
+	esac
+done
+
+if [ "$dbg" = "" -a "$opt" = "" ]; then	# if nothing specified, optimise
+	opt=1
+fi
+
+#------------------------------------------------------------------------
+# SET VARIABLES BASED ON ENVIRONMENT
+#------------------------------------------------------------------------
+#
+case $ccenv in
+	acc|ACC)			# Sun's acc
+		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
+		cc="acc"
+		cflags="$cflags"
+		if [ "$opt" != "" ]; then
+			cflags="$cflags -O2" 
+		fi
+		if [ "$dbg" != "" ]; then 
+			cflags="$cflags -g" 
+		fi
+		defs="$defs CCCHK=\"-Xa -vc\""
+		;;
+
+	Linux)			
+		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
+		cc="gcc"
+		if [ "$opt" != "" ]; then
+			cflags="$cflags -O" 
+		fi
+		if [ "$dbg" != "" ]; then 
+			cflags="$cflags -g" 
+		fi
+		defs="$defs CCCHK=\"-Wall\""
+		;;
+
+	gcc|GCC)			# gcc on a sparc running SunOS 4
+		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
+		cc="gcc"
+		if [ "$opt" != "" ]; then
+			cflags="$cflags -O" 
+		fi
+		if [ "$dbg" != "" ]; then 
+			cflags="$cflags -g" 
+		fi
+		defs="$defs CCCHK=\"-Wall\""
+		;;
+
+	irix*|IRIX*)
+		os_version=`uname -r | sed -e 's/\(.\).*/\1/'`
+
+		defs="$defs AR=ar ARFLAGS=r"
+  	        cflags="$cflags -G 0"
+
+		if [ $os_version -lt 6 ]; then
+			defs="$defs RANLIB=/usr/bin/ranlib"
+			size=""
+			cflags="$cflags -ansiposix -DSDSS_IRIX5"
+			cflags="$cflags"
+		else
+			defs="$defs RANLIB=/bin/true"
+			size=-n32
+
+			# as per IRIX 6.4 cc man page, don't use -ansiposix 
+			cflags="$cflags -xansi -D_POSIX_SOURCE"
+
+			case `uname -m` in
+			  IP27)
+				cflags="$cflags -mips4";;
+			esac
+		fi
+		cc="cc $size"
+
+		if [ \( $ccenv = irix4 \) -o \( $ccenv = IRIX4 \) ]; then 
+			ccenv=IRIX; export ccenv;
+			SGI_IRIX4=1; export SGI_IRIX4;
+		fi
+
+		case $os_version in
+		   5)
+			fullwarn="-fullwarn -wlint,-fp";;
+		   *)
+			fullwarn="-fullwarn";;
+		esac
+		defs="$defs CCCHK=\"$fullwarn\""
+				
+		if [ "$opt" != "" ]; then
+			case `uname -m` in
+			  IP25)
+				type="-r10000 -mips4";;
+			  *)
+				type="";;
+			esac
+
+			if [ "$fullopt" = "" ]; then
+				cflags="$cflags -O2 $type"
+			else
+				cflags="$cflags -O3 $type"
+			fi
+			if [ "$dbg" != "" ]; then
+				cflags="$cflags -g3"
+				dbg=""
+			fi
+		fi
+		if [ "$dbg" != "" ]; then 
+			cflags="$cflags -g"; 
+		fi
+		;;
+
+	osf1|OSF1)			# DEC's OSF1
+		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
+		cc="cc"
+ 		cflags="$cflags"
+		if [ "$opt" != "" ]; then
+			cflags="$cflags -O4" 
+		fi
+		if [ "$dbg" != "" ]; then 
+			if [ "$opt" = "" ]; then
+				cflags="$cflags -g2" 
+			else
+				cflags="$cflags -g3" 
+			fi
+		fi
+		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -migrate -check\""
+		;;
+
+	*)
+		echo \
+	"Please supply one of ACC IRIX GCC OSF1 instead of $ccenv" >&2
+		exit 1;;
+esac
+
+#------------------------------------------------------------------------------
+# NOW ADD IN INCLUDE DIRECTORIES AND LIBRARIES
+#------------------------------------------------------------------------------
+#
+llibs="-L${ERUPT_DIR}/lib -lerupt";
+incdirs="-I${ERUPT_DIR}/inc";
+
+#
+# We are ready to find out what our targets are
+#
+if [ "$target" = "" ]; then
+	target=all
+	if [ "$quiet" = "" ]; then
+		echo "Please specify a target next time, assuming $target" >&2
+	fi
+fi
+# 
+# Include user supplied makefile name (blanks ok)
+#
+target="$makefile_file $target"
+
+
+#------------------------------------------------------------------------
+# OK, PUT IT ALL TOGETHER AND ACTUALLY INVOKE MAKE
+#------------------------------------------------------------------------
+cc="CC=\"$cc\""		# CC
+cflags="ERUPT_CFLAGS=\"$cflags\""	# ERUPT_CFLAGS
+llibs="LLIBS=\"$llibs\""		# LLIBS
+mflags="$mflags CCENV=$ccenv"		# CCENV
+incdirs="INCDIRS=\"$incdirs\""		# INCDIRS
+
+
+# all flags passed to make
+flags="$mflags $cc $cflags $llibs $incdirs $defs"
+ 
+# Check to see if emacs is setup, if the etags file will be changed.
+#
+if [ \( "$needEmacs" = "yes" \) -a "$EMACS_DIR" = ""  ]; then
+	echo "Yo dude ... Please setup emacs first" >&2
+	exit 1
+fi
+
+if [ "${logFile}" != "" ]; then
+	echo   "#++"							>  ${logFile}
+	echo   "# ABSTRACT:	Log file from building target $target"	>> ${logFile}
+	echo   "#"							>> ${logFile}
+	echo   "# ENVIRONMENT:	UNIX make with sdssmake"		>> ${logFile}
+fi
+
+	echo   "$makeCmd"						>> ${logFile}
+	echo   ""							>> ${logFile}
+fi
+
+trap "/bin/rm -f .status.$$" 0; echo 0 > .status.$$
+makeCmd="if make $flags PMFLAGS='$flags' $target; then :; else echo 1 > .status.$$; fi"
+
+eval $makeCmd ${logPipe:-}
+status=`cat .status.$$`
+
+exit $status
