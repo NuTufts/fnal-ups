@@ -6,10 +6,10 @@ destroy_Cell      44 src/dropit.c     destroy_Cell(
 exact            132 src/dropit.c     exact(
 main             141 src/dropit.c     main(
 make_Cell         23 src/dropit.c     make_Cell(
-funame_f          58 src/funame.c     funame_f(
-getopt           212 src/funame.c     int getopt(
-main             310 src/funame.c     main(
-uname            129 src/funame.c     int uname(
+funame_f          62 src/funame.c     funame_f(
+getopt           216 src/funame.c     int getopt(
+main             314 src/funame.c     main(
+uname            133 src/funame.c     int uname(
 ups_configure     61 src/ups_configure.c t_upslst_item *ups_configure(
 ADD_TO_ECHO      121 src/ups_copy.c   #define ADD_TO_ECHO(
 COPY_FROM_OLD_INSTANCE 108 src/ups_copy.c   #define COPY_FROM_OLD_INSTANCE(
@@ -435,8 +435,8 @@ upsutl_upcase    942 src/upsutl.c     char *upsutl_upcase(
 upsutl_user      1033 src/upsutl.c     char *upsutl_user(
 upsver_mes        56 src/upsver.c     void upsver_mes 
 ups_append_OS     79 src/upsuname.c   ups_append_OS(
-ups_append_default_quals 135 src/upsuname.c   ups_append_default_quals(
-ups_append_release 101 src/upsuname.c   ups_append_release(
+ups_append_default_quals 143 src/upsuname.c   ups_append_default_quals(
+ups_append_release 105 src/upsuname.c   ups_append_release(
 ups_have_flavor_override  11 src/upsuname.c   ups_have_flavor_override(
 TOO_MUCH_FOR_UNSETUP  41 inc/upsact.h     #define TOO_MUCH_FOR_UNSETUP(
 UPSACT_CMD_NEEDS_DB 186 inc/upsact.h     #define UPSACT_CMD_NEEDS_DB(
