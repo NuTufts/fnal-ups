@@ -151,7 +151,7 @@ if (-e reqcheck2) then
   unsetenv UPS_VERBOSE
   unsetenv UPS_EXTENDED
   setenv UPS_THIS_DB ../db1
-  setenv UPS_OS_FLAVOR IRIX+5.3
+  setenv UPS_OS_FLAVOR IRIX+6.2
   setenv UPS_PROD_FLAVOR NULL
   setenv UPS_PROD_QUALIFIERS 
   setenv UPS_SHELL csh
