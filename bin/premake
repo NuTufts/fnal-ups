@@ -15,7 +15,7 @@ llibs=""		# LLIBS		Miscellaneous link libraries
 incdirs=""		# INCDIRS	Include paths
 ccenv=""		# CCENV		Compilation environment
 cc=""			# CC		Compiler name
-cflags=""		# ERUPT_CFLAGS	C compiler flags
+cflags=""		# UPS_CFLAGS	C compiler flags
 dbg=""			# compile with debugger
 mflags=""		# flags for the makefile
 opt=""			# compile with optimiser
@@ -263,8 +263,8 @@ esac
 # NOW ADD IN INCLUDE DIRECTORIES AND LIBRARIES
 #------------------------------------------------------------------------------
 #
-llibs="-L${ERUPT_DIR}/lib -lerupt";
-incdirs="-I${ERUPT_DIR}/inc";
+llibs="-L${UPS_DIR}/lib -lups";
+incdirs="-I${UPS_DIR}/inc";
 
 #
 # We are ready to find out what our targets are
@@ -285,7 +285,7 @@ target="$makefile_file $target"
 # OK, PUT IT ALL TOGETHER AND ACTUALLY INVOKE MAKE
 #------------------------------------------------------------------------
 cc="CC=\"$cc\""		# CC
-cflags="ERUPT_CFLAGS=\"$cflags\""	# ERUPT_CFLAGS
+cflags="UPS_CFLAGS=\"$cflags\""		# UPS_CFLAGS
 llibs="LLIBS=\"$llibs\""		# LLIBS
 mflags="$mflags CCENV=$ccenv"		# CCENV
 incdirs="INCDIRS=\"$incdirs\""		# INCDIRS
