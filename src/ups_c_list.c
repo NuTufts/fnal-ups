@@ -110,12 +110,11 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
 			      const char * const a_db)
 {
   t_upslst_item *all_products = NULL, *all_versions = NULL;
-  t_upslst_item *all_chains = NULL;
-  t_upslst_item *tmp_products = NULL, *tmp_versions = NULL;
-  t_upslst_item *tmp_chain_item = NULL, *bogus_chain_item = NULL;
+  t_upslst_item *all_chains = NULL, *all_tmp_chains;
+  t_upslst_item *tmp_products = NULL;
+  t_upslst_item *tmp_chains = NULL;
   t_upslst_item *mproduct_list = NULL;
   t_ups_match_product *mproduct = NULL;
-
   char *prod_name = NULL, *prod_dir = NULL;
   char *new_string = NULL, *tmp_chain = NULL;
   char do_delete = 'd';
@@ -137,65 +136,81 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
     for (tmp_products = all_products ; tmp_products ;
 	 tmp_products = tmp_products->next) {
       prod_name = (char *)tmp_products->data;
-      a_command_line->ugo_product = prod_name;
       
       if (UPS_VERBOSE) {
 	printf("%sListing info for Product = %s\n", VPREFIX, prod_name);
       }
-      /* If all versions were specified get them all */
-      if (a_command_line->ugo_version && 
-	  (! strcmp(a_command_line->ugo_version, ANY_MATCH))) {
-	prod_dir = upsutl_get_prod_dir(a_db, prod_name);
-
-	/* get 2 lists, one with all the chains and one with all the
-	   versions (minus any suffix (e.g. - .chain and .version) */
-	all_versions = upsutl_get_files(prod_dir, (char *)VERSION_SUFFIX);
-	all_chains = upsutl_get_files(prod_dir, (char *)CHAIN_SUFFIX);
-	upsmem_free(prod_dir);
-      } else {
-	if (a_command_line->ugo_version) {
+      /* Look to see if a version was specified. */
+      if (a_command_line->ugo_version) {
+	prod_dir = upsutl_get_prod_dir(a_db, prod_name);    /* product dir */
+	if (! strcmp(a_command_line->ugo_version, ANY_MATCH)) {
+	  /* get a list, with all the versions - minus any suffix (.version) */
+	  all_versions = upsutl_get_files(prod_dir, (char *)VERSION_SUFFIX);
+	} else {
 	  /* we only have one version to list out */
-	  if ((new_string = upsutl_str_create(a_command_line->ugo_version, ' '))) {
+	  if ((new_string =
+	       upsutl_str_create(a_command_line->ugo_version, ' '))) {
 	    all_versions = upslst_add(all_versions, new_string);
 	  } 
 	}
-      }
-
-      /* Check if all chains were requested */
-      for (tmp_chain_item = a_command_line->ugo_chain ; tmp_chain_item ;
-	   tmp_chain_item = tmp_chain_item->next) {
-	tmp_chain = (char *)(tmp_chain_item->data);
-	if (! strcmp(tmp_chain, ANY_MATCH)) {
-	  /* we want to replace this list item with a list of all chains. if
-	     we have already gotten this list, do this, else get the list */
-	  if (! all_chains) {
-	    /* get the list */
-	    prod_dir = upsutl_get_prod_dir(a_db, prod_name);
-	    all_chains = upsutl_get_files(prod_dir, (char *)CHAIN_SUFFIX);
-	    upsmem_free(prod_dir);
-	  }
-	  bogus_chain_item = tmp_chain_item;   /* save for later delete */
-
-	  /* add chain list in place */
-	  tmp_chain_item = upslst_insert_list(tmp_chain_item, all_chains);
-
-	  /* remove the "*" element from the chain list */
-	  bogus_chain_item = upslst_delete(tmp_chain_item,
-					   bogus_chain_item->data, 'd');
+	/* if no chains were entered, get all possible chains so we can match
+	   versions up with their chains. */
+	if (! a_command_line->ugo_chain) {
+	  all_tmp_chains = upsutl_get_files(prod_dir, (char *)CHAIN_SUFFIX);
 	}
-      }
+	upsmem_free(prod_dir);
 
-      if (all_versions) {
-	/* start at the beginning of the list */
-	all_versions = upslst_first(all_versions);
-	
-	/* For each version get the requested instances */
-	for (tmp_versions = all_versions ; tmp_versions ; 
-	     tmp_versions = tmp_versions->next) {
-	  a_command_line->ugo_version = (char *)tmp_versions->data;
+	if (all_versions) {
+	  /* start at the beginning of the list */
+	  all_versions = upslst_first(all_versions);
 
 	  /* now do the instance matching */
-	  mproduct = upsmat_match_instance(a_command_line, a_db, need_unique);
+	  mproduct = upsmat_match_instance(a_command_line, a_db, prod_name,
+					   (t_upslst_item *)NULL,
+					   all_versions, need_unique);
+
+	  /* no longer need version list - free it */
+	  all_versions = upslst_free(all_versions, do_delete);
+
+	  if (UPS_ERROR != UPS_SUCCESS) {
+	    break;
+	  } else {
+	    if (mproduct) {
+	      mproduct_list = upslst_add(mproduct_list, mproduct);
+	    }
+	  }
+
+	  /* try to match the versions obtained with any chains that might
+	     point to them TBD (remember to free all_tmp_chains) */
+	}
+
+      } else {
+	/* Check if chains were requested */
+	for (tmp_chains = a_command_line->ugo_chain ; tmp_chains ;
+	     tmp_chains = tmp_chains->next) {
+	  tmp_chain = (char *)(tmp_chains->data);
+	  if (! strcmp(tmp_chain, ANY_MATCH)) {
+	    /* get the list */
+	    prod_dir = upsutl_get_prod_dir(a_db, prod_name);
+	    all_tmp_chains = upsutl_get_files(prod_dir, (char *)CHAIN_SUFFIX);
+	    upsmem_free(prod_dir);
+
+	    /* Now add these chains to the master list */
+	    all_chains = upslst_insert_list(all_chains, all_tmp_chains);
+	  } else {
+	    /* Now add this chain to the master list */
+	    all_chains = upslst_add(all_chains, tmp_chain);
+	  }
+	}
+	
+	/* get chains.  just do the match, it will check for chains or not */
+	if (all_chains) {
+	  mproduct = upsmat_match_instance(a_command_line, a_db, prod_name,
+					   all_chains, NULL, need_unique);
+
+	  /* no longer need chain list - free it */
+	  all_chains = upslst_free(all_chains, do_delete);
+
 	  if (UPS_ERROR != UPS_SUCCESS) {
 	    break;
 	  } else {
@@ -204,33 +219,11 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
 	    }
 	  }
 	}
-
-	/* no longer need version list - free it */
-	all_versions = upslst_free(all_versions, do_delete);
-
-	/* try to match the versions obtained with any chains that might
-	   point to them TBD */
-
-
-      } else {
-	/* no versions were specified, try to get chains.  just do the match,
-	   it will check for chains or not */
-	mproduct = upsmat_match_instance(a_command_line, a_db, need_unique);
-
-	if (UPS_ERROR != UPS_SUCCESS) {
-	  break;
-	} else {
-	  if (mproduct) {
-	    mproduct_list = upslst_add(mproduct_list, mproduct);
-	  }
-	}
       }
     }
-
     /* no longer need product list - free it */
     all_products = upslst_free(all_products, do_delete);
   }
-
   return(mproduct_list);
 }
 
