@@ -149,7 +149,7 @@ t_upslst_item *l_ptr;
       if (l_ptr == upslst_first(ptr))				\
          fprintf (fd,"%s\n", (char *)l_ptr->data);		\
       else							\
-         fprintf (fd,"                  %s \n",  (char *)l_ptr->data);	\
+         fprintf (fd,"                  %s\n",  (char *)l_ptr->data);	\
       }								\
    }
 
