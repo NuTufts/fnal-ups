@@ -73,6 +73,9 @@ void ups_undeclare( t_upsugo_command * const uc )
   t_upstyp_matched_instance *minst = NULL;
   int not_unique = 0;
   int need_unique = 1;
+  t_upslst_item *save_flavor;
+  t_upslst_item *save_qualifiers;
+  t_upslst_item *save_chain;
   char * save_version;
   t_upstyp_product *product;
   char buffer[FILENAME_MAX+1];
@@ -96,8 +99,8 @@ void ups_undeclare( t_upsugo_command * const uc )
 
   FILE *tmpfile;
 
-  if (!uc->ugo_product || !uc->ugo_version )
-  { printf("To undeclare a product you must specify a product and a version or chain(s) \n");
+  if (!uc->ugo_product || (!uc->ugo_version && !uc->ugo_chain) )
+  { printf("To undeclare a product you must specify a product and version or chain(s) \n");
     exit(1);
   }
   if (!uc->ugo_f || (int)(upslst_count(uc->ugo_flavor) > 1) )
@@ -133,10 +136,6 @@ void ups_undeclare( t_upsugo_command * const uc )
 /* may still be in multiple databases pick first and stay there! */
  for (db_list = uc->ugo_db ; db_list ; db_list=db_list->next) 
  { db_info = (t_upstyp_db *)db_list->data;
-   uc->ugo_chain = upslst_new((void *)ANY_MATCH);
-   uc->ugo_version=0;
-   uc->ugo_flavor = upslst_new((void *)ANY_MATCH);
-   uc->ugo_qualifiers = upslst_new((void *)ANY_MATCH);
    mproduct_list = upsmat_instance(uc, db_list , not_unique);
    if (mproduct_list)    /* the product does exist */ 
    { upsver_mes(1,"Product %s currently exist in database %s\n",

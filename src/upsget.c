@@ -216,13 +216,13 @@ char *upsget_allout(const FILE * const stream,
       if (strlen(addr))
       { fprintf((FILE *)stream,"setenv UPS_VERBOSE=%s\n",addr);
       } else { 
-        fprintf((FILE *)stream,"unset UPS_VERBOSE\n");
+        fprintf((FILE *)stream,"unsetenv UPS_VERBOSE\n");
       }
       addr=upsget_extended(db,instance,command_line);
       if (strlen(addr))
       { fprintf((FILE *)stream,"setenv UPS_EXTENDED=%s\n",addr); 
       } else { 
-        fprintf((FILE *)stream,"unset UPS_EXTENDED\n");
+        fprintf((FILE *)stream,"unsetenv UPS_EXTENDED\n");
       }
       fprintf((FILE *)stream,"setenv UPS_THIS_DB=%s\n",
                upsget_database(db,instance,command_line));
