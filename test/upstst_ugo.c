@@ -12,7 +12,7 @@ Include files:-
 #include "upstst_parse.h"
 #include "upstst_macros.h"
 
-static void upstst_ugo_dump (const t_ups_command * const uc, FILE * const fd);
+static void upstst_ugo_dump (const t_upsugo_command * const uc, FILE * const fd);
 
 /* ==========================================================================
 
@@ -32,7 +32,7 @@ upstst_argt     argt[] = {{"<product>", UPSTST_ARGV_STRING,NULL,&product},
 			  {"-options",  UPSTST_ARGV_STRING,NULL,&options},
                           {"-status",   UPSTST_ARGV_STRING,NULL,&estatus_str},
                           {NULL,        UPSTST_ARGV_END,   NULL,NULL}};
-t_ups_command	*uc;				/* ups command */
+t_upsugo_command	*uc;				/* ups command */
 
 
 /* parse command line
@@ -74,7 +74,7 @@ upstst_argt     argt[] = {{"-options",UPSTST_ARGV_STRING,NULL,&options},
                           {"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
                           {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
                           {NULL,      UPSTST_ARGV_END,   NULL,NULL}};
-t_ups_command	*uc =0;				/* ups command */
+t_upsugo_command	*uc =0;				/* ups command */
 int		ncmds = 0;
 char            diffcmd[132];                   /* diff command */
 
@@ -137,7 +137,7 @@ return (0);
 
    ==========================================================================*/
 
-static void upstst_ugo_dump (const t_ups_command * const uc, FILE * const fd)
+static void upstst_ugo_dump (const t_upsugo_command * const uc, FILE * const fd)
 {
 #define upstst_ugo_dumplist(title,ptr) 				\
    {								\

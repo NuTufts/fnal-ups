@@ -46,11 +46,11 @@
 static int            read_file( void );
 static int            read_file_type( void );
 static int            read_file_desc( void );
-static t_ups_instance *read_instance( void );
+static t_upstyp_instance *read_instance( void );
 static t_upslst_item  *read_instances( void );
-static t_ups_action   *read_action( void );
+static t_upstyp_action   *read_action( void );
 static t_upslst_item  *read_actions( void );
-static t_ups_config   *read_config( void );
+static t_upstyp_config   *read_config( void );
 static t_upslst_item  *read_group( void );
 static t_upslst_item  *read_groups( void );
 static t_upslst_item  *read_comments( void );
@@ -58,7 +58,7 @@ static t_upslst_item  *read_comments( void );
 static int            write_version_file( void );
 static int            write_chain_file( void );
 static int            write_table_file( void );
-static int            write_action( t_ups_action * const act );
+static int            write_action( t_upstyp_action * const act );
 t_upslst_item         *find_group( t_upslst_item * const list_ptr, const char copt );
 
 /* Line parsing */
@@ -74,8 +74,8 @@ static int            cfilei( void );
 t_upslst_item         *copy_action_list( t_upslst_item * const list_ptr );
 
 /* Print stuff */
-static void           print_instance( t_ups_instance * const inst_ptr );
-static void           print_action( t_ups_action * const act_ptr );
+static void           print_instance( t_upstyp_instance * const inst_ptr );
+static void           print_action( t_upstyp_action * const act_ptr );
 /* print_product has gone semi public */
 
 /*
@@ -100,7 +100,7 @@ enum e_ups_file {
 
 #define CHAR_REMOVE " \t\n\r\f\""
 
-static t_ups_product  *g_pd = 0; /* current product to fill */
+static t_upstyp_product  *g_pd = 0; /* current product to fill */
 static FILE           *g_fh = 0; /* file handle */
 
 static char           g_line[MAX_LINE_LEN] = "";  /* current line */
@@ -123,9 +123,9 @@ static int            g_imargin = 0;
  *
  * Input : char *, path to a ups file
  * Output: none
- * Return: t_ups_product *, a pointer to a product
+ * Return: t_upstyp_product *, a pointer to a product
  */
-t_ups_product *upsfil_read_file( const char * const ups_file )
+t_upstyp_product *upsfil_read_file( const char * const ups_file )
 {
   if ( !ups_file || strlen( ups_file ) <= 0 ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
@@ -154,12 +154,12 @@ t_ups_product *upsfil_read_file( const char * const ups_file )
  *
  * Will write a product to a ups file
  *
- * Input : t_ups_product *, a pointer to a product
+ * Input : t_upstyp_product *, a pointer to a product
  *         char *, path to a ups file
  * Output: none
  * Return: int, UPS_SUCCESS just fine, else UPS_<error> number.
  */
-int upsfil_write_file( t_ups_product * const prod_ptr,
+int upsfil_write_file( t_upstyp_product * const prod_ptr,
 		       const char * const ups_file )
 {
   t_upslst_item *l_ptr = 0;
@@ -233,7 +233,7 @@ int upsfil_write_file( t_ups_product * const prod_ptr,
 int write_version_file( void )
 {
   t_upslst_item *l_ptr = 0;
-  t_ups_instance *inst_ptr = 0;
+  t_upstyp_instance *inst_ptr = 0;
 
   /* write file descriptor */
   
@@ -245,7 +245,7 @@ int write_version_file( void )
   
   l_ptr = upslst_first( g_pd->instance_list );
   for( ; l_ptr; l_ptr = l_ptr->next ) {
-    inst_ptr = (t_ups_instance *)l_ptr->data;
+    inst_ptr = (t_upstyp_instance *)l_ptr->data;
     if ( !inst_ptr || !inst_ptr->flavor ) {
       /* handle error !!! */
       return 0;
@@ -275,7 +275,7 @@ int write_version_file( void )
 int write_chain_file( void )
 {
   t_upslst_item *l_ptr = 0;
-  t_ups_instance *inst_ptr = 0;
+  t_upstyp_instance *inst_ptr = 0;
 
   /* write file descriptor */
   
@@ -287,7 +287,7 @@ int write_chain_file( void )
   
   l_ptr = upslst_first( g_pd->instance_list );
   for( ; l_ptr; l_ptr = l_ptr->next ) {
-    inst_ptr = (t_ups_instance *)l_ptr->data;
+    inst_ptr = (t_upstyp_instance *)l_ptr->data;
     if ( !inst_ptr || !inst_ptr->flavor ) {
       /* handle error !!! */
       return 0;
@@ -312,8 +312,8 @@ int write_table_file( void )
 {
   t_upslst_item *l_inst = 0;
   t_upslst_item *l_act = 0;
-  t_ups_instance *inst_ptr = 0;
-  t_ups_action *act_ptr = 0;
+  t_upstyp_instance *inst_ptr = 0;
+  t_upstyp_action *act_ptr = 0;
 
   t_upslst_item *l_copy, *l_ptr;
 
@@ -332,7 +332,7 @@ int write_table_file( void )
     put_key( 0, "GROUP:");
     g_imargin += 2;
     for ( l_ptr = upslst_first( l_ptr ); l_ptr; l_ptr = l_ptr->next ) {
-      inst_ptr = (t_ups_instance *)l_ptr->data;
+      inst_ptr = (t_upstyp_instance *)l_ptr->data;
       put_key( "FLAVOR", inst_ptr->flavor );
       put_key( "QUALIFIERS", inst_ptr->qualifiers );
       put_key( 0, "" );
@@ -343,7 +343,7 @@ int write_table_file( void )
     g_imargin += 2;
     l_act = upslst_first( inst_ptr->action_list );
     for( ; l_act; l_act = l_act->next ) {
-      act_ptr = (t_ups_action *)l_act->data;
+      act_ptr = (t_upstyp_action *)l_act->data;
       write_action( act_ptr );
     }
     g_imargin -= 2;      
@@ -357,7 +357,7 @@ int write_table_file( void )
   
   l_inst = upslst_first( l_copy );
   for( ; l_inst; l_inst = l_inst->next ) {
-    inst_ptr = (t_ups_instance *)l_inst->data;
+    inst_ptr = (t_upstyp_instance *)l_inst->data;
     if ( !inst_ptr || !inst_ptr->flavor ) {
       /* handle error !!! */
       return 0;
@@ -370,7 +370,7 @@ int write_table_file( void )
     put_key( "DESCRIPTION", inst_ptr->description );
     l_act = upslst_first( inst_ptr->action_list );
     for( ; l_act; l_act = l_act->next ) {
-      act_ptr = (t_ups_action *)l_act->data;
+      act_ptr = (t_upstyp_action *)l_act->data;
       write_action( act_ptr );
     }
     g_imargin -= 2;
@@ -380,7 +380,7 @@ int write_table_file( void )
   return 1;
 } 
 
-int write_action( t_ups_action * const act_ptr )
+int write_action( t_upstyp_action * const act_ptr )
 {
   t_upslst_item *l_com = 0;
   char *com;
@@ -557,7 +557,7 @@ int read_file_desc( void )
 t_upslst_item *read_instances( void )
 {
     t_upslst_item *l_ptr = 0;
-    t_ups_instance *inst_ptr = 0;
+    t_upstyp_instance *inst_ptr = 0;
     
     while  ( g_ikey == e_key_flavor ) {
 	inst_ptr = read_instance();
@@ -580,9 +580,9 @@ t_upslst_item *read_instances( void )
  * Output: none
  * Return: pointer to an instance
  */
-t_ups_instance *read_instance( void )
+t_upstyp_instance *read_instance( void )
 {
-  t_ups_instance *inst_ptr = 0;
+  t_upstyp_instance *inst_ptr = 0;
   
   if ( g_ikey != e_key_flavor )
     return 0;    
@@ -649,7 +649,7 @@ t_ups_instance *read_instance( void )
 t_upslst_item *read_actions( void )
 {
     t_upslst_item *l_ptr = 0;
-    t_ups_action *act_ptr = 0;
+    t_upstyp_action *act_ptr = 0;
     
     while  ( g_ikey == e_key_action ) {
 	act_ptr = read_action();
@@ -674,9 +674,9 @@ t_upslst_item *read_actions( void )
  * Output: none
  * Return: pointer to an action
  */
-t_ups_action *read_action( void )
+t_upstyp_action *read_action( void )
 {
-  t_ups_action *act_ptr = 0;
+  t_upstyp_action *act_ptr = 0;
   t_upslst_item *l_cmd = 0;
   char *cmd_ptr = 0;
 
@@ -710,11 +710,11 @@ t_ups_action *read_action( void )
  *
  * Input : char *, path to a ups config file
  * Output: none
- * Return: t_ups_config *, a pointer to the config structure.
+ * Return: t_upstyp_config *, a pointer to the config structure.
  */
-t_ups_config *read_config( void )
+t_upstyp_config *read_config( void )
 {
-  t_ups_config *conf_ptr = ups_new_config();
+  t_upstyp_config *conf_ptr = ups_new_config();
 
   while ( next_key() != e_key_eof ) {
 
@@ -775,7 +775,7 @@ t_upslst_item *read_group( void )
     t_upslst_item *l_ptr = 0;
     t_upslst_item *l_inst_ptr = 0;
     t_upslst_item *l_act_ptr = 0;
-    t_ups_instance *inst_ptr = 0;
+    t_upstyp_instance *inst_ptr = 0;
 
     if ( g_ikey != e_key_group ) 
       return 0;
@@ -797,7 +797,7 @@ t_upslst_item *read_group( void )
 
     if ( l_act_ptr ) {
       l_ptr = upslst_first( l_inst_ptr );
-      inst_ptr = (t_ups_instance *)l_ptr->data;
+      inst_ptr = (t_upstyp_instance *)l_ptr->data;
       inst_ptr->action_list = l_act_ptr;
       l_ptr = l_ptr->next;
 
@@ -807,7 +807,7 @@ t_upslst_item *read_group( void )
       /* the command list would then be shared.     */
       
       for ( ; l_ptr; l_ptr = l_ptr->next ) {
-	inst_ptr = (t_ups_instance *)l_ptr->data;	
+	inst_ptr = (t_upstyp_instance *)l_ptr->data;	
 	inst_ptr->action_list = copy_action_list( l_act_ptr );
       }
     }
@@ -1031,8 +1031,8 @@ t_upslst_item *copy_action_list( t_upslst_item * const list_ptr )
     return 0;
 
   for ( ; l_ptr1; l_ptr1 = l_ptr1->next ) {
-    t_ups_action *a_ptr1 = (t_ups_action *)l_ptr1->data;
-    t_ups_action *a_ptr2 = ups_new_action();
+    t_upstyp_action *a_ptr1 = (t_upstyp_action *)l_ptr1->data;
+    t_upstyp_action *a_ptr2 = ups_new_action();
     
     upsmem_inc_refctr( a_ptr1->action );
     a_ptr2->action = a_ptr1->action;
@@ -1047,7 +1047,7 @@ t_upslst_item *copy_action_list( t_upslst_item * const list_ptr )
  * Print stuff
  */
 
-void print_instance( t_ups_instance * const inst_ptr )
+void print_instance( t_upstyp_instance * const inst_ptr )
 {
   t_upslst_item *l_ptr = 0;
   
@@ -1093,7 +1093,7 @@ void print_instance( t_ups_instance * const inst_ptr )
   }
 }
 
-void print_action( t_ups_action * const act_ptr )
+void print_action( t_upstyp_action * const act_ptr )
 {
   t_upslst_item *l_ptr = 0;
   
@@ -1113,7 +1113,7 @@ void print_action( t_ups_action * const act_ptr )
   }
 }
 
-void g_print_product( t_ups_product * const prod_ptr )
+void g_print_product( t_upstyp_product * const prod_ptr )
 {
   t_upslst_item *l_ptr = 0;
 
@@ -1130,7 +1130,7 @@ void g_print_product( t_ups_product * const prod_ptr )
   
   l_ptr = upslst_first( prod_ptr->instance_list );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
-    t_ups_instance *inst_ptr = (t_ups_instance *)l_ptr->data;
+    t_upstyp_instance *inst_ptr = (t_upstyp_instance *)l_ptr->data;
     print_instance( inst_ptr );
   }
 
@@ -1140,8 +1140,8 @@ void g_print_product( t_ups_product * const prod_ptr )
 
 int action_cmp ( const void * const d1, const void * const d2 )
 {
-  t_ups_action *a1 = (t_ups_action *)d1;
-  t_ups_action *a2 = (t_ups_action *)d2;
+  t_upstyp_action *a1 = (t_upstyp_action *)d1;
+  t_upstyp_action *a2 = (t_upstyp_action *)d2;
 
   return upsutl_stricmp( a1->action, a2->action );
 }
@@ -1166,8 +1166,8 @@ int cmp_actions( t_upslst_item *l_ptr1, t_upslst_item *l_ptr2 )
   l_ptr2 = upslst_sort0( l_ptr2, action_cmp );
 
   for ( ; l_ptr1 && l_ptr2; l_ptr1 = l_ptr1->next, l_ptr2 = l_ptr2->next ) {
-    t_ups_action *a1 = (t_ups_action *)l_ptr1->data;
-    t_ups_action *a2 = (t_ups_action *)l_ptr2->data;
+    t_upstyp_action *a1 = (t_upstyp_action *)l_ptr1->data;
+    t_upstyp_action *a2 = (t_upstyp_action *)l_ptr2->data;
     t_upslst_item *c1, *c2;
 
     /* same action name ? */
@@ -1204,7 +1204,7 @@ t_upslst_item *find_group( t_upslst_item * const list_ptr, const char copt )
 {
   t_upslst_item *l_grp = 0;
   t_upslst_item *l_itm = 0;
-  t_ups_instance *inst = 0;
+  t_upstyp_instance *inst = 0;
   static t_upslst_item* l_orig = 0;
 
   switch ( copt ) {
@@ -1226,11 +1226,11 @@ t_upslst_item *find_group( t_upslst_item * const list_ptr, const char copt )
 
   l_itm = l_orig;
   while ( !l_grp && l_itm && l_itm->next ) {
-    inst = (t_ups_instance *)l_itm->data;
+    inst = (t_upstyp_instance *)l_itm->data;
     l_itm = l_itm->next;
     
     while ( l_itm ) {
-      t_ups_instance *is = (t_ups_instance *)l_itm->data;
+      t_upstyp_instance *is = (t_upstyp_instance *)l_itm->data;
       if ( !cmp_actions( inst->action_list, is->action_list ) ) {
 	l_grp = upslst_add( l_grp, is );
 	l_itm = upslst_delete_safe( l_itm, is, ' ' );

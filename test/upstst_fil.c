@@ -22,7 +22,7 @@ Include files:-
  * Definition of global variables
  */
 
-t_ups_product *upstst_file = NULL;
+t_upstyp_product *upstst_file = NULL;
 
 int upstst_fil_read_file (int argc, char ** const argv)
 {

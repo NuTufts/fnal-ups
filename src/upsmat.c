@@ -43,8 +43,8 @@ extern int UPS_VERBOSE;
 /*
  * Declaration of private functions.
  */
-static t_ups_match_product *match_instance_core(
-				   const t_ups_command * const a_command_line,
+static t_upstyp_match_product *match_instance_core(
+				   const t_upsugo_command * const a_command_line,
 				   const char * const a_db,
 				   const char * const a_prod_name,
 				   const t_upslst_item * const a_chain_list,
@@ -172,13 +172,13 @@ static int get_instance(const t_upslst_item * const a_read_instances,
  * Return: a list of matched products
  */
 t_upslst_item *upsmat_match_instance(
-				   const t_ups_command * const a_command_line,
+				   const t_upsugo_command * const a_command_line,
 				   const int a_need_unique)
 {
   t_upslst_item *db_item, *all_products = NULL, *product_item;
   t_upslst_item *all_versions = NULL;
   t_upslst_item *chain_item, *all_chains = NULL, *all_tmp_chains = NULL;
-  t_ups_match_product *mproduct = NULL;
+  t_upstyp_match_product *mproduct = NULL;
   t_upslst_item *mproduct_list = NULL;
   char *the_db, *prod_name, *the_chain, *new_string = NULL, *location = NULL;
   char do_delete = 'd';
@@ -341,15 +341,15 @@ t_upslst_item *upsmat_match_instance(
  * Output: none
  * Return: a pointer to the instances matched from the files read.
  */
-static t_ups_match_product *match_instance_core(
-				   const t_ups_command * const a_command_line,
+static t_upstyp_match_product *match_instance_core(
+				   const t_upsugo_command * const a_command_line,
 				   const char * const a_db,
 				   const char * const a_prod_name,
 				   const t_upslst_item * const a_chain_list,
 				   const t_upslst_item * const a_version_list,
 				   const int a_need_unique)
 {
-  t_ups_match_product *mproduct = NULL;
+  t_upstyp_match_product *mproduct = NULL;
   t_upslst_item *vinst_list = NULL, *tinst_list = NULL;
   t_upslst_item *cinst_list = NULL;
   t_upslst_item *chain_list = NULL, *version_list = NULL;
@@ -481,10 +481,10 @@ static int match_from_chain( const char * const a_product,
 {
   int file_chars = 0, num_matches = 0, tmp_num_matches = 0;
   char buffer[FILENAME_MAX+1];
-  t_ups_product *read_product;
+  t_upstyp_product *read_product;
   t_upslst_item *cinst;
   t_upslst_item *tmp_flavor_list = NULL, *tmp_quals_list = NULL;
-  t_ups_instance *inst;
+  t_upstyp_instance *inst;
   char *first_flavor, *first_quals;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
@@ -514,7 +514,7 @@ static int match_from_chain( const char * const a_product,
 	 matched only with an instance in the associated version file. */
       for (cinst = *a_cinst_list ; cinst ; cinst = cinst->next) {
 	/* get a table file */
-	inst = (t_ups_instance *)cinst->data;
+	inst = (t_upstyp_instance *)cinst->data;
 
 	/* check to see if a specific version was entered along with the
 	   chain.  if so, then we only match those chains that point to the
@@ -608,10 +608,10 @@ static int match_from_version( const char * const a_product,
 
   int file_chars, num_matches = 0, tmp_num_matches = 0;
   char buffer[FILENAME_MAX+1];
-  t_ups_product *read_product;
+  t_upstyp_product *read_product;
   t_upslst_item *vinst;
   t_upslst_item *tmp_flavor_list = NULL, *tmp_quals_list = NULL;
-  t_ups_instance *inst;
+  t_upstyp_instance *inst;
   char *first_flavor, *first_quals;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
@@ -643,7 +643,7 @@ static int match_from_version( const char * const a_product,
       for (vinst = *a_vinst_list ; vinst ; vinst = vinst->next) {
 
 	/* get an instance and thus a table file */
-	inst = (t_ups_instance *)vinst->data;
+	inst = (t_upstyp_instance *)vinst->data;
 
 	/* It is ok if we do not have a table file.  then we just do whatever
 	   the default action is */
@@ -729,7 +729,7 @@ static int match_from_table( const char * const a_product,
 			     t_upslst_item ** const a_tinst_list)
 {
   char *full_table_file;
-  t_ups_product *read_product;
+  t_upstyp_product *read_product;
   int num_matches = 0;
 
   full_table_file = get_table_file_path(a_product, a_tablefile,
@@ -926,7 +926,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 {
   int got_match;
   t_upslst_item *tmp_list, *tmp_flavor_list, *tmp_quals_list;
-  t_ups_instance *instance;
+  t_upstyp_instance *instance;
   t_upslst_item *first_matched_inst = NULL;
   char *flavor = NULL, *quals = NULL;
   int num_matches  = 0, want_all_f = 1, want_all_q = 1;
@@ -940,7 +940,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
     /* Check to see if the flavors match or want any flavor */
     for (tmp_list = (t_upslst_item *)a_read_instances; tmp_list ;
 	 tmp_list = tmp_list->next) {
-      instance = (t_ups_instance *)(tmp_list->data);
+      instance = (t_upstyp_instance *)(tmp_list->data);
       if ((! strcmp(instance->flavor, flavor)) ||
 	  (! (want_all_f = strcmp(flavor, ANY_MATCH)))) {
 

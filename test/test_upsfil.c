@@ -6,7 +6,7 @@
 int  main( const int argc, char * const argv[] )
 {
   int i = 0;
-  t_ups_product *prod_ptr = NULL;
+  t_upstyp_product *prod_ptr = NULL;
 
   if ( argc <= 1 ) {
     printf( "Usage: test_upsfil file_name\n" );

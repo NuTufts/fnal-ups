@@ -17,7 +17,7 @@
  * MODIFICATIONS:
  *       22-Jul-1997, LR, first, very preliminary
  *       25-Jul-1997, DjF, added command line inputs
- *       29-Jul-1997, LR, New 'unified' t_ups_instance structure.
+ *       29-Jul-1997, LR, New 'unified' t_upstyp_instance structure.
  *                        Added function declarations for creating
  *                        and destroying common types.
  *       30-Jul-1997, LR, Added 'char *db_dir' to instance structure.
@@ -54,7 +54,7 @@ typedef struct ups_match_product
   t_upslst_item    *chain_list;
   t_upslst_item    *version_list;
   t_upslst_item    *table_list;
-} t_ups_match_product;
+} t_upstyp_match_product;
 
 /* a db config file */
 typedef struct ups_config {
@@ -65,7 +65,7 @@ typedef struct ups_config {
   char             *man_path;
   char             *info_path;
   char             *html_path;
-} t_ups_config;
+} t_upstyp_config;
 
 /* a product instance */
 typedef struct ups_instance
@@ -93,14 +93,14 @@ typedef struct ups_instance
 
   t_upslst_item    *action_list;
 
-} t_ups_instance;
+} t_upstyp_instance;
 
 /* an action */
 typedef struct ups_action
 {
   char             *action;
   t_upslst_item    *command_list;
-} t_ups_action;
+} t_upstyp_action;
 
 /* any ups file */
 typedef struct ups_product
@@ -113,8 +113,8 @@ typedef struct ups_product
   
   t_upslst_item    *instance_list;
   t_upslst_item    *comment_list;
-  t_ups_config     *config;
-} t_ups_product;
+  t_upstyp_config  *config;
+} t_upstyp_product;
 
 /* 
  * Public variables
@@ -126,19 +126,19 @@ typedef struct ups_product
 /*
  * Declaration of public functions.
  */
-t_ups_product     *ups_new_product( void );
-int               ups_free_product( t_ups_product * const prod_ptr );
-t_ups_instance    *ups_new_instance( void );
-int               ups_free_instance( t_ups_instance * const inst_ptr );
-t_ups_action      *ups_new_action( void );
-int               ups_free_action( t_ups_action * const act_ptr );
-t_ups_config      *ups_new_config( void );
-int               ups_free_config( t_ups_config * const conf_ptr );
-t_ups_match_product *ups_new_mp(const char * const a_db,
+t_upstyp_product     *ups_new_product( void );
+int               ups_free_product( t_upstyp_product * const prod_ptr );
+t_upstyp_instance    *ups_new_instance( void );
+int               ups_free_instance( t_upstyp_instance * const inst_ptr );
+t_upstyp_action      *ups_new_action( void );
+int               ups_free_action( t_upstyp_action * const act_ptr );
+t_upstyp_config      *ups_new_config( void );
+int               ups_free_config( t_upstyp_config * const conf_ptr );
+t_upstyp_match_product *ups_new_mp(const char * const a_db,
 				t_upslst_item * const a_chain_list,
 				t_upslst_item * const a_vers_list,
 				t_upslst_item * const a_table_list);
-t_ups_match_product *ups_free_mp(t_ups_match_product * const a_mproduct);
+t_upstyp_match_product *ups_free_mp(t_upstyp_match_product * const a_mproduct);
 
 
 #endif /* _UPSTYP_H_ */

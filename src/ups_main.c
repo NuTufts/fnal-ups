@@ -49,7 +49,7 @@ extern int UPS_VERBOSE;
  */
 int main(int argc, char *argv[])
 {
-  t_ups_command *command_line = NULL;
+  t_upsugo_command *command_line = NULL;
   char *list_valid_opts = "a?cdDf:g:h:K:lm:M:noq:r:tU:vVz:Z";
 
   /* Figure out which command was entered TBD */

@@ -652,7 +652,7 @@ void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title )
 **                                                                           
 ** ==========================================================================
 */                                                                           
-t_ups_command *upsugo_env(char * const product,char * const validopts)
+t_upsugo_command *upsugo_env(char * const product,char * const validopts)
 {
      char * setup_prod;                          /* SETUP_PROD name */
      char * setup_env;                           /* SETUP_PROD value */
@@ -714,7 +714,7 @@ t_ups_command *upsugo_env(char * const product,char * const validopts)
 **                                                                           
 ** ==========================================================================
 */                                                                           
-t_ups_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
+t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
 {
      char * waddr;                               /* work address */
      struct ups_command * uc=0;
@@ -764,7 +764,7 @@ t_ups_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
 **                                                                           
 ** ==========================================================================
 */                                                                           
-t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const validopts)
+t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const validopts)
 {
    char   *arg_str;
 
@@ -791,7 +791,7 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
      last_command=ugo_commands;      /* need pointer to drop & remove struct */
      if ( ugo_commands=ugo_commands->next ) {
         upslst_delete( last_command, last_command->data, 'd');
-        return (t_ups_command *)ugo_commands->data; 
+        return (t_upsugo_command *)ugo_commands->data; 
      } else {
         return 0;
      }
@@ -1370,6 +1370,6 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
      ugo_commands = upslst_add(ugo_commands,uc);
    }
    ugo_commands=upslst_first(ugo_commands);
-   return (t_ups_command *)ugo_commands->data; 
+   return (t_upsugo_command *)ugo_commands->data; 
    } /* not subsequent call ... */
 }

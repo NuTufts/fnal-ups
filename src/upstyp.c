@@ -48,23 +48,23 @@ static int all_gone( const void * const ptr );
 /*-----------------------------------------------------------------------
  * ups_new_product
  *
- * Will create an empty t_ups_product structure.
+ * Will create an empty t_upstyp_product structure.
  *
  * Input : none
  * Output: none
- * Return: t_ups_product *, a pointer to a product structure
+ * Return: t_upstyp_product *, a pointer to a product structure
  */
-t_ups_product *ups_new_product( void )
+t_upstyp_product *ups_new_product( void )
 {
-  t_ups_product *prod_ptr =
-    (t_ups_product *)upsmem_malloc( sizeof( t_ups_product ) );
+  t_upstyp_product *prod_ptr =
+    (t_upstyp_product *)upsmem_malloc( sizeof( t_upstyp_product ) );
 
   if ( prod_ptr ) {
-    memset( prod_ptr, 0, sizeof( t_ups_product ) );
+    memset( prod_ptr, 0, sizeof( t_upstyp_product ) );
   }
   else {
     upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_product ) );
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_product ) );
   }
   return prod_ptr;
 }
@@ -74,14 +74,14 @@ t_ups_product *ups_new_product( void )
  *
  * Will free a product.
  *
- * Input : t_ups_product *, a pointer to a product structure.
+ * Input : t_upstyp_product *, a pointer to a product structure.
  * Output: none
  * Return: int, 0 on failer else 1.
  */
-int ups_free_product( t_ups_product * const prod_ptr )
+int ups_free_product( t_upstyp_product * const prod_ptr )
 {
   t_upslst_item *l_ptr;
-  t_ups_instance *inst_ptr;
+  t_upstyp_instance *inst_ptr;
 
   if ( !prod_ptr ) return 0;
 
@@ -118,23 +118,23 @@ int ups_free_product( t_ups_product * const prod_ptr )
 /*-----------------------------------------------------------------------
  * ups_new_instance
  *
- * Will create an empty t_ups_instance structure.
+ * Will create an empty t_upstyp_instance structure.
  *
  * Input : none
  * Output: none
- * Return: t_ups_instance *, a pointer to an instance structure
+ * Return: t_upstyp_instance *, a pointer to an instance structure
  */
-t_ups_instance *ups_new_instance( void )
+t_upstyp_instance *ups_new_instance( void )
 {
-  t_ups_instance *inst_ptr =
-    (t_ups_instance *)upsmem_malloc( sizeof( t_ups_instance ) );
+  t_upstyp_instance *inst_ptr =
+    (t_upstyp_instance *)upsmem_malloc( sizeof( t_upstyp_instance ) );
   
   if ( inst_ptr ) {
-    memset( inst_ptr, 0, sizeof( t_ups_instance ) );
+    memset( inst_ptr, 0, sizeof( t_upstyp_instance ) );
   }
   else {
     upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_instance ) );
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_instance ) );
   }
   return inst_ptr;
 }
@@ -144,11 +144,11 @@ t_ups_instance *ups_new_instance( void )
  *
  * Will free an instance.
  *
- * Input : t_ups_instance *, a pointer to an instance structure.
+ * Input : t_upstyp_instance *, a pointer to an instance structure.
  * Output: none
  * Return: int, 0 on failer else 1.
  */
-int ups_free_instance( t_ups_instance * const inst_ptr )
+int ups_free_instance( t_upstyp_instance * const inst_ptr )
 {
   t_upslst_item *l_ptr;
   void *act_ptr;
@@ -194,23 +194,23 @@ int ups_free_instance( t_ups_instance * const inst_ptr )
 /*-----------------------------------------------------------------------
  * ups_new_action
  *
- * Will create an empty t_ups_action structure
+ * Will create an empty t_upstyp_action structure
  *
  * Input : none
  * Output: none
- * Return: t_ups_action *, a pointer to an actions instance structure
+ * Return: t_upstyp_action *, a pointer to an actions instance structure
  */
-t_ups_action *ups_new_action( void )
+t_upstyp_action *ups_new_action( void )
 {
-  t_ups_action *act_ptr =
-    (t_ups_action *)upsmem_malloc( sizeof( t_ups_action ) );
+  t_upstyp_action *act_ptr =
+    (t_upstyp_action *)upsmem_malloc( sizeof( t_upstyp_action ) );
   
   if ( act_ptr ) {
-    memset( act_ptr, 0, sizeof( t_ups_action ) );
+    memset( act_ptr, 0, sizeof( t_upstyp_action ) );
   }
   else {
     upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_action ) );
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_action ) );
   }
   return act_ptr;
 }
@@ -220,11 +220,11 @@ t_ups_action *ups_new_action( void )
  *
  * Will free an action.
  *
- * Input : t_ups_action *, a pointer to an action structure.
+ * Input : t_upstyp_action *, a pointer to an action structure.
  * Output: none
  * Return: int, 0 on failer else 1.
  */
-int ups_free_action( t_ups_action * const act_ptr )
+int ups_free_action( t_upstyp_action * const act_ptr )
 {
   if ( !act_ptr ) return 0;
 
@@ -241,23 +241,23 @@ int ups_free_action( t_ups_action * const act_ptr )
 /*-----------------------------------------------------------------------
  * ups_new_config
  *
- * Will create an empty t_ups_config structure
+ * Will create an empty t_upstyp_config structure
  *
  * Input : none
  * Output: none
- * Return: t_ups_config *, a pointer to a config structure
+ * Return: t_upstyp_config *, a pointer to a config structure
  */
-t_ups_config *ups_new_config( void )
+t_upstyp_config *ups_new_config( void )
 {
-  t_ups_config *conf_ptr =
-    (t_ups_config *)upsmem_malloc( sizeof( t_ups_config ) );
+  t_upstyp_config *conf_ptr =
+    (t_upstyp_config *)upsmem_malloc( sizeof( t_upstyp_config ) );
   
   if ( conf_ptr ) {
-    memset( conf_ptr, 0, sizeof( t_ups_config ) );
+    memset( conf_ptr, 0, sizeof( t_upstyp_config ) );
   }
   else {
     upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_config ) );
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_config ) );
   }
   return conf_ptr;
 }
@@ -267,11 +267,11 @@ t_ups_config *ups_new_config( void )
  *
  * Will free a config structure.
  *
- * Input : t_ups_config *, a pointer to a config structure.
+ * Input : t_upstyp_config *, a pointer to a config structure.
  * Output: none
  * Return: int, 0 on failer else 1.
  */
-int ups_free_config( t_ups_config * const conf_ptr )
+int ups_free_config( t_upstyp_config * const conf_ptr )
 {
   if ( !conf_ptr ) return 0;
 
@@ -301,14 +301,14 @@ int ups_free_config( t_ups_config * const conf_ptr )
  * Output: none
  * Return: pointer to matched product structure, NULL if error.
  */
-t_ups_match_product *ups_new_mp(const char * const a_db,
+t_upstyp_match_product *ups_new_mp(const char * const a_db,
 				t_upslst_item * const a_chain_list,
 				t_upslst_item * const a_vers_list,
 				t_upslst_item * const a_table_list)
 {
-  t_ups_match_product *mproduct;
+  t_upstyp_match_product *mproduct;
   
-  mproduct = (t_ups_match_product *)upsmem_malloc(sizeof(t_ups_match_product));
+  mproduct = (t_upstyp_match_product *)upsmem_malloc(sizeof(t_upstyp_match_product));
   if (mproduct != NULL) {
     upsmem_inc_refctr(a_db);      /* don't free db till we no longer need it */
     mproduct->db = (char *)a_db;
@@ -317,7 +317,7 @@ t_ups_match_product *ups_new_mp(const char * const a_db,
     mproduct->table_list = a_table_list;
   } else {
     upserr_vplace();
-    upserr_add(UPS_NO_MEMORY, UPS_FATAL, sizeof(t_ups_match_product));
+    upserr_add(UPS_NO_MEMORY, UPS_FATAL, sizeof(t_upstyp_match_product));
   }
 
   return mproduct;
@@ -332,7 +332,7 @@ t_ups_match_product *ups_new_mp(const char * const a_db,
  * Output: none
  * Return: NULL
  */
-t_ups_match_product *ups_free_mp(t_ups_match_product * const a_mproduct)
+t_upstyp_match_product *ups_free_mp(t_upstyp_match_product * const a_mproduct)
 {
   if (! a_mproduct) {
     /* we incremented the ref counter in the ups_new_mp function, doing a

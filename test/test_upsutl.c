@@ -52,7 +52,7 @@ int main (void)
      The database, product combination better be someplace writeable */
 
   char db[] = ".";
-  t_ups_instance instance;
+  t_upstyp_instance instance;
   char command[] = "ups -c -f global thermonuclear_war";
   t_upslst_item *list_ptr;
 

@@ -42,9 +42,9 @@
  * Declaration of private functions.
  */
 
-t_upslst_item *ups_list_core(t_ups_command * const a_command_line);
+t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line);
 void list_output(const t_upslst_item * const a_mproduct_list,
-		 const t_ups_command * const a_command_line);
+		 const t_upsugo_command * const a_command_line);
 
 /*
  * Definition of global variables.
@@ -68,11 +68,11 @@ void list_output(const t_upslst_item * const a_mproduct_list,
  * Output: 
  * Return: 
  */
-void ups_list( t_ups_command * const a_command_line )
+void ups_list( t_upsugo_command * const a_command_line )
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *tmp_mprod_list = NULL;
-  t_ups_match_product *mproduct = NULL;
+  t_upstyp_match_product *mproduct = NULL;
 
   /* Get all the requested instances */
   mproduct_list = ups_list_core(a_command_line);
@@ -86,7 +86,7 @@ void ups_list( t_ups_command * const a_command_line )
   /* free the matched products */
   for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
        tmp_mprod_list = tmp_mprod_list->next) {
-    mproduct = (t_ups_match_product *)tmp_mprod_list->data;
+    mproduct = (t_upstyp_match_product *)tmp_mprod_list->data;
     ups_free_mp(mproduct);      /* free the data */
   }
   /* now free the list */
@@ -103,7 +103,7 @@ void ups_list( t_ups_command * const a_command_line )
  * Output: <output>
  * Return: <return>
  */
-t_upslst_item *ups_list_core(t_ups_command * const a_command_line)
+t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line)
 {
   t_upslst_item *mproduct_list = NULL;
   int need_unique = 0;
@@ -130,22 +130,22 @@ t_upslst_item *ups_list_core(t_ups_command * const a_command_line)
  * Return: <return>
  */
 void list_output(const t_upslst_item * const a_mproduct_list,
-		 const t_ups_command * const a_command_line)
+		 const t_upsugo_command * const a_command_line)
 {
-  t_ups_match_product *mproduct = NULL;
+  t_upstyp_match_product *mproduct = NULL;
   t_upslst_item *tmp_mprod_list = NULL;
   t_upslst_item *tmp_chain_list = NULL;
   t_upslst_item *tmp_vers_list = NULL;
   t_upslst_item *tmp_table_list = NULL;
-  t_ups_instance *instance = NULL;
+  t_upstyp_instance *instance = NULL;
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) {
-    mproduct = (t_ups_match_product *)tmp_mprod_list->data;
+    mproduct = (t_upstyp_match_product *)tmp_mprod_list->data;
     if (a_command_line->ugo_chain) {
        for (tmp_chain_list = mproduct->chain_list ; tmp_chain_list ;
             tmp_chain_list = tmp_chain_list->next) 
-       { instance = (t_ups_instance *)tmp_chain_list->data;
+       { instance = (t_upstyp_instance *)tmp_chain_list->data;
          printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,
                  instance->chain, instance->version);
          printf("FLAVOR=%s, QUALIFIERS=%s\n", instance->flavor,
@@ -154,7 +154,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
     } else { 
        for (tmp_vers_list = mproduct->version_list ; tmp_vers_list ;
             tmp_vers_list = tmp_vers_list->next) 
-       { instance = (t_ups_instance *)tmp_vers_list->data;
+       { instance = (t_upstyp_instance *)tmp_vers_list->data;
          printf("V:PRODUCT=%s, VERSION=%s, ", instance->product,
                 instance->version);
          printf("FLAVOR=%s, QUALIFIERS=%s\n", instance->flavor,
@@ -163,7 +163,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
     }
     for (tmp_table_list = mproduct->table_list ; tmp_table_list ;
 	 tmp_table_list = tmp_table_list->next) {
-      instance = (t_ups_instance *)tmp_table_list->data;
+      instance = (t_upstyp_instance *)tmp_table_list->data;
       printf("T:PRODUCT=%s, VERSION=%s, ", instance->product,
 	     instance->version);
       printf("FLAVOR=%s, QUALIFIERS=%s\n", instance->flavor,

@@ -128,12 +128,12 @@ t_upskey_map *upskey_get_map( const char * const str )
  *
  * Will return an instance value corresponding to passed key
  *
- * Input : t_ups_instance *, an instance.
+ * Input : t_upstyp_instance *, an instance.
  *         char *, string of key.
  * Output: none.
  * Return: char *, an instance value, or 0.
  */
-char *upskey_inst_getval( t_ups_instance * const inst, const char * const skey )
+char *upskey_inst_getval( t_upstyp_instance * const inst, const char * const skey )
 {
   t_upskey_map *key = upskey_get_map( skey );
   if ( key && key->i_index != NO )
@@ -147,13 +147,13 @@ char *upskey_inst_getval( t_ups_instance * const inst, const char * const skey )
  *
  * Will set an instance value corresponding to passed key.
  *
- * Input : t_ups_instance *, an instance.
+ * Input : t_upstyp_instance *, an instance.
  *         char *, string of key.
  *         char *, value.
  * Output: none.
  * Return: char *, return value, or 0.
  */
-char *upskey_inst_setval( t_ups_instance * const inst,
+char *upskey_inst_setval( t_upstyp_instance * const inst,
 			  const char * const skey, const char * const sval )
 {
   t_upskey_map *key = upskey_get_map( skey );
@@ -171,15 +171,15 @@ char *upskey_inst_setval( t_ups_instance * const inst,
  *
  * Will return from an instance, the action with the passed name
  *
- * Input : t_ups_instance *, an instance.
+ * Input : t_upstyp_instance *, an instance.
  *         char *, action name
  * Output: none.
- * Return: t_ups_action *, a pointer to an action or 0.
+ * Return: t_upstyp_action *, a pointer to an action or 0.
  */
-t_ups_action *upskey_inst_getaction( t_ups_instance * const inst,
+t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
 				     const char * const action_name )
 {
-  t_ups_action *act_ptr = 0;
+  t_upstyp_action *act_ptr = 0;
   t_upslst_item *act_list = 0;
 
   if ( !action_name || !inst || !inst->action_list )
@@ -187,7 +187,7 @@ t_ups_action *upskey_inst_getaction( t_ups_instance * const inst,
 
   act_list = upslst_first( inst->action_list );
   for ( ; act_list; act_list = act_list->next ) {
-    t_ups_action *act = (t_ups_action *)act_list->data;
+    t_upstyp_action *act = (t_upstyp_action *)act_list->data;
     if ( !upsutl_stricmp( action_name, act->action ) ) {
       act_ptr = act;
       break;
@@ -197,7 +197,7 @@ t_ups_action *upskey_inst_getaction( t_ups_instance * const inst,
   return act_ptr;
 }
 
-void upskey_inst_print( const t_ups_instance * const inst )
+void upskey_inst_print( const t_upstyp_instance * const inst )
 {
   t_upskey_map *keys;
   int ix;
@@ -215,12 +215,12 @@ void upskey_inst_print( const t_ups_instance * const inst )
  *
  * Will return a product value corresponding to passed key
  *
- * Input : t_ups_product *, a product.
+ * Input : t_upstyp_product *, a product.
  *         char *, string of key.
  * Output: none.
  * Return: char *, a product value, or 0.
  */
-char *upskey_prod_getval( t_ups_product * const prod, const char * const skey )
+char *upskey_prod_getval( t_upstyp_product * const prod, const char * const skey )
 {
   t_upskey_map *key = upskey_get_map( skey );
   if ( key && key->p_index != NO )
@@ -234,13 +234,13 @@ char *upskey_prod_getval( t_ups_product * const prod, const char * const skey )
  *
  * Will set a product value corresponding to passed key.
  *
- * Input : t_ups_product *, a product.
+ * Input : t_upstyp_product *, a product.
  *         char *, string of key.
  *         char *, value.
  * Output: none.
  * Return: char *, return value, or 0.
  */
-char *upskey_prod_setval( t_ups_product * const prod,
+char *upskey_prod_setval( t_upstyp_product * const prod,
 			  const char * const skey, const char * const sval )
 {
   t_upskey_map *key = upskey_get_map( skey );
@@ -253,7 +253,7 @@ char *upskey_prod_setval( t_ups_product * const prod,
     return 0;  
 }
 
-void upskey_prod_print( const t_ups_product * const prod )
+void upskey_prod_print( const t_upstyp_product * const prod )
 {
   t_upskey_map *keys;
   int ix;
@@ -266,7 +266,7 @@ void upskey_prod_print( const t_ups_product * const prod )
   }
 }
 
-void upskey_conf_print( const t_ups_config * const conf )
+void upskey_conf_print( const t_upstyp_config * const conf )
 {
   t_upskey_map *keys;
   int ix;

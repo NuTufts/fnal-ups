@@ -12,7 +12,7 @@ Include files:-
 #include "upstst_parse.h"
 #include "upstst_macros.h"
 
-static void upstst_match_dump (const t_ups_match_product * const , FILE * const);
+static void upstst_match_dump (const t_upslst_item * const , FILE * const);
 /* ==========================================================================
 
     upstst_mat_match_instance - tests upsmat_match_instace
@@ -24,30 +24,18 @@ int upstst_mat_match_instance (int argc, char ** const argv)
 
 int             	status;                         /* status of parse */
 int             	estatus = UPS_SUCCESS;          /* expected status */
-t_ups_command		*uc = 0;			/* ups command */
-t_ups_match_product 	*mp = 0;			/* match product */
+t_upsugo_command	*uc = 0;			/* ups command */
+t_upslst_item		*mp = 0;			/* match product */
 char			diffcmd[132];			/* diff command */
 
 static char     	*estatus_str;                   /*expected status str */
-static char     	*product;			/* product name */
-static char		*database;			/* database dir */
-#if 0
-static char		*chain;				/* chain name */
-static char		*version;			/* version name */
-#endif
 static int		unique;				/* unique flag name */
 static char		*outfile;			/* filename to output */
 static char		*difffile;			/* file to diff */
 FILE			*ofd;				/* outfile fd */
 
 upstst_argt     	argt[] = 
-   {{"-database", UPSTST_ARGV_STRING,NULL,		&database},
-    {"-product",  UPSTST_ARGV_STRING,NULL,		&product},
-#if 0
-    {"-chain",    UPSTST_ARGV_STRING,NULL,		&chain},	
-    {"-version",  UPSTST_ARGV_STRING,NULL,		&version},
-#endif
-    {"-unique",	  UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
+   {{"-unique",	  UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
     {"-out",	  UPSTST_ARGV_STRING,NULL,		&outfile},
     {"-diff",     UPSTST_ARGV_STRING,NULL,		&difffile},
     {NULL,        UPSTST_ARGV_END,NULL,			NULL}};
@@ -56,11 +44,7 @@ upstst_argt     	argt[] =
 /* parse command line
    ------------------ */
 
-estatus_str = NULL; product = NULL; database = NULL; 
-#if 0
-chain = NULL;
-version = NULL; 
-#endif
+estatus_str = NULL; 
 unique = NULL; outfile = NULL; difffile = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
@@ -87,13 +71,12 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        upserr_output(); upserr_clear();
        return (0);
        }
-   mp = upsmat_match_instance(uc,database,product,NULL,NULL,unique);
+   mp = upsmat_match_instance(uc,unique);
    if (UPS_ERROR != estatus)                    	/* error? */
        {
        fprintf(stderr,"%s: %s, %s: %s\n","actual status",
           g_error_ascii[UPS_ERROR],"expected status", g_error_ascii[estatus]);
        if (UPS_ERROR) { upserr_output(); upserr_clear(); }
-       return 0;
        }
    upstst_match_dump(mp,ofd);
    }
@@ -118,29 +101,48 @@ return (0);
 
    ==========================================================================*/
 
-static void upstst_match_dump (const t_ups_match_product * const mp, 
+static void upstst_match_dump (const t_upslst_item * const mp, 
    FILE * const fd)
 {
-#define upstst_match_dumplist(title,ptr) 			\
-   {								\
-   t_upslst_item *l_ptr;					\
-   fprintf(fd,"%s",title);					\
-   for (l_ptr = upslst_first(ptr); l_ptr; l_ptr = l_ptr->next)	\
-      {								\
-      if (l_ptr == upslst_first(ptr))				\
-         fprintf (fd,"%s\n", (char *)l_ptr->data);		\
-      else							\
-         fprintf (fd,"          %s\n",  (char *)l_ptr->data);	\
-      }								\
+t_upslst_item 		*prod_ptr;		/* product ptr */
+t_upslst_item 		*chain_ptr;		/* chain ptr */
+t_upslst_item 		*version_ptr;		/* version ptr */
+t_upslst_item 		*table_ptr;		/* table ptr */
+t_upstyp_match_product	*product;		/* product match */
+t_upstyp_instance		*instance;		/* instance match */
+#define upstst_dump_instance()	{					\
+   fprintf(fd,"C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,\
+     instance->chain, instance->version);				\
+   fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n",instance->flavor,		\
+      instance->qualifiers);						\
    }
 
+
 if(!mp) return;
-if (mp->db) 
-   fprintf(fd,"Database: %s\n",mp->db);
-if (mp->chain_list)
-   upstst_match_dumplist("Chain:    " ,mp->chain_list);
-if (mp->version_list)
-   upstst_match_dumplist("Version:  " ,mp->version_list);
-if (mp->table_list)
-   upstst_match_dumplist("Table:    " ,mp->table_list);
+for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
+   {
+   product = (t_upstyp_match_product *) prod_ptr->data;
+   printf("CHAIN\n=====\n");
+   for (chain_ptr = product->chain_list; 
+        chain_ptr; 
+        chain_ptr = chain_ptr->next)
+      {
+      instance = (t_upstyp_instance *) chain_ptr->data;
+      upstst_dump_instance();
+      }
+   printf("VERSION\n=======\n");
+   for (version_ptr = product->version_list; 
+        version_ptr; 
+        version_ptr = version_ptr->next)
+      {
+      instance = (t_upstyp_instance *) version_ptr->data;
+      upstst_dump_instance();
+      }
+   printf("TABLE\n======\n");
+   for (table_ptr = product->table_list; table_ptr; table_ptr->next)
+      {
+      instance = (t_upstyp_instance *) table_ptr->data;
+      upstst_dump_instance();
+      }
+   }
 }

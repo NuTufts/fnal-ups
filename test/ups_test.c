@@ -13,7 +13,7 @@ Include files:-
 /* Globals:-
    ========= */
 
-extern t_ups_product *upstst_file;
+extern t_upstyp_product *upstst_file;
 
 /* Prototypes:-
    ============ */

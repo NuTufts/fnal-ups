@@ -105,7 +105,7 @@ typedef struct ups_command
     int     ugo_Z;           /* Time this command                    */
 /* these are associated with n,o,d,c,t,and g chains                  */
     t_upslst_item *ugo_chain;
-} t_ups_command;
+} t_upsugo_command;
 
 /* 
  * Public variables
@@ -115,13 +115,13 @@ typedef struct ups_command
  * Declaration of public functions.
  */
 
-t_ups_command     *upsugo_next(const int ups_argc,
+t_upsugo_command     *upsugo_next(const int ups_argc,
 			       char *ups_argv[],
 			       char * const validopts);
 
-t_ups_command     *upsugo_env(char * const product,
+t_upsugo_command     *upsugo_env(char * const product,
 			       char * const validopts);
-t_ups_command     *upsugo_bldcmd(char * const cmdstr,
+t_upsugo_command     *upsugo_bldcmd(char * const cmdstr,
 			       char * const validopts);
 int         upsugo_free(struct ups_command * const uc);
 void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title );

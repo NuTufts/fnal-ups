@@ -114,13 +114,13 @@ int main(const int argc, char *argv[])
 
 static void test_match(const int argc, char *argv[])
 {
-  t_ups_match_product *mproduct = NULL;
+  t_upstyp_match_product *mproduct = NULL;
   t_upslst_item *mproduct_list = NULL, *mproduct_item;
   t_upslst_item *flavor_list = NULL, *quals_list = NULL;
   int need_unique = 0, i;
   char *new_string = NULL;
   char *ups_db = "/home/t2/berman/work/erupt/erupt_database/db";
-  t_ups_command command_line;
+  t_upsugo_command command_line;
 
   /* Calling structure:
      test_upsmat unique chain product version flavor quals flavor quals */
@@ -163,7 +163,7 @@ static void test_match(const int argc, char *argv[])
     mproduct_list = upslst_first(mproduct_list);
     for (mproduct_item = mproduct_list ; mproduct_item ; 
 	 mproduct_item = mproduct_item->next) {
-      mproduct = (t_ups_match_product *)mproduct_item->data;
+      mproduct = (t_upstyp_match_product *)mproduct_item->data;
       printf("\nChain Instances:\n");
       print_inst(mproduct->chain_list);
       printf("\nVersion Instances:\n");
@@ -184,7 +184,7 @@ static void test_get_instance(const int argc, char *argv[])
   char tfile[] = "/usrdevel/s1/berman/upsdb/tigger/v2_0.tbl";
   t_upslst_item *flavor_list = NULL, *quals_list = NULL, *inst_list = NULL;
   int need_unique = 0, i, num_matches;
-  t_ups_product *product = NULL;
+  t_upstyp_product *product = NULL;
   char *new_string = NULL;
 
   if (! strcmp(argv[1],"1")) {
@@ -330,11 +330,11 @@ static char *get_ups_string(const char * const old_string)
 
 static void print_inst(t_upslst_item * const inst_list)
 {
-  t_ups_instance *instPtr = NULL;
+  t_upstyp_instance *instPtr = NULL;
   t_upslst_item *item = NULL;
 
   for (item = inst_list ; item ; item = item->next) {
-    instPtr = (t_ups_instance *)item->data;
+    instPtr = (t_upstyp_instance *)item->data;
     if (instPtr->product) {
       printf("PRODUCT = %s   ", instPtr->product);
     }

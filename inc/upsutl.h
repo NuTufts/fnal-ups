@@ -62,7 +62,7 @@ char *upsutl_get_prod_dir(const char * const a_db,
 			  const char * const a_prod_name);
 void upsutl_start_timing(void);
 void upsutl_stop_timing(void);
-void upsutl_statistics(t_ups_instance const * const a_instance,
+void upsutl_statistics(t_upstyp_instance const * const a_instance,
 		       char const * const a_dir, char const * const a_command);
 char *upsutl_time_date(void);
 char *upsutl_user(void);

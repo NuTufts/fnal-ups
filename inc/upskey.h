@@ -79,32 +79,32 @@ enum e_upskey_key {
 typedef struct upskey_map {
   int           ikey;    /* enum of key (corresponding to e_upskey_key) */
   char          *key;    /* string of key */
-  int           p_index; /* index into product structure (t_ups_product) */
-  int           i_index; /* index into instance structure (t_ups_instance) */
-  int           c_index; /* index into config structure (t_ups_config) */
+  int           p_index; /* index into product structure (t_upstyp_product) */
+  int           i_index; /* index into instance structure (t_upstyp_instance) */
+  int           c_index; /* index into config structure (t_upstyp_config) */
   unsigned int  flag;    /* flags, see ups_keys.c */
 } t_upskey_map;
 
-typedef union ups_product_u {
-  t_ups_product  prod;
-  char           *arr[e_key_count];
-} t_ups_product_u;
+typedef union upskey_product_u {
+  t_upstyp_product	prod;
+  char   		*arr[e_key_count];
+} t_upskey_product_u;
 
-typedef union ups_instance_u {
-  t_ups_instance inst;
-  char           *arr[e_key_count];
-} t_ups_instance_u;
+typedef union upskey_instance_u {
+  t_upstyp_instance 	inst;
+  char           	*arr[e_key_count];
+} t_upskey_instance_u;
 
-typedef union ups_config_u {
-  t_ups_config   conf;
-  char           *arr[e_key_count];
-} t_ups_config_u;
+typedef union upskey_config_u {
+  t_upstyp_config   	conf;
+  char          	*arr[e_key_count];
+} t_upskey_config_u;
 
 /* some convenient macros */
 
-#define UPSKEY_PROD2ARR( prod ) (((t_ups_product_u *)prod)->arr)
-#define UPSKEY_INST2ARR( inst ) (((t_ups_instance_u *)inst)->arr)
-#define UPSKEY_CONF2ARR( conf ) (((t_ups_config_u *)conf)->arr)
+#define UPSKEY_PROD2ARR( prod ) (((t_upskey_product_u *)prod)->arr)
+#define UPSKEY_INST2ARR( inst ) (((t_upskey_instance_u *)inst)->arr)
+#define UPSKEY_CONF2ARR( conf ) (((t_upskey_config_u *)conf)->arr)
 
 #define UPSKEY_ISIN_VERSION( flag ) (flag&0x0001 ? 1 : 0)
 #define UPSKEY_ISIN_TABLE( flag )   (flag&0x0010 ? 1 : 0)
@@ -115,22 +115,22 @@ typedef union ups_config_u {
  * Declaration of public functions.
  */
 t_upskey_map *upskey_get_map( const char * const skey );
-char         *upskey_inst_getval( t_ups_instance * const inst,
+char         *upskey_inst_getval( t_upstyp_instance * const inst,
 				  const char * const skey );
-char         *upskey_inst_setval( t_ups_instance * const inst,
+char         *upskey_inst_setval( t_upstyp_instance * const inst,
 				  const char * const skey,
 				  const char * const sval );
-t_ups_action *upskey_inst_getaction( t_ups_instance * const inst,
+t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
 				     const char * const action_name );
-void         upskey_inst_print( const t_ups_instance * const prod );
+void         upskey_inst_print( const t_upstyp_instance * const prod );
 
-char         *upskey_prod_getval( t_ups_product * const prod,
+char         *upskey_prod_getval( t_upstyp_product * const prod,
 				  const char * const skey );
-char         *upskey_prod_setval( t_ups_product * const prod,
+char         *upskey_prod_setval( t_upstyp_product * const prod,
 				  const char * const skey,
 				  const char * const sval );
-void         upskey_prod_print( const t_ups_product * const prod );
-void         upskey_conf_print( const t_ups_config * const conf );
+void         upskey_prod_print( const t_upstyp_product * const prod );
+void         upskey_conf_print( const t_upstyp_config * const conf );
      
 /*
  * Declarations of public variables.
