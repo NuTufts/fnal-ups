@@ -250,26 +250,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
       { vinst_list=upsmat_match_with_instance( vinst, product );
         vinst=vinst_list->data;
         if (uc->ugo_y || uc->ugo_Y )
-        { 
-/*        if(db_info->config)
-          { if (db_info->config->prod_dir_prefix)
-            { product_home =
-                   upsutl_str_create(db_info->config->prod_dir_prefix,' ');
-              product_home =
-                   upsutl_str_crecat(product_home,"/");
-              product_home =
-                   upsutl_str_crecat(product_home,vinst->prod_dir);
-            } else {
-              product_home =
-                   upsutl_str_create(vinst->prod_dir,' ');
-            }
-          } else { 
-            product_home =
-                 upsutl_str_create(vinst->prod_dir,' ');
-          }
-*/
-          product_home=upsget_prod_dir(db_info,minst,uc);
-
+        { product_home=upsget_prod_dir(db_info,minst,uc);
           if (uc->ugo_y)
           { fprintf(stdout,"Product home directory - \n\t%s\n",product_home);
             fprintf(stdout,"Delete this directory?");
