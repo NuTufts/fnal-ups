@@ -1425,7 +1425,8 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       /* if product is at the top level always use that instance */
       
       if ( new_ugo ) {
-	if ( new_act_itm = find_prod_name( top_list, new_ugo->ugo_product ) ) {
+	if ( (new_act_itm = 
+	      find_prod_name( top_list, new_ugo->ugo_product ) ) ) {
 	  /*	  upsugo_free( new_ugo );
 		  new_ugo = new_act_itm->ugo */
 	}
@@ -2307,7 +2308,7 @@ static void f_copyinfo( ACTION_PARAMS)
 
 #define COPY_FILES(filename, dest_path, type)  \
     /* figure out sectional sub directory (based on file extension) */ \
-    if (subdir = get_man_subdir(filename)) {                           \
+    if ((subdir = get_man_subdir(filename))) {                         \
       sprintf(dest, "%s/%s%c", dest_path, type, subdir);               \
       /* see if the sectional subdir exists.  if not, create it. */    \
       if (stat(dest, &file_stat) == (int )-1) {                        \
@@ -2339,7 +2340,7 @@ static void f_copyinfo( ACTION_PARAMS)
     if (! strncmp(dir_line->d_name, dir_name, dir_size)) {               \
       DIR *file_dir = NULL;                                              \
       struct dirent *file_dir_line = NULL;                               \
-      if (dir_size == strlen(dir_line->d_name)) {                        \
+      if ((dir_size == strlen(dir_line->d_name))) {                      \
 	/* the directory is = to dir_name */                             \
 	if ((file_dir = opendir(filename))) {                            \
 	  while ((file_dir_line = readdir(file_dir))) {                  \
@@ -2405,7 +2406,7 @@ static void f_copyman( ACTION_PARAMS)
 		  /* this is a file, if it is a man file, copy it to the man
 		     area */
 		  if ((file = fopen(filename, "r"))) {
-		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    while((isspace(c=fgetc(file)))) ;   /* skip empty spaces */
 		    if (c == FIRST_MAN_CHAR) {
 		      COPY_FILES(filename, a_db_info->config->man_target_dir, "man");
 		    }
@@ -2509,7 +2510,7 @@ static void f_copycatman( ACTION_PARAMS)
 
 #define REMOVE_FILES(filename, dest_path, type)  \
     /* figure out sectional sub directory (based on file extension) */ \
-    if (subdir = get_man_subdir(filename)) {                           \
+    if ((subdir = get_man_subdir(filename))) {                         \
       sprintf(dest, "%s/%s%c", dest_path, type, subdir);               \
       /* see if the sectional subdir exists.  if not, ignore this. */  \
       if (stat(dest, &file_stat) != (int )-1) {                        \
