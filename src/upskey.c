@@ -97,7 +97,7 @@ t_upskey_map g_key_info[] =
   { e_key_ups_dir,          "UPS_DIR",          NO,   11,   NO, 0x00010001 },
   { e_key_table_dir,        "TABLE_DIR",        NO,   12,   NO, 0x00010001 },
   { e_key_table_file,       "TABLE_FILE",       NO,   13,   NO, 0x00000001 },
-  { e_key_archive_file,     "ARCHIVE_FILE",     NO,   14,   NO, 0x00000001 },
+  { e_key_archive_file,     "ARCHIVE_FILE",     NO,   14,   NO, 0x00010001 },
   { e_key_authorized_nodes, "AUTHORIZED_NODES", NO,   15,    2, 0x00001001 },
   { e_key_description,      "DESCRIPTION",       5,   16,   NO, 0x00000111 },
   { e_key_statistics,       "STATISTICS",       NO,   17,    3, 0x00001001 },
