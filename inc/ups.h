@@ -24,14 +24,16 @@
 #define _UPS_H_
 
 /* all ups specific include files */
-#include "upstyp.h"
+#include "upsact.h"
 #include "upserr.h"
-#include "ups_commands.h"
 #include "upsfil.h"
 #include "upskey.h"
 #include "upslst.h"
 #include "upsmat.h"
 #include "upsmem.h"
+#include "upstyp.h"
 #include "upsutl.h"
+
+#include "ups_list.h"
 
 #endif /* _UPS_H_ */
