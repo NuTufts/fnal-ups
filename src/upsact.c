@@ -384,7 +384,7 @@ t_cmd_info g_cmd_info[] = {
   {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:Pq:r:stU:vVz:Z0123", 0x00000011, e_setup},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z", 0x00000010, e_invalid_action},
-  {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000010, e_invalid_action},
+  {e_copy,        "copy",        "?A:b:cCdD:f:g:G:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000010, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vVz:Z0123", 0x00000010, e_declare},
   {e_depend,      "depend",      "?cdnotg:f:H:jK:lm:M:q:r:RU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:noO:Pq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
@@ -400,10 +400,10 @@ t_cmd_info g_cmd_info[] = {
   {e_flavor,      "flavor",      "?f:H:lvZ0123", 0x00000000, e_invalid_action},
   {e_verify,      "verify",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_help,        "help",
-            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:Pp:q:r:sStT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
+            "a?A:b:B:cCdD:eEf:Fg:G:h:H:jkK:lm:M:nNoO:Pp:q:r:sStT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:x:XyYz:Z", 0x00000010, e_invalid_action}
+            "a?A:b:B:cCdD:eEf:Fg:G:h:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:x:XyYz:Z", 0x00000010, e_invalid_action}
 };
 
 /* These action commands are listed in order of use.  Hopefully the more
