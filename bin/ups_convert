@@ -144,8 +144,8 @@ foreach $db (@dbs) {
       %reqHash = ();
       %flvrverHash = ();
 
-      ParseFile ();		# Parse file build tables 
-      SetFlavor ();		# Set to all defined flavors or specified
+      ParseFile ();	# Parse file build tables 
+      SetFlavor ();	# Set to all defined flavors or specified
       SetVersion ();
 
 #**********************************************************************
@@ -377,7 +377,7 @@ sub WriteTableFile {
     foreach $reqType ( @reqType ) {
     foreach $flvr (@flavor) {
     if ( &prod_dir ) {
-	if ( &table_file ("$reqType") ) {
+if ( &table_file ("$reqType") ) {
            if ("$opt_v") { 
               print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
               }
@@ -435,323 +435,327 @@ sub WriteTableFile {
           $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_UPS_DIR}\/setup.\${UPS_SHELL},UPS_ENV)\n/;
        } else { 
          if (checkfor("${uud}/setup")) {
-		    $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      envSetIfNotSet(UPS_COMPAT,`echo .\${UPS_SHELL}| sed -e 's\/.csh\/\/'`)\n      sourceOptional(\${UPS_UPS_DIR}\/setup\${UPS_COMPAT},UPS_ENV)\n/;
-		 } else {
-		   $key=~s/DaSeTuP/      proddir()\n      setupenv()\n/;
-		 }
-	       }
-	       print TableFile "$key";
-	# remove unsetup all together...
-	#       $key=~s/setup/unsetup/g;
-	#       $key=~s/     doDefaults\(\)\n//g;
-	#       print TableFile "   Action=unsetup\n";
-	#       if (checkfor("${basedir}/ups/unsetup.sh")) {
-	#           print TableFile "$key";
-	#       }
-	# and back to last...
-	#       print TableFile "      doDefaults()\n";
-	       $baseactions=&add_misactions;
-	       print TableFile "${baseactions}";
-	       print TableFile "End:\n";
-	       print TableFile "# End Group definition\n";
-	       print TableFile "#*************************************************\n";
-	       print TableFile "\n";
-	    }
-	    %ReqHash = ();
-	    %RevReqHash = ();
-	    }
-	    %flvrverHash = ();
-	    close TableFile;
-	}
-	sub MakeParentDir {
-	    if ( !-e "$ndbs/$PRODUCT" ) {
-	       if ( ! mkdir "$ndbs/$PRODUCT", 0755 ) {
-		  print  "$errorMsg cannot make $pc $PRODUCT database home";
-		  exit 1;
-	       }
-	    } elsif ( !-d "$ndbs/$PRODUCTS" || !-w "$ndbs/$PRODUCTS" ) {
-		    print  "$errorMsg cannot write in $pc $PRODUCT database directory";
-		    exit 1;
-	    }
-	}
-	sub OpenChainFile {
-	    my ( $chain ) = @_;
-	    $ChainHeaderInfo=1;
-	    if ( !-e "$ndbs/$PRODUCT/$chain.chain" ) {
-	       if ("$opt_v") { 
-		   print "Opening chain file for $PRODUCT chain $chain \n"; 
-	       }
-	       $ChainHeaderInfo=0;
-	       if ( !open(ChainFile, ">$ndbs/$PRODUCT/$chain.chain") ) {
-		  print "$errorMsg cannot make $pc $PRODUCT $chain chain file";
-		  exit 1;
-	       }
-	    } else { 
-	       if ("$opt_v") { 
-		   print "Appending chain file for $PRODUCT chain $chain \n"; 
-	       }
-	       if ( !open( ChainFile, ">>$ndbs/$PRODUCT/$chain.chain" ) ) {
-		    print  "$errorMsg cannot append in $pc $PRODUCT $chain chain file";
-		    exit 1;
-	       }
-	    }
-	}
-	sub AddChainRec { 
-	    ( $chainKey, $flvr, $ver ) = @_; 
-	    OpenChainFile ( $chainKey );
-	    if ( ! $ChainHeaderInfo ) {
-	       print ChainFile "#*************************************************\n";
-	       print ChainFile "# Chain File \n";
-	       print ChainFile "#*************************************************\n";
-	       print ChainFile "# \n";
-	       print ChainFile "# Leading white space is ignored.\n";
-	       print ChainFile "# Keywords are NOT case sensitive.\n";
-	       print ChainFile "# Required keywords.\n";
-	       print ChainFile "# flavor=FLAVOR\n";
-	       print ChainFile "# version=VERSION\n";
-	       print ChainFile "# optional keywords.\n";
-	       print ChainFile "# attributes - \n";
-	       print ChainFile "# declared - when this product was declared\n";
-	       print ChainFile "# declarer - who declared this product\n";
-	       print ChainFile "# \n";
-	       print ChainFile "File=Chain\n";
-	       print ChainFile "Product=$PRODUCT\n";
-	       print ChainFile "Chain=$chain\n";
-	       print ChainFile "# \n";
-	    }
-	    $who="$flvrchnHash{$flvr}{$chainKey}[$#WHO]";
-	    $when=&convert_to_gmt($flvrchnHash{$flvr}{$chainKey}[$#WHEN]);
-	    ( $sos, $qual ) = &split_os ( $flvr );
-	    print ChainFile "Flavor=$sos\n";
-	    print ChainFile "Qualifiers=\"$qual\"\n";
-	    print ChainFile "Version=$ver\n";
-	    print ChainFile "Declarer=$who\n";
-	    print ChainFile "Declared=$when\n";
-	    print ChainFile "# \n";
-	# Add another chain because build attributes will now be a qualifier...
-	    if ( &build_reqs ) { 
-	    print ChainFile "Flavor=$sos\n";
-	    if ( $qual ne "" ) { 
-	       print ChainFile "Qualifiers=\"build:$qual\"\n";
-	    } else { 
-	       print ChainFile "Qualifiers=\"build\"\n";
-	    }
-	    print ChainFile "Version=$ver\n";
-	    print ChainFile "Declarer=$who\n";
-	    print ChainFile "Declared=$when\n";
-	    print ChainFile "# \n";
-	}
-	    close ChainFile;
-	}
-	sub OpenVersionFile {
-	    my ( $version ) = @_;
-	    if ( !-e "$ndbs/$PRODUCT/$version.version" ) {
-	       if ( !open(VersionFile, ">$ndbs/$PRODUCT/$version.version") ) {
-		  print "$errorMsg cannot make $pc $PRODUCT $version version file";
-		  exit 1;
-	       }
-	    } elsif ( !open( VersionFile, ">>$ndbs/$PRODUCT/$version.version" ) ) {
-		    print  "$errorMsg cannot append in $pc $PRODUCT $version version file";
-		    exit 1;
-	    }
-	}
-	sub WriteVersionRecs {
-	    if ( ! $VersionHeaderInfo ) {
-	       $VersionHeaderInfo=1;
-	       print VersionFile "#*************************************************\n";
-	       print VersionFile "# Version File \n";
-	       print VersionFile "#*************************************************\n";
-	       print VersionFile "# \n";
-	       print VersionFile "# Leading white space is ignored.\n";
-	       print VersionFile "# Keywords are NOT case sensitive.\n";
-	       print VersionFile "# Required keywords.\n";
-	       print VersionFile "# flavor=FLAVOR\n";
-	       print VersionFile "# prod_dir=/product/home\n";
-	       print VersionFile "# optional keywords.\n";
-	       print VersionFile "# attributes - \n";
-	       print VersionFile "# declared - when this product was declared\n";
-	       print VersionFile "# declarer - who declared this product\n";
-	       print VersionFile "# ups_dir - product ups directory \n";
-	       print VersionFile "# Source -\n";
-	       print VersionFile "# Origin - \n";
-	       print VersionFile "# Distribution - \n";
-	       print VersionFile "# Authorized_nodes - \n";
-	       print VersionFile "# table_dir - \n";
-	       print VersionFile "# table_file -\n";
-	       print VersionFile "# \n";
-	       print VersionFile "# if ups_dir does not begin with / then it's\n";
-	       print VersionFile "# path is defined by appending it to the PROD_DIR.\n";
-	       print VersionFile "# \n";
-	       print VersionFile "# if table_dir is not defined but there is a table\n";
-	       print VersionFile "# file, the table_dir is defined to be the ups\n";
-	       print VersionFile "# database product definition area. (HERE) \n";
-	       print VersionFile "# \n";
-	       print VersionFile "File=Version\n";
-	       print VersionFile "Product=$PRODUCT\n";
-	       print VersionFile "Version=$version\n";
-	       print VersionFile "# \n";
-	# ups dir's for versions are the same (Table Ups Dir tud)
-	       $tud=$instanceHash{$flvr}{$version}[$#UPSDIR];
-	    }
-	    ( $sos, $qual ) = &split_os ( $flvr );
-	    $DaTe=&convert_to_gmt($instanceHash{$flvr}{$version}[$#WHEN]);
-	    print VersionFile "#*************************************************\n";
-	    print VersionFile "# Starting group definition\n";
-	    print VersionFile "Group:\n";
-	    print VersionFile "   FLAVOR=$sos\n";
-	    print VersionFile "   QUALIFIERS=\"$qual\"\n";
-	    print VersionFile "   DECLARED=$DaTe\n";
-	    print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-	    print VersionFile "   MODIFIED=$DaTe\n";
-	    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-	    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
-	    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
-	    if ( &upsdir ) {
-	     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
-	    } else {  
-	     print VersionFile "   UPS_DIR=ups\n";
-	    }
-	# Had Source and Origin backwards
-	    if ( &source ) {
-	       print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
-	    }
-	    if ( &origin ) {
-	       print VersionFile "   ARCHIVE_FILE=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
-	    }
-	    if ( &auth_nodes ) {
-	       print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
-	    }
-	    if ( &distribution ) {
-	       print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
-	    }
-	# Everbloody get's a table file for the conversion since it has to source
-	# the old setup's....
-	#    if ( &table_file ("USE")  ) {
-	       print VersionFile "   TABLE_FILE=$version.table\n";
-	#    }
-	    print VersionFile "End:\n";
-	    print VersionFile "# end of group definition\n";
-	    print VersionFile "#*************************************************\n\n";
-	    if ( &build_reqs ) {
-	    print VersionFile "#*************************************************\n";
-	    print VersionFile "# Starting group definition\n";
-	    print VersionFile "Group:\n";
-	    print VersionFile "   FLAVOR=$sos\n";
-	    if ( $qual ne "" ) { 
-	       print VersionFile "   QUALIFIERS=\"build:$qual\"\n";
-	    } else { 
-	       print VersionFile "   QUALIFIERS=\"build\"\n";
-	    }
-	    $DaTe=&convert_to_gmt($instanceHash{$flvr}{$version}[$#WHEN]);
-	    print VersionFile "   DECLARED=$DaTe\n";
-	    print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-	    print VersionFile "   MODIFIED=$DaTe\n";
-	    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-	    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
-	    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
-	    if ( &upsdir ) {
-	     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
-	    } else {  
-	     print VersionFile "   UPS_DIR=ups\n";
-	    }
-	# Had Source and Origin backwards
-	    if ( &source ) {
-	     print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
-	    }
-	    if ( &origin ) {
-	     print VersionFile "   ARCHIVE_FILE=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
-	    }
-	    if ( &auth_nodes ) {
-	     print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
-	    }
-	    if ( &distribution ) {
-	     print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
-	    }
-	    if ( &table_file  ("BUILD") ) {
-	#       print VersionFile "   TABLE_DIR=$ndbs/$PRODUCT\n";
-	       print VersionFile "   TABLE_FILE=$version.table\n";
-	    }
-	    print VersionFile "End:\n";
-	    print VersionFile "# end of group definition\n";
-	    print VersionFile "#*************************************************\n\n";
-	    }
-	}
-	sub AddChain {
-	  my $chainKey = $_[0];
-	    $ver = $flvrchnHash{$flvr}{$chainKey}[$#VERSION];
-	    if ("$ver" && ((! "$releaseVersion") || ("$ver" eq "$releaseVersion"))) {
-	       AddChainRec ( $chainKey, $flvr, $ver );
-	    }
-	}
-	sub AddReqS {
-	    if ( &use_reqs ) {
-	       $reqOrder=1;
-	       foreach $useReq (split /\),\(/, &use_reqs ) {
-		  addReq ( $flvr, "USE", $useReq, $reqOrder);
-		  $reqOrder+=1;
-	       }
-	    }
-	    if ( &build_reqs ) {
-	       $reqOrder=1;
-	       foreach $buildReq (split /\),\(/, &build_reqs ) {
-		  addReq ( $flvr, "BUILD", $buildReq, $reqOrder);
-		  $reqOrder+=1;
-	       }
-	    }
-	    writeflvrReqs ($flvr, $version);
-	}
-	#**********************************************************************
-	#* 
-	#* Translation subs
-	#*
-	#* Just try to not use these in if's and keep the code readable ;)
-	#* 
-	#**********************************************************************
-	sub prod_dir { return "$instanceHash{$flvr}{$version}[$#PRODDIR]" }
-	sub use_reqs { return $instanceHash{$flvr}{$version}[$#USE] }
-	sub build_reqs { return $instanceHash{$flvr}{$version}[$#BUILD] }
-	sub source { return $instanceHash{$flvr}{$version}[$#SOURCE] }
-	sub origin { return $instanceHash{$flvr}{$version}[$#ORIGIN] }
-	sub auth_nodes { return $instanceHash{$flvr}{$version}[$#AUTHNDS] }
-	sub distribution { return $instanceHash{$flvr}{$version}[$#DISTRIB] }
-	sub upsdir { return $instanceHash{$flvr}{$version}[$#UPSDIR] }
+	    $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      envSetIfNotSet(UPS_COMPAT,`echo .\${UPS_SHELL}| sed -e 's\/.csh\/\/'`)\n      sourceOptional(\${UPS_UPS_DIR}\/setup\${UPS_COMPAT},UPS_ENV)\n/;
+	 } else {
+           if (checkfor("${uud}/setup.csh")) {
+              $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_UPS_DIR}\/setup.\${UPS_SHELL},UPS_ENV)\n/;
+           } else { 
+	       $key=~s/DaSeTuP/      proddir()\n      setupenv()\n/;
+           }
+	 }
+       }
+       print TableFile "$key";
+# remove unsetup all together...
+#       $key=~s/setup/unsetup/g;
+#       $key=~s/     doDefaults\(\)\n//g;
+#       print TableFile "   Action=unsetup\n";
+#       if (checkfor("${basedir}/ups/unsetup.sh")) {
+#           print TableFile "$key";
+#       }
+# and back to last...
+#       print TableFile "      doDefaults()\n";
+       $baseactions=&add_misactions;
+       print TableFile "${baseactions}";
+       print TableFile "End:\n";
+       print TableFile "# End Group definition\n";
+       print TableFile "#*************************************************\n";
+       print TableFile "\n";
+    }
+    %ReqHash = ();
+    %RevReqHash = ();
+    }
+    %flvrverHash = ();
+    close TableFile;
+}
+sub MakeParentDir {
+    if ( !-e "$ndbs/$PRODUCT" ) {
+       if ( ! mkdir "$ndbs/$PRODUCT", 0755 ) {
+	  print  "$errorMsg cannot make $pc $PRODUCT database home";
+	  exit 1;
+       }
+    } elsif ( !-d "$ndbs/$PRODUCTS" || !-w "$ndbs/$PRODUCTS" ) {
+	    print  "$errorMsg cannot write in $pc $PRODUCT database directory";
+	    exit 1;
+    }
+}
+sub OpenChainFile {
+    my ( $chain ) = @_;
+    $ChainHeaderInfo=1;
+    if ( !-e "$ndbs/$PRODUCT/$chain.chain" ) {
+       if ("$opt_v") { 
+	   print "Opening chain file for $PRODUCT chain $chain \n"; 
+       }
+       $ChainHeaderInfo=0;
+       if ( !open(ChainFile, ">$ndbs/$PRODUCT/$chain.chain") ) {
+	  print "$errorMsg cannot make $pc $PRODUCT $chain chain file";
+	  exit 1;
+       }
+    } else { 
+       if ("$opt_v") { 
+	   print "Appending chain file for $PRODUCT chain $chain \n"; 
+       }
+       if ( !open( ChainFile, ">>$ndbs/$PRODUCT/$chain.chain" ) ) {
+	    print  "$errorMsg cannot append in $pc $PRODUCT $chain chain file";
+	    exit 1;
+       }
+    }
+}
+sub AddChainRec { 
+    ( $chainKey, $flvr, $ver ) = @_; 
+    OpenChainFile ( $chainKey );
+    if ( ! $ChainHeaderInfo ) {
+       print ChainFile "#*************************************************\n";
+       print ChainFile "# Chain File \n";
+       print ChainFile "#*************************************************\n";
+       print ChainFile "# \n";
+       print ChainFile "# Leading white space is ignored.\n";
+       print ChainFile "# Keywords are NOT case sensitive.\n";
+       print ChainFile "# Required keywords.\n";
+       print ChainFile "# flavor=FLAVOR\n";
+       print ChainFile "# version=VERSION\n";
+       print ChainFile "# optional keywords.\n";
+       print ChainFile "# attributes - \n";
+       print ChainFile "# declared - when this product was declared\n";
+       print ChainFile "# declarer - who declared this product\n";
+       print ChainFile "# \n";
+       print ChainFile "File=Chain\n";
+       print ChainFile "Product=$PRODUCT\n";
+       print ChainFile "Chain=$chain\n";
+       print ChainFile "# \n";
+    }
+    $who="$flvrchnHash{$flvr}{$chainKey}[$#WHO]";
+    $when=&convert_to_gmt($flvrchnHash{$flvr}{$chainKey}[$#WHEN]);
+    ( $sos, $qual ) = &split_os ( $flvr );
+    print ChainFile "Flavor=$sos\n";
+    print ChainFile "Qualifiers=\"$qual\"\n";
+    print ChainFile "Version=$ver\n";
+    print ChainFile "Declarer=$who\n";
+    print ChainFile "Declared=$when\n";
+    print ChainFile "# \n";
+# Add another chain because build attributes will now be a qualifier...
+    if ( &build_reqs ) { 
+    print ChainFile "Flavor=$sos\n";
+    if ( $qual ne "" ) { 
+       print ChainFile "Qualifiers=\"build:$qual\"\n";
+    } else { 
+       print ChainFile "Qualifiers=\"build\"\n";
+    }
+    print ChainFile "Version=$ver\n";
+    print ChainFile "Declarer=$who\n";
+    print ChainFile "Declared=$when\n";
+    print ChainFile "# \n";
+}
+    close ChainFile;
+}
+sub OpenVersionFile {
+    my ( $version ) = @_;
+    if ( !-e "$ndbs/$PRODUCT/$version.version" ) {
+       if ( !open(VersionFile, ">$ndbs/$PRODUCT/$version.version") ) {
+	  print "$errorMsg cannot make $pc $PRODUCT $version version file";
+	  exit 1;
+       }
+    } elsif ( !open( VersionFile, ">>$ndbs/$PRODUCT/$version.version" ) ) {
+	    print  "$errorMsg cannot append in $pc $PRODUCT $version version file";
+	    exit 1;
+    }
+}
+sub WriteVersionRecs {
+    if ( ! $VersionHeaderInfo ) {
+       $VersionHeaderInfo=1;
+       print VersionFile "#*************************************************\n";
+       print VersionFile "# Version File \n";
+       print VersionFile "#*************************************************\n";
+       print VersionFile "# \n";
+       print VersionFile "# Leading white space is ignored.\n";
+       print VersionFile "# Keywords are NOT case sensitive.\n";
+       print VersionFile "# Required keywords.\n";
+       print VersionFile "# flavor=FLAVOR\n";
+       print VersionFile "# prod_dir=/product/home\n";
+       print VersionFile "# optional keywords.\n";
+       print VersionFile "# attributes - \n";
+       print VersionFile "# declared - when this product was declared\n";
+       print VersionFile "# declarer - who declared this product\n";
+       print VersionFile "# ups_dir - product ups directory \n";
+       print VersionFile "# Source -\n";
+       print VersionFile "# Origin - \n";
+       print VersionFile "# Distribution - \n";
+       print VersionFile "# Authorized_nodes - \n";
+       print VersionFile "# table_dir - \n";
+       print VersionFile "# table_file -\n";
+       print VersionFile "# \n";
+       print VersionFile "# if ups_dir does not begin with / then it's\n";
+       print VersionFile "# path is defined by appending it to the PROD_DIR.\n";
+       print VersionFile "# \n";
+       print VersionFile "# if table_dir is not defined but there is a table\n";
+       print VersionFile "# file, the table_dir is defined to be the ups\n";
+       print VersionFile "# database product definition area. (HERE) \n";
+       print VersionFile "# \n";
+       print VersionFile "File=Version\n";
+       print VersionFile "Product=$PRODUCT\n";
+       print VersionFile "Version=$version\n";
+       print VersionFile "# \n";
+# ups dir's for versions are the same (Table Ups Dir tud)
+       $tud=$instanceHash{$flvr}{$version}[$#UPSDIR];
+    }
+    ( $sos, $qual ) = &split_os ( $flvr );
+    $DaTe=&convert_to_gmt($instanceHash{$flvr}{$version}[$#WHEN]);
+    print VersionFile "#*************************************************\n";
+    print VersionFile "# Starting group definition\n";
+    print VersionFile "Group:\n";
+    print VersionFile "   FLAVOR=$sos\n";
+    print VersionFile "   QUALIFIERS=\"$qual\"\n";
+    print VersionFile "   DECLARED=$DaTe\n";
+    print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
+    print VersionFile "   MODIFIED=$DaTe\n";
+    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
+    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
+    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
+    if ( &upsdir ) {
+     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
+    } else {  
+     print VersionFile "   UPS_DIR=ups\n";
+    }
+# Had Source and Origin backwards
+    if ( &source ) {
+       print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
+    }
+    if ( &origin ) {
+       print VersionFile "   ARCHIVE_FILE=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
+    }
+    if ( &auth_nodes ) {
+       print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
+    }
+    if ( &distribution ) {
+       print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
+    }
+# Everbloody get's a table file for the conversion since it has to source
+# the old setup's....
+#    if ( &table_file ("USE")  ) {
+       print VersionFile "   TABLE_FILE=$version.table\n";
+#    }
+    print VersionFile "End:\n";
+    print VersionFile "# end of group definition\n";
+    print VersionFile "#*************************************************\n\n";
+    if ( &build_reqs ) {
+    print VersionFile "#*************************************************\n";
+    print VersionFile "# Starting group definition\n";
+    print VersionFile "Group:\n";
+    print VersionFile "   FLAVOR=$sos\n";
+    if ( $qual ne "" ) { 
+       print VersionFile "   QUALIFIERS=\"build:$qual\"\n";
+    } else { 
+       print VersionFile "   QUALIFIERS=\"build\"\n";
+    }
+    $DaTe=&convert_to_gmt($instanceHash{$flvr}{$version}[$#WHEN]);
+    print VersionFile "   DECLARED=$DaTe\n";
+    print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
+    print VersionFile "   MODIFIED=$DaTe\n";
+    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
+    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
+    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
+    if ( &upsdir ) {
+     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
+    } else {  
+     print VersionFile "   UPS_DIR=ups\n";
+    }
+# Had Source and Origin backwards
+    if ( &source ) {
+     print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
+    }
+    if ( &origin ) {
+     print VersionFile "   ARCHIVE_FILE=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
+    }
+    if ( &auth_nodes ) {
+     print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
+    }
+    if ( &distribution ) {
+     print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
+    }
+    if ( &table_file  ("BUILD") ) {
+#       print VersionFile "   TABLE_DIR=$ndbs/$PRODUCT\n";
+       print VersionFile "   TABLE_FILE=$version.table\n";
+    }
+    print VersionFile "End:\n";
+    print VersionFile "# end of group definition\n";
+    print VersionFile "#*************************************************\n\n";
+    }
+}
+sub AddChain {
+  my $chainKey = $_[0];
+    $ver = $flvrchnHash{$flvr}{$chainKey}[$#VERSION];
+    if ("$ver" && ((! "$releaseVersion") || ("$ver" eq "$releaseVersion"))) {
+       AddChainRec ( $chainKey, $flvr, $ver );
+    }
+}
+sub AddReqS {
+    if ( &use_reqs ) {
+       $reqOrder=1;
+       foreach $useReq (split /\),\(/, &use_reqs ) {
+	  addReq ( $flvr, "USE", $useReq, $reqOrder);
+	  $reqOrder+=1;
+       }
+    }
+    if ( &build_reqs ) {
+       $reqOrder=1;
+       foreach $buildReq (split /\),\(/, &build_reqs ) {
+	  addReq ( $flvr, "BUILD", $buildReq, $reqOrder);
+	  $reqOrder+=1;
+       }
+    }
+    writeflvrReqs ($flvr, $version);
+}
+#**********************************************************************
+#* 
+#* Translation subs
+#*
+#* Just try to not use these in if's and keep the code readable ;)
+#* 
+#**********************************************************************
+sub prod_dir { return "$instanceHash{$flvr}{$version}[$#PRODDIR]" }
+sub use_reqs { return $instanceHash{$flvr}{$version}[$#USE] }
+sub build_reqs { return $instanceHash{$flvr}{$version}[$#BUILD] }
+sub source { return $instanceHash{$flvr}{$version}[$#SOURCE] }
+sub origin { return $instanceHash{$flvr}{$version}[$#ORIGIN] }
+sub auth_nodes { return $instanceHash{$flvr}{$version}[$#AUTHNDS] }
+sub distribution { return $instanceHash{$flvr}{$version}[$#DISTRIB] }
+sub upsdir { return $instanceHash{$flvr}{$version}[$#UPSDIR] }
 
-	sub build_version { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#VERSION] }
-	sub use_version { return $reqHash{"USE"}{$reqCat}{$reqName}[$#VERSION] }
-	sub build_flavor { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#FLAVOR] }
-	sub use_flavor { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAVOR] }
-	sub build_flags { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#FLAGS] }
-	sub use_flags { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAGS] }
+sub build_version { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#VERSION] }
+sub use_version { return $reqHash{"USE"}{$reqCat}{$reqName}[$#VERSION] }
+sub build_flavor { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#FLAVOR] }
+sub use_flavor { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAVOR] }
+sub build_flags { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#FLAGS] }
+sub use_flags { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAGS] }
 
-	sub convert_to_gmt
-	{ @D = split ( '\-' , $_[0]);
-	  return sprintf("19%s-%02d-%02d 00.00.00 GMT",$D[2],$D[0],$D[1]);
-	}
-	sub fix_env_specs
-	{ my $value = $_[0];
-	  $value =~ s/\$(\w*)/\${$1}/g;
-	# yes I bet there's a better way but it works... if ${JOE} put ${}{JOE}
-	  $value =~ s/{}//g;
-	  return $value;
-	}
-	sub table_file { 
-	    my $type = $_[0];
-	    return $flvrverHash{$flvr}{$version}{$type} 
-	}
-	sub add_setup {
-	    my $value;
-	    $value="DaSeTuP"
-	} 
-	sub add_misactions { 
-	    $value="";
-	    if ($tud) { $uud=$tud; } else { $uud="${basedir}/ups"; }
-	    if (checkfor("${uud}/tailor")) {
-	       $value.="   Action=Tailor\n";
-	       $value.="      execute(\${UPS_UPS_DIR}/tailor,UPS_ENV)\n";
-	    }
-	    if (checkfor("${uud}/tailor.sh}")) {
-	       $value.="   Action=Tailor\n";
-	       $value.="      execute(\${UPS_UPS_DIR}/tailor.\${UPS_SHELL},UPS_ENV)\n";
+sub convert_to_gmt
+{ @D = split ( '\-' , $_[0]);
+  return sprintf("19%s-%02d-%02d 00.00.00 GMT",$D[2],$D[0],$D[1]);
+}
+sub fix_env_specs
+{ my $value = $_[0];
+  $value =~ s/\$(\w*)/\${$1}/g;
+# yes I bet there's a better way but it works... if ${JOE} put ${}{JOE}
+  $value =~ s/{}//g;
+  return $value;
+}
+sub table_file { 
+    my $type = $_[0];
+    return $flvrverHash{$flvr}{$version}{$type} 
+}
+sub add_setup {
+    my $value;
+    $value="DaSeTuP"
+} 
+sub add_misactions { 
+    $value="";
+    if ($tud) { $uud=$tud; } else { $uud="${basedir}/ups"; }
+    if (checkfor("${uud}/tailor")) {
+       $value.="   Action=Tailor\n";
+       $value.="      execute(\${UPS_UPS_DIR}/tailor,UPS_ENV)\n";
+    }
+    if (checkfor("${uud}/tailor.sh}")) {
+       $value.="   Action=Tailor\n";
+       $value.="      execute(\${UPS_UPS_DIR}/tailor.\${UPS_SHELL},UPS_ENV)\n";
     }
     if (checkfor("${uud}/configure")) {
        $value.="   Action=Configure\n";
@@ -761,6 +765,14 @@ sub WriteTableFile {
        $value.="   Action=Configure\n";
        $value.="      execute(\${UPS_UPS_DIR}/configure.\${UPS_SHELL},UPS_ENV)\n";
     }
+    if (checkfor("${uud}/unconfigure")) {
+       $value.="   Action=unConfigure\n";
+       $value.="      execute(\${UPS_UPS_DIR}/unconfigure,UPS_ENV)\n";
+    }
+    if (checkfor("${uud}/unconfigure.sh")) {
+       $value.="   Action=unConfigure\n";
+       $value.="      execute(\${UPS_UPS_DIR}/unconfigure.\${UPS_SHELL},UPS_ENV)\n";
+    }
     if (checkfor("${uud}/start")) {
        $value.="   Action=start\n";
        $value.="      execute(\${UPS_UPS_DIR}/start,UPS_ENV)\n";
@@ -769,9 +781,34 @@ sub WriteTableFile {
        $value.="   Action=stop\n";
        $value.="      execute(\${UPS_UPS_DIR}/stop,UPS_ENV)\n";
     }
+# This is REAL BS ...
+# If there is a current put it out and check again for configure
+# if there isn't a current check configure again and if so put it out
+# the configure as a current action.
+# This is going to confuse the living daylights out of people because
+# they might see an action=current execute configure
     if (checkfor("${uud}/current")) {
        $value.="   Action=Current\n";
        $value.="      execute(\${UPS_UPS_DIR}/current,UPS_ENV)\n";
+       if (checkfor("${uud}/configure")) {
+          $value.="      execute(\${UPS_UPS_DIR}/configure,UPS_ENV)\n";
+       }
+       if (checkfor("${uud}/configure.sh")) {
+          $value.="      execute(\${UPS_UPS_DIR}/configure.\${UPS_SHELL},UPS_ENV)\n";
+       }
+    } else {
+       if (checkfor("${uud}/configure")) {
+          $value.="   Action=Current\n";
+          $value.="      execute(\${UPS_UPS_DIR}/configure,UPS_ENV)\n";
+       }
+       if (checkfor("${uud}/configure.sh")) {
+          $value.="   Action=Current\n";
+          $value.="      execute(\${UPS_UPS_DIR}/configure.\${UPS_SHELL},UPS_ENV)\n";
+       }
+    }
+    if (checkfor("${uud}/uncurrent")) {
+       $value.="   Action=unCurrent\n";
+       $value.="      execute(\${UPS_UPS_DIR}/uncurrent,UPS_ENV)\n";
     }
     return $value
 }
@@ -814,19 +851,19 @@ sub expandtildes {
     #
     if ( $string =~ /\A\~([^${dirsep}]*)(.*)/ ) {
         $users = $1;
-	$rest = $2;
+        $rest = $2;
 
-	if ( $users =~ /\{.*\}/) {
-	    @users = ($users =~ m/(\w+)/g);
-	    print "here users is @users\n" if ($debugflag);
-	    foreach $user (@users) {
-		unshift(@res, (&gethome($user) . $rest) );
-	    }
+        if ( $users =~ /\{.*\}/) {
+            @users = ($users =~ m/(\w+)/g);
+            print "here users is @users\n" if ($debugflag);
+            foreach $user (@users) {
+	        unshift(@res, (&gethome($user) . $rest) );
+            }
 
-	} else {
+        } else {
             $string =~ s/\A\~([^${dirsep}]*)/&gethome($1)/e;
-	    unshift(@res, $string);
-	}
+            unshift(@res, $string);
+        }
     } else {
         unshift(@res, $string);
     }
@@ -835,9 +872,9 @@ sub expandtildes {
 sub gethome {
     my(@list);
     if ( $_[0] eq '' ) {
-	return $ENV{'HOME'};
+       return $ENV{'HOME'};
     } else {
-	@list = getpwnam($_[0]);
+      @list = getpwnam($_[0]);
         return $list[7];
     }
 }
