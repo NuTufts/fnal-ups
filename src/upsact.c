@@ -756,7 +756,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
     return pcmd;
   }
   else {
-    free( pcmd );
+    upsmem_free( pcmd );
     P_VERB_s( 3, "Parse nothing" );
     return 0;
   }
@@ -2003,7 +2003,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	l_ucmd = upslst_add( l_ucmd, 
 			     upsutl_str_create( buf, ' ' ) );
       }
-      free( p_cmd );      
+      upsmem_free( p_cmd );      
     }    
   }
 
