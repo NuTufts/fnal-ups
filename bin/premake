@@ -291,17 +291,20 @@ case $ccenv in
 		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -migrate -check\""
 		llibs="-lots"
 		;;
+# Don't muck with AIX unless YOU test it, DjF
 	aix|AIX)			# IBM's AIX
 		defs="$defs AR=ar ARFLAGS=r RANLIB=:"
 		cc="cc"
  		cflags="$cflags"
 		if [ "$opt" != "" ]; then
-			cflags="$cflags -O4" 
+			cflags="$cflags -O3" 
 		fi
 		if [ "$dbg" != "" ]; then 
 			cflags="$cflags -g" 
 		fi
-		defs="$defs CCCHK=\"-D_POSIX_SOURCE\""
+#		defs="$defs CCCHK=\"-D_POSIX_SOURCE\""
+# This is fix for AIX+4 DjF ugly but so are you...;)
+defs="$defs CCCHK=\"-D_POSIX_SOURCE -D_NETINET_IN_H_ -D_H_NETDB\""
 		;;
 
 	*)
