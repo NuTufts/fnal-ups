@@ -2,10 +2,11 @@
 # ============================================================================
 # test ups copy
 # ============================================================================
-cd $UPS_DIR/test/scripts/copy
+cd $UPS_DIR/test/scripts/copy/log
 $UPS_DIR/test/ups_test << EOD
 
-ups copy bee1 v1_0 -O "bee3 v4_0" -z copy/db2 -f NULL -v
-ups copy bee1 v1_0 -f NULL -z copy/db2
+copy bee1 v1_0 -O "bee3 v4_0" -z ../db2 -f NULL -X
+copy bee1 v1_0 -f NULL -z ../db2 
+
 quit
 EOD
