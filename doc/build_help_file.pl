@@ -121,8 +121,8 @@ while ( <FSH> ) {
 # 
 # check if all ups commands was found in help file
 #
-
-foreach my $key (keys %copt) {
+my $key;
+foreach $key (keys %copt) {
   print STDERR "$prog: no help for 'ups $key' was found in $fsh\n";
 }
 
@@ -143,8 +143,9 @@ sub get_cop()
   my $cmd = '';
   my $opt = '';
   my $n = 0;
+  my $item;
 
-  foreach my $item (@items) {
+  foreach $item (@items) {
 
     $item =~ s/\A\s*(.*?)\s*/$1/o;
     $n++ if ( $item ne "" && $item ne '{' && $item ne '}' );
