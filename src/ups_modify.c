@@ -66,7 +66,7 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
 {
   t_upslst_item *mproduct_list = NULL;
   char * original_file;
-  char * input="   ";
+  char input[]="   ";
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   int not_unique = 0;
