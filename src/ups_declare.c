@@ -281,7 +281,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                              the_chain,
                              cinst->version);
                (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
-/* product->instance_list=upslst_free(product->instance_list,'d');  */
                unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
                sprintf(unchain,"un%s",the_chain);
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,

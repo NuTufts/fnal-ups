@@ -39,16 +39,13 @@
 #include <math.h>
 #include <sys/utsname.h>
 
-#include "upstyp.h"
-#include "upsugo.h"
-#include "upserr.h"
-#include "upsmem.h"
-#include "upsutl.h"
+#include "ups.h"
 
 #ifdef UPS_ID
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	1.00";
 #endif
 #define MAX_ARGS 1000
+#define UPSUGO "UPSUGO: "
 #define FREE( X )	{			\
 			free( X );		\
 			X = 0;		\
@@ -57,14 +54,17 @@
 {  while ((loc = strrchr(flavor,'.'))) \
       { *loc = 0; \
         addr=upsutl_str_create(flavor,' '); \
+        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
       } \
    if ((loc = strrchr(flavor,'+'))) \
       { *loc = 0; \
         addr=upsutl_str_create(flavor,' '); \
+        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
       } \
    addr=upsutl_str_create("NULL",' '); \
+   upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
 }
 #define case_help \
@@ -122,6 +122,7 @@
 #define case_v \
          case 'v':      \
          uc->ugo_v +=1; \
+         UPS_VERBOSE=uc->ugo_v; \
          break;
 #define case_V \
          case 'V':      \
@@ -423,12 +424,14 @@ if (!uc->ugo_H)
    from the end of the string.
    -------------------------------------------------------------- */
    addr=upsutl_str_create(flavor,' ');		/* first add full */
+   upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
    flavor_sub()
  } else { 
    for ( l_ptr = upslst_first(uc->ugo_osname); 
        l_ptr; l_ptr = l_ptr->next, count++ )
    {   addr=upsutl_str_create(l_ptr->data,' ');
+       upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
        strcpy(flavor,l_ptr->data);
        flavor_sub()
@@ -443,7 +446,9 @@ if (!uc->ugo_H)
    l_ptr = upslst_first(uc->ugo_flavor);
    while ( l_ptr  )
    { if( uc->ugo_number != count )
-     { l_ptr = upslst_delete_safe( l_ptr, l_ptr->data, 'd' );
+     { upsver_mes(3,"%sNumber specified deleting %s from flavor list\n",
+                  UPSUGO,l_ptr->data); 
+       l_ptr = upslst_delete_safe( l_ptr, l_ptr->data, 'd' );
      } else {
        uc->ugo_flavor=l_ptr;
        l_ptr=l_ptr->next;
@@ -502,19 +507,23 @@ int upsugo_ifornota(struct ups_command * const uc)
 
    if (!uc->ugo_product) 
    { addr=upsutl_str_create("*",' ');
+     upsver_mes(3,"%sNo product specified set to %s\n",UPSUGO,addr); 
      uc->ugo_product = addr;
    }
    if (uc->ugo_a)                           /* did the user specify -a */
    { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
      { addr=upsutl_str_create("*",' ');
+       upsver_mes(3,"%sNo chain specified set to %s\n",UPSUGO,addr); 
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
      }
      if (!uc->ugo_qualifiers) 
      { addr=upsutl_str_create("*",' ');
+       upsver_mes(3,"%sNo qualifiers specified set to %s\n",UPSUGO,addr); 
        uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
      if (!uc->ugo_version)          /* unallocated if later specified */
      { addr=upsutl_str_create("*",' ');  
+       upsver_mes(3,"%sNo version specified set to %s\n",UPSUGO,addr); 
        uc->ugo_version = addr;      /* at this point I may not know... */
      }
 /* the ugo_number is an after the fact processing and the -H is kept
@@ -522,11 +531,13 @@ int upsugo_ifornota(struct ups_command * const uc)
      if (!uc->ugo_flavor || uc->ugo_number /* || uc->ugo_H */ ) 
      { if(!uc->ugo_number /* && !uc->ugo_H */ )
        { addr=upsutl_str_create("*",' ');  
+         upsver_mes(3,"%sNo flavor specified set to %s\n",UPSUGO,addr); 
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
        } else {
          upsugo_bldfvr(uc);
 /* test flavor=* in table */
          addr=upsutl_str_create(ANY_FLAVOR,' ');  
+         upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr); 
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
 /* */
        }
@@ -534,15 +545,18 @@ int upsugo_ifornota(struct ups_command * const uc)
    } else {                         /* not -a but give defaults */
      if (!uc->ugo_chain && !uc->ugo_version)
      { addr=upsutl_str_create("current",' ');
+       upsver_mes(3,"%sNo (-a) Adding chain %s\n",UPSUGO,addr); 
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
      }
      if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
      { addr=upsutl_str_create("",' ');
-     uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+       upsver_mes(3,"%sNo (-a) Adding qualifiers \"\"\n",UPSUGO,addr); 
+       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
      if (!uc->ugo_flavor) upsugo_bldfvr(uc);
 /* test flavor=* in table */
          addr=upsutl_str_create(ANY_FLAVOR,' ');  
+         upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr); 
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
 /* */
    }
@@ -615,6 +629,7 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
    addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
    memset (addr,0,sizeof(struct upstyp_db));
    addr->name = db;
+   upsver_mes(3,"%sAdding database %s\n",UPSUGO,addr->name); 
    uc->ugo_db = upslst_add(uc->ugo_db,addr);
  }
  if(nt) 
@@ -626,6 +641,7 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
  memset (addr, 0, sizeof(struct upstyp_db));
  addr->name = db;
+ upsver_mes(3,"%sAdding database %s\n",UPSUGO,addr->name); 
  uc->ugo_db = upslst_add(uc->ugo_db,addr);
  *inaddr = 0;
  return(0);

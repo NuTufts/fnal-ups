@@ -404,7 +404,6 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
   if (tmp_tfd && (tmp_tfd != a_tablefiledir)) {
     upsmem_free(tmp_tfd);
   }
-
 return path_ptr;
 }
 
