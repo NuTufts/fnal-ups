@@ -58,7 +58,62 @@
    int	errflg = 0;
   t_upslst_item *ugo_commands = 0;
     int argindx;
- 
+/*
+ * Utils
+ */
+
+char *str_create( char * const str )
+{
+  char *new_str = NULL;
+    
+  if ( str ) {
+/*    new_str = (char *)upsmem_malloc( (int) strlen( str ) + 1 ); */
+    new_str = (char *)upsmem_malloc( strlen( str ) + 1 );
+    strcpy( new_str, str );
+  }
+  
+  return new_str;
+}
+
+/* ===========================================================================
+** ROUTINE	upsugo_bldfvr()
+**
+*/
+int upsugo_bldfvr(struct ups_command * uc)
+{
+   int      c=0;
+   char   * addr;
+   char   * loc;
+   struct utsname *baseuname;
+   baseuname=(struct utsname *) malloc( sizeof(struct utsname));
+   if ( (c = uname(baseuname)) == -1) return(-1);
+
+/* Silicon Graphics IRIX machines
+   The difference between 64 and 32 bit machines is ignored
+   The real old machines return R2300 - But I don't care...
+*/
+   if ((strncmp(baseuname->machine,"IP",2)) == 0)
+   { if ((baseuname->machine[2] >= '0') && (baseuname->machine[2] <= '9'))
+     { (void) strcpy(baseuname->sysname,"IRIX+");
+       (void) strcat(baseuname->sysname,baseuname->release);
+        addr=str_create(baseuname->sysname);
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+        loc=strchr(baseuname->sysname,'.');
+        *loc = 0;
+        addr=str_create(baseuname->sysname);
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+        loc=strchr(baseuname->sysname,'+');
+        *loc = 0;
+        addr=str_create(baseuname->sysname);
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+        addr=str_create("NULL");
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+        return(0);
+     }
+   }
+   return(-1);
+}
+
 /* ===========================================================================
 ** ROUTINE	upsugo_getarg( int argc, char * argv[])
 **
@@ -152,23 +207,6 @@ char ** argbuf;
 
 }
 
-/*
- * Utils
- */
-
-char *str_create( char * const str )
-{
-  char *new_str = NULL;
-    
-  if ( str ) {
-/*    new_str = (char *)upsmem_malloc( (int) strlen( str ) + 1 ); */
-    new_str = (char *)upsmem_malloc( strlen( str ) + 1 );
-    strcpy( new_str, str );
-  }
-  
-  return new_str;
-}
-
 /* ==========================================================================
 **                                                                           
 ** ROUTINE: upsugo_next
@@ -189,6 +227,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    char   * loc;
    int add_ver=0;
    int my_argc=0;
+   int test=0;
    
    char   **savbuf;
    char   **argbuf;		/* String to hold residual argv stuff*/
@@ -278,7 +317,6 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 
    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
-
    while ((arg_str= upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)
    { my_argc=+1; 
      if(*arg_str == '-')      /* is it an option */
@@ -738,6 +776,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
            add_ver=0;
          } else { 
            uc->ugo_product = addr;
+             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
              if (uc->ugo_a)                   /* did the user specify -a */
              { if (!uc->ugo_chain)            /* If no chain all chains  */
                { addr=str_create("*");
@@ -785,6 +824,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
              add_ver=0;
            } else { 
              uc->ugo_product = addr;
+             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
              if (uc->ugo_a)                   /* did the user specify -a */
              { if (!uc->ugo_chain)            /* If no chain all chains  */
                { addr=str_create("*");
@@ -829,6 +869,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    if (!ugo_commands) 
    { addr=str_create("*");
      uc->ugo_product = addr;
+             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
              if (uc->ugo_a)                   /* did the user specify -a */
              { if (!uc->ugo_chain)            /* If no chain all chains  */
                { addr=str_create("*");
