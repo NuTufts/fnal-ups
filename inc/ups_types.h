@@ -205,7 +205,8 @@ t_ups_command     *upsugo_next(const int ups_argc,
 			       char *ups_argv[],
 			       char * const validopts);
 
-t_ups_command     *upsugo_env(char * const product);
+t_ups_command     *upsugo_env(char * const product,
+			       char * const validopts);
 
 #endif /* _UPS_TYPES_H_ */
 
