@@ -28,41 +28,41 @@
 #line until OPTIONS or a : not found 
 COMMANDS    :
 configure   :?cdfgHmMnoOqrtUvVzZ: 
-: The configure command environmentally configures a product instance.
+: Environmentally configure a product instance.
 copy        :?AcCdfgHmMnoOpPqrtTUvVWXzZ:
-: The copy command allows one instance of a product to be declared "like" another.
+: Allow one instance of a product to be declared "like" another.
 create      :?fHmMpqvZ:
-: The create command blaa blaa
+: Create a template UPS table file.
 declare     :?AcCdfgHmMnoOpqrtTUvVzZ:
-: The declare command adds a product instance to a UPS Database.
+: Add a product instance or a chain to a UPS Database.
 depend      :?cdotgfHKmMqrUvVzZ:
-: The depend command lists (for a specified UPS product instance) UPS product requirements or all UPS product instances that have the specified UPS product instance as a requirement.
+: List (for a specified UPS product instance) UPS product requirements or all UPS product instances that have the specified UPS product instance as a requirement.
 exist       :?BcdefgHjkmMoOqrtUvVzZ:
-: The exist command determines if a setup command with the same options would likely succeed.
+: Determine if a setup command with the same options would likely succeed.
 get         :?cdfFgHmMnoqrtUvVzZ:
-: The get command blaa blaa
+: Return a list of all files that are needed by a product instance and do not live either in the UPS Database or under the product root directory.
 help        :?:This is sort of a special case since it will accept commands
-: The help command blaa blaa
+: Output help information for all UPS commands
 list        :a?cdfghHKlmMnoqrtUvVzZ:
-: The list command blaa blaa
+: List UPS Database information about product instances.
 modify      :?AEfHmMopqrTUvVxzZ:
-: The modify command blaa blaa
+: Allow editor modification of the UPS Database files.  The altered files are verified before being rewritten.
 setup       :?BcdefgHjkmMnoOqrtUvVzZ:
-: The setup command blaa blaa
+: Prepare the environment in order to be able to use a product instance.
 start       :?cdfgHmMnoOqrtUvVwzZ: 
-: The start command blaa blaa
+: Perform any necessary actions for a product instance at system boot time.
 stop        :?cdfgHmMnoOqrtUvVzZ: 
-: The stop command blaa blaa
+: Perform any necessary actions for a product instance at system shutdown.
 tailor      :?cdfghHKmMnoOqrtUvVzZ: 
-: The tailor command blaa blaa
+: Perform any product instance tailoring that needs to be done once (specify hardware device location) or needs user input.
 unconfigure :?cdfgHmMnoOqrtUvVzZ: 
-: The unconfigure command blaa blaa
+: Undo any actions performed by the configure command.
 undeclare   :?cdfgHmMnoOqrtUvVyYzZ:
-: The undeclare command blaa blaa
+: Remove a product instance from a UPS Database.  Any associated chains are removed as well.
 unsetup     :?cdefgHjmMnoOqtUvVzZ:
-: The unsetup command blaa blaa
+: Return the environment to a pre-setup state.
 validate    :?cdfghHlmMnNoqrStUvVzZ:
-: The validate command blaa blaa
+: Check the specified files for correct formatting and information.
 # from : to EOL, lines not starting with - are continuation.
 OPTIONS     :
 -? :print out usage information 
