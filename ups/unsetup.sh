@@ -10,7 +10,7 @@ PATH=`dropit /ups/`; export PATH;
 # Restore the old value of PRODUCTS
 #
 if [ "${PRODUCTS_SAVE:-1}" != "1" ]; then
-    PRODUCTS=${PRODUCTS_SAVE}; export PRODUCTS
+    PRODUCTS="${PRODUCTS_SAVE}"; export PRODUCTS
     unset PRODUCTS_SAVE
 fi
 
