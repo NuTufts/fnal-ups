@@ -220,7 +220,7 @@ static int g_ugo_version = 0;
       }                                              \
     }
 
-/* look through our list of matched instances.  free any and remove them from
+/* look through our list of matched instances.  remove any from
    the list if they have the invalid_instance flag set. */
 #define FREE_INVALID_INSTANCES(minst_list) \
     if (minst_list) {                                                    \
@@ -229,7 +229,7 @@ static int g_ugo_version = 0;
 	minst = (t_upstyp_matched_instance *)minst_list->data;           \
 	if (minst->invalid_instance) {                                   \
 	  minst_list = upslst_delete_safe(minst_list, minst, ' ');       \
-	  minst = ups_free_matched_instance(minst);                      \
+	  /* do not free the instance as it is still in the cache too */ \
 	} else {                                                         \
           tmp_list = minst_list;                                         \
           minst_list = minst_list->next;                                 \
