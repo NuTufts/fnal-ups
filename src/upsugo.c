@@ -47,6 +47,8 @@
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	4.00";
 #endif
 
+int g_command_verb = 0;
+
 int UPS_NEED_DB=1;
 
 #define MAX_ARGS 1000
@@ -352,7 +354,6 @@ void upsugo_liststart(struct ups_command * const a_command_line);
 int upsugo_bldfvr(struct ups_command * const uc)
 {
    char   		*addr;
-   char   		*loc;
    char			uname_flavor[80];	/* put together from uname */
    char			*flavor;		/* flavor ptr */
    t_upslst_item        *l_ptr;
@@ -611,11 +612,20 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
 **
 */
 static char *
-ugo_old2newquals( const char *inaddr ) {
+ugo_old2newquals( const char *inaddr, int declflag ) {
     static char buf[1024]; /* OH NO!! bogus limit on qualifier length... */
     char *p2 = buf;
     const char *p1 = inaddr;
 
+    if (declflag) {
+	/* just remove + signs */
+	while( 0 != (*p2 = *p1 )) {
+	    p1++;
+            if (*p1 != '+')
+		p2++;
+        }
+        return buf;
+    }
     /* if first qual is mandatory, skip the plus, else put in the ? for it */
     if (*p1 == '"') {
         *p2++ = *p1++;
@@ -640,7 +650,7 @@ ugo_old2newquals( const char *inaddr ) {
 	       *p2++ = '?';
 	    }
 	    if (*p1 == '?') {
-                *p1++;
+                p1++;
             }
        } else {
             *p2++ = *p1++;
@@ -678,10 +688,14 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  int opinit=0;
  char *optionals[10]; /* OH NO!! artifical limit of 10 optionals */
  char *fix_inaddr;
+ int is_decl;
+ extern char *strdup();
 
  uc->ugo_reqqualifiers = strdup(inaddr);
 
- fix_inaddr = ugo_old2newquals( inaddr );
+ is_decl = ( g_command_verb == e_undeclare ||
+             g_command_verb == e_declare );
+ fix_inaddr = ugo_old2newquals( inaddr, is_decl );
 
  if ( strchr(fix_inaddr,'?') == 0) {       /* no optional qualifiers */
   addr=upsutl_str_create(fix_inaddr,'p');

@@ -87,6 +87,7 @@ extern int UPS_NEED_DB;
 #define TRUE 1
 #endif
 
+
 /*
  * And now for something completely different
  */
@@ -119,6 +120,8 @@ int main(int argc, char *argv[])
       }
       ++i;
     }
+
+    g_command_verb = i;
 
     /* skip the command name */
     --argc;

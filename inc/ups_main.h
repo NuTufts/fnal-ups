@@ -45,5 +45,6 @@
 /*
  * Declarations of public variables.
  */
+extern int g_command_verb;
 
 #endif /* _UPS_MAIN_H_ */
