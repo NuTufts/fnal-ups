@@ -120,6 +120,8 @@ enum e_shell_type {
   e_CSHELL
 };
 
+#define SETUPENV "SETUP_"
+
 /*
  * Declaration of public functions.
  */
