@@ -419,12 +419,18 @@ sub WriteTableFile {
        print TableFile "Common:\n";
        print TableFile "   Action=setup\n";
        print TableFile "     doDefaults()\n";
-       $key=~s/DaSeTuP/      source(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
+       $key=~s/DaSeTuP/      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
        $key=~s/DaSeTuP//g;
-       print TableFile "$key";
+       if (open(TMPFILE,"${basedir}/ups/setup.${UPS_SHELL}")) {
+          close TMPFILE;
+          print TableFile "$key";
+       }
        $key=~s/setup/unsetup/g;
        print TableFile "   Action=unsetup\n";
-       print TableFile "$key";
+       if (open(TMPFILE,"${basedir}/ups/unsetup.${UPS_SHELL}")) {
+          close TMPFILE;
+          print TableFile "$key";
+       }
        print TableFile "     doDefaults()\n";
        $baseactions=&add_misactions;
        print TableFile "${baseactions}";
@@ -685,35 +691,35 @@ sub table_file {
 sub add_setup {
     my $value;
 #    $value ="      doDefaults()\n";
-#    $value.="      source(\${UPS_PROD_DIR}/ups/setup.\${UPS_SHELL})\n";
+#    $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/setup.\${UPS_SHELL})\n";
     $value="DaSeTuP"
 } 
 sub add_unsetup {
     my $value;
     $value ="      doDefaults()\n";
-    $value.="      source(\${UPS_PROD_DIR}/ups/unsetup.\${UPS_SHELL})\n";
+    $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/unsetup.\${UPS_SHELL})\n";
 } 
 sub add_misactions { 
     $value="";
     if (open(TMPFILE,"${basedir}/ups/tailor")) {
        close TMPFILE;
        $value.="   Action=Tailor\n";
-       $value.="      source(\${UPS_PROD_DIR}/ups/tailor)\n";
+       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/tailor)\n";
     }
     if (open(TMPFILE,"${basedir}/ups/configure")) {
        close TMPFILE;
        $value.="   Action=configure\n";
-       $value.="      source(\${UPS_PROD_DIR}/ups/configure)\n";
+       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/configure)\n";
     }
     if (open(TMPFILE,"${basedir}/ups/start")) {
        close TMPFILE;
        $value.="   Action=start\n";
-       $value.="      source(\${UPS_PROD_DIR}/ups/start)\n";
+       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/start)\n";
     }
     if (open(TMPFILE,"${basedir}/ups/stop")) {
        close TMPFILE;
        $value.="   Action=stop\n";
-       $value.="      source(\${UPS_PROD_DIR}/ups/stop)\n";
+       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/stop)\n";
     }
     return $value
 }
