@@ -2024,8 +2024,8 @@ int do_exit_action( const t_upsact_cmd * const a_cmd )
   */
 
 
-  int exit_flag;
-  int no_ups_env_flag;
+  int exit_flag = NO_EXIT;
+  int no_ups_env_flag = DO_UPS_ENV;
   int icmd;
 
   if ( ! a_cmd ) 
