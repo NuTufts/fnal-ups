@@ -3155,7 +3155,8 @@ static void f_addalias( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:      /* DjF added ; before } */
-      (void) sprintf(g_buff, "%s () { %s ;}\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
+      (void) sprintf(g_buff, "%s () { %s %s}\n#\n", a_cmd->argv[0], a_cmd->argv[1],
+                     ((a_cmd->argv[1])[strlen (a_cmd->argv[1]) - 1] != '&' ? ";" : ""));
       if (strstr(g_buff, g_ACTPARAM)) {
 	/* the string is already in there, add the parameter string */
 	if (fprintf((FILE *)a_stream, g_buff, g_SHPARAM) < 0) {
