@@ -27,6 +27,7 @@
 #include <string.h> /* for memset */
 
 /* ups specific include files */
+#include "upsutl.h"
 #include "upstyp.h"
 #include "upsmem.h"
 #include "upslst.h"
