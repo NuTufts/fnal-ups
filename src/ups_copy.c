@@ -59,7 +59,7 @@ static t_upsugo_command *free_ugo_struct(
  */
 
 extern t_cmd_info g_cmd_info[];
-extern t_cmd_map g_cmd_maps[];
+extern t_cmd_map g_func_info[];
 
 #define TRUE 1
 #define FALSE 0
@@ -289,7 +289,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 		       the new one */
 		    upsmem_free(command_item->data);
 		    sprintf(tmp_buf, "%s(\"%s\")", 
-			    g_cmd_maps[command->icmd].cmd, tmp_buf2);
+			    g_func_info[command->icmd].cmd, tmp_buf2);
 		    command_item->data = (void *)upsutl_str_create(tmp_buf,
 							   STR_TRIM_DEFAULT);
 		  }

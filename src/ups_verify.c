@@ -40,7 +40,7 @@
 /*
  * Definition of public variables.
  */
-extern t_cmd_map g_cmd_maps[];
+extern t_cmd_map g_func_info[];
 
 /*
  * Declaration of private functions.
@@ -273,11 +273,11 @@ static void ups_verify_table_instance(VERIFY_INST_PARAMS)
 	 command_item = command_item->next) {
       if ((cmd_line = upsact_parse_cmd((char *)command_item->data))) {
 	/* check that the number of parameters is legal */
-	if ((cmd_line->argc < g_cmd_maps[cmd_line->icmd].min_params) ||
-	    (cmd_line->argc > g_cmd_maps[cmd_line->icmd].max_params)) {
+	if ((cmd_line->argc < g_func_info[cmd_line->icmd].min_params) ||
+	    (cmd_line->argc > g_func_info[cmd_line->icmd].max_params)) {
 	  upserr_add(UPS_INVALID_ACTION_PARAMS, UPS_WARNING,
-		     action->action, g_cmd_maps[cmd_line->icmd].min_params,
-		     g_cmd_maps[cmd_line->icmd].max_params, cmd_line->argc);
+		     action->action, g_func_info[cmd_line->icmd].min_params,
+		     g_func_info[cmd_line->icmd].max_params, cmd_line->argc);
 	}
       } else {
 	upserr_add(UPS_INVALID_ACTION, UPS_WARNING, action->action);
