@@ -367,7 +367,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                UPS_DECLARE,
                                the_chain,
                                cinst->version);
-                 (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
+                 (void) upsfil_write_file(product, buffer,' ',JOURNAL);
+                 if (UPS_ERROR != UPS_SUCCESS)
+                 {
+                   (void) upsfil_clear_journal_files();
+                   upserr_vplace();
+                   return 0;
+                 }
                  unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
                  (void) sprintf(unchain,"un%s",the_chain);
                  if (!uc->ugo_C)
@@ -380,13 +386,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                    } else {
                      (void) upsfil_clear_journal_files();
                      upserr_vplace();
-                     return 0 ;
+                     return 0;
                    }
                  }
                  else
                  {
-                   upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
-                                 UPS_DECLARE, unchain, cinst->version);
+                   upsver_mes(1,"%sSkipping %s of %s version %s due to -C option\n",
+                                 UPS_DECLARE, unchain, uc->ugo_product, cinst->version);
                  }
                  free (unchain);
                }
@@ -416,7 +422,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
             upslst_add(product->instance_list,new_cinst);
          upsver_mes(1,"%sAdding %s chain version %s to %s\n",
                     UPS_DECLARE, the_chain, new_cinst->version, file);
-         (void )upsfil_write_file(product, file,' ',JOURNAL);  
+         (void) upsfil_write_file(product, file,' ',JOURNAL);  
+         if (UPS_ERROR != UPS_SUCCESS)
+         {
+           (void) upsfil_clear_journal_files();
+           upserr_vplace();
+           return 0;
+         }
         }
       }
 /************************************************************************
@@ -544,7 +556,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  UPS_DECLARE,
                  new_vinst->version,
                  buffer);
-      (void )upsfil_write_file(product, buffer, ' ', JOURNAL);  
+      (void) upsfil_write_file(product, buffer, ' ', JOURNAL);  
+      if (UPS_ERROR != UPS_SUCCESS)
+      {
+        (void) upsfil_clear_journal_files();
+        upserr_vplace();
+        return 0;
+      }
       version=1;
 /* Process the declare action */
       cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -578,8 +596,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       }
       else
       {
-        upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
-                      UPS_DECLARE, g_cmd_info[e_configure].cmd, new_vinst->version);
+        upsver_mes(1,"%sSkipping %s of %s version %s due to -C option\n",
+                      UPS_DECLARE, g_cmd_info[e_configure].cmd, uc->ugo_product, new_vinst->version);
       }
 
 /* Let them know if there is a tailor action for this product */
@@ -626,8 +644,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         } 
         else
         {
-          upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
-                        UPS_DECLARE, the_chain, uc->ugo_version);
+          upsver_mes(1,"%sSkipping %s of %s version %s due to -C option\n",
+                        UPS_DECLARE, the_chain, uc->ugo_product, uc->ugo_version);
         }
         if (!uc->ugo_C)
         {
