@@ -825,6 +825,11 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
       file_stream = NULL;
     }
   }
+
+  /* reset UPS_ERROR because we do not want any errors here to cause
+     damage anywhere else. */
+  UPS_ERROR = UPS_SUCCESS;
+
 }
 
 /*
