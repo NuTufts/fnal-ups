@@ -120,6 +120,10 @@ int main(int argc, char *argv[])
   while (command_line = upsugo_next(argc, &argv[1],
 				    g_cmd_info[i].valid_opts)) {
 
+    if (command_line->ugo_Z) {
+      upsutl_start_timing();
+    }
+
     switch (g_cmd_info[i].cmd_index) {
        case e_setup: ups_unk(command_line, argv[1]);
 	 break;
@@ -159,11 +163,17 @@ int main(int argc, char *argv[])
 	 break;
     }
 
+    if (command_line->ugo_Z) {
+      upsutl_stop_timing();
+    }
+
     if (UPS_ERROR != UPS_SUCCESS) {
-      upserr_output();
       break;
     }
   }
+
+  /* output any errors and the timing information */
+  upserr_output();
 
   return 0;
 }
