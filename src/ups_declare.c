@@ -48,6 +48,7 @@ extern t_cmd_info g_cmd_info[];
 #define CHAIN "chain"
 #define VERSION "version"
 #define DECLARE "declare"
+#define UPS_DECLARE "UPS declare: "
 
 static char buf[MAX_LINE_LEN];
 
@@ -197,7 +198,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
    } 
 /*   if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); }  */
    if (mproduct_list)    /* the product does exist */ 
-   { upsver_mes(1,"Product %s currently exist in database %s\n",
+   { upsver_mes(1,"%sProduct %s currently exist in database %s\n",
+                UPS_DECLARE,
                 uc->ugo_product,
                 db_info->name);
      break; 
@@ -243,7 +245,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            chain_list->next = save_next;
            chain_list->prev = save_prev;
          if (mproduct_list)  /* the chain exists */
-         { upsver_mes(1,"Chain %s currently exist\n",the_chain);
+         { upsver_mes(1,"%sChain %s currently exist\n",UPS_DECLARE,the_chain);
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
            uc->ugo_chain=chain_list;
@@ -258,7 +260,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
              return 0; 
            }
            if (mproduct_list)  /* different version only */
-           { upsver_mes(1,"same flavor and qualifiers exist\n");
+           { upsver_mes(1,"%ssame flavor and qualifiers exist\n",UPS_DECLARE);
              mproduct_list = upslst_first(mproduct_list);
              mproduct = (t_upstyp_matched_product *)mproduct_list->data;
              minst_list = (t_upslst_item *)mproduct->minst_list;
@@ -274,7 +276,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                cinst=cinst_list->data;
                product->instance_list = 
                   upslst_delete(product->instance_list,cinst,'d');
-               upsver_mes(1,"Deleting %s chain of version %s\n",
+               upsver_mes(1,"%sDeleting %s chain of version %s\n",
+                             UPS_DECLARE,
                              the_chain,
                              cinst->version);
                (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
@@ -337,7 +340,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          new_cinst->modified=upsutl_str_create(declared_date,' ');
          product->instance_list = 
             upslst_add(product->instance_list,new_cinst);
-         upsver_mes(1,"Adding %s chain version %s to %s\n",
+         upsver_mes(1,"%sAdding %s chain version %s to %s\n",
+                    UPS_DECLARE,
                     the_chain,
                     new_cinst->version,
                     buffer);
@@ -370,7 +374,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          return 0; 
        }
        if (!mproduct_list) 
-       { upsver_mes(1,"Version exists adding additional instance\n");
+       { upsver_mes(1,"%sVersion exists adding additional instance\n",
+                    UPS_DECLARE);
          product = upsget_version_file(db_info->name,
                                        uc->ugo_product,
                                        uc->ugo_version,
@@ -516,7 +521,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       }
       product->instance_list = 
           upslst_add(product->instance_list,new_vinst);
-      upsver_mes(1,"Adding version %s to %s\n",
+      upsver_mes(1,"%sAdding version %s to %s\n",
+                 UPS_DECLARE,
                  new_vinst->version,
                  buffer);
       (void )upsfil_write_file(product, buffer, ' ', JOURNAL);  
