@@ -53,6 +53,7 @@ int main (void)
   char db[] = ".";
   t_ups_instance instance;
   char command[] = "ups -c -f global thermonuclear_war";
+  t_upslst_item *list_ptr;
 
   instance.product = "middleEast";
   instance.version = "v1_0";
@@ -73,6 +74,9 @@ int main (void)
   if (upsutl_statistics(&instance, db, command) != UPS_SUCCESS) {
     upserr_output();
   }
+
+  /* Now test the function upsutl_get_files */
+  list_ptr = upsutl_get_files("/usrdevel/s1/berman/upsdb/tigger");
 
   return 0;
 }
