@@ -355,7 +355,7 @@ void upstbl_trim( t_upstbl * const table )
     for ( i = 0; i < table->size; i++ ) {
       for ( p = table->buckets[i]; p; p = p->link ) {
 	if ( ! p->value ) {
-	  keys[ nkeys ] = p->key;
+	  keys[ nkeys ] = (char *)p->key;
 	  nkeys++;
 	}
       }
