@@ -754,5 +754,45 @@ sub checkfor {
     $test = eval <<EOF;
 "$test"
 EOF
+#    print "$test\n";
+    $test=&expandtildes($test);
     return (-f $test);
+}
+
+sub expandtildes {
+    my($string) = $_[0];
+    my($users, @users, $rest, $user);
+    my(@res) = ();
+    my $dirsep="/";
+
+    # check for and do  tilde expansion
+    #
+    if ( $string =~ /\A\~([^${dirsep}]*)(.*)/ ) {
+        $users = $1;
+	$rest = $2;
+
+	if ( $users =~ /\{.*\}/) {
+	    @users = ($users =~ m/(\w+)/g);
+	    print "here users is @users\n" if ($debugflag);
+	    foreach $user (@users) {
+		unshift(@res, (&gethome($user) . $rest) );
+	    }
+
+	} else {
+            $string =~ s/\A\~([^${dirsep}]*)/&gethome($1)/e;
+	    unshift(@res, $string);
+	}
+    } else {
+        unshift(@res, $string);
+    }
+    return @res[0];
+}
+sub gethome {
+    my(@list);
+    if ( $_[0] eq '' ) {
+	return $ENV{'HOME'};
+    } else {
+	@list = getpwnam($_[0]);
+        return $list[7];
+    }
 }
