@@ -25,7 +25,7 @@ declare rover -status UPS_INVALID_SPECIFICATION
 declare rover v1_0 -f NULL -r /tmp
 declare rover v1_0 -f NULL -r /tmp -status UPS_INVALID_SPECIFICATION
 declare rover v1_0 -f IRIX -g leash -r /tmp
-declare rover v1_0 -g leash 
+declare rover v1_0 -g leash -H IRIX
 upserr_clear
 #
 # test most switches
