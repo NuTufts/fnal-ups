@@ -7,13 +7,6 @@ Flavor=ANY
 Qualifiers=""
 
 Common:
-   Action=uncurrent
-     doDefaults()
-     envSet(Ups_DB_Path, ${UPS_THIS_DB})
-     execute(${UPS_PROD_DIR}/ups/uncurrent)
-   Action=unconfigure
-     doDefaults{}
-     execute(${UPS_PROD_DIR}/ups/unconfigure)
    Action=configure
      doDefaults()
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
@@ -24,10 +17,11 @@ Common:
       execute(${UPS_PROD_DIR}/ups/current})
    Action=setup
      doDefaults()
-      sourceRequired(${UPS_PROD_DIR}/ups/setup.${UPS_SHELL})
-   Action=unsetup
-      sourceRequired(${UPS_PROD_DIR}/ups/unsetup.${UPS_SHELL})
-     doDefaults()
+     pathAppend(PATH, ${UPS_PROD_DIR}/bin, :)
+     addAlias(ups,${UPS_PROD_DIR}/bin/ups %s)
+     addAlias(setup,'${UPS_SOURCE} `${UPS_PROD_DIR}/bin/ups setup %s`');
+     addAlias(unsetup,'${UPS_SOURCE} `${UPS_PROD_DIR}/bin/ups setup %s`');
+#
 End:
 # End Group definition
 #*************************************************
