@@ -17,6 +17,7 @@ else
 endif
 #
 setenv OPERA "`$UPS_DIR/bin/dropit -p "'"$OPERA"'" -i' ' -d' ' FAUST`"
+if ("x${OPERA}" == "x") unsetenv OPERA
 #
 unsetenv OPERA
 #
