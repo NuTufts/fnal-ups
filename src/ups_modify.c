@@ -44,9 +44,16 @@ int choose_file( void );
 int edit_file( char * const file_name );
 int verify_file( char * const file_name );
 
+static void shutup(const FILE * const tmpfile, const int ups_command);
+
+#define SHUTUP \
+  if ((&bit_bucket == 0) && 0) shutup (tmpfile, ups_command);
+
 /*
  * Definition of global variables.
  */
+
+static long bit_bucket = 0;
 
 #define DEFAULT_EDITOR "vi"
 #define NOT_UNIQUE 1
@@ -106,6 +113,8 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
     else if ( file_no == QUIT ) 
       break;
   } while ( g_file_count > 1 );
+
+  SHUTUP;
 
   return g_mp_list;
 }
@@ -392,4 +401,10 @@ int verify_file( char * const file_name )
   (void) upsutl_free_matched_product_list( &l_mp );
 
   return ( UPS_ERROR == UPS_SUCCESS );
+}
+
+static void shutup(const FILE * const tmpfile, const int ups_command)
+{
+      bit_bucket ^= (long) tmpfile;
+      bit_bucket ^= (long) ups_command;
 }
