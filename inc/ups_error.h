@@ -17,6 +17,7 @@
  *
  * MODIFICATIONS:
  *       15-Jul-1997, EB, first
+ *       13-Aug-1997, LR, added UPS_LINE_TOO_LONG
  *
  ***********************************************************************/
 
@@ -54,7 +55,8 @@
 #define UPS_NO_TABLE_MATCH    12
 #define UPS_NO_FILE           13
 #define UPS_NO_MEMORY         14
-#define UPS_NERR              15      /*  this one must always be last */
+#define UPS_LINE_TOO_LONG     15
+#define UPS_NERR              16      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
@@ -93,4 +95,7 @@ extern char *g_error_ascii[];
 #define upserr_vplace() if (UPS_VERBOSE) { upserr_place() }
 
 #endif /* _UPS_ERROR_H_ */
+
+
+
 

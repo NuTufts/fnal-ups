@@ -16,6 +16,7 @@
  *
  * MODIFICATIONS:
  *       15-Jul-1997, EB, first
+ *       13-Aug-1997, LR, added UPS_LINE_TOO_LONG
  *
  ***********************************************************************/
 
@@ -60,7 +61,7 @@ static char *g_error_messages[UPS_NERR] = {
   "%s: Unable to open file %s.\n",
   "%s: Unable to read file %s.\n",
   "%s: Invalid keyword - %s, in %s found.\n",
-  "%s: No database specified on command line or in \$PRODUCTS.\n",
+  "%s: No database specified on command line or in $PRODUCTS.\n",
   "%s: CPU time used - %f, Wall clock time used %f.\n",
   "%s: File name and path too long, must be less than %d bytes.\n",
   "%s: No statistics directory specified.\n",
@@ -70,7 +71,8 @@ static char *g_error_messages[UPS_NERR] = {
   "%s: The passed filename was longer than the allowed system maximum (%d)\n",
   "%s: No instance matches were made between the version file (%s) and the table file (%s)\n",
   "%s: File not found - %s\n",
-  "%s: Cound not malloc %d bytes\n"
+  "%s: Cound not malloc %d bytes\n",
+  "%s: MAX_LINE_LEN exceeded in \"%s\"\n"
 };
 
 char *g_error_ascii[] = {
@@ -89,7 +91,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_TABLE_MATCH    12 */ "UPS_NO_TABLE_MATCH",
    /* UPS_NO_FILE           13 */ "UPS_NO_FILE",
    /* UPS_NO_MEMORY         14 */ "UPS_NO_MEMORY",
-   /* UPS_NERR              15    */ "UPS_NERR",
+   /* UPS_LINE_TOO_LONG     15 */ "UPS_LINE_TOO_LONG",
+   /* UPS_NERR              16    */ "UPS_NERR",
    0 };
 
 /*
