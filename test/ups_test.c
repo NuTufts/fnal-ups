@@ -33,6 +33,7 @@ int upstst_ugo_bldcmd(int, char**);
 int upstst_mat_instance(int, char**); 	
 int upstst_get_translation(int, char**);int upstst_get_allout(int, char**);
 int upstst_list(int, char**);
+int upstst_declare(int, char**);
 int upstst_act_print(int, char**);	int upstst_act_process_commands(int, char**); 
 
 /*=============================================================================
@@ -63,6 +64,7 @@ upstst_cmd_table_t upstst_my_cmds[] = {
 	"upsget_translation",	upstst_get_translation,
 	"upsget_allout",	upstst_get_allout,
 	"ups_list",		upstst_list,
+	"ups_declare",		upstst_declare,
 	"upsact_print",		upstst_act_print,
 	"upsact_process_commands",upstst_act_process_commands, 
 	NULL,			0};

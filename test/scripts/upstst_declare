@@ -1,0 +1,29 @@
+#!/bin/sh
+# ============================================================================
+# test the file routines
+# ============================================================================
+PRODUCTS="$UPS_DIR/test/scripts/declare/dbclean"; export PRODUCTS
+rm -rf $PRODUCTS
+mkdir $PRODUCTS
+cd $UPS_DIR/test/scripts/declare
+$UPS_DIR/test/ups_test << EOD
+#ups_echo "================================================================="
+#
+#
+ups_declare rover -status UPS_INVALID_SPECIFICATION 
+ups_declare rover v1_0 -f NULL
+ups_declare rover v1_0 -f NULL -status UPS_INVALID_SPECIFICATION
+ups_declare rover v1_0 -f IRIX -g leash
+#
+# test most switches
+#
+ups_declare rover v2_0 -f NULL -A backyard -b mycompile -D akc@kennel -g leash -L -m tablefile -M /tabledir -O "-blah" -q"red" -r /dog/house -T ftp:/tarfile -u /tmp -U /ups 
+#
+# make sure actions are executed
+#
+#ups_declare spot v1_0 -f NULL -r $UPS_DIR/test/scripts/declare/spot -m spot.table -c -d -o -t -n -g leash
+#ups_declare spot v1_0 -f NULL -c -d -o -t -n -g leash
+#ups_declare spot v2_0 -C -r $UPS_DIR/test/scripts/declare/spot -m spot.table
+quit
+EOD
+diff dbclean/rover dbcmp/rover

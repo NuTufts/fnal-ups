@@ -22,7 +22,7 @@ extern int              upstst_debug;            /* debug flag */
 #define UPSTST_SUCCESS		0
 #define UPSTST_NONZEROSUCCESS	10
 #define UPSTST_ZEROSUCCESS	20
-#define UPSTST_ALLOPTS	"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
+#define UPSTST_ALLOPTS	"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz01234"
 
 
 /* Macros:-
