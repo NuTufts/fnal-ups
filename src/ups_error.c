@@ -55,7 +55,7 @@ static int g_buf_start = G_ERROR_INIT;     /* pointer to oldest message */
 static char *g_error_buf[G_ERROR_BUF_MAX];
 
 /* And now the error messages */
-static char *g_error_messages[] = {
+static char *g_error_messages[UPS_NERR] = {
   "%s: Success.\n",
   "%s: Unable to open file %s.\n",
   "%s: Unable to read file %s.\n",
@@ -67,7 +67,7 @@ static char *g_error_messages[] = {
   "%s: Unable to write file %s.\n",
   "%s: Invalid argument specified \"%s\"\n",
   "%s: No instance matches were made between the chain file (%s) and the version (%s)\n",
-  "%s: The passed filename was longer than the allowed system maximum (%d)\n"
+  "%s: The passed filename was longer than the allowed system maximum (%d)\n",
   "%s: No instance matches were made between the version file (%s) and the table file (%s)\n",
   "%s: File not found - %s\n",
   "%s: Cound not malloc %d bytes\n"
