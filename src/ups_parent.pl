@@ -90,6 +90,7 @@ sub parseargs {
     @res = ();
     $a = join(' ', @ARGV);
     $dashz=0;
+    $savek = "";
 
     #
     # if they gave us a -z, set $PRODUCTS, and whine if they used -K
@@ -99,12 +100,22 @@ sub parseargs {
  	   $::ENV{'PRODUCTS'} = $_;
 	   $dashz = 0
         }
+        if ($dashk) {
+	   $savek = $_;
+           $_ = "";
+        }
 	if (/^-.*z/) {
 	   $dashz = 1
         }
-	if (/^-.*K/) {
-	    print STDERR "ERROR: -K not supported\n";
-	    return ();
+	if (/^-(.*)K(.*)/) {
+	    $savek = $2;
+            $others = $1;
+            if ($savek eq "") {
+               $dashk = 1;
+            }
+            if ($others ne "") {
+	       $_ = "-$others";
+            }
         }
     }
 
@@ -142,7 +153,11 @@ sub recurse_tree {
      
     if ( !defined($visited{$node}) ) {
 	@kids = sort(keys(%{$tree->{$node}}));
-	print $pre, $node, $how, "\n";
+        if ( $savek ne "" ) {
+            system ("ups list -K$savek $node");
+        } else {
+	    print $pre, $node, $how, "\n";
+        }
 	$visited{$node} = 1;
 	$k = $#kids;
 	$i = 0;
@@ -157,7 +172,9 @@ sub recurse_tree {
 	    $i++;
 	}
     } else {
-	print $pre, "(", $node, $how, ")\n";
+        if ( $savek eq "" ) {
+	    print $pre, "(", $node, $how, ")\n";
+        }
     }
 }
 
