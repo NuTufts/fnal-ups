@@ -38,6 +38,7 @@
  */
 
 #define UPSPRE "${UPS_"
+#define TILDE "~"
 
 #define get_element(STRING,ELEMENT)              \
 { STRING=0;                                      \
@@ -101,8 +102,6 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_OPTIONS", upsget_options },
   { "${UPS_VERBOSE", upsget_verbose },
   { "${UPS_EXTENDED", upsget_extended },
-  { "${UPS_FLAGS", 0 },
-  { "${UPS_FLAGSDEPEND", 0 },
   { "${UPS_THIS_DB", upsget_this_db},
   { "${UPS_SETUP", upsget_envstr },
   { "${UPS_ORIGIN", upsget_origin },
@@ -258,13 +257,15 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   int idx=0;
   int any=0;
   char * value;
+  char * work;
   newstr[0] = '\0';
-  upto = oldstr;
   inst_list = product->minst_list;
   db_info_ptr = product->db_info;
   instance = (t_upstyp_matched_instance *)(inst_list->data);
-  while (((loc = strstr(upto,UPSPRE))!= 0 ) ||
-         ((loc = strstr(upto,"${PRODUCTS}"))!=0) )
+  work = (char *) malloc((size_t)(strlen(oldstr) +1));
+  strcpy(work,oldstr);
+  upto = work;
+  while ((loc = strstr(upto,UPSPRE))!= 0 ) 
   { count = ( loc - upto );
     strncat(newstr,upto,count);
     upto += count;
@@ -275,22 +276,83 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
     { if (!strcmp(g_var_subs[idx].string,upto)) 
       { if (g_var_subs[idx].func)
         {  value=g_var_subs[idx].func(db_info_ptr,instance,command_line);
-           if(value) strcat(newstr,value);
+           if(value) { strcat(newstr,value); }
         }
         found=1;
         any++;
       }
     }
-    if (!found) { strcat(newstr,upto); strcat(newstr,"}");} 
+    if (!found) { strcat(newstr,upto); strcat(newstr,"}"); } 
     *eaddr = '}';
     upto =strchr(upto,'}') + 1;
   }
   if (any)
   { strcat(newstr,upto);
-    return newstr;
   } else {
-    return oldstr;
+    strcpy(newstr,work);
   }
+  free(work);
+  work = (char *) malloc((size_t)(strlen(newstr) +1));
+  strcpy(work,newstr);
+  upto = work;
+  newstr[0] = '\0';
+  any=0;
+  while ((loc = strstr(upto,"${PRODUCTS}"))!=0) 
+  { count = ( loc - upto );
+    strncat(newstr,upto,count);
+    upto += count;
+    eaddr =strchr(upto,'}');
+    *eaddr = '\0';
+    found=0;
+    if (!strcmp("${PRODUCTS",upto)) 
+    { value=upsget_database(db_info_ptr,instance,command_line);
+      if(value) { strcat(newstr,value); }
+      found=1;
+      any++;
+    } else { 
+      strcat(newstr,upto); 
+      strcat(newstr,"}");
+    } 
+    *eaddr = '}';
+    upto = strchr(upto,'}') + 1;
+  }
+  if (any)
+  { strcat(newstr,upto);
+  } else {
+    strcpy(newstr,work);
+  }
+  free(work);
+  work = (char *) malloc((size_t)(strlen(newstr) +1));
+  strcpy(work,newstr);
+  upto = work;
+  newstr[0] = '\0';
+  any=0;
+/* not working */
+  while ((loc = strstr(upto,TILDE))!=0) 
+  { count = ( loc - upto );
+    strncat(newstr,upto,count);
+    upto += count;
+    eaddr =strchr(upto,'/');
+    *eaddr = '\0';
+    found=0;
+    if (!strcmp(TILDE,upto)) 
+    { value=upsget_tilde_dir(upto);
+      if(value) { strcat(newstr,value); }
+      found=1;
+      any++;
+    } else { 
+      strcat(newstr,upto); 
+      strcat(newstr,"/");
+    } 
+    *eaddr = '/';
+    upto = strchr(upto,'/') + 1;
+  }
+  if (any)
+  { strcat(newstr,upto);
+  } else {
+    strcpy(newstr,work);
+  }
+  return newstr;
 }
 
 char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
@@ -451,6 +513,11 @@ char *upsget_database(const t_upstyp_db * const db_info_ptr,
     strcpy(string,db->name);
   } return(string);     
 } 
+char *upsget_tilde_dir(const char * const addr)
+{
+  static char *string="TEST";
+  return(string);
+}
 
 char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
