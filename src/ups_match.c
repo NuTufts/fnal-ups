@@ -76,10 +76,6 @@ static int match_from_table( const char * const a_product,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
 			     t_upslst_item ** const a_inst_list);
-static t_ups_match_product *match_product_new(const char * const a_db,
-					   t_upslst_item * const a_chain_list,
-					   t_upslst_item * const a_vers_list,
-				           t_upslst_item * const a_table_list);
 static char *get_table_file_path( const char * const a_prodname,
 				  const char * const a_tablefile,
 				  const char * const a_tablefiledir,
@@ -145,41 +141,104 @@ static int get_instance(const t_upslst_item * const a_read_instances,
  * umat_match_instance
  *
  * Given the input from the command line, find the instance(s) in UPS
- * that most closely matches 
+ * that most closely matches it.  if a ups database is passed in, only look
+ * in that db, else look in the database(s) obtained from the command line.
  *
- * Input : command line information, 
+ * Input : command line information, a database
  *         flag indicating if we only want one instance
  * Output: a list of matched instances
  * Return: <return>
  */
 t_ups_match_product *upsmat_match_instance(
 				   const t_ups_command * const a_command_line,
+				   const char * const a_db,
 				   const int a_need_unique)
 {
   t_upslst_item *db_item;
   t_ups_match_product *mproduct;
 
-  /* if no database was specified and we have a table file that is ok */
-  if ((a_command_line->ugo_db == NULL) && (a_command_line->ugo_M)) {
-    
+  if (a_db == NULL) {
+    /* look through all db's in the command line structure */
+
+    /* if no database was specified and we have a table file that is ok */
+    if ((a_command_line->ugo_db == NULL) && (a_command_line->ugo_M)) {
       mproduct = match_instance_core(a_command_line, NULL, a_need_unique);
-  } else {
-    for ( db_item = (t_upslst_item *)a_command_line->ugo_db ; db_item ;
-	  db_item = db_item->next ) {
-      mproduct = match_instance_core(a_command_line,
-				     (char *)db_item->data, a_need_unique);
-      if (UPS_ERROR != UPS_SUCCESS) {
-	/* We found an error, return */
-	break;
-      } else {
-	if (mproduct != NULL) {
-	  /* we found a match */
+    } else {
+      for ( db_item = (t_upslst_item *)a_command_line->ugo_db ; db_item ;
+	    db_item = db_item->next ) {
+	mproduct = match_instance_core(a_command_line,
+				       (char *)db_item->data, a_need_unique);
+	if (UPS_ERROR != UPS_SUCCESS) {
+	  /* We found an error, return */
 	  break;
+	} else {
+	  if (mproduct != NULL) {
+	    break;
+	  }
 	}
       }
     }
+  } else {
+    /* We only want to search through a single db. */
+    mproduct = match_instance_core(a_command_line, (char *)a_db,
+				   a_need_unique);
   }
   return mproduct;
+}
+
+/*-----------------------------------------------------------------------
+ * upsmat_mp_new
+ *
+ * Return an initialized matched product structure.
+ *
+ * Input : db name, list of chain instances, list of version intances,
+ *         list of table intsances, list of matched flavors, 
+ *         list of matched qualifiers
+ * Output: none
+ * Return: pointer to matched product structure, NULL if error.
+ */
+t_ups_match_product *upsmat_mp_new(const char * const a_db,
+				   t_upslst_item * const a_chain_list,
+				   t_upslst_item * const a_vers_list,
+				   t_upslst_item * const a_table_list)
+{
+  t_ups_match_product *mproduct;
+  
+  mproduct = (t_ups_match_product *)upsmem_malloc(sizeof(t_ups_match_product));
+  if (mproduct != NULL) {
+    upsmem_inc_refctr(a_db);      /* don't free db till we no longer need it */
+    mproduct->db = (char *)a_db;
+    mproduct->chain_list = a_chain_list;
+    mproduct->version_list = a_vers_list;
+    mproduct->table_list = a_table_list;
+  } else {
+    upserr_vplace();
+    upserr_add(UPS_NO_MEMORY, UPS_FATAL, sizeof(t_ups_match_product));
+  }
+
+  return mproduct;
+}
+
+/*-----------------------------------------------------------------------
+ * upsmat_mp_free
+ *
+ * Free a matched product structure.
+ *
+ * Input : pointer to matched product structure
+ * Output: none
+ * Return: NULL matched product pointer
+ */
+t_ups_match_product *upsmat_mp_free(t_ups_match_product *a_mproduct)
+{
+
+  /* we incremented this in the upsmat_mp_new function */
+  upsmem_dec_refctr(a_mproduct->db);
+  upsmem_free((void *)a_mproduct);
+
+  /* avoid people using this address again */
+  a_mproduct = NULL;
+
+  return a_mproduct;
 }
 
 /*
@@ -228,7 +287,7 @@ static t_ups_match_product *match_instance_core(
     /* if we got some matches, fill out our matched product structure */
     if (num_matches != 0) {
       tinst_list = upslst_first(tinst_list);        /* back up to start */
-      mproduct = match_product_new(a_db, NULL, NULL, tinst_list);
+      mproduct = upsmat_mp_new(a_db, NULL, NULL, tinst_list);
     }
     
   /* see if we were passed a version. if so, don't worry
@@ -248,7 +307,7 @@ static t_ups_match_product *match_instance_core(
     if (UPS_ERROR == UPS_SUCCESS) {
       tinst_list = upslst_first(tinst_list);        /* back up to start */
       vinst_list = upslst_first(vinst_list);        /* back up to start */
-      mproduct = match_product_new(a_db, NULL, vinst_list, tinst_list);
+      mproduct = upsmat_mp_new(a_db, NULL, vinst_list, tinst_list);
     }
 
   } else {
@@ -272,7 +331,7 @@ static t_ups_match_product *match_instance_core(
       tinst_list = upslst_first(tinst_list);        /* back up to start */
       vinst_list = upslst_first(vinst_list);        /* back up to start */
       cinst_list = upslst_first(cinst_list);        /* back up to start */
-      mproduct = match_product_new(a_db, cinst_list, vinst_list, tinst_list);
+      mproduct = upsmat_mp_new(a_db, cinst_list, vinst_list, tinst_list);
     }
       
   }
@@ -540,39 +599,6 @@ static int match_from_table( const char * const a_product,
   }
     
     return num_matches;
-}
-
-/*-----------------------------------------------------------------------
- * match_product_new
- *
- * Return an initialized matched product structure.
- *
- * Input : db name, list of chain instances, list of version intances,
- *         list of table intsances, list of matched flavors, 
- *         list of matched qualifiers
- * Output: none
- * Return: pointer to matched product structure, NULL if error.
- */
-static t_ups_match_product *match_product_new(const char * const a_db,
-			  	           t_upslst_item * const a_chain_list,
-				           t_upslst_item * const a_vers_list,
-				           t_upslst_item * const a_table_list)
-{
-  t_ups_match_product *mproduct;
-  
-  mproduct = (t_ups_match_product *)upsmem_malloc(sizeof(t_ups_match_product));
-  if (mproduct != NULL) {
-    upsmem_inc_refctr(a_db);      /* don't free db till we no longer need it */
-    mproduct->db = (char *)a_db;
-    mproduct->chain_list = a_chain_list;
-    mproduct->version_list = a_vers_list;
-    mproduct->table_list = a_table_list;
-  } else {
-    upserr_vplace();
-    upserr_add(UPS_NO_MEMORY, UPS_FATAL, sizeof(t_ups_match_product));
-  }
-
-  return mproduct;
 }
 
 /*-----------------------------------------------------------------------

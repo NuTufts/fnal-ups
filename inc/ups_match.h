@@ -40,7 +40,15 @@
  */
 t_ups_match_product *upsmat_match_instance( 
 				    const t_ups_command * const a_command_line,
+				    const char * const a_db,
 				    const int a_need_unique );
+
+t_ups_match_product *upsmat_mp_new(const char * const a_db,
+				   t_upslst_item * const a_chain_list,
+				   t_upslst_item * const a_vers_list,
+				   t_upslst_item * const a_table_list);
+
+t_ups_match_product *upsmat_mp_free(t_ups_match_product *a_mproduct);
 
 /*
  * Declaration of private globals.
