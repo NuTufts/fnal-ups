@@ -87,6 +87,44 @@ char * upsutl_environment(const char * const a_env_var)
 }
 
 /*-----------------------------------------------------------------------
+ * upsutl_free_matched_instance_list
+ *
+ * Given a matched instance list, free all the matched instances and the
+ * list too.
+ * 
+ * Input : matched instance list pointer
+ * Output: none
+ * Return: Null
+ */
+t_upslst_item *upsutl_free_matched_instance_list(
+					   t_upslst_item ** const a_minst_list)
+{
+  t_upslst_item *list_item = NULL;
+  t_upstyp_matched_instance *minst_ptr = NULL;
+  
+  /* make sure we are at the beginning of the list */
+  *a_minst_list = upslst_first(*a_minst_list);
+
+  /* free the instances */
+  for (list_item = *a_minst_list; list_item; list_item = list_item->next) {
+    minst_ptr = (t_upstyp_matched_instance *)(list_item->data);
+    if (minst_ptr->chain) {
+      ups_free_instance(minst_ptr->chain);
+    }
+    if (minst_ptr->version) {
+      ups_free_instance(minst_ptr->version);
+    }
+    if (minst_ptr->table) {
+      ups_free_instance(minst_ptr->table);
+    }
+  }
+
+  /* Now free the list */
+  *a_minst_list = upslst_free(*a_minst_list, ' ');
+
+  return NULL;
+}
+/*-----------------------------------------------------------------------
  * upsutl_free_inst_list
  *
  * Given an instance list, free all the instances and the list too.
