@@ -30,9 +30,7 @@ Name_Of_Ups=$UPS_PROD_NAME
 Script_Prefix=set${Name_Of_Ups}
 
 Setups_Products_Init_Default="/\${Node}/products/ups_database/declared \
-				/usr/products/ups_database/declared \
 				/usr/products/declared \
-				/afs/fnal/products/ups_database/declared \
 				/usr/upsII/ups_database/devel \
 				/usr/upsII/ups_database/declared/oss \
 				/usr/upsII/ups_database/declared/afs"
@@ -92,7 +90,7 @@ then
     Name_Of_Sh=/bin/bash
 elif [ -x /usr/bin/bash ]
 then
-    Name_Of_Shell=/usr/bin/bash
+    Name_Of_Sh=/usr/bin/bash
 elif [ -x /bin/ksh ]
 then
     Name_Of_Sh=/bin/ksh
@@ -118,7 +116,6 @@ else
     echo '**' $Setups_Flag defined as $Setups_Home in 
     echo '**' $Ups_DB_Path/.upsfiles/dbconfig
 fi
-
 
 #
 # determine the location for the startup and shutdown files.
@@ -172,22 +169,20 @@ cat <<XEoF >$BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 #
 $UPS_PROD_DIR
 XEoF
+
+cat <<XEoF >$BootStrap_Dir/setups_find_home
+#!${Name_Of_Sh}
 #
-# Ensure that some sort of PRODUCTS initialization string exists.
+# This script will return, on stdout, the resolved directory
+# associated with the only argument
 #
-# Use the upsdb_list template as a default.
-#
-#if [ ! -f $Setups_Home/$Setups_Products_Init_File ]
-#then
-    if [ -f $Ups_Dir/ups/$Setups_Products_Init_File ]
-    then
-#        cp $Ups_Dir/ups/$Setups_Products_Init_File $BootStrap_Dir
-	Setups_Products_Init_Default=`cat $Ups_Dir/ups/$Setups_Products_Init_File|grep -v'^#'`
-    elif [ -f $Setups_Home/$Setups_Products_Init_File.template ]
-    then
-	Setups_Products_Init_Default=`cat $Ups_Dir/ups/$Setups_Products_Init_File.template|grep -v'^#'`
-    fi
-#fi
+eval Home=\${1}
+cat <<EoF 
+\$Home
+EoF
+XEoF
+
+chmod +x $BootStrap_Dir/setups_find_home
 #
 if [ ! -x $BootStrap_Dir/$Setups_Products_Script ]
 then
@@ -227,7 +222,9 @@ cat <<XEoF >$BootStrap_Dir/$Setups_Products_Script
 # This script was generated when $Name_Of_Ups was configured.
 #
 
-Setups_Home=$Setups_Home
+#Setups_Home=__Setups_Home__
+
+Products_List_Home=$Setups_Home
 
 BootStrap_Dir=$BootStrap_Dir
 
@@ -254,9 +251,9 @@ node=\$Node; NODE=\$Node
 # the one in $Setups_Home is preferred.
 # Other wise use the default created at configure time.
 #
-if [ -r \$Setups_Home/\$Products_String_File ]
+if [ -r \$Products_List_Home/\$Products_String_File ]
 then
-    Products_String=\`cat \$Setups_Home/\$Products_String_File|grep -v '^#'\`
+    Products_String=\`cat \$Products_List_Home/\$Products_String_File|grep -v '^#'\`
     Products_String="\${UPS_EXTRA_DIR} \${Products_String}"
 #elif [ -r \$BootStrap_Dir/\$Products_String_File ]
 #then
@@ -364,7 +361,7 @@ cat <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 #    is used to determine the UPS_DIR variable.
 #
 
-set Setups_Home=$Setups_Home
+setenv Setups_Home $Setups_Home
 
 set BootStrap_Dir=$BootStrap_Dir
 
@@ -475,6 +472,7 @@ unset mach
 unset Flavor
 unset Setups_Home
 unset Name_Of_Ups
+unsetenv $Setups_Home
 XEoF
 fi
 #
@@ -554,6 +552,13 @@ Name_Of_Ups=$Name_Of_Ups
 BootStrap_Dir=$BootStrap_Dir
   
 # === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
+
+if [ "\`echo \$Setups_Home|cut -c1\`" = "~" ]
+then
+    Setups_Home=\`(unset ENV;\$BootStrap_Dir/setups_find_home \$Setups_Home)\`
+fi
+
+export Setups_Home
 
 Setups_Is_Current_Flag=0
 
@@ -709,7 +714,7 @@ do
 rm -f $BootStrap_Dir/ups_${Start_Or_Stop}
 echo '**' Creating $BootStrap_Dir/ups_${Start_Or_Stop}
 cat <<XEoF >$BootStrap_Dir/ups_${Start_Or_Stop}
-#!/bin/sh 
+#!${Name_Of_Sh}
 #
 #================== Copyright Notice =====================
 # 
@@ -903,7 +908,7 @@ then
 # machines.  Change this to the directory in which the
 # setups.* scripts live.
 
-Setups_Home_Dir=$Setups_Home
+Setups_Home_Dir=\$Setups_Dir
 
 Setups_Product_Init_File=$Setups_Products_Init_File
 
@@ -916,20 +921,7 @@ BootStrap_Dir=$BootStrap_Dir
 # the database was initialized
 #
 
-Product_String="\${UPS_EXTRA_DIR:-} \
-	    ${Ups_DB_Path:-} \
-            /\${Node}/products/ups_database/declared \
-            ~products/ups_database/declared \
-            ~products/ups_database \
-            ~products/upsdb \
-            /usr/products/ups_database/declared \
-		/usr/products/ups_database \
-		/usr/products/declared \
-            /afs/fnal/products/ups_database/declared \
-           /afs/fnal/products/upsdb \
-    		/usr/upsII/ups_database/devel \
-		/usr/upsII/ups_database/declared/oss \
-		/usr/upsII/ups_database/declared/afs"
+Product_String="$Setups_Products_Init_Default"
 
 #
 # === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
@@ -1116,7 +1108,7 @@ then
 fi
 echo '**' Creating $BootStrap_Dir/current
 cat <<XEoF >$BootStrap_Dir/current
-#!/bin/sh
+#!${Name_Of_Sh}
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #
@@ -1189,14 +1181,20 @@ then
     exit 1
 fi
 #
-# Tell uncurrent script it has work to do
+# Mark ALL BootStrap files current.
 #
-ed -  \$BootStrap_Dir/uncurrent <<EoFed >/dev/null
+rm -f \$BootStrap_Dir/zzzzzzzzzz
+cat << EoFed >\$BootStrap_Dir/zzzzzzzzzz
 /Setups_Is_Current/
 s/Setups_Is_Current_Flag=0/Setups_Is_Current_Flag=1/
 w
 q
 EoFed
+for filex in \$BootStrap_Dir/*
+do
+    ed -  \$filex <\$BootStrap_Dir/zzzzzzzzzz >/dev/null
+done
+rm -f \$BootStrap_Dir/zzzzzzzzzz
 #
 # Don't forget to copy the ${Script_Prefix}.common script to
 # /usr/local/etc.  Just in case everything else
@@ -1216,13 +1214,6 @@ fi
     do
         Diff_rc='0'
 	file=\`echo \$filex|sed "s%\$BootStrap_Dir/%%"\`
-#	sed 's%Setups_Is_Current_Flag=0%Setups_Is_Current_Flag=1%' \$filex
-	ed -  \$filex <<EoFed >/dev/null
-/Setups_Is_Current/
-s/Setups_Is_Current_Flag=0/Setups_Is_Current_Flag=1/
-w
-q
-EoFed
         if [ ! -f \$Setups_Home/\$file ]
         then
             Diff_rc='1'
@@ -1265,13 +1256,6 @@ for Start_Or_Stop in startup shutdown
 do
     if [ -f \$BootStrap_Dir/ups_\${Start_Or_Stop} ]
     then
-#	sed 's%Setups_Is_Current_Flag=0%Setups_Is_Current_Flag=1%' \$BootStrap_Dir/ups_\$(Start_Or_Start}
-	ed -  \$BootStrap_Dir/ups_\${Start_Or_Start} <<EoFed >/dev/null
-/Setups_Is_Current/
-s/Setups_Is_Current_Flag=0/Setups_Is_Current_Flag=1/g
-w
-q
-EoFed
 	if [ \`echo \$Startup_Home|grep -c '.upsfiles'\` != 0 ]
 	then
  	    if [ ! -d \$Startup_Home/\$Start_Or_Stop ]
@@ -1310,7 +1294,7 @@ then
 fi
 echo '**' Creating $BootStrap_Dir/uncurrent
 cat <<XEoF >$BootStrap_Dir/uncurrent
-#!/bin/sh
+#!${Name_Of_Sh}
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #
