@@ -477,6 +477,21 @@ ups, upd, setup, unsetup -- access to Fermilab local products
 .SH SEE ALSO
 sh(1), csh(1), bash(1), tcsh(1)
 .SH BUGS
- User defined variables in group stanzas get lost.
- A setupRequired using -g current and -H flavor may coredump.
- The bash shell complains about sourcing /dev/null.
+ o User defined variables in group stanzas get lost.
+ o Modify's -E option does nothing.
+ o The bash shell complains about sourcing /dev/null.
+ o There have been reports of declarations being incorrectly made in the 
+   first database in the $PRODUCTS list if there's a match (error?) in the 
+   nth database.
+ o There have been reports of problems with list -K with empty database
+   directories.
+ o (Un)declares may fail if there's an error detected, even if it's not
+   relevant to the product at hand.
+ o Leading spaces in quoted strings (used with -G and -O, for example)
+   are not trimmed and cause errors.
+ o The -P option is only partially effective, and commands can fail even
+   with -P if there are no databases available.
+ o Not all of the variables available to functions are available to scripts
+   executed by table files.
+ o There are reports that envPrepend commands fail with tcsh if the
+   variable doesn't already exist.

@@ -1,21 +1,18 @@
-<p>
-<ul>
-<li>
-On NT when an action is listed and has no functions, get a strange error.  What
-happens is that when UPs outputs the '/dev/null/' (for setup /unsetup) because 
-the temp file is empty (because the action was empty), NT complains.
-<li>
-ups declare will not declare an instance of flavor IRIX say, unless that of
-flavor Linux is reachable and ok.  not good if only mounting IRIX products
-disk and table file is there.
-<li>
--N is not supported by ups modify.
-<li>
--N is not supported by ups verify.
-<li>
-unsetting of UPS_COMPAT handled wrong in tmp file.  it is unset too early 
-and other products may need it.
-<li>
-ups undeclare should either allow multiple flavors in a list or complain about
-it.
-</ul>
+User defined variables in group stanzas get lost.
+Modify's -E option does nothing.
+The bash shell complains about sourcing /dev/null.
+There have been reports of declarations being incorrectly made in the
+  first database in the $PRODUCTS list if there's a match (error?) in the
+  nth database.
+There have been reports of problems with list -K with empty database
+  directories.
+(Un)declares may fail if there's an error detected, even if it's not
+  relevant to the product at hand.
+Leading spaces in quoted strings (used with -G and -O, for example)
+  are not trimmed and cause errors.
+The -P option is only partially effective, and commands can fail even
+  with -P if there are no databases available.
+Not all of the variables available to functions are available to scripts
+  executed by table files.
+There are reports that envPrepend commands fail with tcsh if the
+  variable doesn't already exist.
