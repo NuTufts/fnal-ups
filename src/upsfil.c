@@ -89,16 +89,6 @@ enum {
   e_key_eof = -1
 };
 
-/* enum of known file types (changes here should be reflected in cfilei) */
-enum e_ups_file {
-  e_file_version = 0,
-  e_file_table,
-  e_file_chain,
-  e_file_dbconfig,
-  e_file_unknown,
-  e_file_count
-};
-
 #define CHAR_REMOVE " \t\n\r\f\""
 
 static t_upstyp_product  *g_pd = 0; /* current product to fill */
