@@ -112,7 +112,7 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_cur,
 t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
 				     t_upslst_item *const cmd_list );
 int actname2enum( const char * const act_name );
-char *action2inst( const t_upsact_item *const p_cur );
+char *actitem2inststr( const t_upsact_item *const p_cur );
 int dbl2dbs( char * const db_name, t_upslst_item * const l_db );
 t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act );
 int lst_cmp_str( t_upslst_item * const l1, t_upslst_item * const l2 );
@@ -627,7 +627,7 @@ void upsact_print_item( const t_upsact_item *const p_cur,
   
   if ( strchr( sopt, 't' ) ) for ( i=0; i<p_cur->level; i++ ) { printf( "   " ); }
   if ( strchr( sopt, 'l' ) ) printf( "%d:", p_cur->level );
-  printf( "%s", action2inst( p_cur ) );
+  printf( "%s", actitem2inststr( p_cur ) );
   if ( strchr( sopt, 'a' ) ) {
     printf( ":" );
     upsact_print_cmd( p_cur->cmd );
@@ -1114,7 +1114,7 @@ t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
   return 0;    
 }
 
-char *action2inst( const t_upsact_item *const p_cur )
+char *actitem2inststr( const t_upsact_item *const p_cur )
 {
   static char buf[MAX_LINE_LEN];
   t_upstyp_matched_instance *mat_inst;
@@ -1125,11 +1125,22 @@ char *action2inst( const t_upsact_item *const p_cur )
 
   l_item = upslst_first( p_cur->mat->minst_list );
   mat_inst = (t_upstyp_matched_instance *)l_item->data;
-  strcpy( buf, upsget_envstr( 0, mat_inst, p_cur->ugo ) );
+  strcpy( buf, upsget_envstr( p_cur->mat->db_info, mat_inst, p_cur->ugo ) );
   l_item = upslst_first( p_cur->ugo->ugo_chain );
   if ( l_item && l_item->data ) {
     strcat( buf, " -g " );
     strcat( buf, (char *)l_item->data );
+    
+    /* the following should in princip never happen: a dependency should
+       only be reachable by a single chain, so maybe we should print an
+       error here instead */
+
+    for ( l_item = l_item->next; l_item; l_item = l_item->next ) {
+      if ( l_item->data ) {
+	strcat( buf, ":" );
+	strcat( buf, (char *)l_item->data );
+      }
+    } 
   }
 
   return buf;
