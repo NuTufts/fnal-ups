@@ -2173,6 +2173,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 		 (t_upstyp_matched_instance *)p_act_itm->mat->minst_list->data,
 		 p_act_itm->mat->db_info, p_act_itm->ugo,
 		 (char *)l_cmd->data );
+
     p_cmd = upsact_parse_cmd( p_line );
     if ( p_cmd && ((i_cmd = p_cmd->icmd) != e_invalid_cmd) ) {
 
@@ -2225,24 +2226,30 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	else if ( i_cmd == e_setuprequired ||
 		  i_cmd == e_setupoptional ) {
 
-	  /* SPECIAL when using a SETUP action to create an UNSETUP,
-	     only use the product name */
+	  /* SPECIAL use a SETUP action to create an UNSETUP action */
 
 	  if ( argc > 0 ) {
 	    char *cmd_line = p_cmd->argv[0];
-	    t_upsugo_command *a_cmd_ugo = 0;
+	    t_upsugo_command *a_cmd_ugo = 0;	    
 
 	    if ( ! strchr( cmd_line, ' ' ) ) {
 	      strcat( buf, cmd_line );
 	    }
 	    else {
 	      a_cmd_ugo = upsugo_bldcmd( cmd_line, g_cmd_info[e_unsetup].valid_opts );
-	      strcat( buf, a_cmd_ugo->ugo_product );
+	      
+	      /* check if the product is setuped.
+		 this is a (kind of) hack, for not loosing the instance 
+		 information when the product has not been setuped.
+	         - if it's not setuped, use the original instance
+	         - if it's setuped, use only the product name */
+
+	      if ( upsugo_getenv( a_cmd_ugo->ugo_product ) )
+		strcat( buf, a_cmd_ugo->ugo_product );
+	      else
+		strcat( buf, cmd_line );
 	      upsugo_free( a_cmd_ugo );
 	    }
-	  }
-	  else if ( argc > 0 ) {
-	      strcat( buf, p_cmd->argv[0] );
 	  }
 	}
 	else {
@@ -2265,6 +2272,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 
 	l_ucmd = upslst_insert( l_ucmd, 
 				upsutl_str_create( buf, ' ' ) );
+
       }
       upsmem_free( p_cmd );      
     }    
