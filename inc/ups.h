@@ -44,6 +44,7 @@
 #include "ups_create.h"
 #include "ups_declare.h"
 #include "ups_depend.h"
+#include "ups_flavor.h"
 #include "ups_get.h"
 #include "ups_list.h"
 #include "ups_main.h"
@@ -57,6 +58,6 @@
 #include "ups_unk.h"
 #include "ups_unsetup.h"
 #include "ups_undeclare.h"
-#include "ups_flavor.h"
+#include "ups_verify.h"
 
 #endif /* _UPS_H_ */
