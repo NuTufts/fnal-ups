@@ -288,6 +288,12 @@ int ups_free_instance( t_upstyp_instance * const inst_ptr )
     
     if ( inst_ptr->compile_dir ) { upsmem_free( inst_ptr->compile_dir ); }    
     if ( inst_ptr->compile_file ) { upsmem_free( inst_ptr->compile_file ); }
+
+    if ( inst_ptr->catman_files ) { upsmem_free( inst_ptr->catman_files ); }
+    if ( inst_ptr->html_files ) { upsmem_free( inst_ptr->html_files ); }
+    if ( inst_ptr->info_files ) { upsmem_free( inst_ptr->info_files ); }
+    if ( inst_ptr->man_files ) { upsmem_free( inst_ptr->man_files ); }
+    if ( inst_ptr->news_files ) { upsmem_free( inst_ptr->news_files ); }
     
     if ( inst_ptr->db_dir ) { upsmem_free( inst_ptr->db_dir ); }
   
