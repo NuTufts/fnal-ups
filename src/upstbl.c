@@ -334,13 +334,32 @@ void upstbl_free( t_upstbl ** const table )
 void upstbl_dump( t_upstbl * const table, const int iopt )
 {
   int i;
-  struct binding *p;
+  struct binding *bp;
+  struct atom *ap;
+
+  /* just print number of items */
 
   printf( "total number of items in table = %d\n", table ? table->length : 0 );
+
   if ( iopt <= 0 )
     return;
 
+  /* dump all elements in table */
+
+  printf( "\ndumping table:\n" );
   for ( i = 0; i < table->size; i++ )
-    for ( p = table->buckets[i]; p; p = p->link )
-      printf( "bucket %d : %s\n", i, (char *)p->key );
+    for ( bp = table->buckets[i]; bp; bp = bp->link )
+      printf( "%x, table bucket %d, %s\n", (unsigned int)bp->key, i, (char *)bp->key );
+
+  if ( iopt <= 5 )
+    return;
+
+  /* dump keys */
+
+  printf( "\ndumping atoms:\n" );
+  for ( i = 0; i < (int)NELEMS(buckets); i++ )
+    for ( ap = buckets[i]; ap; ap = ap->link ) 
+      printf( "%x, key bucket %d, %s\n", (unsigned int)ap->str, i, (char *)ap->str );
+
+  return;
 }
