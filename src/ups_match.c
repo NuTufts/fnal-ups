@@ -53,9 +53,9 @@ static int match_from_chain( const char * const a_product,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
-			     t_upslst_item * const a_cinst_list,
-			     t_upslst_item * const a_vinst_list,
-			     t_upslst_item * const a_tinst_list);
+			     t_upslst_item ** const a_cinst_list,
+			     t_upslst_item ** const a_vinst_list,
+			     t_upslst_item ** const a_tinst_list);
 static int match_from_version( const char * const a_product,
 			       const char * const a_version,
 			       const char * const a_upsdir,
@@ -64,8 +64,8 @@ static int match_from_version( const char * const a_product,
 			       const int a_need_unique,
 			       const t_upslst_item * const a_flavor_list,
 			       const t_upslst_item * const a_quals_list,
-			       t_upslst_item * const a_vinst_list,
-			       t_upslst_item * const a_tinst_list);
+			       t_upslst_item ** const a_vinst_list,
+			       t_upslst_item ** const a_tinst_list);
 static int match_from_table( const char * const a_product,
 			     const char * const a_tablefile,
 			     const char * const a_tablefiledir,
@@ -75,7 +75,7 @@ static int match_from_table( const char * const a_product,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
-			     t_upslst_item * const a_inst_list);
+			     t_upslst_item ** const a_inst_list);
 static t_ups_match_product *match_product_new(const char * const a_db,
 					   t_upslst_item * const a_chain_list,
 					   t_upslst_item * const a_vers_list,
@@ -91,7 +91,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 			const t_upslst_item * const a_flavor_list,
 			const t_upslst_item * const a_quals_list,
 			const int a_need_unique,
-			t_upslst_item *a_list_instances);
+			t_upslst_item ** const a_list_instances);
 
 /*
  * Definition of global variables.
@@ -99,6 +99,43 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 #ifndef NULL
 #define NULL
 #endif
+
+#define TMP_LISTS_FREE() \
+      if (tmp_flavor_list) {                                     \
+	/* set to initial value first */                         \
+	tmp_flavor_list->data = (void *)first_flavor;            \
+	tmp_quals_list->data = (void *)first_quals;              \
+	tmp_flavor_list = upslst_free(tmp_flavor_list, ' ');     \
+	tmp_quals_list = upslst_free(tmp_quals_list, ' ');       \
+      }
+	
+#define TMP_LISTS_SET()	\
+     if (tmp_flavor_list == NULL) {                                        \
+       tmp_flavor_list = upslst_insert(tmp_flavor_list, inst->flavor);     \
+       tmp_quals_list = upslst_insert(tmp_quals_list, inst->qualifiers);   \
+     } else {                                                              \
+       /* we already have a list just change the value pointed to */       \
+       tmp_flavor_list->data = (void *)(inst->flavor);                     \
+       tmp_quals_list->data = (void *)(inst->qualifiers);                  \
+       /* save these first values as when we delete the list we will have  \
+          to put these back on first so that the reference counter can     \
+          be decremented properly. */                                      \
+       first_flavor = inst->flavor;                                        \
+       first_quals = inst->qualifiers;                                     \
+     }
+
+#define USE_CMD_LINE_INFO() \
+      if (a_upsdir) {                                \
+	tmp_upsdir = (char *)a_upsdir;               \
+      } else {                                       \
+	tmp_upsdir = inst->ups_dir;                  \
+      }                                              \
+      if (a_productdir) {                            \
+	tmp_productdir = (char *)a_productdir;       \
+      } else {                                       \
+	tmp_productdir = inst->prod_dir;             \
+      }
+
 
 /*
  * Definition of public functions.
@@ -185,7 +222,8 @@ static t_ups_match_product *match_instance_core(
 				   a_command_line->ugo_upsdir,
 				   a_command_line->ugo_productdir, a_db, 
 				   a_need_unique, a_command_line->ugo_flavor,
-				   a_command_line->ugo_qualifiers, tinst_list);
+				   a_command_line->ugo_qualifiers,
+				   &tinst_list);
     
     /* if we got some matches, fill out our matched product structure */
     if (num_matches != 0) {
@@ -201,7 +239,7 @@ static t_ups_match_product *match_instance_core(
 				     a_command_line->ugo_productdir, a_db, 
 				     a_need_unique, a_command_line->ugo_flavor,
 				     a_command_line->ugo_qualifiers, 
-				     vinst_list, tinst_list);
+				     &vinst_list, &tinst_list);
     
 
     /* We went thru the list of version instances, get a matched product
@@ -222,7 +260,7 @@ static t_ups_match_product *match_instance_core(
 				     a_command_line->ugo_productdir, a_db, 
 				     a_need_unique, a_command_line->ugo_flavor,
 				     a_command_line->ugo_qualifiers, 
-				     cinst_list, vinst_list, tinst_list);
+				     &cinst_list, &vinst_list, &tinst_list);
     }
 
     /* We went thru the list of version instances, get a matched product
@@ -260,11 +298,11 @@ static int match_from_chain( const char * const a_product,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
-			     t_upslst_item * const a_cinst_list,
-			     t_upslst_item * const a_vinst_list,
-			     t_upslst_item * const a_tinst_list)
+			     t_upslst_item ** const a_cinst_list,
+			     t_upslst_item ** const a_vinst_list,
+			     t_upslst_item ** const a_tinst_list)
 {
-  int file_chars = 0, num_matches = 0;
+  int file_chars = 0, num_matches = 0, tmp_num_matches = 0;
   char buffer[FILENAME_MAX+1];
   t_ups_product *read_product;
   t_upslst_item *cinst;
@@ -272,21 +310,17 @@ static int match_from_chain( const char * const a_product,
   t_ups_instance *inst;
   char *first_flavor, *first_quals;
   char *tmp_upsdir, *tmp_productdir;
-  FILE *filePtr=NULL;
 
   /* Get total length of chain file name including path */
   file_chars = (int )(strlen(a_chain) + strlen(a_product) + strlen(a_db) + 
                sizeof(CHAIN_SUFFIX) + 4);
   if (file_chars <= FILENAME_MAX) {
     sprintf(buffer, "%s/%s/%s%s", a_db, a_product, a_chain, CHAIN_SUFFIX);
-    if ((filePtr == fopen(buffer, "r")) == 0) {
-      upserr_add(UPS_READ_FILE, UPS_ERROR, buffer);
-      return 0;
-    }
-    if ((read_product = upsfil_read_file(filePtr)) != NULL) {
+    if ((read_product = upsfil_read_file(&buffer[0])) != NULL) {
       /* get all the instances that match command line input */
-      num_matches = get_instance(read_product->instance_list, a_flavor_list,
-				 a_quals_list, a_need_unique, a_cinst_list);
+      tmp_num_matches = get_instance(read_product->instance_list,
+				     a_flavor_list, a_quals_list,
+				     a_need_unique, a_cinst_list);
 
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the a_cinst_list */
@@ -296,62 +330,44 @@ static int match_from_chain( const char * const a_product,
 	 look for the instance that matches the instance found in the chain
 	 file.  this insures that an instance in a chain file is
 	 matched only with an instance in the associated version file. */
-      for (cinst = a_cinst_list ; cinst ; cinst = cinst->next) {
+      for (cinst = *a_cinst_list ; cinst ; cinst = cinst->next) {
 	/* get a table file */
 	inst = (t_ups_instance *)cinst->data;
 
-	/* make 2 lists, one of the desired flavor and one of the
-	   desired qualifier to match */
-	if (tmp_flavor_list == NULL) {
-	    tmp_flavor_list = upslst_add(tmp_flavor_list, inst->flavor);
-	    tmp_quals_list = upslst_add(tmp_quals_list, inst->qualifiers);
-	} else {
-	  /* we already have a list just change the value pointed to */
-	  tmp_flavor_list->data = (void *)(inst->flavor);
-	  tmp_quals_list->data = (void *)(inst->qualifiers);
-
-	  /* save these first values as when we delete the list we will have
-	     to put these back on first so that the reference counter can
-	     be decremented properly. */
-	  first_flavor = inst->flavor;
-	  first_quals = inst->qualifiers;
-	}
+	/* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
+	   desired flavor and one of the desired qualifier to match */
+	TMP_LISTS_SET();
 
 	/* see if any command line info should override what we read from the
 	   files */
-	if (a_upsdir) {
-	  tmp_upsdir = (char *)a_upsdir;
-	} else {
-	  tmp_upsdir = inst->ups_dir;
-	}
-	if (a_productdir) {
-	  tmp_productdir = (char *)a_productdir;
-	} else {
-	  tmp_productdir = inst->prod_dir;
-	}
+	USE_CMD_LINE_INFO();
 
-	num_matches = match_from_version(inst->product, inst->version,
-					 tmp_upsdir, tmp_productdir, a_db,
-					 a_need_unique, tmp_flavor_list,
-					 tmp_quals_list, a_vinst_list,
-					 a_tinst_list);
-	if (num_matches == 0) {
+	tmp_num_matches = match_from_version(inst->product, inst->version,
+					     tmp_upsdir, tmp_productdir, a_db,
+					     a_need_unique, tmp_flavor_list,
+					     tmp_quals_list, a_vinst_list,
+					     a_tinst_list);
+	if (tmp_num_matches == 0) {
 	  /* We should have had a match, this is an error */
 	  upserr_add(UPS_NO_VERSION_MATCH, UPS_FATAL, buffer,
 		     inst->version);
+
+	  /* clean up */
+	  num_matches = 0;
+	  *a_vinst_list = upslst_free(*a_cinst_list, 'd');
+	  *a_vinst_list = upslst_free(*a_vinst_list, 'd');
+	  *a_tinst_list = upslst_free(*a_tinst_list, 'd');
+
 	  break;                        /* stop any search */
 	}
+
+	/* keep a running count of the number of matches found */
+	++num_matches;
       }
 
       /* we no longer need the lists */
-      if (tmp_flavor_list) {
-	/* set to initial value first */
-	tmp_flavor_list->data = (void *)first_flavor;
-	tmp_quals_list->data = (void *)first_quals;
-	tmp_flavor_list = upslst_free(tmp_flavor_list, ' ');
-	tmp_quals_list = upslst_free(tmp_quals_list, ' ');
-      }
-	
+      TMP_LISTS_FREE();
+
     } else {
       /* Could not read file */
       upserr_add(UPS_READ_FILE, UPS_FATAL, buffer);
@@ -387,10 +403,11 @@ static int match_from_version( const char * const a_product,
 			       const int a_need_unique,
 			       const t_upslst_item * const a_flavor_list,
 			       const t_upslst_item * const a_quals_list,
-			       t_upslst_item * const a_vinst_list,
-			       t_upslst_item * const a_tinst_list)
+			       t_upslst_item ** const a_vinst_list,
+			       t_upslst_item ** const a_tinst_list)
 {
-  int file_chars, num_matches = 0;
+
+  int file_chars, num_matches = 0, tmp_num_matches = 0;
   char buffer[FILENAME_MAX+1];
   t_ups_product *read_product;
   t_upslst_item *vinst;
@@ -398,7 +415,6 @@ static int match_from_version( const char * const a_product,
   t_ups_instance *inst;
   char *first_flavor, *first_quals;
   char *tmp_upsdir, *tmp_productdir;
-  FILE *filePtr=NULL;
 
   /* Get total length of version file name including path */
   file_chars = (int )(strlen(a_version) + strlen(a_product) + strlen(a_db) + 
@@ -406,14 +422,11 @@ static int match_from_version( const char * const a_product,
   if (file_chars <= FILENAME_MAX) {
     sprintf(buffer, "%s/%s/%s%s", a_db, a_product, a_version,
 	    VERSION_SUFFIX);
-    if ((filePtr == fopen(buffer, "r")) == 0) {
-      upserr_add(UPS_READ_FILE, UPS_ERROR, buffer);
-      return 0;
-    }
-    if ((read_product = upsfil_read_file(filePtr)) != NULL) {
+    if ((read_product = upsfil_read_file(&buffer[0])) != NULL) {
       /* get all the instances that match command line input */
-      num_matches = get_instance(read_product->instance_list, a_flavor_list,
-				 a_quals_list, a_need_unique, a_vinst_list);
+      tmp_num_matches = get_instance(read_product->instance_list,
+				     a_flavor_list, a_quals_list,
+				     a_need_unique, a_vinst_list);
 
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the a_vinst_list */
@@ -423,60 +436,42 @@ static int match_from_version( const char * const a_product,
 	 look for the instance that matches the instance found in the version
 	 file.  this insures that an instance in a version file is
 	 matched only with an instance in the associated table file. */
-      for (vinst = a_vinst_list ; vinst ; vinst = vinst->next) {
-	/* get a table file */
+      for (vinst = *a_vinst_list ; vinst ; vinst = vinst->next) {
+
+	/* get an instance and thus a table file */
 	inst = (t_ups_instance *)vinst->data;
 
-	/* make 2 lists, one of the desired flavor and one of the
-	   desired qualifier to match */
-	if (tmp_flavor_list == NULL) {
-	    tmp_flavor_list = upslst_add(tmp_flavor_list, inst->flavor);
-	    tmp_quals_list = upslst_add(tmp_quals_list, inst->qualifiers);
-	} else {
-	  /* we already have a list just change the value pointed to */
-	  tmp_flavor_list->data = (void *)(inst->flavor);
-	  tmp_quals_list->data = (void *)(inst->qualifiers);
-
-	  /* save these first values as when we delete the list we will have
-	     to put these back on first so that the reference counter can
-	     be decremented properly. */
-	  first_flavor = inst->flavor;
-	  first_quals = inst->qualifiers;
-	}
+	/* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
+	   desired flavor and one of the desired qualifier to match */
+	TMP_LISTS_SET();
 
 	/* see if any command line info should override what we read from the
 	   files */
-	if (a_upsdir) {
-	  tmp_upsdir = (char *)a_upsdir;
-	} else {
-	  tmp_upsdir = inst->ups_dir;
-	}
-	if (a_productdir) {
-	  tmp_productdir = (char *)a_productdir;
-	} else {
-	  tmp_productdir = inst->prod_dir;
-	}
+	USE_CMD_LINE_INFO();
 
-	num_matches = match_from_table(inst->product, inst->table_file,
-				       inst->table_dir, tmp_upsdir,
-				       tmp_productdir, a_db, a_need_unique,
-				       tmp_flavor_list, tmp_quals_list,
-				       a_tinst_list);
-	if (num_matches == 0) {
+	tmp_num_matches = match_from_table(inst->product, inst->table_file,
+					   inst->table_dir, tmp_upsdir,
+					   tmp_productdir, a_db, a_need_unique,
+					   tmp_flavor_list, tmp_quals_list,
+					   a_tinst_list);
+	if (tmp_num_matches == 0) {
 	  /* We should have had a match, this is an error */
 	  upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer, inst->table_file);
+
+	  /* clean up */
+	  num_matches = 0;
+	  *a_vinst_list = upslst_free(*a_vinst_list, 'd');
+	  *a_tinst_list = upslst_free(*a_tinst_list, 'd');
+
 	  break;                        /* stop any search */
 	}
+
+	/* keep a running total of the matches we found */
+	++num_matches;
       }
 
       /* we no longer need the lists */
-      if (tmp_flavor_list) {
-	/* set to initial value first */
-	tmp_flavor_list->data = (void *)first_flavor;
-	tmp_quals_list->data = (void *)first_quals;
-	tmp_flavor_list = upslst_free(tmp_flavor_list, ' ');
-	tmp_quals_list = upslst_free(tmp_quals_list, ' ');
-      }
+      TMP_LISTS_FREE();
 	
     } else {
       /* Could not read file */
@@ -513,22 +508,17 @@ static int match_from_table( const char * const a_product,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
-			     t_upslst_item * const a_tinst_list)
+			     t_upslst_item ** const a_tinst_list)
 {
   char *full_table_file;
   t_ups_product *read_product;
   int num_matches = 0;
-  FILE *filePtr = NULL;
 
   full_table_file = get_table_file_path(a_product, a_tablefile,
 					a_tablefiledir, a_upsdir, a_productdir,
 					a_db);
   if (full_table_file != NULL) {
-    if ((filePtr = fopen(full_table_file, "r")) == 0) {
-      upserr_add(UPS_READ_FILE, UPS_ERROR, full_table_file);
-      return 0;
-    }
-    if ((read_product = upsfil_read_file(filePtr)) != NULL) {
+    if ((read_product = upsfil_read_file(full_table_file)) != NULL) {
       /* get all the instances that match command line input */
        num_matches = get_instance(read_product->instance_list, a_flavor_list,
 				  a_quals_list, a_need_unique, a_tinst_list);
@@ -685,7 +675,7 @@ char *get_table_file_path( const char * const a_prodname,
       if ((total_chars = file_chars + (int )(strlen(a_prodname) + strlen(a_db))
 	                 + 1)
 	  <= FILENAME_MAX) {
-	sprintf(buffer, "%s/%s/%s", a_db, a_productdir, a_tablefile);
+	sprintf(buffer, "%s/%s/%s", a_db, a_prodname, a_tablefile);
 	if (is_a_file(buffer) == UPS_SUCCESS) {
 	  G_SAVE_PATH(total_chars);        /* found it */
 	}
@@ -714,9 +704,9 @@ return path_ptr;
 static int is_a_file(const char * const a_filename)
 {
   int status = UPS_SUCCESS;
-  struct stat *buf = NULL;
+  struct stat buf;
 
-  if (stat(a_filename, buf) == -1) {
+  if (stat(a_filename, &buf) == -1) {
     status = UPS_NO_FILE;
   }
 
@@ -742,16 +732,21 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 			const t_upslst_item * const a_flavor_list,
 			const t_upslst_item * const a_quals_list,
 			const int a_need_unique,
-			t_upslst_item *a_list_instances)
+			t_upslst_item ** const a_list_instances)
 {
   int got_match;
   t_upslst_item *tmp_list, *tmp_flavor_list, *tmp_quals_list;
+  t_upslst_item *first_instance_ptr;
   t_ups_instance *instance;
   char *flavor = NULL, *quals = NULL;
-  int num_matches  = 0;
+  int num_matches  = 0, want_all_f = 1, want_all_q = 1;
+
+  /* save a pointer to the beginning of the instances list as we will be
+     adding to the list which returns a pointer to the last element of the
+     list.  we will need to return the first element pointer */
+  first_instance_ptr = *a_list_instances;
 
   /* loop over all the flavors from the flavor list */
-  
   for (tmp_flavor_list = (t_upslst_item *)a_flavor_list; tmp_flavor_list ;
        tmp_flavor_list = tmp_flavor_list->next) {
     flavor = (char *)tmp_flavor_list->data;
@@ -762,23 +757,25 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	 tmp_list = tmp_list->next) {
       instance = (t_ups_instance *)(tmp_list->data);
       if ((! strcmp(instance->flavor, flavor)) ||
-	  (! strcmp(flavor, ANY_MATCH))) {
+	  (! (want_all_f = strcmp(flavor, ANY_MATCH)))) {
 
 	/* They do - now compare the qualifiers */
 	for (tmp_quals_list = (t_upslst_item *)a_quals_list; tmp_quals_list ;
 	     tmp_quals_list = tmp_quals_list->next) {
 	  quals = (char *)tmp_quals_list->data;
 	  if ((! strcmp(instance->qualifiers, quals)) ||
-	      (! strcmp(quals, ANY_MATCH))) {
-	    /* They do. Save the instance */
-	    a_list_instances = upslst_insert(a_list_instances,
-					     (void *)instance);
+	      (! (want_all_q = strcmp(quals, ANY_MATCH)))) {
+	    /* They do. Save the instances in the order they came in. */
+	    *a_list_instances = upslst_add(*a_list_instances,
+					   (void *)instance);
 	    ++num_matches;
 	    got_match = 1;
 	    break;
   	  }
 	}
-	if (got_match == 1) {
+	/* if we got a match and we only want one, break.  if we got a match
+	   and want as many as we can get but not any-match (*), break */
+	if (got_match && (a_need_unique || (want_all_f && want_all_q))) {
 	  /* go get the next flavor */
 	  break;
 	}
@@ -788,6 +785,14 @@ static int get_instance(const t_upslst_item * const a_read_instances,
     if ((a_need_unique) && got_match) {
       break;
     }
+  }
+
+  /* point to the beginning of the list.  if the first instance pointer is
+     NULL, then we started the list here, so we must find the first instance */
+  if (! first_instance_ptr) {
+    *a_list_instances = upslst_first(*a_list_instances);
+  } else {
+    *a_list_instances = first_instance_ptr;
   }
   return num_matches;
 }
