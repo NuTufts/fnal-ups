@@ -151,7 +151,8 @@ int main(int argc, char *argv[])
 	  case e_unconfigure: ups_unconfigure(command_line, temp_file,
 					      e_unconfigure);
 	    break;
-	  case e_undeclare: ups_undeclare(command_line);
+	  case e_undeclare: ups_undeclare(command_line, temp_file,
+                                          e_undeclare);
 	    break;
 	  case e_flavor: ups_flavor(command_line);
 	    break;
@@ -161,7 +162,7 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_validate: ups_unk(command_line, argv[1], e_validate);
 	    break;
-	  case e_declare: ups_declare(command_line);
+	  case e_declare: ups_declare(command_line, temp_file, e_declare);
 	    break;
 	  case e_unk: ups_unk(command_line, argv[1], e_unk);
 	    break;

@@ -46,6 +46,7 @@
 
 #define CHAIN "chain"
 #define VERSION "version"
+#define DECLARE "declare"
 
 /*
  * Definition of public functions.
@@ -60,7 +61,8 @@
  * Output: 
  * Return: 
  */
-void ups_declare( t_upsugo_command * const uc )
+void ups_declare( t_upsugo_command * const uc ,
+                  const FILE * const tmpfile, const int ups_command)
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *minst_list = NULL;
@@ -95,8 +97,6 @@ void ups_declare( t_upsugo_command * const uc )
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
   time_t seconds=0;
-
-  FILE *tmpfile;
 
   if (!uc->ugo_product || !uc->ugo_version )
   { printf("To Declare a product you must specify a product and a version \n");
@@ -174,19 +174,20 @@ void ups_declare( t_upsugo_command * const uc )
          uc->ugo_version=0;
          uc->ugo_flavor = upslst_new((void *)ANY_MATCH);
          uc->ugo_qualifiers = upslst_new((void *)ANY_MATCH);
+           save_next = chain_list->next;
+           save_prev = chain_list->prev;
+           chain_list->next=0;
+           chain_list->prev=0;
+           uc->ugo_chain=chain_list;
          mproduct_list = upsmat_instance(uc, db_list , not_unique);
+           chain_list->next = save_next;
+           chain_list->prev = save_prev;
          if (mproduct_list)  /* the chain exists */
          { upsver_mes(1,"Chain %s currently exist\n",the_chain);
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
            uc->ugo_chain=chain_list;
-           save_next = chain_list->next;
-           save_prev = chain_list->prev;
-           chain_list->next=0;
-           chain_list->prev=0;
            mproduct_list = upsmat_instance(uc, db_list , need_unique);
-           chain_list->next = save_next;
-           chain_list->prev = save_prev;
            if (mproduct_list)  /* different version only */
            { upsver_mes(1,"same flavor and qualifiers exist\n");
              mproduct_list = upslst_first(mproduct_list);
@@ -211,8 +212,7 @@ void ups_declare( t_upsugo_command * const uc )
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                           mproduct, unchain);
                if (UPS_ERROR == UPS_SUCCESS) 
-               { upsact_process_commands(cmd_list, tmpfile);
-               }
+               { upsact_process_commands(cmd_list, tmpfile); }
                upsact_cleanup(cmd_list);
              }
            } /* Get chain file (again) */
@@ -313,5 +313,31 @@ void ups_declare( t_upsugo_command * const uc )
                file);
     (void )upsfil_write_file(product, file, 'd');  
     }
-    if (uc->ugo_chain) { printf("chain actions not done yet!!\n"); }
+    if (uc->ugo_chain)
+    { uc->ugo_flavor=save_flavor;
+      uc->ugo_qualifiers=save_qualifiers;
+      uc->ugo_version=save_version;
+      for (chain_list = uc->ugo_chain ; chain_list ;
+           chain_list = chain_list->next)
+      { the_chain = (char *)(chain_list->data);
+        save_next = chain_list->next;
+        save_prev = chain_list->prev;
+        chain_list->next=0;
+        chain_list->prev=0;
+        uc->ugo_chain=chain_list;
+        mproduct_list = upsmat_instance(uc, db_list , need_unique);
+        chain_list->next = save_next;
+        chain_list->prev = save_prev;
+        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                    mproduct, the_chain);
+        if (UPS_ERROR == UPS_SUCCESS) 
+        { upsact_process_commands(cmd_list, tmpfile); }
+        upsact_cleanup(cmd_list);
+        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                    mproduct, g_cmd_info[ups_command].cmd);
+        if (UPS_ERROR == UPS_SUCCESS) 
+        { upsact_process_commands(cmd_list, tmpfile); }
+        upsact_cleanup(cmd_list);
+      }
+    }
 }

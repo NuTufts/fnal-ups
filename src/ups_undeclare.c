@@ -61,7 +61,8 @@
  * Output: 
  * Return: 
  */
-void ups_undeclare( t_upsugo_command * const uc )
+void ups_undeclare( t_upsugo_command * const uc ,
+                    const FILE * const tmpfile, const int ups_command)
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *minst_list = NULL;
@@ -73,31 +74,17 @@ void ups_undeclare( t_upsugo_command * const uc )
   t_upstyp_matched_instance *minst = NULL;
   int not_unique = 0;
   int need_unique = 1;
-  t_upslst_item *save_flavor;
-  t_upslst_item *save_qualifiers;
-  t_upslst_item *save_chain;
-  char * save_version;
   t_upstyp_product *product;
   char buffer[FILENAME_MAX+1];
   char *file=buffer;
   char *the_chain;
-  char *the_flavor;
-  char *the_qualifiers;
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
-  t_upstyp_instance *new_cinst;             /* new chain instance  */
   t_upslst_item *vinst_list;                /* version instance list */
   t_upstyp_instance *vinst;                 /* version instance      */
-  t_upstyp_instance *new_vinst;             /* new version instance  */
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
-  char *username;
-  struct tm *mytime;
-  char *declared_date;
   char *unchain;
-  time_t seconds=0;
-
-  FILE *tmpfile;
 
   if (!uc->ugo_product || (!uc->ugo_version && !uc->ugo_chain) )
   { printf("To undeclare a product -\n");
@@ -110,7 +97,7 @@ void ups_undeclare( t_upsugo_command * const uc )
     exit(1);
   }
   if (!uc->ugo_f || (int)(upslst_count(uc->ugo_flavor) > 1) )
-  { printf("To Declare a product you must specify A flavor \n");
+  { printf("To undeclare a product you must specify A flavor \n");
     exit(1);
   }
   mproduct_list = upsmat_instance(uc, db_list , not_unique);
@@ -118,13 +105,6 @@ void ups_undeclare( t_upsugo_command * const uc )
   { printf("Can find NO matching product entry - doing NOTHING\n");
     exit(1);
   }
-  username=upsutl_user();
-  seconds=time(0);
-  mytime = localtime(&seconds);
-  mytime->tm_mon++; /* correct jan=0 */
-  declared_date = (char *) malloc((size_t)(9));
-  sprintf(declared_date,"%d-%d-%d",
-          mytime->tm_mon,mytime->tm_mday,mytime->tm_year);
 
 /************************************************************************
  *
@@ -176,6 +156,7 @@ void ups_undeclare( t_upsugo_command * const uc )
           save_prev = chain_list->prev;
           chain_list->next=0;
           chain_list->prev=0;
+          uc->ugo_chain=chain_list;
           mproduct_list = upsmat_instance(uc, db_list , need_unique);
           chain_list->next = save_next;
           chain_list->prev = save_prev;
@@ -203,8 +184,12 @@ void ups_undeclare( t_upsugo_command * const uc )
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                          mproduct, unchain);
               if (UPS_ERROR == UPS_SUCCESS) 
-              { upsact_process_commands(cmd_list, tmpfile);
-              }
+              { upsact_process_commands(cmd_list, tmpfile); }
+              upsact_cleanup(cmd_list);
+              cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                         mproduct,g_cmd_info[ups_command].cmd);
+              if (UPS_ERROR == UPS_SUCCESS) 
+              { upsact_process_commands(cmd_list, tmpfile); }
               upsact_cleanup(cmd_list);
             }
           } 
@@ -240,12 +225,11 @@ void ups_undeclare( t_upsugo_command * const uc )
         upsver_mes(1,"Deleting version %s\n",
                       vinst->version);
         (void )upsfil_write_file(product, file,' '); 
-        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+/*        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                    mproduct, UNDECLARE);
         if (UPS_ERROR == UPS_SUCCESS) 
-        { upsact_process_commands(cmd_list, tmpfile);
-        }
-        upsact_cleanup(cmd_list);
+        { upsact_process_commands(cmd_list, tmpfile); }
+        upsact_cleanup(cmd_list); */
       }
     }
 }
