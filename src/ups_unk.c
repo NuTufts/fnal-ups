@@ -79,13 +79,17 @@ t_upslst_item *ups_unk(const t_upsugo_command * const a_command_line,
       /* Now process the actions */
       cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
 				mproduct, a_unk_cmd, e_unk);
-      if (UPS_ERROR == UPS_SUCCESS) {
+      if (cmd_list && UPS_ERROR == UPS_SUCCESS) {
 	upsact_process_commands(cmd_list, a_temp_file);
+      } else if (!cmd_list && UPS_ERROR == UPS_SUCCESS) {
+	/* tell people that nothing was found in case they really meant
+	   something else and just mistyped */
+	upserr_add(UPS_NO_ACTION, UPS_INFORMATIONAL, a_unk_cmd);
       }
       /* now clean up the memory that we used */
       upsact_cleanup(cmd_list);
     }
-  } 
+  }
 
   return(mproduct_list);
 
