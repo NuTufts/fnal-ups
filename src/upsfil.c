@@ -464,6 +464,8 @@ int write_version_file( void )
     put_key( "UPS_DIR", inst_ptr->ups_dir );
     put_key( "TABLE_DIR", inst_ptr->table_dir );
     put_key( "TABLE_FILE", inst_ptr->table_file );
+    put_key( "COMPILE_DIR", inst_ptr->compile_dir );
+    put_key( "COMPILE_FILE", inst_ptr->compile_file );
     put_key( "ARCHIVE_FILE", inst_ptr->archive_file );
     put_key( "AUTHORIZED_NODES", inst_ptr->authorized_nodes );
     if ( inst_ptr->statistics )

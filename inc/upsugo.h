@@ -96,7 +96,7 @@ typedef struct ups_command
     int     ugo_T;           /* archive file name                    */
     char    *ugo_archivefile; 
     int     ugo_u;           /* compile file dir                     */
-    char    *ugo_compile_file_dir;
+    char    *ugo_compile_dir;
     int     ugo_U;           /* ups directory location               */
     char    *ugo_upsdir; 
     int     ugo_v;           /* verbose                              */

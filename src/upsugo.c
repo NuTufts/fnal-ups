@@ -349,7 +349,7 @@
 #define case_u           \
          case 'u':       \
          uc->ugo_u = 1;  \
-         set_value (uc->ugo_compile_file_dir, "u")
+         set_value (uc->ugo_compile_dir, "u")
 #define case_U           \
          case 'U':       \
          uc->ugo_U = 1;  \
@@ -489,8 +489,8 @@ int upsugo_ifornota(struct ups_command * const uc)
      }
 /* the ugo_number is an after the fact processing and the -H is kept
    in the os_name until after so they must be dealt with specifically  */
-     if (!uc->ugo_flavor || uc->ugo_number || uc->ugo_H ) 
-     { if(!uc->ugo_number && !uc->ugo_H )
+     if (!uc->ugo_flavor || uc->ugo_number /* || uc->ugo_H */ ) 
+     { if(!uc->ugo_number /* && !uc->ugo_H */ )
        { addr=upsutl_str_create("*",' ');  
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
        } else {

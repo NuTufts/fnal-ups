@@ -58,6 +58,8 @@ enum e_upskey_key {
   e_key_authorized_nodes,
   e_key_description,
   e_key_statistics,
+  e_key_compile_dir,
+  e_key_compile_file,
 
   e_key_db_dir,
   e_key_action,

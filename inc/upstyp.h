@@ -99,8 +99,8 @@ typedef struct upstyp_instance
   char             *authorized_nodes;
   char             *description;  
   char             *statistics;
+  char             *compile_dir;
   char             *compile_file;
-  char             *compile_file_dir;
   
   char             *db_dir;  
   

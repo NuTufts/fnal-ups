@@ -105,6 +105,7 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_EXTENDED", upsget_extended },
   { "${UPS_THIS_DB", upsget_this_db},
   { "${UPS_SETUP", upsget_envstr },
+  { "${UPS_COMPILE", upsget_compile },
   { "${UPS_ORIGIN", upsget_origin },
   { "${PRODUCTS", upsget_database },
   {  0, 0 }
@@ -416,6 +417,19 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
   } else { 
     get_element(string,prod_dir);
   }
+  return string;
+}
+char *upsget_compile(const t_upstyp_db * const db_info_ptr,
+                     const t_upstyp_matched_instance * const instance,
+                     const t_upsugo_command * const command_line )
+{ 
+  static char newstr[4096];
+  static char *string = 0;
+  *newstr='\0';
+  get_element(string,compile_dir);
+  if (string) strcpy(newstr,string);
+  get_element(string,compile_file);
+  if (string) strcat(newstr,string);
   return string;
 }
 char *upsget_origin(const t_upstyp_db * const db_info_ptr,

@@ -315,7 +315,7 @@ void ups_declare( t_upsugo_command * const uc ,
       new_vinst->ups_dir=uc->ugo_upsdir;
       new_vinst->origin=uc->ugo_origin;
       new_vinst->compile_file=uc->ugo_compile_file;
-      new_vinst->compile_file_dir=uc->ugo_compile_file_dir;
+      new_vinst->compile_dir=uc->ugo_compile_dir;
       if (uc->ugo_O) /* single value quicky must seperate by : lines */
       { new_vinst->user_list = upslst_add(new_vinst->user_list,uc->ugo_options);
       }

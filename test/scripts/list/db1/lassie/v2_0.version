@@ -9,6 +9,8 @@ QUALIFIERS = "nodbg:opt"
   PROD_DIR = /NULL/lassie
   UPS_DIR = ups
   TABLE_FILE = lassie.table
+  COMPILE_DIR = /products/compiled
+  COMPILE_FILE = lassie.collar
   ORIGIN = roddy@village.england
 
 FLAVOR = IRIX+5.3

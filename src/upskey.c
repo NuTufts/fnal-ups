@@ -82,22 +82,25 @@ static t_upskey_map g_key_map[] =
   { 17, "AUTHORIZED_NODES", NO,   15,    2, 0x00001001 },
   { 18, "DESCRIPTION",      NO,   16,   NO, 0x00000010 },
   { 19, "STATISTICS",       NO,   17,    3, 0x00001001 },
-  { 20, "DB_DIR",           NO,   18,   NO, 0x00000000 },
-  { 21, "ACTION",           NO,   19,   NO, 0x00000010 },
-  { 22, "USER",             NO,   20,   NO, 0x00000011 },
+  { 20, "COMPILE_DIR",      NO,   18,   NO, 0x00000001 },
+  { 21, "COMPILE_FILE",     NO,   19,   NO, 0x00000001 },
 
-  { 23, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
-  { 24, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
-  { 25, "INFO_PATH",        NO,   NO,    5, 0x00001000 },
-  { 26, "NEWS_PATH",        NO,   NO,    6, 0x00001000 },
-  { 27, "HTML_PATH",        NO,   NO,    7, 0x00001000 },
+  { 22, "DB_DIR",           NO,   20,   NO, 0x00000000 },
+  { 23, "ACTION",           NO,   21,   NO, 0x00000010 },
+  { 24, "USER",             NO,   22,   NO, 0x00000011 },
+
+  { 25, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
+  { 26, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
+  { 27, "INFO_PATH",        NO,   NO,    5, 0x00001000 },
+  { 28, "NEWS_PATH",        NO,   NO,    6, 0x00001000 },
+  { 29, "HTML_PATH",        NO,   NO,    7, 0x00001000 },
   
 
-  { 28, "GROUP:",           NO,   NO,   NO, 0x00000010 },
-  { 29, "COMMON:",          NO,   NO,   NO, 0x00000010 },
-  { 30, "END:",             NO,   NO,   NO, 0x00000010 },
+  { 30, "GROUP:",           NO,   NO,   NO, 0x00000010 },
+  { 31, "COMMON:",          NO,   NO,   NO, 0x00000010 },
+  { 32, "END:",             NO,   NO,   NO, 0x00000010 },
 
-  { 30,0,0,0,0 },
+  { 32,0,0,0,0 },
 };
 
 /*

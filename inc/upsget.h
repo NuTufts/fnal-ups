@@ -26,6 +26,9 @@ char *upsget_translation( const t_upstyp_matched_product * const ,
 char *upsget_prod_dir(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
+char *upsget_compile(const t_upstyp_db * const,
+                     const t_upstyp_matched_instance * const ,
+                     const t_upsugo_command * const );
 char *upsget_product(const t_upstyp_db * const,
                      const t_upstyp_matched_instance * const ,
                      const t_upsugo_command * const );
