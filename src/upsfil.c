@@ -91,6 +91,7 @@ enum {
 };
 
 #define CHAR_REMOVE " \t\n\r\f\""
+#define SEPARATION_LINE "#*************************************************\n#"
 
 static t_upstyp_product  *g_pd = 0; /* current product to fill */
 static FILE              *g_fh = 0; /* file handle */
@@ -263,6 +264,7 @@ int write_version_file( void )
     }
 
     put_key( 0, "" );
+    put_key( 0, SEPARATION_LINE );
     put_key( "FLAVOR", inst_ptr->flavor );    
     put_key( "QUALIFIERS", inst_ptr->qualifiers );
     
@@ -306,6 +308,7 @@ int write_chain_file( void )
 
 
     put_key( 0, "" );
+    put_key( 0, SEPARATION_LINE );
     put_key( "FLAVOR", inst_ptr->flavor );
     put_key( "QUALIFIERS", inst_ptr->qualifiers );
     
@@ -340,12 +343,14 @@ int write_table_file( void )
   l_copy = upslst_copy( g_pd->instance_list );
   find_group( l_copy, 's' );
   while( (l_ptr = find_group( 0, ' ' )) ) {
+    put_key( 0, SEPARATION_LINE );
     put_key( 0, "GROUP:");
     g_imargin += 2;
     for ( l_ptr = upslst_first( l_ptr ); l_ptr; l_ptr = l_ptr->next ) {
       inst_ptr = (t_upstyp_instance *)l_ptr->data;
       put_key( "FLAVOR", inst_ptr->flavor );
       put_key( "QUALIFIERS", inst_ptr->qualifiers );
+      put_key( "DESCRIPTION", inst_ptr->description );
       put_key( 0, "" );
       
     }
@@ -374,6 +379,7 @@ int write_table_file( void )
       return 0;
     }
 
+    put_key( 0, SEPARATION_LINE );
     put_key( "FLAVOR", inst_ptr->flavor );
     put_key( "QUALIFIERS", inst_ptr->qualifiers );
     
