@@ -1034,6 +1034,8 @@ int upsugo_dump (struct ups_command * const uc,
          upsugo_prtlst(uc->ugo_auth,  "Authorized Nodes: ",prnt_ptr); 
       if ( uc->ugo_flavor ) 
          upsugo_prtlst(uc->ugo_flavor,"Flavor:           ",prnt_ptr); 
+      if ( uc->ugo_osname) 
+         printf("Osname:           %s\n",uc->ugo_osname); 
       if ( uc->ugo_host ) 
          upsugo_prtlst(uc->ugo_host,  "Host:             ",prnt_ptr); 
       if ( uc->ugo_key ) 
@@ -1050,6 +1052,10 @@ int upsugo_dump (struct ups_command * const uc,
          printf("Description:      %s\n",uc->ugo_description); 
 /*      if ( uc->ugo_override ) 
          printf("Override:         %s\n",uc->ugo_override); */
+      if ( uc->ugo_P) 
+         printf("LongListing\n"); 
+      if ( uc->ugo_P) 
+         printf("OutputActOnly\n"); 
       if ( uc->ugo_qualifiers ) 
          upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers:       ",prnt_ptr); 
       if ( uc->ugo_productdir ) 
