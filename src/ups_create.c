@@ -21,6 +21,7 @@
 
 /* standard include files */
 #include <stdio.h>
+#include <string.h>
 
 /* ups specific include files */
 #include "upserr.h"
