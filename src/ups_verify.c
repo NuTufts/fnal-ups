@@ -391,7 +391,7 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
 }
 
 
-static void shutup(VERIFY_INST_PARAMS)
+static void shutup (VERIFY_INST_PARAMS)
 {
   bit_bucket ^= (long) a_inst;
   bit_bucket ^= (long) a_db;
