@@ -386,6 +386,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          buffer[0]=0; /* don't create instance */
          mproduct_list = upslst_first(mproduct_list);
          mproduct = (t_upstyp_matched_product *)mproduct_list->data;
+         minst_list = (t_upslst_item *)mproduct->minst_list;
+         minst = (t_upstyp_matched_instance *)(minst_list->data);
        }
     } else { /* new version does NOT exist at all */
       product = ups_new_product();
@@ -595,6 +597,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
             { upsver_mes(0,"A UPS start/stop exists for this product\n");
               upsact_cleanup(cmd_list);
             } 
+            upsutl_copy_info( minst, tmpfile, db_info);
           }
           chain_list->next = save_next;
           chain_list->prev = save_prev;
