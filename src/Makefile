@@ -159,6 +159,7 @@ ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_commands.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_match.o:	ups_match.c
 ups_match.o:	$(ERUPT_DIR)/inc/ups_match.h
 ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
@@ -169,6 +170,9 @@ ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_match.o:	$(ERUPT_DIR)/inc/ups_memory.h
 ups_match.o:	$(ERUPT_DIR)/inc/ups_files.h
 ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_match.o:	$(ERUPT_DIR)/inc/ups_utils.h
+ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_match.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_memory.o:	ups_memory.c
 ups_memory.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
@@ -177,6 +181,7 @@ ups_types.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_types.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_types.o:	$(ERUPT_DIR)/inc/ups_memory.h
 ups_types.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_types.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_utils.o:	ups_utils.c
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
