@@ -22,6 +22,8 @@
 **			release-number.version-number
 **
 **			like the "other" systems.
+**
+**  25-Sep-2000  MWM	use upsuname.c routines...
 */
 		
 #include <stdio.h>
@@ -70,32 +72,15 @@ char *ipaddress;
 		if ( (c = uname(baseuname)) == -1)
 			return(-1);
 
-		if ( (strncmp(baseuname->machine,"IP",2)) == 0)
-		{
-			if ( (baseuname->machine[2] >= '0') &&
-			     (baseuname->machine[2] <= '9') )
-				(void) strcpy(baseuname->sysname,"IRIX");
-		}
-		else if ( (strcmp(baseuname->machine,"R2300")) == 0)
-			(void) strcpy(baseuname->sysname,"IRIX");
+                basename->sysname[0] = 0;
+                ups_append_OS(basename->sysname);
+                basename->release[0] = 0;
+		ups_append_release(basename->release);
 
 		if( (strncmp(baseuname->sysname, "AIX", 3) == 0 ) &&
-			(strchr( baseuname->release, '.') == NULL)) {
-			strcat(baseuname->version, ".");
-			strcat(baseuname->version, 
-				baseuname->release);
-			strcpy(baseuname->release,
-				baseuname->version);
 			baseuname->version[1] = '\0';
 		}
 
-		if(strncmp(baseuname->sysname, "HP-UX", 5) == 0)
-		{
-			strcpy(dstr, baseuname->release);
-			tpoint = strchr(dstr, '.') ;
-			if(tpoint != NULL)
-				strcpy(baseuname->release, tpoint+1);
-		}
 		tpoint = strchr(baseuname->nodename,'.');
 		if ( tpoint != NULL)
 			tpoint[0] = '\0';

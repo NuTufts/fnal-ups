@@ -1037,23 +1037,13 @@ char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
 char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
                        const t_upstyp_matched_instance * const instance,
                        const t_upsugo_command * const command_line )
-{  static char uname_flavor[80];
-   struct utsname baseuname;              /* returned from uname */
-   static char *flavor;                /* flavor ptr */
-   flavor = uname_flavor;                       /* init pointer */
-   if (uname(&baseuname) == -1) return(0);     /* do uname */
-   (void) strcpy (flavor,baseuname.sysname);    /* get sysname */
-   if (!strncmp(flavor,"IRIX",4))               /* Slam all IRIXanything */
-   { (void) strcpy(flavor,"IRIX");
-   }
-   (void) strcat (flavor,"+");                  /* add plus */
-   if (strncmp(baseuname.sysname,"AIX",3) == 0) /* because AIX is different */
-   { (void) strcat(flavor,baseuname.version);  /* add in version */
-     (void) strcat(flavor,".");
-   }
-   (void) strcat(flavor,baseuname.release);     /* add in release */
-   SHUTUP;
-   return flavor;
+{  
+   static char uname_flavor[80];
+   uname_flavor[0] = 0;
+   ups_append_OS(uname_flavor);		/* get IRIX part */
+   strcat(uname_flavor, "+");		/* append "+" */
+   ups_append_release(uname_flavor);	/* append 6.5 part */
+   return uname_flavor;
 }
 
 /*  upsget_chain_file

@@ -312,7 +312,6 @@ int upsugo_bldfvr(struct ups_command * const uc)
    char   		*addr;
    char   		*loc;
    char			uname_flavor[80];	/* put together from uname */
-   struct utsname 	baseuname;		/* returned from uname */
    char			*flavor;		/* flavor ptr */
    t_upslst_item        *l_ptr;
    int count = 0;
@@ -321,18 +320,11 @@ int upsugo_bldfvr(struct ups_command * const uc)
    but some OS's are funny
    ------------------------------------------------------------------------*/
 if (!uc->ugo_H)
- { if (uname(&baseuname) == -1) return(-1);	/* do uname */
-   (void) strcpy (flavor,baseuname.sysname);	/* get sysname */
-   if (!strncmp(flavor,"IRIX",4))		/* Slam all IRIXanything */
-   { (void) strcpy(flavor,"IRIX");
-   }
-   (void) strcat (flavor,"+");			/* add plus */
-   if (strncmp(baseuname.sysname,"AIX",3) == 0)	/* because AIX is different */
-      {
-      (void) strcat(flavor,baseuname.version);	/* add in version */
-      (void) strcat(flavor,".");
-      }
-   (void) strcat(flavor,baseuname.release);	/* add in release */
+ {
+   flavor[0] = 0;
+   ups_append_OS(flavor);
+   (void)strcat(flavor, "+");
+   ups_append_release(flavor);
 
 /* ok, have flavor string now. it should look like os+n.m.o. ...
    we well build the flavor table by successively removing '.'
