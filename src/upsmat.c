@@ -205,6 +205,7 @@ static int g_ups_error;
 
 #define ADD_TO_MPRODUCT_LIST() \
       if (mproduct) {                                                  \
+	mproduct->db_info = db_info;                                   \
 	mproduct_list = upslst_add(mproduct_list, (void *)mproduct);   \
       }
 
@@ -227,12 +228,6 @@ static int g_ups_error;
 	db_info->config = config_ptr->config;        \
 	upsmem_inc_refctr(db_info->config);          \
       }                                              \
-    }
-
-
-#define FREE_CONFIG_FILE() \
-    if (db_info && db_info->config) {               \
-      db_info->config = upsutl_free_config(db_info->config);  \
     }
 
 #define FREE_INVALID_INSTANCES() \
@@ -396,8 +391,6 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	  if (a_need_unique && mproduct) {
 	    break;
 	  }
-	  /* free the db configuration info, it we previously read it in */
-	  FREE_CONFIG_FILE();
 	}
       } else {
 	upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
@@ -542,8 +535,6 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	if (a_need_unique && mproduct) {
 	  break;
 	}
-	/* free the db configuration info, it we previously read it in */
-	FREE_CONFIG_FILE();
       }
     }
   } else if (a_command_line->ugo_m && a_command_line->ugo_product) {
@@ -567,9 +558,6 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   }
 
   /* make sure we have cleaned up */
-  /* free the db configuration info, if we previously read it in */
-  FREE_CONFIG_FILE();
-
   if (all_products) {
     /* no longer need product list - free it */
     all_products = upslst_free(all_products, do_delete);
