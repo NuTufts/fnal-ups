@@ -433,19 +433,19 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         if (a_command_line->ugo_l && instance->version )
         { printf("\t\tDeclared=");
           strcpy(buffer,"declared");
-          FromVersion(declared);
+          FromBoth(declared);
           printf("\n");
           printf("\t\tDeclarer=");
           strcpy(buffer,"declarer");
-          FromVersion(declarer);
+          FromBoth(declarer);
           printf("\n");
           printf("\t\tModified=");
           strcpy(buffer,"modified");
-          FromVersion(modified);
+          FromBoth(modified);
           printf("\n");
           printf("\t\tModifier=");
           strcpy(buffer,"modifier");
-          FromVersion(modifier);
+          FromBoth(modifier);
           printf("\n");
           printf("\t\tHome=");
           if (mproduct->db_info) 
