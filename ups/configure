@@ -1165,7 +1165,8 @@ cat <<XEoF >$BootStrap_Dir/current
 #
 # The primary function of this script is to copy the files from 
 # the bootstrap sub-directory of the $Name_Of_Ups product to the 
-# $Setups_Home directory, if needed.
+# $Setups_Home 
+# directory, if needed.
 #
 
 Name_Of_Ups=$Name_Of_Ups
@@ -1197,7 +1198,8 @@ then
     exit 1
 fi
 #
-# If the $Setups_Home is in AFS space, 
+# If the $Setups_Home
+# is in AFS space, 
 # force it to the read/write area.
 #
 # The following algorithm is known to be overly simplistic
@@ -1238,7 +1240,7 @@ done
 #fi
 #
 # Move all the files from the bootstrap directory to 
-# $Setups_Home.
+# $Setups_Home
 # Only move the files which have changed
 #
     for filex in \$BootStrap_Dir/set*
