@@ -72,7 +72,7 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 
 #define CMP_AUTH_NODES(struct) \
     if (struct && struct->authorized_nodes) {                   \
-      a_nodes = struct->authorized_nodes;                       \
+      *a_nodes = struct->authorized_nodes;                       \
       if (strcmp(struct->authorized_nodes, ANY_MATCH) &&        \
 	  !strstr(struct->authorized_nodes, nodename)) {        \
 	is_auth = 0;                                            \
@@ -177,19 +177,19 @@ char *upsutl_get_hostname( void )
  * current node.  The authorization information is stored in either the 
  * dbconfig file info or in the product instance info.  
  *
- * Input : Matched instance structure, database configuration info and a 
- *         product name
+ * Input : Matched instance structure, database configuration info and a
+ *         pointer to a char pointer 
  * Output: list of nodes on which the product is authorized
  * Return: 0 if not authorized, else 1.
  */
 int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
 			  const t_upstyp_db * const a_db_info, 
-			  const char *a_nodes)
+			  const char **a_nodes)
 {
   int is_auth = 1;
   char *nodename = NULL;
 
-  a_nodes = NULL;
+  *a_nodes = NULL;
 
   /* get the hostname */
   if ((nodename = upsutl_get_hostname())) {
@@ -213,8 +213,8 @@ int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
     }
 
     /* if no authorized nodes were specified, then we assume all */
-    if (! a_nodes) {
-      a_nodes = ANY_MATCH;
+    if (! *a_nodes) {
+      *a_nodes = ANY_MATCH;
     }
   } else {
     /* error when getting the node name */
