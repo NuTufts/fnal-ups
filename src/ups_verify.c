@@ -167,8 +167,8 @@ void ups_verify_matched_instance(const t_upstyp_db * const a_db,
 {
   if (a_minst) {
     if (a_minst->chain) {
-      ups_verify_version_instance(a_minst->chain, a_db, a_minst, 
-				  a_command_line);
+      ups_verify_chain_instance(a_minst->chain, a_db, a_minst, 
+				a_command_line);
     }
     if (a_minst->version) {
       ups_verify_generic_instance(a_minst->version, a_db, a_minst,
@@ -232,6 +232,8 @@ static void ups_verify_chain_instance(VERIFY_INST_PARAMS)
  */
 static void ups_verify_version_instance(VERIFY_INST_PARAMS)
 {
+  char *bufPtr;
+
   /* the following elements of an instance structure are verified here -
 	       table_dir
 	       table_file
@@ -261,6 +263,10 @@ static void ups_verify_version_instance(VERIFY_INST_PARAMS)
     /* Make sure the following files exist */
     VERIFY_FILE_SPEC(a_inst->archive_file);
     VERIFY_DIR_SPEC(a_inst->compile_dir, a_minst);
+    bufPtr = upsget_prod_dir(a_db, a_minst, a_command_line);
+    VERIFY_DIR_SPEC(bufPtr, (0));
+    bufPtr = upsget_ups_dir(a_db, a_minst, a_command_line);
+    VERIFY_DIR_SPEC(bufPtr, (0));
   }
 }
 /*-----------------------------------------------------------------------
