@@ -109,7 +109,7 @@ t_upslst_item *ups_create(const t_upsugo_command * const a_command_line,
 
       /* write the table file */
       product->file = upsutl_str_create("TABLE", ' ');
-      (void )upsfil_write_file(product, buffer, ' ');
+      (void )upsfil_write_file(product, buffer, ' ', NOJOURNAL);
       /* this free will free instances too */
       product = (t_upstyp_product *)ups_free_product(product);
       

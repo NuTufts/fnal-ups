@@ -100,9 +100,9 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
            "Specificy a version, which will remove ALL chains, or chains(s)");
     return 0;
   }
-  if ((int)(upslst_count(uc->ugo_flavor) ==0 ) )
+  if ((int)(upslst_count(uc->ugo_flavor) != 2 ) )
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
-           "Specification must include a flavor");
+           "Specification must include a single flavor");
     return 0;
   }
   mproduct_list = upsmat_instance(uc, db_list , not_unique);
@@ -185,7 +185,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
               upsver_mes(1,"Deleting %s of version %s\n",
                             the_chain,
                             cinst->version);
-              (void )upsfil_write_file(product, buffer,' '); 
+              (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
               unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
               sprintf(unchain,"un%s",the_chain);
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -259,7 +259,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
            upslst_delete(product->instance_list,vinst,'d');
         upsver_mes(1,"Deleting version %s\n",
                       vinst->version);
-        (void )upsfil_write_file(product, buffer,' '); 
+        (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
 /*        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                    mproduct, UNDECLARE,ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 

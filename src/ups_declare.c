@@ -238,8 +238,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                upsver_mes(1,"Deleting %s chain of version %s\n",
                              the_chain,
                              cinst->version);
-               (void )upsfil_write_file(product, buffer,' '); 
-               product->instance_list=upslst_free(product->instance_list,'d');
+               (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
+/*         product->instance_list=upslst_free(product->instance_list,'d'); */
                unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
                sprintf(unchain,"un%s",the_chain);
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -292,8 +292,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                     the_chain,
                     new_cinst->version,
                     buffer);
-         (void )upsfil_write_file(product, buffer,'d');  
-         product->instance_list=upslst_free(product->instance_list,'d');
+         (void )upsfil_write_file(product, buffer,' ',JOURNAL);  
+/*         product->instance_list=upslst_free(product->instance_list,'d'); */
         }
       }
 /************************************************************************
@@ -391,11 +391,12 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       upsver_mes(1,"Adding version %s to %s\n",
                  new_vinst->version,
                  buffer);
-      (void )upsfil_write_file(product, buffer, 'd');  
-      if (new_vinst->user_list)
+      (void )upsfil_write_file(product, buffer, ' ', JOURNAL);  
+/*      if (new_vinst->user_list)
       { new_vinst->user_list=upslst_free(new_vinst->user_list,'d');
       }
       product->instance_list=upslst_free(product->instance_list,'d');
+*/
     } 
     uc->ugo_chain=save_chain;
     if (uc->ugo_chain)
@@ -439,5 +440,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         }
       }
     }
+    upsfil_stat(1);
     return 0;
 }

@@ -200,7 +200,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc ,
            cinst=cinst_list->data;
            cinst->modifier=username;
            cinst->modified=declared_date;
-           (void )upsfil_write_file(product, buffer,' ');
+           (void )upsfil_write_file(product, buffer,' ',JOURNAL);
          }
        }
        return(0);
@@ -223,7 +223,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc ,
        vinst=vinst_list->data;
        vinst->modifier=username;
        vinst->modified=declared_date;
-       (void )upsfil_write_file(product, buffer,' ');
+       (void )upsfil_write_file(product, buffer,' ',JOURNAL);
      }
     return 0;
 }

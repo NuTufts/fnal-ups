@@ -382,7 +382,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	if (tmp_buf2) {
 	  write_product_ptr->file = upsutl_str_create("TABLE",
 						      STR_TRIM_DEFAULT);
-	  upsfil_write_file(write_product_ptr, tmp_buf2, ' ');
+	  upsfil_write_file(write_product_ptr, tmp_buf2, ' ', NOJOURNAL);
 	}
       	/* STEP 2: if we are echoing only, construct a declare command string
 	        and echo it to the user.  if we are doing the declare,
