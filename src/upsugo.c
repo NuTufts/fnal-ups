@@ -1321,103 +1321,104 @@ t_upsugo_command *upsugo_next(const int old_argc,
                               char *old_argv[],
                               char * const validopts)
 {
-   char   *arg_str;
+  char   *arg_str;
 
-   char   * addr;
-   char   * loc;
-   int    ups_argc;            /* argv and argc with white space and commas  */
-   char   *ups_argv[MAX_ARGS]; /* reformatted */
+  char   * addr;
+  char   * loc;
+  int    ups_argc;            /* argv and argc with white space and commas  */
+  char   *ups_argv[MAX_ARGS]; /* reformatted */
    
-   char   **argbuf;		/* String to hold residual argv stuff*/
+  char   **argbuf;		/* String to hold residual argv stuff*/
 				/* returned by upsugo_getarg */
 				/* if contents are used is reset to */
 				/* to 0 before recalling getarg */
 /* Initialize those pesky variables
     -------------------------------- */
-   struct ups_command * uc;
-   struct ups_command * luc=0;
-  if ( ugo_commands ) { /* subsequent call */ 
-     /* dealloc your brain out */ 
-     (void) upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
-     ugo_commands=upslst_delete(ugo_commands,ugo_commands->data, 'd');
-     if (ugo_commands && ugo_commands->data) /* && data needed? */
-     {  luc = ugo_commands->data;
-        upsugo_setshell(luc);
-        UPS_VERBOSE = luc->ugo_v;
+  struct ups_command * uc;
+  struct ups_command * luc=0;
+  if ( ugo_commands )
+  { /* subsequent call */ 
+    /* dealloc your brain out */ 
+    (void) upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
+    ugo_commands=upslst_delete(ugo_commands,ugo_commands->data, 'd');
+    if (ugo_commands && ugo_commands->data) /* && data needed? */
+    {  luc = ugo_commands->data;
+       upsugo_setshell(luc);
+       UPS_VERBOSE = luc->ugo_v;
 	upsugo_liststart(luc);  /* move all lists to first element */
-        return (t_upsugo_command *)ugo_commands->data; 
-     } else {
-        return 0;
-     }
+       return (t_upsugo_command *)ugo_commands->data; 
+    } else {
+       return 0;
+    }
   } else { 
 /* this is VERY important... to make sure argindx is 0 */
 /* if there is a subsequent call to upsugo_next for a WHOLE NEW command
 ** line to be parsed the index must be reset!!!
 */
-   uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-   (void) memset (uc, 0, sizeof(struct ups_command));
-   argindx=0;
-   argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
-   *argbuf = 0;
-   (void) upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
-   while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
-   { if(*arg_str == '-')      /* is it an option */
-     { if (!strchr(validopts,(int)*(arg_str+1))) { 
-          upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, arg_str+1);
-       }
-       switch(*(arg_str+1))      /* which flag was specified */
-       { /* Single flag cases */
-         case_a case_C case_e case_E case_F 
-         case_j case_k case_l case_L case_P 
-         case_R case_s case_S case_v case_V 
-         case_w case_W case_x case_X case_y 
-         case_Y case_Z case_help
-         /* Chain cases */ 
-         case_c case_d case_n case_t case_o
-         /* List elements */
-         case_g            /* also a chain */
-         case_f case_K case_A case_h case_H
-         /* single values */ 
-         case_b case_D case_G case_m 
-         case_M case_N case_O case_p 
-         case_r case_T case_u case_U 
-         case_0 case_1 case_2 case_3 /* number sets */
-         case_q case_z               /* special cases */
-         default:
-            errflg = 1;
-       }
-     } else {
-       if ( strchr(arg_str,',') != 0 )
-       { (void) upsugo_ifornota(uc);
-         ugo_commands = upslst_add(ugo_commands,uc);
-         uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-         (void) memset (uc, 0, sizeof(struct ups_command));
-       } else { 
-         addr=upsutl_str_create(arg_str,' ');
-         if ( !uc->ugo_product ) 
-         { uc->ugo_product = addr;
-         } else { 
-           if ( !uc->ugo_version )
-           { uc->ugo_version = addr ;
-           } else { 
-             upserr_add(UPS_INVALID_ARGUMENT,UPS_FATAL,addr);
-           }
-         } 
-       }
-     }
-   }
-   if (!ugo_commands) 
-   { addr=upsutl_str_create("*",' ');
-     uc->ugo_product = addr;
-     (void) upsugo_ifornota(uc);             
-     ugo_commands = upslst_add(ugo_commands,uc);
-   }
-   ugo_commands=upslst_first(ugo_commands);
-   luc = ugo_commands->data;
-   upsugo_setshell(luc);
-   UPS_VERBOSE=luc->ugo_v;
+    uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
+    (void) memset (uc, 0, sizeof(struct ups_command));
+    argindx=0;
+    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
+    *argbuf = 0;
+    (void) upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
+    while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
+    { if(*arg_str == '-')      /* is it an option */
+      { if (!strchr(validopts,(int)*(arg_str+1))) { 
+           upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, arg_str+1);
+        }
+        switch(*(arg_str+1))      /* which flag was specified */
+        { /* Single flag cases */
+          case_a case_C case_e case_E case_F 
+          case_j case_k case_l case_L case_P 
+          case_R case_s case_S case_v case_V 
+          case_w case_W case_x case_X case_y 
+          case_Y case_Z case_help
+          /* Chain cases */ 
+          case_c case_d case_n case_t case_o
+          /* List elements */
+          case_g            /* also a chain */
+          case_f case_K case_A case_h case_H
+          /* single values */ 
+          case_b case_D case_G case_m 
+          case_M case_N case_O case_p 
+          case_r case_T case_u case_U 
+          case_0 case_1 case_2 case_3 /* number sets */
+          case_q case_z               /* special cases */
+          default:
+             errflg = 1;
+        }
+      } else {
+        if ( strchr(arg_str,',') != 0 )
+        { (void) upsugo_ifornota(uc);
+          ugo_commands = upslst_add(ugo_commands,uc);
+          uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
+          (void) memset (uc, 0, sizeof(struct ups_command));
+        } else { 
+          addr=upsutl_str_create(arg_str,' ');
+          if ( !uc->ugo_product ) 
+          { uc->ugo_product = addr;
+          } else { 
+            if ( !uc->ugo_version )
+            { uc->ugo_version = addr ;
+            } else { 
+              upserr_add(UPS_INVALID_ARGUMENT,UPS_FATAL,addr);
+            }
+          } 
+        }
+      }
+    }
+    if (!ugo_commands) 
+    { addr=upsutl_str_create("*",' ');
+      uc->ugo_product = addr;
+      (void) upsugo_ifornota(uc);             
+      ugo_commands = upslst_add(ugo_commands,uc);
+    }
+  }
+  ugo_commands=upslst_first(ugo_commands);
+  luc = ugo_commands->data;
+  upsugo_setshell(luc);
+  UPS_VERBOSE=luc->ugo_v;
 /* don't want to change now but I don't think this is right??? */
-   upsugo_liststart(luc);      /* move all lists to first element */
-   }
-   return (t_upsugo_command *)ugo_commands->data; 
+  upsugo_liststart(luc);      /* move all lists to first element */
+  return (t_upsugo_command *)ugo_commands->data; 
 }
