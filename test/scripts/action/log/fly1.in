@@ -4,11 +4,19 @@ setenv SETUP_FLY "fly v1_0 -f NULL -z ../db1"
 #
 setenv OPERA "AIDA FAUST"
 #
-setenv OPERA "${OPERA} MADAM_BUTTERFLY CARMEN"
+if (! ${?OPERA}) then
+  setenv OPERA "MADAM_BUTTERFLY CARMEN"
+else
+  setenv OPERA "${OPERA} MADAM_BUTTERFLY CARMEN"
+endif
 #
-setenv OPERA "FIDELIO ${OPERA}"
+if (! ${?OPERA}) then
+  setenv OPERA FIDELIO
+else
+  setenv OPERA "FIDELIO ${OPERA}"
+endif
 #
-setenv upstmp "`dropit -p "$OPERA" -i   FAUST`"
+setenv upstmp "`dropit -p "$OPERA" -i' ' -d' ' FAUST`"
 if ($status == 0 && "$upstmp" != " ") setenv OPERA $upstmp
 unsetenv upstmp
 #
@@ -23,13 +31,13 @@ rehash
 set path=(emacs/test $path)
 rehash
 #
-setenv upstmp "`dropit -p "$path" -i : emacs`"
-if ($status == 0 && "$upstmp" != ":") set path=$upstmp
+setenv upstmp "`dropit -p "$path" -i' ' -d' ' emacs`"
+if ($status == 0 && "$upstmp" != " ") set path=$upstmp
 rehash
 unsetenv upstmp
 #
-setenv upstmp "`dropit -p "$path" -i : bin`"
-if ($status == 0 && "$upstmp" != ":") set path=$upstmp
+setenv upstmp "`dropit -p "$path" -i' ' -d' ' bin`"
+if ($status == 0 && "$upstmp" != " ") set path=$upstmp
 rehash
 unsetenv upstmp
 #

@@ -210,6 +210,18 @@ static void f_dodefaults( ACTION_PARAMS);
       delimiter = g_default_delimiter;                                  \
     }
 
+#define CHECK_FOR_PATH(thePath, theDelimiter)  \
+    /* if the variable is path then it must be of a certain case */  \
+    if ( upsutl_stricmp(thePath,a_cmd->argv[0])) {                   \
+      /* it was not equal to path so use the original value */       \
+      pathPtr = a_cmd->argv[0];                                      \
+    } else {                                                         \
+      /* it was path, make sure we use a right one by using ours */  \
+      pathPtr = thePath;                                             \
+      /* and the delimiter must be set right too */                  \
+      delimiter = theDelimiter;                                      \
+    }
+
 #define GET_ERR_MESSAGE(msg_ptr) \
     if (msg_ptr) {                                 \
       err_message = msg_ptr;                       \
@@ -294,6 +306,10 @@ static void f_dodefaults( ACTION_PARAMS);
 static char *g_default_delimiter = ":";
 static int g_ups_cmd = e_invalid_action;
 static char g_buff[MAX_LINE_LEN];
+static char *g_shPath = "PATH";
+static char *g_cshPath = "path";
+static char *g_shDelimiter = ":";
+static char *g_cshDelimiter = " ";
 
 /* 
  * Note: This array should in princip be in ups_main.c, but since
@@ -2382,7 +2398,7 @@ static void f_envappend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=%s\nelse\n  %s=\"${%s}%s%s\"\nfi\nexport %s\n#\n",
+      if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=\"%s\"\nelse\n  %s=\"${%s}%s%s\"\nfi\nexport %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1],
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
 		  a_cmd->argv[0]) < 0) {
@@ -2395,7 +2411,7 @@ static void f_envappend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s %s\nelse\n  setenv %s \"${%s}%s%s\"\nendif\n#\n",
+      if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s \"%s\"\nelse\n  setenv %s \"${%s}%s%s\"\nendif\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1], 
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter,
 		  a_cmd->argv[1]) < 0) {
@@ -2487,17 +2503,17 @@ static void f_envremove( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit -p \"$%s\" -i %s %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
-		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter,
-		  a_cmd->argv[0]) < 0) {
+		  "upstmp=`dropit -p \"$%s\" -i'%s' -d'%s' %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
+		  delimiter, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "setenv upstmp \"`dropit -p \"$%s\" -i %s %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s $upstmp\nunsetenv upstmp\n#\n",
-		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter,
-		  a_cmd->argv[0]) < 0) {
+	      "setenv upstmp \"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s $upstmp\nunsetenv upstmp\n#\n",
+		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
+		  delimiter, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -2748,6 +2764,8 @@ static void f_filetest( ACTION_PARAMS)
 static void f_pathappend( ACTION_PARAMS)
 {
   char *delimiter;
+  char *env_to_set;
+  char *pathPtr;
   
   CHECK_NUM_PARAM("pathAppend");
 
@@ -2762,25 +2780,26 @@ static void f_pathappend( ACTION_PARAMS)
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
+      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
 	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\";export %s\n#\n",
-		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
-		  a_cmd->argv[0]) < 0) {
+		  pathPtr, pathPtr, delimiter, a_cmd->argv[1], pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
+      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
 	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n#\n",
-		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1]) < 0) {
+		  pathPtr, pathPtr, a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -2799,6 +2818,7 @@ static void f_pathappend( ACTION_PARAMS)
 static void f_pathprepend( ACTION_PARAMS)
 {
   char *delimiter;
+  char *pathPtr;
   
   CHECK_NUM_PARAM("pathPrepend");
 
@@ -2813,25 +2833,26 @@ static void f_pathprepend( ACTION_PARAMS)
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
+      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
 	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\";export %s\n#\n",
-		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
-		  a_cmd->argv[0]) < 0) {
+		  pathPtr, a_cmd->argv[1], delimiter, pathPtr, pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
+      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
       if (g_COMPILE_FLAG) {
 	/* we are being called during a compile, we need to output extra
 	   stuff */
 	f_pathremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
       if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n#\n",
-		  a_cmd->argv[0], a_cmd->argv[1], a_cmd->argv[0]) < 0) {
+		  pathPtr, a_cmd->argv[1], pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -2851,6 +2872,7 @@ static void f_pathprepend( ACTION_PARAMS)
 static void f_pathremove( ACTION_PARAMS)
 {
   char *delimiter;
+  char *pathPtr;
   
   CHECK_NUM_PARAM("pathRemove");
 
@@ -2865,18 +2887,20 @@ static void f_pathremove( ACTION_PARAMS)
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
+      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit -p \"$%s\" -i %s %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
-		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter, 
-		  a_cmd->argv[0]) < 0) {
+		  "upstmp=`dropit -p \"$%s\" -i'%s' -d'%s' %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		  pathPtr, delimiter, delimiter, a_cmd->argv[1], delimiter, 
+		  pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
+      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
       if (fprintf((FILE *)a_stream,
-		 "setenv upstmp \"`dropit -p \"$%s\" -i %s %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
-		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter,
-		  a_cmd->argv[0]) < 0) {
+          "setenv upstmp \"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
+		  pathPtr, delimiter, delimiter, a_cmd->argv[1], delimiter,
+		  pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -2895,6 +2919,9 @@ static void f_pathremove( ACTION_PARAMS)
 
 static void f_pathset( ACTION_PARAMS)
 {
+  char *delimiter;
+  char *pathPtr;
+
   CHECK_NUM_PARAM("pathSet");
 
   OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
@@ -2905,13 +2932,15 @@ static void f_pathset( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n#\n", a_cmd->argv[0],
-		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
+      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
+      if (fprintf((FILE *)a_stream, "%s=\"%s\";export %s\n#\n", pathPtr,
+		  a_cmd->argv[1], pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n#\n", a_cmd->argv[0],
+      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
+      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n#\n", pathPtr,
 		  a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
       }

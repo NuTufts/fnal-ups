@@ -4,28 +4,38 @@ SETUP_FLY="fly v1_0 -f NULL -z ../db1";export SETUP_FLY
 #
 OPERA="AIDA FAUST";export OPERA
 #
-OPERA="${OPERA-} MADAM_BUTTERFLY CARMEN";export OPERA
+if [ "${OPERA:-}" = "" ]; then
+  OPERA="MADAM_BUTTERFLY CARMEN"
+else
+  OPERA="${OPERA} MADAM_BUTTERFLY CARMEN"
+fi
+export OPERA
 #
-OPERA="FIDELIO ${OPERA-}";export OPERA
+if [ "${OPERA:-}" = "" ]; then
+  OPERA=FIDELIO
+else
+  OPERA="FIDELIO ${OPERA}"
+fi
+export OPERA
 #
-upstmp=`dropit -p "$OPERA" -i   FAUST`;
+upstmp=`dropit -p "$OPERA" -i' ' -d' ' FAUST`;
 if [ $? -eq 0 -a "$upstmp" != " " ]; then OPERA=$upstmp; fi
 unset upstmp;
 #
 unset OPERA
 #
-path=/bin:/usr/local/bin:/local/etc:/mybin;export path
+PATH="/bin:/usr/local/bin:/local/etc:/mybin";export PATH
 #
-path="${path-}emacs/etcemacs/bin";export path
+PATH="${PATH-}:emacs/bin";export PATH
 #
-path="emacs/test:${path-}";export path
+PATH="emacs/test:${PATH-}";export PATH
 #
-upstmp=`dropit -p "$path" -i : emacs`;
-if [ $? -eq 0 -a "$upstmp" != ":" ]; then path=$upstmp; fi
+upstmp=`dropit -p "$PATH" -i':' -d':' emacs`;
+if [ $? -eq 0 -a "$upstmp" != ":" ]; then PATH=$upstmp; fi
 unset upstmp;
 #
-upstmp=`dropit -p "$path" -i : bin`;
-if [ $? -eq 0 -a "$upstmp" != ":" ]; then path=$upstmp; fi
+upstmp=`dropit -p "$PATH" -i':' -d':' bin`;
+if [ $? -eq 0 -a "$upstmp" != ":" ]; then PATH=$upstmp; fi
 unset upstmp;
 #
 if [ ! r blah ]; then
