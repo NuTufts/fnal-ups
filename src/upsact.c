@@ -49,6 +49,8 @@
  * Definition of public variables.
  */
 int g_LOCAL_VARS_DEF = 0;
+int g_keep_temp_file = 0;
+char *g_temp_file_name = NULL;
 
 /*
  * Private constants

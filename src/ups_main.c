@@ -54,6 +54,9 @@
  */
 extern int UPS_VERBOSE;
 extern int g_LOCAL_VARS_DEF;
+extern int g_keep_temp_file;
+extern char *g_temp_file_name;
+
 
 /*
  * Declaration of private functions.
