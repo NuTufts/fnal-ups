@@ -188,8 +188,10 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	    }	   
 	    /* make sure the file is executable */
 	    if (! chmod(g_temp_file_name, mode)) {
+              char sourced_temp_file[L_tmpnam+3] = ". ";
+              strcat(sourced_temp_file, g_temp_file_name);
 	      upsver_mes(1,"%sExecuting file %s\n",VPREFIX,g_temp_file_name);
-	      if (system(g_temp_file_name) < 0) {
+	      if (system(sourced_temp_file) < 0) {
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			   strerror(errno));
 		upserr_add(UPS_COMMAND_FAILED, UPS_FATAL,
