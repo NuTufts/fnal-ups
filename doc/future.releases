@@ -48,7 +48,8 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	hierarchy" or "if a product goes current, send mail to
 	prodadmin@here.there" or "when somebody sets up a test version of a
 	product, prepend the MAN_SOURCE_DIR into their MAN_PATH so that they
-	can access the man pages for the test version", etc.
+	can access the man pages for the test version", etc. This would mean
+	supporting actions in the dbconfig file.
 
 12. Let declared files be the umask and ownership of the database in which
 	they currently reside.
@@ -65,3 +66,24 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	prepend an 'un' to the script name and optionally run that script.
 
 18. think about implementing QUALIFIERS=ANY in the table file.
+
+19. Core problem: the permissions on the "configure" and "current"
+	scripts do not include "execute" permissions, and therefore 
+	"upd install" isn't configuring the product properly.
+
+	This is precisely the type of systematic error that we had in
+	old-style products, where the developer would forget to add execute
+	permissions to various scripts.  UPS and/or UPD should get the
+	brains to fix this bug by ensuring that all scripts which are
+	executed via the table file have execute permissions set.
+
+        - do we need a separate "executeScript" function to distinguish
+          shell commands from scripts?
+        - should ups check for execute permission before it executes
+          the script?  (Should it try to set execute permission?)
+        - and/or should upd read through the table file and SET
+          execute permission on all the scripts it encounters?
+
+	This isn't an immediate need, but it's the kind of systematic bug we
+	ran into in the past, where the brains to fix it should be at a
+	higher level.
