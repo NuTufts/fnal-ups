@@ -67,6 +67,13 @@ extern int g_LOCAL_VARS_DEF;
 #define NULL 0
 #endif
 
+#define KEEP_OR_REMOVE_FILE()   \
+   if (! keep_temp_file) {                  \
+     (void )remove(temp_file_name);         \
+   } else {                                 \
+     (void )printf("%s\n", temp_file_name); \
+   }
+
 /*
  * And now for something completely different
  */
@@ -217,6 +224,14 @@ int main(int argc, char *argv[])
     /* if nothing was written to the file, delete it, */
     if (empty_temp_file) {
       (void )remove(temp_file_name);
+      switch (g_cmd_info[i].cmd_index) {
+      case e_setup: 
+      case e_unsetup: 
+	/* output the name of the a null file so the automatic sourcing does
+	   not give an error */
+	(void )printf("/dev/null\n");
+	break;
+      }
     } else {
       if (UPS_ERROR == UPS_SUCCESS ) {
 	switch (g_cmd_info[i].cmd_index) {
@@ -228,11 +243,7 @@ int main(int argc, char *argv[])
 	case e_exist:
 	  /* just get rid of the file. (unless asked not to) we do not need it,
 	     we just wanted to see if we could create it */
-	  if (! keep_temp_file) {
-	    (void )remove(temp_file_name);
-	  } else {
-	    (void )printf("%s\n", temp_file_name);
-	  }
+	  KEEP_OR_REMOVE_FILE();
 	  break;
 	default:
 	  /* source the file within the current process context */
@@ -240,7 +251,8 @@ int main(int argc, char *argv[])
 	  /*if (system(temp_file_name) <= 0) {
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 		       strerror(errno));
-	    }*/
+	    KEEP_OR_REMOVE_FILE();
+	  }*/
 	  
 	}
       } else {  /* there was an error while doing the command */
@@ -251,14 +263,12 @@ int main(int argc, char *argv[])
 	     command will try and source it and only half change the user's
 	     environment */
 	  (void )remove(temp_file_name);
+	  /* print the following so automatic sourcing does'nt give an error */
+	  printf("/dev/null\n");
 	  break;
 	default:
 	  /* keep the file if we were asked to */
-	  if (! keep_temp_file) {
-	    (void )remove(temp_file_name);
-	  } else {
-	    (void )printf("%s\n", temp_file_name);
-	  }
+	  KEEP_OR_REMOVE_FILE();
 	}
       }
     }
