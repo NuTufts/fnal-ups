@@ -863,7 +863,6 @@ int get_key( void )
   }
 
   ckeyi();
-  printf( "translate key %s = %d\n", g_key, g_ikey );
 
   return g_ikey;
 }
