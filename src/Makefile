@@ -34,15 +34,15 @@ CFLAGScia = $(INCDIRS)
 
 #
 #
-OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.o \
-	  ups_files.o upsugo.o ups_match.o ups_action.o ups_keys.o \
+OBJECTS = ups_error.o upslst.o ups_memory.o upsutl.o upstyp.o \
+	  upsfil.o upsugo.o ups_match.o ups_action.o upskey.o \
 	  ups_help.o
 
 COMMAND_OBJECTS = ups_c_list.o
 
-CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a ups_types.a \
-	     ups_files.a upsugo.a ups_match.a ups_c_list.a ups_action.a \
-             ups_keys.a ups_help.a
+CIAOBJECTS = ups_error.a  upslst.a ups_memory.o upsutl.a upstyp.a \
+	     upsfil.a upsugo.a ups_match.a ups_c_list.a ups_action.a \
+             upskey.a ups_help.a
 
 LDFLAGS = $(LLIBS)
 
@@ -120,87 +120,87 @@ make :
 ups_action.o:	ups_action.c
 ups_action.o:	$(ERUPT_DIR)/inc/ups_action.h
 ups_action.o:	$(ERUPT_DIR)/inc/ups_error.h
-ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_action.o:	$(ERUPT_DIR)/inc/ups_utils.h
-ups_action.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_action.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_action.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_action.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_action.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_action.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_action.o:	$(ERUPT_DIR)/inc/ups_memory.h
 ups_c_list.o:	ups_c_list.c
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_c_list.o:	$(ERUPT_DIR)/inc/ups_memory.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_c_list.o:	$(ERUPT_DIR)/inc/ups_error.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_utils.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_c_list.o:	$(ERUPT_DIR)/inc/ups_match.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_files.h
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upsfil.h
+ups_c_list.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_c_list.o:	$(ERUPT_DIR)/inc/ups_commands.h
 ups_error.o:	ups_error.c
 ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
-ups_files.o:	ups_files.c
-ups_files.o:	$(ERUPT_DIR)/inc/ups_utils.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_files.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_memory.h
-ups_files.o:	$(ERUPT_DIR)/inc/ups_error.h
-ups_keys.o:     ups_keys.c
-ups_keys.o:     $(ERUPT_DIR)/inc/ups_keys.h
-ups_keys.o:     $(ERUPT_DIR)/inc/ups_types.h
-ups_keys.o:     $(ERUPT_DIR)/inc/ups_memory.h
-ups_list.o:	ups_list.c
-ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_list.o:	$(ERUPT_DIR)/inc/ups_memory.h
+upsfil.o:	upsfil.c
+upsfil.o:	$(ERUPT_DIR)/inc/upsutl.h
+upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
+upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
+upsfil.o:	$(ERUPT_DIR)/inc/upsfil.h
+upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
+upsfil.o:	$(ERUPT_DIR)/inc/upsmem.h
+upsfil.o:	$(ERUPT_DIR)/inc/upserr.h
+upskey.o:     upskey.c
+upskey.o:     $(ERUPT_DIR)/inc/upskey.h
+upskey.o:     $(ERUPT_DIR)/inc/upstyp.h
+ups_key.o:     $(ERUPT_DIR)/inc/upsmem.h
+upslst.o:	upslst.c
+upslst.o:	$(ERUPT_DIR)/inc/upslst.h
+upslst.o:	$(ERUPT_DIR)/inc/upsmem.h
 ups_main.o:	ups_main.c
-ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_main.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_main.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_commands.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_match.o:	ups_match.c
 ups_match.o:	$(ERUPT_DIR)/inc/ups_match.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_match.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_match.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_match.o:	$(ERUPT_DIR)/inc/ups_error.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_match.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_match.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_match.o:	$(ERUPT_DIR)/inc/ups_memory.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_files.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_utils.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_match.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_match.o:	$(ERUPT_DIR)/inc/upsfil.h
+ups_match.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_match.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_match.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_match.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_memory.o:	ups_memory.c
 ups_memory.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
-ups_types.o:	ups_types.c
-ups_types.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_types.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_types.o:	$(ERUPT_DIR)/inc/ups_memory.h
-ups_types.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_types.o:	$(ERUPT_DIR)/inc/ups_error.h
+upstyp.o:	upstyp.c
+upstyp.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstyp.o:	$(ERUPT_DIR)/inc/upslst.h
+upstyp.o:	$(ERUPT_DIR)/inc/upsmem.h
+upstyp.o:	$(ERUPT_DIR)/inc/upslst.h
+upstyp.o:	$(ERUPT_DIR)/inc/upserr.h
 upsugo.o:	upsugo.c
-upsugo.o:	$(ERUPT_DIR)/inc/ups_types.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_list.h
+upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upsugo.o:	$(ERUPT_DIR)/inc/ups_error.h
 upsugo.o:	$(ERUPT_DIR)/inc/ups_memory.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_utils.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_types.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_utils.o:	ups_utils.c
-ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
-ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
-ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
-ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
-ups_utils.o:	$(ERUPT_DIR)/inc/ups_memory.h
+upsugo.o:	$(ERUPT_DIR)/inc/upsutl.h
+upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
+upsutl.o:	upsutl.c
+upsutl.o:	$(ERUPT_DIR)/inc/upsutl.h
+upsutl.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsutl.o:	$(ERUPT_DIR)/inc/upslst.h
+upsutl.o:	$(ERUPT_DIR)/inc/upslst.h
+upsutl.o:	$(ERUPT_DIR)/inc/upserr.h
+upsutl.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsutl.o:	$(ERUPT_DIR)/inc/upsmem.h

@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_utils.h
+ *       upsutl.h
  * 
  * DESCRIPTION: 
  *       Utility routine definitions
@@ -27,15 +27,15 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_UTILS_H_
-#define _UPS_UTILS_H_
+#ifndef _UPSUTL_H_
+#define _UPSUTL_H_
 
 /* standard include files, if needed for .h file */
 #include <sys/types.h>
 
 /* ups specific include files, if needed for .h file */
-#include "ups_types.h"
-#include "ups_list.h"
+#include "upstyp.h"
+#include "upslst.h"
 
 /*
  * Constans.
@@ -85,5 +85,5 @@ size_t upsutl_str_remove_edges( char * const str, const char * const ct );
  * Declarations of public variables.
  */
 
-#endif /* _UPS_UTILS_H_ */
+#endif /* _UPSUTL_H_ */
 

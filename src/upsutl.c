@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_utils.c
+ *       upsutl.c
  * 
  * DESCRIPTION: 
  *       UPs utility routines
@@ -43,10 +43,10 @@
 #endif */
 
 /* ups specific include files */
-#include "ups_utils.h"
-#include "ups_error.h"
-#include "ups_types.h"
-#include "ups_memory.h"
+#include "upsutl.h"
+#include "upserr.h"
+#include "upstyp.h"
+#include "upsmem.h"
 
 /*
  * Definition of public variables.
