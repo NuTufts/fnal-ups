@@ -263,8 +263,8 @@ esac
 # NOW ADD IN INCLUDE DIRECTORIES AND LIBRARIES
 #------------------------------------------------------------------------------
 #
-llibs="-L${UPS_DIR}/lib -lups";
-incdirs="-I${UPS_DIR}/inc";
+llibs="-L${ERUPT_DIR}/lib -lups";
+incdirs="-I${ERUPT_DIR}/inc";
 
 #
 # We are ready to find out what our targets are
