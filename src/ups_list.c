@@ -15,15 +15,22 @@
  *       Batavia, Il 60510, U.S.A.                                              
  *
  * MODIFICATIONS:
- *       23-Jun-1997, LR, first
- *       25-Jul-1997, LR, upslst_add is now as fast as upslst_insert:
+ *       23-jul-1997, LR, first
+ *       25-jul-1997, LR, upslst_add is now as fast as upslst_insert:
  *                        upslst_add will now return the last element.
  *                        upslst_insert will return the first element.
  *                        In that way, successive calls using previous
  *                        return will be fast.  
  *                        Changed 'bot' to 'last' and 'top' to 'first'.
- *       30-Jul-1997, LR, Added functions to add list to list,
+ *       30-jul-1997, LR, Added functions to add list to list,
  *                        upslst_add_list, upslst_insert_list.
+ *       31-jul-1997, LR, Added use of upsmem, to allocate/free memory.
+ *                        Note: all list data elements should be allocated
+ *                        by upsmem_alloc.
+ *                        Replaced upslst_add_list and upslst_insert_list
+ *                        with upslst_merge
+ *                        Added upslst_copy, which will create a new list
+ *                        containing data elements from passed list.
  *
  ***********************************************************************/
 
@@ -32,6 +39,7 @@
 
 /* ups specific include files */
 #include "ups_list.h"
+#include "ups_memory.h"
 
 /*
  * Definition of public variables.
@@ -67,6 +75,8 @@ t_upslst_item *upslst_new( void *data_ptr )
   if ( !l_first ) return NULL;
   
   l_first->data = data_ptr;
+  upsmem_inc_refctr( data_ptr );
+  
   l_first->prev = NULL;
   l_first->next = NULL;
 
@@ -94,7 +104,10 @@ t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt )
 
   l_ptr = l_first;
   while( l_ptr ) {
-    if ( copt == 'd' && l_ptr->data ) free ( l_ptr->data );
+    upsmem_dec_refctr( l_ptr->data );    
+    if ( copt == 'd' && l_ptr->data ) {
+      upsmem_free ( l_ptr->data );
+    }
     l_tmp = l_ptr;
     l_ptr = l_ptr->next;
     if ( l_ptr ) l_ptr->prev = NULL;
@@ -130,13 +143,13 @@ t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr )
 
   l_first = upslst_first( list_ptr );
 
-  if ( !l_first ) return NULL;
-  
   l_new = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
   if ( !l_new ) return NULL;
 
   l_new->data = data_ptr;
+  upsmem_inc_refctr( data_ptr );  
+  
   l_first->prev = l_new;
   l_new->next = l_first;
   l_new->prev = NULL;
@@ -170,86 +183,18 @@ t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr )
   
   l_last = upslst_last( list_ptr );
 
-  if ( !l_last ) return NULL;
-  
   l_new = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
   if ( !l_new ) return NULL;
 
   l_new->data = data_ptr;
+  upsmem_inc_refctr( data_ptr );
+  
   l_last->next = l_new;
   l_new->prev = l_last;
   l_new->next = NULL;
 
   return l_new;
-}
-
-/*-----------------------------------------------------------------------
- * upslst_insert_list
- *
- * Will add a list to the first item.
- *
- * Input : t_upslst_item *, pointer to a list, if NULL a new list will
- *         be created.
- *         t_upslist_item*, pointer to a list to be inserted.
- * Output: none
- * Return: t_upslst_item *, pointer to the first item of the list or NULL
- */
-t_upslst_item *upslst_insert_list( t_upslst_item *list_ptr, t_upslst_item *list_new )
-{
-  t_upslst_item *l_first = NULL;
-  t_upslst_item *l_new_last = NULL;
-
-  if ( !list_new ) {
-    return upslst_first( list_ptr );
-  }
-  
-  if ( !list_ptr ) {
-    list_ptr = list_new;
-    return upslst_first( list_ptr );
-  }
-
-  l_first = upslst_first( list_ptr );
-  l_new_last = upslst_last( list_new );
-
-  l_first->prev = l_new_last;
-  l_new_last->next = l_first;
-
-  return upslst_first( list_new );  
-}
-
-/*-----------------------------------------------------------------------
- * upslst_add_list
- *
- * Will add a list to the last item.
- *
- * Input : t_upslst_item *, pointer to a list, if NULL a new list will
- *         be created.
- *         t_upslist_item*, pointer to a list to be added.
- * Output: none
- * Return: t_upslst_item *, pointer to the lastt item of the list or NULL
- */
-t_upslst_item *upslst_add_list( t_upslst_item *list_ptr, t_upslst_item *list_new )
-{
-  t_upslst_item *l_last = NULL;
-  t_upslst_item *l_new_first = NULL;
-
-  if ( !list_new ) {
-    return upslst_last( list_ptr );
-  }
-  
-  if ( !list_ptr ) {
-    list_ptr = list_new;
-    return upslst_last( list_ptr );
-  }
-
-  l_last = upslst_last( list_ptr );
-  l_new_first = upslst_first( list_new );
-
-  l_last->next = l_new_first;
-  l_new_first->prev = l_last;
-
-  return upslst_last( list_new );  
 }
 
 /*-----------------------------------------------------------------------
@@ -283,7 +228,10 @@ t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt
       else {
 	if ( l_prev ) l_prev->next = NULL;
       }
-      if ( copt == 'd' && l_ptr->data ) free( l_ptr->data );
+      upsmem_dec_refctr ( l_ptr->data );
+      if ( copt == 'd' && l_ptr->data ) {
+	upsmem_free( l_ptr->data );
+      }
       if ( l_ptr == l_first ) {
 	l_first = l_ptr->next;
       }
@@ -294,6 +242,58 @@ t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt
 
   /* item was not found */
   return NULL;
+}
+
+/*-----------------------------------------------------------------------
+ * upslst_merge
+ *
+ * Will merge two lists. 
+ *
+ * Input : t_upslst_item *, pointer to a list.
+ *         t_upslst_item *, pointer to a list to be appended.
+ * Output: none
+ * Return: t_upslst_item *, pointer to the first item of the list or NULL
+ */
+t_upslst_item *upslst_merge( t_upslst_item *list_ptr_1, t_upslst_item *list_ptr_2 )
+{
+  t_upslst_item *l_last_1 = NULL;
+  t_upslst_item *l_first_2 = NULL;
+
+  if ( list_ptr_1 && list_ptr_2 ) {
+    l_last_1 = upslst_last( list_ptr_1 );
+    l_first_2 = upslst_first( list_ptr_2 );
+
+    l_last_1->next = l_first_2;
+    l_first_2->prev = l_last_1;
+  }
+  
+  return upslst_first( list_ptr_1 ? list_ptr_1 : list_ptr_2 );
+}
+
+/*-----------------------------------------------------------------------
+ * upslst_copy
+ *
+ * Will create a new list, contaning data elements from the passed list.
+ * The 'copied' data elements will have their ref count incremented.
+ *
+ * Input : t_upslst_item *, pointer to a list.
+ * Output: none
+ * Return: t_upslst_item *, pointer to the first item of the list or NULL
+ */
+t_upslst_item *upslst_copy( t_upslst_item *list_ptr )
+{
+  t_upslst_item *l_ptr = NULL;
+  t_upslst_item *l_new = NULL;
+  
+  if ( !list_ptr )
+    return NULL;
+  
+  l_ptr = upslst_first( list_ptr );
+  for ( ; l_ptr; l_ptr = l_ptr->next ) {
+    l_new = upslst_insert( l_new, l_ptr->data );
+  }
+
+  return upslst_first( l_new );
 }
 
 /*-----------------------------------------------------------------------

@@ -18,16 +18,17 @@
  *
  * MODIFICATIONS:
  *       29-jul-1997, LR, first
+ *       30-jul-1997, LR, Using ups_memory (reference counting).
  *
  ***********************************************************************/
 
 /* standard include files */
 #include <stdlib.h>
-#include <string.h>                       /* for memset */
+#include <string.h> /* for memset */
 
 /* ups specific include files */
 #include "ups_types.h"
-/* #include "ups_memory.h" */
+#include "ups_memory.h"
 #include "ups_list.h"
 
 /*
@@ -37,7 +38,8 @@
 /*
  * Declaration of private functions
  */
-  
+static int all_gone( void *ptr );
+
 /*
  * Definition of public functions
  */
@@ -52,9 +54,9 @@
  * Return: t_ups_product *, a pointer to a product structure
  */
 t_ups_product *ups_new_product( void )
-{  
+{
   t_ups_product *prod_ptr =
-    (t_ups_product *)malloc( sizeof( t_ups_product ) );
+    (t_ups_product *)upsmem_malloc( sizeof( t_ups_product ) );
   
   memset( prod_ptr, 0, sizeof( t_ups_product ) );
   return prod_ptr;
@@ -72,19 +74,25 @@ t_ups_product *ups_new_product( void )
 int ups_free_product( t_ups_product *prod_ptr )
 {
   t_upslst_item *l_ptr;
+  void *inst_ptr;
 
   if ( !prod_ptr ) return 0;
 
-  if ( prod_ptr->file ) { free( prod_ptr->file ); }
-  if ( prod_ptr->product ) { free( prod_ptr->product); }
-  if ( prod_ptr->chaver ) { free( prod_ptr->chaver ); }
-  
-  for ( l_ptr = upslst_first( prod_ptr->instance_list ); l_ptr; l_ptr = l_ptr->next ) {
-    ups_free_action( l_ptr->data );
-  }
-  upslst_free( prod_ptr->instance_list, ' ' );
+  if ( all_gone( prod_ptr ) ) {
+    printf( "Freeing Product\n" );
+    if ( prod_ptr->file ) { upsmem_free( prod_ptr->file ); }
+    if ( prod_ptr->product ) { upsmem_free( prod_ptr->product); }
+    if ( prod_ptr->chaver ) { upsmem_free( prod_ptr->chaver ); }
+    
+    l_ptr = upslst_first( prod_ptr->instance_list );
+    while( l_ptr ) {
+      inst_ptr = l_ptr->data;
+      l_ptr = upslst_delete( l_ptr, inst_ptr, ' ' );
+      ups_free_instance( inst_ptr );
+    }
 
-  free( prod_ptr );
+    upsmem_free( prod_ptr );
+  }
   
   return 1;
 }
@@ -101,7 +109,7 @@ int ups_free_product( t_ups_product *prod_ptr )
 t_ups_instance *ups_new_instance( void )
 {
   t_ups_instance *inst_ptr =
-    (t_ups_instance *)malloc( sizeof( t_ups_instance ) );
+    (t_ups_instance *)upsmem_malloc( sizeof( t_ups_instance ) );
   
   memset( inst_ptr, 0, sizeof( t_ups_instance ) );
   return inst_ptr;
@@ -119,35 +127,41 @@ t_ups_instance *ups_new_instance( void )
 int ups_free_instance( t_ups_instance *inst_ptr )
 {
   t_upslst_item *l_ptr;
+  void *act_ptr;
 
   if ( !inst_ptr ) return 0;
 
-  if ( inst_ptr->product ) { free( inst_ptr->product); }
-  if ( inst_ptr->version ) { free( inst_ptr->version ); }
-  if ( inst_ptr->flavor ) { free( inst_ptr->flavor ); }
-  if ( inst_ptr->qualifiers ) { free( inst_ptr->qualifiers ); }
+  if ( all_gone( inst_ptr ) ) {
+    printf( "Freeing Instance\n" );
+    if ( inst_ptr->product ) { upsmem_free( inst_ptr->product); }
+    if ( inst_ptr->version ) { upsmem_free( inst_ptr->version ); }
+    if ( inst_ptr->flavor ) { upsmem_free( inst_ptr->flavor ); }
+    if ( inst_ptr->qualifiers ) { upsmem_free( inst_ptr->qualifiers ); }
   
-  if ( inst_ptr->chain ) { free( inst_ptr->chain ); }
-  if ( inst_ptr->chain_declarer ) { free( inst_ptr->chain_declarer ); }
-  if ( inst_ptr->chain_declared ) { free( inst_ptr->chain_declared ); }
+    if ( inst_ptr->chain ) { upsmem_free( inst_ptr->chain ); }
+    if ( inst_ptr->chain_declarer ) { upsmem_free( inst_ptr->chain_declarer ); }
+    if ( inst_ptr->chain_declared ) { upsmem_free( inst_ptr->chain_declared ); }
 
-  if ( inst_ptr->declarer ) { free( inst_ptr->declarer ); }
-  if ( inst_ptr->declared ) { free( inst_ptr->declared ); }
-  if ( inst_ptr->prod_dir ) { free( inst_ptr->prod_dir ); }
-  if ( inst_ptr->ups_dir ) { free( inst_ptr->ups_dir ); }
-  if ( inst_ptr->table_dir ) { free( inst_ptr->table_dir ); }
-  if ( inst_ptr->archive_file ) { free( inst_ptr->archive_file ); }
-  if ( inst_ptr->authorized_nodes ) { free( inst_ptr->authorized_nodes ); }
-  if ( inst_ptr->description ) { free( inst_ptr->description ); }
+    if ( inst_ptr->declarer ) { upsmem_free( inst_ptr->declarer ); }
+    if ( inst_ptr->declared ) { upsmem_free( inst_ptr->declared ); }
+    if ( inst_ptr->prod_dir ) { upsmem_free( inst_ptr->prod_dir ); }
+    if ( inst_ptr->ups_dir ) { upsmem_free( inst_ptr->ups_dir ); }
+    if ( inst_ptr->table_dir ) { upsmem_free( inst_ptr->table_dir ); }
+    if ( inst_ptr->archive_file ) { upsmem_free( inst_ptr->archive_file ); }
+    if ( inst_ptr->authorized_nodes ) { upsmem_free( inst_ptr->authorized_nodes ); }
+    if ( inst_ptr->description ) { upsmem_free( inst_ptr->description ); }
   
-  if ( inst_ptr->unknown_list ) upslst_free( inst_ptr->unknown_list, 'd' );
-  
-  for ( l_ptr = upslst_first( inst_ptr->action_list ); l_ptr; l_ptr = l_ptr->next ) {
-    ups_free_action( l_ptr->data );
+    if ( inst_ptr->unknown_list ) upslst_free( inst_ptr->unknown_list, 'd' );
+    
+    l_ptr = upslst_first( inst_ptr->action_list );
+    while( l_ptr ) {
+      act_ptr = l_ptr->data;
+      l_ptr = upslst_delete( l_ptr, act_ptr, ' ' );
+      ups_free_action( act_ptr );
+    }
+
+    upsmem_free ( inst_ptr );
   }
-  upslst_free( inst_ptr->action_list, ' ' );
-
-  free ( inst_ptr );
 
   return 1;
 }
@@ -164,7 +178,7 @@ int ups_free_instance( t_ups_instance *inst_ptr )
 t_ups_action *ups_new_action( void )
 {
   t_ups_action *act_ptr =
-    (t_ups_action *)malloc( sizeof( t_ups_action ) );
+    (t_ups_action *)upsmem_malloc( sizeof( t_ups_action ) );
   
   memset( act_ptr, 0, sizeof( t_ups_action ) );
   return act_ptr;
@@ -183,10 +197,29 @@ int ups_free_action( t_ups_action *act_ptr )
 {
   if ( !act_ptr ) return 0;
 
-  if ( act_ptr->action ) { free( act_ptr->action ); }
-  if ( act_ptr->command_list ) { upslst_free( act_ptr->command_list, 'd' ); }
+  if ( all_gone( act_ptr ) ) {
+    printf( "Freeing Action\n" );
+    if ( act_ptr->action ) { upsmem_free( act_ptr->action ); }
+    if ( act_ptr->command_list ) { upslst_free( act_ptr->command_list, 'd' ); }
 
-  free( act_ptr );
+    upsmem_free( act_ptr );
+  }
 
   return 1;
 }
+
+/*
+ * Definition of private functions
+ */
+
+int all_gone( void *ptr )
+{
+  return ( upsmem_get_refctr( ptr ) <= 0 );
+}
+
+
+
+
+
+
+

@@ -15,7 +15,8 @@
  *       Batavia, Il 60510, U.S.A.
  *
  * MODIFICATIONS:
- *       23-Jun-1997, LR, first
+ *       23-jun-1997, LR, first.
+ *       31-jul-1997, LR, Added use of upsmem.
  *
  ***********************************************************************/
 
@@ -28,6 +29,7 @@
 #include "ups_files.h"
 #include "ups_types.h"
 #include "ups_list.h"
+#include "ups_memory.h"
 
 /*
  * Definition of public variables
@@ -58,6 +60,7 @@ static char           *str_create( char *str );
 /* Print stuff */
 static void           print_instance( t_ups_instance *inst_ptr );
 static void           print_action( t_ups_action* act_ptr );
+/* print_product has gone semi public */
 
 /*
  * Definition of global variables
@@ -203,7 +206,7 @@ t_upslst_item *read_instances( void )
 	}
     }
 
-    return l_ptr;
+    return upslst_first( l_ptr );
 }
   
 /*-----------------------------------------------------------------------
@@ -384,7 +387,7 @@ t_upslst_item *read_groups( void )
 	l_tmp_ptr = read_group();
 
 	if ( l_tmp_ptr ) {
-	  l_ptr = upslst_add_list( l_ptr, l_tmp_ptr );
+	  l_ptr = upslst_merge( l_ptr, l_tmp_ptr );
 	}
 	else {
 	  break;
@@ -431,9 +434,12 @@ t_upslst_item *read_group( void )
 
     if ( l_act_ptr ) {
       l_ptr = upslst_first( l_inst_ptr );
+      inst_ptr = (t_ups_instance *)l_ptr->data;
+      inst_ptr->action_list = l_act_ptr;
+      l_ptr = l_ptr->next;
       for ( ; l_ptr; l_ptr = l_ptr->next ) {
 	inst_ptr = (t_ups_instance *)l_ptr->data;
-	inst_ptr->action_list = l_act_ptr;
+	inst_ptr->action_list = upslst_copy( l_act_ptr );
       }
     }
 
@@ -589,7 +595,7 @@ char *str_create( char *str )
   char *new_str = NULL;
     
   if ( str ) {
-    new_str = (char *)malloc( strlen( str ) + 1 );
+    new_str = (char *)upsmem_malloc( strlen( str ) + 1 );
     strcpy( new_str, str );
   }
   

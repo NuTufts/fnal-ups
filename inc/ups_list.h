@@ -16,6 +16,21 @@
  *
  * MODIFICATIONS:
  *       23-Jun-1997, LR, first
+ *       25-jul-1997, LR, upslst_add is now as fast as upslst_insert:
+ *                        upslst_add will now return the last element.
+ *                        upslst_insert will return the first element.
+ *                        In that way, successive calls using previous
+ *                        return will be fast.  
+ *                        Changed 'bot' to 'last' and 'top' to 'first'.
+ *       30-jul-1997, LR, Added functions to add list to list,
+ *                        upslst_add_list, upslst_insert_list.
+ *       31-jul-1997, LR, Added use of upsmem, to allocate/free memory.
+ *                        Note: all list data elements should be allocated
+ *                        by upsmem_alloc.
+ *                        Replaced upslst_add_list and upslst_insert_list
+ *                        with upslst_merge
+ *                        Added upslst_copy, which will create a new list
+ *                        with data elements from passed list.
  *
  ***********************************************************************/
 
@@ -49,8 +64,8 @@ t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr );
 t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr );
 t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt );
 
-t_upslst_item *upslst_insert_list( t_upslst_item *list_ptr, t_upslst_item *list_new );
-t_upslst_item *upslst_add_list( t_upslst_item *list_ptr, t_upslst_item *list_new );
+t_upslst_item *upslst_merge( t_upslst_item *list_ptr_1, t_upslst_item *list_ptr_2 );
+t_upslst_item *upslst_copy( t_upslst_item *list_ptr );
 
 t_upslst_item *upslst_first( t_upslst_item *list_ptr );
 t_upslst_item *upslst_last( t_upslst_item *list_ptr );
