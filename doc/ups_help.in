@@ -108,6 +108,7 @@ OPTIONS     :
 -F :return list of files that are associated with the product but 
 :do not live in the products' area 
 -g :chainName : chain to use 
+-G :"options" : these options will be passed to 'ups declare'
 -h :nodeName : use this node 
 -H :flavor : use this as the flavor and build a flavor table from it 
 -j :applies to top level product and not UPS product requirements 
