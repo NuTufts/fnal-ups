@@ -35,13 +35,13 @@ CFLAGScia = $(INCDIRS)
 #
 #
 OBJECTS = ups_error.o upslst.o ups_memory.o upsutl.o upstyp.o \
-	  upsfil.o upsugo.o ups_match.o ups_action.o upskey.o \
+	  upsfil.o upsugo.o ups_match.o upskey.o \
 	  ups_help.o
 
 COMMAND_OBJECTS = ups_c_list.o
 
 CIAOBJECTS = ups_error.a  upslst.a ups_memory.o upsutl.a upstyp.a \
-	     upsfil.a upsugo.a ups_match.a ups_c_list.a ups_action.a \
+	     upsfil.a upsugo.a ups_match.a ups_c_list.a \
              upskey.a ups_help.a
 
 LDFLAGS = $(LLIBS)
@@ -117,15 +117,6 @@ make :
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
 # src DIRECTORY TO GENERATE IT
 #START_DEPEND
-ups_action.o:	ups_action.c
-ups_action.o:	$(ERUPT_DIR)/inc/ups_action.h
-ups_action.o:	$(ERUPT_DIR)/inc/ups_error.h
-ups_action.o:	$(ERUPT_DIR)/inc/upslst.h
-ups_action.o:	$(ERUPT_DIR)/inc/upsutl.h
-ups_action.o:	$(ERUPT_DIR)/inc/upstyp.h
-ups_action.o:	$(ERUPT_DIR)/inc/upslst.h
-ups_action.o:	$(ERUPT_DIR)/inc/upslst.h
-ups_action.o:	$(ERUPT_DIR)/inc/ups_memory.h
 ups_c_list.o:	ups_c_list.c
 ups_c_list.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_c_list.o:	$(ERUPT_DIR)/inc/ups_memory.h

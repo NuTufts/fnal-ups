@@ -43,16 +43,13 @@ default:
 
 all : unit_tests integration_tests
 
-unit_tests : test_ups_error test_upslst test_ups_memory test_ups_utils test_ups_ugo test_ups_match test_ups_action
+unit_tests : test_ups_error test_upslst test_ups_memory test_ups_utils test_ups_ugo test_ups_match
 
 integration_tests : ups_test
 
 #
 # Main programs.
 #
-
-test_ups_action : test_ups_action.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
 
 test_ups_error : test_ups_error.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
@@ -129,10 +126,6 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
-test_ups_action.o:	test_ups_action.c
-test_ups_action.o:	$(ERUPT_DIR)/inc/ups_error.h
-test_ups_action.o:	$(ERUPT_DIR)/inc/ups_action.h
-test_ups_action.o:	$(ERUPT_DIR)/inc/upslst.h
 test_ups_error.o:	test_ups_error.c
 test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
 test_upsfil.o:	test_upsfil.c
