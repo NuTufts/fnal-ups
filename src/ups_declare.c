@@ -315,27 +315,17 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
        for (chain_list = uc->ugo_chain ; chain_list ;
          chain_list = chain_list->next) 
        { the_chain = (char *)(chain_list->data);
-         uc->ugo_version=0;
-         uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' ')); 
-         uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
-         save_next = chain_list->next;
-         save_prev = chain_list->prev;
-         chain_list->next=0;
-         chain_list->prev=0;
-         uc->ugo_chain=chain_list;
-         mproduct_list = upsmat_instance(uc, db_list , not_unique);
-         if (UPS_ERROR != UPS_SUCCESS) 
-         { upsfil_clear_journal_files(); 
-           upserr_vplace();
-           return 0; 
-         }
-           chain_list->next = save_next;
-           chain_list->prev = save_prev;
-         if (mproduct_list)  /* the chain exists */
+         sprintf(buffer,"%s/%s/%s%s",
+                 db_info->name,
+                 uc->ugo_product,
+                 the_chain,CHAIN_SUFFIX);
+         if (upsfil_exist(buffer))        /* does chain file exist at all */
          { upsver_mes(1,"%sChain %s currently exist\n",UPS_DECLARE,the_chain);
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
            uc->ugo_chain=chain_list;
+           save_next = chain_list->next;
+           save_prev = chain_list->prev;
            chain_list->next=0;
            chain_list->prev=0;
            mproduct_list = upsmat_instance(uc, db_list , need_unique);
@@ -622,17 +612,19 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
             { upsver_mes(0,"A UPS start/stop exists for this product\n");
               upsact_cleanup(cmd_list);
             } 
+/* upscpy_info takes care of the checking... 
             if (minst->table && minst->table->info_source_dir)
             {  minst->table->info_source_dir =
                upsget_translation( minst, db_info, 
                                    uc, minst->table->info_source_dir);
             }
+*/
 /*            upsutl_copy_info( minst, tmpfile, db_info);
               upsutl_copy_man( minst, tmpfile, db_info);
 */
-              upscpy_info(minst,db_info,uc,tmpfile);
               upscpy_man(minst,db_info,uc,tmpfile);
               upscpy_catman(minst,db_info,uc,tmpfile);
+              upscpy_info(minst,db_info,uc,tmpfile);
           }
           chain_list->next = save_next;
           chain_list->prev = save_prev;

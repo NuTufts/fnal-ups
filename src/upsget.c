@@ -39,6 +39,7 @@
 
 #define UPSPRE "${UPS_"
 #define TILDE "~"
+static char g_buffer[FILENAME_MAX+1];
 
 #define get_element(STRING,ELEMENT)              \
 { STRING=0;                                      \
@@ -554,6 +555,9 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
   } else { 
     get_element(string,prod_dir);
   }
+  if (!string)             /* The only why this could happen is if you */
+  { string=nostring;       /* declare a product with no -r */
+  }
   if (UPSRELATIVE(string))
   { if (db_info_ptr->config)
     { if (db_info_ptr->config->prod_dir_prefix)
@@ -877,4 +881,110 @@ int upsget_key(const t_upstyp_instance * const instance)
   key = upstbl_atom_string( skey );
   i = (int)HASHATOM( key )%g_ft->size;
   return(i);
+}
+
+/*-----------------------------------------------------------------------
+ * upsget_man_source_dir
+ *
+ * Return a string containing the location of the products' man pages
+ *
+ * Input : an instance, and db configuration info
+ * Output: none
+ * Return: static string containing the location of the products' man pages
+ */
+char *upsget_man_source_dir( const t_upstyp_matched_instance * const a_inst,
+                             const t_upstyp_db * const a_db_info,
+                             const t_upsugo_command * const uc)
+{
+  t_upstyp_instance *vinst;
+  t_upstyp_instance *tinst;
+  char *man_source;                        /* man_source_dir translated      */
+  char *prod_dir;                          /* full path to product           */
+
+  g_buffer[0] = '\0';                      /* we want to fill this anew      */
+ 
+  if (tinst = a_inst->table)               /* See if we have a table file    */
+  { if (tinst->man_source_dir)             /* Is the source in the table file*/
+    { man_source =                         /* will return value translated   */
+         upsget_translation(a_inst, a_db_info,               /* if necessary */
+                            0, tinst->man_source_dir);
+      if (UPSRELATIVE(man_source))         /* Is it a relative path?         */
+      { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc);   
+	strcat(g_buffer, prod_dir);
+	strcat(g_buffer, "/");
+      } 
+      strcat(g_buffer,man_source);
+      strcat(g_buffer, "/");               /* safe then sorry...             */
+      return ((char *)(&g_buffer[0]));     /* Bail out path from table       */
+    }
+  }
+
+  /* the information we need is in the version file match */
+  if ((vinst = a_inst->version))           /* Verify our version is there    */
+  { if (vinst->ups_dir)                    /* Do we have a ups dir           */
+    { if (UPSRELATIVE(vinst->ups_dir))     /* is ups_dir a relative path     */
+      { prod_dir=upsget_prod_dir(a_db_info, a_inst, 0);   /* no command line */
+        strcat(g_buffer, prod_dir);        /* full path to product           */
+        strcat(g_buffer, "/");             /* add the /                      */
+        strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
+      } else { 
+        strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
+      }
+      strcat(g_buffer, "/toman/");         /* Add the default location       */
+    } else {                               /* no UPS dir, PROD_DIR/ups/toman */
+      prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
+      strcat(g_buffer, prod_dir);          /* full path to product           */
+      strcat(g_buffer, "/ups/toman/");     /* add the /ups/toman default     */
+    }
+  }
+  
+  return ((char *)(&g_buffer[0]));
+}
+char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
+                              const t_upstyp_db * const a_db_info,
+                              const t_upsugo_command * const uc)
+{
+  t_upstyp_instance *vinst;
+  t_upstyp_instance *tinst;
+  char *info_source;                       /* info_source_dir translated     */
+  char *prod_dir;                          /* full path to product           */
+
+  g_buffer[0] = '\0';                      /* we want to fill this anew      */
+ 
+  if (tinst = a_inst->table)               /* See if we have a table file    */
+  { if (tinst->info_source_dir)            /* Is the source in the table file*/
+    { info_source =                        /* will return value translated   */
+         upsget_translation(a_inst, a_db_info,               /* if necessary */
+                            0, tinst->info_source_dir);
+      if (UPSRELATIVE(info_source))        /* Is it a relative path?         */
+      { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
+	strcat(g_buffer, prod_dir);
+        strcat(g_buffer, "/");
+      } 
+      strcat(g_buffer,info_source);
+      strcat(g_buffer, "/");               /* safe then sorry...             */
+      return ((char *)(&g_buffer[0]));     /* Bail out path from table       */
+    }
+  }
+
+  /* the information we need is in the version file match */
+  if ((vinst = a_inst->version))           /* Verify our version is there    */
+  { if (vinst->ups_dir)                    /* Do we have a ups dir           */
+    { if (UPSRELATIVE(vinst->ups_dir))     /* is ups_dir a relative path     */
+      { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
+        strcat(g_buffer, prod_dir);        /* full path to product           */
+        strcat(g_buffer, "/");             /* add the /                      */
+        strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
+      } else { 
+        strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
+      }
+      strcat(g_buffer, "/toinfo/");        /* Add the default location       */
+    } else {                               /* no UPS dir, PROD_DIR/ups/toman */
+      prod_dir=upsget_prod_dir(a_db_info, a_inst, 0);     /* no command line */
+      strcat(g_buffer, prod_dir);          /* full path to product           */
+      strcat(g_buffer, "/ups/toinfo/");    /* add the /ups/toinfo default    */
+    }
+  }
+  
+  return ((char *)(&g_buffer[0]));
 }

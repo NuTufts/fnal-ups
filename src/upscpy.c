@@ -116,19 +116,25 @@ void upscpy_html(UPSCPY_PARAMS)
 void upscpy_info(UPSCPY_PARAMS)
 {
   struct stat file_stat;
+  char *info_source;
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) 
     /* Make sure we have somewhere to copy the files to and a source. */
-  { if (a_db_info->config && a_db_info->config->info_target_dir &&
-        a_minst->table && a_minst->table->info_source_dir)
-        /* first check to see if the directory where the info files are
-           located exists and is a directory */
-    { if (! stat(a_minst->table->info_source_dir, &file_stat))
+  { if (a_db_info->config && a_db_info->config->info_target_dir)
+    { info_source = upsget_info_source_dir(a_minst, a_db_info,a_command_line);
+      if (! stat(info_source, &file_stat))
       { if (S_ISDIR(file_stat.st_mode))
-        { if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-              a_minst->table->info_source_dir,
+        { if (stat(a_db_info->config->info_target_dir, &file_stat) 
+              == (int )-1)  /* target not there make it */
+          { if (fprintf((FILE *)a_stream, "/bin/mkdir -p %s\n", 
+                a_db_info->config->info_target_dir) < 0)
+            { FPRINTF_ERROR();
+            }
+          }
+          if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
+              info_source,
               a_db_info->config->info_target_dir) < 0)
           { FPRINTF_ERROR();
           }
@@ -139,12 +145,8 @@ void upscpy_info(UPSCPY_PARAMS)
     { upserr_vplace();
     }
   } else {
-    if (a_minst->table && a_minst->table->info_source_dir) 
-        /* there was a source but no destination.  if we have no source then
-           there are no info files and that is not an error */
-    { upsver_mes(1, "%sNo destination in dbconfig file for info files\n",
-                 "UPSCPY"); 
-    }
+    upsver_mes(1, "%sNo destination in dbconfig file for info files\n",
+                  "UPSCPY"); 
   }
 }
 
@@ -166,18 +168,6 @@ void upscpy_info(UPSCPY_PARAMS)
       fprintf((FILE *)a_stream, "cp %s %s\n", filename, dest);         \
     }
 
-#define GET_SOURCE(source, keyword)  \
-    if (!a_minst->table || !a_minst->table->keyword) {                     \
-      source = upsutl_find_manpages(a_minst, a_db_info);                   \
-    } else {                                                               \
-      /* the *MAN_SOURCE_DIR keyword must have been specified, use it but we \
-         must translate any local ups environment variables in it. */      \
-      if (a_minst->version) {                                              \
-        source = upsget_translation(a_minst, a_db_info, a_command_line,    \
-                                      a_minst->table->keyword);              \
-      }                                                                    \
-    }
-      
 #define PROCESS_DIR(dir_name, dir_size, type, keyword)   \
     if (! strncmp(dir_line->d_name, dir_name, (unsigned int )dir_size)) { \
       DIR *file_dir = NULL;                                              \
@@ -223,7 +213,8 @@ void upscpy_man(UPSCPY_PARAMS)
   { if (a_db_info->config && a_db_info->config->man_target_dir)
       /* ok we have a destination, now see if we have a source, if not
          assume the default */
-    { GET_SOURCE(man_source, man_source_dir);
+    { /* GET_SOURCE(man_source, man_source_dir); */
+      man_source = upsget_man_source_dir(a_minst, a_db_info,a_command_line);
         /* open the source directory and see what type of structure we have */
       if ((dir = opendir(man_source)))
           /* read each directory item and figure out what to do with it */
@@ -282,7 +273,8 @@ void upscpy_catman(UPSCPY_PARAMS)
   { if (a_db_info->config && a_db_info->config->catman_target_dir) 
        /* ok we have a destination, now see if we have a source, if not
           assume the default */
-    { GET_SOURCE(catman_source, catman_source_dir);
+    { /* GET_SOURCE(catman_source, catman_source_dir); */
+      catman_source = upsget_man_source_dir(a_minst, a_db_info,a_command_line);
       /* open the source directory and see what type of structure we have */
       if ((dir = opendir(catman_source)))
          /* read each directory item and figure out what to do with it */
@@ -364,7 +356,8 @@ void upscpy_rmman(UPSCPY_PARAMS)
   { if (a_db_info->config && a_db_info->config->man_target_dir)
       /* ok we have a destination, now see if we have a source, if not
          assume the default */
-    { GET_SOURCE(man_source, man_source_dir);
+    { /* GET_SOURCE(man_source, man_source_dir); */
+      man_source = upsget_man_source_dir(a_minst, a_db_info,a_command_line);
       /* open the source directory and see what type of structure we have */
       if ((dir = opendir(man_source))) 
           /* read each directory item and figure out what to do with it */
@@ -421,7 +414,8 @@ void upscpy_rmcatman(UPSCPY_PARAMS)
   { if (a_db_info->config && a_db_info->config->catman_target_dir)
       /* ok we have a destination, now see if we have a source, if not
          assume the default */
-    { GET_SOURCE(catman_source, man_source_dir);
+    { /* GET_SOURCE(catman_source, man_source_dir); */
+      catman_source = upsget_man_source_dir(a_minst, a_db_info,a_command_line);
       /* open the source directory and see what type of structure we have */
       if ((dir = opendir(catman_source))) 
         /* read each directory item and figure out what to do with it */
