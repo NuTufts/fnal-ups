@@ -47,7 +47,7 @@ char *upsget_verbose(const t_upstyp_db * const,
 char *upsget_options(const t_upstyp_db * const,
                      const t_upstyp_matched_instance * const ,
                      const t_upsugo_command * const );
-char *upsget_database(const t_upstyp_db * const,
+char *upsget_this_db(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
 char *upsget_OS_flavor(const t_upstyp_db * const,
@@ -80,5 +80,8 @@ t_upstyp_product *upsget_version_file (const char * const,
                                        const char * const,
                                        const char * const,
                                        char ** const);
+char *upsget_database(const t_upstyp_db * const,
+                      const t_upstyp_matched_instance * const ,
+                      const t_upsugo_command * const );
 
 #endif /* _UPSGET_H_ */
