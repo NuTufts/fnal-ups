@@ -193,8 +193,7 @@ static int g_ups_error;
 #define ADD_TO_MINST_LIST(inst_type) \
       if (*a_minst_list) {                                             \
 	t_upslst_item *tmp_list = *a_minst_list;                       \
-	t_upstyp_matched_instance *tmp_minst =                         \
-		   (t_upstyp_matched_instance *)(tmp_list->data);      \
+	t_upstyp_matched_instance *tmp_minst = NULL;                   \
 	while (tmp_list) {                                             \
 	  tmp_minst = (t_upstyp_matched_instance *)(tmp_list->data);   \
 	  if (tmp_minst->inst_type) {                                  \
@@ -952,7 +951,8 @@ static int match_from_version( const char * const a_product,
 	   look for the instance that matches the instance found in the version
 	   file.  this insures that an instance in a version file is
 	   matched only with an instance in the associated table file. */
-	for (vinst = *a_minst_list ; vinst ; vinst = vinst->next) {
+	vinst = *a_minst_list;
+	while (vinst) {
 	  /* get an instance and thus a table file */
 	  tmp_minst_ptr = (t_upstyp_matched_instance *)(vinst->data);
 	  if ((inst = tmp_minst_ptr->version) != NULL) {
@@ -986,21 +986,23 @@ static int match_from_version( const char * const a_product,
 		/* We should have had a match, this is an error */
 		upserr_vplace();
 		upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer,
-			   inst->table_file);
+			   inst->table_file, inst->flavor, inst->qualifiers);
 
-		/* clean up */
-		num_matches = 0;
-		*a_minst_list = upsutl_free_matched_instance_list(
-								a_minst_list);
-		break;                        /* stop any search */
+		/* remove the matched instance from the list */
+		vinst = upslst_delete_safe(vinst, tmp_minst_ptr, ' ');
+
+		/* free the data too */
+		tmp_minst_ptr = ups_free_matched_instance(tmp_minst_ptr);
+	      } else {
+		/* keep a running total of the matches we found */
+		++num_matches;
+		vinst = vinst->next;
 	      }
-
-	      /* keep a running total of the matches we found */
-	      ++num_matches;
 	    } else {
 	      /* this one did not have a table file so we just record the
 		 match from the version file */
 	      ++num_matches;
+	      vinst = vinst->next;
 	    }
 	  } else {
 	    /* There are no more version matched instances filled out here */
