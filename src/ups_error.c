@@ -75,7 +75,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 15 */  "%s: MAX_LINE_LEN exceeded in \"%s\"\n",
 /* 16 */  "%s: Unknown file type \"%s\"\n",
 /* 17 */  "%s: Invalid value \"%s\" for argument \"%s\"\n",
-/* 18 */  "%s: Invalid Action - %s\n",
+/* 18 */  "%s: Invalid action - %s\n",
 /* 19 this is the last */
 };
 
@@ -98,7 +98,7 @@ char *g_error_ascii[] = {
    /* UPS_LINE_TOO_LONG     15 */ "UPS_LINE_TOO_LONG",
    /* UPS_UNKNOWN_FILETYPE  16 */ "UPS_UNKNOWN_FILETYPE",
    /* UPS_NOVALUE_ARGUMENT  17 */ "UPS_NOVALUE_ARGUMENT",
-   /* UPS_INV_ACTION        18 */ "UPS_INV_ACTION",
+   /* UPS_INVALID_ACTION    18 */ "UPS_INVALID_ACTION",
    /* UPS_NERR              19 */ "UPS_NERR",
    0 };
 
