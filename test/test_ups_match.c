@@ -75,6 +75,7 @@ int match_from_version( const char * const a_product,
 			t_upslst_item ** const a_tinst_list);
 #endif
 
+#ifdef MATCH_CHAIN
 static void test_match_chain(const int argc, char *argv[]);
 int match_from_chain( const char * const a_product,
 			const char * const a_chain,
@@ -87,6 +88,9 @@ int match_from_chain( const char * const a_product,
 			t_upslst_item ** const a_cinst_list,
 			t_upslst_item ** const a_vinst_list,
 			t_upslst_item ** const a_tinst_list);
+#endif
+
+static void test_match(const int argc, char *argv[]);
 static void print_inst(t_upslst_item * const inst_list);
 static char *get_ups_string(const char * const old_string);
 
@@ -101,10 +105,56 @@ static char *get_ups_string(const char * const old_string);
 
 int main(const int argc, char *argv[])
 {
-  test_match_chain(argc, argv);
+  test_match(argc, argv);
   upserr_output();
 
   return 1;
+}
+
+static void test_match(const int argc, char *argv[])
+{
+  t_ups_match_product *mproduct = NULL;
+  t_upslst_item *flavor_list = NULL, *quals_list = NULL;
+  int need_unique = 0, i;
+  char *new_string = NULL;
+  char *ups_db = "/usrdevel/s1/berman/upsdb";
+  t_ups_command command_line;
+
+  if (! strcmp(argv[1],"1")) {
+    need_unique = 1;
+  }
+
+  for (i = 3; i < argc; i += 2) {
+    new_string = get_ups_string(argv[i]);
+    flavor_list = upslst_add(flavor_list, new_string);
+    new_string = get_ups_string(argv[i+1]);
+    quals_list = upslst_add(quals_list, new_string);
+  }
+
+  /* point back to the first elements of the list */
+  flavor_list = upslst_first(flavor_list);
+  quals_list = upslst_first(quals_list);
+
+  command_line.ugo_product = "tigger";
+  command_line.ugo_version = "v2_0";
+  command_line.ugo_flavor = flavor_list;
+  command_line.ugo_qualifiers = quals_list;
+  new_string = get_ups_string(ups_db);
+  command_line.ugo_db = upslst_new(new_string);
+  command_line.ugo_tablefile = (char *)NULL;
+  command_line.ugo_tablefiledir = (char *)NULL;
+  command_line.ugo_productdir = (char *)NULL;
+  command_line.ugo_upsdir = (char *)NULL;
+  new_string = get_ups_string(argv[2]);
+  command_line.ugo_chain = upslst_new(new_string);
+
+  mproduct = upsmat_match_instance(&command_line, need_unique);
+  printf("\nChain Instances:\n");
+  print_inst(mproduct->chain_list);
+  printf("\nVersion Instances:\n");
+  print_inst(mproduct->version_list);
+  printf("\nTable Instances:\n");
+  print_inst(mproduct->table_list);
 }
 
 #ifdef GET_INSTANCE
@@ -209,6 +259,7 @@ static void test_match_version(const int argc, char *argv[])
 }
 #endif
 
+#ifdef MATCH_CHAIN
 static void test_match_chain(const int argc, char *argv[])
 {
   t_upslst_item *flavor_list = NULL, *quals_list = NULL;
@@ -244,6 +295,7 @@ static void test_match_chain(const int argc, char *argv[])
   printf("\nNumber of matches found in table file is %d -\n",num_matches);
   print_inst(tinst_list);
 }
+#endif
 
 static char *get_ups_string(const char * const old_string)
 {
