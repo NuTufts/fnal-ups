@@ -1,6 +1,6 @@
 FLY_DIR="/NULL/fly";export FLY_DIR
 #
-SETUP_FLY="fly v1_0 -f NULL -z ../db1";export SETUP_FLY
+SETUP_FLY='fly v1_0 -f NULL -z ../db1'; export SETUP_FLY
 #
 OPERA="AIDA FAUST";export OPERA
 #

@@ -1,6 +1,6 @@
 setenv FLY_DIR "/NULL/fly"
 #
-setenv SETUP_FLY "fly v1_0 -f NULL -z ../db1"
+setenv SETUP_FLY 'fly v1_0 -f NULL -z ../db1'
 #
 setenv OPERA "AIDA FAUST"
 #
