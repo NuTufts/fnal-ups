@@ -269,7 +269,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   upto = work;
   while ((loc = strstr(upto,UPSPRE))!= 0 ) 
   { count = ( loc - upto );
-    strncat(newstr,upto,count);
+    strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr =strchr(upto,'}');
     *eaddr = '\0';
@@ -301,7 +301,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   any=0;
   while ((loc = strstr(upto,"${PRODUCTS}"))!=0) 
   { count = ( loc - upto );
-    strncat(newstr,upto,count);
+    strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr =strchr(upto,'}');
     *eaddr = '\0';
@@ -332,7 +332,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
 /* not working */
   while ((loc = strstr(upto,TILDE))!=0) 
   { count = ( loc - upto );
-    strncat(newstr,upto,count);
+    strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr =strchr(upto,'/');
     *eaddr = '\0';
