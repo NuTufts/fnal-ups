@@ -95,6 +95,8 @@ static void test_match(int argc, char *argv[]);
 static void print_inst(t_upslst_item * const inst_list);
 static char *get_ups_string(const char * const old_string);
 
+void list_output(const t_upslst_item * const a_mproduct_list,
+                 const t_upsugo_command * const a_command_line);
 
 /*
  * Definition of global variables.
@@ -128,13 +130,13 @@ static void test_match(int argc, char *argv[])
   }
 
  /* get the options for each iteration of the command and do it */
-  while (command_line = upsugo_next(argc, &argv[2], (char *)list_valid_opts)) {
+  while ((command_line = upsugo_next(argc, &argv[2], (char *)list_valid_opts)) != 0) {
     mproduct_list = upsmat_instance(command_line, NULL, need_unique);
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_output();
       break;
     }
-    (void) list_output(mproduct_list, command_line);
+    list_output(mproduct_list, command_line);
   }
 }
 
