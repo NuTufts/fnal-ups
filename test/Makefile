@@ -32,7 +32,7 @@ OBJECTS =
 LDFLAGS = $(LLIBS)
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
 	upstst_misc.o upstst_parse.o upstst_error.o upstst_files.o	\
-	upstst_ugo.o
+	upstst_ugo.o upstst_match.o
 #=============================================================================
 # TARGETS
 #=============================================================================
@@ -93,6 +93,9 @@ upstst_files.o : upstst_files.c
 upstst_ugo.o : upstst_ugo.c
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
+upstst_match.o : upstst_match.c
+	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
+
 #
 # Now standard targets
 #
@@ -129,6 +132,7 @@ make :
 test_ups_action.o:	test_ups_action.c
 test_ups_action.o:	$(ERUPT_DIR)/inc/ups_error.h
 test_ups_action.o:	$(ERUPT_DIR)/inc/ups_action.h
+test_ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_error.o:	test_ups_error.c
 test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
 test_ups_files.o:	test_ups_files.c
@@ -194,6 +198,13 @@ upstst_files.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_files.o:	./upstst_parse.h
 upstst_files.o:	./upstst_macros.h
 upstst_files.o:	$(ERUPT_DIR)/inc/ups_error.h
+upstst_match.o:	upstst_match.c
+upstst_match.o:	$(ERUPT_DIR)/inc/ups_types.h
+upstst_match.o:	$(ERUPT_DIR)/inc/ups_list.h
+upstst_match.o:	$(ERUPT_DIR)/inc/ups_error.h
+upstst_match.o:	./upstst_parse.h
+upstst_match.o:	./upstst_macros.h
+upstst_match.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_misc.o:	upstst_misc.c
 upstst_misc.o:	./upstst_parse.h
 upstst_misc.o:	./upstst_macros.h

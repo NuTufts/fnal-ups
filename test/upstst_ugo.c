@@ -43,7 +43,7 @@ estatus_str = NULL; options = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
-if (!options) options = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+if (!options) options = UPSTST_ALLOPTS;
 
 /* call the real routine
    --------------------- */
@@ -89,7 +89,7 @@ options = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
-if (!options) options = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+if (!options) options = UPSTST_ALLOPTS;
 if (outfile) 					/* don't use stdout */
    {
    ofd = fopen(outfile,"w");
@@ -140,9 +140,9 @@ return (0);
 
 static void upstst_ugo_dump (const t_ups_command * const uc, FILE * const fd)
 {
-t_upslst_item *l_ptr;
 #define upstst_ugo_dumplist(title,ptr) 				\
    {								\
+   t_upslst_item *l_ptr;					\
    fprintf(fd,"%s",title);					\
    for (l_ptr = upslst_first(ptr); l_ptr; l_ptr = l_ptr->next)	\
       {								\
@@ -155,9 +155,9 @@ t_upslst_item *l_ptr;
 
 if(!uc) return;
 if ( uc->ugo_product ) 
-        fprintf(fd,"Product:          %s\n",uc->ugo_product);
+   fprintf(fd,"Product:          %s\n",uc->ugo_product);
 if ( uc->ugo_version )
-        fprintf(fd,"Version:          %s\n",uc->ugo_version);
+   fprintf(fd,"Version:          %s\n",uc->ugo_version);
 if ( uc->ugo_auth )
    upstst_ugo_dumplist("Authorized Nodes: " ,uc->ugo_auth);
 if ( uc->ugo_flavor )
@@ -167,25 +167,25 @@ if ( uc->ugo_host )
 if ( uc->ugo_key )
    upstst_ugo_dumplist("Key:              ",uc->ugo_key);
 if ( uc->ugo_tablefiledir )
-        fprintf(fd,"Tablefiledir:     %s\n",uc->ugo_tablefiledir);
+   fprintf(fd,"Tablefiledir:     %s\n",uc->ugo_tablefiledir);
 if ( uc->ugo_tablefile )
-        fprintf(fd,"Tablefile:        %s\n",uc->ugo_tablefile);
+   fprintf(fd,"Tablefile:        %s\n",uc->ugo_tablefile);
 if ( uc->ugo_anyfile )
-        fprintf(fd,"Anyfile:          %s\n",uc->ugo_anyfile);
+   fprintf(fd,"Anyfile:          %s\n",uc->ugo_anyfile);
 if ( uc->ugo_options )
-        fprintf(fd,"Options:          %s\n",uc->ugo_options);
+   fprintf(fd,"Options:          %s\n",uc->ugo_options);
 if ( uc->ugo_description )
-        fprintf(fd,"Description:      %s\n",uc->ugo_description);
+   fprintf(fd,"Description:      %s\n",uc->ugo_description);
 if ( uc->ugo_override )
-        fprintf(fd,"Override:         %s\n",uc->ugo_override);
+   fprintf(fd,"Override:         %s\n",uc->ugo_override);
 if ( uc->ugo_qualifiers )
    upstst_ugo_dumplist("Qualifiers:       ",uc->ugo_qualifiers);
 if ( uc->ugo_productdir )
-        fprintf(fd,"Productdir:       %s\n",uc->ugo_productdir);
+   fprintf(fd,"Productdir:       %s\n",uc->ugo_productdir);
 if ( uc->ugo_archivefile )
-        fprintf(fd,"Archivefile:      %s\n",uc->ugo_archivefile);
+   fprintf(fd,"Archivefile:      %s\n",uc->ugo_archivefile);
 if ( uc->ugo_upsdir )
-        fprintf(fd,"Upsdir:           %s\n",uc->ugo_upsdir);
+   fprintf(fd,"Upsdir:           %s\n",uc->ugo_upsdir);
 if ( uc->ugo_db )
    upstst_ugo_dumplist("DB:               ",uc->ugo_db);
 if ( uc->ugo_chain )

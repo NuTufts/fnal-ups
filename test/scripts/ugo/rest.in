@@ -3,9 +3,7 @@ Version:          *
 Authorized Nodes: hercules
                   neptune
                   zeus
-Flavor:           CHOCOLATE
-                  VANILLA
-                  ROCKYROAD
+Flavor:           *
 Host:             levinworth
                   alcatraz
 Key:              west

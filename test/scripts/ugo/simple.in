@@ -2,4 +2,6 @@ Product:          *
 Version:          *
 Flavor:           CHOCOLATE
 Qualifiers:       *
+DB:               /thunder
+                  /lightening
 Chains:           current

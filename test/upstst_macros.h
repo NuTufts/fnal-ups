@@ -18,10 +18,11 @@ Header file with useful things for wrapper routines
 
 int strcasecmp		(const char *s1, const char *s2);
 extern int              upstst_debug;            /* debug flag */
-#define UPSTST_ERROR	1
-#define UPSTST_SUCCESS	0
+#define UPSTST_ERROR		1
+#define UPSTST_SUCCESS		0
 #define UPSTST_NONZEROSUCCESS	10
 #define UPSTST_ZEROSUCCESS	20
+#define UPSTST_ALLOPTS	"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
 
 
 /* Macros:-

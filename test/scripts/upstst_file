@@ -3,12 +3,15 @@
 # test the file routines
 # ============================================================================
 touch dummy.file
-cd $ERUPT_DIR/test/scripts
+cd $ERUPT_DIR/test/scripts/file
 $ERUPT_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
-upsfil_read_file database/dog_v2_0.version.input
-upsfil_write_file database/dog_v2_0.version.output
+upsfil_read_file ../database/dog_v2_0.version
+upsfil_write_file dog_v2_0.version.out
+upsfil_read_file ../database/dog_v2_0_1.table
+upsfil_write_file dog_v2_0_1.table.out
 upsfil_write_file -status UPS_OPEN_FILE /junk/junk/junk
+upserr_clear
 upsfil_write_file -status UPS_UNKNOWN_FILETYPE /junk/junk/junk
 upserr_clear
 upsfil_read_file -status UPS_OPEN_FILE blah
@@ -17,5 +20,6 @@ upsfil_read_file -status UPS_READ_FILE dummy.file
 upserr_clear
 quit
 EOD
-diff database/dog_v2_0.version.input database/dog_v2_0.version.output
+diff ../database/dog_v2_0.version dog_v2_0.version.out
+diff ../database/dog_v2_0_1.table dog_v2_0_1.table.out
 rm dummy.file

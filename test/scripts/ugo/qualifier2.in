@@ -1,5 +1,7 @@
 Product:          *
 Flavor:           CHOCOLATE
+                  VANILLA
+                  ROCKYROAD
 Qualifiers:       a,aardvark
                   123,Bear,Canary,___,big-dog,dog
                   cat,fat-cat
@@ -7,4 +9,7 @@ Qualifiers:       a,aardvark
                   fat-cat
                   
                   aardvark
+DB:               /thunder
+                  	
+                  /lightening
 Chains:           current
