@@ -60,6 +60,10 @@ int g_LOCAL_VARS_DEF = 0;
 #define CLOSE_PAREN ')'
 #define SLASH "/"
 #define WSPACE " \t\n\r\f\""
+#define EXIT "EXIT"
+#define CONTINUE "CONTINUE"
+#define UPS_ENV "UPS_ENV"
+#define NO_UPS_ENV "NO_UPS_ENV"
 
 /*
  * Private types
@@ -265,6 +269,21 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     upserr_vplace(); \
     upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 
+#define GET_FLAGS() \
+    if (a_cmd->argc > g_cmd_maps[a_cmd->icmd].min_params) {                \
+      int i;                                                               \
+      /* we have more than the minimum number of params, must be flags */  \
+      for (i = 1 ; i < a_cmd->argc ; ++i) {                                \
+	if (! strcmp(a_cmd->argv[i], EXIT)) {                              \
+	  exit_flag = 1;                                                   \
+	  continue;                                                        \
+	}                                                                  \
+	if (! strcmp(a_cmd->argv[i], NO_UPS_ENV)) {                        \
+	  no_ups_env_flag = 1;                                             \
+	}                                                                  \
+      }                                                                    \
+    }
+
 #define SET_PARSE_ERROR( str ) \
     upserr_vplace(); \
     upserr_add(UPS_ACTION_PARSE, UPS_FATAL, str );
@@ -390,10 +409,10 @@ static t_cmd_map g_cmd_maps[] = {
   { "pathremove", e_pathremove, f_pathremove, 2, 3, e_invalid_cmd },
   { "pathprepend", e_pathprepend, f_pathprepend, 2, 3, e_pathremove },
   { "pathset", e_pathset, f_pathset, 2, 2, e_envunset },
-  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 1, e_invalid_cmd },
-  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 1, e_invalid_cmd },
-  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 1, e_invalid_cmd },
-  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 1, e_invalid_cmd },
+  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 3, e_invalid_cmd },
+  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 3, e_invalid_cmd },
+  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 3, e_invalid_cmd },
+  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_invalid_cmd },
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
   { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
@@ -1526,14 +1545,14 @@ void f_envappend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=\${%s-}%s%s;export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\";export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s \${%s}%s%s\n#\n",
+      if (fprintf((FILE *)a_stream, "setenv %s \"${%s}%s%s\"\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter,
 		  a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
@@ -1570,14 +1589,14 @@ void f_envprepend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\";export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s %s%s\${%s}\n#\n",
+      if (fprintf((FILE *)a_stream, "setenv %s \"%s%s${%s}\"\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -1884,7 +1903,7 @@ void f_pathappend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=${%s-}%s%s;export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\";export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -1927,7 +1946,7 @@ void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\";export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2042,16 +2061,24 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
 		       const FILE * const a_stream,
 		       const t_upsact_cmd * const a_cmd)
 {
+  int exit_flag = 0;
+  int no_ups_env_flag = 0;
+
   CHECK_NUM_PARAM("sourceRequired");
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-  
+
+    /* Determine which flags (if any) were entered */
+    GET_FLAGS();
+
     /* define all of the UPS local variables that the user may need. */
-    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
-    if (UPS_ERROR == UPS_SUCCESS) {
+    if (! no_ups_env_flag) {
+      upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
       g_LOCAL_VARS_DEF = 1;   /* keep track that we defined local variables */
+    }
+    if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
 	if (fprintf((FILE *)a_stream, ". %s\n#\n", a_cmd->argv[0]) < 0) {
@@ -2084,12 +2111,18 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 		       const FILE * const a_stream,
 		       const t_upsact_cmd * const a_cmd)
 {
+  int exit_flag = 0;
+  int no_ups_env_flag = 0;
+
   CHECK_NUM_PARAM("sourceOptional");
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
+    /* Determine which flags (if any) were entered */
+    GET_FLAGS();
+
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_cmd->argv[0])
@@ -2102,12 +2135,27 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
-	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
-	  if (UPS_ERROR == UPS_SUCCESS) {
+	  if (! no_ups_env_flag) {
+	    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
-	    if (fprintf((FILE *)a_stream, "  . %s;\n;\nfi;\nfi;\n#\n", 
+	  }
+	  if (UPS_ERROR == UPS_SUCCESS) {
+	    if (fprintf((FILE *)a_stream, "  . %s;\n", 
 			a_cmd->argv[0]) < 0) {
 	      FPRINTF_ERROR();
+	    } else {
+	      if (exit_flag) {
+		if (g_LOCAL_VARS_DEF) {
+		  /* undefine the local env variables */
+		  (void )upsget_remall(a_stream, a_command_line);
+		}
+		if (fprintf((FILE *)a_stream, "  return\n") < 0) {
+		  FPRINTF_ERROR();
+		}
+	      }
+	      if (fprintf((FILE *)a_stream, "fi;\nfi;\n#\n") < 0) {
+		FPRINTF_ERROR();
+	      }
 	    }
 	  } else {
 	    FPRINTF_ERROR();
@@ -2126,12 +2174,27 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
-	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
-	  if (UPS_ERROR == UPS_SUCCESS) {
+	  if (! no_ups_env_flag) {
+	    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
-	    if (fprintf((FILE *)a_stream, "  source %s\n\nendif\nendif\n#\n", 
+	  }
+	  if (UPS_ERROR == UPS_SUCCESS) {
+	    if (fprintf((FILE *)a_stream, "  source %s\n", 
 			a_cmd->argv[0]) < 0) {
 	      FPRINTF_ERROR();
+	    } else {
+	      if (exit_flag) {
+		if (g_LOCAL_VARS_DEF) {
+		  /* undefine the local env variables */
+		  (void )upsget_remall(a_stream, a_command_line);
+		}
+		if (fprintf((FILE *)a_stream, "  return\n") < 0) {
+		  FPRINTF_ERROR();
+		}
+	      }
+	      if (fprintf((FILE *)a_stream, "endif\nendif\n#\n") < 0) {
+		FPRINTF_ERROR();
+	      }
 	    }
 	  } else {
 	    FPRINTF_ERROR();
@@ -2157,13 +2220,21 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
 		       const FILE * const a_stream,
 		       const t_upsact_cmd * const a_cmd)
 {
+  int exit_flag = 0;
+  int no_ups_env_flag = 0;
+
   CHECK_NUM_PARAM("sourceReqCheck");
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    /* Determine which flags (if any) were entered */
+    GET_FLAGS();
+
     /* define all of the UPS local variables that the user may need. */
-    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
+    if (! no_ups_env_flag) {
+      upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
+    }
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
     if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
@@ -2176,7 +2247,7 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
 	break;
       case e_CSHELL:
 	if (fprintf((FILE *)a_stream,
-		    "source %s\nif ($status == 1) return 1/n#\n",
+		    "source %s\nif ($status == 1) return 1\n#\n",
 		    a_cmd->argv[0]) < 0) {
 	  FPRINTF_ERROR();
 	}
@@ -2203,12 +2274,17 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 		       const FILE * const a_stream,
 		       const t_upsact_cmd * const a_cmd)
 {
+  int exit_flag = 0;
+  int no_ups_env_flag = 0;
+
   CHECK_NUM_PARAM("sourceOptCheck");
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-  
+    /* Determine which flags (if any) were entered */
+    GET_FLAGS();
+
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_cmd->argv[0])
@@ -2216,18 +2292,37 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
-		    "if [ ! -r %s -o ! -x %s]; then\n  echo File to be optionally sourced (%s) is not readable or not executable;\nelse\n",
+		    "  if [ ! -r %s -o ! -x %s]; then\n    echo File to be optionally sourced (%s) is not readable or not executable;\n  else\n",
 		    a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
-	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
-	  if (UPS_ERROR == UPS_SUCCESS) {
+	  if (! no_ups_env_flag) {
+	    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
-	    if (fprintf((FILE *)a_stream,
-			"  . %s;\n  if [ $? -eq 1 ]; then return 1; fi;\nfi;\nfi;\n#\n", 
+	  }
+	  if (UPS_ERROR == UPS_SUCCESS) {
+	    if (fprintf((FILE *)a_stream, "    . %s;\n    UPS_STATUS=$?\n", 
 			a_cmd->argv[0]) < 0) {
 	      FPRINTF_ERROR();
+	    } else {
+	      /* write out the rest of the if statement and don't worry about
+		 write errors, will catch them further down */
+	      if (g_LOCAL_VARS_DEF) {
+		/* undefine the local env variables */
+		(void )upsget_remall(a_stream, a_command_line);
+	      }
+	      (void )fprintf((FILE *)a_stream,
+			     "    if [ $UPS_STATUS -eq 1 ]; then\n      unset UPS_STATUS\n      return 1;\n    fi;\n");
+	      if (exit_flag) {
+		if (fprintf((FILE *)a_stream,
+			    "    unset UPS_STATUS\n    return\n") < 0) {
+		  FPRINTF_ERROR();
+		}
+	      }
+	      if (fprintf((FILE *)a_stream, "  fi;\nfi;\n#\n") < 0) {
+		FPRINTF_ERROR();
+	      }
 	    }
 	  } else {
 	    FPRINTF_ERROR();
@@ -2241,18 +2336,39 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
-		    "if (! -r %s || ! -x %s) then\n  echo File to be optionally sourced (%s) is not readable or not executable\nelse\n", 
+		    "  if (! -r %s || ! -x %s) then\n    echo File to be optionally sourced (%s) is not readable or not executable\n  else\n", 
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
-	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
-	  if (UPS_ERROR == UPS_SUCCESS) {
+	  if (! no_ups_env_flag) {
+	    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
+	  }
+	  if (UPS_ERROR == UPS_SUCCESS) {
 	    if (fprintf((FILE *)a_stream,
-			"  source %s\n  if ($status == 1) return 1/nendif\nendif\nendif\n#\n", 
+		    "    source %s\n    setenv UPS_STATUS $status\n", 
 			a_cmd->argv[0]) < 0) {
 	      FPRINTF_ERROR();
+	    } else {
+	      /* write out the rest of the if statement and don't worry about
+		 write errors, will catch them further down */
+	      if (g_LOCAL_VARS_DEF) {
+		/* undefine the local env variables */
+		(void )upsget_remall(a_stream, a_command_line);
+	      }
+	      (void )fprintf((FILE *)a_stream,
+			     "    if ($UPS_STATUS == 1) then\n      unsetenv UPS_STATUS\n      return 1\n    endif\n");
+
+	      if (exit_flag) {
+		if (fprintf((FILE *)a_stream,
+			    "    unsetenv UPS_STATUS\n    return\n") < 0) {
+		  FPRINTF_ERROR();
+		}
+	      }
+	      if (fprintf((FILE *)a_stream, "  endif\nendif\n#\n") < 0) {
+		FPRINTF_ERROR();
+	      }
 	    }
 	  } else {
 	    FPRINTF_ERROR();
