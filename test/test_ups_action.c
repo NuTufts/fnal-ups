@@ -21,10 +21,12 @@
 
 /* standard include files */
 #include <stdio.h>
+#include <string.h>
 
 /* ups specific include files */
 #include "ups_error.h"
 #include "ups_action.h"
+#include "ups_list.h"
 
 /*
  * Definition of public variables.
@@ -34,6 +36,7 @@
  * Declaration of private functions.
  */
 static void test_upsact_parse(void);
+static void test_upsact_params(void);
 static void print_action( const char * const a_action_line,
 		   const char * const a_params, const int a_action_val);
 
@@ -55,11 +58,13 @@ static void print_action( const char * const a_action_line,
  * test ups_action routines
  *
  */
-int main (int argc, char *argv[])
+int main (void)
 {
 
-  test_upsact_parse();
-  upserr_output();
+  /*  test_upsact_parse();
+  upserr_output();*/
+
+  test_upsact_params();
 
   return 0;
 }
@@ -120,6 +125,39 @@ static void test_upsact_parse(void)
 }
 
 /*-----------------------------------------------------------------------
+ * test_upsact_params
+ *
+ * test the routine that parses the parameters.  keep taking string input from
+ * the command line until a null line is received.
+ *
+ * Input : none
+ * Output: none
+ * Return: none
+ */
+static void test_upsact_params(void)
+{
+  char cmd_line[500];
+  char *cmd_line_ptr = NULL;
+  t_upslst_item *param_list = NULL, *tmp_item;
+
+  while (1) {
+    cmd_line_ptr = gets(&cmd_line[0]);
+    if (strlen(cmd_line_ptr) > 0) {
+      upsact_params(cmd_line_ptr, &param_list);
+      param_list = upslst_first(param_list);
+      printf("\nFor string = %s  params are:\n", cmd_line_ptr);
+      for (tmp_item = param_list ; tmp_item ; tmp_item = tmp_item->next) {
+	printf("%s\n", (char *)tmp_item->data);
+      }
+      param_list = upslst_free(param_list, 'd');
+    } else {
+      break;
+    }
+  }
+
+}
+
+/*-----------------------------------------------------------------------
  * print_action_info
  *
  * print the passed in action information
@@ -142,13 +180,3 @@ static void print_action( const char * const a_action_line,
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
