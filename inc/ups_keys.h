@@ -106,12 +106,14 @@ t_upskey_map *upskey_get_map( const char * const skey );
 char         *upskey_inst_getval( t_ups_instance * const inst,
 				  const char * const skey );
 char         *upskey_inst_setval( t_ups_instance * const inst,
-				  const char * const skey, const char * const sval );
+				  const char * const skey,
+				  const char * const sval );
 void         upskey_inst_print( const t_ups_instance * const prod );
 char         *upskey_prod_getval( t_ups_product * const prod,
 				  const char * const skey );
 char         *upskey_prod_setval( t_ups_product * const prod,
-				  const char * const skey, const char * const sval );
+				  const char * const skey,
+				  const char * const sval );
 void         upskey_prod_print( const t_ups_product * const prod );
      
 /*
