@@ -40,7 +40,7 @@ all :
 #
 clean :
 	@../bin/upsClean
-	@/bin/rm -f catman/*.1
 
 spotless : clean
+	@/bin/rm -f catman/*.1
 	@/bin/rm -f up
