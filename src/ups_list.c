@@ -841,6 +841,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
           (void) printf("\"%s\" ", 
                  upsget_prod_dir(product->db_info,instance,command));
         } 
+        if(!upsutl_stricmp(l_ptr->data,"@compile_file"))
+        { valid=1;
+          (void) printf("\"%s\" ",
+                 upsget_compile(product->db_info,instance,command));
+        } 
         if(!upsutl_stricmp(l_ptr->data,"@ups_dir"))
         { valid=1;
           (void) printf("\"");
