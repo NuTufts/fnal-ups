@@ -44,14 +44,14 @@ typedef struct ups_list_item
 /*
  * Declaration of public functions.
  */
-t_ups_list_item *ups_list_new( void *data_ptr );
-t_ups_list_item *ups_list_free( t_ups_list_item *list_ptr, char copt );
-t_ups_list_item *ups_list_insert( t_ups_list_item *list_ptr, void *data_ptr );
-t_ups_list_item *ups_list_add( t_ups_list_item *list_ptr, void *data_ptr );
-t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, char copt );
+t_ups_list_item *upslst_new( void *data_ptr );
+t_ups_list_item *upslst_free( t_ups_list_item *list_ptr, char copt );
+t_ups_list_item *upslst_insert( t_ups_list_item *list_ptr, void *data_ptr );
+t_ups_list_item *upslst_add( t_ups_list_item *list_ptr, void *data_ptr );
+t_ups_list_item *upslst_delete( t_ups_list_item *list_ptr, void *data_ptr, char copt );
 
-t_ups_list_item *ups_list_first( t_ups_list_item *list_ptr );
-t_ups_list_item *ups_list_last( t_ups_list_item *list_ptr );
+t_ups_list_item *upslst_first( t_ups_list_item *list_ptr );
+t_ups_list_item *upslst_last( t_ups_list_item *list_ptr );
 
 /*
  * Declaration of private globals.

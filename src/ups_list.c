@@ -16,9 +16,9 @@
  *
  * MODIFICATIONS:
  *       23-Jun-1997, LR, first
- *       25-Jul-1997, LR, ups_list_add is now as fast as ups_list_insert:
- *                        ups_list_add will now return the last element.
- *                        ups_list_insert will return the first element.
+ *       25-Jul-1997, LR, upslst_add is now as fast as upslst_insert:
+ *                        upslst_add will now return the last element.
+ *                        upslst_insert will return the first element.
  *                        In that way, successive calls using previous
  *                        return will be fast.  
  *                        Changed 'bot' to 'last' and 'top' to 'first'.
@@ -48,7 +48,7 @@
  */
 
 /*-----------------------------------------------------------------------
- * ups_list_new
+ * upslst_new
  *
  * Will create a new ups list and add first item.
  *
@@ -56,7 +56,7 @@
  * Output: none
  * Return: t_ups_list_item *, pointer to top of list or NULL
  */
-t_ups_list_item *ups_list_new( void *data_ptr )
+t_ups_list_item *upslst_new( void *data_ptr )
 {
   t_ups_list_item *l_first = NULL;
 
@@ -72,7 +72,7 @@ t_ups_list_item *ups_list_new( void *data_ptr )
 }	
 
 /*-----------------------------------------------------------------------
- * ups_list_free
+ * upslst_free
  *
  * Will free up all memory for ups list.
  * If option 'd' is passed the data elements are also freed.
@@ -82,11 +82,11 @@ t_ups_list_item *ups_list_new( void *data_ptr )
  * Output: none
  * Return: t_ups_list_item *, NULL
  */
-t_ups_list_item *ups_list_free( t_ups_list_item *list_ptr, char copt )
+t_ups_list_item *upslst_free( t_ups_list_item *list_ptr, char copt )
 {
   t_ups_list_item *l_ptr = NULL;
   t_ups_list_item *l_tmp = NULL;
-  t_ups_list_item *l_first = ups_list_first( list_ptr );
+  t_ups_list_item *l_first = upslst_first( list_ptr );
 
   if ( !l_first ) return NULL;
 
@@ -103,23 +103,29 @@ t_ups_list_item *ups_list_free( t_ups_list_item *list_ptr, char copt )
 }
 
 /*-----------------------------------------------------------------------
- * ups_list_insert
+ * upslst_insert
  *
  * Will add an item as the first item to the list.
  *
- * Input : t_ups_list_item *, pointer to a list.
+ * Input : t_ups_list_item *, pointer to a list, if NULL a new list will
+ *         be created.
  * Output: none
  * Return: t_ups_list_item *, pointer to the first item of the list or NULL
  *
  * NOTE: if passed list pointer, in successive calls, is the first item,
  * it should be pretty fast.
  */
-t_ups_list_item *ups_list_insert( t_ups_list_item *list_ptr, void *data_ptr )
+t_ups_list_item *upslst_insert( t_ups_list_item *list_ptr, void *data_ptr )
 {
   t_ups_list_item *l_first = NULL;
   t_ups_list_item *l_new = NULL;
 
-  l_first = ups_list_first( list_ptr );
+  if ( ! list_ptr ) {
+    list_ptr = upslst_new( data_ptr );
+    return list_ptr;
+  }
+
+  l_first = upslst_first( list_ptr );
 
   if ( !l_first ) return NULL;
   
@@ -136,23 +142,29 @@ t_ups_list_item *ups_list_insert( t_ups_list_item *list_ptr, void *data_ptr )
 }
 
 /*-----------------------------------------------------------------------
- * ups_list_add
+ * upslst_add
  *
  * Will add an item as the last item to the list.
  *
- * Input : t_ups_list_item *, pointer to a list.
+ * Input : t_ups_list_item *, pointer to a list, if NULL a new list will
+ *         be created.
  * Output: none
  * Return: t_ups_list_item *, pointer to the last item of the list or NULL
  *
  * NOTE: if passed list pointer, in successive calls, is the last item,
  * it should be pretty fast.
  */
-t_ups_list_item *ups_list_add( t_ups_list_item *list_ptr, void *data_ptr )
+t_ups_list_item *upslst_add( t_ups_list_item *list_ptr, void *data_ptr )
 {
   t_ups_list_item *l_last = NULL;
   t_ups_list_item *l_new = NULL;
 
-  l_last = ups_list_last( list_ptr );
+  if ( ! list_ptr ) {
+    list_ptr = upslst_new( data_ptr );
+    return list_ptr;
+  }
+  
+  l_last = upslst_last( list_ptr );
 
   if ( !l_last ) return NULL;
   
@@ -169,7 +181,7 @@ t_ups_list_item *ups_list_add( t_ups_list_item *list_ptr, void *data_ptr )
 }
 
 /*-----------------------------------------------------------------------
- * ups_list_delete
+ * upslst_delete
  *
  * Will delete item from list.
  * If option 'd' is passed the data elements are also freed.
@@ -180,13 +192,13 @@ t_ups_list_item *ups_list_add( t_ups_list_item *list_ptr, void *data_ptr )
  * Output: none
  * Return: t_ups_list_item *, pointer to top of list
  */
-t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, char copt )
+t_ups_list_item *upslst_delete( t_ups_list_item *list_ptr, void *data_ptr, char copt )
 {
   t_ups_list_item *l_ptr = NULL;
   t_ups_list_item *l_prev = NULL;
   t_ups_list_item *l_first = NULL;
 
-  l_first = ups_list_first( list_ptr );
+  l_first = upslst_first( list_ptr );
   
   for ( l_ptr = l_first; l_ptr; l_ptr = l_ptr->next ) {
     l_prev = l_ptr->prev;
@@ -213,7 +225,7 @@ t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, cha
 }
 
 /*-----------------------------------------------------------------------
- * ups_list_first
+ * upslst_first
  *
  * Will return first item of passed list.
  *
@@ -221,7 +233,7 @@ t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, cha
  * Output: none
  * Return: t_ups_list_item *, pointer to first item of list
  */
-t_ups_list_item *ups_list_first( t_ups_list_item *list_ptr )
+t_ups_list_item *upslst_first( t_ups_list_item *list_ptr )
 {
   t_ups_list_item *l_ptr = NULL;
   
@@ -233,7 +245,7 @@ t_ups_list_item *ups_list_first( t_ups_list_item *list_ptr )
 }
 
 /*-----------------------------------------------------------------------
- * ups_list_last
+ * upslst_last
  *
  * Will return last item of passed list.
  *
@@ -241,7 +253,7 @@ t_ups_list_item *ups_list_first( t_ups_list_item *list_ptr )
  * Output: none
  * Return: t_ups_list_item *, pointer to last item of list
  */
-t_ups_list_item *ups_list_last( t_ups_list_item *list_ptr )
+t_ups_list_item *upslst_last( t_ups_list_item *list_ptr )
 {
   t_ups_list_item *l_ptr = NULL;
   
