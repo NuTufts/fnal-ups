@@ -373,6 +373,7 @@
    t_upslst_item *ugo_commands = 0;
    t_upslst_item *last_command = 0;
    int argindx;
+   int g_UPS_SHELL=e_INVALID_SHELL;
 
 /* ===========================================================================
  * Private function declarations
@@ -464,28 +465,27 @@ if (!uc->ugo_H)
 void upsugo_setfixed(struct ups_command * const uc)
 {
    char   * SHELL;                           /* SHELL value */
-   static int shell=e_INVALID_SHELL;
-   if (shell==e_INVALID_SHELL)
+   if (g_UPS_SHELL==e_INVALID_SHELL)
    { if((SHELL = (char *)getenv("UPS_SHELL")) == 0)
      { if((SHELL = (char *)getenv("SHELL")) == 0)
-       { shell=e_BOURNE;
+       { g_UPS_SHELL=e_BOURNE;
          strcpy(SHELL,"sh");
        } else { 
          if (strstr(SHELL,"csh"))
-         { shell=e_CSHELL;
+         { g_UPS_SHELL=e_CSHELL;
          } else { 
-           shell=e_BOURNE;
+           g_UPS_SHELL=e_BOURNE;
          }
        }
        upserr_add(UPS_NOSHELL, UPS_INFORMATIONAL, SHELL);
      } else { 
        if (strstr(SHELL,"csh"))
-       { shell=e_CSHELL;
+       { g_UPS_SHELL=e_CSHELL;
        } else { 
-         shell=e_BOURNE;
+         g_UPS_SHELL=e_BOURNE;
        }
      }
-   } uc->ugo_shell=shell;
+   } uc->ugo_shell=g_UPS_SHELL;
 }
 /* ===========================================================================
 ** ROUTINE	upsugo_ifornota()
