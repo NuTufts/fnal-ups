@@ -376,7 +376,7 @@ t_cmd_info g_cmd_info[] = {
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000000, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:p:q:r:stT:u:U:vVz:Z0123", 0x00000000, e_declare},
-  {e_depend,      "depend",      "?cdotg:f:H:K:lm:M:q:r:RU:vVz:Z0123", 0x00000000, e_invalid_action},
+  {e_depend,      "depend",      "?cdnotg:f:H:K:lm:M:q:r:RU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_modify,      "modify",      "a?A:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
@@ -393,7 +393,7 @@ t_cmd_info g_cmd_info[] = {
             "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
+            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStRT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
 };
 
 /* These action commands are listed in order of use.  Hopefully the more
@@ -2103,7 +2103,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 
 	  strcat( buf, fn );
 
-	  /* SPECIAL end */ 
+	  /* SPECIAL case end */ 
 
 	}
 	else if ( i_cmd == e_setuprequired ||
