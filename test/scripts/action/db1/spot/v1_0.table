@@ -6,4 +6,4 @@ QUALIFIERS = ""
 
 ACTION = SETUP
    dodefaults()
-   sourcerequired( spot_v1_0 )
+   sourcerequired( spot_v1_0 , UPS_ENV)

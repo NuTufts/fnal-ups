@@ -70,7 +70,6 @@ enum {
   e_undeclare,
   e_create,
   e_get,
-  e_validate,
   e_flavor,
   e_help,
   e_verify,

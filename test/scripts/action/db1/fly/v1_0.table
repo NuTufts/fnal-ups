@@ -31,7 +31,7 @@ ACTION = SETUP
 #   setupRequired(blah)
 # execute tests
    exeAccess(ls)
-   execute("ls -l",mystatus)
+   execute("ls -l", NO_UPS_ENV, mystatus)
    exeActionOptional(extra1)
    exeActionOptional(extra2)
    exeActionRequired(extra3)
@@ -56,24 +56,18 @@ ACTION = SETUP
 #aliases
    addalias (rambo,"SlyStalone %s")
    unalias  (rambo)
-# copy tests
-   copyInfo()
-   copyMan()
-   copyCatMan()
-   copyHtml()
-   copyNews()
 # source tests
-   sourceRequired(reqfile1,continue,NO_UPS_ENV)
-   sourceReqCheck(reqcheck1,continue,NO_UPS_ENV)
-   sourceOptional(optfile,CONTINUE,NO_UPS_ENV)
-   sourceOptCheck(optcheck,CONTINUE,NO_UPS_ENV)
-   sourceOptional(optfile,EXIT,NO_UPS_ENV)
-   sourceOptCheck(optcheck,EXIT,NO_UPS_ENV)
-   sourceReqCheck(reqcheck2,EXIT,ups_env)
+   sourceRequired(reqfile1,NO_UPS_ENV, continue)
+   sourceReqCheck(reqcheck1,NO_UPS_ENV,continue)
+   sourceOptional(optfile,NO_UPS_ENV,CONTINUE)
+   sourceOptCheck(optcheck,NO_UPS_ENV,CONTINUE)
+   sourceOptional(optfile,NO_UPS_ENV,EXIT)
+   sourceOptCheck(optcheck,NO_UPS_ENV,EXIT)
+   sourceReqCheck(reqcheck2,ups_env,EXIT)
    envset (OPERA,"")
 # compile tests
 #   sourceCompileReq(requiredScript)
 ACTION = extra1
-execute (echo "from extra1")
+execute (echo "from extra1", NO_UPS_ENV)
 ACTION = extra3
-execute (echo "from extra3")
+execute (echo "from extra3", NO_UPS_ENV)

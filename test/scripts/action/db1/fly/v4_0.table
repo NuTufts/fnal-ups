@@ -13,7 +13,7 @@ ACTION = SETUP
    envsetifnotset(TMPDIR,/tmp)
    filetest(blah,r,"can't read file")
    exeAccess(ls)
-   execute("ls -l",mystatus)
+   execute("ls -l", NO_UPS_ENV, mystatus)
    exeActionOptional(extra1)
    exeActionRequired(extra3)
 ACTION = CURRENT
@@ -25,4 +25,4 @@ ACTION = CURRENT
 ACTION = CONFIGURE
    addalias (rambo,"SlyStalone %s")
    unalias  (rambo)
-   sourceRequired(reqfile1,continue,NO_UPS_ENV)
+   sourceRequired(reqfile1,NO_UPS_ENV,continue)

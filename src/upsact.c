@@ -261,15 +261,18 @@ static void f_dodefaults( ACTION_PARAMS);
     if (a_cmd->argc > g_func_info[a_cmd->icmd].min_params) {                \
       int i;                                                               \
       /* we have more than the minimum number of params, must be flags */  \
-      for (i = 1 ; i < a_cmd->argc ; ++i) {                                \
-	if (! upsutl_stricmp(a_cmd->argv[i], EXIT)) {                      \
+      for (i = 2 ; i < a_cmd->argc ; ++i) {                                \
+	if ((! upsutl_stricmp(a_cmd->argv[i], EXIT))) {                    \
 	  exit_flag = DO_EXIT;                                             \
 	  continue;                                                        \
 	}                                                                  \
-	if (! upsutl_stricmp(a_cmd->argv[i], NO_UPS_ENV)) {                \
-	  no_ups_env_flag = DO_NO_UPS_ENV;                                 \
-	}                                                                  \
       }                                                                    \
+    }
+
+#define GET_UPS_ENV()  \
+    /* determine if we are to set the ups local environment variables */  \
+    if ((! upsutl_stricmp(a_cmd->argv[1], UPS_ENV))) {                    \
+      no_ups_env_flag = DO_UPS_ENV;                                       \
     }
 
 #define SH_OUTPUT_LAST_PART_OPT() \
@@ -385,7 +388,6 @@ t_cmd_info g_cmd_info[] = {
   {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000000, e_undeclare},
   {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:lZ0123", 0x00000000, e_invalid_action},
   {e_verify,      "verify",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_help,        "help",
@@ -432,12 +434,12 @@ t_cmd_map g_func_info[] = {
   { "pathset", e_pathset, f_pathset, 2, 2, e_envunset, 0x00000001 },
   { "addalias", e_addalias, f_addalias, 2, 2, e_unalias, 0x00000001 },
   { "unalias", e_unalias, f_unalias, 1, 1, e_invalid_cmd, 0x00000001 },
-  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 3, e_sourceoptional, 0x00000001 },
-  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 3, e_sourceoptional, 0x00000001 },
-  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 3, e_sourceoptcheck, 0x00000001 },
-  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_sourceoptcheck, 0x00000001 },
+  { "sourcerequired", e_sourcerequired, f_sourcerequired, 2, 3, e_sourceoptional, 0x00000001 },
+  { "sourceoptional", e_sourceoptional, f_sourceoptional, 2, 3, e_sourceoptional, 0x00000001 },
+  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 2, 3, e_sourceoptcheck, 0x00000001 },
+  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 2, 3, e_sourceoptcheck, 0x00000001 },
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd, 0x00000001 },
-  { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd, 0x00000001 },
+  { "execute", e_execute, f_execute, 2, 2, e_invalid_cmd, 0x00000001 },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd, 0x00000001 },
   { "copyhtml", e_copyhtml, f_copyhtml, 0, 0, e_invalid_cmd, 0x00000000 },
   { "copyinfo", e_copyinfo, f_copyinfo, 0, 0, e_invalid_cmd, 0x00000000 },
@@ -2148,7 +2150,6 @@ int do_exit_action( const t_upsact_cmd * const a_cmd )
 
 
   int exit_flag = NO_EXIT;
-  int no_ups_env_flag = DO_UPS_ENV;
   int icmd;
 
   if ( ! a_cmd ) 
@@ -2998,6 +2999,8 @@ static void f_exeaccess( ACTION_PARAMS)
 
 static void f_execute( ACTION_PARAMS)
 {
+  int ups_env_flag = DO_NO_UPS_ENV;
+
   CHECK_NUM_PARAM("execute");
 
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
@@ -3006,6 +3009,11 @@ static void f_execute( ACTION_PARAMS)
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
+  /* define all of the UPS local variables that the user may need. */
+  if (ups_env_flag == DO_UPS_ENV) {
+    upsget_allout(a_stream, a_db_info, a_minst, a_command_line, "  ");
+    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
+  }
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (a_cmd->argc == g_func_info[a_cmd->icmd].min_params) {
@@ -3013,8 +3021,8 @@ static void f_execute( ACTION_PARAMS)
 	  FPRINTF_ERROR();
 	}
       } else {
-	if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n", a_cmd->argv[1],
-		    a_cmd->argv[0], a_cmd->argv[1]) < 0) {
+	if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n", a_cmd->argv[2],
+		    a_cmd->argv[0], a_cmd->argv[2]) < 0) {
 	  FPRINTF_ERROR();
 	}
       }
@@ -3026,7 +3034,7 @@ static void f_execute( ACTION_PARAMS)
 	}
       } else {
 	if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n#\n",
-		    a_cmd->argv[1], a_cmd->argv[0])< 0) {
+		    a_cmd->argv[2], a_cmd->argv[0])< 0) {
 	  FPRINTF_ERROR();
 	}
       }
@@ -3620,7 +3628,7 @@ static void f_sourcecompileopt( ACTION_PARAMS)
 static void f_sourcerequired( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
-  int no_ups_env_flag = DO_UPS_ENV;
+  int no_ups_env_flag = DO_NO_UPS_ENV;
 
   CHECK_NUM_PARAM("sourceRequired");
 
@@ -3629,17 +3637,17 @@ static void f_sourcerequired( ACTION_PARAMS)
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-
     /* Determine which flags (if any) were entered */
     GET_FLAGS();
+    GET_UPS_ENV();
 
     if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
 	if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
 	  if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				  NO_CHECK, no_ups_env_flag, a_minst, a_db_info,
-				  a_command_line) < 0) {
+				 NO_CHECK, no_ups_env_flag, a_minst, a_db_info,
+				 a_command_line) < 0) {
 	    FPRINTF_ERROR();
 	  } else {
 	    (void )sh_output_last_part_req(a_stream, a_cmd->argv[0],
@@ -3677,7 +3685,7 @@ static void f_sourcerequired( ACTION_PARAMS)
 static void f_sourceoptional( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
-  int no_ups_env_flag = DO_UPS_ENV;
+  int no_ups_env_flag = DO_NO_UPS_ENV;
 
   CHECK_NUM_PARAM("sourceOptional");
 
@@ -3689,6 +3697,7 @@ static void f_sourceoptional( ACTION_PARAMS)
   
     /* Determine which flags (if any) were entered */
     GET_FLAGS();
+    GET_UPS_ENV();
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
@@ -3728,7 +3737,7 @@ static void f_sourceoptional( ACTION_PARAMS)
 static void f_sourcereqcheck( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
-  int no_ups_env_flag = DO_UPS_ENV;
+  int no_ups_env_flag = DO_NO_UPS_ENV;
 
   CHECK_NUM_PARAM("sourceReqCheck");
 
@@ -3739,6 +3748,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
     /* Determine which flags (if any) were entered */
     GET_FLAGS();
+    GET_UPS_ENV();
 
     if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
@@ -3785,7 +3795,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
 static void f_sourceoptcheck( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
-  int no_ups_env_flag = DO_UPS_ENV;
+  int no_ups_env_flag = DO_NO_UPS_ENV;
 
   CHECK_NUM_PARAM("sourceOptCheck");
 
@@ -3796,6 +3806,7 @@ static void f_sourceoptcheck( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
     /* Determine which flags (if any) were entered */
     GET_FLAGS();
+    GET_UPS_ENV();
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
@@ -4165,7 +4176,7 @@ static void f_dodefaults( ACTION_PARAMS)
       break;
     case e_untest:	/* None */
       break;
-    case e_validate:	/* None */
+    case e_verify:	/* None */
       break;
     default:
       break;

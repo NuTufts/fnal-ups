@@ -24,7 +24,7 @@ unset upstmp;
 #
 unset OPERA
 #
-if [ ! ${TMPDIR-} ]; then TMPDIR="/tmp";export TMPDIR
+if [ ! ${TMPDIR-} ]; then TMPDIR="/tmp";export TMPDIR;fi;
 #
 PATH="/bin:/usr/local/bin:/local/etc:/mybin";export PATH
 #
