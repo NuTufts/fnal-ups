@@ -131,9 +131,9 @@ t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
      { tmp_ptr = vinst->prod_dir; }
      if (db_info && db_info->config && 
          db_info->config->prod_dir_prefix && UPSRELATIVE(tmp_ptr))
-     { sprintf(buf,"%s/%s/ups", db_info->config->prod_dir_prefix, tmp_ptr);
+     { (void) sprintf(buf,"%s/%s/ups", db_info->config->prod_dir_prefix, tmp_ptr);
      } else {
-       sprintf(buf,"%s/ups", tmp_ptr);
+       (void) sprintf(buf,"%s/ups", tmp_ptr);
      }
      if (upsutl_is_a_file(buf) == UPS_SUCCESS)
      { vinst->ups_dir=upsutl_str_create("ups",' ');
@@ -322,7 +322,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
        for (chain_list = uc->ugo_chain ; chain_list ;
          chain_list = chain_list->next) 
        { the_chain = (char *)(chain_list->data);
-         sprintf(buffer,"%s/%s/%s%s",
+         (void) sprintf(buffer,"%s/%s/%s%s",
                  db_info->name,
                  uc->ugo_product,
                  the_chain,CHAIN_SUFFIX);
@@ -339,7 +339,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            chain_list->next = save_next;
            chain_list->prev = save_prev;
            if (UPS_ERROR != UPS_SUCCESS) 
-           { upsfil_clear_journal_files();
+           { (void) upsfil_clear_journal_files();
              upserr_vplace();
              return 0; 
            }
@@ -369,14 +369,14 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                cinst->version);
                  (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
                  unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
-                 sprintf(unchain,"un%s",the_chain);
+                 (void) sprintf(unchain,"un%s",the_chain);
                  cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                             mproduct, unchain,ups_command);
                  if (UPS_ERROR == UPS_SUCCESS) 
                  { upsact_process_commands(cmd_list, tmpfile); 
                    upsact_cleanup(cmd_list);
                  } else {
-                   upsfil_clear_journal_files();
+                   (void) upsfil_clear_journal_files();
                    upserr_vplace();
                    return 0 ;
                  }
@@ -422,7 +422,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
     mproduct_list = upsmat_instance(uc, db_list , not_unique);
     if (UPS_ERROR != UPS_SUCCESS) 
-    { upsfil_clear_journal_files();
+    { (void) upsfil_clear_journal_files();
       upserr_vplace();
       return 0; 
     }
@@ -431,7 +431,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
        uc->ugo_qualifiers=save_qualifiers;
        mproduct_list = upsmat_instance(uc, db_list , need_unique);
        if (UPS_ERROR != UPS_SUCCESS) 
-       { upsfil_clear_journal_files();
+       { (void) upsfil_clear_journal_files();
          upserr_vplace();
          return 0; 
        }
@@ -442,7 +442,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                        uc->ugo_product,
                                        uc->ugo_version,
                                        &file);
-         strcpy(buffer,file); /* hum */
+         (void) strcpy(buffer,file); /* hum */
        } else { 
          if (!save_chain) /* declaring the same this over and not chains */
          { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
@@ -460,7 +460,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
        }
     } else { /* new version does NOT exist at all */
       product = ups_new_product();
-      sprintf(buffer,"%s/%s/%s%s",
+      (void) sprintf(buffer,"%s/%s/%s%s",
               db_info->name,
               uc->ugo_product,
               uc->ugo_version,VERSION_SUFFIX);
@@ -545,7 +545,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       { upsact_process_commands(cmd_list, tmpfile); 
         upsact_cleanup(cmd_list);
       } else {
-        upsfil_clear_journal_files();
+        (void) upsfil_clear_journal_files();
         upserr_vplace();
         return 0;
       } 
@@ -560,7 +560,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
           { upsact_process_commands(cmd_list, tmpfile); 
             upsact_cleanup(cmd_list);
           } else {
-            upsfil_clear_journal_files();
+            (void) upsfil_clear_journal_files();
             upserr_vplace();
             return 0;
           }
@@ -596,7 +596,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
           { upsact_process_commands(cmd_list, tmpfile);
             upsact_cleanup(cmd_list);
           } else {
-            upsfil_clear_journal_files();
+            (void) upsfil_clear_journal_files();
             upserr_vplace();
             return 0;
           } 
