@@ -41,5 +41,6 @@
 void *umem_malloc(const int a_bytes);
 void umem_free(void *a_data);
 void umem_inc_refctr(const void * const a_data);
+void umem_print(void);
 
 #endif /* _UPS_XYZ_H_ */
