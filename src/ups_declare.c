@@ -100,23 +100,20 @@ void ups_declare( t_upsugo_command * const uc ,
   time_t seconds=0;
 
   if (!uc->ugo_product || !uc->ugo_version )
-  { printf("To Declare a product you must specify a product and a version \n");
-    exit(1);
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+               "Specification must include a product and a version");
+    return;
   }
   if ((int)(upslst_count(uc->ugo_flavor) == 0) )
-  { printf("To Declare a product you must specify A flavor \n");
-    exit(1);
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+               "Specification must include a flavor");
+    return;
   }
-/*
-  if ((int)(upslst_count(uc->ugo_chain) > 1) )
-  { printf("Multiple chains specified\n");
-    exit(1);
-  }
-*/
   mproduct_list = upsmat_instance(uc, db_list , need_unique);
   if (mproduct_list)
-  { printf("Exact instance of product exists doing NOTHING\n");
-    exit(1);
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+               "Exact product definition exists");
+    return;
   }
   save_chain=uc->ugo_chain;
   save_flavor=uc->ugo_flavor;
@@ -231,10 +228,10 @@ void ups_declare( t_upsugo_command * const uc ,
            /* if(!product) Chain deleted was all only one */ 
            } else { 
              product = ups_new_product();
-             sprintf(file,"%s/%s/%s%s",
+/*             sprintf(file,"%s/%s/%s%s",
                      db_info->name,
                      uc->ugo_product,
-                     the_chain,CHAIN_SUFFIX);
+                     the_chain,CHAIN_SUFFIX); */
              product->file = CHAIN;
              product->product=uc->ugo_product;
              product->chain = the_chain;
@@ -265,7 +262,6 @@ void ups_declare( t_upsugo_command * const uc ,
                     new_cinst->version,
                     file);
          (void )upsfil_write_file(product, file,'d');  
-         /* product = (t_upstyp_product *)ups_free_product(product); */
         }
       }
 /************************************************************************

@@ -88,23 +88,25 @@ void ups_undeclare( t_upsugo_command * const uc ,
   char *unchain;
 
   if (!uc->ugo_product || (!uc->ugo_version && !uc->ugo_chain) )
-  { printf("To undeclare a product -\n");
-    printf("\tyou must specify a product and version OR chain(s) \n");
-    exit(1);
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+           "Specifications must include a product and a version or chain(s)");
+    return;
   }
   if (uc->ugo_version && uc->ugo_chain)
-  { printf("To undeclare a product -\n");
-    printf("\tspecify a version, which will remove ALL chains, OR chain(s) \n");
-    exit(1);
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+           "Specificy a version, which will remove ALL chains, or chains(s)");
+    return;
   }
   if ((int)(upslst_count(uc->ugo_flavor) ==0 ) )
-  { printf("To undeclare a product you must specify A flavor \n");
-    exit(1);
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+           "Specification must include a flavor");
+    return;
   }
   mproduct_list = upsmat_instance(uc, db_list , not_unique);
   if (!mproduct_list)
-  { printf("Can find NO matching product entry - doing NOTHING\n");
-    exit(1);
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+           "No matching product found");
+    return;
   }
 
 /************************************************************************
