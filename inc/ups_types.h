@@ -56,18 +56,16 @@ typedef struct ups_match_product
   t_upslst_item    *table_list;
 } t_ups_match_product;
 
-/* a ups file, chaver will be chain name if file == CHAIN, else version */
-typedef struct ups_product
-{
-  char             *file;
-  char             *product;
-  char             *version;
-  char             *chain;
+/* a db config file */
+typedef struct ups_config {
   char             *ups_db_version;
-  
-  t_upslst_item    *instance_list;
-  t_upslst_item    *comment_list;
-} t_ups_product;
+  char             *prod_dir_prefix;
+  char             *authorized_nodes;
+  char             *statistics;
+  char             *man_path;
+  char             *info_path;
+  char             *html_path;
+} t_ups_config;
 
 /* a product instance */
 typedef struct ups_instance
@@ -103,6 +101,20 @@ typedef struct ups_action
   char             *action;
   t_upslst_item    *command_list;
 } t_ups_action;
+
+/* any ups file */
+typedef struct ups_product
+{
+  char             *file;
+  char             *product;
+  char             *version;
+  char             *chain;
+  char             *ups_db_version;
+  
+  t_upslst_item    *instance_list;
+  t_upslst_item    *comment_list;
+  t_ups_config     *config;
+} t_ups_product;
 
 /* Inputs from the command line */
 typedef struct ups_command
@@ -194,6 +206,8 @@ t_ups_instance    *ups_new_instance( void );
 int               ups_free_instance( t_ups_instance * const inst_ptr );
 t_ups_action      *ups_new_action( void );
 int               ups_free_action( t_ups_action * const act_ptr );
+t_ups_config      *ups_new_config( void );
+int               ups_free_config( t_ups_config * const conf_ptr );
 t_ups_match_product *ups_new_mp(const char * const a_db,
 				t_upslst_item * const a_chain_list,
 				t_upslst_item * const a_vers_list,

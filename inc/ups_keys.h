@@ -59,6 +59,11 @@ enum e_upskey_key {
   e_key_db_dir,
   e_key_action,
   e_key_unknown,
+
+  e_key_prod_dir_prefix,
+  e_key_man_path,
+  e_key_info_path,
+  e_key_html_path,
   
   e_key_group,
   e_key_common,
@@ -76,6 +81,7 @@ typedef struct upskey_map {
   char          *key;    /* string of key */
   int           p_index; /* index into product structure (t_ups_product) */
   int           i_index; /* index into instance structure (t_ups_instance) */
+  int           c_index; /* index into config structure (t_ups_config) */
   unsigned int  flag;    /* flags, see ups_keys.c */
 } t_upskey_map;
 
@@ -89,10 +95,16 @@ typedef union ups_instance_u {
   char           *arr[e_key_count];
 } t_ups_instance_u;
 
+typedef union ups_config_u {
+  t_ups_config   conf;
+  char           *arr[e_key_count];
+} t_ups_config_u;
+
 /* some convenient macros */
 
 #define UPSKEY_PROD2ARR( prod ) (((t_ups_product_u *)prod)->arr)
 #define UPSKEY_INST2ARR( inst ) (((t_ups_instance_u *)inst)->arr)
+#define UPSKEY_CONF2ARR( conf ) (((t_ups_config_u *)conf)->arr)
 
 #define UPSKEY_ISIN_VERSION( flag ) (flag&0x0001 ? 1 : 0)
 #define UPSKEY_ISIN_TABLE( flag )   (flag&0x0010 ? 1 : 0)
@@ -115,6 +127,7 @@ char         *upskey_prod_setval( t_ups_product * const prod,
 				  const char * const skey,
 				  const char * const sval );
 void         upskey_prod_print( const t_ups_product * const prod );
+void         upskey_conf_print( const t_ups_config * const conf );
      
 /*
  * Declarations of public variables.

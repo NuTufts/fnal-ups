@@ -105,6 +105,10 @@ int ups_free_product( t_ups_product * const prod_ptr )
 
     upslst_free( prod_ptr->comment_list, 'd' );
 
+    /* get rid of config structure */
+    
+    ups_free_config( prod_ptr->config );
+
     upsmem_free( prod_ptr );
   }
   
@@ -229,6 +233,58 @@ int ups_free_action( t_ups_action * const act_ptr )
     if ( act_ptr->command_list ) { upslst_free( act_ptr->command_list, 'd' ); }
 
     upsmem_free( act_ptr );
+  }
+
+  return 1;
+}
+
+/*-----------------------------------------------------------------------
+ * ups_new_config
+ *
+ * Will create an empty t_ups_config structure
+ *
+ * Input : none
+ * Output: none
+ * Return: t_ups_config *, a pointer to a config structure
+ */
+t_ups_config *ups_new_config( void )
+{
+  t_ups_config *conf_ptr =
+    (t_ups_config *)upsmem_malloc( sizeof( t_ups_config ) );
+  
+  if ( conf_ptr ) {
+    memset( conf_ptr, 0, sizeof( t_ups_config ) );
+  }
+  else {
+    upserr_vplace();
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_config ) );
+  }
+  return conf_ptr;
+}
+
+/*-----------------------------------------------------------------------
+ * ups_free_config
+ *
+ * Will free a config structure.
+ *
+ * Input : t_ups_config *, a pointer to a config structure.
+ * Output: none
+ * Return: int, 0 on failer else 1.
+ */
+int ups_free_config( t_ups_config * const conf_ptr )
+{
+  if ( !conf_ptr ) return 0;
+
+  if ( all_gone( conf_ptr ) ) {
+    if ( conf_ptr->ups_db_version ) { upsmem_free( conf_ptr->ups_db_version ); }
+    if ( conf_ptr->prod_dir_prefix ) { upsmem_free( conf_ptr->prod_dir_prefix ); }
+    if ( conf_ptr->authorized_nodes ) { upsmem_free( conf_ptr->authorized_nodes ); }
+    if ( conf_ptr->statistics ) { upsmem_free( conf_ptr->statistics ); }
+    if ( conf_ptr->man_path ) { upsmem_free( conf_ptr->man_path ); }
+    if ( conf_ptr->info_path ) { upsmem_free( conf_ptr->info_path ); }
+    if ( conf_ptr->html_path ) { upsmem_free( conf_ptr->html_path ); }
+
+    upsmem_free( conf_ptr );
   }
 
   return 1;

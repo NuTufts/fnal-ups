@@ -44,11 +44,13 @@
  * Declaration of private functions
  */
 static int            read_file( void );
+static int            read_file_type( void );
 static int            read_file_desc( void );
 static t_ups_instance *read_instance( void );
 static t_upslst_item  *read_instances( void );
 static t_ups_action   *read_action( void );
 static t_upslst_item  *read_actions( void );
+static t_ups_config   *read_config( void );
 static t_upslst_item  *read_group( void );
 static t_upslst_item  *read_groups( void );
 static t_upslst_item  *read_comments( void );
@@ -438,6 +440,17 @@ int read_file( void )
   /* read comments */
 
   g_pd->comment_list = read_comments();
+
+  /* read file type */
+  if ( !read_file_type() )
+    return 0;
+
+  /* if config file we are done quickly */
+  
+  if ( g_ifile == e_file_dbconfig ) {
+    g_pd->config = read_config();
+    return 1;
+  }
   
   /* read file descriptor */
 
@@ -500,15 +513,15 @@ t_upslst_item *read_comments( void )
 }
   
 /*-----------------------------------------------------------------------
- * read_file_desc
+ * read_file_type
  *
- * Will read file descriptor: FILE, PRODUCT, VERSION/CHAIN.
+ * Will read file descriptor: FILE
  *
  * Input:  none
  * Output: none
- * Return: int,  1 if file descriptor was read, else 0
+ * Return: int,  1 success, 0 error.
  */
-int read_file_desc( void )
+int read_file_type( void )
 {
   if ( g_ikey != e_key_file ) {
     upserr_vplace();
@@ -523,8 +536,26 @@ int read_file_desc( void )
   if ( cfilei() == e_file_unknown ) {
     upserr_vplace();
     upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, g_pd->file );
-  }
-  
+  }  
+
+  return 1;
+}
+
+/*-----------------------------------------------------------------------
+ * read_file_desc
+ *
+ * Will read file descriptor: FILE, PRODUCT, VERSION/CHAIN.
+ *
+ * Input:  none
+ * Output: none
+ * Return: int,  1 if file descriptor was read, else 0
+ */
+int read_file_desc( void )
+{
+  if ( g_ikey != e_key_file ) {
+    return 0;
+  }  
+
   while ( next_key() != e_key_eof ) {
 
     if ( is_stop_key() ) break;
@@ -590,7 +621,7 @@ t_ups_instance *read_instance( void )
   else
     inst_ptr->version = upsutl_str_create( g_pd->version, ' ' );
     
-  /* fill information from file ... we still need a map */
+  /* fill information from file */
   
   inst_ptr->flavor = upsutl_str_create( g_val, ' ' );
     
@@ -694,6 +725,34 @@ t_ups_action *read_action( void )
   act_ptr->command_list = upslst_first( l_cmd );
   
   return act_ptr;
+}
+
+/*-----------------------------------------------------------------------
+ * read_config
+ *
+ * Will read ups config file.
+ *
+ * Input : char *, path to a ups config file
+ * Output: none
+ * Return: t_ups_config *, a pointer to the config structure.
+ */
+t_ups_config *read_config( void )
+{
+  t_ups_config *conf_ptr = ups_new_config();
+
+  while ( next_key() != e_key_eof ) {
+
+    if ( g_ikey == e_key_statistics ) {
+      upsutl_str_remove( g_val, CHAR_REMOVE );  
+      upsutl_str_sort( g_val, ',' );
+    }
+      
+    if ( g_mkey && g_mkey->c_index != INVALID_INDEX ) 
+      UPSKEY_CONF2ARR( conf_ptr )[g_mkey->c_index] = upsutl_str_create( g_val, ' ' );
+  }
+
+  fclose( g_fh );  
+  return conf_ptr;
 }
 
 /*-----------------------------------------------------------------------
@@ -1085,13 +1144,15 @@ void g_print_product( t_ups_product * const prod_ptr )
   printf( "version  = %s\n", prod_ptr->version );
   printf( "chain  = %s\n", prod_ptr->chain );
   printf( "instance_list:\n" );
-
   
   l_ptr = upslst_first( prod_ptr->instance_list );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     t_ups_instance *inst_ptr = (t_ups_instance *)l_ptr->data;
     print_instance( inst_ptr );
-  }     
+  }
+
+  if ( prod_ptr->config )
+    upskey_conf_print( prod_ptr->config ); 
 }
 
 int action_cmp ( const void * const d1, const void * const d2 )

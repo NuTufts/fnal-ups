@@ -47,7 +47,8 @@
  * g_key_map.
  *
  * It goes like: 'enum key', 'string key', 'index to product structure',
- *               'index to instance structure', 'flag'.
+ *               'index to instance structure', 'index into config structure',
+ *               'flag'.
  * where flag:
  * <byte>: <description>
  *   0   : key can be in a version file
@@ -61,32 +62,38 @@
  */
 static t_upskey_map g_key_map[] =
 {
-  {  0, "FILE",             0,    NO,   0x00001111 },
-  {  1, "PRODUCT",          1,     0,   0x00000111 },
-  {  2, "VERSION",          2,     1,   0x00000111 }, 
-  {  3, "CHAIN",            3,     4,   0x00000110 },
-  {  4, "UPS_DB_VERSION",   4,    NO,   0x00001111 },
-  {  5, "FLAVOR",           NO,    2,   0x00000111 },
-  {  6, "QUALIFIERS",       NO,    3,   0x00000111 },
-  {  7, "DECLARER",         NO,    5,   0x00000101 },
-  {  8, "DECLARED",         NO,    6,   0x00000101 },
-  {  9, "PROD_DIR",         NO,    7,   0x00000001 },
-  { 10, "UPS_DIR",          NO,    8,   0x00000001 },
-  { 11, "TABLE_DIR",        NO,    9,   0x00000001 },
-  { 12, "TABLE_FILE",       NO,   10,   0x00000001 },
-  { 13, "ARCHIVE_FILE",     NO,   11,   0x00000001 },
-  { 14, "AUTHORIZED_NODES", NO,   12,   0x00001001 },
-  { 15, "DESCRIPTION",      NO,   13,   0x00000100 },
-  { 16, "STATISTICS",       NO,   14,   0x00001001 },
-  { 17, "DB_DIR",           NO,   15,   0x00000000 },
-  { 18, "ACTION",           NO,   16,   0x00000010 },
-  { 19, "UNKNOWN",          NO,   17,   0x00000011 },
+  {  0, "FILE",             0,    NO,   NO, 0x00001111 },
+  {  1, "PRODUCT",          1,     0,   NO, 0x00000111 },
+  {  2, "VERSION",          2,     1,   NO, 0x00000111 }, 
+  {  3, "CHAIN",            3,     4,   NO, 0x00000110 },
+  {  4, "UPS_DB_VERSION",   4,    NO,    0, 0x00001111 },
+  {  5, "FLAVOR",           NO,    2,   NO, 0x00000111 },
+  {  6, "QUALIFIERS",       NO,    3,   NO, 0x00000111 },
+  {  7, "DECLARER",         NO,    5,   NO, 0x00000101 },
+  {  8, "DECLARED",         NO,    6,   NO, 0x00000101 },
+  {  9, "PROD_DIR",         NO,    7,   NO, 0x00000001 },
+  { 10, "UPS_DIR",          NO,    8,   NO, 0x00000001 },
+  { 11, "TABLE_DIR",        NO,    9,   NO, 0x00000001 },
+  { 12, "TABLE_FILE",       NO,   10,   NO, 0x00000001 },
+  { 13, "ARCHIVE_FILE",     NO,   11,   NO, 0x00000001 },
+  { 14, "AUTHORIZED_NODES", NO,   12,    2, 0x00001001 },
+  { 15, "DESCRIPTION",      NO,   13,   NO, 0x00000100 },
+  { 16, "STATISTICS",       NO,   14,    3, 0x00001001 },
+  { 17, "DB_DIR",           NO,   15,   NO, 0x00000000 },
+  { 18, "ACTION",           NO,   16,   NO, 0x00000010 },
+  { 19, "UNKNOWN",          NO,   17,   NO, 0x00000011 },
 
-  { 20, "GROUP:",           NO,   NO,   0x00000010 },
-  { 21, "COMMON:",          NO,   NO,   0x00000010 },
-  { 22, "END:",             NO,   NO,   0x00000010 },
+  { 20, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
+  { 21, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
+  { 22, "INFO_PATH",        NO,   NO,    5, 0x00001000 },
+  { 23, "HTML_PATH",        NO,   NO,    6, 0x00001000 },
+  
 
-  { 23,0,0,0,0 },
+  { 24, "GROUP:",           NO,   NO,   NO, 0x00000010 },
+  { 25, "COMMON:",          NO,   NO,   NO, 0x00000010 },
+  { 26, "END:",             NO,   NO,   NO, 0x00000010 },
+
+  { 27,0,0,0,0 },
 };
 
 /*
@@ -225,6 +232,19 @@ void upskey_prod_print( const t_ups_product * const prod )
   for ( (keys = g_key_map); keys->key; keys++ ) {
     if ( (ix = keys->p_index) != NO && UPSKEY_PROD2ARR( prod )[ix] ) 
       printf( "%s = %s\n", keys->key, UPSKEY_PROD2ARR( prod )[ix] );
+  }
+}
+
+void upskey_conf_print( const t_ups_config * const conf )
+{
+  t_upskey_map *keys;
+  int ix;
+  
+  if ( !conf ) return;
+  
+  for ( keys = g_key_map; keys->key; keys++ ) {
+    if ( (ix = keys->c_index) != NO && UPSKEY_CONF2ARR( conf )[ix] )
+      printf( "%s = %s\n", keys->key, UPSKEY_CONF2ARR( conf )[ix] );    
   }
 }
 
