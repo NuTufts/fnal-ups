@@ -50,12 +50,10 @@ def use_python(pythonVersion=DEFAULT_PYTHON_VERSION):
     # did we setup python at all?  Or are we getting it by default from the path?
     alreadySetup = ( os.environ.has_key('SETUP_PYTHON') and
                      os.environ['SETUP_PYTHON'] != '' )
-    print("did we setup any python? %s" % alreadySetup)
 
     # are we already using the requested version?
     alreadyUsing = ( os.environ.has_key('SETUP_PYTHON') and
                      re.search('python ' + pythonVersion, os.environ['SETUP_PYTHON']) != None )
-    print("are we alreadyUsing pythonVersion? %s" % alreadyUsing)
 
     if ( alreadyUsing ):
         # already using the requested version, no-op.
@@ -175,10 +173,10 @@ class upsManager:
 
 	setup = open(filename,"a")
 	setup.write(""" 
-echo "--------------cut here-------------"
 cat <<'EOF' | python
 import os
 import re
+print "--------------cut here-------------"
 for v in os.environ.keys():
   fix= re.sub( "\'", "\\'", os.environ[v])
   print "os.environ['"+v+"'] = '" + fix + "'" 
@@ -190,9 +188,9 @@ EOF
 	f = os.popen("/bin/sh " + filename)
 	c1 = f.read()
 	f.close()
-	c1 = re.sub( '.*--------------cut here-------------', '', c1)
+        (realUpsStuff, ourOsEnvironmentStuff) = re.split('.*--------------cut here-------------', c1)
 	os.environ = {}
-	exec c1
+        exec ourOsEnvironmentStuff
 
 
 
