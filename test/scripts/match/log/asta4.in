@@ -1,4 +1,5 @@
 D:NAME=../db0
+V:PRODUCT=        notable, VERSION=      v1_0, FLAVOR=        NULL, QUALIFIERS=
 D:NAME=../db1
 V:PRODUCT=         lassie, VERSION=      v1_0, FLAVOR=        NULL, QUALIFIERS=nodbg:opt
 T:PRODUCT=         lassie, VERSION=    (null), FLAVOR=        NULL, QUALIFIERS=nodbg:opt
