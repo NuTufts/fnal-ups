@@ -32,7 +32,8 @@ static char	*estatus_str;                   /*expected status str */
 int		estatus = UPS_SUCCESS;          /* expected status */
 int		status;				/* function status */
 FILE		*ofd;				/* f_stdout file descriptor */
-FILE		*afd;				/* f_stdout file descriptor */
+FILE		*afd;				/* action file descriptor */
+FILE		*fufd = (FILE *)1;		/* finish up file descriptor */
 upstst_argt     argt[] = {{"-out",     UPSTST_ARGV_STRING,NULL,&f_stdout},
                           {"-diff",    UPSTST_ARGV_STRING,NULL,&f_stdout_diff},
                           {"-actout",  UPSTST_ARGV_STRING,NULL,&f_action},
@@ -60,10 +61,14 @@ else
    {ofd = stdout;}
 
 if (!f_action)
+   {
    f_action = "/dev/null";
+   fufd = NULL;
+   }
 
 if (!(afd = fopen(f_action,"w")))
       { perror("f_action"); return (1); }
+if (fufd) fufd = afd;
 g_temp_file_name = f_action; 
 
 
@@ -98,7 +103,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
       }                                                
    upserr_clear();
    if (had_error) continue;
-   upsutl_finish_up(afd,uc->ugo_shell,calledby,FALSE);
+   upsutl_finish_up(fufd,uc->ugo_shell,calledby,FALSE);
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    }
 

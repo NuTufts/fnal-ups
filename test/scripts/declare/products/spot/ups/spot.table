@@ -1,7 +1,11 @@
 FILE = table
 
+GROUP:
+
 FLAVOR = ANY
 QUALIFIERS = ""
+
+COMMON:
 
 ACTION = declare
    Execute("echo declare",NO_UPS_ENV)
@@ -35,3 +39,4 @@ ACTION = leash
    Execute("echo leash",NO_UPS_ENV)
 ACTION = unleash
    Execute("echo unleash",NO_UPS_ENV)
+END:
