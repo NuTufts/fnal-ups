@@ -251,7 +251,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         vinst=vinst_list->data;
         if (uc->ugo_y || uc->ugo_Y )
         { product_home=upsget_prod_dir(db_info,minst,uc);
-          if (uc->ugo_y)
+          if (uc->ugo_y && product_home)
           { fprintf(stdout,"Product home directory - \n\t%s\n",product_home);
             fprintf(stdout,"Delete this directory?");
             (void)fgets(input,3,stdin);
@@ -289,7 +289,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
           upserr_vplace();
           return 0;
         }
-        if (uc->ugo_Y) 
+        if (uc->ugo_Y && product_home) 
         { fprintf((FILE *)tmpfile,"rm -rf %s\n",product_home);
         }
       } else {
