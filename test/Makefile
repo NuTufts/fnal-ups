@@ -30,7 +30,8 @@ CFLAGS	  = $(UPS_CFLAGS) $(INCDIRS)
 OBJECTS = 
 
 LDFLAGS = $(LLIBS)
-
+UPS_TEST_OBJECTS = ups_t_cmdline.o ups_t_cmdloop.o ups_t_cmdproc.o \
+	ups_t_misc.o ups_t_parse.o
 #=============================================================================
 # TARGETS
 #=============================================================================
@@ -39,7 +40,7 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : test_ups_error test_ups_list test_ups_memory test_ups_utils
+all : test_ups_error test_ups_list test_ups_memory test_ups_utils ups_test
 
 #
 # Main programs.
@@ -60,13 +61,23 @@ test_ups_memory : test_ups_memory.o $(LIB)/libups.a
 test_ups_utils : test_ups_utils.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
+ups_test : ups_test.o $(UPS_TEST_OBJECTS)
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(UPS_TEST_OBJECTS) $(LDFLAGS)
+
+ups_t_cmdline.o : ups_t_cmdline.c
+	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
+
+ups_t_cmdloop.o : ups_t_cmdloop.c
+	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
+
 #
 # Now standard targets
 #
 clean :
 	@ upsClean
 	@ rm -f test_ups_error test_ups_memory
-	@ rm -f test_ups_list test_ups_utils
+	@ rm -f test_ups_list test_ups_utils 
+	@ rm -f ups_test libups_test.a
 
 install :
 	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
@@ -93,8 +104,10 @@ make :
 #START_DEPEND
 test_ups_error.o:	test_ups_error.c
 test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
-test_ups_files.o:       test_ups_files.c
-test_ups_files.o:       $(ERUPT_DIR)/inc/ups_files.h
+test_ups_files.o:	test_ups_files.c
+test_ups_files.o:	$(ERUPT_DIR)/inc/ups_files.h
+test_ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
+test_ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_list.o:	test_ups_list.c
 test_ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_memory.o:	test_ups_memory.c
@@ -108,6 +121,23 @@ test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
 test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
 test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
-test_upsugo_utils.o:	test_upsugo_utils.c
-test_upsugo_utils.o:	./../inc/ups_types.h
-test_upsugo_utils.o:	./../inc/ups_list.h
+test_upsugo.o:	test_upsugo.c
+test_upsugo.o:	./../inc/ups_types.h
+test_upsugo.o:	./../inc/ups_list.h
+ups_t_cmdline.o:	ups_t_cmdline.c
+ups_t_cmdline.o:	./ups_t_cmdline.h
+ups_t_cmdloop.o:	ups_t_cmdloop.c
+ups_t_cmdloop.o:	./ups_t_cmdline.h
+ups_t_cmdloop.o:	./ups_t_parse.h
+ups_t_cmdloop.o:	./ups_t_cmdtable.h
+ups_t_cmdproc.o:	ups_t_cmdproc.c
+ups_t_cmdproc.o:	./ups_t_cmdline.h
+ups_t_cmdproc.o:	./ups_t_parse.h
+ups_t_cmdproc.o:	./ups_t_cmdtable.h
+ups_t_misc.o:	ups_t_misc.c
+ups_t_misc.o:	./ups_t_parse.h
+ups_t_misc.o:	./ups_t_macros.h
+ups_t_parse.o:	ups_t_parse.c
+ups_t_parse.o:	./ups_t_parse.h
+ups_test.o:	ups_test.c
+ups_test.o:	./ups_t_cmdtable.h
