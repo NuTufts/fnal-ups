@@ -284,8 +284,10 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
       /* try prod_dir/table_file_dir/tablefile */
-      if ((found == 0) && (a_productdir != NULL)) {
-	if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
+      if ((found == 0) && (a_productdir != NULL) &&
+	  UPSRELATIVE(a_tablefiledir)) {
+	if (a_db_info->config && a_db_info->config->prod_dir_prefix &&
+	    UPSRELATIVE(a_productdir)) {
 	  if ((total_chars += (int )strlen(a_productdir) + 
 	       (int )strlen(a_db_info->config->prod_dir_prefix) +
 	       1) <= FILENAME_MAX) {
@@ -321,8 +323,10 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	}
       }
       /* try prod_dir/ups_dir/tablefile */
-      if ((found == 0) && (a_upsdir != NULL) && (a_productdir != NULL)) {
-	if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
+      if ((found == 0) && (a_upsdir != NULL) && (a_productdir != NULL) &&
+	  UPSRELATIVE(a_upsdir)) {
+	if (a_db_info->config && a_db_info->config->prod_dir_prefix &&
+	    UPSRELATIVE(a_productdir)) {
 	  if ((total_chars = file_chars + (int )strlen(a_upsdir) + 
 	       (int )strlen(a_productdir) + 
 	       (int )strlen(a_db_info->config->prod_dir_prefix) +
@@ -415,21 +419,21 @@ char *upsutl_find_manpages( const t_upstyp_matched_instance * const a_inst,
 
   g_buffer[0] = '\0';    /* we want to fill this anew */
 
-  /* Check for a PROD_DIR_PREFIX first */
-  if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
-    strcat(g_buffer, a_db_info->config->prod_dir_prefix);
-    strcat(g_buffer, "/");
-  }
-
   /* the information we need is in the version file match */
   if ((vinst = a_inst->version)) {
     /* see if we have a ups dir or not */
     if (vinst->ups_dir) {
       /* if UPS_DIR does not begin with a "/", use
 	 PROD_DIR/UPS_DIR/toman */
-      if (strcmp("/", (char *)&vinst->ups_dir[0])) {
+      if (UPSRELATIVE(vinst->ups_dir)) {
 	/* UPS_DIR does not begin with a "/" */
 	if (vinst->prod_dir) {
+	  /* Check for a PROD_DIR_PREFIX */
+	  if (a_db_info->config && a_db_info->config->prod_dir_prefix &&
+	      UPSRELATIVE(vinst->prod_dir)) {
+	    strcat(g_buffer, a_db_info->config->prod_dir_prefix);
+	    strcat(g_buffer, "/");
+	  }
 	  strcat(g_buffer, vinst->prod_dir);
 	  strcat(g_buffer, "/");
 	}
