@@ -113,6 +113,35 @@ t_upstyp_matched_instance *ups_new_matched_instance( void )
 }
 
 /*-----------------------------------------------------------------------
+ * ups_free_matched_instance
+ *
+ * Will free all space associated with a matched instance
+ *
+ * Input : the matched instance structure pointer
+ * Output: none
+ * Return: NULL
+ */
+t_upstyp_matched_instance *ups_free_matched_instance(
+                                 t_upstyp_matched_instance * const minst_ptr)
+{
+  if (minst_ptr && all_gone(minst_ptr)) {
+    if (minst_ptr->chain) {
+      ups_free_instance(minst_ptr->chain);
+    }
+    if (minst_ptr->version) {
+      ups_free_instance(minst_ptr->version);
+    }
+    if (minst_ptr->table) {
+      ups_free_instance(minst_ptr->table);
+    }
+
+    upsmem_free(minst_ptr);
+  }
+
+  return NULL;
+}
+
+/*-----------------------------------------------------------------------
  * ups_new_product
  *
  * Will create an empty t_upstyp_product structure.
@@ -281,8 +310,13 @@ int ups_free_action( t_upstyp_action * const act_ptr )
   if ( !act_ptr ) return 0;
 
   if ( all_gone( act_ptr ) ) {
-    if ( act_ptr->action ) { upsmem_free( act_ptr->action ); }
-    if ( act_ptr->command_list ) { upslst_free( act_ptr->command_list, 'd' ); }
+    if ( act_ptr->action ) { 
+      upsmem_free( act_ptr->action );
+      act_ptr->action = 0;
+    }
+    if ( act_ptr->command_list ) { 
+      act_ptr->command_list = upslst_free( act_ptr->command_list, 'd' );
+    }
 
     upsmem_free( act_ptr );
   }
