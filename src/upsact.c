@@ -189,6 +189,11 @@ static void f_envset( const t_upstyp_matched_instance * const a_inst,
 		      const t_upsugo_command * const a_command_line,
 		      const FILE * const a_stream,
 		      const t_upsact_cmd * const a_cmd);
+static void f_envsetifnotset( const t_upstyp_matched_instance * const a_inst,
+			      const t_upstyp_db * const a_db_info,
+			      const t_upsugo_command * const a_command_line,
+			      const FILE * const a_stream,
+			      const t_upsact_cmd * const a_cmd);
 static void f_envunset( const t_upstyp_matched_instance * const a_inst,
 			const t_upstyp_db * const a_db_info,
 			const t_upsugo_command * const a_command_line,
@@ -467,6 +472,7 @@ t_cmd_map g_cmd_maps[] = {
   { "envremove", e_envremove, f_envremove, 2, 3, e_invalid_cmd },
   { "envprepend", e_envprepend, f_envprepend, 2, 3, e_envremove },
   { "envset", e_envset, f_envset, 2, 2, e_envunset },
+  { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_envunset },
   { "envunset", e_envunset, f_envunset, 1, 1, e_invalid_cmd },
   { "pathappend", e_pathappend, f_pathappend, 2, 3, e_pathremove },
   { "pathremove", e_pathremove, f_pathremove, 2, 3, e_invalid_cmd },
@@ -980,6 +986,7 @@ t_upslst_item *upsact_check_files(
 	case e_envremove:
 	case e_envprepend:
 	case e_envset:
+	case e_envsetifnotset:
 	case e_envunset:
 	case e_pathappend:
 	case e_pathremove:
@@ -2558,6 +2565,45 @@ static void f_envset( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream, "setenv %s \"%s\"\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1]) < 0) {
+	FPRINTF_ERROR();
+      }
+      break;
+    default:
+      upserr_vplace();
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
+    }
+  }
+}
+
+static void f_envsetifnotset( const t_upstyp_matched_instance * const a_inst,
+			      const t_upstyp_db * const a_db_info,
+			      const t_upsugo_command * const a_command_line,
+			      const FILE * const a_stream,
+			      const t_upsact_cmd * const a_cmd)
+{
+  CHECK_NUM_PARAM("envSetIfNotSet");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream,
+		  "if [ ! ${%s-} ]; then %s=\"%s\";export %s\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[0],
+		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "if (! ${?%s}) setenv %s \"%s\"\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
