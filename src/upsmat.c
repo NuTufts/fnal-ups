@@ -764,7 +764,7 @@ static t_upstyp_matched_product *match_instance_core(
     /* clean out any invalid instances */
     FREE_INVALID_INSTANCES(master_minst_list);
 
-    if (num_matches > 0) {
+    if ((num_matches > 0) && master_minst_list) {
       /* we got some matches, fill out our matched product structure */
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
@@ -848,7 +848,7 @@ static t_upstyp_matched_product *match_instance_core(
 
     /* We went thru the list of versions, get a matched product
        structure if we got no errors */
-    if (num_matches > 0) {
+    if ((num_matches > 0) && master_minst_list) {
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
     }
