@@ -78,7 +78,7 @@ static char	*funcname = "upserr_add";
 static char	*severity;
 static char	*error_str;
 static char	*extra_str;
-int		error;
+int		error = 0;
 upstst_argt	argt[] = {{"<error>",  UPSTST_ARGV_STRING,NULL,&error_str},
 			  {"-severity",UPSTST_ARGV_STRING,NULL,&severity},
 			  {"[<extra>]",  UPSTST_ARGV_STRING,NULL,&extra_str},
