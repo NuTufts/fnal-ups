@@ -103,6 +103,14 @@ static int get_instance(const t_upslst_item * const a_read_instances,
    the matches that we were able to make. */
 static int g_ups_error;
 
+/* we want to keep track of when the user entered a specific 
+   version on the command line.  that way when we are way down in the
+   routines and the file does not exist, then we can clear the error and just
+   return no matches.  if the version was obtained from the ups
+   database and it does not exist, then we want to return an error. */
+static int g_ugo_version = 0;
+
+
 #define VPREFIX  "UPSMAT: "
 
 #define TMP_LISTS_FREE() \
@@ -155,26 +163,6 @@ static int g_ups_error;
 	}                                                              \
       }
 
-#define CHECK_NO_FILE() \
-      if ((UPS_ERROR == UPS_NO_FILE) && ! a_need_unique) {      \
-	upserr_backup();					\
-	upserr_backup();					\
-      } 
-
-#define CHECK_SOFT_ERR() \
-      if (UPS_ERROR != UPS_SUCCESS) {                                   \
-         if ((UPS_ERROR == UPS_NO_FILE ||                               \
-              UPS_ERROR == UPS_NO_TABLE_MATCH ||                        \
-              UPS_ERROR == UPS_NO_VERSION_MATCH) && ! a_need_unique) {  \
-	   g_ups_error = UPS_ERROR;                                     \
-	   upserr_backup();						\
-	   upserr_backup();						\
-	 }                                                              \
-         else {								\
-	   break;                                                       \
-         }								\
-      }
-
 #define GET_NEW_MINST(inst_type) \
       minst = ups_new_matched_instance();                          \
       minst->inst_type = instance;                                 \
@@ -210,16 +198,6 @@ static int g_ups_error;
 	mproduct->db_info = db_info;                                   \
 	mproduct_list = upslst_add(mproduct_list, (void *)mproduct);   \
       }
-
-#define MATCH_TABLE_ONLY(product) \
-    mproduct = match_instance_core(a_command_line, db_info,            \
-				   product, NULL, NULL, a_need_unique, \
-                                   any_version, any_chain);            \
-    if (UPS_ERROR != UPS_SUCCESS) {                                    \
-      CHECK_NO_FILE();                                                 \
-    }                                                                  \
-    /* update the mproduct_list structure with the new info */         \
-    ADD_TO_MPRODUCT_LIST();
 
 #define GET_CONFIG_FILE() \
     if (db_info && !db_info->config) {               \
@@ -287,6 +265,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 
   /* initialize this to success */
   g_ups_error = UPS_SUCCESS;
+  g_ugo_version = 0;            /* assume no version file on command line */
 
   /* In order to avoid doing this for each database, if a product name was
      entered, create a list (with 1 element) here */
@@ -379,7 +358,12 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	      if (UPS_VERBOSE) {
 		printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
 	      }
-	      MATCH_TABLE_ONLY(prod_name);
+	      mproduct = match_instance_core(a_command_line, db_info, 
+					     prod_name, NULL, NULL,
+					     a_need_unique, any_version,
+					     any_chain);
+	      /* update the mproduct_list structure with the new info */
+	      ADD_TO_MPRODUCT_LIST();
 	    }
 	    /* may no longer need product list - free it */
 	    if (! got_all_products) {
@@ -464,6 +448,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 
 	    /* Look to see if a version was specified. */
 	    if (a_command_line->ugo_version) {
+	      g_ugo_version = 1;            /* version file on command line */
 	      if (! got_all_versions) {
 		/* get all the versions in the current product area */
 		upsutl_get_files(location, (char *)VERSION_SUFFIX,
@@ -547,7 +532,11 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	printf("%sNo UPS Database, using Table File - %s\n", VPREFIX,    
 	       (char *)a_command_line->ugo_tablefile);
       }
-      MATCH_TABLE_ONLY(a_command_line->ugo_product);
+      mproduct = match_instance_core(a_command_line, db_info,
+				     a_command_line->ugo_product, NULL, NULL,
+				     a_need_unique, any_version, any_chain);
+      /* update the mproduct_list structure with the new info */
+      ADD_TO_MPRODUCT_LIST();
     } else {
       upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
     }
@@ -687,11 +676,17 @@ static t_upstyp_matched_product *match_instance_core(
 
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
+    } else if (UPS_ERROR == UPS_NO_FILE) {
+      /* the file could not be found.  this is not an error, just no match
+	 made */
+      upserr_backup();
+      upserr_backup();
     }
     
   /* we were not passed a specific list of chains (or we were passed no chains
      at all) and we have some versions,  start by reading the version files. */
   } else if ((a_any_chain || !a_chain_list) && a_version_list) { 
+    g_ugo_version = 1;             /* version on command line */
     for (version_list = (t_upslst_item *)a_version_list; version_list;
 	 version_list = version_list->next) {
       /* get the version */
@@ -711,10 +706,6 @@ static t_upstyp_matched_product *match_instance_core(
       master_minst_list = upslst_add_list(master_minst_list, tmp_minst_list);
       tmp_minst_list = NULL;
 
-      /* if we had an error & it was an error that the requested file could
-	 not be found and we are asking for many instances, then continue
-	 with the next version.  else get out. */
-      CHECK_SOFT_ERR();
       num_matches += tmp_num_matches;
     }
     if (a_chain_list && (num_matches > 0)) {
@@ -752,11 +743,13 @@ static t_upstyp_matched_product *match_instance_core(
 	    }
 	  }
 	} else {
-	  /* if we could not find the file and we are looking for more than one
-	     instance then clear out the error.  otherwise if a ups list is
-	     done on an entire db for v2_0, all products without a v2_0 will
-	     generate an error */
-	  CHECK_NO_FILE();
+	  /* if we could not find the file, then clear out the error.
+	     otherwise if a ups list is done on an entire db for test chain,
+	     all products without a test chain will generate an error */
+	  if (UPS_ERROR == UPS_NO_FILE) {
+	    upserr_backup();
+	    upserr_backup();
+	  } 
 	}
       }
 
@@ -782,6 +775,7 @@ static t_upstyp_matched_product *match_instance_core(
   } else if (a_chain_list) {
     /* we need to start with any requested chains and find the associated
        version and then table files. */
+    g_ugo_version = 0;             /* no version on command line */
     for (chain_list = (t_upslst_item *)a_chain_list; chain_list;
 	 chain_list = chain_list->next) {
       /* get the chain name */
@@ -803,11 +797,6 @@ static t_upstyp_matched_product *match_instance_core(
       master_minst_list = upslst_add_list(master_minst_list, tmp_minst_list);
       tmp_minst_list = NULL;
 
-      /* we had an error, if it was an error that the requested file could
-	 not be found and we are asking for many instances, then continue
-	 with the next version.  else get out. */
-      CHECK_SOFT_ERR();
-      
       num_matches += tmp_num_matches;
     }
 
@@ -940,11 +929,13 @@ static int match_from_chain( const char * const a_product,
     *a_minst_list = upslst_first(cinst);
     } /* if (cinst) */
   } else {
-    /* if we could not find the file and we are looking for more than one
-       instance then clear out the error.  otherwise if a ups list is done 
-       on an entire db for v2_0, all products without a v2_0 will generate
-       an error */
-    CHECK_NO_FILE();
+    /* if we could not find the file then clear out the error.  otherwise if
+       a ups list is done on an entire db for test chain, all products without
+       a test chain will generate an error */
+    if (UPS_ERROR == UPS_NO_FILE) {
+      upserr_backup();
+      upserr_backup();
+    }
   }
   
 return num_matches;
@@ -1068,11 +1059,14 @@ static int match_from_version( const char * const a_product,
 	TMP_LISTS_FREE();
       }
     } else {
-      /* if we could not find the file and we are looking for more than one
-	 instance then clear out the error.  otherwise if a ups list is done 
-	 on an entire db for v2_0, all products without a v2_0 will generate
-	 an error */
-      CHECK_NO_FILE();
+      /* if we could not find the file and a version was entered on the 
+	 command line then clear out the error.  otherwise if a ups list is
+	 done on an entire db for v2_0, all products without a v2_0 will
+	 generate an error */
+      if ((UPS_ERROR == UPS_NO_FILE) && (g_ugo_version)) {
+	upserr_backup();
+	upserr_backup();
+      } 
     }
   } else {
     upserr_vplace();
@@ -1131,13 +1125,9 @@ static int match_from_table( const char * const a_product,
       /* free the table_file_path */
       upsmem_free(full_table_file);
     }
-  } else { 
-    if (UPS_VERIFY) 
-    { upserr_add(UPS_FILE_NOT_FOUND, UPS_WARNING, "CHAIN", a_tablefile );
-      upserr_output(); /* THIS SHOULD NOT BE !!! , BUT IT'S LOST DJF */
-    }
   }
-    return num_matches;
+  
+  return num_matches;
 }
 
 /*-----------------------------------------------------------------------
