@@ -93,9 +93,6 @@ OPTIONS     :
 -A :nodes : authorized nodes 
 -b :compileFile : compile file name (.sh and .csh will be added 
 :automatically)
--B :depProdName="options" : prepend the listed options to the 
-:setupRequired line for the UPS required product 
-:with name depProdName 
 -c :current chain 
 -C :don't do configure 
 -d :development chain 
@@ -107,7 +104,6 @@ OPTIONS     :
 :do not live in the products' area 
 -g :chainName : chain to use 
 -G :"options" : these options will be passed to 'ups declare'
--h :nodeName : use this node 
 -H :flavor : use this as the flavor and build a flavor table from it 
 -j :applies to top level product and not UPS product requirements 
 -k :do not execute unsetup files first 
@@ -122,7 +118,7 @@ OPTIONS     :
 -o :old chain 
 -O :"options" : set $UPS_OPTIONS to "options" 
 -p :"description" : product description 
--P : do not look in a database for this product
+-P :do not look in a database for this product
 -q :qualifiers : colon separated list ofrequired or optional qualifiers
 :that are to be part of the instance
 -r :dir : set $PROD_DIR to dir 
@@ -138,8 +134,6 @@ OPTIONS     :
 -w :stop first then start 
 -W :use environment variables to determine instances of UPS 
 :product requirements 
--x :"DELETE [cmd] [order#] | INSERT value [cmd] [order#] | 
-:REPLACE value [cmd] [order#]" : edit action lists 
 -X :execute command instead of just echoing it 
 -y :delete home directory, query 
 -Y :delete home directory, no query 
