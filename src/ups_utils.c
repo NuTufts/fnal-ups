@@ -178,6 +178,42 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
 }
 
 /*-----------------------------------------------------------------------
+ * upsutl_get_prod_dir
+ *
+ * Given a database and a product name return a character string of the
+ * product directory.
+ * 
+ * Input : Database and product name
+ * Output: none
+ * Return: product directory string
+ */
+char *upsutl_get_prod_dir(const char * const a_db,
+			  const char * const a_prod_name)
+{
+  char *prod_dir = NULL;
+
+  /* make sure a_db and a_prod_name are not both NULL */
+  if (a_db || a_prod_name) {
+    prod_dir = (char *)upsmem_malloc((int )(strlen(a_db) + 
+					    strlen(prod_name)) + 2);
+    if (a_db) {
+      prod_dir = strcpy(prod_dir, a_db);       /* add the db directory */
+    }
+
+    /* only add the / divider if we have both a db and a product name */
+    if (a_db && a_prod_name) {
+      prod_dir = strcat(prod_dir, "/");        /* and a / */
+    }
+
+    if (a_prod_name) {
+      prod_dir = strcat(prod_dir, prod_name);  /* and the product name */
+    }
+  }
+
+  return(prod_dir);
+}
+
+/*-----------------------------------------------------------------------
  * upsutl_start_timing
  *
  * Start timing the current function
