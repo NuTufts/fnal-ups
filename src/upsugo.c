@@ -41,6 +41,7 @@
 #include <sys/utsname.h>
 
 #include "ups_types.h"
+#include "upsugo.h"
 #include "ups_error.h"
 #include "ups_memory.h"
 #include "ups_utils.h"
