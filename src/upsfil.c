@@ -497,8 +497,15 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     strcpy( buff, ups_file );
     l = (int )strlen( buff );
     while ( --l >= 0 && buff[l] != '/' ) buff[l] = 0;
-    if ( l > 0 && upsutl_is_a_file( buff ) == UPS_NO_FILE )
-      mkdir( buff, 0775 );
+    if (buff[l] == '/') buff[l] = 0;
+    if ( l > 0 && upsutl_is_a_file( buff ) == UPS_NO_FILE ) {
+      if (mkdir( buff, 0775 )) {
+         P_VERB_s( 1, "Create directory ERROR" );
+         upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "mkdir", strerror(errno));
+         upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
+         return(UPS_OPEN_FILE);
+      }
+    }
   }
 
   /* open file */
