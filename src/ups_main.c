@@ -63,7 +63,7 @@ extern int UPS_VERBOSE;
 extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
-int g_simulate;
+int g_simulate = 0;
 static mode_t g_umask = 0;
 extern int UPS_NEED_DB;
 
