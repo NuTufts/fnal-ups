@@ -40,11 +40,11 @@
 #include <bstring.h>
 #include <sys/utsname.h>
 
-#include "ups_types.h"
+#include "upstyp.h"
 #include "upsugo.h"
-#include "ups_error.h"
-#include "ups_memory.h"
-#include "ups_utils.h"
+#include "upserr.h"
+#include "upsmem.h"
+#include "upsutl.h"
 
 #ifdef UPS_ID
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	1.00";
