@@ -106,4 +106,11 @@ char *upsget_man_source_dir( const t_upstyp_matched_instance * const ,
 char *upsget_info_source_dir( const t_upstyp_matched_instance * const ,
                               const t_upstyp_db * const ,
                               const t_upsugo_command * const );
+char *upsget_table_file( const char * const ,
+                         const char * const ,
+                         const char * const ,
+                         const char * const ,
+                         const char * const ,
+                         const t_upstyp_db * const ,
+                         const int );
 #endif /* _UPSGET_H_ */
