@@ -733,7 +733,6 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	if ( \$mach == IRIX ) setenv MACH_OS IRIX
 	set Full_Flavor=\$MACH_OS'+'\`uname -r\`
 	if ( \$MACH_OS == AIX ) set Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
-	if ( \$MACH_OS == HP-UX ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`
 	set Flavor_2=\`echo \$Full_Flavor|cut -f1-2 -d'.'\`
 	set Flavor=\`echo \$Full_Flavor|cut -f1 -d'.'\`
 
@@ -987,10 +986,6 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	then
 	    Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
 	fi
-	if test \$MACH_OS = HP-UX
-	then
-	    Full_Flavor=\$MACH_OS'+'\`uname -r\`
-	fi
 	Flavor_2=\`echo \$Full_Flavor | cut -f1-2 -d'.'\`
 	Flavor=\`echo \$Full_Flavor | cut -f1 -d'.'\`
 	if test \$error = 0 -a x\`echo \${UPS_DIR:-}|cut -c1\` = x/
@@ -1217,6 +1212,13 @@ for Start_Or_Stop in startup shutdown
 	then                                          
 	    MACH_OS=IRIX                              
 	fi                                            
+	Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	if test \$MACH_OS = AIX
+	then
+	    Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
+	fi
+	Flavor_2=\`echo \$Full_Flavor | cut -f1-2 -d'.'\`
+	Flavor=\`echo \$Full_Flavor | cut -f1 -d'.'\`
 
 	for starts in \`echo \${PRODUCTS}|tr ':' ' '\`
 	do
@@ -1237,20 +1239,17 @@ for Start_Or_Stop in startup shutdown
 	    fi
 	    started='0';
 	#======================================================================
-	# execute the appropriate node.products file
+	# execute the appropriate node.products or flavor.products file
 	#======================================================================
-	    if test -f \$starts_dir/\$Node.products
-	    then 
-		\$starts_dir/\$Node.products
-		started='1'
-	#======================================================================
-	# execute the appropriate flavor.products file
-	#======================================================================
-	    elif test -f \$starts_dir/\$MACH_OS.products
-	    then
-		\$starts_dir/\$MACH_OS.products
-		started='1'
-	    fi 
+	    for fl in \$Node \$Full_Flavor \$Flavor_2 \$Flavor \$MACH_OS
+	    do
+		if test -f \$starts_dir/\$fl.products
+		then
+		    \$starts_dir/\$fl.products
+		    started='1'
+		    break
+		fi
+	    done
 	    if test \$started = '1'
 	    then
 		break
