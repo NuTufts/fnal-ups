@@ -403,6 +403,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                uc->ugo_product, "product home", 
                "\nSpecification did not include a -r for product directory");
       }
+      if (!uc->ugo_m )
+      { upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL, 
+               uc->ugo_product, "table file", 
+               "\nSpecification did not include a -m for table file only default actions will be performed");
+      }
       if (uc->ugo_O)
       { if ( strchr(uc->ugo_options,':') == 0)
         { new_vinst->user_list = 

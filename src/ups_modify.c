@@ -65,46 +65,17 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
                           const int ups_command)
 {
   t_upslst_item *mproduct_list = NULL;
-  t_upslst_item *minst_list = NULL;
-  t_upslst_item *chain_list = NULL;
-  t_upslst_item *cmd_list = NULL;
   char * original_file;
   char * input="   ";
-  int rc;
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
-  t_upstyp_matched_product *mproduct = NULL;
-  t_upstyp_matched_instance *minst = NULL;
   int not_unique = 0;
-  int need_unique = 1;
   t_upslst_item *save_flavor;
   t_upslst_item *save_qualifiers;
   t_upslst_item *save_chain;
   char * save_version;
-  t_upstyp_product *product;
   char buffer[FILENAME_MAX+1];
-  char *file=buffer;
-  char *the_chain;
-  char *the_flavor;
-  char *the_qualifiers;
-  char *saddr;				/* start address for -O manipulation */
-  char *eaddr;				/* end address for -O manipulation */
-  char *naddr;				/* new address for -O manipulation */
-  t_upslst_item *cinst_list;                /* chain instance list */
-  t_upstyp_instance *cinst;                 /* chain instance      */
-  t_upstyp_instance *new_cinst;             /* new chain instance  */
-  t_upstyp_instance *new_vinst;             /* new version instance  */
-  char *username;
-  char *loc;
-  struct tm *mytime;
-  char *declared_date;
   char *file_stamp;
-  char *unchain;
-  t_upslst_item *save_next;
-  t_upslst_item *save_prev;
-  time_t seconds=0;
-  char * save_table_dir;		/* match won't work "how I want" */
-  char * save_table_file;		/* with table specifications     */
   char *editor;
   editor = getenv("EDITOR");
   if (editor == NULL || *editor == '\0')
@@ -112,8 +83,6 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   uc->ugo_m=0;
   uc->ugo_M=0;
   UPS_VERIFY=1;
-  save_table_dir=uc->ugo_tablefiledir;
-  save_table_file=uc->ugo_tablefile;
   uc->ugo_tablefile=0;
   uc->ugo_tablefiledir=0;
   if (!uc->ugo_anyfile)
@@ -125,15 +94,8 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
-  username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
-  declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
-				    STR_TRIM_DEFAULT);
   file_stamp = upsutl_str_create(upsutl_time_date(STR_TRIM_PACK),
 				    STR_TRIM_PACK);
-/*  while((loc=strchr(declared_date,' '))!=0)
-  { *loc='_';
-  }
-*/
 
 /************************************************************************
  *

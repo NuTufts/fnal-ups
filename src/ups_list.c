@@ -262,7 +262,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
       }                                                              \
     } printf("\n");                                                  \
 }
-int list_error=UPS_SUCCESS; 
+/* int list_error=UPS_SUCCESS;  */
 
 int product_cmp ( const void * const d1, const void * const d2 )
 {
@@ -322,9 +322,9 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
       { upsutl_statistics(mproduct_list, g_cmd_info[e_list].cmd);
       }
     } else { 
-      upserr_output(); 
+/*      upserr_output(); 
       upserr_clear(); 
-      UPS_ERROR=list_error;
+      UPS_ERROR=list_error; */
       return 0; 
     }
   } else {
@@ -353,7 +353,7 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
     /* free the matched products */
     (void )upsutl_free_matched_product_list(&mproduct_list);
   }
-  UPS_ERROR=list_error;
+/*  UPS_ERROR=list_error; */
   return 0;
 }
 
@@ -524,8 +524,10 @@ void list_output(const t_upslst_item * const a_mproduct_list,
       } else { 
           list_K(instance,a_command_line,mproduct);
           if (UPS_ERROR!=UPS_SUCCESS) 
-          { upserr_output(); 
+          { 
+/* upserr_output(); 
             upserr_clear(); 
+*/
             return; 
           }
       }
@@ -684,7 +686,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     if (!valid) 
     { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
 /*      if (list_error!=UPS_SUCCESS) */
-      list_error=UPS_INVALID_KEYWORD; 
+/*      list_error=UPS_INVALID_KEYWORD;  */
     }
   }
   printf("\n");
