@@ -154,10 +154,10 @@ char *upsget_envout(const FILE * const stream,
 { char *name;
   get_element(name,product);
   if (command_line->ugo_shell == e_BOURNE )
-  { fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n",
+  { fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n#\n",
     name,upsget_envstr(db,instance,command_line),name);
   } else {
-    fprintf((FILE *)stream,"setenv SETUP_%s=\"%s\"\n",
+    fprintf((FILE *)stream,"setenv SETUP_%s=\"%s\"\n#\n",
     name,upsget_envstr(db,instance,command_line));
   }
 }
