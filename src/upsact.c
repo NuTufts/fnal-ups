@@ -190,6 +190,14 @@ static void f_dodefaults( ACTION_PARAMS);
 		 a_cmd->argc);                                  \
     }
 
+#define OUTPUT_VERBOSE_MESSAGE(cmd)  \
+    if (a_inst->version && a_inst->version->product) {                       \
+      upsver_mes(1, "UPSACT: Processing action \'%s\' for product \'%s\'\n", \
+                 cmd, a_inst->version->product);                             \
+    } else {                                                                 \
+      upsver_mes(1, "UPSACT: Processing action \'%s\'\n", cmd);              \
+    }
+
 #define GET_DELIMITER() \
     if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].max_params) {            \
       /* remember arrays start at 0, so subtract one here */            \
@@ -2066,6 +2074,8 @@ static void f_copyhtml( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyHtml");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2099,6 +2109,8 @@ static void f_copyhtml( ACTION_PARAMS)
 static void f_copyinfo( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyInfo");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2135,6 +2147,8 @@ static void f_copyman( ACTION_PARAMS)
   char *buf = NULL;
 
   CHECK_NUM_PARAM("copyMan");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2173,6 +2187,8 @@ static void f_copycatman( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("copyCatMan");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2210,6 +2226,8 @@ static void f_uncopyman( ACTION_PARAMS)
   t_upslst_item *man_item, *man_list = NULL;
 
   CHECK_NUM_PARAM("uncopyMan");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2261,6 +2279,8 @@ static void f_uncopycatman( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("uncopyCatMan");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2308,6 +2328,8 @@ static void f_copynews( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyNews");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2343,6 +2365,8 @@ static void f_envappend( ACTION_PARAMS)
   char *delimiter;
   
   CHECK_NUM_PARAM("envAppend");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2395,6 +2419,8 @@ static void f_envprepend( ACTION_PARAMS)
   char *delimiter;
   
   CHECK_NUM_PARAM("envPrepend");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2449,6 +2475,8 @@ static void f_envremove( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("envRemove");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2490,6 +2518,8 @@ static void f_envset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envSet");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2522,6 +2552,8 @@ static void f_envset( ACTION_PARAMS)
 static void f_envsetifnotset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envSetIfNotSet");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2558,6 +2590,8 @@ static void f_envunset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envUnset");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2588,6 +2622,8 @@ static void f_envunset( ACTION_PARAMS)
 static void f_exeaccess( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("exeAccess");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2623,6 +2659,8 @@ static void f_exeaccess( ACTION_PARAMS)
 static void f_execute( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("execute");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2671,6 +2709,8 @@ static void f_filetest( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("fileTest");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2710,6 +2750,8 @@ static void f_pathappend( ACTION_PARAMS)
   char *delimiter;
   
   CHECK_NUM_PARAM("pathAppend");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2759,6 +2801,8 @@ static void f_pathprepend( ACTION_PARAMS)
   char *delimiter;
   
   CHECK_NUM_PARAM("pathPrepend");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2810,6 +2854,8 @@ static void f_pathremove( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("pathRemove");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2851,6 +2897,8 @@ static void f_pathset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("pathSet");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -2887,6 +2935,8 @@ static void f_pathset( ACTION_PARAMS)
 static void f_addalias( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("addAlias");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2936,6 +2986,8 @@ static void f_addalias( ACTION_PARAMS)
 static void f_unalias( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("unAlias");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3122,6 +3174,8 @@ static void f_sourcecompilereq( ACTION_PARAMS)
   if (! g_COMPILE_FLAG) {
     CHECK_NUM_PARAM("sourceCompileReq");
 
+    OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
     /* only proceed if we have a valid number of parameters and a stream to
        write them to */
     if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -3172,6 +3226,8 @@ static void f_sourcecompileopt( ACTION_PARAMS)
   if (! g_COMPILE_FLAG) {
     CHECK_NUM_PARAM("sourceCompileOpt");
 
+    OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
     /* only proceed if we have a valid number of parameters and a stream to
        write them to */
     if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -3219,6 +3275,8 @@ static void f_sourcerequired( ACTION_PARAMS)
   int no_ups_env_flag = DO_UPS_ENV;
 
   CHECK_NUM_PARAM("sourceRequired");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3277,6 +3335,8 @@ static void f_sourceoptional( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("sourceOptional");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -3327,6 +3387,8 @@ static void f_sourcereqcheck( ACTION_PARAMS)
   int no_ups_env_flag = DO_UPS_ENV;
 
   CHECK_NUM_PARAM("sourceReqCheck");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3385,6 +3447,8 @@ static void f_sourceoptcheck( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("sourceOptCheck");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -3440,6 +3504,8 @@ static void f_writecompilescript(ACTION_PARAMS)
   /* skip this whole action if we are being called while compiling */
   if (! g_COMPILE_FLAG) {
     CHECK_NUM_PARAM("writeCompileScript");
+
+    OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
     /* only proceed if we have a valid number of parameters */
     if (UPS_ERROR == UPS_SUCCESS) {
@@ -3553,6 +3619,8 @@ static void f_setupenv( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("setupEnv");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -3566,6 +3634,8 @@ static void f_unsetupenv( ACTION_PARAMS)
   char *uprod_name;
 
   CHECK_NUM_PARAM("unSetupEnv");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3593,6 +3663,8 @@ static void f_proddir( ACTION_PARAMS)
   char *uprod_name;
 
   CHECK_NUM_PARAM("prodDir");
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3630,6 +3702,8 @@ static void f_unproddir( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("unProdDir");
 
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
@@ -3653,6 +3727,8 @@ static void f_dodefaults( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
   char *uprod_name;
+
+  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
 
   /* only proceed if we have a stream to write the output to */
   if (a_stream) {
