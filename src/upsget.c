@@ -203,9 +203,9 @@ void upsget_allout(const FILE * const stream,
     if (command_line->ugo_shell == e_BOURNE )
     { fprintf((FILE *)stream,"%sUPS_PROD_NAME=%s;export UPS_PROD_NAME\n",
 	       pdefault, name);
-      fprintf((FILE *)stream,"%sUPS_PROD_VERSION=%s;export UPS_PROD_VERSION\n",
+      fprintf((FILE *)stream,"%sUPS_PROD_VERSION=\"%s\";export UPS_PROD_VERSION\n",
                pdefault, upsget_version(db,instance,command_line));
-      fprintf((FILE *)stream,"%sUPS_PROD_DIR=%s;export UPS_PROD_DIR\n",
+      fprintf((FILE *)stream,"%sUPS_PROD_DIR=\"%s\";export UPS_PROD_DIR\n",
                pdefault, upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (strlen(addr)) 
@@ -237,9 +237,9 @@ void upsget_allout(const FILE * const stream,
 		 pdefault,addr); } 
     } else { 
       fprintf((FILE *)stream,"%ssetenv UPS_PROD_NAME %s\n",pdefault,name);
-      fprintf((FILE *)stream,"%ssetenv UPS_PROD_VERSION %s\n",pdefault,
+      fprintf((FILE *)stream,"%ssetenv UPS_PROD_VERSION \"%s\"\n",pdefault,
                upsget_version(db,instance,command_line));
-      fprintf((FILE *)stream,"%ssetenv UPS_PROD_DIR %s\n",pdefault,
+      fprintf((FILE *)stream,"%ssetenv UPS_PROD_DIR \"%s\"\n",pdefault,
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (strlen(addr))
