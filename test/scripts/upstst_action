@@ -1,0 +1,20 @@
+#!/bin/sh
+# ============================================================================
+# test the action routines
+# ============================================================================
+cd $ERUPT_DIR/test/scripts/action/log
+env PRODUCTS=../db1 $ERUPT_DIR/test/ups_test << EOD
+#ups_echo "================================================================="
+#
+# check simple things
+#
+upsact_print -out lassie1.out -diff lassie1.in setup lassie v1_0 
+upsact_print -out lassie2.out -diff lassie2.in setup lassie v2_0 
+upsact_print -out lassie3.out -diff lassie3.in setup lassie v3_0 
+upsact_print -out lassie4.out -diff lassie4.in setup lassie v4_0 
+upsact_print -out rover1.out  -diff rover1.in  setup rover  v1_0 
+upsact_print -out rover2.out  -diff rover2.in  setup rover  v2_0 
+upsact_print -out snoopy1.out -diff snoopy1.in setup snoopy v2_0 -z ../db1:../db2 
+upsact_print -out snoopy2.out -diff snoopy2.in setup snoopy v3_0 -z ../db1:../db2 
+quit
+EOD
