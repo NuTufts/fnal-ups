@@ -119,7 +119,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 {
   int empty_stream = 0;
   t_upsugo_command command_line;
-  mode_t mode = 0777;   /* rwx by owner and group and all*/
+  mode_t mode = 0755;   /* rwx by owner, rx by group and all */
 
   /* we will need the shell information when we call upsutl_remall from within
      upsutl_finish_temp_file */
@@ -207,7 +207,8 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
               } else {
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			   "error from subprocess");
-		upserr_add(UPS_COMMAND_FAILED, UPS_FATAL,
+		if (g_cmd_info[a_command_index].cmd != NULL)
+		  upserr_add(UPS_COMMAND_FAILED, UPS_FATAL,
 			  g_cmd_info[a_command_index].cmd);
 		KEEP_OR_REMOVE_FILE();
                 return (errno);
