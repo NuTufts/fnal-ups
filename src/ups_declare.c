@@ -602,7 +602,12 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                upsget_translation( minst, db_info, 
                                    uc, minst->table->info_source_dir);
             }
-            upsutl_copy_info( minst, tmpfile, db_info);
+/*            upsutl_copy_info( minst, tmpfile, db_info);
+              upsutl_copy_man( minst, tmpfile, db_info);
+*/
+              upscpy_info(minst,db_info,uc,tmpfile);
+              upscpy_man(minst,db_info,uc,tmpfile);
+              upscpy_catman(minst,db_info,uc,tmpfile);
           }
           chain_list->next = save_next;
           chain_list->prev = save_prev;
