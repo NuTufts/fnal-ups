@@ -89,8 +89,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
   char *unchain;
-
   if (!uc->ugo_product || (!uc->ugo_version && !uc->ugo_chain) )
+
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
            "Specifications must include a product and a version or chain(s)");
     return 0;

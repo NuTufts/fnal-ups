@@ -119,9 +119,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                "Specification must include a product and a version");
     return 0;
   }
-  if ((int)(upslst_count(uc->ugo_flavor) == 0) )
+  if ((int)(upslst_count(uc->ugo_flavor) != 2) ) /* remember any */
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
-               "Specification must include a flavor");
+               "Specification must include a single flavor");
     return 0;
   }
   mproduct_list = upsmat_instance(uc, db_list , not_unique);
@@ -396,6 +396,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       }
       product->instance_list=upslst_free(product->instance_list,'d');
     } 
+    uc->ugo_chain=save_chain;
     if (uc->ugo_chain)
     { uc->ugo_flavor=save_flavor;
       uc->ugo_qualifiers=save_qualifiers;
@@ -426,6 +427,15 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         if (UPS_ERROR == UPS_SUCCESS) 
         { upsact_process_commands(cmd_list, tmpfile); }
         upsact_cleanup(cmd_list);
+        if (strstr(the_chain,"current"))
+        { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+				  mproduct, g_cmd_info[e_start].cmd,
+				  e_start);
+          if (cmd_list)
+          { printf("theres a start...\n");
+            upsact_cleanup(cmd_list);
+          }
+        }
       }
     }
     return 0;
