@@ -4,7 +4,6 @@ if [ -s $UPS_DIR/test/scripts/compile/log/rover.out.sh ]; then
   . $UPS_DIR/test/scripts/compile/log/rover.out.sh
 else
   echo "File ($UPS_DIR/test/scripts/compile/log/rover.out.sh) not found"
-  /bin/rm -f /dev/null
   return 1
 fi
 #
