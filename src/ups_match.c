@@ -110,15 +110,15 @@ static int get_instance(const t_upslst_item * const a_read_instances,
      if (tmp_flavor_list == NULL) {                                        \
        tmp_flavor_list = upslst_insert(tmp_flavor_list, inst->flavor);     \
        tmp_quals_list = upslst_insert(tmp_quals_list, inst->qualifiers);   \
-     } else {                                                              \
-       /* we already have a list just change the value pointed to */       \
-       tmp_flavor_list->data = (void *)(inst->flavor);                     \
-       tmp_quals_list->data = (void *)(inst->qualifiers);                  \
        /* save these first values as when we delete the list we will have  \
           to put these back on first so that the reference counter can     \
           be decremented properly. */                                      \
        first_flavor = inst->flavor;                                        \
        first_quals = inst->qualifiers;                                     \
+     } else {                                                              \
+       /* we already have a list just change the value pointed to */       \
+       tmp_flavor_list->data = (void *)(inst->flavor);                     \
+       tmp_quals_list->data = (void *)(inst->qualifiers);                  \
      }
 
 #define USE_CMD_LINE_INFO() \
