@@ -27,7 +27,7 @@
 #include <malloc.h>
 
 /* ups specific include files */
-#include "ups_error.h"
+#include "upserr.h"
 
 /*
  * Definition of public variables.
