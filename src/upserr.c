@@ -92,8 +92,9 @@ static char *g_error_messages[UPS_NERR] = {
 /* 32 */  "%s: Version specified already exists\n",
 /* 33 */  "%s: Version/Chain and Table file both cannot be specified on the command line \n",
 /* 34 */  "%s: Cannot do unsetup, SETUP_%s is not defined\n",
-/* 35 */  "%s: Cannot do %s, no product specified on command line\n"
-/* 36 this is the last */
+/* 35 */  "%s: Cannot do %s, no product specified on command line\n",
+/* 36 */  "%s: Action parsing failed on \"%s\"\n"
+/* 37 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -133,7 +134,8 @@ char *g_error_ascii[] = {
    /* UPS_TABLEFILE_AND_VERSION 33 */ "UPS_TABLEFILE_AND_VERSION",
    /* UPS_NO_SETUP_ENV        34 */ "UPS_NO_SETUP_ENV",
    /* UPS_NO_PRODUCT          35 */ "UPS_NO_PRODUCT",
-   /* UPS_NERR                36 */ "UPS_NERR",
+   /* UPS_ACTION_PARSE        36 */ "UPS_ACTION_PARSE",
+   /* UPS_NERR                37 */ "UPS_NERR",
    0 };
 
 /*
