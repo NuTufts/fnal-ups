@@ -1048,10 +1048,10 @@ t_upslst_item *upsact_check_files(
 	case e_unproddir:
 	case e_exeaccess:
 	case e_uncopyman:
-	case e_writecompilescript:
 	  break;
 	  /* the following actions contain a file or directory path.  return
 	     this value to the calling routine as a list element. */
+	case e_writecompilescript:
 	case e_sourcecompilereq:
 	case e_sourcecompileopt:
 	case e_sourcerequired:

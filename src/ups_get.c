@@ -60,6 +60,9 @@ extern t_cmd_info g_cmd_info[];
        /* no it is not, print it out */               \
        printf("%s\n", (char *)file);                  \
      }                                                \
+   } else {                                           \
+     /* cannot get prod dir, output all the files */  \
+     printf("%s\n", (char *)file);                    \
    }
 
 /*-----------------------------------------------------------------------
