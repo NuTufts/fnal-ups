@@ -354,7 +354,7 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
          { if (db_info && db_info->name)
    	   { if (new_db)           /* only the first time !!! */
              { PRINT_DB(db_info->name);
-               new_db=1;
+               new_db=0;
              }
    	   }
          }
