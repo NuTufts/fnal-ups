@@ -150,11 +150,6 @@ static int g_ups_error;
 	tmp_productdir = inst->prod_dir;             \
       }
 
-#define GET_ALL_FILES(suffix, file_list) \
-	location = upsutl_get_prod_dir(db_info->name, prod_name);    \
-	file_list = upsutl_get_files(location, suffix);              \
-	upsmem_free(location);
-
 #define CHECK_UNIQUE(a_list, type) \
       if (a_list) {                                                    \
         a_list = upslst_first(a_list);                                 \
@@ -269,13 +264,14 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   t_upslst_item *db_list;
   t_upslst_item *db_item, *all_products = NULL, *product_item;
   t_upslst_item *all_versions = NULL;
-  t_upslst_item *chain_item, *all_chains = NULL, *all_tmp_chains = NULL;
+  t_upslst_item *chain_item, *all_chains = NULL;
   t_upstyp_matched_product *mproduct = NULL;
   t_upslst_item *mproduct_list = NULL;
   t_upstyp_product *config_ptr = NULL;
   char *prod_name, *the_chain, *new_string = NULL, *location = NULL;
   char do_delete = 'd';
-  int got_all_products = 0, got_all_versions = 0;
+  int got_all_products = 0, got_all_versions = 0, got_all_chains = 0;
+  int need_all_chains = 0;
   int any_version = 0, any_chain = 0;
   void *saved_next = NULL;
 
@@ -292,6 +288,27 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
     }
   }
   
+  /* In order to avoid doing this for each database, if chains were
+     entered, create a list here (can only do if '*' was not one of the
+     requested chains. */
+  if (a_command_line->ugo_chain) {
+    /* first make sure none of the requested chains were '*' */
+    for (chain_item = a_command_line->ugo_chain ; chain_item ;
+	 chain_item = chain_item->next) {
+      the_chain = (char *)(chain_item->data);
+      if (! strcmp(the_chain, ANY_MATCH)) {
+	need_all_chains = 1;
+	break;
+      }
+    }
+    if (! need_all_chains) {
+      /* none of the chains were '*' so they will remain the same for
+	 all products.  just point to the list we have. */
+      all_chains = a_command_line->ugo_chain;
+      got_all_chains = 1;
+    }
+  }
+
   /* In order to avoid doing this for each database, if a version was
      entered, create a list (with 1 element) here */
   if (a_command_line->ugo_version &&
@@ -338,7 +355,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	/* If the user did not enter a product name, get all the product names
 	   in the current db. */
 	if (! got_all_products) {
-	  all_products = upsutl_get_files(db_info->name, (char *)ANY_MATCH);
+	  upsutl_get_files(db_info->name, (char *)ANY_MATCH, &all_products);
 	}
 
 	if (all_products) {
@@ -358,31 +375,30 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	  for (product_item = all_products ; product_item ;
 	       product_item = product_item->next) {
 	    prod_name = (char *)product_item->data;
+	    location = upsutl_get_prod_dir(db_info->name, prod_name);
 	  
 	    if (UPS_VERBOSE) {
 	      printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
 	    }
 	    /* Check if chains were requested */
 	    if (a_command_line->ugo_chain) {
-	      for (chain_item = a_command_line->ugo_chain ; chain_item ;
-		   chain_item = chain_item->next) {
-		the_chain = (char *)(chain_item->data);
+	      /* we may have already made a list of them above. check before
+		 doing anything here */
+	      if (! got_all_chains) {
+		for (chain_item = a_command_line->ugo_chain ; chain_item ;
+		     chain_item = chain_item->next) {
+		  the_chain = (char *)(chain_item->data);
 		
-		if (! strcmp(the_chain, ANY_MATCH)) {
-		  /* get all the chains in the current product area */
-		  GET_ALL_FILES((char *)CHAIN_SUFFIX, all_tmp_chains);
-		  any_chain = 1;             /* originally chain was *  */
+		  if (! strcmp(the_chain, ANY_MATCH)) {
+		    /* get all the chains in the current product area */
+		    upsutl_get_files(location, (char *)CHAIN_SUFFIX,
+				     &all_chains);
+		    any_chain = 1;             /* originally chain was *  */
 		  
-		  /* Now add these chains to the master list */
-		  all_chains = upslst_insert_list(all_chains, all_tmp_chains);
-
-		  /* we do not need to upsmem_free this list as it is getting
-		     inserted into the all_chains list and will be freed when
-		     that list is freed.  */
-		  all_tmp_chains = 0;
-		} else {
-		  /* Now add this chain to the master list */
-		all_chains = upslst_add(all_chains, the_chain);
+		  } else {
+		    /* Now add this chain to the master list */
+		    all_chains = upslst_add(all_chains, the_chain);
+		  }
 		}
 	      }
 	      /* make sure if we need unique instance that we only have one */
@@ -393,8 +409,12 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    if (a_command_line->ugo_version) {
 	      if (! got_all_versions) {
 		/* get all the versions in the current product area */
-		GET_ALL_FILES((char *)VERSION_SUFFIX, all_versions);
+		upsutl_get_files(location, (char *)VERSION_SUFFIX,
+				 &all_versions);
 		any_version = 1;             /* originally version was *  */
+		
+		/* point back to the beginning of the list */
+		all_versions = upslst_first(all_versions);
 	      }
 	      /* make sure if need unique instance that we only have one */
 	      CHECK_UNIQUE(all_versions, "versions");
@@ -410,8 +430,10 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	      all_versions = upslst_free(all_versions, do_delete);
 	    }
 	      
-	    /* no longer need chain list - free it */
-	    all_chains = upslst_free(all_chains, do_delete);
+	    /* may no longer need chain list - free it */
+	    if (! got_all_chains) {
+	      all_chains = upslst_free(all_chains, do_delete);
+	    }
 	    
 	    /* get out of the loop if we got an error */
 	    CHECK_SOFT_ERR();
@@ -453,7 +475,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
     /* no longer need version list - free it */
     all_versions = upslst_free(all_versions, do_delete);
   }
-  if (all_chains) {
+  if (all_chains && (!got_all_chains)) {
     /* no longer need chain list - free it */
     all_chains = upslst_free(all_chains, do_delete);
   }      
