@@ -76,11 +76,11 @@ void ups_list( t_upsugo_command * const a_command_line )
 
   /* Get all the requested instances */
   mproduct_list = ups_list_core(a_command_line);
-  upsugo_prtlst(mproduct_list,"the products");
+  /*  upsugo_prtlst(mproduct_list,"the products");*/
   mproduct_list = upslst_first(mproduct_list);  /* point to the start */
 
   /* Output the requested information from the instances */
-  upsugo_dump(a_command_line);
+  /*  upsugo_dump(a_command_line);*/
   list_output(mproduct_list, a_command_line);
 
   /* free the matched products */
@@ -143,18 +143,24 @@ void list_output(const t_upslst_item * const a_mproduct_list,
     for (tmp_minst_list = mproduct->minst_list ; tmp_minst_list ;
 	 tmp_minst_list = tmp_minst_list->next) {
       minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
-      printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", minst_ptr->chain->product,
-	     minst_ptr->chain->chain, minst_ptr->chain->version);
-      printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->chain->flavor,
-	     minst_ptr->chain->qualifiers);
-      printf("V:PRODUCT=%s, VERSION=%s, ", minst_ptr->version->product,
-	     minst_ptr->version->version);
-      printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->version->flavor,
-	     minst_ptr->version->qualifiers);
-      printf("T:PRODUCT=%s, VERSION=%s, ", minst_ptr->table->product,
-	     minst_ptr->table->version);
-      printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->table->flavor,
-	     minst_ptr->table->qualifiers);
+      if (minst_ptr->chain) {
+	printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ",
+	       minst_ptr->chain->product,
+	       minst_ptr->chain->chain, minst_ptr->chain->version);
+	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->chain->flavor,
+	       minst_ptr->chain->qualifiers);
+      }
+      if (minst_ptr->version ) {
+	printf("V:PRODUCT=%s, VERSION=%s, ", minst_ptr->version->product,
+	       minst_ptr->version->version);
+	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->version->flavor,
+	       minst_ptr->version->qualifiers);
+      }
+      if (minst_ptr->table) {
+	printf("T:PRODUCT=%s, ", minst_ptr->table->product);
+	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->table->flavor,
+	       minst_ptr->table->qualifiers);
+      }
     }
     printf("\n\n");
   }
