@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/utsname.h>
 
 /* ups specific include files */
 
@@ -38,64 +39,45 @@
 
 #define UPSPRE "${UPS_"
 
-#define get_element(STRING,ELEMENT) \
-{  if(instance->chain)                                 \
-    { if (instance->chain->ELEMENT)                     \
-      { STRING=instance->chain->ELEMENT;         \
-      } else {                                          \
-        if(instance->version)                           \
-        { if (instance->version->ELEMENT)               \
-          { STRING=instance->version->ELEMENT;   \
-          } else {                                      \
-            if (instance->table)                        \
-            { if (instance->table->ELEMENT)             \
-              { STRING=instance->table->ELEMENT; \
-              } else {                                  \
-                STRING=0;                        \
-              }                                         \
-            } else {                                    \
-              STRING=0;                          \
-            }                                           \
-          }                                             \
-        } else {                                        \
-          if (instance->table)                          \
-          { if (instance->table->ELEMENT)               \
-            { STRING=instance->table->ELEMENT;   \
-            } else {                                    \
-              STRING=0;                          \
-            }                                           \
-          } else {                                      \
-            STRING=0;                            \
-          }                                             \
-        }                                               \
-      }                                                 \
-    } else {                                            \
-      if(instance->version)                             \
-      { if (instance->version->ELEMENT)                 \
+#define get_element(STRING,ELEMENT)              \
+{ STRING=0;                                      \
+  if(instance->chain)                            \
+  { if (instance->chain->ELEMENT)                \
+    { STRING=instance->chain->ELEMENT;           \
+    } else {                                     \
+      if(instance->version)                      \
+      { if (instance->version->ELEMENT)          \
         { STRING=instance->version->ELEMENT;     \
-        } else {                                        \
-          if (instance->table)                          \
-          { if (instance->table->ELEMENT)               \
-            { STRING=instance->table->ELEMENT;   \
-            } else {                                    \
-              STRING=0;                          \
-            }                                           \
-          } else {                                      \
-            STRING=0;                            \
-          }                                             \
-        }                                               \
-      } else {                                          \
-        if (instance->table)                            \
-        { if (instance->table->ELEMENT)                 \
-          { STRING=instance->table->ELEMENT;     \
-          } else {                                      \
-            STRING=0;                            \
-          }                                             \
-        } else {                                        \
-          STRING=0;                              \
-        }                                               \
-      }                                                 \
-    }                                                   \
+        } else {                                 \
+          if (instance->table)                   \
+          { if (instance->table->ELEMENT)        \
+            { STRING=instance->table->ELEMENT; } \
+          }                                      \
+        }                                        \
+      } else {                                   \
+        if (instance->table)                     \
+        { if (instance->table->ELEMENT)          \
+          { STRING=instance->table->ELEMENT; }   \
+        }                                        \
+      }                                          \
+    }                                            \
+  } else {                                       \
+    if(instance->version)                        \
+    { if (instance->version->ELEMENT)            \
+      { STRING=instance->version->ELEMENT;       \
+      } else {                                   \
+        if (instance->table)                     \
+        { if (instance->table->ELEMENT)          \
+          { STRING=instance->table->ELEMENT; }   \
+        }                                        \
+      }                                          \
+    } else {                                     \
+      if (instance->table)                       \
+      { if (instance->table->ELEMENT)            \
+        { STRING=instance->table->ELEMENT; }     \
+      }                                          \
+    }                                            \
+  }                                              \
 }
 
 
@@ -112,16 +94,16 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_PROD_NAME", upsget_product },
   { "${UPS_PROD_VERSION", upsget_version },
   { "${UPS_PROD_FLAVOR", upsget_flavor },
-  { "${UPS_OS_FLAVOR", 0 },
+  { "${UPS_OS_FLAVOR", upsget_OS_flavor },
   { "${UPS_PROD_QUALIFIERS", upsget_qualifiers },
   { "${UPS_PROD_DIR", upsget_prod_dir },
   { "${UPS_SHELL", upsget_shell },
   { "${UPS_OPTIONS", upsget_options },
   { "${UPS_VERBOSE", upsget_verbose },
-  { "${UPS_EXTENDED", 0 },
+  { "${UPS_EXTENDED", upsget_extended },
   { "${UPS_FLAGS", 0 },
   { "${UPS_FLAGSDEPEND", 0 },
-  { "${UPS_THIS_DB", 0 },
+  { "${UPS_THIS_DB", upsget_database },
   {  0, 0 }
 } ;
 
@@ -219,9 +201,9 @@ char *upsget_shell(const t_upstyp_matched_product * const product,
 { 
   if (command_line->ugo_shell != e_INVALID_SHELL )
   { if (!command_line->ugo_shell) 
-    { return ("SH");
+    { return ("sh");
     } else {
-      return ("CSH");
+      return ("csh");
     }
   }
 }
@@ -235,6 +217,16 @@ char *upsget_verbose(const t_upstyp_matched_product * const product,
     sprintf(string,"");
   } return string;
 }
+char *upsget_extended(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ char string[2];
+  if (command_line->ugo_e)
+  { sprintf(string,"1");
+  } else {
+    sprintf(string,"");
+  } return string;
+}
 char *upsget_options(const t_upstyp_matched_product * const product,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
@@ -243,4 +235,30 @@ char *upsget_options(const t_upstyp_matched_product * const product,
   } else {
     return 0;
   }
+}
+char *upsget_database(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ if ( product->db_info )
+  { return product->db_info->name;
+  } else {
+    return 0;
+  }
+}
+char *upsget_OS_flavor(const t_upstyp_matched_product * const product,
+                       const t_upstyp_matched_instance * const instance,
+                       const t_upsugo_command * const command_line )
+{  char                 uname_flavor[80];
+   struct utsname       baseuname;              /* returned from uname */
+   char                 *flavor;                /* flavor ptr */
+   flavor = uname_flavor;                       /* init pointer */
+   if (uname(&baseuname) == -1) return(0);     /* do uname */
+   (void) strcpy (flavor,baseuname.sysname);    /* get sysname */
+   (void) strcat (flavor,"+");                  /* add plus */
+   if (strncmp(baseuname.sysname,"AIX",3) == 0) /* because AIX is different */
+   { (void) strcat(flavor,baseuname.version);  /* add in version */
+     (void) strcat(flavor,".");
+   }
+   (void) strcat(flavor,baseuname.release);     /* add in release */
+   return flavor;
 }
