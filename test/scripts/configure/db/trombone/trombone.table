@@ -1,0 +1,37 @@
+FILE = TABLE
+PRODUCT = trombone
+
+GROUP:
+
+FLAVOR = IRIX+3
+QUALIFIERS = ""
+
+FLAVOR = IRIX+5.1
+QUALIFIERS = "red"
+
+FLAVOR = IRIX+6.2   
+QUALIFIERS = "nodbg:opt"
+
+FLAVOR = NULL
+QUALIFIERS = "RED"
+
+FLAVOR = NULL
+QUALIFIERS = ""
+
+FLAVOR = OSF1
+QUALIFIERS = ""
+
+FLAVOR = PLUM  
+QUALIFIERS = "music"
+
+COMMON:
+
+ACTION = CONFIGURE
+  execute("echo configure noise",UPS_ENV)
+
+ACTION = SETUP
+  execute("echo configure trombone",UPS_ENV)
+
+ACTION = UNTAILOR
+  execute("echo untailor me",UPS_ENV)
+END:
