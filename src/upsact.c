@@ -7,6 +7,12 @@
  *       This file contains routines to manage ups action lines.
  *       *** It need to be reentrant ***
  *
+ *       Steps in order to add a new action -
+ *           1. add a f_<action> prototype at the top of the file
+ *           2. add an e_<action> to the enum below
+ *           3. add a line to the g_cmd_maps structure
+ *           4. add the code for the f_<action> function
+ *
  * AUTHORS:
  *       Eileen Berman
  *       David Fagan
@@ -168,6 +174,11 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
 		 const t_upsact_cmd * const a_cmd);
+void f_makedir( const t_upstyp_matched_instance * const a_inst,
+		const t_upstyp_db * const a_db_info,
+		const t_upsugo_command * const a_command_line,
+		const FILE * const a_stream,
+		const t_upsact_cmd * const a_cmd);
 void f_pathappend( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
@@ -292,6 +303,7 @@ enum {
   e_exeaccess,
   e_execute,
   e_filetest,
+  e_makedir,
   e_copyhtml,
   e_copyinfo,
   e_copyman,
@@ -306,9 +318,10 @@ enum {
 /* These action commands are listed in order of use.  Hopefully the more
  * used actions are at the front of the list. Also the ones most used by
  * setup and unsetup are at the front of the array.  The actions in this
- * array MUST appear in the same order in the following enumeration
+ * array MUST appear in the same order as in the above enumeration. NOTE:
+ * the last two parameters are the minimum and maximum parameters expected
+ * by the action.
  */
-
 static t_cmd_map g_cmd_maps[] = {
   { "setupoptional", e_setupoptional, NULL, 0, 0 },
   { "setuprequired", e_setuprequired, NULL, 0, 0 },
@@ -330,6 +343,7 @@ static t_cmd_map g_cmd_maps[] = {
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1 },
   { "execute", e_execute, f_execute, 1, 2 },
   { "filetest", e_filetest, f_filetest, 2, 3 },
+  { "makedir", e_makedir, f_makedir, 1, 1 },
   { "copyhtml", e_copyhtml, f_copyhtml, 1, 1 },
   { "copyinfo", e_copyinfo, f_copyinfo, 1, 1 },
   { "copyman", e_copyman, f_copyman, 0, 1 },
@@ -1557,6 +1571,36 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
       if (fprintf((FILE *)a_stream,
 		  "if ( ! %s %s ) then\necho %s\nreturn 1\nendif\n#\n", 
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
+	FPRINTF_ERROR();
+      }
+      break;
+    default:
+      upserr_vplace();
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
+    }
+  }
+}
+
+void f_makedir( const t_upstyp_matched_instance * const a_inst,
+		const t_upstyp_db * const a_db_info,
+		const t_upsugo_command * const a_command_line,
+		const FILE * const a_stream,
+		const t_upsact_cmd * const a_cmd)
+{
+  CHECK_NUM_PARAM("makeDir");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "mkdir %s\n#\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
