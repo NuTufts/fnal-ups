@@ -2620,19 +2620,23 @@ static void f_envremove( ACTION_PARAMS)
 	 argument, it could contain some code there has to be executed, which
 	 we don't want to put into the dropit command */
 
-      if ( fprintf((FILE *)a_stream, "upstmp=%s\n", a_cmd->argv[1] ) < 0) {
+      if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" != \"\" ]\nthen\n", a_cmd->argv[0]) < 0) {
+        FPRINTF_ERROR();
+      }
+
+      if ( fprintf((FILE *)a_stream, "  upstmp=%s\n", a_cmd->argv[1] ) < 0) {
 	FPRINTF_ERROR();
       }
 
       if (fprintf((FILE *)a_stream,
-		  "%s=\"`%s -p \"$%s\" -i'%s' -d'%s' \"$upstmp\"`\";\nif [ \"x${%s:-}\" = \"x\" ]; then unset %s; fi\n#\n", 
+		  "  %s=\"`%s -p \"$%s\" -i'%s' -d'%s' \"$upstmp\"`\";\n  if [ \"x${%s:-}\" = \"x\" ]; then unset %s; fi\n", 
 		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter,
 		  delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
 
-      if (fprintf((FILE *)a_stream, "unset upstmp\n" ) < 0 ) {
+      if (fprintf((FILE *)a_stream, "  unset upstmp\nfi\n#\n" ) < 0 ) {
 	FPRINTF_ERROR();
       }
 
@@ -2643,18 +2647,22 @@ static void f_envremove( ACTION_PARAMS)
 	 argument, it could contain some code there has to be executed, which
 	 we don't want to put into the dropit command */
 
-      if (fprintf((FILE *)a_stream, "setenv upstmp \"%s\"\n", a_cmd->argv[1] ) < 0) {
+      if (fprintf((FILE *)a_stream, "if (${?%s}) then\n", a_cmd->argv[1]) < 0) {
+        FPRINTF_ERROR();
+      }
+
+      if (fprintf((FILE *)a_stream, "  setenv upstmp \"%s\"\n", a_cmd->argv[1] ) < 0) {
 	FPRINTF_ERROR();
       }
 
       if (fprintf((FILE *)a_stream,
-		 "setenv %s \"`%s -p \"\'\"$%s\"\'\" -i'%s' -d'%s' \"\'\"$upstmp\"\'\"`\"\nif (\"x${%s}\" == \"x\") unsetenv %s\n#\n",
+		 "  setenv %s \"`%s -p \"\'\"$%s\"\'\" -i'%s' -d'%s' \"\'\"$upstmp\"\'\"`\"\n  if (\"x${%s}\" == \"x\") unsetenv %s\n",
 		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter, delimiter,
 		  a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
 
-      if (fprintf((FILE *)a_stream, "unsetenv upstmp\n" ) < 0 ) {
+      if (fprintf((FILE *)a_stream, "  unsetenv upstmp\nendif\n#\n" ) < 0 ) {
 	FPRINTF_ERROR();
       }
       break;
