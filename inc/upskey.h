@@ -93,6 +93,8 @@ enum e_upskey_key {
   e_key_common,
   e_key_end,
 
+  e_key_osalias,
+
   e_key_unknown,
   e_key_count
 };

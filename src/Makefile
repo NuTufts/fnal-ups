@@ -29,6 +29,7 @@ LIB	= ../lib
 BIN	= ../bin
 DOC	= ../doc
 
+INCDIRS   = -I$(INC)
 CFLAGS	  = $(UPS_CFLAGS) $(INCDIRS)
 CFLAGScia = $(INCDIRS)
 
@@ -37,7 +38,8 @@ CFLAGScia = $(INCDIRS)
 
 OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 	  upsfil.o upsugo.o upsmat.o upskey.o upshlp.o \
-	  upsver.o upsact.o upsget.o upstbl.o upscpy.o
+	  upsver.o upsact.o upsget.o upstbl.o upscpy.o \
+	  upsuname.o
 
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
 	          ups_configure.o ups_unconfigure.o ups_unsetup.o \
@@ -53,7 +55,8 @@ CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     ups_unsetup.A ups_tailor.A upstbl.A \
              ups_list.A ups_depend.A ups_get.A ups_declare.A \
 	     ups_undeclare.A ups_flavor.A ups_copy.A ups_modify.A \
-             ups_unk.A ups_touch.A ups_verify.A upscpy.A
+             ups_unk.A ups_touch.A ups_verify.A upscpy.A \
+	     upsuname.A
 
 LDFLAGS = $(LLIBS)
 
@@ -93,8 +96,8 @@ $(BIN)/ups_parent : ups_parent.pl
 
 #
 # Build the old products people expect that arn't really dependencies
-$(BIN)/funame : 
-	$(CC) funame.c -o $@ $(OLD_LIBS)
+$(BIN)/funame : upsuname.o
+	$(CC) $(CFLAGS) funame.c -o $@ upsuname.o $(OLD_LIBS)
 
 $(BIN)/dropit :
 	$(CC) dropit.c -o $@ 

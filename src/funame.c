@@ -32,6 +32,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <getopt.h>
+#include "upsuname.h"
 
 #ifdef VMS
 
@@ -52,6 +54,7 @@ struct utsname {
 
 #define DOMAIN ".fnal.gov"
 
+int
 funame_f(baseuname,hostname,ipaddress)
 struct utsname *baseuname;
 char *hostname;
@@ -66,18 +69,17 @@ char *ipaddress;
 #endif	/* VMS */
 	char *tpoint;
 	char thostname[MAXHOSTNAMELEN];
-	char dstr[10];
 
 
 		if ( (c = uname(baseuname)) == -1)
 			return(-1);
 
-                basename->sysname[0] = 0;
-                ups_append_OS(basename->sysname);
-                basename->release[0] = 0;
-		ups_append_release(basename->release);
+                baseuname->sysname[0] = 0;
+                ups_append_OS(baseuname->sysname);
+                baseuname->release[0] = 0;
+		ups_append_release(baseuname->release);
 
-		if( (strncmp(baseuname->sysname, "AIX", 3) == 0 ) &&
+		if( (strncmp(baseuname->sysname, "AIX", 3) == 0 )) {
 			baseuname->version[1] = '\0';
 		}
 
@@ -304,13 +306,14 @@ char optstring[];
 
 #define MAXIPLEN 16
 
+int
 main(argc,argv)
 int argc;
 char ** argv;
 
 {
 	struct utsname name;
-	int c,i;
+	int c;
 	extern char *optarg;
 	extern int optind;
 	short sflag = 0;
@@ -323,11 +326,9 @@ char ** argv;
 	short errflag = 0;
 	short space = 0;
 	extern int errno;
-	extern char *sys_errlis[];
 #ifndef VMS
 	extern int sys_nerr;
 #endif	/* VMS */
-	char *tpoint;
 	char hostname[MAXHOSTNAMELEN];
 	char ipaddress[MAXIPLEN+1];
 

@@ -40,6 +40,7 @@
 #include <sys/utsname.h>
 
 #include "ups.h"
+#include "upsuname.h"
 
 #ifdef UPS_ID
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	4.00";

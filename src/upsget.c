@@ -32,6 +32,7 @@
 /* ups specific include files */
 
 #include "ups.h"
+#include "upsuname.h"
  
 /*
  * Declaration of private functions.
