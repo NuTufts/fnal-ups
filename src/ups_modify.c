@@ -60,9 +60,9 @@ extern t_cmd_info g_cmd_info[];
  * Output: 
  * Return: 
  */
-void ups_modify( t_upsugo_command * const uc , 
-                 const FILE * const tmpfile,
-                 const int ups_command)
+t_upslst_item *ups_modify( t_upsugo_command * const uc , 
+                          const FILE * const tmpfile,
+                          const int ups_command)
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *minst_list = NULL;
@@ -116,31 +116,11 @@ void ups_modify( t_upsugo_command * const uc ,
   save_table_file=uc->ugo_tablefile;
   uc->ugo_tablefile=0;
   uc->ugo_tablefiledir=0;
-
-  if (uc->ugo_product == "*" )
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "modify", 
-               "Specification must include a product");
-    return;
-  }
   if (!uc->ugo_anyfile)
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "modify", 
                "Specification must include a file specification with -N");
-    return;
+    return(mproduct_list);
   }
-/*  if ((int)(upslst_count(uc->ugo_flavor) == 0) )
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
-               "Specification must include a flavor");
-    return;
-  }
-  mproduct_list = upsmat_instance(uc, db_list , not_unique);
-  if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
-  /* if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); }
-  if (!mproduct_list)
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Modify", 
-               "Product doesn't exists");
-    return;
-  }
-*/
   save_chain=uc->ugo_chain;
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
@@ -162,6 +142,8 @@ void ups_modify( t_upsugo_command * const uc ,
  *
  ***********************************************************************/
 
+if (strcmp(uc->ugo_product,"*"))
+{
  uc->ugo_chain = upslst_new(upsutl_str_create(ANY_MATCH,' '));
  uc->ugo_version=0;
  uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
@@ -169,8 +151,6 @@ void ups_modify( t_upsugo_command * const uc ,
  for (db_list = uc->ugo_db ; db_list ; db_list=db_list->next) 
  { db_info = (t_upstyp_db *)db_list->data;
    mproduct_list = upsmat_instance(uc, db_list , not_unique);
-/*   if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; } */
-   /* if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); } */
    if (mproduct_list)    /* the product does exist */ 
    { upsver_mes(1,"Product %s currently exist in database %s\n",
                 uc->ugo_product,
@@ -182,6 +162,7 @@ void ups_modify( t_upsugo_command * const uc ,
   { db_list = upslst_first(uc->ugo_db);
     db_info = (t_upstyp_db *)db_list->data;
   } 
+}
 /* restore everything */
   uc->ugo_chain=upslst_free(uc->ugo_chain,'d');
   uc->ugo_chain=save_chain;
@@ -199,21 +180,23 @@ void ups_modify( t_upsugo_command * const uc ,
    but if the file was read with the normal process it's in the file
    cache and will not repeat the errors */
  if (!upsfil_is_in_cache(uc->ugo_anyfile))
- { fprintf(stdout,"WARNING - File specified not in instance specified\n")
+ { fprintf(stdout,"WARNING - File specified not in instance specified\n");
    fprintf(stdout,"cannot check validity of instance only file format\n");
  }
  (void)upsfil_read_file(uc->ugo_anyfile);
  fprintf(stdout,"Pre modification verification pass complete\n");
  fprintf(stdout,"Do you wish to continue?");
  (void)fgets(input,3,stdin);
- if(upsutl_strincmp(input,"y",1)) { return; }
+ if(upsutl_strincmp(input,"y",1)) { return(mproduct_list); }
  upsfil_flush(); /* flush the cache we are going to modify the file!!! */
  if ((original_file = tmpnam(0)) != 0)
  { sprintf(buffer,"cp %s %s",uc->ugo_anyfile,original_file);
    if (!system(buffer))
    { sprintf(buffer,"%s %s",EDIT_PGM,uc->ugo_anyfile);
      if (!system(buffer))
-     { mproduct_list = upsmat_instance(uc, db_list , not_unique);
+     { if (strcmp(uc->ugo_product,"*"))
+       { mproduct_list = upsmat_instance(uc, db_list , not_unique);
+       }
        (void)upsfil_read_file(uc->ugo_anyfile);
        fprintf(stdout,"Do you wish to save this modification?");
        (void)fgets(input,3,stdin);
@@ -230,16 +213,16 @@ void ups_modify( t_upsugo_command * const uc ,
          if (system(buffer))
          { fprintf(stdout,"Cannot restore original file %s copy in %s\n",
                    uc->ugo_anyfile,original_file);
-           return;
+           return(mproduct_list);
          }
        }
      } else { 
        fprintf(stdout,"Unable to edit file, check $EDITOR\n");
-       return;
+       return(mproduct_list);
      }
    } else { 
      fprintf(stdout,"Unable to create temporary work space\n");
-     return;
+     return(mproduct_list);
    }
  } else { 
    fprintf(stdout,"Unable to generate temporary file name(tmpnam)\n");
