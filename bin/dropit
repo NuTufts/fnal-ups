@@ -36,8 +36,12 @@ dropit() {
 	case "x$1" in
 	x-c) d_d=" "; d_pi=" "; shift 1;;
 	x-i) d_i="$2"; d_pi="$2"; shift 2;;
+	x-i' ') d_i=' '; shift 1;;
+	x-i':') d_i=':'; shift 1;;
 	x-n) d_n="$2"; shift 2;;
 	x-d) d_d="$2"; shift 2;;
+	x-d' ') d_d=' '; shift 1;;
+	x-d':') d_d=':'; shift 1;;
 	x-p) d_p="$2"; d_i="$d_pi"; shift 2;;
 	x-e) d_a=true; d_e=true; shift 1;;
 	x-a) d_a=true; shift 1;;
@@ -117,5 +121,3 @@ dropit() {
 }
 
 dropit "$@"
-
-
