@@ -21,8 +21,8 @@
 #ifndef _UPSGET_H_
 #define _UPSGET_H_
 char *upsget_translation( const t_upstyp_matched_product * const ,
-                  const t_upsugo_command * const ,
-                  char * const );
+                          const t_upsugo_command * const ,
+                          char * const );
 char *upsget_prod_dir(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
@@ -61,6 +61,13 @@ char *upsget_remall(const FILE * const,
                     const t_upstyp_matched_instance * const,
                     const t_upsugo_command * const);
 char *upsget_allout(const FILE * const,
+                    const t_upstyp_db * const,
+                    const t_upstyp_matched_instance * const,
+                    const t_upsugo_command * const);
+char *upsget_envstr(const t_upstyp_db * const,
+                    const t_upstyp_matched_instance * const ,
+                    const t_upsugo_command * const );
+char *upsget_envout(const FILE * const,
                     const t_upstyp_db * const,
                     const t_upstyp_matched_instance * const,
                     const t_upsugo_command * const);
