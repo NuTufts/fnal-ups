@@ -45,6 +45,9 @@ static void test_upsact_params(void);
 static void print_action( const char * const a_action_line,
 		   const char * const a_params, const int a_action_val);
 
+void list_output(const t_upslst_item * const a_mproduct_list,
+                 const t_upsugo_command * const a_command_line);
+
 /*
  * Definition of global variables.
  */
