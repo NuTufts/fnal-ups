@@ -67,6 +67,7 @@ ADDEMPTY=
 # the version string replaced
 VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 
+#
 #------------------------------------------------------------------
 # this is an *example* of a mythical product with a GNU Configure
 # based module "gnuproduct", an X11R6 imake based module "xproduct", 
