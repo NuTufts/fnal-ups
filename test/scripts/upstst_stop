@@ -13,6 +13,6 @@ stop penguin v2_0 -q ralph -s -n
 stop penguin v2_0 -q ralph -s -o
 stop penguin v2_0 -q ralph -s -t
 stop penguin v2_0 -q ralph -s -V -U /NULL/blah
-stop kerplop -status UPS_NO_MATCH
+stop kerplop -status UPS_SUCCESS
 quit
 EOD

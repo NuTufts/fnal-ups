@@ -13,6 +13,6 @@ start penguin v2_0 -q ralph -s -n
 start penguin v2_0 -q ralph -s -o
 start penguin v2_0 -q ralph -s -t
 start penguin v2_0 -q ralph -s -V -U /NULL/blah
-start kerplop -status UPS_NO_MATCH
+start kerplop -status UPS_SUCCESS
 quit
 EOD
