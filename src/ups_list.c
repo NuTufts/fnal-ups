@@ -49,6 +49,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 /*
  * Definition of global variables.
  */
+static int g_MATCH_DONE = 0;
+
 #define VPREFIX "UPSLIST: "
 
 #ifndef NULL
@@ -111,6 +113,16 @@ void print_chain(const t_upstyp_matched_instance * const instance,
     }                                                   \
   }                                                     \
 }
+#define OutputConfig() \
+{ FromConfig(upd_usercode_dir,"UPD_UserCode_Dir") \
+  FromConfig(setups_dir,"Setups_Dir")             \
+  FromConfig(ups_db_version,"DB_Version")         \
+  FromConfig(prod_dir_prefix,"Prod_dir_prefix")   \
+  FromConfig(man_target_dir,"Man_Target_dir")     \
+  FromConfig(html_target_dir,"Html_Target_dir")   \
+  FromConfig(info_target_dir,"Info_Target_dir")   \
+}
+
 #define FromAny(ELEMENT) \
 { if (!upsutl_stricmp(buffer,"" #ELEMENT ""))           \
   { valid=1;                                            \
@@ -313,10 +325,12 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
     /*  upsugo_prtlst(mproduct_list,"the products");*/
     upsver_mes(2,"%sFrom Database %s\n",VPREFIX,db_info->name);
     mproduct_list = upslst_first(mproduct_list);  /* point to the start */
-    upsver_mes(2,"%sStarting sort of product list\n",VPREFIX);
-    mproduct_list = upslst_sort0( mproduct_list , product_cmp );
-    upsver_mes(2,"%sEnding sort of product list\n",VPREFIX);
-    mproduct_list = upslst_first(mproduct_list);  /* point to the start */
+    if (g_MATCH_DONE)
+    { upsver_mes(2,"%sStarting sort of product list\n",VPREFIX);
+      mproduct_list = upslst_sort0( mproduct_list , product_cmp );
+      upsver_mes(2,"%sEnding sort of product list\n",VPREFIX);
+      mproduct_list = upslst_first(mproduct_list);  /* point to the start */
+    }
     if(!verify)  /* verify is list with NO output */
     {
       /* Output the requested information from the instances */
@@ -362,8 +376,8 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
 	     minst_item = minst_item->next)
 	{ upserr_add(UPS_VERIFY_PRODUCT, UPS_INFORMATIONAL,
 		     mproduct->product);
-	ups_verify_matched_instance(mproduct->db_info,
-			         (t_upstyp_matched_instance *)minst_item->data,
+	  ups_verify_matched_instance(mproduct->db_info,
+				 (t_upstyp_matched_instance *)minst_item->data,
 				 a_command_line, mproduct->product);
 	}
 	/* there may be lots of messages so output them on a per product
@@ -394,20 +408,56 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
 t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
                              t_upslst_item * const db_list )
 {
-  t_upslst_item *mproduct_list = NULL;
+  t_upslst_item *mproduct_list = NULL, *key;
   int need_unique = 0;
   char * addr;
+  t_upskey_map *keymap;
+  int do_match = 1;
+  t_upstyp_product *db;
+  t_upstyp_db *cli_db;
+  t_upstyp_matched_product *mproduct;
 
-  /* if no chains were entered, ask for them all */
-  if (! a_command_line->ugo_chain) { 
-    addr=upsutl_str_create(ANY_MATCH,' ');
-    a_command_line->ugo_chain = upslst_new(addr);
+  /* if the requested keyword is only in the dbconfig file, just read it and
+     no instances */
+  for (key = (t_upslst_item *)a_command_line->ugo_key ; key ;
+	 key = key->next) {
+    keymap = upskey_get_info((char *)key->data);
+    if (((int )(((char *)key->data)[0]) == '+') || (keymap && 
+	(UPSKEY_ISIN_VERSION(keymap->flag) ||
+	 UPSKEY_ISIN_TABLE(keymap->flag) ||
+	 UPSKEY_ISIN_CHAIN(keymap->flag)))) {
+      /* yes the keyword is in a version, table, or chain file. we must do the
+	 match below */
+      do_match = 1;
+      break;
+    } else {
+      do_match = 0;
+    }
   }
+  if (do_match) {
+    g_MATCH_DONE = 1;
+    /* if no chains were entered, ask for them all */
+    if (! a_command_line->ugo_chain) { 
+      addr=upsutl_str_create(ANY_MATCH,' ');
+      a_command_line->ugo_chain = upslst_new(addr);
+    }
 
-  /* Get all the instances that the user requested */
-  mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
-  if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); upserr_clear(); }
-
+    /* Get all the instances that the user requested */
+    mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
+    if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); upserr_clear(); }
+  } else {
+    g_MATCH_DONE = 0;
+    cli_db = (t_upstyp_db *)db_list->data;
+    /* the keywords requested are only in the dbconfig file. read the file */
+    db = upsutl_get_config(cli_db->name);
+    if (db) {
+      mproduct = ups_new_matched_product(NULL, NULL, NULL);
+      mproduct->db_info = (t_upstyp_db *)upsmem_malloc(sizeof(t_upstyp_db));
+      mproduct->db_info->name = upsutl_str_create(cli_db->name, ' ');
+      mproduct->db_info->config = db->config;
+      mproduct_list = upslst_add(mproduct_list, (void *)mproduct);
+    }
+  }
   return(mproduct_list);
 }
 
@@ -555,16 +605,14 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           }
         }
         printf("\n");
-      } else { 
-          list_K(instance,a_command_line,mproduct);
-          if (UPS_ERROR!=UPS_SUCCESS) 
-          { 
-/* upserr_output(); 
-            upserr_clear(); 
-*/
-            return; 
-          }
+      } else {
+        list_K(instance,a_command_line,mproduct);
       }
+    }
+    /* we must check if we only read in a dbconfig file, this can only
+       happen when -K is also entered */
+    if (! g_MATCH_DONE) 
+    { list_K(instance,a_command_line,mproduct);
     }
 /* end product loop */
   }
@@ -588,156 +636,163 @@ void list_K(const t_upstyp_matched_instance * const instance,
   if (product->db_info) 
   { config_ptr = product->db_info->config;
   }
-  for ( l_ptr = upslst_first( command->ugo_key ); 
-        l_ptr; l_ptr = l_ptr->next, count++ )
-  { valid=0;
-    strcpy(buffer,l_ptr->data);
-    if(!upsutl_stricmp(l_ptr->data,"+"))
-    { strcpy(buffer,"product");
+  if (g_MATCH_DONE)
+  { for ( l_ptr = upslst_first( command->ugo_key ); 
+	  l_ptr; l_ptr = l_ptr->next, count++ )
+    { valid=0;
+      strcpy(buffer,l_ptr->data);
+      if(!upsutl_stricmp(l_ptr->data,"+"))
+      { strcpy(buffer,"product");
+        FromAny(product) 
+	strcpy(buffer,"version");
+	FromAny(version) 
+	strcpy(buffer,"flavor");
+	FromAny(flavor) 
+	strcpy(buffer,"qualifiers");
+	FromAny(qualifiers)
+	strcpy(buffer,"chain");
+        print_chain(instance,buffer);
+        strcpy(buffer,"+");
+      }
       FromAny(product) 
-      strcpy(buffer,"version");
       FromAny(version) 
-      strcpy(buffer,"flavor");
       FromAny(flavor) 
-      strcpy(buffer,"qualifiers");
       FromAny(qualifiers)
-      strcpy(buffer,"chain");
+      if (!upsutl_stricmp(buffer,"chain")) { valid=1; }
       print_chain(instance,buffer);
-      strcpy(buffer,"+");
-    }
-    FromAny(product) 
-    FromAny(version) 
-    FromAny(flavor) 
-    FromAny(qualifiers)
-    if (!upsutl_stricmp(buffer,"chain")) { valid=1; }
-    print_chain(instance,buffer);
-    FromVersion(table_file)
-    FromVersion(table_dir)
-    FromVersion(ups_dir)
-    FromVersion(prod_dir)
-    FromVersion(archive_file)
-    FromVersion(compile_file)
-    FromVersion(compile_dir)
-    FromTable(description)
-    FromTable(man_source_dir)
-    FromTable(catman_source_dir)
-    FromTable(html_source_dir)
-    FromTable(news_source_dir)
-    FromTable(info_source_dir)
-    FromVersion(origin)
-    /* FromChain(chain) */
-    FromBoth(declarer)
-    FromBoth(declared)
-    FromBoth(modifier)
-    FromBoth(modified)
-    if (!upsutl_stricmp(buffer,"authorized_nodes")) 
-    { (void)(upsutl_is_authorized(instance, product->db_info,&nodes));
-      printf("\"%s\" ",nodes);
-      valid=1;
-    }
-    if (!upsutl_stricmp(buffer,"statistics")) 
-    { if (config_ptr)
-      { if (config_ptr->statistics)
-        { if (strstr(config_ptr->statistics,product->product))
-          { printf("\"statistics\" ");
-          } else { 
+      FromVersion(table_file)
+      FromVersion(table_dir)
+      FromVersion(ups_dir)
+      FromVersion(prod_dir)
+      FromVersion(archive_file)
+      FromVersion(compile_file)
+      FromVersion(compile_dir)
+      FromTable(description)
+      FromTable(man_source_dir)
+      FromTable(catman_source_dir)
+      FromTable(html_source_dir)
+      FromTable(news_source_dir)
+      FromTable(info_source_dir)
+      FromVersion(origin)
+      /* FromChain(chain) */
+      FromBoth(declarer)
+      FromBoth(declared)
+      FromBoth(modifier)
+      FromBoth(modified)
+      if (!upsutl_stricmp(buffer,"authorized_nodes")) 
+      { (void)(upsutl_is_authorized(instance, product->db_info,&nodes));
+        printf("\"%s\" ",nodes);
+        valid=1;
+      }
+      if (!upsutl_stricmp(buffer,"statistics")) 
+      { if (config_ptr)
+        { if (config_ptr->statistics)
+          { if (strstr(config_ptr->statistics,product->product))
+            { printf("\"statistics\" ");
+            } else { 
+              printf("\"\" ");
+            }
+          } else {
             printf("\"\" ");
           }
         } else {
           printf("\"\" ");
         }
-      } else {
-        printf("\"\" ");
+        valid=1;
       }
-      valid=1;
-    }
-    FromDatabase(name,"Database")
-    FromDatabase(name,"db")
-    FromConfig(upd_usercode_dir,"UPD_UserCode_Dir")
-    FromConfig(setups_dir,"Setups_Dir")
-    FromConfig(ups_db_version,"DB_Version")
-    FromConfig(prod_dir_prefix,"Prod_dir_prefix")
-    FromConfig(man_target_dir,"Man_Target_dir")
-    FromConfig(html_target_dir,"Html_Target_dir")
-    FromConfig(info_target_dir,"Info_Target_dir")
-    if (!strcmp(l_ptr->data,"key"))
-    { valid=1; 
-      printf("\"%d\"",upsget_key(instance->version)); /* test */ 
-    }
-    if (!strncmp(l_ptr->data,"_",1))
-    { str_val=0;
-      valid=1;
-      if (instance->chain) 
-         str_val = upskey_inst_getuserval( instance->chain,l_ptr->data);
-      if (instance->version && !str_val )
-         str_val = upskey_inst_getuserval( instance->version,l_ptr->data);
-      if (instance->table && !str_val )
-         str_val = upskey_inst_getuserval( instance->table,l_ptr->data);
-      if (!str_val) 
-      { printf("\"\" ");  /* this gives them "" for a invalid _key */
-      } else {
-        if (strlen(str_val))
-        { printf("\"%s\" ",str_val);
-        } else { 
-          printf("\"%s\" ",(char *)l_ptr->data);
-        }
-      } 
-    }
+      FromDatabase(name,"Database")
+      FromDatabase(name,"db")
+      OutputConfig();
+      if (!strcmp(l_ptr->data,"key"))
+      { valid=1; 
+        printf("\"%d\"",upsget_key(instance->version)); /* test */ 
+      }
+      if (!strncmp(l_ptr->data,"_",1))
+      { str_val=0;
+        valid=1;
+        if (instance->chain) 
+           str_val = upskey_inst_getuserval( instance->chain,l_ptr->data);
+        if (instance->version && !str_val )
+           str_val = upskey_inst_getuserval( instance->version,l_ptr->data);
+	if (instance->table && !str_val )
+	   str_val = upskey_inst_getuserval( instance->table,l_ptr->data);
+	if (!str_val) 
+	{ printf("\"\" ");  /* this gives them "" for a invalid _key */
+	} else {
+	  if (strlen(str_val))
+          { printf("\"%s\" ",str_val);
+	  } else { 
+	    printf("\"%s\" ",(char *)l_ptr->data);
+	  }
+	} 
+      }
 /* look for "processed values" spam? */
-    if (!strncmp(l_ptr->data,"@",1))
-    { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
-      { valid=1;
-        if (instance->version)
-        { addr=upsget_table_file(product->product,
-                                 instance->version->table_file,
-                                 instance->version->table_dir,
-                                 instance->version->ups_dir,
-                                 instance->version->prod_dir,
-                                 product->db_info,
-                                 exists);
-          if(addr)
-          { printf("\"%s\" ",addr);
-          } else { 
-            printf("\"\" "); 
-          }
-        } else {
-          printf("\"\" "); 
-        }
-      } else {
-        if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
-        { valid=1;
-          printf("\"");
-          if (UPSRELATIVE(instance->version->prod_dir))
-          { if (product->db_info) 
-            { config_ptr = product->db_info->config;
-              if (config_ptr) 
-              { if (config_ptr->prod_dir_prefix) 
-                { printf("%s/",config_ptr->prod_dir_prefix); }
-              }
-            }
-          }
-          printf("%s\" ", instance->version->prod_dir);
-        } 
-        if(!upsutl_stricmp(l_ptr->data,"@ups_dir"))
-        { valid=1;
-          printf("\"");
-          if (UPSRELATIVE(instance->version->ups_dir))
-          { if (product->db_info) 
-            { config_ptr = product->db_info->config;
-              if (config_ptr) 
-              { if (config_ptr->prod_dir_prefix) 
-                { printf("%s/",config_ptr->prod_dir_prefix); }
-              }
-            }
-          }
-          printf("%s\" ", instance->version->ups_dir);
-        } 
+      if (!strncmp(l_ptr->data,"@",1))
+      { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
+	{ valid=1;
+          if (instance->version)
+	  { addr=upsget_table_file(product->product,
+				   instance->version->table_file,
+				   instance->version->table_dir,
+				   instance->version->ups_dir,
+				   instance->version->prod_dir,
+				   product->db_info,
+				   exists);
+            if(addr)
+	    { printf("\"%s\" ",addr);
+	    } else { 
+	      printf("\"\" "); 
+	    }
+	  } else {
+	    printf("\"\" "); 
+	  }
+	} else {
+	  if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
+	  { valid=1;
+            printf("\"");
+	    if (UPSRELATIVE(instance->version->prod_dir))
+	    { if (product->db_info) 
+	      { config_ptr = product->db_info->config;
+                if (config_ptr) 
+                { if (config_ptr->prod_dir_prefix) 
+		  { printf("%s/",config_ptr->prod_dir_prefix); }
+		}
+	      }
+	    }
+	    printf("%s\" ", instance->version->prod_dir);
+	  } 
+	  if(!upsutl_stricmp(l_ptr->data,"@ups_dir"))
+	  { valid=1;
+            printf("\"");
+	    if (UPSRELATIVE(instance->version->ups_dir))
+	    { if (product->db_info) 
+	      { config_ptr = product->db_info->config;
+                if (config_ptr) 
+		{ if (config_ptr->prod_dir_prefix) 
+		  { printf("%s/",config_ptr->prod_dir_prefix); }
+		}
+	      }
+	    }
+	    printf("%s\" ", instance->version->ups_dir);
+	  } 
+	}
+      }
+      if (!valid) 
+      { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
+/*        if (list_error!=UPS_SUCCESS) */
+/*        list_error=UPS_INVALID_KEYWORD;  */
       }
     }
-    if (!valid) 
-    { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
-/*      if (list_error!=UPS_SUCCESS) */
-/*      list_error=UPS_INVALID_KEYWORD;  */
+  } else {
+    /* just have the dbconfig info */
+    for ( l_ptr = upslst_first( command->ugo_key ); 
+	  l_ptr; l_ptr = l_ptr->next, count++ )
+    { valid=0;
+      strcpy(buffer,(char *)l_ptr->data);
+      OutputConfig();
+      if (!valid) 
+      { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
+      }
     }
   }
   printf("\n");
