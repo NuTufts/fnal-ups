@@ -52,13 +52,6 @@ extern int UPS_VERBOSE;
 #define NULL 0
 #endif
 
-/* all individual command information */
-typedef struct s_cmd_info {
-  int cmd_index;
-  char *cmd;
-  char *valid_opts;
-} t_cmd_info;
-
 /* The enum is defined in ups_main.h */
 t_cmd_info g_cmd_info[] = {
   {e_setup,       "setup",       "?B:cde:f:g:jkm:M:noO:q:r:tU:vVz:Z"},
@@ -131,41 +124,41 @@ int main(int argc, char *argv[])
 
       if (UPS_ERROR == UPS_SUCCESS) {
 	switch (g_cmd_info[i].cmd_index) {
-	case e_setup: ups_setup(command_line, temp_file);
+	case e_setup: ups_setup(command_line, temp_file, e_setup);
 	  break;
-	case e_unsetup: ups_unk(command_line, argv[1]);
+	case e_unsetup: ups_unk(command_line, argv[1], e_unsetup);
 	  break;
 	case e_list: ups_list(command_line);
 	  break;
-	case e_configure: ups_unk(command_line, argv[1]);
+	case e_configure: ups_unk(command_line, argv[1], e_configure);
 	  break;
-	case e_copy: ups_unk(command_line, argv[1]);
+	case e_copy: ups_unk(command_line, argv[1], e_copy);
 	  break;
-	case e_declare: ups_unk(command_line, argv[1]);
+	case e_declare: ups_unk(command_line, argv[1], e_declare);
 	  break;
-	case e_depend: ups_unk(command_line, argv[1]);
+	case e_depend: ups_unk(command_line, argv[1], e_depend);
 	  break;
-	case e_exist: ups_unk(command_line, argv[1]);
+	case e_exist: ups_unk(command_line, argv[1], e_exist);
 	  break;
-	case e_modify: ups_unk(command_line, argv[1]);
+	case e_modify: ups_unk(command_line, argv[1], e_modify);
 	  break;
-	case e_start: ups_unk(command_line, argv[1]);
+	case e_start: ups_unk(command_line, argv[1], e_start);
 	  break;
-	case e_stop: ups_unk(command_line, argv[1]);
+	case e_stop: ups_unk(command_line, argv[1], e_stop);
 	  break;
-	case e_tailor: ups_unk(command_line, argv[1]);
+	case e_tailor: ups_unk(command_line, argv[1], e_tailor);
 	  break;
-	case e_unconfigure: ups_unk(command_line, argv[1]);
+	case e_unconfigure: ups_unk(command_line, argv[1], e_unconfigure);
 	  break;
-	case e_undeclare: ups_unk(command_line, argv[1]);
+	case e_undeclare: ups_unk(command_line, argv[1], e_undeclare);
 	  break;
-	case e_create: ups_unk(command_line, argv[1]);
+	case e_create: ups_unk(command_line, argv[1], e_create);
 	  break;
-	case e_get: ups_unk(command_line, argv[1]);
+	case e_get: ups_unk(command_line, argv[1], e_get);
 	  break;
-	case e_validate: ups_unk(command_line, argv[1]);
+	case e_validate: ups_unk(command_line, argv[1], e_validate);
 	  break;
-	case e_unk: ups_unk(command_line, argv[1]);
+	case e_unk: ups_unk(command_line, argv[1], e_unk);
 	  break;
 	}
       }
