@@ -113,8 +113,6 @@ static t_var_sub g_var_subs[] = {
  * Definition of public functions.
  */
 char *upsget_remall(const FILE * const stream, 
-                    const t_upstyp_db * const db,
-                    const t_upstyp_matched_instance * const instance,
                     const t_upsugo_command * const command_line )
 {
   if (command_line->ugo_shell == e_INVALID_SHELL)
@@ -155,10 +153,10 @@ char *upsget_envout(const FILE * const stream,
 { char *name;
   get_element(name,product);
   if (command_line->ugo_shell == e_BOURNE )
-  { fprintf((FILE *)stream,"SETUP_%s=%s;export SETUP_%s\n",
+  { fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n",
     name,upsget_envstr(db,instance,command_line),name);
   } else {
-    fprintf((FILE *)stream,"setenv SETUP_%s=%s\n",
+    fprintf((FILE *)stream,"setenv SETUP_%s=\"%s\"\n",
     name,upsget_envstr(db,instance,command_line));
   }
 }
