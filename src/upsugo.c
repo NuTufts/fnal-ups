@@ -52,39 +52,60 @@ int UPS_NEED_DB=1;
 #define UPSUGO "UPSUGO: "
 #define FREE( X ) free( X ); X = 0;
 
-#define flavor_sub() \
-{  while ((loc = strrchr(flavor,'.'))) \
-      { int n; \
-	*loc = 0; \
-        addr=upsutl_str_create(flavor,' '); \
-        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
-        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
-        n = strlen(addr)-1;\
-	if(addr[n] >= '0' && addr[n] <= '9') { \
-	  int release; \
-	  while(addr[n] >= '0' && addr[n] <= '9') { \
-	    n--; \
-          } \
-	  n++; \
-          release=atoi(addr+n); \
-	  while( release > 0 ) { \
-	    release--; \
-	    addr=upsutl_str_create(addr,' '); \
-	    sprintf(addr + n, "%d", release); \
-	    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
-	    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
-          } \
-        } \
-      } \
-   if ((loc = strrchr(flavor,'+'))) \
-      { *loc = 0; \
-        addr=upsutl_str_create(flavor,' '); \
-        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
-        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
-      } \
-   addr=upsutl_str_create("NULL",' '); \
-   upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
-   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
+static void
+expand_flavorlist(struct ups_command * uc) {
+  int n;
+  char *addr;
+  t_upslst_item *new_flavor = 0;
+  t_upslst_item *l_ptr = 0;
+  
+   for ( l_ptr = upslst_first(uc->ugo_flavor); l_ptr; l_ptr = l_ptr->next) {
+    addr=upsutl_str_create(l_ptr->data,' ');   
+    upsver_mes(3,"%sExamining flavor %s from flavor list\n",UPSUGO,addr);
+    upsver_mes(3,"%sAdding flavor %s to exp flavor list\n",UPSUGO,addr);
+    new_flavor = upslst_add(new_flavor,addr);
+    n = strlen(addr) - 1;
+    if(addr[n] >= '0' && addr[n] <= '9') {
+      int release;
+      while(addr[n] >= '0' && addr[n] <= '9') {
+	n--;
+      }
+      n++;
+      release=atoi(addr+n);
+      while( release > 0 ) {
+	release--;
+	addr=upsutl_str_create(addr,' ');
+	sprintf(addr + n, "%d", release);
+	upsver_mes(3,"%sAdding flavor %s to exp flavor list\n",UPSUGO,addr);
+	new_flavor = upslst_add(new_flavor,addr);
+      }
+    }
+  }
+  upslst_free(uc->ugo_flavor,'d');
+  uc->ugo_flavor = new_flavor;
+}
+
+static void
+flavor_sub(char *flavor, struct ups_command * uc)
+{  
+   char *addr;
+   char *loc;
+  
+   while ((loc = strrchr(flavor,'.')))
+      { *loc = 0;
+        addr=upsutl_str_create(flavor,' ');
+        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+      }
+   if ((loc = strrchr(flavor,'+')))
+      { *loc = 0;
+        addr=upsutl_str_create(flavor,' ');
+        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+      }
+   addr=upsutl_str_create("NULL",' ');
+   upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
+   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
 }
 
 /* Single flag set cases */
@@ -117,6 +138,7 @@ int UPS_NEED_DB=1;
 #define case_1 case '1': uc->ugo_number = 2; break;
 #define case_2 case '2': uc->ugo_number = 3; break;
 #define case_3 case '3': uc->ugo_number = 4; break;
+#define case_4 case '4': uc->ugo_number = 5; break;
 
 /* Add a specified chain to the list */
 #define add_chain(CHAIN) \
@@ -352,7 +374,7 @@ if (!uc->ugo_H)
    addr=upsutl_str_create(flavor,' ');		/* first add full */
    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
-   flavor_sub()
+   flavor_sub(flavor, uc);
  } else { 
    for ( l_ptr = upslst_first(uc->ugo_osname); 
        l_ptr; l_ptr = l_ptr->next, count++ )
@@ -360,7 +382,7 @@ if (!uc->ugo_H)
        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
        (void) strcpy(flavor,l_ptr->data);
-       flavor_sub()
+       flavor_sub(flavor, uc);
    }
 /*   upslst_free(uc->ugo_osname,'d');    need -f and -H
    uc->ugo_osname=0; */
@@ -380,7 +402,9 @@ if (!uc->ugo_H)
        l_ptr=l_ptr->next;                  /* there                          */
      } count--;
    } 
- } 
+ } else  
+ { expand_flavorlist(uc);
+ }
  return(0);
 }
 /* ===========================================================================
@@ -1409,7 +1433,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
           case_b case_D case_G case_m 
           case_M case_N case_O case_p 
           case_r case_T case_u case_U 
-          case_0 case_1 case_2 case_3 /* number sets */
+          case_0 case_1 case_2 case_3 case_4/* number sets */
           case_q case_z               /* special cases */
           default:
              errflg = 1;
