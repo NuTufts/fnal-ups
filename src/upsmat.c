@@ -631,7 +631,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
  * Output: None
  * Return: a list of matched products
  */
-t_upstyp_instance *upsmat_version(t_upstyp_matched_instance * const a_minst,
+t_upstyp_instance *upsmat_version(t_upstyp_instance * const a_inst,
 				  const t_upstyp_db * const a_db_info)
 {
   t_upslst_item *minst_list = NULL;
@@ -642,22 +642,19 @@ t_upstyp_instance *upsmat_version(t_upstyp_matched_instance * const a_minst,
   int num_matches;
   int need_unique = 1;
 
-  if (a_minst->version) {
+  if (a_inst) {
     /* fill in the flavor list and the qualifer list */
-    if (a_minst->version->flavor) {
-      flavor_list.data = (void *)a_minst->version->flavor;
+    if (a_inst->flavor) {
+      flavor_list.data = (void *)a_inst->flavor;
     }
-    if (a_minst->version->qualifiers) {
-      quals_list.data = (void *)a_minst->version->qualifiers;
+    if (a_inst->qualifiers) {
+      quals_list.data = (void *)a_inst->qualifiers;
     }
 
     /* go get the table file */
-    num_matches = match_from_table(a_minst->version->product,
-				   a_minst->version->table_file,
-				   a_minst->version->table_dir,
-				   a_minst->version->ups_dir,
-				   a_minst->version->prod_dir,
-				   a_db_info, need_unique,
+    num_matches = match_from_table(a_inst->product, a_inst->table_file,
+				   a_inst->table_dir, a_inst->ups_dir,
+				   a_inst->prod_dir, a_db_info, need_unique,
 				   &flavor_list, &quals_list, &minst_list);
     if (num_matches > 0) {
       minst = (t_upstyp_matched_instance *)minst_list->data;
