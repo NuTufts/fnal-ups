@@ -40,7 +40,7 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : test_ups_error test_ups_list test_ups_memory test_ups_utils ups_test
+all : test_ups_error test_ups_list test_ups_memory test_ups_utils ups_test test_upsugo
 
 #
 # Main programs.
@@ -70,6 +70,8 @@ ups_t_cmdline.o : ups_t_cmdline.c
 ups_t_cmdloop.o : ups_t_cmdloop.c
 	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
 
+test_upsugo: test_upsugo.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 #
 # Now standard targets
 #
@@ -78,6 +80,7 @@ clean :
 	@ rm -f test_ups_error test_ups_memory
 	@ rm -f test_ups_list test_ups_utils 
 	@ rm -f ups_test libups_test.a
+	@ rm -f test_upsugo
 
 install :
 	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
