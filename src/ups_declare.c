@@ -49,6 +49,8 @@ extern t_cmd_info g_cmd_info[];
 #define VERSION "version"
 #define DECLARE "declare"
 
+static char buf[MAX_LINE_LEN];
+
 /*
  * Definition of public functions.
  */
@@ -403,6 +405,21 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       new_vinst->table_dir=upsutl_str_create(save_table_dir,' ');
       new_vinst->table_file=upsutl_str_create(save_table_file,' ');
       new_vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' ');
+      /* if no ups dir was entered on the command line, then check if 
+	 PROD_DIR/ups exists. if it does, then set this = to ups. EFB */
+      if ((! new_vinst->ups_dir) && new_vinst->prod_dir) {
+	if (db_info && db_info->config && db_info->config->prod_dir_prefix
+	    && UPSRELATIVE(new_vinst->prod_dir)) {
+	  sprintf(buf,"%s/%s/ups", db_info->config->prod_dir_prefix,
+		  new_vinst->prod_dir);
+        } else {
+	  sprintf(buf,"%s/ups", new_vinst->prod_dir);
+        }
+	if (upsutl_is_a_file(buf) == UPS_SUCCESS) {
+	  /* the file existed */
+	  new_vinst->ups_dir=upsutl_str_create("ups",' ');
+	}
+      }
       new_vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
       new_vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
       new_vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
