@@ -1,5 +1,4 @@
 /****************************** Copyright Notice ******************************
-/*									
  *                                                                            *
  * Copyright (c) 1991 Universities Research Association, Inc.                 *
  *               All Rights Reserved.                                         *
@@ -9,7 +8,7 @@
 **                                                                           
 ** DESCRIPTION
 **
-**	ups ugo utils (ups get opts) 
+**	ups ugo (ups get opts) 
 **           upsugo_getarg
 **                                                                           
 ** DEVELOPERS                                                                
@@ -42,23 +41,129 @@
 */
 #include <sys/utsname.h>
 
-#include "../inc/ups_types.h"
+#include "ups_types.h"
 
 #ifdef UPS_ID
-	char	UPS_UGO_ID[] = "@(#)upsugo_utils.c	1.00";
+	char	UPS_UGO_ID[] = "@(#)upsugo.c	1.00";
 #endif
-
+/*
 #define FREE( X )	{			\
 			free( X );		\
 			X = 0;		\
 			}
 
+*/
 	int	errflg = 0;
+/* ===========================================================================
+** ROUTINE	upsugo_getarg( int argc, char * argv[])
+**
+** DESCRIPTION
+**	Ups_ugo_getarg replaces getopt. It will always return
+**	the next argument/option from the argc and argv pointers.
+**	It does not modify either of its arguments.
+**
+** Returns
+**	Ups_ugo_getarg returns either of the following:
+**
+**	The pointer to the next argument, or
+**	0 if no more arguments exist.
+** ==========================================================================
+*/
 
-char    *       upsugo_getarg          (int, char **, char **);
+char * upsugo_getarg(argc, argv, argbuf)
+int argc;
+char *  argv[];
+char ** argbuf;
+{
 
-/* Utils */
-static char             *str_create( char *str );
+    static int 	argindx;
+    static int	arg_end;
+    static char **   argpt = 0;
+    static char * buff = 0;
+    char * c;
+    char d[3];
+
+    if( argc < 2 )
+	{
+	argpt = 0;
+	argindx = 0;
+	return  0;
+	}
+
+    if( argv == 0 )
+	{
+	argpt = 0;
+	argindx = 0;
+	return 0;
+	}
+
+
+    if( argv != argpt)
+	{
+	if( buff )
+	    upsmem_free(buff);
+	argpt = argv;
+	argindx = 0;
+	arg_end = 0;
+	}
+
+    if( (*argbuf == 0) && (buff != 0))
+	upsmem_free(buff);
+
+    if( argv[argindx] == 0 )
+	{
+	++arg_end;
+	return  0;
+	}
+
+    if(*argbuf == 0)
+	{
+
+	if( ++argindx < argc )
+	    {
+	    if((*argv[argindx] == '-') && (strlen(argv[argindx]) >2))
+		{
+		buff = (char *) upsmem_malloc(strlen(argv[argindx] +1));
+		strcpy(buff, argv[argindx]);
+		*argbuf = buff + 2;
+		}
+	    return argv[argindx];
+	    }
+
+	return  0;
+    	}	
+/* else if argbuf != 0
+   ---------------------- */
+
+	d[0] = '-';
+	d[1] = **argbuf;
+	d[2] = '\0';
+	c = *argbuf;
+	*argbuf = c+1;
+	if(**argbuf == '\0')
+	    {
+	    upsmem_free(buff);
+	    *argbuf = 0;
+	    }
+	return &d[0];
+
+}
+
+/*
+ * Utils
+ */
+
+char *str_create( char *str )
+{
+  char *new_str = NULL;
+    
+  if ( str ) {
+    new_str = (char *)upsmem_malloc( strlen( str ) + 1 );
+    strcpy( new_str, str );
+  }
+  
+  return new_str;
+}
 
 /* ==========================================================================
 **                                                                           
@@ -72,7 +177,7 @@ static char             *str_create( char *str );
 **                                                                           
 ** ==========================================================================
 */                                                                           
-struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
+t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 {
 
    char   *arg_str;
@@ -80,8 +185,6 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    char   * addr;
    char   * loc;
    
-
-   int         argnum = 0;
 
    char   **argbuf;		/* String to hold residual argv stuff*/
 				/* returned by upsugo_getarg */
@@ -92,7 +195,7 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
     -------------------------------- */
    struct ups_command * uc;
    t_upslst_item *my_qualifiers;
-   uc=(struct ups_command *)malloc( sizeof(struct ups_command));
+   uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
    my_qualifiers=0;
    uc->ugo_product = 0;
    uc->ugo_version = 0;
@@ -156,7 +259,7 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 	uc->ugo_db = 0; 
 	uc->ugo_chain = 0; 
 
-   argbuf = (char **)malloc(sizeof(char *)+1);
+   argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
 
    while ((arg_str= upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)
@@ -609,124 +712,3 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 */
    return uc;
 }
-/* ===========================================================================
-** ROUTINE	upsugo_getarg( int argc, char * argv[])
-**
-** DESCRIPTION
-**	Ups_ugo_getarg replaces getopt. It will always return
-**	the next argument/option from the argc and argv pointers.
-**	It does not modify either of its arguments.
-**
-** Returns
-**	Ups_ugo_getarg returns either of the following:
-**
-**	The pointer to the next argument, or
-**	0 if no more arguments exist.
-** ==========================================================================
-*/
-
-char * upsugo_getarg( argc, argv, argbuf )
-
-int argc;
-char *  argv[];
-char ** argbuf;
-
-{
-
-    static int 	argindx;
-    static int	arg_end;
-    static char **   argpt = 0;
-    static char * buff = 0;
-    char * c;
-    char d[3];
-
-    if( argc < 2 )
-	{
-	argpt = 0;
-	argindx = 0;
-	return  0;
-	}
-
-    if( argv == 0 )
-	{
-	argpt = 0;
-	argindx = 0;
-	return 0;
-	}
-
-
-    if( argv != argpt)
-	{
-	if( buff )
-	    FREE(buff);
-	argpt = argv;
-	argindx = 0;
-	arg_end = 0;
-	}
-
-    if( (*argbuf == 0) && (buff != 0))
-	FREE(buff);
-
-    if( argv[argindx] == 0 )
-	{
-	++arg_end;
-	return  0;
-	}
-
-    if(*argbuf == 0)
-	{
-
-	if( ++argindx < argc )
-	    {
-	    if((*argv[argindx] == '-') && (strlen(argv[argindx]) >2))
-		{
-		buff = (char *) malloc(strlen(argv[argindx] +1));
-		strcpy(buff, argv[argindx]);
-		*argbuf = buff + 2;
-		}
-	    return argv[argindx];
-	    }
-
-	return  0;
-    	}	
-/* else if argbuf != 0
-   ---------------------- */
-
-	d[0] = '-';
-	d[1] = **argbuf;
-	d[2] = '\0';
-	c = *argbuf;
-	*argbuf = c+1;
-	if(**argbuf == '\0')
-	    {
-	    FREE(buff);
-	    *argbuf = 0;
-	    }
-	return &d[0];
-
-}
-/* =========================================================================
-** Dis-allow wildcarding
-** ========================================================================
-if((strchr(ugo_product,'*')!=0)||(strchr(ugo_version,'*')!= 0))
-	{
-          fprintf( stderr, "ups: Error - Wildcarding is not allowed !!\n");
-        }
-*/
-
-/*
- * Utils
- */
-
-char *str_create( char *str )
-{
-  char *new_str = NULL;
-    
-  if ( str ) {
-    new_str = (char *)malloc( strlen( str ) + 1 );
-    strcpy( new_str, str );
-  }
-  
-  return new_str;
-}
-
