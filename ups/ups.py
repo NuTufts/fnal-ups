@@ -13,40 +13,66 @@ else:
 # User interface:
 #  import ups
 #  optional:
-#       ups.getUps( [setupsDir=/path/to/setups.sh], ['pythonVersion'='python instance'] )
+#       ups.getUps( [setupsDir=/path/to/setups.sh] )
 #  
-#  ups.setup('my project spec')
+#  ups.setup('my project spec' [, setupsDir=/path/to/setups.sh])
+#############################################################
+# returns the address of a singleton upsManager object:
+
+singletonUps = None
+def getUps(setupsDir=DEFAULT_SETUPS_DIR):
+    global singletonUps
+    if ( singletonUps is None ):
+        singletonUps = upsManager(setupsDir)
+    return singletonUps
+
+def setup(arg, setupsDir=DEFAULT_SETUPS_DIR):
+    upsmgr = getUps()
+    upsmgr.setup(arg)
+
 #############################################################
 
 def set_setupsDir(setupsDir=DEFAULT_SETUPS_DIR):
     global DEFAULT_SETUPS_DIR
     DEFAULT_SETUPS_DIR = setupsDir
-
-def set_pyVersion(pythonVersion=DEFAULT_PYTHON_VERSION):
-    global DEFAULT_PYTHON_VERSION
-    DEFAULT_PYTHON_VERSION = pythonVersion
-    
 #############################################################
-# returns the address of a singleton upsManager object:
 
-singletonUps = None
-def getUps(setupsDir=DEFAULT_SETUPS_DIR, pythonVersion=DEFAULT_PYTHON_VERSION):
-    global singletonUps
-    if ( singletonUps is None ):
-        singletonUps = upsManager(setupsDir, pythonVersion)
-    return singletonUps
+# force a reload and exec of the requested version of
+# python:
+def use_python(pythonVersion=DEFAULT_PYTHON_VERSION):
+    if ( pythonVersion != DEFAULT_PYTHON_VERSION ):
+        vm = '.*'
+    else:
+        vm = pythonVersion
 
-def setup(arg, setupsDir=DEFAULT_SETUPS_DIR, pythonVersion=DEFAULT_PYTHON_VERSION):
-    upsmgr = getUps()
-    upsmgr.setup(arg)
+    obj = getUps()
 
-##############################################################
+    # are we already using the requested version?
+    alreadyUsing = ( os.environ.has_key('SETUP_PYTHON') and
+                     re.search('python ' + pythonVersion, os.environ['SETUP_PYTHON']) != None )
+
+    if ( not alreadyUsing ):
+        if os.environ.has_key('SETUP_PYTHON'):
+            obj._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups unsetup python')
+        obj._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups setup python ' + pythonVersion)
+
+        # were we running the python interpreter itself?  Special handling required!
+        if ( sys.argv == [''] ):
+            sys.argv = [ os.environ['PYTHON_DIR'] + '/bin/python' ]
+        else:
+            sys.argv.insert(0, os.environ['PYTHON_DIR'] + '/bin/python')
+
+        # bye bye, exec into another context:
+        os.execve( os.environ['PYTHON_DIR']+'/bin/python', sys.argv, os.environ )
+
+##############################################################################
+
 class upsException(Exception):
     def __init__(self, msg):
         self.args = msg
     
 class upsManager:
-    def __init__(self, setupsDir=DEFAULT_SETUPS_DIR, pythonVersion=DEFAULT_PYTHON_VERSION):
+    def __init__(self, setupsDir=DEFAULT_SETUPS_DIR):
 
         # initial setup of ups itself:
         os.environ['UPS_SHELL'] = 'sh'
@@ -56,10 +82,6 @@ class upsManager:
                       'echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"$SETUP_UPS\\"')
 	exec f.read()
 	f.close()
-
-        # do we need a specific python version?  (If not specified, assume we don't).
-        if ( pythonVersion != DEFAULT_PYTHON_VERSION ):
-            self._use_python(pythonVersion)
 
         # we need to initialize the following so that we can
         #  make the correct changes to sys.path later when products
@@ -92,24 +114,6 @@ class upsManager:
     ############################################################################ 
     # PRIVATE METHODS BELOW THIS POINT.
     #
-    def _use_python(self,v):
-	if ( v == "" ):
-	    vm = '.*';
-	else:
-	    vm = v;
-
-	if ( not os.environ.has_key('SETUP_PYTHON') or None == re.search('python '+vm,os.environ.get('SETUP_PYTHON',''))):
-	    if os.environ.has_key('SETUP_PYTHON'):
-		self._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups unsetup python')
-            self._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups setup python ' + v)
-
-            # were we running the python interpreter itself?  Special handling required!
-            if ( sys.argv == [''] ):
-                sys.argv = [ os.environ['PYTHON_DIR'] + '/bin/python' ]
-            else:
-                sys.argv.insert(0, os.environ['PYTHON_DIR'] + '/bin/python')
-	    os.execve( os.environ['PYTHON_DIR']+'/bin/python', sys.argv, os.environ )
-    ##############################################################################
     def _getInitialSyspathElements(self):
         pyPath = string.split(self._pythonPath, ':')
         sysPath = self._sysPath
