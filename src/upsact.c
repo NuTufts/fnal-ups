@@ -84,7 +84,7 @@ int g_COMPILE_FLAG = 0;
 #define OLD_FLAG "OLD"
 #define CATMANPAGES "catman"
 #define MANPAGES "man"
-
+#define DROPIT "$UPS_DIR/bin/dropit"
 /*
  * Private types
  */
@@ -2852,17 +2852,17 @@ static void f_envremove( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		"upstmp=\"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
-		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
-		  whats_left, a_cmd->argv[0]) < 0) {
+		  "%s=\"`%s -p \"$%s\" -i'%s' -d'%s' %s`\";\n#\n", 
+		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter,
+		  delimiter, a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-	     "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s \"$upstmp\"\nunsetenv upstmp\n#\n",
-		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
-		  whats_left, a_cmd->argv[0]) < 0) {
+		 "setenv %s \"`%s -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\n#\n",
+		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter, delimiter,
+		  a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -3250,8 +3250,8 @@ static void f_pathremove( ACTION_PARAMS)
       GET_WHATS_LEFT();
 
       if (fprintf((FILE *)a_stream,
-	        "upstmp=\"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
-		  pathPtr, delimiter, delimiter, a_cmd->argv[1], whats_left, 
+	        "upstmp=\"`%s -S -p \"$%s\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		  DROPIT, pathPtr, delimiter, delimiter, a_cmd->argv[1],
 		  pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
@@ -3260,8 +3260,8 @@ static void f_pathremove( ACTION_PARAMS)
       CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
       GET_WHATS_LEFT()
       if (fprintf((FILE *)a_stream,
-          "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=($upstmp)\nrehash\nunsetenv upstmp\n#\n",
-		  pathPtr, delimiter, delimiter, a_cmd->argv[1], whats_left,
+          "setenv upstmp \"`%s -S -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"\") set %s=($upstmp)\nrehash\nunsetenv upstmp\n#\n",
+		  DROPIT, pathPtr, delimiter, delimiter, a_cmd->argv[1],
 		  pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
