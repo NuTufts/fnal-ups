@@ -21,7 +21,7 @@ Include files:-
    ==========================================================================*/
 
 
-int upstst_command(int argc, char ** const argv, const void * const myfunc(),const char * const funcname, const int calledby)
+int upstst_command(int argc, char ** const argv, const void * myfunc(),const char * const funcname, const int calledby)
 {
 static char	*f_stdout;			/* filename to output */
 static char     *f_stdout_diff;			/* file to diff */
