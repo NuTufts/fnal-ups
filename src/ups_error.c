@@ -95,7 +95,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_MEMORY         14 */ "UPS_NO_MEMORY",
    /* UPS_LINE_TOO_LONG     15 */ "UPS_LINE_TOO_LONG",
    /* UPS_UNKNOWN_FILETYPE  16 */ "UPS_UNKNOWN_FILETYPE",
-   /* UPS_NERR              17 */ "UPS_NERR",
+   /* UPS_NOVALUE_ARGUMENT  17 */ "UPS_NOVALUE_ARGUMENT",
+   /* UPS_NERR              18 */ "UPS_NERR",
    0 };
 
 /*
