@@ -37,14 +37,14 @@ CFLAGScia = $(INCDIRS)
 
 OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 	  upsfil.o upsugo.o upsmat.o upskey.o upshlp.o \
-	  upsver.o upstra.o
+	  upsver.o upsget.o
 
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_unk.o
 
 CIAOBJECTS = upserr.a upslst.a upsmem.a upsutl.a upstyp.a \
 	     upsfil.a upsugo.a upsmat.a ups_list.a  \
 	     upskey.a upshlp.a ups_unk.a ups_setup.a \
-             upsver.a upstra.a
+             upsver.a upsget.a
 
 LDFLAGS = $(LLIBS)
 
