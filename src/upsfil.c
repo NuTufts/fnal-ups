@@ -43,41 +43,46 @@
  */
 
 /*
+ * Definition of public variables.
+ */
+extern int UPS_VERBOSE;
+
+/*
  * Declaration of private functions
  */
-static int            read_file( void );
-static int            read_file_type( void );
-static int            read_file_desc( void );
+static int               read_file( void );
+static int               read_file_type( void );
+static int               read_file_desc( void );
 static t_upstyp_instance *read_instance( void );
-static t_upslst_item  *read_instances( void );
+static t_upslst_item     *read_instances( void );
 static t_upstyp_action   *read_action( void );
-static t_upslst_item  *read_actions( void );
+static t_upslst_item     *read_actions( void );
 static t_upstyp_config   *read_config( void );
-static t_upslst_item  *read_group( void );
-static t_upslst_item  *read_groups( void );
-static t_upslst_item  *read_comments( void );
+static t_upslst_item     *read_group( void );
+static t_upslst_item     *read_groups( void );
+static t_upslst_item     *read_comments( void );
 
-static int            write_version_file( void );
-static int            write_chain_file( void );
-static int            write_table_file( void );
-static int            write_action( t_upstyp_action * const act );
-t_upslst_item         *find_group( t_upslst_item * const list_ptr, const char copt );
+static int               write_version_file( void );
+static int               write_chain_file( void );
+static int               write_table_file( void );
+static int               write_action( t_upstyp_action * const act );
+t_upslst_item            *find_group( t_upslst_item * const list_ptr, const char copt );
 
 /* Line parsing */
-static int            get_key( void );
-static int            next_key( void );
-static int            is_stop_key( void );
-static int            is_start_key( void );
-static int            put_key( const char * const key, const char * const val );
+static int               get_key( void );
+static int               next_key( void );
+static int               is_stop_key( void );
+static int               is_start_key( void );
+static int               put_key( const char * const key, const char * const val );
 
 /* Utils */
-static int            trim_qualifiers( char * const str );
-static int            cfilei( void );
-t_upslst_item         *copy_action_list( t_upslst_item * const list_ptr );
+static int               trim_qualifiers( char * const str );
+static int               cfilei( void );
+t_upslst_item            *copy_action_list( t_upslst_item * const list_ptr );
 
 /* Print stuff */
-static void           print_instance( t_upstyp_instance * const inst_ptr );
-static void           print_action( t_upstyp_action * const act_ptr );
+static void              print_instance( t_upstyp_instance * const inst_ptr );
+static void              print_action( t_upstyp_action * const act_ptr );
 /* print_product has gone semi public */
 
 /*
@@ -106,11 +111,20 @@ static int               g_ifile = e_file_unknown;   /* current file type as enu
 
 static int               g_imargin = 0;
 static const char        *g_filename = 0;
+static int               g_item_count = 0;
+static int               g_line_count = 0;
 
-static t_upstbl g_ft = 0;
-static int g_call_cache_count = 0;
-static int g_call_count = 0;
+static int               g_use_cache = 1;            /* turn on/off use of cache */
+static t_upstbl          g_ft = 0;                   /* pointer to file cache */
+static int               g_call_cache_count = 0;     /* # times cache is used */
+static int               g_call_count = 0;           /* # times read_file is called */
 
+
+#define P_VERB_s( str ) \
+  if ( UPS_VERBOSE ) printf("UPSFIL: %s - %s\n", g_filename, (str))
+  
+#define P_VERB_s_i_s( str1, num, str2 ) \
+  if ( UPS_VERBOSE ) printf("UPSFIL: %s - %s %d %s\n", g_filename, (str1), (num), (str2))
 
 /*
  * Definition of public functions
@@ -127,34 +141,41 @@ static int g_call_count = 0;
  */
 t_upstyp_product *upsfil_read_file( const char * const ups_file )
 {
-  const char *key;
-
-  if ( !g_ft )
-    g_ft = upstbl_new( 300 );
+  const char *key = 0;
 
   UPS_ERROR = UPS_SUCCESS;
   g_filename = ups_file;
+  g_item_count = 0;
+  g_line_count = 0;
 
   if ( !ups_file || strlen( ups_file ) <= 0 ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
     return 0;
   }
 
-  key = upstbl_atom_string( ups_file );
-  g_pd = upstbl_get( g_ft, key );
-
-  /* product was in table */
-
   g_call_count++;
-  if ( g_pd ) {
-    g_call_cache_count++;
-    return g_pd;
+
+  if ( g_use_cache ) {
+    if ( !g_ft )
+      g_ft = upstbl_new( 300 );
+
+    key = upstbl_atom_string( ups_file );
+    g_pd = upstbl_get( g_ft, key );
+
+    /* check if product is in cache */
+
+    if ( g_pd ) {
+      g_call_cache_count++;
+      P_VERB_s( "Reading from cache" );
+      return g_pd;
+    }
   }
 
-  /* product was not in table */
+  /* product is not in cache */
 
   g_fh = fopen ( ups_file, "r" );
   if ( ! g_fh ) {
+    P_VERB_s( "Open file for read ERROR" );
     upserr_vplace();
     upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
     if (errno == ENOENT)
@@ -163,16 +184,19 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
       upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return 0;
   }
+  P_VERB_s( "Open file for read" );
   
   g_pd = ups_new_product();
   if ( g_pd ) {       
     if ( !read_file() ) {
       
-      /* file was empty */      
+      /* file was empty */
+
       upserr_vplace(); upserr_add( UPS_READ_FILE, UPS_WARNING, ups_file );
       
       ups_free_product( g_pd );
       g_pd = 0;
+      g_item_count = 0;
     }
   }
   
@@ -180,8 +204,13 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
   /* add product to table */
 
-  if ( g_pd )
+  if ( g_ft && g_pd )
     upstbl_put( g_ft, key, g_pd );
+
+  P_VERB_s_i_s( "Read", g_item_count, "item(s)" );
+
+  g_fh = 0;
+  g_filename = 0;
 
   return g_pd;
 }
@@ -201,6 +230,8 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 {
   t_upslst_item *l_ptr = 0;
   g_filename = ups_file;
+  g_item_count = 0;
+  g_line_count = 0;
   
   if ( ! prod_ptr ) {
     upserr_vplace(); upserr_add( UPS_NOVALUE_ARGUMENT, UPS_FATAL, "0",
@@ -216,10 +247,12 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   
   g_fh = fopen ( ups_file, "w" );
   if ( ! g_fh ) {
+    P_VERB_s( "Open file for write ERROR" );
     upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return UPS_OPEN_FILE;
   }    
+  P_VERB_s( "Open file for write" );
 
   g_imargin = 0;
   
@@ -238,6 +271,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   cfilei();
 
   if ( g_ifile == e_file_unknown ) {
+    P_VERB_s( "Unknown file type for writing" );
     upserr_vplace();
     upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, g_pd->file ? g_pd->file : "(null)" );
     return UPS_UNKNOWN_FILETYPE;
@@ -248,14 +282,17 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   switch ( g_ifile ) {
 
   case e_file_version:
+    P_VERB_s( "Writing version file" );
     write_version_file();
     break;
 	
   case e_file_table:
+    P_VERB_s( "Writing table file" );
     write_table_file();
     break;
 	
   case e_file_chain:
+    P_VERB_s( "Writing chain file" );
     write_chain_file();
     break;
   }
@@ -263,17 +300,42 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   
   fclose( g_fh );
 
+  P_VERB_s_i_s( "Write", g_item_count, "item(s)" );
+
+  g_fh = 0;
+  g_filename = 0;
+
   return UPS_SUCCESS;
 }
-     
+
+void free_product( const void *key, void **prod, void *cl ) 
+{
+  ups_free_product( *prod );
+}     
 void upsfil_flush( void )
 {
-  /*
-  printf( "total calls = %d, cache calls = %d\n", g_call_count, g_call_cache_count );
-  upstbl_dump( g_ft );
-  */
+  upsfil_stat( 1 );
+
+  /* clean up cache */
+
+  if ( g_ft ) {
+    P_VERB_s( "Flushing cache" );
+    upstbl_map( g_ft, free_product, NULL );
+    upstbl_free( &g_ft );
+    g_ft = 0;
+  }
 }
 
+void upsfil_stat( const int iopt )
+{
+  /* print some statistic og the file cache */
+
+  printf( "total calls = %d, cache calls = %d (%.1f%%)\n", 
+	  g_call_count, g_call_cache_count, 
+	  g_call_count ? 100.0*(double)(g_call_cache_count)/g_call_count : 0 );
+
+  upstbl_dump( g_ft, iopt );
+}
 
 /*
  * Definition of private functions
@@ -300,6 +362,7 @@ int write_version_file( void )
       return 0;
     }
 
+    g_item_count++;
     put_key( 0, "" );
     put_key( 0, SEPARATION_LINE );
     put_key( "FLAVOR", inst_ptr->flavor );    
@@ -343,7 +406,7 @@ int write_chain_file( void )
       return 0;
     }
 
-
+    g_item_count++;
     put_key( 0, "" );
     put_key( 0, SEPARATION_LINE );
     put_key( "FLAVOR", inst_ptr->flavor );
@@ -416,6 +479,7 @@ int write_table_file( void )
       return 0;
     }
 
+    g_item_count++;
     put_key( 0, SEPARATION_LINE );
     put_key( "FLAVOR", inst_ptr->flavor );
     put_key( "QUALIFIERS", inst_ptr->qualifiers );
@@ -624,7 +688,7 @@ t_upslst_item *read_instances( void )
 	else
 	  break;
     }
-
+    
     return upslst_first( l_ptr );
 }
   
@@ -642,7 +706,7 @@ t_upstyp_instance *read_instance( void )
   t_upstyp_instance *inst_ptr = 0;
   
   if ( g_ikey != e_key_flavor )
-    return 0;    
+    return 0;
 
   inst_ptr = ups_new_instance();
 
@@ -696,6 +760,9 @@ t_upstyp_instance *read_instance( void )
     }
 
   }
+
+  if ( inst_ptr ) 
+    g_item_count++;
 
   return inst_ptr;
 }
@@ -778,6 +845,7 @@ t_upstyp_action *read_action( void )
  */
 t_upstyp_config *read_config( void )
 {
+  int didit = 0;
   t_upstyp_config *conf_ptr = ups_new_config();
 
   while ( next_key() != e_key_eof ) {
@@ -785,12 +853,16 @@ t_upstyp_config *read_config( void )
     if ( g_ikey == e_key_statistics ) {
       upsutl_str_remove( g_val, CHAR_REMOVE );  
       upsutl_str_sort( g_val, ':' );
+      didit = 1;
     }
       
-    if ( g_mkey && g_mkey->c_index != INVALID_INDEX ) 
+    if ( g_mkey && g_mkey->c_index != INVALID_INDEX ) {
       UPSKEY_CONF2ARR( conf_ptr )[g_mkey->c_index] = upsutl_str_create( g_val, ' ' );
+      didit = 1;
+    }
   }
 
+  g_item_count += didit;
   fclose( g_fh );  
   return conf_ptr;
 }
@@ -902,9 +974,16 @@ int next_key( void )
   g_ikey = e_key_eof;
 
   while ( fgets( g_line, MAX_LINE_LEN, g_fh ) ) {
+    g_line_count++;
 
     if ( strlen( g_line ) < 1 ) continue;
     if ( g_line[0] == '#' ) continue;
+
+    if ( UPS_VERBOSE > 2 ) {
+      /* you asked for it */
+      printf( "UPSFIL: %s - reading line %d: %s", g_filename, g_line_count, g_line );
+    }    
+  
     if ( !upsutl_str_remove_edges( g_line, CHAR_REMOVE ) ) continue;
 
     if ( get_key() != e_key_eol ) {
@@ -929,16 +1008,23 @@ int get_key( void )
 {
   char *cp = g_line;
   int count = 0;
+  int has_val = 1;
 
   /* check if line is not empty (again) */
   
-  if ( strlen( g_line ) < 1 ) return e_key_eol;
-  if ( g_line[0] == '#' ) return e_key_eol;
+  if ( strlen( g_line ) < 1 || g_line[0] == '#' ) {
+    if ( UPS_VERBOSE > 2 ) {
+      /* you asked for it */
+      printf( "UPSFIL: %s - parsed line  %d: \n", g_filename, g_line_count );
+    }
+    return e_key_eol;
+  }
     
   /* check if line has a key/value pair */
   
   if ( !strchr( g_line, '=' ) ) {
     strcpy( g_key, g_line );
+    has_val = 0;
   }
 
   /* split line into key/value pair */
@@ -950,7 +1036,13 @@ int get_key( void )
       count++; cp++;
     }
     g_key[count] = 0;
-    if ( strlen( g_key ) <= 0 ) return e_key_eol;
+    if ( strlen( g_key ) <= 0 ) {
+      if ( UPS_VERBOSE > 2 ) {
+	/* you asked for it */
+	printf( "UPSFIL: %s - parsed line  %d: \n", g_filename, g_line_count );
+      }
+      return e_key_eol;
+    }
   
     while( cp && *cp && *cp != '=' ) { cp++; }
     cp++;
@@ -968,7 +1060,17 @@ int get_key( void )
     g_ikey = g_mkey->ikey;
   else
     g_ikey = e_key_unknown;
-  
+
+  if ( UPS_VERBOSE > 2 ) {
+    /* you asked for it */
+    if ( has_val )
+      printf( "UPSFIL: %s - parsed line  %d: %s=%s\n", 
+	      g_filename, g_line_count, g_key, g_val );
+    else 
+      printf( "UPSFIL: %s - parsed line  %d: %s\n", 
+	      g_filename, g_line_count, g_key );
+  }
+
   return g_ikey;
 }
 
