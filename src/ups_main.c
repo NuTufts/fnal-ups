@@ -31,6 +31,7 @@
 #include "upstyp.h"
 #include "ups_setup.h"
 #include "ups_start.h"
+#include "ups_stop.h"
 #include "ups_list.h"
 #include "ups_unk.h"
 #include "upserr.h"
@@ -153,7 +154,7 @@ int main(int argc, char *argv[])
 	  break;
 	case e_start: ups_start(command_line, temp_file, e_start);
 	  break;
-	case e_stop: ups_unk(command_line, argv[1], e_stop);
+	case e_stop: ups_stop(command_line, temp_file, e_stop);
 	  break;
 	case e_tailor: ups_unk(command_line, argv[1], e_tailor);
 	  break;
