@@ -37,9 +37,9 @@ DISTRIBUTIONFILE="$(DIR)/../$(FLAVOR).tar"
 
 # for Flavored products
           FLAVOR=$(OS)$(CUST)$(QUALS)
-              OS=`funame -s`
+              OS=`uname -s | sed -e 's/IRIX64/IRIX/'`
            QUALS=
-            CUST=+`funame -r | sed -e 's|\..*||'`
+            CUST=+`uname -r | sed -e 's|\..*||'`
 
 #------------------------------------------------------------------
 # Files to include in Distribution
