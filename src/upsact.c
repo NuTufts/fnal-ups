@@ -366,6 +366,8 @@ t_cmd_info g_cmd_info[] = {
  * array MUST appear in the same order as in the above enumeration. NOTE:
  * the 4th and 5th parameters are the minimum and maximum parameters expected
  * by the action. The six parameter is the corresponding 'undo' command.
+ *
+ * name, enum, command_handler, min argc, max argc, enum of opposite
  */
 t_cmd_map g_cmd_maps[] = {
   { "setupoptional", e_setupoptional, NULL, 1, 1, e_unsetupoptional },
@@ -1151,13 +1153,19 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
   i_act = upsact_action2enum( act_name );
 
-  if ( copt != 'd' && !p_act_itm->act ) {
-
-    /* if we don't have an action, take care of defaults cases, controlled by: 
-       g_cmd_info.flags, g_cmd_info.uncmd_index and g_cmd_maps.icmd_undo */
-
-    if ( !(p_act_itm->act = new_default_action( p_act_itm, act_name, i_act )) )
+  if ( !p_act_itm->act ) {
+    if ( copt == 'd' ) {
+      
       return dep_list;
+    }
+    else {
+      
+      /* if we don't have an action, take care of defaults cases, controlled by: 
+	 g_cmd_info.flags, g_cmd_info.uncmd_index and g_cmd_maps.icmd_undo */
+
+      if ( !(p_act_itm->act = new_default_action( p_act_itm, act_name, i_act )) )
+	return dep_list;
+    }
   }
   
   l_cmd = p_act_itm->act->command_list;
