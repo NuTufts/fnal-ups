@@ -292,7 +292,7 @@ t_upslst_item *upslst_copy( t_upslst_item * const list_ptr )
   
   l_ptr = upslst_first( list_ptr );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
-    l_new = upslst_insert( l_new, l_ptr->data );
+    l_new = upslst_add( l_new, l_ptr->data );
   }
 
   return upslst_first( l_new );

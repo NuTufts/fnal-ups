@@ -57,8 +57,10 @@ typedef struct ups_product
   char             *file;
   char             *product;
   char             *chaver;
+  char             *ups_db_version;
   
   t_upslst_item    *instance_list;
+  t_upslst_item    *comment_list;
 } t_ups_product;
 
 /* a product instance */
@@ -82,12 +84,14 @@ typedef struct ups_instance
   char             *archive_file;
   char             *authorized_nodes;
   char             *description;  
+  char             *statistics;
+  
+  char             *db_dir;  
+  
   t_upslst_item    *unknown_list;
 
   t_upslst_item    *action_list;
 
-  char             *db_dir;
-  
 } t_ups_instance;
 
 /* an action */

@@ -74,7 +74,7 @@ t_ups_product *ups_new_product( void )
 int ups_free_product( t_ups_product * const prod_ptr )
 {
   t_upslst_item *l_ptr;
-  void *inst_ptr;
+  t_ups_instance *inst_ptr;
 
   if ( !prod_ptr ) return 0;
 
@@ -82,6 +82,9 @@ int ups_free_product( t_ups_product * const prod_ptr )
     if ( prod_ptr->file ) { upsmem_free( prod_ptr->file ); }
     if ( prod_ptr->product ) { upsmem_free( prod_ptr->product); }
     if ( prod_ptr->chaver ) { upsmem_free( prod_ptr->chaver ); }
+    if ( prod_ptr->ups_db_version ) { upsmem_free( prod_ptr->ups_db_version ); }
+
+    /* get rid of instances */
     
     l_ptr = upslst_first( prod_ptr->instance_list );
     while( l_ptr ) {
@@ -89,6 +92,10 @@ int ups_free_product( t_ups_product * const prod_ptr )
       l_ptr = upslst_delete( l_ptr, inst_ptr, ' ' );
       ups_free_instance( inst_ptr );
     }
+
+    /* get rid of comments */
+
+    upslst_free( prod_ptr->comment_list, 'd' );
 
     upsmem_free( prod_ptr );
   }
@@ -149,8 +156,12 @@ int ups_free_instance( t_ups_instance * const inst_ptr )
     if ( inst_ptr->archive_file ) { upsmem_free( inst_ptr->archive_file ); }
     if ( inst_ptr->authorized_nodes ) { upsmem_free( inst_ptr->authorized_nodes ); }
     if ( inst_ptr->description ) { upsmem_free( inst_ptr->description ); }
+    
+    if ( inst_ptr->statistics ) { upsmem_free( inst_ptr->statistics ); }
+    
+    if ( inst_ptr->db_dir ) { upsmem_free( inst_ptr->db_dir ); }
   
-    if ( inst_ptr->unknown_list ) upslst_free( inst_ptr->unknown_list, 'd' );
+    if ( inst_ptr->unknown_list ) { upslst_free( inst_ptr->unknown_list, 'd' ); }
     
     l_ptr = upslst_first( inst_ptr->action_list );
     while( l_ptr ) {
@@ -214,10 +225,3 @@ int all_gone( const void * const ptr )
 {
   return ( upsmem_get_refctr( ptr ) <= 0 );
 }
-
-
-
-
-
-
-
