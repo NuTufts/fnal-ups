@@ -1,10 +1,9 @@
-/****************************** Copyright Notice ******************************
+/****************************Copyright Notice ******************************
  *                                                                            *
  * Copyright (c) 1991 Universities Research Association, Inc.                 *
  *               All Rights Reserved.                                         *
  *                                                                            *
  ******************************************************************************/
-/*static char           *str_create( char * const str ); */
 /* char    *       upsugo_getarg          (int , char *, char **); */
 /* ==========================================================================
 **                                                                           
@@ -38,14 +37,13 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <ctype.h>
-/*
-#include <sys/stat.h>
-*/
+#include <math.h>
 #include <sys/utsname.h>
 
 #include "ups_types.h"
 #include "ups_error.h"
 #include "ups_memory.h"
+#include "ups_utils.h"
 
 #ifdef UPS_ID
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	1.00";
@@ -58,22 +56,6 @@
    int	errflg = 0;
   t_upslst_item *ugo_commands = 0;
     int argindx;
-/*
- * Utils
- */
-
-char *str_create( char * const str )
-{
-  char *new_str = NULL;
-    
-  if ( str ) {
-/*    new_str = (char *)upsmem_malloc( (int) strlen( str ) + 1 ); */
-    new_str = (char *)upsmem_malloc( strlen( str ) + 1 );
-    strcpy( new_str, str );
-  }
-  
-  return new_str;
-}
 
 /* ===========================================================================
 ** ROUTINE	upsugo_bldfvr()
@@ -95,17 +77,17 @@ int upsugo_bldfvr(struct ups_command * uc)
    if ((strncmp(baseuname->sysname,"IRIX",4)) == 0)
    { (void) strcpy(baseuname->machine,"IRIX+");
      (void) strcat(baseuname->machine,baseuname->release);
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'.');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'+');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=str_create("NULL");
+     addr=upsutl_str_create("NULL",' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      return(0);
    }
@@ -122,17 +104,17 @@ int upsugo_bldfvr(struct ups_command * uc)
      *loc=0;				/* second dot not first */
      loc=strchr(baseuname->machine,'-');
      *loc='.';				/* return dot */
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'.');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'+');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=str_create("NULL");
+     addr=upsutl_str_create("NULL",' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      return(0);
    }
@@ -146,17 +128,17 @@ int upsugo_bldfvr(struct ups_command * uc)
      *loc=0;				/* second dot not first */
      loc=strchr(baseuname->machine,'-');
      *loc='.';				/* return dot */
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'.');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'+');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=str_create("NULL");
+     addr=upsutl_str_create("NULL",' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      return(0);
    }
@@ -166,17 +148,36 @@ int upsugo_bldfvr(struct ups_command * uc)
      (void) strcat(baseuname->machine,baseuname->version);
      (void) strcat(baseuname->machine,".");
      (void) strcat(baseuname->machine,baseuname->release);
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'.');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      loc=strchr(baseuname->machine,'+');
      *loc = 0;
-     addr=str_create(baseuname->machine);
+     addr=upsutl_str_create(baseuname->machine,' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=str_create("NULL");
+     addr=upsutl_str_create("NULL",' ');
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     return(0);
+   }
+/* Digital Equipment Corporation OSF1
+*/
+   if ((strncmp(baseuname->sysname,"OSF1",4)) == 0)
+   { (void) strcpy(baseuname->machine,"OSF1+");
+     (void) strcat(baseuname->machine,baseuname->release);
+     addr=upsutl_str_create(baseuname->machine,' ');
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'.');
+     *loc = 0;
+     addr=upsutl_str_create(baseuname->machine,' ');
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'+');
+     *loc = 0;
+     addr=upsutl_str_create(baseuname->machine,' ');
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     addr=upsutl_str_create("NULL",' ');
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      return(0);
    }
@@ -194,28 +195,157 @@ int upsugo_ifornota(struct ups_command * uc)
    char   * addr;
    if (uc->ugo_a)                   /* did the user specify -a */
    { if (!uc->ugo_chain)            /* If no chain all chains  */
-     { addr=str_create("*");
+     { addr=upsutl_str_create("*",' ');
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
      }
      if (!uc->ugo_qualifiers) 
-     { addr=str_create("*");
+     { addr=upsutl_str_create("*",' ');
        uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
-     if (!uc->ugo_version)          /* This will cause a slight memory */
-     { addr=str_create("*");        /* leak if version is specified    */
+     if (!uc->ugo_version)          /* unallocated if later specified */
+     { addr=upsutl_str_create("*",' ');  
        uc->ugo_version = addr;      /* at this point I may not know... */
      }
    } else {                         /* not -a but give defaults */
      if (!uc->ugo_chain)            /* If no chain current      */
-     { addr=str_create("current");
+     { addr=upsutl_str_create("current",' ');
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
      }
      if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
-     { addr=str_create("");
+     { addr=upsutl_str_create("",' ');
      uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
    }
    return(0);
+}
+/* ===========================================================================
+** ROUTINE	upsugo_bldqual()
+**
+*/
+int upsugo_bldqual(struct ups_command * uc, char * inaddr)
+{
+ char * addr;                          /* required qualifier string */
+ char * oaddr;                         /* optional qualifier string */
+ char * naddr;                         /* address for build red,opt */
+ int test;
+ char * waddr;                         /* work address string */
+ char * loc;
+ int onq=0;                            /* parsing a ? element */
+ int onc=0;                            /* parsing a , element */
+ int done=0;
+ int qcount=0;                         /* number of optional qualifiers */
+ int i,j,k;
+ int opinit=0;
+ char * optionals[10]; /* OH NO!! artifical limit of 10 optionals */
+
+ if ( strchr(inaddr,'?') == 0) {       /* no optional qualifiers */
+  addr=upsutl_str_create(inaddr,'p');
+  test=upsutl_str_sort(addr,',');
+  uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+ } else {
+  addr=upsutl_str_create(inaddr,'p');
+/* remove all ?qualifiers from required string */
+  waddr=addr;				/* work address */
+  while (*waddr)   
+  { if (*waddr==',')
+    { onq=0;
+    } else {
+      if (*waddr=='?'||onq)
+      { onq=1;
+        *waddr=' ';
+      }
+    }
+    ++waddr;
+  }
+  waddr=addr;
+  while (*waddr&&!done) 
+  { if (*waddr!=' '&&*waddr!=',')
+    { done=1;
+    } else { 
+      if (*waddr==',') 
+      { *waddr=' ';
+        done=1;
+      }
+    }
+    ++waddr;
+  }
+  waddr=upsutl_str_create(addr,'p');   /* new list trimed */
+  upsmem_free(addr);                   /* disgard work string */
+  addr=waddr;                          /* required string in addr */
+/* give it for the moment */
+/*  uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr); */
+/* remove all required from the optional string */
+  oaddr=upsutl_str_create(inaddr,'p');
+  onc=1;                               /* must assume first no spec is , */
+  waddr=oaddr;				/* work address */
+  while (*waddr)   
+  { if (*waddr=='?')
+    { onc=0;
+    } else {
+      if (*waddr==','||onc)
+      { onc=1;
+        *waddr=' ';
+      }
+    }
+    ++waddr;
+  }
+  waddr=oaddr;
+  done=0;
+  while (*waddr&&!done) 
+  { if (*waddr!=' '&&*waddr!='?')
+    { done=1;
+    } else { 
+      if (*waddr=='?') 
+      { *waddr=' ';
+        done=1;
+      }
+    }
+    ++waddr;
+  }
+/* now replace any ?'s left with ,'s */
+  while((loc=strchr(oaddr,'?'))!=0)
+  { *loc=','; }
+  waddr=upsutl_str_create(oaddr,'p');   /* new list trimed */
+  upsmem_free(oaddr);                   /* disgard work string */
+  oaddr=waddr;                          /* optional string in oaddr */
+/*  uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,oaddr); */
+/* This IS going to loose memory and the previous few steps might be
+** futile but I'm going in steps here...
+*/
+  test=upsutl_str_sort(oaddr,',');
+  optionals[0]=oaddr;
+  ++qcount;
+  waddr=oaddr;
+  while((loc=strchr(waddr,','))!=0)
+  { optionals[qcount]=loc+1;
+    ++qcount;
+    *loc=0;
+    waddr=loc+1;
+  }
+/*    for ( i=0; i < (1<<(qcount)); ++i)  */
+    for ( i=(1<<(qcount))-1; i >=0; --i) 
+    { opinit=0;
+      waddr=0;
+      for ( j=0; j < qcount; ++j)
+/*       {  if ( i & (1<<j) ) */
+         {  if ( i & (1<<(qcount-j-1)) )  /* eeek geeek code */
+          { 
+             if(!opinit)
+            { waddr=upsutl_str_create(optionals[j],' '); 
+              opinit=1;
+            } else { 
+              waddr=upsutl_str_crecat(waddr,","); 
+              waddr=upsutl_str_crecat(waddr,optionals[j]); 
+            }
+          }
+      }
+      naddr=upsutl_str_crecat(addr,",");
+      naddr=upsutl_str_crecat(naddr,waddr);
+      test=upsutl_str_sort(naddr,',');
+      uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
+    }
+ }
+ return(0);
 }
 /* ===========================================================================
 ** ROUTINE	upsugo_getarg( int argc, char * argv[])
@@ -488,27 +618,27 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               break;
          case 'c':
               uc->ugo_c = 1;
-              addr=str_create("current");
+              addr=upsutl_str_create("current",' ');
               uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
               break;
          case 'n':
               uc->ugo_n = 1;
-              addr=str_create("new");
+              addr=upsutl_str_create("new",' ');
               uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
               break;
          case 'd':
               uc->ugo_d = 1;
-              addr=str_create("development");
+              addr=upsutl_str_create("development",' ');
               uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
               break;
          case 't':
               uc->ugo_t = 1;
-              addr=str_create("test");
+              addr=upsutl_str_create("test",' ');
               uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
               break;
          case 'o':
               uc->ugo_o = 1;
-              addr=str_create("old");
+              addr=upsutl_str_create("old",' ');
               uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
               break;
          case 'g':
@@ -518,10 +648,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=str_create(addr);
+                  addr=upsutl_str_create(addr,'t');
                   uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                 }
-                addr=str_create(*argbuf);
+                addr=upsutl_str_create(*argbuf,'t');
                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                 *argbuf = 0;
                 break;
@@ -535,10 +665,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=str_create(addr);
+                    addr=upsutl_str_create(addr,'t');
 		    uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  }
-                    addr=str_create(addr);
+                    addr=upsutl_str_create(addr,'t');
                  uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  break;
                }
@@ -551,10 +681,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=str_create(addr);
+                  addr=upsutl_str_create(addr,'t');
                   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                 }
-                addr=str_create(*argbuf);
+                addr=upsutl_str_create(*argbuf,'t');
                 uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                 *argbuf = 0;
                 break;
@@ -568,10 +698,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=str_create(addr);
+                    addr=upsutl_str_create(addr,'t');
 		    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                  }
-                    addr=str_create(arg_str);
+                    addr=upsutl_str_create(arg_str,'t');
                  uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                  break;
                }
@@ -584,10 +714,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=str_create(addr);
+                  addr=upsutl_str_create(addr,'t');
                   uc->ugo_host = upslst_add(uc->ugo_host,addr);
                 }
-                addr=str_create(*argbuf);
+                addr=upsutl_str_create(*argbuf,'t');
                 uc->ugo_host = upslst_add(uc->ugo_host,addr);
                 *argbuf = 0;
                 break;
@@ -601,10 +731,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=str_create(addr);
+                    addr=upsutl_str_create(addr,'t');
 		    uc->ugo_host = upslst_add(uc->ugo_host,addr);
                  }
-                 addr=str_create(arg_str);
+                 addr=upsutl_str_create(arg_str,'t');
                  uc->ugo_host = upslst_add(uc->ugo_host,addr);
                  break;
                }
@@ -617,10 +747,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=str_create(addr);
+                  addr=upsutl_str_create(addr,'t');
                   uc->ugo_key = upslst_add(uc->ugo_key,addr);
                 }
-                addr=str_create(*argbuf);
+                addr=upsutl_str_create(*argbuf,'t');
                 uc->ugo_key = upslst_add(uc->ugo_key,addr);
                 *argbuf = 0;
                 break;
@@ -634,10 +764,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=str_create(addr);
+                    addr=upsutl_str_create(addr,'t');
 		    uc->ugo_key = upslst_add(uc->ugo_key,addr);
                  }
-                    addr=str_create(arg_str);
+                    addr=upsutl_str_create(arg_str,'t');
                  uc->ugo_key = upslst_add(uc->ugo_key,addr);
                  break;
                }
@@ -731,23 +861,27 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
          case 'q':
               uc->ugo_q = 1;
               if ( *argbuf ) 
-              { addr=str_create(*argbuf);
+              { test=upsugo_bldqual(uc,*argbuf); *argbuf=0; break; }
+/*
+              { addr=upsutl_str_create(*argbuf,'t');
                 my_qualifiers = upslst_add(my_qualifiers,addr);
-/* return something for now */
                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
                 *argbuf = 0;
                 break;
                }
+*/
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
                  { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" );
                    break;
                  }
-                    addr=str_create(arg_str);
+/*
+                 addr=upsutl_str_create(arg_str,'t');
                  my_qualifiers = upslst_add(my_qualifiers,addr);
-/* return something for now */
                  uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
                  break;
+*/
+                 test=upsugo_bldqual(uc,arg_str); break;
                }
                errflg = 1;
                break;
@@ -809,10 +943,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=str_create(addr);
+                  addr=upsutl_str_create(addr,'t');
                   uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                 }
-                addr=str_create(*argbuf);
+                addr=upsutl_str_create(*argbuf,'t');
                 uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                 *argbuf = 0;
                 break;
@@ -826,10 +960,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=str_create(addr);
+                    addr=upsutl_str_create(addr,'t');
 		    uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                  }
-                    addr=str_create(arg_str);
+                    addr=upsutl_str_create(arg_str,'t');
                  uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                  break;
                }
@@ -842,10 +976,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=str_create(addr);
+                  addr=upsutl_str_create(addr,'t');
                   uc->ugo_db = upslst_add(uc->ugo_db,addr);
                 }
-                addr=str_create(*argbuf);
+                addr=upsutl_str_create(*argbuf,'t');
                 uc->ugo_db = upslst_add(uc->ugo_db,addr);
                 *argbuf = 0;
                 break;
@@ -859,10 +993,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=str_create(addr);
+                    addr=upsutl_str_create(addr,'t');
 		    uc->ugo_db = upslst_add(uc->ugo_db,addr);
                  }
-                    addr=str_create(arg_str);
+                    addr=upsutl_str_create(arg_str,'t');
                  uc->ugo_db = upslst_add(uc->ugo_db,addr);
                  break;
                }
@@ -873,14 +1007,15 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
        }
      } else {
        if ( strchr(arg_str,',') == 0 )
-       { addr=str_create(arg_str);
+       { addr=upsutl_str_create(arg_str,' ');
          if (add_ver) 
-         { luc->ugo_version=addr;
+         { if(luc->ugo_version) upsmem_free(luc->ugo_version); /* -a put * */
+           luc->ugo_version=addr;
            add_ver=0;
          } else { 
            uc->ugo_product = addr;
-             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
-             test = upsugo_ifornota(uc);
+           if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
+           test = upsugo_ifornota(uc);
            luc=uc;
            add_ver=1;
            ugo_commands = upslst_add(ugo_commands,uc);
@@ -898,10 +1033,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
          } else { 
            loc=strchr(arg_str,',');
            if(loc==arg_str)
-           { addr=str_create(arg_str+1);
+           { addr=upsutl_str_create(arg_str+1,' ');
            } else {
              *loc=0;
-             addr=str_create(arg_str);
+             addr=upsutl_str_create(arg_str,' ');
             *loc=' '; 
            }
            if (add_ver) 
@@ -934,7 +1069,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    were still done.
 */
    if (!ugo_commands) 
-   { addr=str_create("*");
+   { addr=upsutl_str_create("*",' ');
      uc->ugo_product = addr;
      if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
      test = upsugo_ifornota(uc);             
