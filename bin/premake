@@ -167,7 +167,7 @@ case $ccenv in
 			cflags="$cflags -g" 
 		fi
 #		defs="$defs CCCHK=\"-Xa -vc\""
-		defs="$defs CCCHK=\"-Xc -vc\""
+		defs="$defs CCCHK=\"-Xc -v\""
 		;;
 
 	Linux)			
@@ -320,9 +320,6 @@ incdirs="-I${ERUPT_DIR}/inc";
 #
 if [ "$target" = "" ]; then
 	target=all
-	if [ "$quiet" = "" ]; then
-		echo "Please specify a target next time, assuming $target" >&2
-	fi
 fi
 # 
 # Include user supplied makefile name (blanks ok)
