@@ -107,6 +107,10 @@
          case 'L':      \
          uc->ugo_L = 1; \
          break;
+#define case_R \
+         case 'R':      \
+         uc->ugo_R = 1; \
+         break;
 #define case_s \
          case 's':      \
          uc->ugo_s = 1; \
@@ -1398,9 +1402,10 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        switch(*(arg_str+1))      /* which flag was specified */
        { /* Single flag cases */
          case_a case_C case_e case_E case_F 
-         case_j case_k case_l case_L case_P case_s case_S
-         case_v case_V case_w case_W case_x case_X
-         case_y case_Y case_Z case_help
+         case_j case_k case_l case_L case_P 
+         case_R case_s case_S case_v case_V 
+         case_w case_W case_x case_X case_y 
+         case_Y case_Z case_help
          /* Chain cases */ 
          case_c case_d case_n case_t case_o
          /* List elements */

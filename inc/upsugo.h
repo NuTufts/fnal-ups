@@ -90,7 +90,7 @@ typedef struct ups_command
 /*  int     ugo_Q;           UPD-RESERVE */
     int     ugo_r;           /* set product dir to value             */
     char    *ugo_productdir; 
-/*  int     ugo_R;           UPD-RESERVE */
+    int     ugo_R;           /* for ups depend                       */
     int     ugo_s;           /* simulate                             */
     int     ugo_S;           /* Syntax Checking                      */
     int     ugo_t;           /* test chain                           */
