@@ -613,13 +613,16 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
 static char *
 ugo_old2newquals( const char *inaddr ) {
     static char buf[1024]; /* OH NO!! bogus limit on qualifier length... */
-    char *p2 = buf, *p1 = inaddr;
+    char *p2 = buf;
+    const char *p1 = inaddr;
 
     /* if first qual is mandatory, skip the plus, else put in the ? for it */
     if (*p1 == '"') {
         *p2++ = *p1++;
          if (*p1 == '"') {
-	     return inaddr;
+             *p2++ = *p1++;
+             *p2 = 0;
+	     return buf;
          }
     }
     if (*p1 == '+') {
@@ -673,7 +676,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  int qcount=0;                         /* number of optional qualifiers */
  int i,j;
  int opinit=0;
- char * optionals[10]; /* OH NO!! artifical limit of 10 optionals */
+ char *optionals[10]; /* OH NO!! artifical limit of 10 optionals */
  char *fix_inaddr;
 
  uc->ugo_reqqualifiers = strdup(inaddr);
