@@ -398,7 +398,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
   next_cmd( p_act, new_cur, act_name );
 
   if ( g_list_count > 0 )
-    return g_list;
+    return upslst_first( g_list );
   else
     return 0;
 }
