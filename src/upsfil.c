@@ -163,7 +163,8 @@ static void              print_action( t_upstyp_action * const act_ptr );
 void                     trim_cache( void );
 static int               trim_qualifiers( char * const str );
 static int               cfilei( void );
-t_upslst_item            *copy_action_list( t_upslst_item * const list_ptr );
+t_upslst_item            *add_to_action_list( t_upslst_item * const add_to,
+					    t_upslst_item * const add_from );
 int                      add_to_instance( t_upstyp_instance * const inst,
 					  t_upstyp_instance * const inst_add );
 
@@ -2100,7 +2101,7 @@ int add_to_instance( t_upstyp_instance * const inst,
   /* actions */
 
   if ( inst_add->action_list )
-    inst->action_list = copy_action_list( inst_add->action_list );
+    inst->action_list = add_to_action_list( inst->action_list, inst_add->action_list );
 
   /* the untranslated values */
   
@@ -2113,25 +2114,26 @@ int add_to_instance( t_upstyp_instance * const inst,
   return 1;
 }
 
-t_upslst_item *copy_action_list( t_upslst_item * const list_ptr )
+t_upslst_item *add_to_action_list( t_upslst_item * const list_to,
+				   t_upslst_item * const list_from )
 {
-  t_upslst_item *l_ptr1 = upslst_first( list_ptr );
-  t_upslst_item *l_ptr2 = 0;
+  t_upslst_item *l_ptr_f = upslst_first( list_from );
+  t_upslst_item *l_ptr_t = list_to;
 
-  if( !list_ptr )
-    return 0;
+  if( !l_ptr_f )
+    return l_ptr_t;
 
-  for ( ; l_ptr1; l_ptr1 = l_ptr1->next ) {
-    t_upstyp_action *a_ptr1 = (t_upstyp_action *)l_ptr1->data;
-    t_upstyp_action *a_ptr2 = ups_new_action();
+  for ( ; l_ptr_f; l_ptr_f = l_ptr_f->next ) {
+    t_upstyp_action *a_ptr_f = (t_upstyp_action *)l_ptr_f->data;
+    t_upstyp_action *a_ptr_t = ups_new_action();
     
-    upsmem_inc_refctr( a_ptr1->action );
-    a_ptr2->action = a_ptr1->action;
-    a_ptr2->command_list = upslst_copy( a_ptr1->command_list );
-    l_ptr2 = upslst_add( l_ptr2, a_ptr2 );
+    upsmem_inc_refctr( a_ptr_f->action );
+    a_ptr_t->action = a_ptr_f->action;
+    a_ptr_t->command_list = upslst_copy( a_ptr_f->command_list );
+    l_ptr_t = upslst_add( l_ptr_t, a_ptr_t );
   }
 
-  return upslst_first( l_ptr2 );
+  return upslst_first( l_ptr_t );
 }
 
 int *find_common_mask_list( t_upslst_item *l_inst,
