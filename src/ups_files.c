@@ -21,6 +21,7 @@
  ***********************************************************************/
 
 /* standard include files */
+#include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -88,9 +89,13 @@ static char           g_val[MAX_LINE_LENGTH] = "";   /* current value */
  * Output: none
  * Return: t_ups_product *, a pointer to a product
  */
-t_ups_product *upsfil_read_file( FILE * const fh )
+t_ups_product *upsfil_read_file( const char * const ups_file )
 {
-  g_fh = fh;
+  g_fh = NULL;
+
+  g_fh = fopen ( ups_file, "r" );
+  if ( ! g_fh ) { printf( "Error opening file %s\n", ups_file ); return 0; }
+  
   g_pd = ups_new_product();
 
   if ( !g_pd ) { fprintf( stderr, "Buy more memory !!!\n"); return 0; }
@@ -100,7 +105,8 @@ t_ups_product *upsfil_read_file( FILE * const fh )
   g_val[0] = 0;
   
   read_file();
-
+  fclose( g_fh );
+  
   return g_pd;
 }
 
@@ -132,7 +138,7 @@ int read_file( void )
     return 0;
   }
 
-  /* from here on, we expect only to see FLAVOR or GROUP: */
+  /* here, we expect only to see FLAVOR or GROUP: */
   
   while ( !strcmp( g_key, "FLAVOR") || !strcmp( g_key, "GROUP:" ) ) {
     l_ptr = NULL;
@@ -201,12 +207,10 @@ t_upslst_item *read_instances( void )
     while  ( !strcmp( g_key, "FLAVOR" ) ) {
 	inst_ptr = read_instance();
 	
-	if ( inst_ptr ) {
+	if ( inst_ptr )
 	  l_ptr = upslst_add( l_ptr, inst_ptr );
-	}
-	else {
+	else
 	  break;
-	}
     }
 
     return upslst_first( l_ptr );
@@ -240,7 +244,7 @@ t_ups_instance *read_instance( void )
     inst_ptr->version = str_create( g_pd->chaver );
   }
     
-  /* fill information from found key words */
+  /* fill information from file */
   
   inst_ptr->flavor = str_create( g_val );
     

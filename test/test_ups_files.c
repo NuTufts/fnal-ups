@@ -5,7 +5,6 @@
 int  main( const int argc, char * const argv[] )
 {
   int i = 0;
-  FILE *fh = 0;
   t_ups_product *prod_ptr = NULL;
 
   if ( argc <= 1 ) {
@@ -15,14 +14,12 @@ int  main( const int argc, char * const argv[] )
 
   for ( i=1; i<argc; i++ ) {
     
-    fh = fopen ( argv[i], "r" );
-    if ( ! fh ) { printf( "Error opening file %s\n", argv[i] ); exit( 1 ); }
-    prod_ptr = upsfil_read_file( fh );  
-    fclose( fh );
-    
-    g_print_product( prod_ptr );
+    prod_ptr = upsfil_read_file( argv[i] );  
 
-    ups_free_product( prod_ptr );    
+    if ( prod_ptr ) {
+      g_print_product( prod_ptr );
+      ups_free_product( prod_ptr );
+    }
   }
   
 
