@@ -463,9 +463,6 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		upsutl_get_files(location, (char *)VERSION_SUFFIX,
 				 &all_versions);
 		any_version = 1;             /* originally version was *  */
-		
-		/* point back to the beginning of the list */
-		all_versions = upslst_first(all_versions);
 	      }
 	      /* make sure if need unique instance that we only have one */
 	      CHECK_UNIQUE(all_versions, "versions");
@@ -714,8 +711,6 @@ static t_upstyp_matched_product *match_instance_core(
 		  minst->xtra_chains = upslst_add(minst->xtra_chains,
 				      (t_upstyp_instance *)matched_item->data);
 		}
-		/* go get next chain */
-		break;
 	      }
 	    }
 	  }
