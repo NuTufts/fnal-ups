@@ -1,11 +1,16 @@
-FILE=TABLE
-PRODUCT=flute
+File=Table
+Product=flute
 #*************************************************
-FLAVOR = NULL
-QUALIFIERS = "song"
+# Starting Group definition
+Group:
+Flavor=NULL
+Qualifiers="song"
 
-COMMON:
+Common:
    ACTION = TAILOR
-        execute("echo start music", NO_UPS_ENV)
-END:
+	execute("echo tailor flute",NO_UPS_ENV)
+
+End:
+# End Group definition
 #*************************************************
+

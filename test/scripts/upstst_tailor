@@ -20,7 +20,7 @@ tailor clarinet v2_0 -q woodwinds -s -n
 #
 #
 tailor flute -g current -M ../db1/flute -m flute.table -z ../db1 -actout temp 
-tailor -f Irix+6.2 -q debug -d -o "music" flute 
+tailor -f IRIX+6.2 -q debug -o flute 
 tailor flute v1_0 -c
 tailor flute -U ../db1 -s
 #
@@ -29,10 +29,9 @@ tailor flute -U ../db1 -s
 #tailor oboe -z ../db1 -f NULL -G "oboe v1_0 -m oboe.table" -s -t 
 #
 #
-tailor junk v1_0 -q debug -s -n
+tailor junk
 #
-#There is no v1_0; should complain
+#There is no product junk. Should complain.
 #
-tailor junk v3_0 -q debug -s -n
 quit
 EOD

@@ -4,21 +4,23 @@
 # test ups unconfigure   
 #   
 #============================================================================
-cd $UPS_DIR/test/scripts/configure/db
+cd $UPS_DIR/test/scripts/configure/log
 SHELL=sh;export SHELL;
 UPS_SHELL=${SHELL};export UPS_SHELL;
 env PRODUCTS=../db $UPS_DIR/test/ups_test << EOD
 #ups_echo
 #"================================================================="
 #
-unconfigure baritone -f NULL db -o
-unconfigure v1_0 -r db -n
 #
-unconfigure -O db -c current.chain -t test.chain
+unconfigure trombone -O -z ../db -c
 #   
-unconfigure trombone v1_0 -g test -s -actout -c -f PLUM -q  music -V
-unconfigure trombone v2_0 -m trombone.table -M ""
-unconfigure trombone -f NULL -U $UPS_DIR -z $PRODUCTS -H OSF1
-unconfigure trombone v2_0 -out trombone/trombone.out -diff trombone/trombone.in
+unconfigure trombone v1_0 -g current -s -actout temp
+
+#Problem 
+unconfigure trombone v2_0 -M "../db1/trombone" -m trombone.table 
+#Problem 
+
+unconfigure trombone -f NULL 
+unconfigure trombone v2_0 -actout temp2 -out trombone1.out -diff trombone.in
 quit
 EOD

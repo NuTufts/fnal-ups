@@ -1,37 +1,18 @@
-FILE = TABLE
-PRODUCT = trombone
+File=Table
+Product=trombone
+#*************************************************
+# Starting Group definition
+Group:
+Flavor=NULL
+Qualifiers=""
 
-GROUP:
+Common:
+   ACTION = CONFIGURE
+	execute("echo configure trombone",NO_UPS_ENV)
+   ACTION = UNCONFIGURE
+        execute("echo unconfigure trombone",NO_UPS_ENV)
 
-FLAVOR = IRIX+3
-QUALIFIERS = ""
+End:
+# End Group definition
+#*************************************************
 
-FLAVOR = IRIX+5.1
-QUALIFIERS = "red"
-
-FLAVOR = IRIX+6.2   
-QUALIFIERS = "nodbg:opt"
-
-FLAVOR = NULL
-QUALIFIERS = "RED"
-
-FLAVOR = NULL
-QUALIFIERS = ""
-
-FLAVOR = OSF1
-QUALIFIERS = ""
-
-FLAVOR = PLUM  
-QUALIFIERS = "music"
-
-COMMON:
-
-ACTION = CONFIGURE
-  execute("echo configure noise",UPS_ENV)
-
-ACTION = SETUP
-  execute("echo configure trombone",UPS_ENV)
-
-ACTION = UNTAILOR
-  execute("echo untailor me",UPS_ENV)
-END:
