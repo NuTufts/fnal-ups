@@ -32,6 +32,8 @@
 #include "ups_setup.h"
 #include "ups_start.h"
 #include "ups_stop.h"
+#include "ups_configure.h"
+#include "ups_unconfigure.h"
 #include "ups_list.h"
 #include "ups_unk.h"
 #include "upserr.h"
@@ -88,7 +90,8 @@ int main(int argc, char *argv[])
   t_upsugo_command *command_line = NULL;
   FILE *temp_file = NULL;
   char *temp_file_name = NULL;
-  int i = 0, empty_temp_file = 0, remove_this_file = 0;
+  int i = 0, empty_temp_file = 0, keep_temp_file = 0;
+  int rstatus = 0;              /* assume success */
 
   /* Figure out which command was entered */
   while (g_cmd_info[i].cmd) {
@@ -111,8 +114,8 @@ int main(int argc, char *argv[])
 
     /* we will need this later after command_line goes away, so keep track
        of it here. only attempt to save it if it has not already been saved */
-    if (! remove_this_file ) {
-      remove_this_file = command_line->ugo_V;
+    if (! keep_temp_file ) {
+      keep_temp_file = command_line->ugo_V;
     }
 
     if (!command_line->ugo_help) {
@@ -140,7 +143,7 @@ int main(int argc, char *argv[])
 	  break;
 	case e_list: ups_list(command_line);
 	  break;
-	case e_configure: ups_unk(command_line, argv[1], e_configure);
+	case e_configure: ups_configure(command_line, temp_file, e_configure);
 	  break;
 	case e_copy: ups_unk(command_line, argv[1], e_copy);
 	  break;
@@ -158,7 +161,8 @@ int main(int argc, char *argv[])
 	  break;
 	case e_tailor: ups_unk(command_line, argv[1], e_tailor);
 	  break;
-	case e_unconfigure: ups_unk(command_line, argv[1], e_unconfigure);
+	case e_unconfigure: ups_unconfigure(command_line, temp_file,
+					    e_unconfigure);
 	  break;
 	case e_undeclare: ups_unk(command_line, argv[1], e_undeclare);
 	  break;
@@ -185,48 +189,86 @@ int main(int argc, char *argv[])
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
+      rstatus = 1;                   /* return an error to the user */
       break;
     }
   }
 
   /* close the temp file */
   if (temp_file) {
-    /* look and see where we are */
-    if (ftell(temp_file) == 0L) {
-      /* we are at the beginning of the file, nothing was written to it */
-     empty_temp_file = 1;
-    } else {
-      /* write any closing info to the file */
-      if (g_LOCAL_VARS_DEF) {
-	/* ??? call dave's routine to undefine the local env variables */
-      }
-
-      /* we usually tell the file to delete itself.  however the user may
-	 override this */
-      if (! remove_this_file) {
-	fprintf(temp_file, "rm %s\n", temp_file_name);
-      }
-    }
-    if (fclose(temp_file) == EOF) {
-      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
-    }
-    /* if nothing was written to the file, delete it, */
-    if (empty_temp_file) {
-      (void )remove(temp_file_name);
-    } else {
-      switch (g_cmd_info[i].cmd_index) {
-      case e_setup: 
-      case e_unsetup: 
-	/* output the name of the temp file that was created */
-	(void )printf("%s\n", temp_file_name);
-	break;
-      default:
-	/* source the file within the current process context */
-	/*	if (system(temp_file_name) <= 0) {
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system", strerror(errno));
-	}*/
-	(void )printf("(usually sourced) %s\n", temp_file_name);  /* output it for now */
+    if (UPS_ERROR == UPS_SUCCESS ) {
+      /* look and see where we are */
+      if (ftell(temp_file) == 0L) {
+	/* we are at the beginning of the file, nothing was written to it */
+	empty_temp_file = 1;
+      } else {
+	/* write any closing info to the file */
+	if (g_LOCAL_VARS_DEF) {
+	  /* ??? call dave's routine to undefine the local env variables */
+	}
 	
+	/* we usually tell the file to delete itself.  however the user may
+	   override this */
+	if (! keep_temp_file) {
+	  fprintf(temp_file, "/bin/rm -f %s\n", temp_file_name);
+	}
+      }
+      if (fclose(temp_file) == EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
+      }
+      /* if nothing was written to the file, delete it, */
+      if (empty_temp_file) {
+	(void )remove(temp_file_name);
+      } else {
+	switch (g_cmd_info[i].cmd_index) {
+	case e_setup: 
+	case e_unsetup: 
+	  /* output the name of the temp file that was created */
+	  (void )printf("%s\n", temp_file_name);
+	  break;
+	case e_exist:
+	  /* just get rid of the file. (unless asked not to) we do not need it,
+	     we just wanted to see if we could create it */
+	  if (! keep_temp_file) {
+	    (void )remove(temp_file_name);
+	  } else {
+	    (void )printf("%s\n", temp_file_name);
+	  }
+	  break;
+	default:
+	  /* source the file within the current process context */
+	  /*	if (system(temp_file_name) <= 0) {
+		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
+		strerror(errno));
+		}*/
+	  (void )printf("(usually sourced) %s\n", temp_file_name);  /* output it for now */
+	  
+	}
+      }
+    } else {
+      /* An error occurred while doing what we had to do.  close the temp file.
+	 if it is not empty leave it and report it's name. except for setup or
+	 unsetup where it is always deleted */
+      if (fclose(temp_file) == EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
+      }
+      /* if nothing was written to the file, delete it, */
+      if (empty_temp_file) {
+	(void )remove(temp_file_name);
+      } else {
+	switch (g_cmd_info[i].cmd_index) {
+	case e_setup:
+	case e_unsetup:
+	  (void )remove(temp_file_name);
+	  break;
+	default:
+	  /* keep the file if we were asked to */
+	  if (! keep_temp_file) {
+	    (void )remove(temp_file_name);
+	  } else {
+	    (void )printf("%s\n", temp_file_name);
+	  }
+	}
       }
     }
   }
@@ -234,6 +276,7 @@ int main(int argc, char *argv[])
   /* output any errors and the timing information */
   upserr_output();
 
-  return 0;
+
+  return rstatus;
 }
 
