@@ -353,53 +353,60 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 
   if (db_list) {
     if (a_command_line->ugo_m && a_command_line->ugo_product) {
-     /* We have a table file  and we have a product name, we do not need the
-        db. */
-      if (UPS_VERBOSE) {
-	printf("%sUsing Table File - %s\n", VPREFIX,
-	       (char *)a_command_line->ugo_tablefile);
-      }
-      for (db_item = db_list ; db_item ; db_item = db_item->next) {
-	db_info = (t_upstyp_db *)db_item->data;
+      /* since a specific table file was entered, we need to check if a
+	 version or chain was also specified.  if yes then this is an error */
+      if (!a_command_line->ugo_version &&
+	  (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
+	/* We have a table file  and we have a product name, we do not need the
+	   db. */
 	if (UPS_VERBOSE) {
-	  printf("%sSearching UPS database - %s\n", VPREFIX, db_info->name);
+	  printf("%sUsing Table File - %s\n", VPREFIX,
+		 (char *)a_command_line->ugo_tablefile);
 	}
-	/* If the user did not enter a product name, get all the product names
-	   in the current db. */
-	if (! got_all_products) {
-	  upsutl_get_files(db_info->name, (char *)ANY_MATCH, &all_products);
-	}
-
-	if (all_products) {
-	  /* make sure if we need a unique instance that we only have one */
-	  CHECK_UNIQUE(all_products, "products");
-
-	  /* read in the config file associated with this database and
-	     save it */
-	  GET_CONFIG_FILE();
-
-	  /* for each product, get all the requested instances */
-	  for (product_item = all_products ; product_item ;
-	       product_item = product_item->next) {
-	    prod_name = (char *)product_item->data;
-	  
-	    if (UPS_VERBOSE) {
-	      printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
-	    }
-	    MATCH_TABLE_ONLY(prod_name);
+	for (db_item = db_list ; db_item ; db_item = db_item->next) {
+	  db_info = (t_upstyp_db *)db_item->data;
+	  if (UPS_VERBOSE) {
+	    printf("%sSearching UPS database - %s\n", VPREFIX, db_info->name);
 	  }
-	  /* may no longer need product list - free it */
+	  /* If the user did not enter a product name, get all the product
+	     names in the current db. */
 	  if (! got_all_products) {
-	    all_products = upslst_free(all_products, do_delete);
+	    upsutl_get_files(db_info->name, (char *)ANY_MATCH, &all_products);
 	  }
+
+	  if (all_products) {
+	    /* make sure if we need a unique instance that we only have one */
+	    CHECK_UNIQUE(all_products, "products");
+
+	    /* read in the config file associated with this database and
+	       save it */
+	    GET_CONFIG_FILE();
+
+	    /* for each product, get all the requested instances */
+	    for (product_item = all_products ; product_item ;
+		 product_item = product_item->next) {
+	      prod_name = (char *)product_item->data;
+	  
+	      if (UPS_VERBOSE) {
+		printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
+	      }
+	      MATCH_TABLE_ONLY(prod_name);
+	    }
+	    /* may no longer need product list - free it */
+	    if (! got_all_products) {
+	      all_products = upslst_free(all_products, do_delete);
+	    }
+	  }
+	  /* if we have a match and are asking for a unique one, we do not need
+	     to go to the next db */
+	  if (a_need_unique && mproduct) {
+	    break;
+	  }
+	  /* free the db configuration info, it we previously read it in */
+	  FREE_CONFIG_FILE();
 	}
-	/* if we have a match and are asking for a unique one, we do not need
-	   to go to the next db */
-	if (a_need_unique && mproduct) {
-	  break;
-	}
-	/* free the db configuration info, it we previously read it in */
-	FREE_CONFIG_FILE();
+      } else {
+	upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
       }
     } else {
       /* we have at least one db */
@@ -504,12 +511,19 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
       }
     }
   } else if (a_command_line->ugo_m && a_command_line->ugo_product) {
-    /* We have a table file and no db, that is ok */
-    if (UPS_VERBOSE) {                                                 
-      printf("%sNo UPS Database, using Table File - %s\n", VPREFIX,    
-	     (char *)a_command_line->ugo_tablefile);
+    /* since a specific table file was entered, we need to check if a
+       version or chain was also specified.  if yes then this is an error */
+    if (!a_command_line->ugo_version &&
+	(!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
+      /* We have a table file and no db, that is ok */
+      if (UPS_VERBOSE) {                                                 
+	printf("%sNo UPS Database, using Table File - %s\n", VPREFIX,    
+	       (char *)a_command_line->ugo_tablefile);
+      }
+      MATCH_TABLE_ONLY(a_command_line->ugo_product);
+    } else {
+      upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
     }
-    MATCH_TABLE_ONLY(a_command_line->ugo_product);
   } else {
     /* we have no db and no table file or no product name, this is an error */
     upserr_vplace();
