@@ -344,6 +344,8 @@ char *upsget_translation_tilde( char * const oldstr )
   char *e_loc = 0;
   char *tr_env = 0;
   
+  buf[0] = 0; /* reset buf[0] */
+
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, TILDE)) != 0 ) 
   { if(!clear_flag)                   
     { memset( buf, 0, sizeof( buf ) );  /* clear ONLY if I need too... */
