@@ -97,16 +97,20 @@ void ups_declare( t_upsugo_command * const uc )
 
   if (!uc->ugo_product || !uc->ugo_version )
   { printf("To Declare a product you must specify a product and a version \n");
-    abort();
+    exit(1);
   }
-  if (!uc->ugo_f )
-  { printf("To Declare a product you must specify a flavor \n");
-    abort();
+  if (!uc->ugo_f || (int)(upslst_count(uc->ugo_flavor) > 1) )
+  { printf("To Declare a product you must specify A flavor \n");
+    exit(1);
+  }
+  if ((int)(upslst_count(uc->ugo_chain) > 1) )
+  { printf("Multiple chains specified\n");
+    exit(1);
   }
   mproduct_list = upsmat_instance(uc, db_list , need_unique);
   if (mproduct_list)
   { printf("Exact instance of product exists doing NOTHING\n");
-    abort();
+    exit(1);
   }
   save_chain=uc->ugo_chain;
   save_flavor=uc->ugo_flavor;
