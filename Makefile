@@ -76,6 +76,7 @@ INSURE=
 all: 	proddir_is_set
 	cd src; upspremake $(UPSDBG) $(INSURE)
 	cd test; upspremake $(UPSDBG) $(INSURE)
+	cd doc; upspremake $(UPSDBG) $(INSURE)
 
 test: FORCE
 	cd test/scripts; upstst_all
