@@ -42,3 +42,10 @@ End:
 # End Group definition
 #*************************************************
 
+Flavor=ANY
+qualifiers=build
+
+action=setup
+  proddir()
+  setupenv()
+  setupOptional (egcs)
