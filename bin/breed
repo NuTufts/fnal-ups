@@ -1,0 +1,67 @@
+#!/usr/local/bin/perl
+#
+# It will make <n> copies of the product 'orig_<name>' directory,
+# named '<name>n'
+#
+use File::Path;
+
+my $count = 25; # default number of copies to make
+my $prod = '';
+my $prod_dir = '';
+my @prod_files = ();
+
+# need to get value of $ERUPT_DIR
+
+my $co_dir = $ENV{"ERUPT_DIR"};
+
+die "\'ERUPT_DIR\' is not defined\n" if ( ! -d $co_dir );
+
+# parse arguments
+
+while ( $_ = $ARGV[0], /^-/ ) {
+    shift;
+    $count = shift if ( /^-n/ );
+}
+
+die "Usage: breed [-n count] prod_name\n" if ( ! @ARGV || $count <= 0 );
+
+foreach $prod ( @ARGV ) {
+
+    $prod_dir = "$co_dir/erupt_database/orig_$prod";
+
+    # get list of product files
+
+    die "Could not open directory \'$prod_dir\'\n"
+	if ( ! opendir DIR, $prod_dir );
+
+    @prod_files = grep !/^\.\.?$/ && !-d && !/^CVS/, readdir DIR;
+    closedir DIR;
+
+    die "Directory \'$prod_dir\' is empty\n"
+	if ( ! @prod_files );
+
+    # copy product
+
+    my $i;
+    my $file = '';
+    for ( $i=0; $i<$count; $i++ ) {
+	rmtree( "$prod$i" ) if ( -e "$prod$i" );
+	mkdir "$prod$i", 0755;
+	print "... making $prod$i\n";
+	foreach $file ( @prod_files) {
+	    die "Could not open original product file \'$prod_dir/$file\'\n"
+		if ( ! open IN, "$prod_dir/$file" );
+	    die "Could not open new product file \'$prod$i/$file\'\n"
+		if ( ! open OUT, ">>$prod$i/$file" );
+	
+	    while (<IN>) {
+		s/$prod/$prod$i/;
+		print OUT $_;
+	    }
+	    close IN;
+	    close OUT;
+	}
+    }
+}
+
+1;
