@@ -356,7 +356,7 @@ static int match_from_chain( const char * const a_product,
 	TMP_LISTS_SET();
 
 	/* see if any command line info should override what we read from the
-	   files */
+	   files  - set tmp_upsdir, tmp_productdir */
 	USE_CMD_LINE_INFO();
 
 	tmp_num_matches = match_from_version(inst->product, inst->version,
@@ -462,7 +462,7 @@ static int match_from_version( const char * const a_product,
 	TMP_LISTS_SET();
 
 	/* see if any command line info should override what we read from the
-	   files */
+	   files - set tmp_upsdir, tmp_productdir */
 	USE_CMD_LINE_INFO();
 
 	tmp_num_matches = match_from_table(inst->product, inst->table_file,
