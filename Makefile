@@ -385,9 +385,10 @@ DEFAULT_DIR=`pwd | sed	-e 's|^/tmp_mnt||' \
 
 DEFAULT_PREFIX=/tmp/build-$(PROD)-$(VERS)-$(QUALS)
 
-build_prefix: proddir_is_set $(PREFIX)
+build_prefix:
+	proddir_is_set $(PREFIX)
 
-$(PREFIX):
+"$(PREFIX)":
 	ln -s $$$(PRODUCT_DIR) $(PREFIX)
 
 
