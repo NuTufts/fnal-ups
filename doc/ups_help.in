@@ -112,7 +112,7 @@ OPTIONS     :
 -j :applies to top level product and not UPS product requirements 
 -k :do not execute unsetup files first 
 -K :"keywords" : return information from these (colon-separated) keywords
-:only ("+" means PROD_NAME:VERSION:FLAVOR:QUALIFIERS:CHAIN(S))
+:only ("+" means PRODUCT:VERSION:FLAVOR:QUALIFIERS:CHAIN(S))
 -l :produce a long listing 
 -L :add the STATISTICS keyword to this instance in the VERSION file 
 -m :tableFile : table file name
