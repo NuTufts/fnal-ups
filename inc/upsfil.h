@@ -49,8 +49,11 @@ void              g_print_product( t_upstyp_product * const prod_ptr );
 
 #define VERSION_SUFFIX  ".version"
 #define CHAIN_SUFFIX    ".chain"
+#define UPS_FILES       ".upsfiles"
+#define UPS_FILES_LEN   9
 #define CONFIG_FILE     "dbconfig"
-#define CONFIG_SIZE     8           /* this is the length of CONFIG_FILE */
+#define CONFIG_FILE_LEN 8
+#define CONFIG_SIZE     UPS_FILES_LEN + CONFIG_FILE_LEN + 1
 
 /* enum of known file types (changes here should be reflected in cfilei) */
 enum e_ups_file {
