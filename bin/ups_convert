@@ -706,53 +706,39 @@ sub add_misactions {
     $value="";
     if (checkfor("${basedir}/ups/tailor")) {
        $value.="   Action=Tailor\n";
-       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
+       $value.="      proddir()\n"
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/tailor)\n";
        $value.="      doDefaults()\n";
-       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
+       $value.="      unproddir()\n"
     }
     if (checkfor("${basedir}/ups/configure")) {
        $value.="   Action=Configure\n";
-       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
+       $value.="      proddir()\n"
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/configure)\n";
        $value.="      doDefaults()\n";
-       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
+       $value.="      unproddir()\n"
     }
-#    if (checkfor("${basedir}/ups/configure")) {
-#       $value.="   Action=Unconfigure\n";
-#       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
-#       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/unconfigure)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
-#    }
     if (checkfor("${basedir}/ups/start")) {
        $value.="   Action=start\n";
-       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
+       $value.="      proddir()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/start)\n";
        $value.="      doDefaults()\n";
-       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
+       $value.="      unproddir()\n";
     }
     if (checkfor("${basedir}/ups/stop")) {
        $value.="   Action=stop\n";
-       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
+       $value.="      proddir()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/stop)\n";
        $value.="      doDefaults()\n";
-       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
+       $value.="      unproddir()\n";
     }
     if (checkfor("${basedir}/ups/current")) {
        $value.="   Action=Current\n";
-       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
+       $value.="      proddir()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/current)\n";
        $value.="      doDefaults()\n";
-       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
+       $value.="      unproddir()\n";
     }
-#    if (checkfor("${basedir}/ups/current")) {
-#       $value.="   Action=Uncurrent\n";
-#       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
-#       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/uncurrent)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
-#    }
     return $value
 }
 sub split_os { 
