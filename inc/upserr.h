@@ -85,7 +85,8 @@
 #define UPS_DUPLICATE_INSTANCE  42
 #define UPS_FILE_NOT_FOUND      43
 #define UPS_MISSING_MATCH       44
-#define UPS_NERR                45      /*  this one must always be last */
+#define UPS_NO_INSTANCE         45
+#define UPS_NERR                46      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
