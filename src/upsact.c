@@ -402,7 +402,7 @@ t_cmd_info g_cmd_info[] = {
   {e_touch,       "touch",       "?cdf:g:H:noq:tvz:Z0123", 0x00000010, e_invalid_action},
   {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_configure},
   {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000010, e_undeclare},
-  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000010, e_invalid_action},
+  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vz:Z", 0x00000010, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:lvZ0123", 0x00000000, e_invalid_action},
   {e_verify,      "verify",      "?acdf:g:H:m:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_help,        "help",        "?v", 0x00000000, e_invalid_action},
