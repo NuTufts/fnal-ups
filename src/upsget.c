@@ -305,8 +305,8 @@ char *upsget_translation_env( char * const oldstr )
      is done, it will return a pointer to a static string containing the 
      translated string. if no translation is done, it will return (null).
 
-     Note: right now it quit dumb, it will only recognize ${var},
-     but should probaly also recognize ${ var }, $var, maybe even
+     Note: right now it is quite dumb, it will only recognize ${var},
+     but should probably also recognize ${ var }, $var, maybe even
      ${var1_${var2}} ... */
 
   static char buf[MAX_LINE_LEN];
