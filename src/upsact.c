@@ -113,6 +113,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
 				     t_upslst_item *const cmd_list );
 int actname2enum( const char * const act_name );
 char *action2inst( const t_upsact_item *const p_cur );
+int dbl2dbs( char * const db_name, t_upslst_item * const l_db );
 
 /* functions to handle specific action commands */
 
@@ -260,8 +261,25 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     }
 
 #define FPRINTF_ERROR() \
-    upserr_vplace();                                                     \
+    upserr_vplace(); \
     upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+
+#define SET_PARSE_ERROR( str ) \
+    upserr_vplace(); \
+    upserr_add(UPS_ACTION_PARSE, UPS_FATAL, str );
+
+#define P_VERB_s( iver, str ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s\n", \
+				str )
+
+#define P_VERB_s_s( iver, str1, str2 ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s\n", \
+				str1, str2 )
+  
+#define P_VERB_s_s_i( iver, str1, str2, inum ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %d\n", \
+				str1, str2, inum )
+     
 
 /*
  * Definition of global variables.
@@ -396,7 +414,7 @@ static t_cmd_map g_cmd_maps[] = {
  */
 
 /*-----------------------------------------------------------------------
- * upsact_print_inst
+ * upsact_print
  *
  * Input : t_upsugo_command *,
  *         t_upstyp_matched_product *,
@@ -500,6 +518,8 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   
   while ( act_s && *act_s && isspace( *(act_s) ) ){ ++act_s; }
 
+  P_VERB_s_s( 3, "Parsing line:", act_s );
+  
   if ( !act_s || !*act_s )
     return 0;
 
@@ -539,10 +559,12 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   if ( icmd != e_invalid_action ) {
     pcmd->icmd = icmd;
     pcmd->argc = parse_params( act_s, pcmd->argv );
+    P_VERB_s_s_i( 3, "Parse result #arg:", g_cmd_maps[icmd].cmd, pcmd->argc );
     return pcmd;
   }
   else {
     free( pcmd );
+    P_VERB_s( 3, "Parse nothing" );
     return 0;
   }
 }
@@ -595,7 +617,7 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
   icmd = cmd_cur->icmd;
   
   printf( "%s(", g_cmd_maps[icmd].cmd );
- for ( i = 0; i < cmd_cur->argc; i++ ) {
+  for ( i = 0; i < cmd_cur->argc; i++ ) {
     if ( i == cmd_cur->argc - 1 ) 
       printf( " %s ", cmd_cur->argv[i] );
     else
@@ -753,36 +775,64 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 t_upslst_item *get_top_prod( t_upsact_item *const p_cur, 
 			     const char *const act_name )
 {
-  static char *valid_switch = "AacCdfghKtmMNoOPqrTuUv";
+  static char current_act_line[MAX_LINE_LEN] = "";
+  static char current_db[MAX_LINE_LEN] = "";
   t_upslst_item *l_cmd = p_cur->act ? p_cur->act->command_list : 0;
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
   t_upslst_item *top_list = 0;
   int i_act = actname2enum( act_name );
+  int i_cmd = 0;
+  int ignore_errors;
+  int add_item;
 
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
+    ignore_errors = 0;
+    add_item = 0;
     p_line = upsget_translation( p_cur->mat, p_cur->ugo,
 				 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
-
-    if ( p_cmd && p_cmd->icmd >= 0 ) {
+    i_cmd = p_cmd ? p_cmd->icmd : -1;
+    
+    if ( i_cmd >= 0 && i_cmd <= e_unsetuprequired ) {
       t_upsact_item *new_cur = 0;
       t_upsugo_command *new_ugo = 0;
       p_cmd->iact = i_act;
-      switch ( p_cmd->icmd ) 
+
+      if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
+	   dbl2dbs( current_db, p_cur->ugo->ugo_db ) > 0 ) {
+	strcpy( current_act_line, p_cmd->argv[0] ); 
+	strcat( current_act_line, current_db );
+	new_ugo = upsugo_bldcmd( current_act_line, g_cmd_info[i_act].valid_opts );
+      }
+      else {
+	new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
+      }
+
+      switch (i_cmd ) 
       {
-      case e_setuprequired: case e_setupoptional:
-	new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+      case e_setupoptional:
+	ignore_errors = 1;
+      case e_setuprequired:
 	new_cur = new_act_item( new_ugo, 0, 0, "SETUP");
-	break;
-	
-      case e_unsetuprequired: case e_unsetupoptional:
-	new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+	break;	
+
+      case e_unsetupoptional:
+	ignore_errors = 1;
+      case e_unsetuprequired:
 	new_cur = new_act_item( new_ugo, 0, 0, "UNSETUP");
 	break;
       }
-      if ( new_cur )
+
+      if ( !new_cur ) {
+	if ( ignore_errors )
+	  upserr_clear();
+	else
+	  SET_PARSE_ERROR( p_line );
+      }
+      else {
 	top_list = upslst_add( top_list, new_cur );
+      }
     }
   }
 
@@ -802,12 +852,13 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 const char *const act_name,
 			 const char copt )
 {
-  static char *valid_switch = "AacCdfghKtmMNoOPqrTuUv";
-
+  static char current_act_line[MAX_LINE_LEN] = "";
+  static char current_db[MAX_LINE_LEN] = "";
   t_upslst_item *l_cmd = 0;
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
   int i_act = e_invalid_action;
+  int ignore_errors;
 
   if ( !p_cur )
     return dep_list;
@@ -823,6 +874,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
   
   l_cmd = p_cur->act->command_list;
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
+    ignore_errors = 0;
 
     /* translate and parse command */    
     p_line = upsget_translation( p_cur->mat, p_cur->ugo,
@@ -841,12 +893,24 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	dep_list = upslst_add( dep_list, new_cur );
 	continue;
       }
-      else if ( copt != 't' ) { /* here we go again */
+      else if ( copt != 't' && !p_cur->ugo->ugo_j ) { /* here we go again */
 	t_upsact_item *new_cur = 0;
-	t_upsugo_command *new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+	t_upsugo_command *new_ugo = 0;
+
+	/* set/get current db */
+
+	if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
+	     dbl2dbs( current_db, p_cur->ugo->ugo_db ) > 0 ) {
+	  strcpy( current_act_line, p_cmd->argv[0] ); 
+	  strcat( current_act_line, current_db );
+	  new_ugo = upsugo_bldcmd( current_act_line, g_cmd_info[i_act].valid_opts );
+	}
+	else {
+	  new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
+	}
 
 	if ( !new_ugo ) {
-	  printf( "???? no new ugo on %s\n", p_line );
+	  SET_PARSE_ERROR( p_line );
 	  continue;
 	}
 
@@ -856,7 +920,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  new_cur = find_product( top_list, new_ugo->ugo_product );
 	}
 
-	/* check if product is already setup */
+	/* check if product is already in setup list */
 	
 	if ( find_product( dep_list, new_ugo->ugo_product ) ) {
 	  /* ??? free stuff */
@@ -866,25 +930,33 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	if ( !new_cur ) {
 	  switch ( p_cmd->icmd ) 
 	  {
-	  case e_setuprequired: case e_setupoptional:
+	  case e_setupoptional:
+	    ignore_errors = 1;
+	  case e_setuprequired:	    
 	    new_cur = new_act_item( new_ugo, 0, 0, "SETUP");
 	    break;	
-	  case e_unsetuprequired: case e_unsetupoptional:
+	  case e_unsetupoptional:
+	    ignore_errors = 1;
+	  case e_unsetuprequired: 
 	    new_cur = new_act_item( new_ugo, 0, 0, "UNSETUP");
 	    break;
 	  }
 	  if ( !new_cur ) {
-	    printf( "???? no action_item for %s\n", p_line );
+	    if ( ignore_errors )
+	      upserr_clear();
+	    else
+	      SET_PARSE_ERROR( p_line );
 	    continue;
 	  }
 	}
 	new_cur->level = p_cur->level + 1;
 	dep_list = next_cmd( top_list, dep_list, new_cur, act_name, copt );
+	P_VERB_s_s( 3, "Adding dependcy:", p_line );
 	continue;
       }
     }
     else {
-      printf( "parse_cmd failed on %s\n", p_line );
+      SET_PARSE_ERROR( p_line );
     }
   }
   
@@ -950,6 +1022,30 @@ int actname2enum( const char * const act_name )
   }
   
   return iact;
+}
+
+int dbl2dbs( char * const s_db, t_upslst_item * const l_db )
+{
+  t_upslst_item *l_item = 0;
+  int c_db = 0;
+
+  if ( !s_db )
+    return 0;
+
+  s_db[0] = '\0';
+
+  if ( !(l_item = upslst_first( l_db )) )
+    return 0;
+
+  strcpy( s_db, " -z " );
+  for ( ; l_item; l_item = l_item->next, c_db++ ) {
+    t_upstyp_db * db = (t_upstyp_db *)l_item->data;
+    strcat( s_db, db->name );
+    if ( l_item->next )
+      strcat( s_db, ":" );
+  }
+    
+  return c_db;
 }
 
 /*-----------------------------------------------------------------------
@@ -1094,7 +1190,7 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_cur,
     strcpy( new_act->action, act_name );
     new_act->command_list = 0;
     new_act->command_list = upslst_add( new_act->command_list, 
-					upsutl_str_create( "dodefault()", ' ' ) );
+					upsutl_str_create( "dodefaults()", ' ' ) );
   }
 
   return new_act;
