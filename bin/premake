@@ -79,6 +79,8 @@ for a in "$@" ; do
 	fi
 		
 	case $a in
+	  -filter)
+		filter="yes";;
 	  -f)
 	    	positional=-f;;
 	  -cc|-CC)
@@ -87,8 +89,6 @@ for a in "$@" ; do
 		positional=-cflags;;
 	  -deb*|-DEB*)
 		dbg=1;;
-	  -filter)
-		filter="yes";;
 	  -i)
 	        insight=1;;
 	  -FULLOPT*|-fullopt*)
@@ -146,9 +146,9 @@ fi
 #------------------------------------------------------------------------
 #
 case $ccenv in
-	acc|ACC)			# Sun's acc
+	acc|ACC)			# Sun's cc
 		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
-		cc="acc"
+		cc="cc"
 		cflags="$cflags"
 		if [ "$opt" != "" ]; then
 			cflags="$cflags -O2" 
@@ -156,7 +156,8 @@ case $ccenv in
 		if [ "$dbg" != "" ]; then 
 			cflags="$cflags -g" 
 		fi
-		defs="$defs CCCHK=\"-Xa -vc\""
+#		defs="$defs CCCHK=\"-Xa -vc\""
+		defs="$defs CCCHK=\"-Xc -vc\""
 		;;
 
 	Linux)			
