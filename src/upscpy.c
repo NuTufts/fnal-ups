@@ -128,14 +128,14 @@ void upscpy_info(UPSCPY_PARAMS)
           { upsver_mes(0, 
                   "%s: Creating target for info %s\n",
                   "UPSCPY", a_db_info->config->info_target_dir); 
-            sprintf(buffer, "umask 003;/bin/mkdir -p %s\n", 
+            (void) sprintf(buffer, "umask 003;/bin/mkdir -p %s\n", 
                     a_db_info->config->info_target_dir);
             if (system(buffer))
             { SYSTEM_ERROR();
             }
           }
           upsver_mes(0,"%s: Copying info from %s\n","UPSCPY",info_source);
-          sprintf(buffer,"umask 003;cp %s/* %s\n", info_source,
+          (void) sprintf(buffer,"umask 003;cp %s/* %s\n", info_source,
                   a_db_info->config->info_target_dir);
           if (system(buffer))
           { SYSTEM_ERROR();
@@ -159,21 +159,21 @@ void upscpy_info(UPSCPY_PARAMS)
 #define COPY_FILES(filename, dest_path, type)  \
     /* figure out sectional sub directory (based on file extension) */ \
     if ((subdir = get_man_subdir(filename))) {                         \
-      sprintf(dest, "%s/%s%c", dest_path, type, subdir);               \
+      (void) sprintf(dest, "%s/%s%c", dest_path, type, subdir);        \
       /* see if the sectional subdir exists.  if not, create it. */    \
       if (stat(dest, &file_stat) == (int )-1) {                        \
         /* make sure we have not created it before */                  \
         if (not_yet_created(subdirs_made, subdirs_index, subdir)) {    \
           /* we must create the directory first */                     \
          upsver_mes(0,"%s: Creating target for %s %s\n","UPSCPY",type,dest);\
-          sprintf(buffer,"umask 003;/bin/mkdir -p %s\n", dest);        \
+          (void) sprintf(buffer,"umask 003;/bin/mkdir -p %s\n", dest); \
           if (system(buffer)) { SYSTEM_ERROR(); }                      \
           /* now keep a record so we only create it once */            \
           subdirs_made[subdirs_index++] = (int )subdir;                \
         }                                                              \
       }                                                                \
       /* now add the copy line to the temp file */                     \
-      sprintf(buffer, "umask 003;cp %s %s\n", filename, dest);         \
+      (void) sprintf(buffer, "umask 003;cp %s %s\n", filename, dest);  \
       if (system(buffer)) { SYSTEM_ERROR(); }                          \
     }
 
@@ -187,7 +187,7 @@ void upscpy_info(UPSCPY_PARAMS)
           upsver_mes(0,"%s: Copying %s files\n","UPSCPY",type);          \
           while ((file_dir_line = readdir(file_dir))) {                  \
             if (file_dir_line->d_name[0] != '.') {                       \
-              sprintf(g_buff, "%s/%s", filename, file_dir_line->d_name); \
+              (void) sprintf(g_buff, "%s/%s", filename, file_dir_line->d_name);\
               COPY_FILES(g_buff, a_db_info->config->keyword, type);      \
             }                                                            \
           }                                                              \
@@ -197,7 +197,7 @@ void upscpy_info(UPSCPY_PARAMS)
            we just need to copy the entire contents of this dir          \
            (of the form *.*) to the appropriate destination */           \
         upsver_mes(0,"%s: Copying %s files\n","UPSCPY",type);            \
-        sprintf(buffer, "umask 003;cp %s/*.* %s/%s/ \n", filename,       \
+        (void) sprintf(buffer, "umask 003;cp %s/*.* %s/%s/ \n", filename,\
                 a_db_info->config->keyword, dir_line->d_name);           \
         if (system(buffer)) { SYSTEM_ERROR(); }                          \
       }                                                                  \
@@ -233,7 +233,7 @@ void upscpy_man(UPSCPY_PARAMS)
           /* read each directory item and figure out what to do with it */
       { while ((dir_line = readdir(dir))) 
         { if (dir_line->d_name[0] != '.')    /* skip any . file */
-          { sprintf(filename, "%s/%s", man_source, dir_line->d_name);
+          { (void) sprintf(filename, "%s/%s", man_source, dir_line->d_name);
             if (! stat(filename, &file_stat))
             { if (S_ISDIR(file_stat.st_mode))
                   /* this is a directory.  so we need to process the files in
@@ -249,7 +249,7 @@ void upscpy_man(UPSCPY_PARAMS)
                     { COPY_FILES(filename, 
                            a_db_info->config->man_target_dir, "man");
                     }
-                    fclose(file);
+                    (void) fclose(file);
                   }
                 }
               }
@@ -299,7 +299,7 @@ void upscpy_catman(UPSCPY_PARAMS)
          /* read each directory item and figure out what to do with it */
       { while ((dir_line = readdir(dir))) 
         { if (dir_line->d_name[0] != '.')    /* skip any . file */
-          { sprintf(filename, "%s/%s", catman_source, dir_line->d_name);
+          { (void) sprintf(filename, "%s/%s", catman_source, dir_line->d_name);
             if (! stat(filename, &file_stat)) 
             { if (S_ISDIR(file_stat.st_mode))
                 /* this is a directory.  so we need to process the files in
@@ -316,7 +316,7 @@ void upscpy_catman(UPSCPY_PARAMS)
                   { COPY_FILES(filename,
                                       a_db_info->config->catman_target_dir, "cat");
                   }
-                  fclose(file);
+                  (void) fclose(file);
                 }
               }
             }
@@ -340,11 +340,11 @@ void upscpy_catman(UPSCPY_PARAMS)
 #define REMOVE_FILES(filename, dest_path, type)  \
     /* figure out sectional sub directory (based on file extension) */ \
     if ((subdir = get_man_subdir(filename))) {                         \
-      sprintf(dest, "%s/%s%c", dest_path, type, subdir);               \
+      (void) sprintf(dest, "%s/%s%c", dest_path, type, subdir);        \
       /* see if the sectional subdir exists.  if not, ignore this. */  \
       if (stat(dest, &file_stat) != (int )-1) {                        \
         /* now add the remove line to the temp file */                 \
-        sprintf(buffer, "rm -f %s/%s\n", dest, filename);              \
+        (void) sprintf(buffer, "rm -f %s/%s\n", dest, filename);       \
         if (system(buffer)) { SYSTEM_ERROR(); }                        \
       }                                                                \
     }
@@ -389,7 +389,7 @@ void upscpy_rmman(UPSCPY_PARAMS)
           /* read each directory item and figure out what to do with it */
       { while ((dir_line = readdir(dir)))
         { if (dir_line->d_name[0] != '.')    /* skip any . file */
-          { sprintf(filename, "%s/%s", man_source, dir_line->d_name);
+          { (void) sprintf(filename, "%s/%s", man_source, dir_line->d_name);
             if (! stat(filename, &file_stat)) 
             { if (S_ISDIR(file_stat.st_mode))
                   /* this is a directory.  so we need to process the files in
@@ -405,7 +405,7 @@ void upscpy_rmman(UPSCPY_PARAMS)
                   { REMOVE_FILES(dir_line->d_name, 
                                  a_db_info->config->man_target_dir, "man");
                   }
-                  fclose(file);
+                  (void) fclose(file);
                 }
               }
             }
@@ -452,7 +452,7 @@ void upscpy_rmcatman(UPSCPY_PARAMS)
         /* read each directory item and figure out what to do with it */
       { while ((dir_line = readdir(dir))) 
         { if (dir_line->d_name[0] != '.')    /* skip any . file */
-          { sprintf(filename, "%s/%s", catman_source, dir_line->d_name);
+          { (void) sprintf(filename, "%s/%s", catman_source, dir_line->d_name);
             if (! stat(filename, &file_stat)) 
             { if (S_ISDIR(file_stat.st_mode)) 
                 /* this is a directory.  so we need to process the files in
@@ -469,7 +469,7 @@ void upscpy_rmcatman(UPSCPY_PARAMS)
                                  a_db_info->config->catman_target_dir,
                                  "cat");
                   }
-                  fclose(file);
+                  (void) fclose(file);
                 }
               }
             }
