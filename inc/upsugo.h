@@ -57,6 +57,7 @@ typedef struct ups_command
     int     ugo_h;           /* Host(s) specified                    */
     t_upslst_item *ugo_host;
     int     ugo_H;           /* Gen flavor match list from -f no OS  */
+    t_upslst_item *ugo_osname; /* user specified os name             */
     int     ugo_j;           /* applies to top level product         */
 /*  int     ugo_J;           UNDEFINED                               */
     int     ugo_k;           /* Don't do unsetup first               */
