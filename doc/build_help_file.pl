@@ -81,7 +81,7 @@ while ( <FSC> ) {
 }
 
 #
-# read ups commands from help file, build a new help file and print results
+# read ups commands from help file, build a new file and print results
 #
 
 my $oncmd = 0;
@@ -130,7 +130,7 @@ foreach $key (keys %copt) {
 #
 # subs
 #
-sub get_cop()
+sub get_cop
 {
   my @items = split /,/, $_;
 
