@@ -1,4 +1,3 @@
-ups_configure     61 src/ups_configure.c t_upslst_item *ups_configure(const t_upsugo_command * const a_command_line,
 Cell_s            15 src/dropit.c     struct Cell_s {
 add_at_back       67 src/dropit.c     add_at_back(list,cell)
 add_at_front      54 src/dropit.c     add_at_front(list,cell)
@@ -13,10 +12,7 @@ getopt           225 src/funame.c     int getopt(argc, argv, optstring)
 main             322 src/funame.c     main(argc,argv)
 uname            142 src/funame.c     int uname(name)
 utsname           36 src/funame.c     struct utsname {
-ups_declare      172 src/ups_declare.c t_upslst_item *ups_declare( t_upsugo_command * const uc ,
-upsdcl_new_chain  78 src/ups_declare.c t_upstyp_instance *upsdcl_new_chain(t_upsugo_command * const uc)
-upsdcl_new_product  67 src/ups_declare.c t_upstyp_product *upsdcl_new_product(t_upsugo_command * const uc)
-upsdcl_new_version  93 src/ups_declare.c t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
+ups_configure     61 src/ups_configure.c t_upslst_item *ups_configure(const t_upsugo_command * const a_command_line,
 ADD_TO_ECHO      121 src/ups_copy.c   #define ADD_TO_ECHO(inst_elem, format)  \
 COPY_FROM_OLD_INSTANCE 108 src/ups_copy.c   #define COPY_FROM_OLD_INSTANCE(the_inst, old_inst, inst_elem)  \
 COPY_TO_INSTANCE  85 src/ups_copy.c   #define COPY_TO_INSTANCE(the_inst, ugo_elem, old_inst, inst_elem)  \
@@ -29,7 +25,10 @@ fill_ugo_struct  628 src/ups_copy.c   static t_upsugo_command *fill_ugo_struct(
 free_new_dclr_instance 612 src/ups_copy.c   static t_upstyp_instance *free_new_dclr_instance(
 free_ugo_struct  695 src/ups_copy.c   static t_upsugo_command *free_ugo_struct( 
 ups_copy         163 src/ups_copy.c   t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
-ups_unconfigure   61 src/ups_unconfigure.c t_upslst_item *ups_unconfigure( const t_upsugo_command * const a_command_line,
+ups_declare      172 src/ups_declare.c t_upslst_item *ups_declare( t_upsugo_command * const uc ,
+upsdcl_new_chain  78 src/ups_declare.c t_upstyp_instance *upsdcl_new_chain(t_upsugo_command * const uc)
+upsdcl_new_product  67 src/ups_declare.c t_upstyp_product *upsdcl_new_product(t_upsugo_command * const uc)
+upsdcl_new_version  93 src/ups_declare.c t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
 ups_depend        59 src/ups_depend.c t_upslst_item *ups_depend( t_upsugo_command * const u_cmd, 
 ups_flavor        56 src/ups_flavor.c void ups_flavor( t_upsugo_command * const uc )
 IS_IN_PROD_DIR    57 src/ups_get.c    #define IS_IN_PROD_DIR()   \
@@ -63,6 +62,7 @@ ups_start         61 src/ups_start.c  t_upslst_item *ups_start(const t_upsugo_co
 ups_stop          61 src/ups_stop.c   t_upslst_item *ups_stop(const t_upsugo_command * const a_command_line,
 ups_tailor        64 src/ups_tailor.c t_upslst_item *ups_tailor( const t_upsugo_command * const a_command_line,
 ups_touch         66 src/ups_touch.c  t_upslst_item *ups_touch( t_upsugo_command * const uc,
+ups_unconfigure   61 src/ups_unconfigure.c t_upslst_item *ups_unconfigure( const t_upsugo_command * const a_command_line,
 ups_undeclare     65 src/ups_undeclare.c t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
 ups_unk           60 src/ups_unk.c    t_upslst_item *ups_unk(const t_upsugo_command * const a_command_line,
 ups_unsetup       61 src/ups_unsetup.c t_upslst_item *ups_unsetup( const t_upsugo_command * const a_command_line,
