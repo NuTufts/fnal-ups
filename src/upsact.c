@@ -392,7 +392,7 @@ t_cmd_info g_cmd_info[] = {
   {e_list,        "list",        "?acdf:g:H:K:lm:M:noq:r:tU:vz:Z0123", 0x00000010, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:G:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000010, e_invalid_action},
-  {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vVz:Z0123", 0x00000010, e_declare},
+  {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vz:Z0123", 0x00000010, e_declare},
   {e_depend,      "depend",      "?cdf:g:H:jK:lm:M:noq:r:RtU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_exist,       "exist",       "?cdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_modify,      "modify",      "?aA:E:f:H:m:M:Np:q:r:T:U:vVz:Z", 0x00000010, e_invalid_action},
