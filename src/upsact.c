@@ -2279,7 +2279,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	         - if it's not setuped, use the original instance
 	         - if it's setuped, use only the product name */
 
-	      if ( ! g_COMPILE_FLAG && upsugo_getenv( a_cmd_ugo->ugo_product ) )
+	      if ( (! g_COMPILE_FLAG) && upsugo_getenv( a_cmd_ugo->ugo_product ) )
 		strcat( buf, a_cmd_ugo->ugo_product );
 	      else
 		strcat( buf, cmd_line );
