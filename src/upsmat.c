@@ -7,6 +7,12 @@
  *        Compare the instance(s) requested on the command line with those
  *        contined in the product UPS files and return a list of matches.
  *
+ *   upsmat_instance: takes command line input and finds chain/version and
+ *                      table file instance that matches it.
+ *   upsmat_match_with_instance: takes a product and finds the match in a
+ *                      list of instances that matches the version, flavor 
+ *                      and qualifiers.
+ *
  * AUTHORS:
  *       Eileen Berman
  *       David Fagan
@@ -92,7 +98,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
  * Definition of global variables.
  */
 #ifndef NULL
-#define NULL
+#define NULL 0
 #endif
 
 /* sometimes when matching for > 1 instance, and error is found with a
@@ -111,8 +117,12 @@ static int g_ups_error;
 static int g_ugo_version = 0;
 
 
+/* Prefix for any messages that are put in the error buffer. */
 #define VPREFIX  "UPSMAT: "
 
+/* if we used the tmp lists then they need to be freed. since only malloced
+   the lists once and then just changed the pointer (in order to save time)
+   we need to put back the initial values before freeing them up */
 #define TMP_LISTS_FREE() \
       if (tmp_flavor_list) {                                     \
 	/* set to initial value first */                         \
@@ -121,7 +131,11 @@ static int g_ugo_version = 0;
 	tmp_flavor_list = upslst_free(tmp_flavor_list, ' ');     \
 	tmp_quals_list = upslst_free(tmp_quals_list, ' ');       \
       }
-	
+
+/* we will use temporary lists in order to pass exactly what we want to the
+   matching routines.  however we only want to allocate these lists once in
+   order to avoid the mallocing time.  so just reset the pointers if we are
+   doing this more than once.  the pointers will get reset back when freed */
 #define TMP_LISTS_SET()	\
      if (tmp_flavor_list == NULL) {                                        \
        tmp_flavor_list = upslst_insert(tmp_flavor_list, inst->flavor);     \
@@ -137,6 +151,8 @@ static int g_ugo_version = 0;
        tmp_quals_list->data = (void *)(inst->qualifiers);                  \
      }
 
+/* if ups directory and prod directory were entered on the command line then
+   use those values instead of the ones in the read in instance. */
 #define USE_CMD_LINE_INFO() \
       if (a_upsdir) {                                \
 	tmp_upsdir = (char *)a_upsdir;               \
@@ -149,6 +165,8 @@ static int g_ugo_version = 0;
 	tmp_productdir = inst->prod_dir;             \
       }
 
+/* check the list with the a_need_unique flag.  report an error if we need
+   a unique instance and there is more than one on the list. */
 #define CHECK_UNIQUE(a_list, type) \
       if (a_list) {                                                    \
         a_list = upslst_first(a_list);                                 \
@@ -163,13 +181,25 @@ static int g_ugo_version = 0;
 	}                                                              \
       }
 
+/* get a new maintched instance, fill in the correct instance pointer and add
+   this matched instance to a list */
 #define GET_NEW_MINST(inst_type) \
       minst = ups_new_matched_instance();                          \
       minst->inst_type = instance;                                 \
       upsmem_inc_refctr((void *)instance);                         \
       *a_minst_list = upslst_add(*a_minst_list, (void *)minst);
 
-
+/* add the instance to a matched instance list.  look at the current element
+   in the list and see if the type of the instance we have already is filled
+   in for that matched instance.  if it is , go to the next element in the
+   list or create a new element if we are at the end of the list. e.g. - we
+   have matched 3 instances in a version file.  so we will have 3 matched
+   instances in our matched instance list.  when we are matching in the table
+   file, we are only matching one instance at a time, so we can fill in the
+   table file pointer for the matched instance and then go to the next element
+   on the list for our next table file. we can do this since the instances are
+   always matched in the same order and only one at a time after the initial
+   match. */
 #define ADD_TO_MINST_LIST(inst_type) \
       if (*a_minst_list) {                                             \
 	t_upslst_item *tmp_list = *a_minst_list;                       \
@@ -193,12 +223,14 @@ static int g_ugo_version = 0;
 	  GET_NEW_MINST(inst_type);                                    \
       }
 
+/* add the matched product structure to a list */
 #define ADD_TO_MPRODUCT_LIST() \
       if (mproduct) {                                                  \
 	mproduct->db_info = db_info;                                   \
 	mproduct_list = upslst_add(mproduct_list, (void *)mproduct);   \
       }
 
+/* read in the database configuration pointer if not done already */
 #define GET_CONFIG_FILE() \
     if (db_info && !db_info->config) {               \
       config_ptr = upsutl_get_config(db_info->name); \
@@ -208,6 +240,8 @@ static int g_ugo_version = 0;
       }                                              \
     }
 
+/* look through our list of matched instances.  free any and remove them from
+   the list if they have the invalid_instance flag set. */
 #define FREE_INVALID_INSTANCES(minst_list) \
     if (minst_list) {                                                    \
       t_upslst_item *tmp_list = NULL;                                    \
@@ -263,104 +297,283 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   g_ups_error = UPS_SUCCESS;
   g_ugo_version = 0;            /* assume no version file on command line */
 
-  /* In order to avoid doing this for each database, if a product name was
-     entered, create a list (with 1 element) here */
-  if (strcmp(a_command_line->ugo_product, ANY_MATCH)) {
-    /* we only have one to list out */
-    if ((new_string = upsutl_str_create(a_command_line->ugo_product, ' '))) {
-      all_products = upslst_add(all_products, new_string);
-      got_all_products = 1;
-    }
-  }
-  
-  /* In order to avoid doing this for each database, if chains were
-     entered, create a list here (can only do if '*' was not one of the
-     requested chains. */
-  if (a_command_line->ugo_chain) {
-    /* first make sure none of the requested chains were '*' */
-    for (chain_item = a_command_line->ugo_chain ; chain_item ;
-	 chain_item = chain_item->next) {
-      the_chain = (char *)(chain_item->data);
-      if (! strcmp(the_chain, ANY_MATCH)) {
-	need_all_chains = 1;
-	break;
+  if (a_command_line) {
+    /* In order to avoid doing this for each database, if a product name was
+       entered, create a list (with 1 element) here.  if the user entered a
+       specific product then we can create a list of the product to match
+       here.  and then we do not have to do this for each database we will
+       look at.  however if the user entered "*" for example, then he wants all
+       products in each database and we need to make a new list for each
+       database we encounter.  */
+    if (NOT_EQUAL_ANY_MATCH(a_command_line->ugo_product)) {
+      /* we only have one to list out */
+      if ((new_string = upsutl_str_create(a_command_line->ugo_product,
+					  STR_TRIM_DEFAULT))) {
+	all_products = upslst_add(all_products, new_string);
+	got_all_products = 1;
       }
     }
-    if (! need_all_chains) {
-      /* none of the chains were '*' so they will remain the same for
-	 all products.  just point to the list we have. */
-      all_chains = a_command_line->ugo_chain;
-      got_all_chains = 1;
-    }
-  }
-
-  /* In order to avoid doing this for each database, if a version was
-     entered, create a list (with 1 element) here */
-  if (a_command_line->ugo_version &&
-      strcmp(a_command_line->ugo_version, ANY_MATCH)) {
-    /* we only have one to list out */
-    if ((new_string = upsutl_str_create(a_command_line->ugo_version,  ' '))) {
-      all_versions = upslst_add(all_versions, new_string);
-      got_all_versions = 1;
-      g_ugo_version = 1;            /* version file on command line */
-    }
-  }
-
-  /* figure out where we are getting our database from */
-  if (a_db_info) {
-    /* the user passed a particular one */
-    db_list = (t_upslst_item *)a_db_info;
-    saved_next = db_list->next;
-    db_list->next = NULL;                     /* we only want this one */
-  } else {
-    db_list = a_command_line->ugo_db;
-  }
-
-  if (db_list) {
-    if (a_command_line->ugo_m && a_command_line->ugo_product) {
-      /* since a specific table file was entered, we need to check if a
-	 version or chain was also specified.  if yes then this is an error */
-      if (!a_command_line->ugo_version &&
-	  (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
-	/* We have a table file  and we have a product name, we do not need the
-	   db. */
-	if (UPS_VERBOSE) {
-	  printf("%sUsing Table File - %s\n", VPREFIX,
-		 (char *)a_command_line->ugo_tablefile);
+  
+    /* In order to avoid doing this for each database, if chains were
+       entered, create a list here (can only do if '*' was not one of the
+       requested chains.   if the user entered a list of
+       specific chains then we can create a list of the chains to match
+       here.  and then we do not have to do this for each database we will
+       look at.  however if the user entered "*" for example, then he wants all
+       chains and we need to make a new list for each product in each
+       database we encounter.  */
+    if (a_command_line->ugo_chain) {
+      /* first make sure none of the requested chains were '*' */
+      for (chain_item = a_command_line->ugo_chain ; chain_item ;
+	   chain_item = chain_item->next) {
+	the_chain = (char *)(chain_item->data);
+	if (! NOT_EQUAL_ANY_MATCH(the_chain)) {
+	  need_all_chains = 1;
+	  break;
 	}
+      }
+      if (! need_all_chains) {
+	/* none of the chains were '*' so they will remain the same for
+	   all products.  just point to the list we have. */
+	all_chains = a_command_line->ugo_chain;
+	got_all_chains = 1;
+      }
+    }
+    
+    /* In order to avoid doing this for each database, if a version was
+       entered, create a list (with 1 element) here.   if the user entered a
+       specific version then we can create a list of the version to match
+       here.  and then we do not have to do this for each database we will
+       look at.  however if the user entered "*" for example, then he wants all
+       versions and we need to make a new list for each
+       product in each database we encounter.  */
+    if (a_command_line->ugo_version &&
+	(NOT_EQUAL_ANY_MATCH(a_command_line->ugo_version))) {
+      /* we only have one to list out */
+      if ((new_string = upsutl_str_create(a_command_line->ugo_version, 
+					  STR_TRIM_DEFAULT))) {
+	all_versions = upslst_add(all_versions, new_string);
+	got_all_versions = 1;
+	g_ugo_version = 1;            /* version file on command line */
+      }
+    }
+    
+    /* figure out where we are getting our database from.  if the user passed
+       us a specific one in a_db_info, then we do not need to look at the
+       command line to get this info. */
+    if (a_db_info) {
+      /* the user passed a particular one */
+      db_list = (t_upslst_item *)a_db_info;
+      saved_next = db_list->next;
+      db_list->next = NULL;                     /* we only want this one */
+    } else {
+      /* this might be null but we will check for that below. */
+      db_list = a_command_line->ugo_db;
+    }
+    
+    if (db_list) {
+      if (a_command_line->ugo_m && a_command_line->ugo_product) {
+	/* since a specific table file was entered, we need to check if a
+	   version or chain was also specified.  if yes then is an error */
+	if (!a_command_line->ugo_version &&
+	    (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
+	  /* We have a table file  and we have a product name, we do not need a
+	     db. */
+	  if (UPS_VERBOSE) {
+	    printf("%sUsing Table File - %s\n", VPREFIX,
+		   (char *)a_command_line->ugo_tablefile);
+	  }
+	  for (db_item = db_list ; db_item ; db_item = db_item->next) {
+	    db_info = (t_upstyp_db *)db_item->data;
+	    if (UPS_VERBOSE) {
+	      printf("%sSearching UPS database - %s\n", VPREFIX,
+		     db_info->name);
+	    }
+	    /* If the user did not enter a product name, get all the product
+	       names in the current db. */
+	    if (! got_all_products) {
+	      upsutl_get_files(db_info->name, (char *)ANY_MATCH,
+			       &all_products);
+	    }
+	    
+	    if (all_products) {
+	      /* make sure if we need a unique instance that we only have 1 */
+	      CHECK_UNIQUE(all_products, "products");
+
+	      /* read in the config file associated with this database and
+		 save it */
+	      GET_CONFIG_FILE();
+	      
+	      /* for each product, get all the requested instances */
+	      for (product_item = all_products ; product_item ;
+		   product_item = product_item->next) {
+		prod_name = (char *)product_item->data;
+		
+		if (UPS_VERBOSE) {
+		  printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
+		}
+		mproduct = match_instance_core(a_command_line, db_info, 
+					       prod_name, NULL, NULL,
+					       a_need_unique, any_version,
+					       any_chain);
+		/* update the mproduct_list structure with the new info */
+		ADD_TO_MPRODUCT_LIST();
+	      }
+	      /* may no longer need product list - free it */
+	      if (! got_all_products) {
+		all_products = upslst_free(all_products, do_delete);
+	      }
+	    }
+	    /* if we have a match and are asking for a unique one, we do not
+	       need to go to the next db */
+	    if (a_need_unique && mproduct) {
+	      break;
+	    }
+	  }
+	} else {
+	  upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
+	}
+      } else {
+	/* we have at least one db */
 	for (db_item = db_list ; db_item ; db_item = db_item->next) {
 	  db_info = (t_upstyp_db *)db_item->data;
 	  if (UPS_VERBOSE) {
 	    printf("%sSearching UPS database - %s\n", VPREFIX, db_info->name);
 	  }
-	  /* If the user did not enter a product name, get all the product
-	     names in the current db. */
+	  /* If the user did not enter a product name, get all product names
+	     in the current db. */
 	  if (! got_all_products) {
 	    upsutl_get_files(db_info->name, (char *)ANY_MATCH, &all_products);
 	  }
-
+	  
 	  if (all_products) {
 	    /* make sure if we need a unique instance that we only have one */
 	    CHECK_UNIQUE(all_products, "products");
-
+	    
 	    /* read in the config file associated with this database and
 	       save it */
 	    GET_CONFIG_FILE();
-
+	    
 	    /* for each product, get all the requested instances */
 	    for (product_item = all_products ; product_item ;
 		 product_item = product_item->next) {
 	      prod_name = (char *)product_item->data;
-	  
+	      location = upsutl_get_prod_dir(db_info->name, prod_name);
+	      
 	      if (UPS_VERBOSE) {
 		printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
 	      }
-	      mproduct = match_instance_core(a_command_line, db_info, 
-					     prod_name, NULL, NULL,
-					     a_need_unique, any_version,
-					     any_chain);
-	      /* update the mproduct_list structure with the new info */
-	      ADD_TO_MPRODUCT_LIST();
+	      
+	      /* make sure that the product actually exists. */
+	      if (upsutl_is_a_file(location) == UPS_SUCCESS) {
+		/* Check if chains were requested. if a specific version was
+		   passed, but no chain, the we will want to report all chains.
+		   this is only true in the case where we are not looking for a
+		   unique instance. this way we do not require setup to open up
+		   all of the chain files */
+		if (a_command_line->ugo_chain ||
+		    (a_command_line->ugo_version && !a_need_unique)) {
+		  /* we may have already made a list of them above. check
+		     before doing anything here */
+		  if (! got_all_chains) {
+		    if (a_command_line->ugo_version) {
+		      /* a specific version was entered so we want to report on
+			 all chains that point to the specified version */
+		      chain_item = upslst_new(upsutl_str_create(ANY_MATCH,
+							    STR_TRIM_DEFAULT));
+		    } else {
+		      chain_item = a_command_line->ugo_chain;
+		    }
+		    for ( ; chain_item ; chain_item = chain_item->next) {
+		      the_chain = (char *)(chain_item->data);
+		      
+		      if (! NOT_EQUAL_ANY_MATCH(the_chain)) {
+			/* get all the chains in the current product area */
+			upsutl_get_files(location, (char *)CHAIN_SUFFIX,
+					 &all_chains);
+			any_chain = 1;            /* originally chain was *  */
+			
+		      } else {
+			/* Now add this chain to the master list */
+			all_chains = upslst_add(all_chains, the_chain);
+		      }
+		    }
+		  }
+		  /* make sure if we need unique instance we only have one */
+		  CHECK_UNIQUE(all_chains, "chains");
+		}
+		
+		/* Look to see if a version was specified. */
+		if (a_command_line->ugo_version) {
+		  if (! got_all_versions) {
+		    /* get all the versions in the current product area */
+		    upsutl_get_files(location, (char *)VERSION_SUFFIX,
+				     &all_versions);
+		    any_version = 1;            /* originally version was *  */
+		  }
+		  /* make sure if need unique instance that we only have one */
+		  CHECK_UNIQUE(all_versions, "versions");
+		}
+		
+		/* now do the instance matching */
+		mproduct = match_instance_core(a_command_line, db_info,
+					       prod_name, all_chains,
+					       all_versions, a_need_unique,
+					       any_version, any_chain);
+		
+		/* update the mproduct_list structure with the new info */
+		ADD_TO_MPRODUCT_LIST();
+		
+		/* may no longer need version list - free it */
+		if (! got_all_versions) {
+		  all_versions = upslst_free(all_versions, do_delete);
+		}
+		
+		/* may no longer need chain list - free it */
+		if (! got_all_chains) {
+		  all_chains = upslst_free(all_chains, do_delete);
+		}
+		
+		/* get out of the loop if we got an error */
+		if (UPS_ERROR != UPS_SUCCESS) {
+		  if (!a_need_unique) {
+		    /* we are looking for possibly many instances.  skip the
+		       error if current instance could not be found and look
+		       for the next one.  error message is in error buffer. */
+		    if (UPS_ERROR == UPS_NO_TABLE_MATCH ||
+			UPS_ERROR == UPS_NO_VERSION_MATCH) {
+		      g_ups_error = UPS_ERROR;
+		      /* erase the last error from the error buffer */
+		      upserr_backup();
+		    }
+		    else {
+		      /* it was another error so pay attention to it. */
+		      break;
+		    }
+		  } else {
+		    /* we are only looking for one instance. if we are looking
+		       thru multiple databases, and have not reached the last
+		       one, then ignore the error and continue on to the next
+		       prod or db. */
+		    if (db_item->next) {
+		      /* there are more databases to look thru. erase the error
+			 and continue. still to do - need to make sure on the
+			 number of times to backup. */
+		      upserr_backup();
+		      upserr_backup();
+		    } else {
+		      /* this was the last db on the list so we need to handle
+			 the error */
+		      break;
+		    }
+		  }
+		}
+	      } else {
+		/* the entered product does not exist in this database */
+		if (UPS_VERBOSE) {
+		  printf("%sProduct - %s does not exist\n", VPREFIX, location);
+		}
+	      }
 	    }
 	    /* may no longer need product list - free it */
 	    if (! got_all_products) {
@@ -373,212 +586,59 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    break;
 	  }
 	}
+      }
+    } else if (a_command_line->ugo_m && a_command_line->ugo_product) {
+      /* since a specific table file was entered, we need to check if a
+	 version or chain was also specified.  if yes then this is an error */
+      if (!a_command_line->ugo_version &&
+	  (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
+	/* We have a table file and no db, that is ok */
+	if (UPS_VERBOSE) {                                                 
+	  printf("%sNo UPS Database, using Table File - %s\n", VPREFIX,    
+		 (char *)a_command_line->ugo_tablefile);
+	}
+	mproduct = match_instance_core(a_command_line, db_info,
+				       a_command_line->ugo_product, NULL, NULL,
+				       a_need_unique, any_version, any_chain);
+	/* update the mproduct_list structure with the new info */
+	ADD_TO_MPRODUCT_LIST();
       } else {
 	upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
       }
     } else {
-      /* we have at least one db */
-      for (db_item = db_list ; db_item ; db_item = db_item->next) {
-	db_info = (t_upstyp_db *)db_item->data;
-	if (UPS_VERBOSE) {
-	  printf("%sSearching UPS database - %s\n", VPREFIX, db_info->name);
-	}
-	/* If the user did not enter a product name, get all the product names
-	   in the current db. */
-	if (! got_all_products) {
-	  upsutl_get_files(db_info->name, (char *)ANY_MATCH, &all_products);
-	}
-
-	if (all_products) {
-	  /* make sure if we need a unique instance that we only have one */
-	  CHECK_UNIQUE(all_products, "products");
-
-	  /* read in the config file associated with this database and
-	     save it */
-	  GET_CONFIG_FILE();
-
-	  /* for each product, get all the requested instances */
-	  for (product_item = all_products ; product_item ;
-	       product_item = product_item->next) {
-	    prod_name = (char *)product_item->data;
-	    location = upsutl_get_prod_dir(db_info->name, prod_name);
-
-	    if (UPS_VERBOSE) {
-	      printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
-	    }
-
-	    /* make sure that the product actually exists. */
-	    if (upsutl_is_a_file(location) == UPS_SUCCESS) {
-	      /* Check if chains were requested. if a specific version was
-		 passed, but no chain, the we will want to report all chains.
-		 this is only true in the case where we are not looking for a
-		 unique instance. this way we do not require setup to open up
-		 all of the chain files */
-	      if (a_command_line->ugo_chain ||
-		  (a_command_line->ugo_version && !a_need_unique)) {
-		/* we may have already made a list of them above. check before
-		   doing anything here */
-		if (! got_all_chains) {
-		  if (a_command_line->ugo_version) {
-		    /* a specific version was entered so we want to report on
-		       all chains that point to the specified version */
-		    chain_item = upslst_new(upsutl_str_create(ANY_MATCH,
-							    STR_TRIM_DEFAULT));
-		  } else {
-		    chain_item = a_command_line->ugo_chain;
-		  }
-		  for ( ; chain_item ; chain_item = chain_item->next) {
-		    the_chain = (char *)(chain_item->data);
-		    
-		    if (! strcmp(the_chain, ANY_MATCH)) {
-		      /* get all the chains in the current product area */
-		      upsutl_get_files(location, (char *)CHAIN_SUFFIX,
-				       &all_chains);
-		      any_chain = 1;             /* originally chain was *  */
-		      
-		    } else {
-		      /* Now add this chain to the master list */
-		      all_chains = upslst_add(all_chains, the_chain);
-		    }
-		  }
-		}
-		/* make sure if we need unique instance we only have one */
-		CHECK_UNIQUE(all_chains, "chains");
-	      }
-
-	      /* Look to see if a version was specified. */
-	      if (a_command_line->ugo_version) {
-		if (! got_all_versions) {
-		  /* get all the versions in the current product area */
-		  upsutl_get_files(location, (char *)VERSION_SUFFIX,
-				   &all_versions);
-		  any_version = 1;             /* originally version was *  */
-		}
-		/* make sure if need unique instance that we only have one */
-		CHECK_UNIQUE(all_versions, "versions");
-	      }
-	      
-	      /* now do the instance matching */
-	      mproduct = match_instance_core(a_command_line, db_info,
-					     prod_name, all_chains,
-					     all_versions, a_need_unique,
-					     any_version, any_chain);
-
-	      /* update the mproduct_list structure with the new info */
-	      ADD_TO_MPRODUCT_LIST();
-
-	      /* may no longer need version list - free it */
-	      if (! got_all_versions) {
-		all_versions = upslst_free(all_versions, do_delete);
-	      }
-	      
-	      /* may no longer need chain list - free it */
-	      if (! got_all_chains) {
-		all_chains = upslst_free(all_chains, do_delete);
-	      }
-	    
-	      /* get out of the loop if we got an error */
-	      if (UPS_ERROR != UPS_SUCCESS) {
-		if (!a_need_unique) {
-		  /* we are looking for possibly many instances.  skip the
-		     error if the current instance could not be found and look
-		     for the next one.  error message is in error buffer. */
-		  if (UPS_ERROR == UPS_NO_TABLE_MATCH ||
-		      UPS_ERROR == UPS_NO_VERSION_MATCH) {
-		    g_ups_error = UPS_ERROR;
-		    upserr_backup();
-		  }
-		  else {
-		    /* it was another error so pay attention to it. */
-		    break;
-		  }
-		} else {
-		  /* we are only looking for one instance. if we are looking
-		     thru multiple databases, and have not reached the last
-		     one, then ignore the error and continue on to the next
-		     prod or db. */
-		  if (db_item->next) {
-		    /* there are more databases to look thru. erase the error
-		       and continue. still to do - need to make sure on the
-		       number of times to backup. */
-		    upserr_backup();
-		    upserr_backup();
-		  } else {
-		    /* this was the last db on the list so we need to handle
-		       the error */
-		    break;
-		  }
-		}
-	      }
-	    } else {
-	      /* the entered product does not exist in this database */
-	      if (UPS_VERBOSE) {
-		printf("%sProduct - %s does not exist\n", VPREFIX, location);
-	      }
-	    }
-	  }
-	  /* may no longer need product list - free it */
-	  if (! got_all_products) {
-	    all_products = upslst_free(all_products, do_delete);
-	  }
-	}
-	/* if we have a match and are asking for a unique one, we do not need
-	   to go to the next db */
-	if (a_need_unique && mproduct) {
-	  break;
-	}
-      }
+      /* we have no db and no table file or no product name, this is an 
+	 error */
+      upserr_vplace();
+      upserr_add(UPS_NO_DATABASE, UPS_FATAL);
     }
-  } else if (a_command_line->ugo_m && a_command_line->ugo_product) {
-    /* since a specific table file was entered, we need to check if a
-       version or chain was also specified.  if yes then this is an error */
-    if (!a_command_line->ugo_version &&
-	(!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
-      /* We have a table file and no db, that is ok */
-      if (UPS_VERBOSE) {                                                 
-	printf("%sNo UPS Database, using Table File - %s\n", VPREFIX,    
-	       (char *)a_command_line->ugo_tablefile);
-      }
-      mproduct = match_instance_core(a_command_line, db_info,
-				     a_command_line->ugo_product, NULL, NULL,
-				     a_need_unique, any_version, any_chain);
-      /* update the mproduct_list structure with the new info */
-      ADD_TO_MPRODUCT_LIST();
-    } else {
-      upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
+    
+    /* make sure we have cleaned up */
+    if (all_products) {
+      /* no longer need product list - free it */
+      all_products = upslst_free(all_products, do_delete);
     }
-  } else {
-    /* we have no db and no table file or no product name, this is an error */
-    upserr_vplace();
-    upserr_add(UPS_NO_DATABASE, UPS_FATAL);
-  }
+    if (all_versions) {
+      /* no longer need version list - free it */
+      all_versions = upslst_free(all_versions, do_delete);
+    }
+    if (all_chains && (!got_all_chains)) {
+      /* no longer need chain list - free it */
+      all_chains = upslst_free(all_chains, do_delete);
+    }      
 
-  /* make sure we have cleaned up */
-  if (all_products) {
-    /* no longer need product list - free it */
-    all_products = upslst_free(all_products, do_delete);
-  }
-  if (all_versions) {
-    /* no longer need version list - free it */
-    all_versions = upslst_free(all_versions, do_delete);
-  }
-  if (all_chains && (!got_all_chains)) {
-    /* no longer need chain list - free it */
-    all_chains = upslst_free(all_chains, do_delete);
-  }      
-
-  /* back up to the front of the list */
-  mproduct_list = upslst_first(mproduct_list);
-
-  /* restore the next pointer of the db list */
-  if (a_db_info) {
-    db_list->next = saved_next;
-  }
-
-  /* return any error we encountered along the way */
-  if (g_ups_error != UPS_SUCCESS) {
-    UPS_ERROR = g_ups_error;
-  }
+    /* back up to the front of the list */
+    mproduct_list = upslst_first(mproduct_list);
+    
+    /* restore the next pointer of the db list */
+    if (a_db_info) {
+      db_list->next = saved_next;
+    }
+    
+    /* return any error we encountered along the way */
+    if (g_ups_error != UPS_SUCCESS) {
+      UPS_ERROR = g_ups_error;
+    }
+  } /* if (a_command_line) */
   return(mproduct_list);
 }
 
@@ -606,7 +666,7 @@ t_upslst_item *upsmat_match_with_instance(
   t_upslst_item *instance_list = NULL;
   t_upstyp_instance *inst = NULL;
 
-  if (a_instance->version) {
+  if (a_instance && a_product && a_instance->version) {
     for (instance_list = a_product->instance_list ; instance_list ;
 	 instance_list = instance_list->next) {
       inst = (t_upstyp_instance *)instance_list->data;
@@ -616,7 +676,7 @@ t_upslst_item *upsmat_match_with_instance(
 	  if (! strcmp(a_instance->flavor, inst->flavor)) {
 	    /* they have the same flavor */
 	    if (! strcmp(a_instance->qualifiers, inst->qualifiers)) {
-	      /* they have the same qualifiers, we found a match, return it */
+	      /* they have same qualifiers, we found a match, return it */
 	      break;
 	    }
 	  }
@@ -1120,20 +1180,17 @@ static int match_from_table( const char * const a_product,
   if (full_table_file != NULL) {
     if ((read_product = upsfil_read_file(full_table_file)) != NULL) {
       /* get all the instances that match command line input */
-       num_matches = get_instance(read_product->instance_list, a_flavor_list,
-				  a_quals_list, a_need_unique, e_file_table,
-				  a_minst_list);
-       if (UPS_VERBOSE) {
-	 printf("%sFound %d instances in %s\n", VPREFIX, num_matches,
-		full_table_file);
-       }
-       if (UPS_VERIFY && !num_matches)
-       { upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "TABLE", full_table_file);
-         /* upserr_output(); no clue maybe ??? */ 
-       } 
-
-      /* free the table_file_path */
-      upsmem_free(full_table_file);
+      num_matches = get_instance(read_product->instance_list, a_flavor_list,
+				 a_quals_list, a_need_unique, e_file_table,
+				 a_minst_list);
+      if (UPS_VERBOSE) {
+	printf("%sFound %d instances in %s\n", VPREFIX, num_matches,
+	       full_table_file);
+      }
+      if (UPS_VERIFY && !num_matches) {
+	upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "TABLE",
+		   full_table_file);
+      }
     }
   }
   
@@ -1174,23 +1231,19 @@ static int get_instance(const t_upslst_item * const a_read_instances,
        tmp_flavor_list = tmp_flavor_list->next) {
     flavor = (char *)tmp_flavor_list->data;
     got_match = 0;
-    want_all_f = (! strcmp(flavor, ANY_MATCH));   /* true if flavor = *  */
+    want_all_f = (! NOT_EQUAL_ANY_MATCH(flavor));   /* true if flavor = *  */
 
     for (tmp_quals_list = (t_upslst_item *)a_quals_list; tmp_quals_list ;
 	 tmp_quals_list = tmp_quals_list->next) {
       quals = (char *)tmp_quals_list->data;
-      want_all_q = (! strcmp(quals, ANY_MATCH));   /* true if quals = *  */
+      want_all_q = (! NOT_EQUAL_ANY_MATCH(quals));   /* true if quals = *  */
       /* Check to see if the flavors match or want any flavor */
       for (tmp_list = (t_upslst_item *)a_read_instances; tmp_list ;
 	   tmp_list = tmp_list->next) {
 	instance = (t_upstyp_instance *)(tmp_list->data);
-	if (want_all_f || (! strcmp(instance->flavor, flavor)) ||
-	    ((a_file_type == e_file_table) && 
-	     (! strcmp(instance->flavor, ANY_MATCH)))) {
+	if (want_all_f || (! strcmp(instance->flavor, flavor))) {
 	  /* They do - now compare the qualifiers */
-	  if (want_all_q || (! strcmp(instance->qualifiers, quals)) ||
-	      ((a_file_type == e_file_table) && 
-	       (! strcmp(instance->qualifiers, ANY_MATCH)))) {
+	  if (want_all_q || (! strcmp(instance->qualifiers, quals))) {
 	    /* They do. Save the instances in the order they came in. */
 	    if (a_file_type == e_file_chain) {
 	      /* this instance was read in from a chain file, create a new
