@@ -1042,18 +1042,16 @@ void upsugo_free_ugo_db( t_upslst_item * const ugo_db )
   if ( ! ugo_db )
     return;
 
-  upsmem_dec_refctr( ugo_db );
-  if ( upsmem_get_refctr( ugo_db ) > 0 )
-    return;
-
   l_db = upslst_first( ugo_db );
   for ( ; l_db; l_db = l_db->next ) {
     t_upstyp_db* db = (t_upstyp_db * )l_db->data;
-    upsmem_free( db->name );
-    upsmem_free( db );
+    upsmem_dec_refctr( db );
+    if ( upsmem_get_refctr( db ) <= 0 ) {
+      upsmem_free( db->name );
+      upsmem_free( db );
+    }
   }
-  upslst_free( ugo_db,' ');
-
+  upslst_free( ugo_db,' ' );
 }
 
 /* ==========================================================================
