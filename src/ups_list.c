@@ -629,6 +629,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
       valid=1;
     }
     FromDatabase(name,"Database")
+    FromDatabase(name,"ups_db")
     FromConfig(upd_usercode_dir,"UPD_UserCode_Dir")
     FromConfig(setups_dir,"Setups_Dir")
     FromConfig(ups_db_version,"DB_Version")
