@@ -3,6 +3,13 @@ PRODUCT = fly
 
 FLAVOR = NULL
 QUALIFIERS = ""
+INFO_FILES = ${UPS_DIR}/test/scripts/action/info
+HTML_FILES = ${UPS_DIR}/test/scripts/action/html
+MAN_FILES = ${UPS_DIR}/test/scripts/action
+CATMAN_FILES = ${UPS_DIR}/test/scripts/action
+#MAN_FILES = ${UPS_DIR}/test/scripts/action/man
+#CATMAN_FILES = ${UPS_DIR}/test/scripts/action/catman
+
 
 ACTION = SETUP
    doDefaults()
@@ -53,11 +60,11 @@ ACTION = SETUP
    addalias (rambo,"SlyStalone %s")
    unalias  (rambo)
 # copy tests
-   copyInfo(info)
-   copyMan(man)
-   copyCatMan(catman)
-   copyHtml(html)
-   copyNews(news)
+   copyInfo()
+   copyMan()
+   copyCatMan()
+   copyHtml()
+   copyNews()
 # source tests
    sourceRequired(reqfile1,continue,NO_UPS_ENV)
    sourceReqCheck(reqcheck1,continue,NO_UPS_ENV)

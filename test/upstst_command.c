@@ -70,6 +70,9 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
       }
    *myfunc(uc,stdout,calledby);
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
+   if (UPS_ERROR != UPS_SUCCESS) continue;
+   upsfil_flush();
+   UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    }
 
 /* dump the output to specified file and compare
