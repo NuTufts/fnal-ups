@@ -325,7 +325,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          new_cinst=ups_new_instance();
          new_cinst->product=upsutl_str_create( uc->ugo_product, ' ' );
          new_cinst->version=upsutl_str_create(save_version,' ');
-         /* the_flavor=save_flavor->data; */
+         if (!the_flavor)
+         { the_flavor=save_flavor->data; 
+         }
          new_cinst->flavor=upsutl_str_create(the_flavor,' ');
          the_qualifiers=save_qualifiers->data;
          new_cinst->qualifiers=upsutl_str_create(the_qualifiers,' ');
