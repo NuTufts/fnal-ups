@@ -89,13 +89,13 @@ void ups_declare( t_upsugo_command * const a_command_line )
     { if ( mproduct_list->next )  /* found multiple products, not possible as of yet!! */
       { upserr_output();  abort(); } 
       /* now let's look for an EXACT match */
+/*
       for (tmp_minst_list = mproduct->minst_list ; tmp_minst_list ;
            tmp_minst_list = tmp_minst_list->next)
       { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data)
         if (minst_ptr->version)
-        { /* if(minst->version->flavor) */
-        }
       }
+*/
       printf("call ups modify for this"); 
       mproduct = (t_upstyp_matched_product *)mproduct_list->data;
       printf("\tPRODUCT=%s\n",mproduct->product);
