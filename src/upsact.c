@@ -1424,8 +1424,12 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       /* if product is at the top level always use that instance */
       
-      if ( new_ugo )
-	new_act_itm = find_prod_name( top_list, new_ugo->ugo_product );
+      if ( new_ugo ) {
+	if ( new_act_itm = find_prod_name( top_list, new_ugo->ugo_product ) ) {
+	  /*	  upsugo_free( new_ugo );
+		  new_ugo = new_act_itm->ugo */
+	}
+      }
 
       /* if product is already in our setup list, go to next product */
 
@@ -1825,7 +1829,10 @@ int cmp_ugo_db( const void * const d1, const void * const d2 )
   t_upstyp_db *db1 = (t_upstyp_db *)d1;
   t_upstyp_db *db2 = (t_upstyp_db *)d2;
 
-  return upsutl_stricmp( db1->name, db2->name );
+  if ( db1 && db2 && db1->name && db2->name )
+    return upsutl_stricmp( db1->name, db2->name );
+  else
+    return -1;
 }
 
 t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
@@ -1837,6 +1844,9 @@ t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list,
   t_upslst_item *l_db = upslst_first( db_list );
   t_upslst_item *f_db_itm = 0;
   t_upstyp_db *f_db = 0;
+
+  if ( !db ) 
+    return db_list;
 
   /* if passed database list contain passed db, remove it */
 
