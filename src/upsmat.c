@@ -155,6 +155,15 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	  break;                                                     \
 	}                                                            \
       }
+
+#define CHECK_NO_FILE() \
+      if (UPS_ERROR != UPS_SUCCESS) {                                    \
+         if ((UPS_ERROR != UPS_NO_FILE) || (a_need_unique == 1)) {       \
+           local_error = 1;                                              \
+	   break;                                                        \
+	 }                                                               \
+      }
+
 /*
  * Definition of public functions.
  */
@@ -182,6 +191,28 @@ t_upslst_item *upsmat_match_instance(
   t_upslst_item *mproduct_list = NULL;
   char *the_db, *prod_name, *the_chain, *new_string = NULL, *location = NULL;
   char do_delete = 'd';
+  int got_all_products = 0, got_all_versions = 0, local_error = 0;
+
+  /* In order to avoid doing this for each database, if a product name was
+     entered, create a list (with 1 element) here */
+  if (strcmp(a_command_line->ugo_product, ANY_MATCH)) {
+    /* we only have one to list out */
+    if ((new_string = upsutl_str_create(a_command_line->ugo_product, ' '))) {
+      all_products = upslst_add(all_products, new_string);
+      got_all_products = 1;
+    }
+  }
+  
+  /* In order to avoid doing this for each database, if a version was
+     entered, create a list (with 1 element) here */
+  if (strcmp(a_command_line->ugo_version, ANY_MATCH)) {
+    /* we only have one to list out */
+    if ((new_string = upsutl_str_create(a_command_line->ugo_version,  ' '))) {
+      all_versions = upslst_add(all_versions, new_string);
+      got_all_versions = 1;
+    }
+  }
+
 
   if (a_command_line->ugo_db) {
     /* we have at least one db */
@@ -193,14 +224,8 @@ t_upslst_item *upsmat_match_instance(
       }
       /* If the user did not enter a product name, get all the product names in
 	 the current db. */
-      if (! strcmp(a_command_line->ugo_product, ANY_MATCH)) {
+      if (! got_all_products) {
 	all_products = upsutl_get_files(the_db, (char *)ANY_MATCH);
-      } else {
-	/* we only have one to list out */
-	if ((new_string = upsutl_str_create(a_command_line->ugo_product,
-					    ' '))) {
-	  all_products = upslst_add(all_products, new_string);
-	}
       }
 
       if (all_products) {
@@ -246,25 +271,18 @@ t_upslst_item *upsmat_match_instance(
 	      /* no longer need chain list - free it */
 	      all_chains = upslst_free(all_chains, do_delete);
 	    
-	      if (UPS_ERROR != UPS_SUCCESS) {
-		break;
-	      } else {
-		if (mproduct) {
-		  mproduct_list = upslst_add(mproduct_list, mproduct);
-		}
+	      /* get out of the loop if we got an error */
+	      CHECK_NO_FILE();
+
+	      if (mproduct) {
+		mproduct_list = upslst_add(mproduct_list, mproduct);
 	      }
 	    } 
 	    /* Look to see if a version was specified. */
 	  } else if (a_command_line->ugo_version) {
-	    if (! strcmp(a_command_line->ugo_version, ANY_MATCH)) {
+	    if (! got_all_versions) {
 	      /* get all the versions in the current product area */
 	      GET_ALL_FILES((char *)VERSION_SUFFIX, all_versions);
-	    } else {
-	      /* we only have one to list out */
-	      if ((new_string = upsutl_str_create(a_command_line->ugo_version,
-						  ' '))) {
-		all_versions = upslst_add(all_versions, new_string);
-	      }
 	    }
 
 	    if (all_versions) {
@@ -275,21 +293,24 @@ t_upslst_item *upsmat_match_instance(
 	      mproduct = match_instance_core(a_command_line, the_db, prod_name,
 					     (t_upslst_item *)NULL,
 					     all_versions, a_need_unique);
-	      /* no longer need version list - free it */
-	      all_versions = upslst_free(all_versions, do_delete);
+	      /* may no longer need version list - free it */
+	      if (! got_all_versions) {
+		all_versions = upslst_free(all_versions, do_delete);
+	      }
 	      
-	      if (UPS_ERROR != UPS_SUCCESS) {
-		break;
-	      } else {
-		if (mproduct) {
-		  mproduct_list = upslst_add(mproduct_list, mproduct);
-		}
+	      /* get out of the loop if we got an error */
+	      CHECK_NO_FILE();
+
+	      if (mproduct) {
+		mproduct_list = upslst_add(mproduct_list, mproduct);
 	      }
 	    }
 	  }
 	}
-	/* no longer need product list - free it */
-	all_products = upslst_free(all_products, do_delete);
+	/* may no longer need product list - free it */
+	if (! got_all_products) {
+	  all_products = upslst_free(all_products, do_delete);
+	}
       }
     }
   } else if (a_command_line->ugo_M && a_command_line->ugo_product) {
@@ -353,7 +374,7 @@ static t_upstyp_match_product *match_instance_core(
   t_upslst_item *vinst_list = NULL, *tinst_list = NULL;
   t_upslst_item *cinst_list = NULL;
   t_upslst_item *chain_list = NULL, *version_list = NULL;
-  int num_matches;
+  int num_matches, local_error = 0;
   char *chain, *version;
 
   /* see if we were passed a table file. if so, don't worry about
@@ -371,12 +392,10 @@ static t_upstyp_match_product *match_instance_core(
 				   a_need_unique, a_command_line->ugo_flavor,
 				   a_command_line->ugo_qualifiers,
 				   &tinst_list);
-    if (UPS_ERROR == UPS_SUCCESS) {
-      /* if we got some matches, fill out our matched product structure */
-      if (num_matches != 0) {
-	tinst_list = upslst_first(tinst_list);        /* back up to start */
-	mproduct = ups_new_mp(a_db, NULL, NULL, tinst_list);
-      }
+    if ((UPS_ERROR == UPS_SUCCESS) && (num_matches != 0)) {
+      /* we got some matches, fill out our matched product structure */
+      tinst_list = upslst_first(tinst_list);        /* back up to start */
+      mproduct = ups_new_mp(a_db, NULL, NULL, tinst_list);
     }
     
   /* see if we were passed a version. if so, don't worry
@@ -396,20 +415,18 @@ static t_upstyp_match_product *match_instance_core(
 				       a_command_line->ugo_flavor,
 				       a_command_line->ugo_qualifiers, 
 				       &vinst_list, &tinst_list);
-      if (UPS_ERROR != UPS_SUCCESS) {
-	/* we had an error, get out */
-	break;
-      }
+      /* if we had an error & it was an error that the requested file could
+	 not be found and we are asking for many instances, then continue
+	 with the next version.  else get out. */
+      CHECK_NO_FILE();
     }
 
     /* We went thru the list of versions, get a matched product
        structure if we got no errors */
-    if (UPS_ERROR == UPS_SUCCESS) {
-      if (num_matches > 0) {
-	tinst_list = upslst_first(tinst_list);        /* back up to start */
-	vinst_list = upslst_first(vinst_list);        /* back up to start */
-	mproduct = ups_new_mp(a_db, NULL, vinst_list, tinst_list);
-      }
+    if ((local_error == 0) && (num_matches > 0)) {
+      tinst_list = upslst_first(tinst_list);        /* back up to start */
+      vinst_list = upslst_first(vinst_list);        /* back up to start */
+      mproduct = ups_new_mp(a_db, NULL, vinst_list, tinst_list);
     }
   } else {
     /* we need to start with any requested chains and find the associated
@@ -428,21 +445,19 @@ static t_upstyp_match_product *match_instance_core(
 				     a_need_unique, a_command_line->ugo_flavor,
 				     a_command_line->ugo_qualifiers, 
 				     &cinst_list, &vinst_list, &tinst_list);
-      if (UPS_ERROR != UPS_SUCCESS) {
-	/* we had an error - get out */
-	break;
-      }
+      /* we had an error, if it was an error that the requested file could
+	 not be found and we are asking for many instances, then continue
+	 with the next version.  else get out. */
+      CHECK_NO_FILE();
     }
 
     /* We went thru the list of version instances, get a matched product
        structure if we got no errors */
-    if (UPS_ERROR == UPS_SUCCESS) {
-      if (num_matches > 0) {
-	tinst_list = upslst_first(tinst_list);        /* back up to start */
-	vinst_list = upslst_first(vinst_list);        /* back up to start */
-	cinst_list = upslst_first(cinst_list);        /* back up to start */
-	mproduct = ups_new_mp(a_db, cinst_list, vinst_list, tinst_list);
-      }
+    if ((local_error == 0) && (num_matches > 0)) {
+      tinst_list = upslst_first(tinst_list);        /* back up to start */
+      vinst_list = upslst_first(vinst_list);        /* back up to start */
+      cinst_list = upslst_first(cinst_list);        /* back up to start */
+      mproduct = ups_new_mp(a_db, cinst_list, vinst_list, tinst_list);
     }
       
   }
@@ -494,7 +509,8 @@ static int match_from_chain( const char * const a_product,
                sizeof(CHAIN_SUFFIX) + 4);
   if (file_chars <= FILENAME_MAX) {
     sprintf(buffer, "%s/%s/%s%s", a_db, a_product, a_chain, CHAIN_SUFFIX);
-    if ((read_product = upsfil_read_file(&buffer[0])) != NULL) {
+    read_product = upsfil_read_file(&buffer[0]);
+    if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
       /* get all the instances that match command line input */
       tmp_num_matches = get_instance(read_product->instance_list,
 				     a_flavor_list, a_quals_list,
@@ -567,9 +583,6 @@ static int match_from_chain( const char * const a_product,
       /* we no longer need the lists */
       TMP_LISTS_FREE();
 
-    } else {
-      /* Could not read file */
-      upserr_add(UPS_READ_FILE, UPS_FATAL, buffer);
     }
   } else {
     upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
@@ -622,7 +635,8 @@ static int match_from_version( const char * const a_product,
   if (file_chars <= FILENAME_MAX) {
     sprintf(buffer, "%s/%s/%s%s", a_db, a_product, a_version,
 	    VERSION_SUFFIX);
-    if ((read_product = upsfil_read_file(&buffer[0])) != NULL) {
+    read_product = upsfil_read_file(&buffer[0]);
+    if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
       /* get all the instances that match command line input */
       tmp_num_matches = get_instance(read_product->instance_list,
 				     a_flavor_list, a_quals_list,
@@ -691,9 +705,6 @@ static int match_from_version( const char * const a_product,
       /* we no longer need the lists */
       TMP_LISTS_FREE();
 	
-    } else {
-      /* Could not read file */
-      upserr_add(UPS_READ_FILE, UPS_FATAL, buffer);
     }
   } else {
     upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
@@ -767,7 +778,8 @@ static int match_from_table( const char * const a_product,
  *
  *    Look in each of the following successively till the file is found.  If
  *    the file is not found, it is an error.  If one of the pieces is missing,
- *    say - ups_dir - then that step is skipped.
+ *    say - ups_dir - then that step is skipped.  NOTE: there is no default for
+ *    the table file name.
  *
  *         tablefiledir/tablefile
  *         ./tablefile
@@ -810,10 +822,8 @@ static char *get_table_file_path( const char * const a_prodname,
 	  found = 1;
 	}
       } else {
-	if (UPS_VERBOSE) {
-	  upserr_place();
-	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
-	}
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
     }
     /* try ./tablefile */
@@ -824,10 +834,8 @@ static char *get_table_file_path( const char * const a_prodname,
 	found = 1;
       }
     } else {
-      if (UPS_VERBOSE) {
-	upserr_place();
-	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
-      }
+      upserr_vplace();
+      upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
     }
     /* try ups_dir/tablefile */
     if ((found == 0) && (a_upsdir != NULL)) {
@@ -839,10 +847,8 @@ static char *get_table_file_path( const char * const a_prodname,
 	  found = 1;
 	}
       } else {
-	if (UPS_VERBOSE) {
-	  upserr_place();
-	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
-	}
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
     }
     /* try prod_dir/ups_dir/tablefile */
@@ -854,10 +860,8 @@ static char *get_table_file_path( const char * const a_prodname,
 	  found = 1;
 	}
       } else {
-	if (UPS_VERBOSE) {
-	  upserr_place();
-	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
-	}
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
     }
     /* try db/prod_name/tablefile */
@@ -870,10 +874,8 @@ static char *get_table_file_path( const char * const a_prodname,
 	  G_SAVE_PATH(total_chars);        /* found it */
 	}
       } else {
-	if (UPS_VERBOSE) {
-	  upserr_place();
-	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
-	}
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
     }
   }
