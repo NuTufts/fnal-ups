@@ -1,0 +1,21 @@
+<p>
+<ul>
+<li>
+On NT when an action is listed and has no functions, get a strange error.  What
+happens is that when UPs outputs the '/dev/null/' (for setup /unsetup) because 
+the temp file is empty (because the action was empty), NT complains.
+<li>
+ups declare will not declare an instance of flavor IRIX say, unless that of
+flavor Linux is reachable and ok.  not good if only mounting IRIX products
+disk and table file is there.
+<li>
+-N is not supported by ups modify.
+<li>
+-N is not supported by ups verify.
+<li>
+unsetting of UPS_COMPAT handled wrong in tmp file.  it is unset too early 
+and other products may need it.
+<li>
+ups undeclare should either allow multiple flavors in a list or complain about
+it.
+</ul>
