@@ -347,7 +347,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                        &file);
          strcpy(buffer,file);
        } else { 
-         upsver_mes(1,"Instance in version file allready exists\n");
+         upsver_mes(0,"Instance in version file allready exists\n");
          buffer[0]=0; /* don't create instance */
          mproduct_list = upslst_first(mproduct_list);
          mproduct = (t_upstyp_matched_product *)mproduct_list->data;

@@ -108,6 +108,7 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_SETUP", upsget_envstr },
   { "${UPS_COMPILE", upsget_compile },
   { "${UPS_ORIGIN", upsget_origin },
+  { "${UPS_SOURCE", upsget_source },
   { "${PRODUCTS", upsget_database },
   {  0, 0 }
 } ;
@@ -547,11 +548,21 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
   static char newstr[4096];
   static char *string = 0;
   *newstr='\0';
-  get_element(string,compile_dir);
-  if (string) strcpy(newstr,string);
-  if (string) strcat(newstr,"/");
-  get_element(string,compile_file);
-  if (string) strcat(newstr,string);
+  if (!command_line->ugo_b) /* did they specify a compile file */
+  {  get_element(string,compile_dir);
+     if (string) strcpy(newstr,string);
+     if (string) strcat(newstr,"/");
+     get_element(string,compile_file);
+     if (string) strcat(newstr,string);
+  } else {
+    if (command_line->ugo_u)
+    { strcpy(newstr,command_line->ugo_compile_dir); 
+      strcpy(newstr,"/"); 
+    }
+    if (command_line->ugo_b)
+    { strcpy(newstr,command_line->ugo_compile_file); 
+    }
+  }
   return newstr;
 }
 char *upsget_origin(const t_upstyp_db * const db_info_ptr,
@@ -594,6 +605,21 @@ char *upsget_shell(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char SH[]="sh";
   static char CSH[]="csh";
+  if (command_line->ugo_shell != e_INVALID_SHELL )
+  { if (!command_line->ugo_shell) 
+    { return (SH);
+    } else {
+      return (CSH);
+    }
+  } else {
+    return (0);
+  }
+}
+char *upsget_source(const t_upstyp_db * const db_info_ptr,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ static char SH[]=".";
+  static char CSH[]="source";
   if (command_line->ugo_shell != e_INVALID_SHELL )
   { if (!command_line->ugo_shell) 
     { return (SH);

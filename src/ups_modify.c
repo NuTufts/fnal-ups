@@ -157,7 +157,7 @@ if (strcmp(uc->ugo_product,"*"))
  if ((original_file = tmpnam(0)) != 0)
  { sprintf(buffer,"cp %s %s",uc->ugo_anyfile,original_file);
    if (!system(buffer))
-   { sprintf(buffer,"%s %s",EDIT_PGM,uc->ugo_anyfile);
+   { sprintf(buffer,"%s %s",editor,uc->ugo_anyfile);
      if (!system(buffer))
      { if (strcmp(uc->ugo_product,"*"))
        { mproduct_list = upsmat_instance(uc, db_list , not_unique);
