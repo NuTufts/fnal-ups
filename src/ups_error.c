@@ -57,24 +57,25 @@ static char *g_error_buf[G_ERROR_BUF_MAX];
 
 /* And now the error messages */
 static char *g_error_messages[UPS_NERR] = {
-/* 01 */  "%s: Success.\n",
-/* 02 */  "%s: Unable to open file %s.\n",
-/* 03 */  "%s: Unable to read file %s.\n",
-/* 04 */  "%s: Invalid keyword - %s, in %s found.\n",
-/* 05 */  "%s: No database specified on command line or in $PRODUCTS.\n",
-/* 06 */  "%s: CPU time used - %f, Wall clock time used %f.\n",
-/* 07 */  "%s: File name and path too long, must be less than %d bytes.\n",
-/* 08 */  "%s: No statistics directory specified.\n",
-/* 09 */  "%s: Unable to write file %s.\n",
-/* 10 */  "%s: Invalid argument specified \"%s\"\n",
-/* 11 */  "%s: No instance matches were made between the chain file (%s) and the version (%s)\n",
-/* 12 */  "%s: The passed filename was longer than the allowed system maximum (%d)\n",
-/* 13 */  "%s: No instance matches were made between the version file (%s) and the table file (%s)\n",
-/* 14 */  "%s: File not found - %s\n",
-/* 15 */  "%s: Could not malloc %d bytes\n",
-/* 16 */  "%s: MAX_LINE_LEN exceeded in \"%s\"\n",
+/* 00 */  "%s: Success.\n",
+/* 01 */  "%s: Unable to open file %s.\n",
+/* 02 */  "%s: Unable to read file %s.\n",
+/* 03 */  "%s: Invalid keyword - %s, in %s found.\n",
+/* 04 */  "%s: No database specified on command line or in $PRODUCTS.\n",
+/* 05 */  "%s: CPU time used - %f, Wall clock time used %f.\n",
+/* 06 */  "%s: File name and path too long, must be less than %d bytes.\n",
+/* 07 */  "%s: No statistics directory specified.\n",
+/* 08 */  "%s: Unable to write file %s.\n",
+/* 09 */  "%s: Invalid argument specified \"%s\"\n",
+/* 10 */  "%s: No instance matches were made between the chain file (%s) and the version (%s)\n",
+/* 11 */  "%s: The passed filename was longer than the allowed system maximum (%d)\n",
+/* 12 */  "%s: No instance matches were made between the version file (%s) and the table file (%s)\n",
+/* 13 */  "%s: File not found - %s\n",
+/* 14 */  "%s: Could not malloc %d bytes\n",
+/* 15 */  "%s: MAX_LINE_LEN exceeded in \"%s\"\n",
+/* 16 */  "%s: Unknown file type \"%s\"\n"
 /* 17 */  "%s: Invalid value \"%s\" for argument \"%s\"\n",
-/* 18 */  "%s: Unknown file type \"%s\"\n"
+/* 18 this is the last */
 };
 
 char *g_error_ascii[] = {
