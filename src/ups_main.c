@@ -46,6 +46,7 @@
 #include "upsget.h"
 #include "ups_declare.h"
 #include "ups_undeclare.h"
+#include "ups_flavor.h"
 #include "ups_get.h"
 
 /*
@@ -151,6 +152,8 @@ int main(int argc, char *argv[])
 					      e_unconfigure);
 	    break;
 	  case e_undeclare: ups_undeclare(command_line);
+	    break;
+	  case e_flavor: ups_flavor(command_line);
 	    break;
 	  case e_create: ups_create(command_line, e_create);
 	    break;

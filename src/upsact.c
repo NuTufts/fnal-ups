@@ -308,6 +308,7 @@ t_cmd_info g_cmd_info[] = {
   {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_flavor,      "flavor",      "?f:H:l0123", 0x00000000, e_invalid_action},
   {e_help,        "help",
             "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */

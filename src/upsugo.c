@@ -357,7 +357,7 @@
  */
 char * upsugo_getarg( const int , char **,char ** const );
 int upsugo_rearg(const int ,char **,int * const,char **);
-int upsugo_bldfvr(struct ups_command * const uc);
+/* int upsugo_bldfvr(struct ups_command * const uc); */
 int upsugo_ifornota(struct ups_command * const uc);
 void upsugo_setfixed(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
@@ -401,16 +401,6 @@ if (!uc->ugo_H)
    addr=upsutl_str_create(flavor,' ');		/* first add full */
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
    flavor_sub()
-upsugo_dump(uc,1);
-   if (uc->ugo_number)
-   { for ( l_ptr=upslst_first(uc->ugo_flavor);
-       l_ptr; l_ptr = l_ptr->next, count++ )
-     { if(uc->ugo_number!=count)
-       {  l_ptr = upslst_delete_safe(l_ptr,l_ptr->data,'d'); 
-printf("count = %d\n",count); 
-     } } 
-exit(0);
-   } 
  } else { 
    for ( l_ptr = upslst_first(uc->ugo_osname); 
        l_ptr; l_ptr = l_ptr->next, count++ )
@@ -420,6 +410,20 @@ exit(0);
        flavor_sub()
    }
    uc->ugo_osname=0;
+ } 
+ if (uc->ugo_number)
+ { count = 1;
+   if(uc->ugo_number > upslst_count(uc->ugo_flavor))
+   { uc->ugo_number=upslst_count(uc->ugo_flavor); }
+   l_ptr = upslst_first(uc->ugo_flavor);
+   while ( l_ptr  )
+   { if( uc->ugo_number != count )
+     { l_ptr = upslst_delete_safe( l_ptr, l_ptr->data, 'd' );
+     } else {
+       uc->ugo_flavor=l_ptr;
+       l_ptr=l_ptr->next;
+     } count++;
+   } 
  } 
  return(0);
 }
