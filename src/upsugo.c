@@ -499,9 +499,9 @@ int upsugo_ifornota(struct ups_command * const uc)
         while ((loc=strchr(addr,' '))!=0) {
                 *loc = 0;
                 PRODUCTS = upsutl_str_create(addr,' ');
+                upsugo_blddb(uc,PRODUCTS);
                 addr=loc+1; 
                 while(*addr==' ') { addr=addr+1; }
-                upsugo_blddb(uc,PRODUCTS);
 /*              uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS); */
         }
         PRODUCTS = upsutl_str_create(addr,' ');
@@ -1260,7 +1260,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          case_c case_d case_n case_t case_o
          /* List elements */
          case_g            /* also a chain */
-         case_f case_K case_A 
+         case_f case_K case_A case_h
          /* single values */ 
          case_m case_M case_N case_O case_p
          case_P case_r case_T case_U
