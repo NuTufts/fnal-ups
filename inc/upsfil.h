@@ -46,6 +46,17 @@ void           g_print_product( t_upstyp_product * const prod_ptr );
 #define VERSION_SUFFIX  ".version"
 #define CHAIN_SUFFIX    ".chain"
 
+/* enum of known file types (changes here should be reflected in cfilei) */
+enum e_ups_file {
+  e_file_version = 0,
+  e_file_table,
+  e_file_chain,
+  e_file_dbconfig,
+  e_file_unknown,
+  e_file_count
+};
+
+
 #endif /* _UPSFIL_H_ */
 
 
