@@ -1590,7 +1590,7 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
       g_LOCAL_VARS_DEF = 1;   /* keep track that we defined local variables */
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
-	if (fprintf((FILE *)a_stream, ". %s;\n", a_cmd->argv[0]) < 0) {
+	if (fprintf((FILE *)a_stream, ". %s\n", a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
