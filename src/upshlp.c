@@ -16,6 +16,7 @@
  *
  * MODIFICATIONS:
  *       Sep 17 1997, DjF, First.
+ *       Jan 6  1998, EB, Get help file from ERUPT_DIR/doc
  *
  ***********************************************************************/
 
@@ -65,6 +66,8 @@ int upshlp_command(const char * const what)
     char    * option;
     char    * last ;
     int     found=0;			/* did I find the command? */
+    char    * erupt_dir;
+    char    buff[MAX_LINE_LEN];
 
 /* test
     char    *what = "compile";
@@ -72,7 +75,20 @@ int upshlp_command(const char * const what)
 
   last =  (char *) malloc(13);
 
-  fh = fopen ( "/home/t2/fagan/erupt/src/ups_help.dat", "r" );
+  erupt_dir = getenv("ERUPT_DIR");
+  if (erupt_dir) {
+     /* we got one */
+     sprintf(buff, "%s/doc/ups_help.dat", erupt_dir);
+  } else {
+     /* the environment variable could not be translated.  bail. */
+     return 1;
+  }
+
+  fh = fopen ( buff, "r" );
+  if (! fh) {
+     /* could not open the file */
+     return 1;
+  }
   while ( fgets( line, MAX_LINE_LEN, fh ) ) {
     if ( line[0] != '#' ) {
        if ( !strncmp(line,"COMMAND",7)) {
