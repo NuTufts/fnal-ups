@@ -3807,7 +3807,13 @@ static void f_proddir( ACTION_PARAMS)
       } else {
 	tmp_prod_dir = a_minst->version->prod_dir;
       }
-      tmp_prod_name = a_minst->version->product;
+      if (! a_minst->version->prod_name) {
+	/* we do not have a product name in the version file.  therefore use
+	   the product name from the command line */
+	tmp_prod_name = a_command_line->ugo_product;
+      } else {
+	tmp_prod_name = a_minst->version->product;
+      }
     }
     if (tmp_prod_dir && tmp_prod_name) {
       uprod_name = upsutl_upcase(tmp_prod_name);
