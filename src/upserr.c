@@ -117,7 +117,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 56 */  "%s:  \'%s\'is not an allowable separator in \'%s\'\n",
 /* 57 */  "%s: TABLE_FILE keyword not specified when TABLE_DIR was, in version \'%s\'\n",
 /* 58 */  "%s: COMPILE_FILE keyword was not specified when COMPILE_DIR was, in version \'%s\'\n",
-/* 59 */  "%s: Product keyword \'%s\' must match name of product it is in \'%s\'\n"
+/* 59 */  "%s: Product keyword \'%s\' must match name of product it is in \'%s\'\n",
+/* 60 */  "%s: Unable to translate or evaluate \'%s\'\n"
 };
 
 char *g_error_ascii[] = {
@@ -181,7 +182,8 @@ char *g_error_ascii[] = {
    /* UPS_VERIFY_TABLE_DIR    57 */ "UPS_VERIFY_TABLE_DIR",
    /* UPS_VERIFY_COMPILE_DIR  58 */ "UPS_VERIFY_COMPILE_DIR",
    /* UPS_MISMATCH_PROD_NAME  59 */ "UPS_MISMATCH_PROD_NAME",
-   /* UPS_NERR                60 */ "UPS_NERR",
+   /* UPS_NO_TRANSLATION      60 */ "UPS_NO_TRANSLATION",
+   /* UPS_NERR                61 */ "UPS_NERR",
    0 };
 
 /*

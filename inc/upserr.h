@@ -100,7 +100,8 @@
 #define UPS_VERIFY_TABLE_DIR    57
 #define UPS_VERIFY_COMPILE_DIR  58
 #define UPS_MISMATCH_PROD_NAME  59
-#define UPS_NERR                60      /*  this one must always be last */
+#define UPS_NO_TRANSLATION      60
+#define UPS_NERR                61      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
