@@ -156,7 +156,9 @@
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   852, 2,  "upsutl.c", 	'\'c2\' can be const qualified,');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsfil.c", 	'function parameter \'key\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsfil.c", 	'function parameter \'cl\' is not used in function');
-
+&fe ('IRIX' , undef, undef, 'W', 1174 , 5,  "ups_modify.c", 'parameter "ups_command" was declared');
+&fe ('IRIX' , undef, undef, 'W', 1174 , 5,  "ups_modify.c", 'parameter "tmpfile" was declared');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   821, 2,  "ups_list.c", 	'\valid\' set but unused in function');
 #
 #
 
@@ -176,6 +178,9 @@
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "upsget.c", 'parameter \"db_info_ptr\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 2,  "upsmem.c", 'parameter \"a_bytes\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 2,  undef, 'value returned from the function \"printf(...)\" is not used ');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "ups_modify.c", 'parameter "ups_command" was declared');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "ups_modify.c", 'parameter "tmpfile" was declared');
+&fe ('IRIX64'	, undef		, 'cfe'	, 'W'	,   821, 2,  "ups_list.c", 	'\valid\' set but unused in function');
 
 
 
