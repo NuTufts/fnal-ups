@@ -542,10 +542,11 @@ static char get_man_subdir(char * const a_man_file)
    while ((next_c = *sp++) != '\0') {
      if (next_c == '.')  {
        ret_val = *sp++;
-       /* check to see if this file extension is 1 or 2 characters
-          (but no dots), possibly followed by a compression extension. */
-       if (ret_val == '.')
+       /* Ignore obviously bogus file extensions. */
+       if ((ret_val == '.') || (ret_val == 'g') || (ret_val == 'z') || (ret_val == 'Z'))
          continue;
+       /* check to see if this file extension is 1 or 2 characters
+          possibly followed by a compression extension. */
        if ((ret_val == '\0') || ((next_c = *sp++) == '\0'))
          break;
        if ((next_c != '.') && (*sp == '\0'))
