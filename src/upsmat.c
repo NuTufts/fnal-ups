@@ -382,6 +382,11 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    all_products = upslst_free(all_products, do_delete);
 	  }
 	}
+	/* if we have a match and are asking for a unique one, we do not need
+	   to go to the next db */
+	if (a_need_unique && mproduct) {
+	  break;
+	}
       }
     }
   } else if (a_command_line->ugo_M && a_command_line->ugo_product) {
