@@ -22,9 +22,9 @@
 /* standard include files */
 
 /* ups specific include files */
-#include "ups_utils.h"
-#include "ups_error.h"
-#include "ups_match.h"
+#include "upsutl.h"
+#include "upserr.h"
+#include "upsmat.h"
 
 /*
  * Definition of public variables.

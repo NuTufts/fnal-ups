@@ -29,7 +29,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "ups_types.h"
+#include "upstyp.h"
  
 /* ==========================================================================
 **                                                                           
