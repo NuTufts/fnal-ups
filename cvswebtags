@@ -50,7 +50,7 @@ product_cmp      292 src/ups_list.c   int product_cmp
 product_name     299 src/ups_list.c   int product_name 
 ups_list         318 src/ups_list.c   t_upslst_item *ups_list(
 ups_list_core    438 src/ups_list.c   t_upslst_item *ups_list_core(
-main              94 src/ups_main.c   int main(
+main              95 src/ups_main.c   int main(
 choose_file      123 src/ups_modify.c int choose_file(
 edit_file        232 src/ups_modify.c int edit_file(
 make_file_list   166 src/ups_modify.c int make_file_list(
@@ -77,102 +77,102 @@ ups_verify_generic_instance 369 src/ups_verify.c static void ups_verify_generic_
 ups_verify_matched_instance 171 src/ups_verify.c void ups_verify_matched_instance(
 ups_verify_table_instance 299 src/ups_verify.c static void ups_verify_table_instance(
 ups_verify_version_instance 242 src/ups_verify.c static void ups_verify_version_instance(
-CHECK_FOR_PATH   241 src/upsact.c     #define CHECK_FOR_PATH(
-CHECK_NUM_PARAM  204 src/upsact.c     #define CHECK_NUM_PARAM(
-CSH_OUTPUT_LAST_PART_OPT 292 src/upsact.c     #define CSH_OUTPUT_LAST_PART_OPT(
-DO_SYSTEM_MOVE   300 src/upsact.c     #define DO_SYSTEM_MOVE(
-FPRINTF_ERROR    260 src/upsact.c     #define FPRINTF_ERROR(
-GET_DELIMITER    225 src/upsact.c     #define GET_DELIMITER(
-GET_ERR_MESSAGE  253 src/upsact.c     #define GET_ERR_MESSAGE(
-GET_FLAGS        264 src/upsact.c     #define GET_FLAGS(
-GET_UPS_ENV      276 src/upsact.c     #define GET_UPS_ENV(
-OUTPUT_ACTION_INFO 196 src/upsact.c     #define OUTPUT_ACTION_INFO(
-OUTPUT_VERBOSE_MESSAGE 217 src/upsact.c     #define OUTPUT_VERBOSE_MESSAGE(
-P_VERB_s         318 src/upsact.c     #define P_VERB_s(
-P_VERB_s_s       322 src/upsact.c     #define P_VERB_s_s(
-P_VERB_s_s_s     327 src/upsact.c     #define P_VERB_s_s_s(
-P_VERB_s_s_s_s   333 src/upsact.c     #define P_VERB_s_s_s_s(
-P_VERB_s_s_s_s_s 340 src/upsact.c     #define P_VERB_s_s_s_s_s(
-SET_NO_ACTION_ERROR 314 src/upsact.c     #define SET_NO_ACTION_ERROR(
-SET_PARSE_ERROR  310 src/upsact.c     #define SET_PARSE_ERROR(
-SET_SETUP_PROD   297 src/upsact.c     #define SET_SETUP_PROD(
-SH_OUTPUT_LAST_PART_OPT 287 src/upsact.c     #define SH_OUTPUT_LAST_PART_OPT(
-actitem2str      2367 src/upsact.c     char *actitem2str(
-cmp_ugo_db       2023 src/upsact.c     int cmp_ugo_db(
-copy_act_item    2067 src/upsact.c     t_upsact_item *copy_act_item(
-csh_output_first_check 3189 src/upsact.c     static int csh_output_first_check(
-csh_output_last_part_req 3265 src/upsact.c     static int csh_output_last_part_req(
-csh_output_next_part 3201 src/upsact.c     static int csh_output_next_part(
-do_exit_action   2327 src/upsact.c     int do_exit_action(
-f_addalias       3040 src/upsact.c     static void f_addalias(
-f_copycatman     2471 src/upsact.c     static void f_copycatman(
-f_copyhtml       2447 src/upsact.c     static void f_copyhtml(
-f_copyinfo       2455 src/upsact.c     static void f_copyinfo(
-f_copyman        2463 src/upsact.c     static void f_copyman(
-f_copynews       2495 src/upsact.c     static void f_copynews(
-f_dodefaults     4068 src/upsact.c     static void f_dodefaults(
-f_else           4045 src/upsact.c     static void f_else(
-f_endif          3997 src/upsact.c     static void f_endif(
-f_envappend      2503 src/upsact.c     static void f_envappend(
-f_envprepend     2560 src/upsact.c     static void f_envprepend(
-f_envremove      2618 src/upsact.c     static void f_envremove(
-f_envset         2701 src/upsact.c     static void f_envset(
-f_envsetifnotset 2739 src/upsact.c     static void f_envsetifnotset(
-f_envunset       2779 src/upsact.c     static void f_envunset(
-f_exeaccess      2815 src/upsact.c     static void f_exeaccess(
-f_execute        2867 src/upsact.c     static void f_execute(
-f_filetest       2928 src/upsact.c     static void f_filetest(
-f_if             3921 src/upsact.c     static void f_if(
-f_pathappend     2973 src/upsact.c     static void f_pathappend(
-f_pathprepend    2989 src/upsact.c     static void f_pathprepend(
-f_pathremove     3005 src/upsact.c     static void f_pathremove(
-f_pathset        3020 src/upsact.c     static void f_pathset(
-f_proddir        3818 src/upsact.c     static void f_proddir(
-f_setupenv       3775 src/upsact.c     static void f_setupenv(
-f_sourcecompileopt 3336 src/upsact.c     static void f_sourcecompileopt(
-f_sourcecompilereq 3283 src/upsact.c     static void f_sourcecompilereq(
-f_sourceoptcheck 3564 src/upsact.c     static void f_sourceoptcheck(
-f_sourceoptional 3446 src/upsact.c     static void f_sourceoptional(
-f_sourcereqcheck 3503 src/upsact.c     static void f_sourcereqcheck(
-f_sourcerequired 3386 src/upsact.c     static void f_sourcerequired(
-f_unalias        3095 src/upsact.c     static void f_unalias(
-f_uncopycatman   2487 src/upsact.c     static void f_uncopycatman(
-f_uncopyman      2479 src/upsact.c     static void f_uncopyman(
-f_unless         3959 src/upsact.c     static void f_unless(
-f_unproddir      3889 src/upsact.c     static void f_unproddir(
-f_unsetupenv     3789 src/upsact.c     static void f_unsetupenv(
-f_writecompilescript 3620 src/upsact.c     static void f_writecompilescript(
-find_prod_name   2008 src/upsact.c     t_upsact_item *find_prod_name(
-get_SETUP_prod   1737 src/upsact.c     t_upsugo_command *get_SETUP_prod(
-get_act          1797 src/upsact.c     t_upstyp_action *get_act(
-get_dependent    1837 src/upsact.c     t_upsugo_command *get_dependent(
-get_top_item     1929 src/upsact.c     t_upsact_item *get_top_item(
-is_prod_done     1997 src/upsact.c     int is_prod_done(
-merge_ugo_db     2035 src/upsact.c     t_upslst_item* merge_ugo_db(
-new_act_item     2096 src/upsact.c     t_upsact_item *new_act_item(
-new_default_action 2158 src/upsact.c     t_upstyp_action *new_default_action(
-next_cmd         1331 src/upsact.c     t_upslst_item *next_cmd(
-next_top_prod    1190 src/upsact.c     t_upslst_item *next_top_prod(
-parse_params     1646 src/upsact.c     int parse_params(
-reverse_command_list 2194 src/upsact.c     t_upslst_item *reverse_command_list(
-sh_output_first_check 3131 src/upsact.c     static int sh_output_first_check(
-sh_output_last_part_req 3247 src/upsact.c     static int sh_output_last_part_req(
-sh_output_next_part 3143 src/upsact.c     static int sh_output_next_part(
-shutup           4177 src/upsact.c     static void shutup(
-upsact_action2enum 1046 src/upsact.c     int upsact_action2enum(
-upsact_check_files 1074 src/upsact.c     t_upslst_item *upsact_check_files(
-upsact_cleanup   892 src/upsact.c     void upsact_cleanup(
-upsact_free_act_cmd 1004 src/upsact.c     void upsact_free_act_cmd(
-upsact_free_act_item 1010 src/upsact.c     void upsact_free_act_item(
-upsact_get_cmd   707 src/upsact.c     t_upslst_item *upsact_get_cmd(
-upsact_get_dep   646 src/upsact.c     t_upslst_item *upsact_get_dep(
-upsact_new_upsact_cmd 983 src/upsact.c     t_upsact_cmd *upsact_new_upsact_cmd(
-upsact_parse_cmd 795 src/upsact.c     t_upsact_cmd *upsact_parse_cmd(
-upsact_print     509 src/upsact.c     int upsact_print(
-upsact_print_cmd 952 src/upsact.c     void upsact_print_cmd(
-upsact_print_item 922 src/upsact.c     void upsact_print_item(
-upsact_process_commands 2420 src/upsact.c     void upsact_process_commands(
-upsact_trim_unsetup 764 src/upsact.c     t_upslst_item *upsact_trim_unsetup(
+CHECK_FOR_PATH   244 src/upsact.c     #define CHECK_FOR_PATH(
+CHECK_NUM_PARAM  207 src/upsact.c     #define CHECK_NUM_PARAM(
+CSH_OUTPUT_LAST_PART_OPT 295 src/upsact.c     #define CSH_OUTPUT_LAST_PART_OPT(
+DO_SYSTEM_MOVE   303 src/upsact.c     #define DO_SYSTEM_MOVE(
+FPRINTF_ERROR    263 src/upsact.c     #define FPRINTF_ERROR(
+GET_DELIMITER    228 src/upsact.c     #define GET_DELIMITER(
+GET_ERR_MESSAGE  256 src/upsact.c     #define GET_ERR_MESSAGE(
+GET_FLAGS        267 src/upsact.c     #define GET_FLAGS(
+GET_UPS_ENV      279 src/upsact.c     #define GET_UPS_ENV(
+OUTPUT_ACTION_INFO 199 src/upsact.c     #define OUTPUT_ACTION_INFO(
+OUTPUT_VERBOSE_MESSAGE 220 src/upsact.c     #define OUTPUT_VERBOSE_MESSAGE(
+P_VERB_s         321 src/upsact.c     #define P_VERB_s(
+P_VERB_s_s       325 src/upsact.c     #define P_VERB_s_s(
+P_VERB_s_s_s     330 src/upsact.c     #define P_VERB_s_s_s(
+P_VERB_s_s_s_s   336 src/upsact.c     #define P_VERB_s_s_s_s(
+P_VERB_s_s_s_s_s 343 src/upsact.c     #define P_VERB_s_s_s_s_s(
+SET_NO_ACTION_ERROR 317 src/upsact.c     #define SET_NO_ACTION_ERROR(
+SET_PARSE_ERROR  313 src/upsact.c     #define SET_PARSE_ERROR(
+SET_SETUP_PROD   300 src/upsact.c     #define SET_SETUP_PROD(
+SH_OUTPUT_LAST_PART_OPT 290 src/upsact.c     #define SH_OUTPUT_LAST_PART_OPT(
+actitem2str      2370 src/upsact.c     char *actitem2str(
+cmp_ugo_db       2026 src/upsact.c     int cmp_ugo_db(
+copy_act_item    2070 src/upsact.c     t_upsact_item *copy_act_item(
+csh_output_first_check 3192 src/upsact.c     static int csh_output_first_check(
+csh_output_last_part_req 3268 src/upsact.c     static int csh_output_last_part_req(
+csh_output_next_part 3204 src/upsact.c     static int csh_output_next_part(
+do_exit_action   2330 src/upsact.c     int do_exit_action(
+f_addalias       3043 src/upsact.c     static void f_addalias(
+f_copycatman     2474 src/upsact.c     static void f_copycatman(
+f_copyhtml       2450 src/upsact.c     static void f_copyhtml(
+f_copyinfo       2458 src/upsact.c     static void f_copyinfo(
+f_copyman        2466 src/upsact.c     static void f_copyman(
+f_copynews       2498 src/upsact.c     static void f_copynews(
+f_dodefaults     4071 src/upsact.c     static void f_dodefaults(
+f_else           4048 src/upsact.c     static void f_else(
+f_endif          4000 src/upsact.c     static void f_endif(
+f_envappend      2506 src/upsact.c     static void f_envappend(
+f_envprepend     2563 src/upsact.c     static void f_envprepend(
+f_envremove      2621 src/upsact.c     static void f_envremove(
+f_envset         2704 src/upsact.c     static void f_envset(
+f_envsetifnotset 2742 src/upsact.c     static void f_envsetifnotset(
+f_envunset       2782 src/upsact.c     static void f_envunset(
+f_exeaccess      2818 src/upsact.c     static void f_exeaccess(
+f_execute        2870 src/upsact.c     static void f_execute(
+f_filetest       2931 src/upsact.c     static void f_filetest(
+f_if             3924 src/upsact.c     static void f_if(
+f_pathappend     2976 src/upsact.c     static void f_pathappend(
+f_pathprepend    2992 src/upsact.c     static void f_pathprepend(
+f_pathremove     3008 src/upsact.c     static void f_pathremove(
+f_pathset        3023 src/upsact.c     static void f_pathset(
+f_proddir        3821 src/upsact.c     static void f_proddir(
+f_setupenv       3778 src/upsact.c     static void f_setupenv(
+f_sourcecompileopt 3339 src/upsact.c     static void f_sourcecompileopt(
+f_sourcecompilereq 3286 src/upsact.c     static void f_sourcecompilereq(
+f_sourceoptcheck 3567 src/upsact.c     static void f_sourceoptcheck(
+f_sourceoptional 3449 src/upsact.c     static void f_sourceoptional(
+f_sourcereqcheck 3506 src/upsact.c     static void f_sourcereqcheck(
+f_sourcerequired 3389 src/upsact.c     static void f_sourcerequired(
+f_unalias        3098 src/upsact.c     static void f_unalias(
+f_uncopycatman   2490 src/upsact.c     static void f_uncopycatman(
+f_uncopyman      2482 src/upsact.c     static void f_uncopyman(
+f_unless         3962 src/upsact.c     static void f_unless(
+f_unproddir      3892 src/upsact.c     static void f_unproddir(
+f_unsetupenv     3792 src/upsact.c     static void f_unsetupenv(
+f_writecompilescript 3623 src/upsact.c     static void f_writecompilescript(
+find_prod_name   2011 src/upsact.c     t_upsact_item *find_prod_name(
+get_SETUP_prod   1740 src/upsact.c     t_upsugo_command *get_SETUP_prod(
+get_act          1800 src/upsact.c     t_upstyp_action *get_act(
+get_dependent    1840 src/upsact.c     t_upsugo_command *get_dependent(
+get_top_item     1932 src/upsact.c     t_upsact_item *get_top_item(
+is_prod_done     2000 src/upsact.c     int is_prod_done(
+merge_ugo_db     2038 src/upsact.c     t_upslst_item* merge_ugo_db(
+new_act_item     2099 src/upsact.c     t_upsact_item *new_act_item(
+new_default_action 2161 src/upsact.c     t_upstyp_action *new_default_action(
+next_cmd         1334 src/upsact.c     t_upslst_item *next_cmd(
+next_top_prod    1193 src/upsact.c     t_upslst_item *next_top_prod(
+parse_params     1649 src/upsact.c     int parse_params(
+reverse_command_list 2197 src/upsact.c     t_upslst_item *reverse_command_list(
+sh_output_first_check 3134 src/upsact.c     static int sh_output_first_check(
+sh_output_last_part_req 3250 src/upsact.c     static int sh_output_last_part_req(
+sh_output_next_part 3146 src/upsact.c     static int sh_output_next_part(
+shutup           4180 src/upsact.c     static void shutup(
+upsact_action2enum 1049 src/upsact.c     int upsact_action2enum(
+upsact_check_files 1077 src/upsact.c     t_upslst_item *upsact_check_files(
+upsact_cleanup   895 src/upsact.c     void upsact_cleanup(
+upsact_free_act_cmd 1007 src/upsact.c     void upsact_free_act_cmd(
+upsact_free_act_item 1013 src/upsact.c     void upsact_free_act_item(
+upsact_get_cmd   710 src/upsact.c     t_upslst_item *upsact_get_cmd(
+upsact_get_dep   649 src/upsact.c     t_upslst_item *upsact_get_dep(
+upsact_new_upsact_cmd 986 src/upsact.c     t_upsact_cmd *upsact_new_upsact_cmd(
+upsact_parse_cmd 798 src/upsact.c     t_upsact_cmd *upsact_parse_cmd(
+upsact_print     512 src/upsact.c     int upsact_print(
+upsact_print_cmd 955 src/upsact.c     void upsact_print_cmd(
+upsact_print_item 925 src/upsact.c     void upsact_print_item(
+upsact_process_commands 2423 src/upsact.c     void upsact_process_commands(
+upsact_trim_unsetup 767 src/upsact.c     t_upslst_item *upsact_trim_unsetup(
 COPY_FILES       166 src/upscpy.c     #define COPY_FILES(
 FPRINTF_ERROR     82 src/upscpy.c     #define FPRINTF_ERROR(
 PROCESS_DIR      187 src/upscpy.c     #define PROCESS_DIR(

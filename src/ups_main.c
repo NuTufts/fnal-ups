@@ -69,6 +69,7 @@ extern int g_UPS_SHELL; /* Ugliness!!! */
 int g_simulate = 0;
 static mode_t g_umask = 022;
 extern int UPS_NEED_DB;
+extern char upsact_dropit_buf[];
 
 /*
  * Declaration of private functions.
@@ -101,7 +102,12 @@ int main(int argc, char *argv[])
   mode_t old_umask;
   int need_help = 0;
   char *on_what = NULL;
+  char *UPS_DIR = 0;
 
+  UPS_DIR = getenv("UPS_DIR");
+  if ( UPS_DIR ) {
+      snprintf(upsact_dropit_buf, 2048, "%s/bin/dropit -e", UPS_DIR);
+  }
 
   if (argv[1] && (0 == strcmp(argv[1],"parent")) && 0 != strcmp(argv[2],"-?")) {
 
