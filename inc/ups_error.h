@@ -32,6 +32,12 @@
  */
 
 /* Error Messages */
+/* CAREFUL!! When adding errors, you must also edit ../src/ups_error.c.
+   There are two ascii arrays that will also need to be modified, one for 
+   a long description (g_error_messages) and one for an ascii version of 
+   the #define (g_error_ascii) 
+   ======================================================================= */
+
 #define UPS_INVALID           -1
 #define UPS_SUCCESS           0
 #define UPS_OPEN_FILE         1
@@ -53,7 +59,6 @@
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
 #define UPS_INFORMATIONAL   "INFORMATIONAL"
-
 
 /*
  * Types.
@@ -81,6 +86,7 @@ extern int UPS_ERROR;
 extern int UPS_VERBOSE;
 extern int g_ups_line;
 extern char *g_ups_file;
+extern char *g_error_ascii[];
 
 
 #define upserr_place() g_ups_line=__LINE__; g_ups_file=(char *)__FILE__;

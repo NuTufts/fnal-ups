@@ -49,6 +49,9 @@ char *g_ups_file = '\0';
 #define G_ERROR_INIT -1
 #define G_ERROR_BUF_MAX 30
 
+static int g_buf_counter = G_ERROR_INIT;   /* pointer to current message */
+static int g_buf_start = G_ERROR_INIT;     /* pointer to oldest message */
+
 static char *g_error_buf[G_ERROR_BUF_MAX];
 
 /* And now the error messages */
@@ -70,8 +73,24 @@ static char *g_error_messages[] = {
   "%s: Cound not malloc %d bytes\n"
 };
 
-static int g_buf_counter = G_ERROR_INIT;   /* pointer to current message */
-static int g_buf_start = G_ERROR_INIT;     /* pointer to oldest message */
+char *g_error_ascii[] = {
+   /* UPS_SUCCESS           0 */ "UPS_SUCCESS",
+   /* UPS_OPEN_FILE         1 */ "UPS_OPEN_FILE",
+   /* UPS_READ_FILE         2 */ "UPS_READ_FILE",
+   /* UPS_INVALID_KEYWORD   3 */ "UPS_INVALID_KEYWORD",
+   /* UPS_NO_DATABASE       4 */ "UPS_NO_DATABASE",
+   /* UPS_TIME              5 */ "UPS_TIME",
+   /* UPS_NAME_TOO_LONG     6 */ "UPS_NAME_TOO_LONG",
+   /* UPS_NO_STAT_DIR       7 */ "UPS_NO_STAT_DIR",
+   /* UPS_WRITE_FILE        8 */ "UPS_WRITE_FAIL",
+   /* UPS_INVALID_ARGUMENT  9 */ "UPS_INVALID_ARGUMENT",
+   /* UPS_NO_VERSION_MATCH  10 */ "UPS_NO_VERSION_MATCH",
+   /* UPS_FILENAME_TOO_LONG 11 */ "UPS_FILENAME_TOO_LONG",
+   /* UPS_NO_TABLE_MATCH    12 */ "UPS_NO_TABLE_MATCH",
+   /* UPS_NO_FILE           13 */ "UPS_NO_FILE",
+   /* UPS_NO_MEMORY         14 */ "UPS_NO_MEMORY",
+   /* UPS_NERR              15    */ "UPS_NERR",
+   0 };
 
 /*
  * Definition of public functions.
