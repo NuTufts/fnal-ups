@@ -60,9 +60,10 @@
 #define UPS_NOVALUE_ARGUMENT    17
 #define UPS_INVALID_ACTION      18
 #define UPS_INVALID_ACTION_ARG  19
-#define UPS_INVALID_SHELL       20
-#define UPS_NEED_UNIQUE         21
-#define UPS_NERR                22      /*  this one must always be last */
+#define UPS_TO_MANY_ACTION_ARG  20
+#define UPS_INVALID_SHELL       21
+#define UPS_NEED_UNIQUE         22
+#define UPS_NERR                23      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
