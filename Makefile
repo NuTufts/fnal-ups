@@ -76,13 +76,13 @@ VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 UPSDBG=
 INSURE=
 
-all: 	proddir_is_set
+all: 	proddir_is_set cvswebtags
 	cd src; ../bin/upspremake $(UPSDBG) $(INSURE)
 	cd test; ../bin/upspremake $(UPSDBG) $(INSURE)
 	cd doc; ../bin/upspremake $(UPSDBG) $(INSURE)
 	cd man; ../bin/upspremake $(UPSDBG) $(INSURE)
 
-cvswebtags:
+cvswebtags: FORCE
 	-find src inc -name '*.[ch]' -exec ctags -txw {} \; > cvswebtags
 
 test: FORCE
