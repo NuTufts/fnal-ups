@@ -181,7 +181,6 @@ void upscpy_info(UPSCPY_PARAMS)
     if (! strncmp(dir_line->d_name, dir_name, (unsigned int )dir_size))  \
     { DIR *file_dir = NULL;                                              \
       struct dirent *file_dir_line = NULL;                               \
-      upsver_mes(0, "%s: Copying %s\n", "UPSCPY", type);                 \
       if ((dir_size == (int )strlen(dir_line->d_name)))                  \
       { /* the directory is = to dir_name */                             \
         if ((file_dir = opendir(filename))) {                            \
