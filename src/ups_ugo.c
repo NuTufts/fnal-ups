@@ -54,7 +54,8 @@
 
    int	errflg = 0;
    t_upslst_item *ugo_commands = 0;
-    int argindx;
+   t_upslst_item *last_command = 0;
+   int argindx;
 
 /* ===========================================================================
  * Private function declarations
@@ -746,13 +747,20 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
 	uc->ugo_chain = 0; 
   if ( ugo_commands ) { /* subsequent call */ 
      /* dealloc your brain out */ 
+     upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
+     last_command=ugo_commands;      /* need pointer to drop & remove struct */
      if ( ugo_commands=ugo_commands->next ) {
+        upslst_delete( last_command, last_command->data, 'd');
         return (t_ups_command *)ugo_commands->data; 
      } else {
         return 0;
      }
   } else { 
-
+/* this is VERY important... to make sure argindx is 0 */
+/* if there is a subsequent call to upsugo_next for a WHOLE NEW command
+** line to be parsed the index must be reset!!!
+*/
+   argindx=0;
    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
    while ((arg_str= upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)

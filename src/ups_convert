@@ -252,7 +252,7 @@ sub writeflvrReqs {
              }
              if ( ! $CatFlag && $reqCat eq "POSTREQ" ) {
                 $CatFlaq=1;
-                $flvrverHash{$flavor}{$version}{$reqType}=&add_defaults;
+                $flvrverHash{$flavor}{$version}{$reqType}.=&add_defaults;
              }
           }
           @use = sort keys %{ $reqHash{$reqType}{$reqCat} };
