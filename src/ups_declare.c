@@ -211,7 +211,7 @@ void ups_declare( t_upsugo_command * const uc ,
                unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
                sprintf(unchain,"un%s",the_chain);
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                          mproduct, unchain);
+                                          mproduct, unchain,ups_command);
                if (UPS_ERROR == UPS_SUCCESS) 
                { upsact_process_commands(cmd_list, tmpfile); }
                upsact_cleanup(cmd_list);
@@ -344,12 +344,14 @@ void ups_declare( t_upsugo_command * const uc ,
         chain_list->next = save_next;
         chain_list->prev = save_prev;
         cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                    mproduct, the_chain);
+                                  mproduct, the_chain,
+				  ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
         { upsact_process_commands(cmd_list, tmpfile); }
         upsact_cleanup(cmd_list);
         cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                    mproduct, g_cmd_info[ups_command].cmd);
+				  mproduct, g_cmd_info[ups_command].cmd,
+				  ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
         { upsact_process_commands(cmd_list, tmpfile); }
         upsact_cleanup(cmd_list);

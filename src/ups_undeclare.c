@@ -185,12 +185,13 @@ void ups_undeclare( t_upsugo_command * const uc ,
               unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
               sprintf(unchain,"un%s",the_chain);
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                         mproduct, unchain);
+                                         mproduct, unchain,ups_command);
               if (UPS_ERROR == UPS_SUCCESS) 
               { upsact_process_commands(cmd_list, tmpfile); }
               upsact_cleanup(cmd_list);
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                         mproduct,g_cmd_info[ups_command].cmd);
+                                         mproduct,g_cmd_info[ups_command].cmd,
+					ups_command);
               if (UPS_ERROR == UPS_SUCCESS) 
               { upsact_process_commands(cmd_list, tmpfile); }
               upsact_cleanup(cmd_list);
@@ -229,7 +230,7 @@ void ups_undeclare( t_upsugo_command * const uc ,
                       vinst->version);
         (void )upsfil_write_file(product, file,' '); 
 /*        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                   mproduct, UNDECLARE);
+                                   mproduct, UNDECLARE,ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
         { upsact_process_commands(cmd_list, tmpfile); }
         upsact_cleanup(cmd_list); */

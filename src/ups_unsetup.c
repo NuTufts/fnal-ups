@@ -148,7 +148,8 @@ static t_upslst_item *unsetup_core(
 	      /* Now process the unsetup actions */
 	      cmd_list = upsact_get_cmd((t_upsugo_command *)new_command_line,
 					mproduct, 
-					g_cmd_info[a_ups_command].cmd);
+					g_cmd_info[a_ups_command].cmd,
+					a_ups_command);
 	      if (UPS_ERROR == UPS_SUCCESS) {
 		upsact_process_commands(cmd_list, a_temp_file);
 	      }

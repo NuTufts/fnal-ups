@@ -60,11 +60,11 @@ void ups_depend( t_upsugo_command * const u_cmd,
 		 const int e_cmd )
 {
   if ( u_cmd->ugo_v > 1 )
-    upsact_print( u_cmd, 0, "setup", "tal" );
+    upsact_print( u_cmd, 0, "setup", e_cmd, "tal" );
   else if ( u_cmd->ugo_v > 0 )
-    upsact_print( u_cmd, 0, "setup", "tl" );
+    upsact_print( u_cmd, 0, "setup", e_cmd, "tl" );
   else
-    upsact_print( u_cmd, 0, "setup", "" );
+    upsact_print( u_cmd, 0, "setup", e_cmd, "" );
 }
 
 /*

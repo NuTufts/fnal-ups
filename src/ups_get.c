@@ -124,7 +124,8 @@ static t_upslst_item *get_core(const t_upsugo_command * const a_command_line,
     if (mproduct->minst_list) {
       /* Now process the get actions */
       cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
-				mproduct, g_cmd_info[a_ups_command].cmd);
+				mproduct, g_cmd_info[a_ups_command].cmd,
+				a_ups_command);
       if (UPS_ERROR == UPS_SUCCESS) {
 	upsact_process_commands(cmd_list, a_temp_file);
       }

@@ -118,7 +118,7 @@ static t_upslst_item *unk_core(const t_upsugo_command * const a_command_line,
 
       /* Now process the actions */
       cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
-				mproduct, a_unk_cmd);
+				mproduct, a_unk_cmd, e_unk);
       if (UPS_ERROR == UPS_SUCCESS) {
 	upsact_process_commands(cmd_list, a_temp_file);
       }

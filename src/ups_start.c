@@ -126,7 +126,8 @@ static t_upslst_item *start_core(const t_upsugo_command * const a_command_line,
 	if (a_command_line->ugo_w == 0) {
 	  /* the command line says stop first */
 	  cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
-				    mproduct, g_cmd_info[e_stop].cmd);
+				    mproduct, g_cmd_info[e_stop].cmd, 
+				    a_ups_command);
 	  if (UPS_ERROR == UPS_SUCCESS) {	  
 	    /* Now output all the actions to the file */
 	    upsact_process_commands(cmd_list, a_temp_file);
@@ -137,7 +138,8 @@ static t_upslst_item *start_core(const t_upsugo_command * const a_command_line,
 	if (UPS_ERROR == UPS_SUCCESS) {	  
 	  /* Now process the start actions */
 	  cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
-				    mproduct, g_cmd_info[a_ups_command].cmd);
+				    mproduct, g_cmd_info[a_ups_command].cmd, 
+				    a_ups_command);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    upsact_process_commands(cmd_list, a_temp_file);
 	  }

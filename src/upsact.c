@@ -91,14 +91,13 @@ int parse_params( const char * const a_params,
 t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 t_upslst_item *dep_list,
 			 t_upsact_item * const p_cur,
-			 const char * const act_name, 
-			 const char copt );
+			 const char * const act_name );
 t_upslst_item *get_top_prod( t_upsact_item *const p_cur, 
 			     const char *const act_name );
 t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 			  t_upstyp_matched_product * mat_prod,
 			  const char * const act_name );
-t_upsact_item *find_product( t_upslst_item *const dep_list,
+t_upsact_item *find_product_str( t_upslst_item *const dep_list,
 			     const char *const prod_name );
 t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
 				 const t_upsact_item* const act_item );
@@ -116,6 +115,7 @@ char *actitem2inststr( const t_upsact_item *const p_cur );
 int dbl2dbs( char * const db_name, t_upslst_item * const l_db );
 t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act );
 int lst_cmp_str( t_upslst_item * const l1, t_upslst_item * const l2 );
+void trim_delimiter( char * str );
 
 /* functions to handle specific action commands */
 
@@ -266,6 +266,8 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       /* remember arrays start at 0, so subtract one here */            \
       delimiter =                                                       \
 	(a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);            \
+      /* trim delimiter for quotes */                                   \
+      trim_delimiter( delimiter );                                      \
     } else {                                                            \
       /* use the default, nothing was entered */                        \
       delimiter = g_default_delimiter;                                  \
@@ -337,6 +339,7 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
  */
 
 static char *g_default_delimiter = ":";
+static int g_ups_cmd = e_invalid_action;
 
 /* 
  * Note: This array should in princip be in ups_main.c, but since
@@ -430,22 +433,34 @@ static t_cmd_map g_cmd_maps[] = {
   { 0,0,0,0,0 }
 };
 
-/*
- * Definition of public functions.
- */
+/*=======================================================================
+ *
+ * Public functions
+ *
+ *=====================================================================*/
 
 /*-----------------------------------------------------------------------
  * upsact_print
  *
- * Input : t_upsugo_command *,
- *         t_upstyp_matched_product *,
- *         char *,
+ * will call ups_get_cmd to get list of dependencies of a product, and 
+ * print it to stdout.
+ *
+ * Input : t_upsugo_command *, a ugo_command
+ *         t_upstyp_matched_product *, a matched product (can be null).
+ *         char *, name of action.
+ *         int, enum of ups command.
+ *         char *, options, 'a': it will print all action commands for all instances,
+ *                               default is to only print instances.
+ *                          'l': will print more information on each line.
+ *                          't': will indent line corresponding to level in dependency
+ *                               list.
  * Output: none
  * Return: t_upsact_tree *,
  */
 int upsact_print( t_upsugo_command * const ugo_cmd,
 		  t_upstyp_matched_product *mat_prod,
 		  const char * const act_name,
+		  int ups_cmd,
 		  char * sopt )
 {
   static char s_sopt[] = "";
@@ -457,21 +472,27 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
   if ( !ugo_cmd || !act_name )
     return 0;
 
-  dep_list = upsact_get_cmd( ugo_cmd, mat_prod, act_name );
+  /* get depency list */
 
-  /* print all actions */
+  dep_list = upsact_get_cmd( ugo_cmd, mat_prod, act_name, ups_cmd );
+
+  /* option a: print all action commands for all instances */
+
   if ( strchr( sopt, 'a' ) ) {
     for ( ; dep_list; dep_list = dep_list->next )
       upsact_print_item( (t_upsact_item *)dep_list->data, sopt );
   }
 
-  /* print only instances */
+  /* print only instances,
+     we need to keep a list of already printed instances */
+
   else {
     t_upsugo_command *cur_ugo = 0;
     t_upslst_item *didit_list = 0;
-    t_upsact_item *act0 = find_product( dep_list, ugo_cmd->ugo_product );
+    t_upsact_item *act0 = find_product_str( dep_list, ugo_cmd->ugo_product );
 
     /* add parent product to 'already done list' */
+
     if ( act0 )
       didit_list = upslst_add( didit_list, act0 );
 
@@ -493,28 +514,42 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 /*-----------------------------------------------------------------------
  * upsact_get_cmd
  *
- * Input : t_upsugo_command *,
- *         t_upstyp_matched_product *,
- *         char *,
+ * Will get list of dependencies for a product.
+ *
+ * Input : t_upsugo_command *, a ugo_command.
+ *         t_upstyp_matched_product *, a matched product (can be null).
+ *         char *, action name.
+ *         int, enum of ups command.
  * Output: none
- * Return: t_upsact_tree *,
+ * Return: t_upslst_item *, a list of t_upsact_item's.
  */
 t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product * const mat_prod,
-			       const char * const act_name )
+			       const char * const act_name,
+			       int ups_cmd )
 {
   t_upsact_item *new_cur;
   t_upslst_item *top_list = 0;
   t_upslst_item *dep_list = 0;
 
+  g_ups_cmd = ups_cmd;
+
   if ( !ugo_cmd || !act_name )
     return 0;
 
+  /* create a partial action structure for top product */
+
   if ( !(new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name )) ) 
     return 0;
-  top_list = get_top_prod( new_cur, act_name );
 
-  dep_list = next_cmd( top_list, dep_list, new_cur, act_name, ' ' );
+  /* create a list of 1'st level dependecies,
+     they have precedence over products at other levels */
+
+  top_list = get_top_prod( new_cur, act_name );
+  
+  /* get the list, next_cmd is recursive */
+
+  dep_list = next_cmd( top_list, dep_list, new_cur, act_name );
 
   return upslst_first( dep_list );
 }
@@ -523,8 +558,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
  * upsact_parse_cmd
  *
  * It will translate a single action command line.
- * The returned t_upsact_cmd structure is valid untill next call to
- * upsact_parse_cmd.
+ * The returned t_upsact_cmd structure is allocated on the free store.
  *
  * Input : action line.
  * Output: none
@@ -534,7 +568,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 {
   static char trim_chars[] = " \t\n\r\f)";
   t_upsact_cmd *pcmd;
-  char *act_s = (char *)cmd_str, *act_e = NULL;
+  char *act_s = (char *)cmd_str, *act_e = NULL, *act_p = NULL;
   int icmd = e_invalid_action;
   int i;
   int len;
@@ -548,7 +582,8 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   if ( !act_s || !*act_s )
     return 0;
 
-  /* create a new command structure */
+  /* create a new command structure, with space for the command string.
+     the created argv array is then (just) a list of pointers into that string. */
   
   pcmd = (t_upsact_cmd *)malloc( sizeof( t_upsact_cmd ) + strlen( act_s ) + 1 );
   pcmd->pmem = (char *)(pcmd + 1);
@@ -556,7 +591,15 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   strcpy( pcmd->pmem, act_s );
   act_s = pcmd->pmem;
 
-  if ( (act_e = strchr( act_s, OPEN_PAREN )) != NULL ) {
+  /* get name of action command */
+
+  if ( (act_p = strchr( act_s, OPEN_PAREN )) != NULL ) {
+
+    /* save pointer to parenthese and
+       get rid of trailing spaces in name of action command */
+
+    act_e = act_p;
+    while ( act_e && *act_e && isspace( *(act_e) ) ){ --act_e; }    
     len = act_e - act_s;
 
     /* look for action in the supported action array */
@@ -566,12 +609,15 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 	
 	/* we found a match. create a pointer to a string with these parameters.
 	   note - it does not include an open parenthesis */
-	act_s = act_e + 1;
+
+	act_s = act_p + 1;
 		 
-	/* trim off whitespace & the ending ")" */	  
+	/* trim off whitespace & the ending ")" */
+
 	upsutl_str_remove_edges( act_s, trim_chars );
 
         /* save the location in the array */
+
 	icmd = i;
 	
 	break;
@@ -579,7 +625,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
     }
   }
 
-  /* fill p_cmd, split parameter string into a list of arguments */
+  /* split parameter string into a list of arguments (fill argv) */
   
   if ( icmd != e_invalid_action ) {
     pcmd->icmd = icmd;
@@ -603,14 +649,16 @@ void upsact_cleanup( t_upslst_item *dep_list )
 /*-----------------------------------------------------------------------
  * upsact_print_item
  *
+ * It will print a t_upsact_item to stdout.
+ *
  * options (sopt):
  *    always : print correspoding product instance.
  *    'l'    : also print instance level
  *    'a'    : also print corresponding action command
  *    't'    : also print indentions (corresponding to level)
  *
- * Input : action item
- *         iopt
+ * Input : t_upsact_item *, action item
+ *         char *, sopt 
  * Output: none
  * Return: none
  */
@@ -635,6 +683,15 @@ void upsact_print_item( const t_upsact_item *const p_cur,
   else printf( "\n" );
 }
 
+/*-----------------------------------------------------------------------
+ * upsact_print_cmd
+ *
+ * It will print a t_upsact_cmd to stdout.
+ *
+ * Input : t_upsact_cmd *, and action command
+ * Output: none
+ * Return: none
+ */
 void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
 {
   int i;
@@ -757,52 +814,286 @@ t_upslst_item *upsact_check_files(
   return(file_list);
 }
 
+/*-----------------------------------------------------------------------
+ * upsact_free_upsact_cmd
+ *
+ * It will free a single t_upsact_cmd
+ *
+ * Input : t_upsact_cmd *, an action command
+ * Output: none
+ * Return: none
+ */
 void upsact_free_upsact_cmd( t_upsact_cmd * const act_cmd )
 {
   if ( act_cmd ) 
     free( act_cmd );
 }
 
-/*
+/*=======================================================================
+ *
  * Private functions
- */
+ *
+ *=====================================================================*/
 
 /*-----------------------------------------------------------------------
- * get_act
+ * next_cmd
  *
- * Input : t_upsugo_command *,
+ * Here is the work for creating a list of dependencies. 
+ * It's recursive.
+ *
+ * Input : t_upslst_item *, list of 1'st level products (t_upsact_item's).
+ *         t_upslst_item *, current list of dependent products (t_upsact_item's).
+ *         t_upsact_item *, current t_upsact_item.
+ *         char *, current name of action.
+ *         
  * Output: none
- * Return: t_upsact_action *,
+ * Return: t_upsact_cmd *,
  */
-t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
-			  t_upstyp_matched_product * mat_prod,
-			  const char * const act_name )
+t_upslst_item *next_cmd( t_upslst_item * const top_list,
+			 t_upslst_item *dep_list,
+			 t_upsact_item *const p_cur,
+			 const char *const act_name )
 {
-  t_upstyp_matched_instance *mat_inst;
+  static char s_current_act_line[MAX_LINE_LEN] = "";
+  static char s_current_db[MAX_LINE_LEN] = "";
 
-  if ( !ugo_cmd || !act_name )
-    return 0;
+  t_upslst_item *l_cmd = 0;
+  t_upsact_cmd *p_cmd = 0;
+  char *p_line = 0;
+  int i_act = e_invalid_action;
+  int ignore_errors = 0;
 
-  if ( !mat_prod ) {
-    t_upslst_item *l_mproduct = upsmat_instance( (t_upsugo_command *)ugo_cmd, NULL, 1 );
-    if ( !l_mproduct || !l_mproduct->data )
+  if ( !p_cur )
+    return dep_list;
+
+  i_act = actname2enum( act_name );
+
+  if ( !p_cur->act ) {
+
+    /* if we don't have an action, take care of defaults cases, controlled by: 
+       g_cmd_info.flags, g_cmd_info.uncmd_index and g_cmd_maps.icmd_undo */
+
+    if ( !(p_cur->act = new_default_action( p_cur, act_name, i_act )) )
+      return dep_list;
+  }
+  
+  l_cmd = p_cur->act->command_list;
+  for ( ; l_cmd; l_cmd = l_cmd->next ) {
+    ignore_errors = 0;
+
+    /* translate and parse command */
+
+    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
+				 (char *)l_cmd->data );
+    p_cmd = upsact_parse_cmd( p_line );
+
+    if ( p_cmd && p_cmd->icmd >= 0 ) {
+      p_cmd->iact = i_act;
+      if ( p_cmd->icmd > e_unsetuprequired ) {
+
+	/* here we add an action item to the list (no dependency action) */
+
+	t_upsact_item *new_cur = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
+	new_cur->level = p_cur->level;
+	new_cur->ugo = p_cur->ugo;
+	new_cur->mat = p_cur->mat;
+	new_cur->act = p_cur->act;
+	new_cur->cmd = p_cmd;
+	dep_list = upslst_add( dep_list, new_cur );
+	continue;
+      }
+      else if ( !p_cur->ugo->ugo_j ) {
+
+	/* here we do the dependencies: (un)setup* */
+
+	t_upsact_item *new_act = 0;
+	t_upsugo_command *new_ugo = 0;
+
+	/* handle unsetup ... that's special, we will compare command line to the
+           product actually setup and get the instance from $SETUP_prodname */
+
+	if ( p_cmd->icmd == e_unsetuprequired ||
+	     p_cmd->icmd == e_unsetupoptional ) {
+	  if ( !(new_ugo = get_SETUP_prod( p_cmd, i_act )) )
+	    continue;
+	}
+
+	/* get/set current db: set db to current database if database is not 
+           specified on command line, else ugo_bldcmd knows what to do */
+
+	else if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
+	     dbl2dbs( s_current_db, p_cur->ugo->ugo_db ) > 0 ) {
+	  strcpy( s_current_act_line, p_cmd->argv[0] ); 
+	  strcat( s_current_act_line, s_current_db );
+	  new_ugo = upsugo_bldcmd( s_current_act_line, g_cmd_info[i_act].valid_opts );
+	}
+	else {
+	  new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
+	}
+
+	/* if product is at the top level, use that one */
+
+	if ( new_ugo && p_cur->level > 0 ) {
+	  new_act = find_product_str( top_list, new_ugo->ugo_product );
+	}
+
+	/* if product is already in our setup list, go to next product */
+	
+	if ( new_ugo && find_product_str( dep_list, new_ugo->ugo_product ) ) {
+	  /* !!! free stuff */
+	  continue;
+	}
+	
+	/* new_act is only set if product found at the top level, else
+           we will have to create a new_act from a ugo */
+
+	if ( !new_act ) {
+	  switch ( p_cmd->icmd ) 
+	  {
+	  case e_setupoptional:
+	    ignore_errors = 1;
+	  case e_setuprequired:	    
+	    new_act = new_act_item( new_ugo, 0, 0, "SETUP");
+	    break;	
+	  case e_unsetupoptional:
+	    ignore_errors = 1;
+	  case e_unsetuprequired: 
+	    new_act = new_act_item( new_ugo, 0, 0, "UNSETUP");
+	    break;
+	  }
+
+	  /* ignore errors if optional (un)setup */
+
+	  if ( !new_act ) {
+	    if ( ignore_errors )
+	      upserr_clear();
+	    else {
+	      SET_PARSE_ERROR( p_line );
+	    }
+	    continue;
+	  }
+	}
+
+	/* here we have a new action, increment dependency level and
+           parse atcion (by calling next_cmd) */
+
+	new_act->level = p_cur->level + 1;
+	dep_list = next_cmd( top_list, dep_list, new_act, act_name );
+	P_VERB_s_s( 3, "Adding dependcy:", p_line );
+	continue;
+      }
+    }
+    else {
+      SET_PARSE_ERROR( p_line );
+    }
+  }
+  
+  return dep_list;
+}
+
+/*-----------------------------------------------------------------------
+ * parse_params
+ *
+ * Split an action's parameter string into into separate parameters and
+ * return an array of these.The parameters in the string are separated 
+ * by commas, but ignore commas within quotes.
+ *
+ * The routine writes into passed parameter string !!!.
+ *
+ * Input : char *, parameter string
+ *         char **, pointer to array of arguments
+ * Output: char **, pointer to array of arguments
+ * Return: number of arguments found
+ */
+int parse_params( const char * const a_params, char **argv )
+{
+  char *ptr = (char *)a_params, *saved_ptr = NULL;
+  char *new_ptr;
+  int count = 0;
+
+  while ( ptr && *ptr ) {
+
+    if ( count >= UPS_MAX_ARGC ) {
+      upserr_vplace();
+      upserr_add( UPS_TOO_MANY_ACTION_ARG, UPS_FATAL, a_params );
       return 0;
-    mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
+    }
+    
+    switch ( *ptr ) {
+      
+    case DQUOTE:    /* found a double quote */
+      
+      /* this may be the beginning of the line, saved_ptr is not set yet
+	 so do it now. */
+      
+      if ( !saved_ptr )
+	saved_ptr = ptr;           /* the beginning of a new parameter */
+      
+      /* found a double quote, skip to next double quote */
+      
+      if ( (new_ptr = strchr( ++ptr, (int)DQUOTE) ) == NULL ) {
+	
+	/* did not find another quote  - take the end of the line as end of
+	   string and end of param list */
+	
+	saved_ptr = ptr;         /* no longer valid, we got the param */
+	ptr = NULL;              /* all done */
+      }
+      else {
+	
+	/* point string just past double quote */
+	
+	ptr = ++new_ptr;
+      }
+      break;
+      
+    case COMMA:     /* found a comma */       
+
+      if ( saved_ptr ) {
+	
+	/* we have a param, create a new pointer to the string */
+        /* and add it to the list */
+	
+	*ptr = '\0';
+	upsutl_str_remove_edges( saved_ptr, WSPACE );
+	argv[count++] = saved_ptr;
+	
+      }
+      ++ptr;                       /* go past the comma */
+      saved_ptr = ptr;             /* start of param */
+      break;
+      
+    default:       /* go to next char */
+      
+      if ( !saved_ptr ) {
+	saved_ptr = ptr;           /* the beginning of a new parameter */
+      }
+      ++ptr;                       /* go to the next character */
+    }
   }
 
-  mat_inst = (t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
-  if ( mat_inst->table ) 
-    return upskey_inst_getaction( mat_inst->table, act_name );
-  else
-    return 0;
+  if ( saved_ptr ) {
+    
+    /* Get the last one too */
+
+    upsutl_str_remove_edges( saved_ptr, WSPACE );
+    argv[count++] = saved_ptr;
+  }
+  
+  return count;
 }
 
 /*-----------------------------------------------------------------------
  * get_top_prod
  *
- * Input : t_upsact_tree *,
+ * Will fill the passed list of action item with translated actions.
+ * It will not follow depencies. It's very close to 'next_cmd'.
+ * (actally, it should probaly had been a part of next_cmd).
+ *
+ * Input : t_upsact_item *, action item
+ *         char *, action name
  * Output: none
- * Return: t_upsact_cmd *,
+ * Return: t_upslst_item *, a list of top action items
  */
 t_upslst_item *get_top_prod( t_upsact_item *const p_cur, 
 			     const char *const act_name )
@@ -873,135 +1164,19 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
 }
 
 /*-----------------------------------------------------------------------
- * next_cmd
+ * get_SETUP_prod
  *
- * Input : t_upsact_tree *,
+ * Will create an ugo command from the env. variable SETUP_prodname.
+ * It will compare if the passed command line correspond to the product
+ * defined by SETUP_prod.
+ *
+ * Input : t_upsact_cmd *, action command line
+ *         int, enum of main line action
  * Output: none
- * Return: t_upsact_cmd *,
+ * Return: t_upsugo_command *, a ugo command
  */
-t_upslst_item *next_cmd( t_upslst_item * const top_list,
-			 t_upslst_item *dep_list,
-			 t_upsact_item *const p_cur,
-			 const char *const act_name,
-			 const char copt )
-{
-  static char s_current_act_line[MAX_LINE_LEN] = "";
-  static char s_current_db[MAX_LINE_LEN] = "";
-
-  t_upslst_item *l_cmd = 0;
-  t_upsact_cmd *p_cmd = 0;
-  char *p_line = 0;
-  int i_act = e_invalid_action;
-  int ignore_errors;
-
-  if ( !p_cur )
-    return dep_list;
-
-  i_act = actname2enum( act_name );
-
-  /* take care of defaults cases */
-
-  if ( !p_cur->act ) {
-    if ( !(p_cur->act = new_default_action( p_cur, act_name, i_act )) )
-      return dep_list;
-  }
-  
-  l_cmd = p_cur->act->command_list;
-  for ( ; l_cmd; l_cmd = l_cmd->next ) {
-    ignore_errors = 0;
-
-    /* translate and parse command */    
-    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
-				 (char *)l_cmd->data );
-    p_cmd = upsact_parse_cmd( p_line );
-
-    if ( p_cmd && p_cmd->icmd >= 0 ) {
-      p_cmd->iact = i_act;
-      if ( p_cmd->icmd > e_unsetuprequired ) {
-	t_upsact_item *new_cur = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
-	new_cur->level = p_cur->level;
-	new_cur->ugo = p_cur->ugo;
-	new_cur->mat = p_cur->mat;
-	new_cur->act = p_cur->act;
-	new_cur->cmd = p_cmd;
-	dep_list = upslst_add( dep_list, new_cur );
-	continue;
-      }
-      else if ( copt != 't' && !p_cur->ugo->ugo_j ) { /* here we go again */
-	t_upsact_item *new_act = 0;
-	t_upsugo_command *new_ugo = 0;
-
-	/* handle unsetup ... that's special */
-
-	if ( p_cmd->icmd == e_unsetuprequired ||
-	     p_cmd->icmd == e_unsetupoptional ) {
-	  if ( !(new_ugo = get_SETUP_prod( p_cmd, i_act )) )
-	    continue;
-	}
-
-	/* set/get current db */
-
-	else if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
-	     dbl2dbs( s_current_db, p_cur->ugo->ugo_db ) > 0 ) {
-	  strcpy( s_current_act_line, p_cmd->argv[0] ); 
-	  strcat( s_current_act_line, s_current_db );
-	  new_ugo = upsugo_bldcmd( s_current_act_line, g_cmd_info[i_act].valid_opts );
-	}
-	else {
-	  new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
-	}
-
-	/* check if product is already at top level */
-
-	if ( new_ugo && p_cur->level > 0 ) {
-	  new_act = find_product( top_list, new_ugo->ugo_product );
-	}
-
-	/* check if product is already in setup list */
-	
-	if ( new_ugo && find_product( dep_list, new_ugo->ugo_product ) ) {
-	  /* ??? free stuff */
-	  continue;
-	}
-	
-	if ( !new_act ) {
-	  switch ( p_cmd->icmd ) 
-	  {
-	  case e_setupoptional:
-	    ignore_errors = 1;
-	  case e_setuprequired:	    
-	    new_act = new_act_item( new_ugo, 0, 0, "SETUP");
-	    break;	
-	  case e_unsetupoptional:
-	    ignore_errors = 1;
-	  case e_unsetuprequired: 
-	    new_act = new_act_item( new_ugo, 0, 0, "UNSETUP");
-	    break;
-	  }
-	  if ( !new_act ) {
-	    if ( ignore_errors )
-	      upserr_clear();
-	    else {
-	      SET_PARSE_ERROR( p_line );
-	    }
-	    continue;
-	  }
-	}
-	new_act->level = p_cur->level + 1;
-	dep_list = next_cmd( top_list, dep_list, new_act, act_name, copt );
-	P_VERB_s_s( 3, "Adding dependcy:", p_line );
-	continue;
-      }
-    }
-    else {
-      SET_PARSE_ERROR( p_line );
-    }
-  }
-  
-  return dep_list;
-}
-
-t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act )
+t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
+				  const int i_act )
 {
   static char s_pname[256];
   char *pname = 0;
@@ -1072,9 +1247,49 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act )
   return a_setup_ugo;
 }
 
+/*-----------------------------------------------------------------------
+ * get_act
+ *
+ * It will from a ugo command or a macthed product fetch the corresponding
+ * action (t_upstyp_action). The passed ugo command or macthed product is
+ * expected to be an unique instance.
+ *
+ * Input : t_upsugo_command *, a ugo command
+ *         t_upstyp_matched_product *, a matched product (can be null)
+ *         char *, name of action
+ * Output: none
+ * Return: t_upstyp_action *, an action (as read from a table file)
+ */
+t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
+			  t_upstyp_matched_product * mat_prod,
+			  const char * const act_name )
+{
+  t_upstyp_matched_instance *mat_inst;
+
+  if ( !ugo_cmd || !act_name )
+    return 0;
+
+  if ( !mat_prod ) {
+    t_upslst_item *l_mproduct = upsmat_instance( (t_upsugo_command *)ugo_cmd, NULL, 1 );
+    if ( !l_mproduct || !l_mproduct->data )
+      return 0;
+    mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
+  }
+
+  /* we are expecting one match, else the above should fail */
+
+  mat_inst = (t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
+  if ( mat_inst->table ) 
+    return upskey_inst_getaction( mat_inst->table, act_name );
+  else
+    return 0;
+}
+
 int lst_cmp_str( t_upslst_item * const l1, 
 		 t_upslst_item * const l2 )
 {
+  /* will compare all strings in a list of strings */
+
   int dc = 0;
   t_upslst_item *l_1 = upslst_first( l1 );
   t_upslst_item *l_2 = upslst_first( l2 );
@@ -1090,9 +1305,12 @@ int lst_cmp_str( t_upslst_item * const l1,
   return 0;
 }
 
-t_upsact_item *find_product( t_upslst_item* const dep_list,
+t_upsact_item *find_product_str( t_upslst_item* const dep_list,
 			     const char *const prod_name )
 {
+  /* in a list of act_item's it will find the item corresponding to
+     passed product name */
+
   t_upslst_item *l_ptr = upslst_first( (t_upslst_item *)dep_list );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     t_upsact_item *p_item = (t_upsact_item *)l_ptr->data;
@@ -1105,6 +1323,9 @@ t_upsact_item *find_product( t_upslst_item* const dep_list,
 t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
 				 const t_upsact_item* const act_item )
 {
+  /* in a list of act_item's it will find the item corresponding to
+     passed act_item pointer */
+
   t_upslst_item *l_ptr = upslst_first( dep_list );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     t_upsact_item *act_ptr = (t_upsact_item *)l_ptr->data;
@@ -1116,6 +1337,10 @@ t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
 
 char *actitem2inststr( const t_upsact_item *const p_cur )
 {
+  /* given an act_item it will create a string representing the 
+     corresponding product instance. the result is the string
+     from upsget_envstr with chain information appended */
+
   static char buf[MAX_LINE_LEN];
   t_upstyp_matched_instance *mat_inst;
   t_upslst_item *l_item;
@@ -1133,7 +1358,7 @@ char *actitem2inststr( const t_upsact_item *const p_cur )
     
     /* the following should in princip never happen: a dependency should
        only be reachable by a single chain, so maybe we should print an
-       error here instead */
+       error here */
 
     for ( l_item = l_item->next; l_item; l_item = l_item->next ) {
       if ( l_item->data ) {
@@ -1148,6 +1373,8 @@ char *actitem2inststr( const t_upsact_item *const p_cur )
 
 int actname2enum( const char * const act_name )
 {
+  /* it will map an action name to the corresponding enum */
+
   int iact = e_invalid_action, i = 0;
 
   if ( act_name ) {
@@ -1164,6 +1391,9 @@ int actname2enum( const char * const act_name )
 
 int dbl2dbs( char * const s_db, t_upslst_item * const l_db )
 {
+  /* from a list of typ_db items it will create a string of databases
+     corresponding including -z option */
+
   t_upslst_item *l_item = 0;
   int c_db = 0;
 
@@ -1186,99 +1416,24 @@ int dbl2dbs( char * const s_db, t_upslst_item * const l_db )
   return c_db;
 }
 
-/*-----------------------------------------------------------------------
- * parse_params
- *
- * Given an action's parameters split them up into separate params and
- * return a linked list of the separate parameters.  The parameters are
- * separated by commas, but ignore commas within quotes.
- *
- * The routine writes into passed parameter string.
- *
- * called by upsact_parse.
- *
- * Input : parameter string
- *         pointer to array of arguments
- * Output: pointer to array of arguments
- * Return: number of arguments found
- */
-int parse_params( const char * const a_params, char **argv )
+void trim_delimiter( char * str )
 {
-  char *ptr = (char *)a_params, *saved_ptr = NULL;
-  char *new_ptr;
-  int count = 0;
+  /* just to trim the delimiter: get rid of starting and
+     trailing quotes. the passed string are expected to be
+     trimmed of starting and trailing blanks */
 
-  while ( ptr && *ptr ) {
+  int len = strlen( str );
 
-    if ( count >= UPS_MAX_ARGC ) {
-      upserr_vplace();
-      upserr_add( UPS_TOO_MANY_ACTION_ARG, UPS_FATAL, a_params );
-      return 0;
-    }
-    
-    switch ( *ptr ) {
-      
-    case DQUOTE:    /* found a double quote */
-      
-      /* this may be the beginning of the line, saved_ptr is not set yet
-	 so do it now. */
-      
-      if ( !saved_ptr )
-	saved_ptr = ptr;           /* the beginning of a new parameter */
-      
-      /* found a double quote, skip to next double quote */
-      
-      if ( (new_ptr = strchr( ++ptr, (int)DQUOTE) ) == NULL ) {
-	
-	/* did not find another quote  - take the end of the line as end of
-	   string and end of param list */
-	
-	saved_ptr = ptr;         /* no longer valid, we got the param */
-	ptr = NULL;               /* all done */
-      }
-      else {
-	
-	/* point string just past double quote */
-	
-	ptr = ++new_ptr;
-      }
-      break;
-      
-    case COMMA:     /* found a comma */       
+  if ( len < 2 )
+    return;
 
-      if ( saved_ptr ) {
-	
-	/* we have a param, create a new pointer to the string */
-        /* and add it to the list */
-	
-	*ptr = '\0';
-	upsutl_str_remove_edges( saved_ptr, WSPACE );
-	argv[count++] = saved_ptr;
-	
-      }
-      ++ptr;                       /* go past the comma */
-      saved_ptr = ptr;             /* start of param */
-      break;
-      
-    default:       /* go to next char */
-      
-      if ( !saved_ptr ) {
-	saved_ptr = ptr;           /* the beginning of a new parameter */
-      }
-      ++ptr;                       /* go to the next character */
-    }
+  if ( (str[0] == '\"' && str[len-1] == '\"') ||
+       (str[0] == '\'' && str[len-1] == '\'') ) {
+    char *sp1 = &str[1], *sp2 = &str[len-1];
+    for ( ; sp1 < sp2; str++, sp1++ ) *str = *sp1;
+    *str = 0;
   }
-
-  if ( saved_ptr ) {
-    
-    /* Get the last one too */
-    upsutl_str_remove_edges( saved_ptr, WSPACE );
-    argv[count++] = saved_ptr;
-  }
-  
-  return count;
 }
-
 
 t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     t_upstyp_matched_product *mat_prod,
@@ -1286,6 +1441,9 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     const char * const act_name )
 {		       
   t_upsact_item *act_item = 0;
+
+  /* from a passed ugo command or a matched product it will create a 
+     new action item */
 
   if ( !ugo_cmd )
     return 0;
@@ -1311,6 +1469,10 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_cur,
 				     const char * const act_name, 
 				     const int iact )
 {
+  /* it will create a new t_upstyp_action. It will be:
+     1) reverse action, if exist (g_cmd_info.uncmd_index)
+     2) a dodefault() action, if default bit set (g_cmd_info.flags) */
+
   t_upstyp_action *new_act = 0;
   int i_uncmd = 0;
 
@@ -1340,6 +1502,10 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_cur,
 t_upslst_item *reverse_command_list( t_upsact_item *const p_cur, 
 				     t_upslst_item *const cmd_list )
 {
+  /* it will, given a list of action command lines, reverse each 
+     command line (if g_cmd_maps.icmd_undo is set), and return a 
+     list of these. */ 
+
   static char buf[MAX_LINE_LEN];
   t_upslst_item *l_ucmd = 0;
   t_upslst_item *l_cmd = upslst_first( cmd_list );
@@ -1351,7 +1517,9 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
   int i;
 
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
-    /* translate and parse command */    
+
+    /* translate and parse command */
+
     p_line = upsget_translation( p_cur->mat, p_cur->ugo,
 				 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
@@ -2774,7 +2942,7 @@ static void f_writecompilescript(
     
       /*       get the action command list */
       cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, &mproduct,
-				a_cmd->argv[1]);
+				a_cmd->argv[1], e_setup);
       if (UPS_ERROR == UPS_SUCCESS) {
 	/* 2      now that we have the list, locate the current compile file
 	          if there is one */
