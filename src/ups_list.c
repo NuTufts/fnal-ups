@@ -286,11 +286,10 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
 {
   t_upslst_item *mproduct_list = NULL, *mproduct_item = NULL;
   t_upslst_item *minst_item = NULL;
-  t_upslst_item *tmp_mprod_list = NULL;
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
-  t_upstyp_matched_instance *minst = NULL;
+
   /* Get all the requested instances */
   UPS_VERIFY=verify;		/* this is REALLY the ups verify command */ 
   for (db_list = a_command_line->ugo_db ; db_list ; db_list=db_list->next) 
@@ -334,8 +333,8 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
 	 mproduct_item = mproduct_item->next) 
     { mproduct = (t_upstyp_matched_product *)mproduct_item->data;
       ups_verify_dbconfig(mproduct->db_info, 
-			  (t_upstyp_matched_instance *)minst_item->data,
-			  a_command_line);
+		       (t_upstyp_matched_instance *)mproduct->minst_list->data,
+		       a_command_line);
       for (minst_item = mproduct->minst_list ; minst_item ;
 	   minst_item = minst_item->next)
       { upserr_add(UPS_VERIFY_PRODUCT, UPS_INFORMATIONAL, mproduct->product);
@@ -349,7 +348,7 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
     }    
   }
     /* free the matched products */
-    tmp_mprod_list = upsutl_free_matched_product_list(&mproduct_list);
+    (void )upsutl_free_matched_product_list(&mproduct_list);
   }
   return 0;
 }
@@ -532,7 +531,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
             const t_upstyp_matched_product * const product)
 {
   t_upslst_item *l_ptr = 0;
-  t_upslst_item *ul_ptr = 0;
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
