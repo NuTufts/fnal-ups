@@ -92,7 +92,7 @@ $(LIB)/libups.a : $(OBJECTS) $(COMMAND_OBJECTS)
 #
 # Now standard targets
 #
-clean :
+clean spotless :
 	@ upsClean
 
 make :

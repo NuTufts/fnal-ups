@@ -7,12 +7,14 @@ Include files:-
 ===============
 */
 
+#include <unistd.h>
+
 /* ups specific include files */
 #include "ups.h"
 #include "upstst_parse.h"
 #include "upstst_macros.h"
 
-static void upstst_match_dump (const t_upslst_item * const , FILE * const);
+static void upstst_match_dump (const t_upslst_item * const );
 /* ==========================================================================
 
     upstst_mat_instance - tests upsmat_instace
@@ -33,6 +35,7 @@ static int		unique;				/* unique flag name */
 static char		*outfile;			/* filename to output */
 static char		*difffile;			/* file to diff */
 FILE			*ofd;				/* outfile fd */
+int			stdout_dup;			/* dup of stdout */
 
 upstst_argt     	argt[] = 
    {{"-unique",	  UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
@@ -50,16 +53,20 @@ unique = NULL; outfile = NULL; difffile = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
+
+/* let's get our output file descriptor setup
+   ------------------------------------------ */
+
 if (outfile)                                    /* don't use stdout */
    {
-   ofd = fopen(outfile,"w");
-   if (!ofd)
+   if (!(ofd = fopen(outfile,"w")))
       { perror(outfile); return (1); }
    }
 else
    {ofd = stdout;}
-
-
+stdout_dup = dup(STDOUT_FILENO);                /* dup stdout */
+fflush(stdout);                                 /* clear output buffer */
+status = dup2(fileno(ofd),STDOUT_FILENO);       /* reset it to output file */
 
 /* call the real routine
    --------------------- */
@@ -80,13 +87,17 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
           g_error_ascii[UPS_ERROR],"expected status", g_error_ascii[estatus]);
        if (UPS_ERROR) { upserr_output(); upserr_clear(); }
        }
-   upstst_match_dump(mp,ofd);
+   upstst_match_dump(mp);
    }
 
 /* dump the output to specified file and compare
    --------------------------------------------- */
 
-if(outfile) fclose(ofd);
+fflush(stdout);                                 /* flush buffer */
+dup2(stdout_dup,STDOUT_FILENO);                 /* reset stdout */
+close(stdout_dup);                              /* close files*/
+if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);
+
 if (difffile && outfile)
    {
    sprintf (diffcmd,"diff %s %s",difffile,outfile);
@@ -103,8 +114,7 @@ return (0);
 
    ==========================================================================*/
 
-static void upstst_match_dump (const t_upslst_item * const mp, 
-   FILE * const fd)
+static void upstst_match_dump (const t_upslst_item * const mp)
 {
 t_upslst_item 			*prod_ptr;		/* product ptr */
 t_upslst_item 			*inst_ptr;		/* instance ptr */
@@ -118,29 +128,29 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
    prod = (t_upstyp_matched_product *) prod_ptr->data;
    db = (t_upstyp_db *) prod->db_info;
-   if (db) fprintf(fd,"D:NAME=%s\n", db->name);
+   if (db) printf("D:NAME=%s\n", db->name);
    for (inst_ptr = prod->minst_list; inst_ptr; inst_ptr = inst_ptr->next)
       {
       inst = (t_upstyp_matched_instance *) inst_ptr->data;
       if (inst->chain)
          {
-         fprintf(fd,"C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", inst->chain->product,
+         printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", inst->chain->product,
              inst->chain->chain, inst->chain->version);
-         fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->chain->flavor,
+         printf("FLAVOR=%s, QUALIFIERS=%s\n", inst->chain->flavor,
              inst->chain->qualifiers);
          }
       if (inst->version)
          {
-         fprintf(fd,"V:PRODUCT=%s, VERSION=%s, ", inst->version->product,
+         printf("V:PRODUCT=%s, VERSION=%s, ", inst->version->product,
              inst->version->version);
-         fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->version->flavor,
+         printf("FLAVOR=%s, QUALIFIERS=%s\n", inst->version->flavor,
              inst->version->qualifiers);
          }
       if (inst->table)
          {
-         fprintf(fd,"T:PRODUCT=%s, VERSION=%s, ", inst->table->product,
+         printf("T:PRODUCT=%s, VERSION=%s, ", inst->table->product,
              inst->table->version);
-         fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->table->flavor,
+         printf("FLAVOR=%s, QUALIFIERS=%s\n", inst->table->flavor,
              inst->table->qualifiers);
          }
       }

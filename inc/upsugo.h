@@ -136,10 +136,8 @@ t_upsugo_command     *upsugo_bldcmd(char * const cmdstr,
 			       char * const validopts);
 int         upsugo_free(struct ups_command * const uc);
 void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title ,
-		           const unsigned int prnt_ptr,
-			   FILE * const fd);
+		           const unsigned int prnt_ptr);
 int         upsugo_dump (struct ups_command * const uc, 
-			 const unsigned int prnt_ptr,
-			 FILE * const fd);
+			 const unsigned int prnt_ptr);
 #endif /* _UPSUGO_H_ */
 

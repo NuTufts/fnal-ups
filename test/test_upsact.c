@@ -182,7 +182,7 @@ t_upslst_item *l_dep;
   ugo_cmd = upsugo_bldcmd( "-c -f IRIX  exmh",
 			   "zAacCdfghKtmMNoOPqrTuUv?" );
   
-  upsugo_dump( ugo_cmd, 1, stdout );
+  upsugo_dump( ugo_cmd, 1);
   mproduct_list = upsmat_instance( ugo_cmd, 1 );
   list_output( upslst_first( mproduct_list ), ugo_cmd);
 

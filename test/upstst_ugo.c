@@ -7,6 +7,8 @@ Include files:-
 ===============
 */
 
+#include <unistd.h>
+
 /* ups specific include files */
 #include "ups.h"
 #include "upstst_parse.h"
@@ -66,6 +68,7 @@ static int	encmds;				/* expected count */
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
 FILE		*ofd;				/* outfile file descriptor */
+int		stdout_dup;			/* dup of stdout */
 upstst_argt     argt[] = {{"-options",UPSTST_ARGV_STRING,NULL,&options},
 			  {"-encmds", UPSTST_ARGV_INT,   NULL,&encmds},
                           {"-status", UPSTST_ARGV_STRING,NULL,&estatus_str},
@@ -87,14 +90,21 @@ status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 if (!options) options = UPSTST_ALLOPTS;
+
+/* let's get our output file descriptor setup
+   ------------------------------------------ */
+
 if (outfile) 					/* don't use stdout */
    {
-   ofd = fopen(outfile,"w");
-   if (!ofd)
+   if (!(ofd = fopen(outfile,"w")))
       { perror(outfile); return (1); }
    }
 else
    {ofd = stdout;}
+stdout_dup = dup(STDOUT_FILENO);                /* dup stdout */
+fflush(stdout);                                 /* clear output buffer */
+status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
+
 
 /* call the real routine
    --------------------- */
@@ -103,7 +113,7 @@ UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,options))	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
-   upsugo_dump(uc,FALSE,ofd);			/* display */
+   upsugo_dump(uc,FALSE);			/* display */
    ncmds++;					/* increment ncommands */
    }
 
@@ -114,7 +124,11 @@ if (ncmds != encmds)
 /* dump the output to specified file and compare
    --------------------------------------------- */
 
-if(outfile) fclose(ofd);
+fflush(stdout);					/* flush buffer */
+dup2(stdout_dup,STDOUT_FILENO);			/* reset stdout */
+close(stdout_dup);				/* close files*/
+if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);	
+
 if (difffile && outfile)
    {
    sprintf (diffcmd,"diff %s %s",difffile,outfile);

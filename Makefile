@@ -73,13 +73,17 @@ VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 # "all" should probably depend on the product directory being set.
 
 ERUPTDBG=
+INSIGHT=
 
 all: 	proddir_is_set
-	cd src; premake $(ERUPTDBG)
-	cd test; premake $(ERUPTDBG)
+	cd src; premake $(ERUPTDBG) $(INSIGHT)
+	cd test; premake $(ERUPTDBG) $(INSIGHT)
 
 debug: 	
 	make ERUPTDBG=-debug all
+
+insight: 	
+	make INSIGHT=-i ERUPTDBG=-debug all
 
 clean:
 	for subdir in src inc test doc bin lib; do \
@@ -90,19 +94,6 @@ spotless:
 	for subdir in src inc test doc bin lib; do \
 	   ( cd $$subdir; echo "cleaning $$subdir"; premake spotless ); \
 	done
-
-
-#clean: 				# clean up unneeded files	#
-#	-cd imports/gnuproduct ; make clean; rm config.status
-#	-cd imports/xproduct ; make clean; rm Makefile
-#	-cd fnal/premakedir ; premake -f $(FLAVOR) clean
-
-spotless: clean
-	-rm lib/*.a 
-	-rm bin/ups
-	-rm test/ups_test test/test_upserr test/upslst test/upsmat
-	-rm test/upsugo   test/test_upstul 
-
 
 # we indirect this a level so we can customize it for bundle products
 
