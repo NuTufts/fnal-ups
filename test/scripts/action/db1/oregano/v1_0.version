@@ -1,15 +1,15 @@
 FILE = version
-PRODUCT = penguin
+PRODUCT = oregano
 VERSION = v1_0
 
 #*************************************************
 #
 FLAVOR = NULL
 QUALIFIERS = ""
-  DECLARER = rtokarek
+  DECLARER = thyme
   DECLARED = 1998-06-10
-  MODIFIER = highpriest
+  MODIFIER = rosemary
   MODIFIED = 1998-06-22
-  PROD_DIR = /NULL/penguin/
+  PROD_DIR = /NULL/oregano/
   UPS_DIR = ups
-  TABLE_FILE = penguin.table
+  TABLE_FILE = oregano.table
