@@ -639,10 +639,9 @@ t_upstyp_instance *read_instance( void )
       
     case e_key_unknown:
       if ( g_line[0] == '_' ) {
-	char *sp = 0;
-	strcat( g_key, "=" );
-	sp = upsutl_str_crecat( g_key, g_val );	
-	inst_ptr->user_list = upslst_add( inst_ptr->user_list, sp );
+	sprintf( g_line, "%s=%s", g_key, g_val );
+	inst_ptr->user_list = upslst_add( inst_ptr->user_list, 
+					  upsutl_str_create( g_line, ' ' ) );
       }
       else {
 	upserr_vplace(); upserr_add( UPS_INVALID_KEYWORD, UPS_FATAL,
