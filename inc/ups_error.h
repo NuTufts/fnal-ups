@@ -42,8 +42,13 @@
 #define UPS_NAME_TOO_LONG     6
 #define UPS_NO_STAT_DIR       7
 #define UPS_WRITE_FILE        8
-#define UPS_NERR              9
-#define UPS_INVALID_ARGUMENT  10
+#define UPS_INVALID_ARGUMENT  9
+#define UPS_NO_VERSION_MATCH  10
+#define UPS_FILENAME_TOO_LONG 11
+#define UPS_NO_TABLE_MATCH    12
+#define UPS_NO_FILE           13
+#define UPS_NO_MEMORY         14
+#define UPS_NERR              15      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
