@@ -704,6 +704,56 @@ t_ups_command *upsugo_env(char * const product,char * const validopts)
 
 /* ==========================================================================
 **                                                                           
+** ROUTINE: upsugo_bldcmd
+**                                                                           
+** DESCRIPTION                                                               
+**
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/                                                                           
+t_ups_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
+{
+     char * waddr;                               /* work address */
+     struct ups_command * uc=0;
+     int argc=0;
+     int    count=0;
+     int    length=0;
+     char ** argv;
+     t_upslst_item *hold = 0;
+     
+       waddr=cmdstr;
+       while ((waddr != 0) && (strlen(waddr) > 0))
+             { if ((waddr = strchr(waddr,' ')) != 0) 
+                  { for( ; (*waddr == ' ') ; waddr++ ) ; }
+                count++;
+             }
+       count++;  /* add one more for the program who called */
+       argv = (char **) malloc((size_t)count*sizeof(char *));
+       argv[1] = (char *) malloc((size_t)(strlen("upsugo_env") +1));
+       (void) strcpy(argv[1],"upsugo_bldcmd");
+       waddr=cmdstr;
+       for (argc = 1;argc < count;argc++)
+           { length = (int)strcspn(waddr," ");
+             argv[argc] = (char *) malloc((size_t)(length + 1));
+             strncpy(argv[argc],waddr,(size_t)length);
+             argv[argc][length] = '\0';
+             if ((waddr = strchr(waddr, ' ')) != 0) 
+                { waddr++;
+                  for( ; (*waddr == ' ') ; waddr++ ) ;
+                }
+           }
+     hold=ugo_commands;
+     ugo_commands=0;
+     uc=upsugo_next(argc,argv,validopts);
+     ugo_commands=hold;
+     return(uc);
+}
+
+/* ==========================================================================
+**                                                                           
 ** ROUTINE: upsugo_next
 **                                                                           
 ** DESCRIPTION                                                               
