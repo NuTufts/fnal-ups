@@ -14,3 +14,9 @@ minor documentation fixes
 <li>
 ups current action will now also do a configure
 </ul>
+<li>
+Added -G flag (ugo_G and ugo_passed) 
+</ul>
+<li>
+Fixed ups list -K with ONLY database specification
+</ul>
