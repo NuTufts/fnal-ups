@@ -286,7 +286,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   t_upslst_item *db_list;
   t_upslst_item *db_item, *all_products = NULL, *product_item;
   t_upslst_item *all_versions = NULL;
-  t_upslst_item *chain_item, *all_chains = NULL;
+  t_upslst_item *chain_item, *all_chains = NULL, *tmp_chain = NULL;
   t_upstyp_matched_product *mproduct = NULL;
   t_upslst_item *mproduct_list = NULL;
   t_upstyp_product *config_ptr = NULL;
@@ -481,8 +481,9 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		    } else {
 		      chain_item = a_command_line->ugo_chain;
 		    }
-		    for ( ; chain_item ; chain_item = chain_item->next) {
-		      the_chain = (char *)(chain_item->data);
+		    for ( tmp_chain ; chain_item ;
+			  chain_item = chain_item->next) {
+		      the_chain = (char *)(tmp_chain->data);
 		      
 		      if (! NOT_EQUAL_ANY_MATCH(the_chain)) {
 			/* get all the chains in the current product area */
