@@ -50,7 +50,7 @@ if (cmdbuf[0] == '#')  return 0;			/* comment, return */
    
 if (upstst_split (cmdbuf, &myargc, &myargv))		/* split command */ 
    {
-   fprintf (stderr, "could not split line \n");
+   (void) fprintf (stderr, "could not split line \n");
    return (1);
    }
 
@@ -67,7 +67,7 @@ for (cmd = cmdlist; cmd->cmdname != NULL; cmd++)	/* look thru all cmds */
       {
       if (match) 					/* already found one */
          {
-         fprintf (stderr, "command %s is not unique \n",
+         (void) fprintf (stderr, "command %s is not unique \n",
 	     usrcmd);					/* print error */
 	 return (1);					/* return */
 	 }
@@ -78,7 +78,7 @@ for (cmd = cmdlist; cmd->cmdname != NULL; cmd++)	/* look thru all cmds */
 
 if (!match)
    {
-   fprintf (stderr, "command %s not found \n",usrcmd);	/* print error */
+   (void) fprintf (stderr, "command %s not found \n",usrcmd);	/* print error */
    return (1);						/* return */
    } 
 

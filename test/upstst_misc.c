@@ -37,7 +37,7 @@ UPSTST_CHECK_PARSE(status,argt,argv[0]);
    --------- */
 
 stime = time(NULL);					/* display time */
-printf (asctime(localtime(&stime)));
+(void) printf (asctime(localtime(&stime)));
 return 0;						/* success */
 }
 
@@ -67,7 +67,7 @@ UPSTST_CHECK_PARSE (status, argt, argv[0]);
 /* echo string to stderr
    --------------------- */
 
-printf ("%s\n",mystring);
+(void) printf ("%s\n",mystring);
 return 0;
 }
 
@@ -101,9 +101,9 @@ UPSTST_CHECK_PARSE (status, argt, argv[0]);
 
 if (level == -1)					/* show current level */
    {
-   printf ("Current test debug level is: %d\n",upstst_debug);
+   (void) printf ("Current test debug level is: %d\n",upstst_debug);
 #if 0
-   printf ("Current ups debug level is: %d\n",ups_debug);
+   (void) printf ("Current ups debug level is: %d\n",ups_debug);
 #endif
    }
 else							/* change level */

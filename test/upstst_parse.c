@@ -89,7 +89,7 @@ for (length = 0, ptr = argTable; ptr->type != UPSTST_ARGV_END; ptr++)
 
 if (length >= ARGSIZ)  
    {
-   fprintf(stderr,"Internal buffer overflow in ups test program(). Please notify "
+   (void) fprintf(stderr,"Internal buffer overflow in ups test program(). Please notify "
               "ups maintainer!\n");
    abort();
    }
@@ -104,8 +104,8 @@ if (retValue) return (retValue);			/* return error */
 
 if (*argcPtr > 1 && options & UPSTST_PARSE_NOLEFTOVERS)	/* no leftovers! */
    {         
-   fprintf (stderr,"Syntax Error: unprocessed command line parameters remain ");
-   fprintf (stderr,"\n    (check for extra parameters or invalid options)\n");
+   (void) fprintf (stderr,"Syntax Error: unprocessed command line parameters remain ");
+   (void) fprintf (stderr,"\n    (check for extra parameters or invalid options)\n");
    return UPSTST_BADSYNTAX;
    }
 
@@ -171,7 +171,7 @@ size_t length;		/* Number of characters in current argument. */
 char tmpKeyBuf[30];
 
 #define upstst_missing_arg(myarg) {					\
-   fprintf(stderr,"Syntax Error: %s option requires an additional argument\n",\
+   (void) fprintf(stderr,"Syntax Error: %s option requires an additional argument\n",\
     myarg);								\
    return UPSTST_BADSYNTAX;						\
    }
@@ -223,7 +223,7 @@ for (srcIndex = dstIndex = 1; srcIndex < *argcPtr; )
 	 }
       if (matchPtr != NULL) 
 	 {
-	 fprintf (stderr, "Syntax Error: ambiguous option %s ", curArg); 
+	 (void) fprintf (stderr, "Syntax Error: ambiguous option %s ", curArg); 
 	 return UPSTST_BADSYNTAX;
 	 }
       matchPtr = infoPtr;
@@ -249,8 +249,8 @@ gotMatch:
 
       case UPSTST_ARGV_CONSTANT:
  	 *((int *) infoPtr->dst) = (int) infoPtr->src;
-         sprintf(tmpKeyBuf, "%s,", infoPtr->key);
-         strcat(g_Specified_args, tmpKeyBuf);
+         (void) sprintf(tmpKeyBuf, "%s,", infoPtr->key);
+         (void) strcat(g_Specified_args, tmpKeyBuf);
 	 break;
 
       case UPSTST_ARGV_INT:
@@ -261,13 +261,13 @@ gotMatch:
 	 *((int *) infoPtr->dst) = (int) strtoul(argv[srcIndex], &endPtr, 0);
 	 if ((endPtr == argv[srcIndex]) || (*endPtr != 0)) 
 	    {
-	    fprintf (stderr,"Syntax Error: expected integer argument "
+	    (void) fprintf (stderr,"Syntax Error: expected integer argument "
 	 	"for %s but got %s \n", infoPtr->key,argv[srcIndex]);
 	    return UPSTST_BADSYNTAX;
 	    }
 	 srcIndex++;
-         sprintf(tmpKeyBuf, "%s,", infoPtr->key);
-         strcat(g_Specified_args, tmpKeyBuf);
+         (void) sprintf(tmpKeyBuf, "%s,", infoPtr->key);
+         (void) strcat(g_Specified_args, tmpKeyBuf);
 	 break;
 	 }
 
@@ -276,8 +276,8 @@ gotMatch:
 	 if (srcIndex == *argcPtr) upstst_missing_arg(curArg);
 	 *((char **)infoPtr->dst) = argv[srcIndex];
 	 srcIndex++;
-         sprintf(tmpKeyBuf, "%s,", infoPtr->key);
-         strcat(g_Specified_args, tmpKeyBuf);
+         (void) sprintf(tmpKeyBuf, "%s,", infoPtr->key);
+         (void) strcat(g_Specified_args, tmpKeyBuf);
 	 break;
 
       case UPSTST_ARGV_DOUBLE :
@@ -288,19 +288,19 @@ gotMatch:
 	 *((double *) infoPtr->dst) = strtod(argv[srcIndex], &endPtr);
 	 if ((endPtr == argv[srcIndex]) || (*endPtr != 0)) 
 	    {
-	    fprintf(stderr,"Syntax Error: expected floating-point argument ");
-	    fprintf(stderr," for %s but got %s\n",infoPtr->key, argv[srcIndex]);
+	    (void) fprintf(stderr,"Syntax Error: expected floating-point argument ");
+	    (void) fprintf(stderr," for %s but got %s\n",infoPtr->key, argv[srcIndex]);
 	    return UPSTST_BADSYNTAX;
 	    }
 	 srcIndex++;
-         sprintf(tmpKeyBuf, "%s,", infoPtr->key);
-         strcat(g_Specified_args, tmpKeyBuf);
+         (void) sprintf(tmpKeyBuf, "%s,", infoPtr->key);
+         (void) strcat(g_Specified_args, tmpKeyBuf);
 	 break;
 	 }
 
       default:
 	 
-	 fprintf(stderr,"Programmer Error: bad argument type %d in arg table",
+	 (void) fprintf(stderr,"Programmer Error: bad argument type %d in arg table",
 	    infoPtr->type);
 	  return UPSTST_BADSYNTAX;
       }
@@ -404,9 +404,9 @@ if (flag)
 
    p = (infoPtr->key == NULL ? "NULL" : infoPtr->key);
 
-   fprintf (stderr, "Programmer Error: %s argument table key must be -null",p);
-   fprintf (stderr, " non-null and begin with\n");
-   fprintf (stderr, "either '<', '[', or '-' only\n");
+   (void) fprintf (stderr, "Programmer Error: %s argument table key must be -null",p);
+   (void) fprintf (stderr, " non-null and begin with\n");
+   (void) fprintf (stderr, "either '<', '[', or '-' only\n");
    return UPSTST_BADSYNTAX;
    }
  
@@ -415,7 +415,7 @@ if (reqPosParams == 0 && optPosParams == 0) /* No sense sticking around */
  
 if (reqPosParams && *argcPtr <= 1)  
    {
-   fprintf (stderr, "Syntax Error: expected at least one positional parameter\n");
+   (void) fprintf (stderr, "Syntax Error: expected at least one positional parameter\n");
    return UPSTST_BADSYNTAX;
    }
 
@@ -471,8 +471,8 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
       {
       if (argv[i] == NULL)  
          {
-         fprintf (stderr,"Syntax Error: expected %d more", reqPosParams); 
-         fprintf (stderr," required positional parameters\n");
+         (void) fprintf (stderr,"Syntax Error: expected %d more", reqPosParams); 
+         (void) fprintf (stderr," required positional parameters\n");
          return UPSTST_BADSYNTAX;
          }
       reqPosParams--;
@@ -490,12 +490,12 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
          *((int *) infoPtr->dst) = (int) strtoul(argv[i], &sp, 0);
          if (sp == argv[i] || *sp != 0)  
 	    {
-	    fprintf(stderr,"Syntax Error: expected integer positional\n"); 
-	    fprintf(stderr,"parameter for %s but got %s", infoPtr->key,argv[i]);
+	    (void) fprintf(stderr,"Syntax Error: expected integer positional\n"); 
+	    (void) fprintf(stderr,"parameter for %s but got %s", infoPtr->key,argv[i]);
             return UPSTST_BADSYNTAX;
 	    }
-         sprintf(keyBuf, "%s,", infoPtr->key);
-         strcat(g_Specified_args, keyBuf);
+         (void) sprintf(keyBuf, "%s,", infoPtr->key);
+         (void) strcat(g_Specified_args, keyBuf);
          break;
 
       case UPSTST_ARGV_DOUBLE :
@@ -503,19 +503,19 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
          *((double *) infoPtr->dst) = strtod(argv[i], &sp);
          if (sp == argv[i] || *sp != 0)  
 	    {
-	    fprintf(stderr,"Syntax Error: expected floating point positional\n"); 
-	    fprintf(stderr,"parameter for %s but got %s", infoPtr->key,argv[i]);
+	    (void) fprintf(stderr,"Syntax Error: expected floating point positional\n"); 
+	    (void) fprintf(stderr,"parameter for %s but got %s", infoPtr->key,argv[i]);
             return UPSTST_BADSYNTAX;
             }
-         sprintf(keyBuf, "%s,", infoPtr->key);
-         strcat(g_Specified_args, keyBuf);
+         (void) sprintf(keyBuf, "%s,", infoPtr->key);
+         (void) strcat(g_Specified_args, keyBuf);
          break;
 
       case UPSTST_ARGV_STRING :
 
          *((char **) infoPtr->dst) = argv[i];
-         sprintf(keyBuf, "%s,", infoPtr->key);
-         strcat(g_Specified_args, keyBuf);
+         (void) sprintf(keyBuf, "%s,", infoPtr->key);
+         (void) strcat(g_Specified_args, keyBuf);
          break;
 
       case UPSTST_ARGV_CONSTANT :
@@ -524,17 +524,17 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
                   * Get rid of positional parameter delimiters '<...>' or
                   * '[...]' from infoPtr->key. Store the result in keyBuf[].
                   */
-         sprintf(keyBuf, "%s", &infoPtr->key[1]);
+         (void) sprintf(keyBuf, "%s", &infoPtr->key[1]);
          for (pSp = keyBuf; *pSp != NULL; pSp++)
             if (*pSp == '>' || *pSp == ']') *pSp = NULL;
 
-         fprintf(stderr,"Programmer Error: %s is not a ", infoPtr->key);
-         fprintf(stderr,"supported object for positional\n parameters. ");
-	 fprintf(stderr,"Positional parameters must be of type UPSTST_ARGV_INT");
-	 fprintf(stderr,",\nUPSTST_ARGV_DOUBLE, or UPSTST_ARGV_STRING only.");
-	 fprintf(stderr," Please modify your argument\ntable and declare %s",
+         (void) fprintf(stderr,"Programmer Error: %s is not a ", infoPtr->key);
+         (void) fprintf(stderr,"supported object for positional\n parameters. ");
+	 (void) fprintf(stderr,"Positional parameters must be of type UPSTST_ARGV_INT");
+	 (void) fprintf(stderr,",\nUPSTST_ARGV_DOUBLE, or UPSTST_ARGV_STRING only.");
+	 (void) fprintf(stderr," Please modify your argument\ntable and declare %s",
 	    infoPtr->key);
-         fprintf(stderr," as %s instead\n",keyBuf);
+         (void) fprintf(stderr," as %s instead\n",keyBuf);
          return UPSTST_BADSYNTAX;
          break; /* NOTREACHED */
       }
@@ -613,8 +613,8 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
             *((int *) infoPtr->dst) = (int) strtoul(pSrc, &pEnd, 0);
             if (pEnd == pSrc || *pEnd != 0)  
 	       {
-	       fprintf (stderr,"Parsing error: cannot convert default value " );
-	       fprintf (stderr,"%s to an integer",pSrc);
+	       (void) fprintf (stderr,"Parsing error: cannot convert default value " );
+	       (void) fprintf (stderr,"%s to an integer",pSrc);
                return FALSE;
                }
             }
@@ -625,8 +625,8 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
             *((double *)infoPtr->dst) = strtod(pSrc, &pEnd);
             if (pEnd == pSrc || *pEnd != 0)  
 	       {
-	       fprintf (stderr,"Parsing error: cannot convert default value " );
-	       fprintf (stderr,"%s to an integer",pSrc);
+	       (void) fprintf (stderr,"Parsing error: cannot convert default value " );
+	       (void) fprintf (stderr,"%s to an integer",pSrc);
                return FALSE;
                }
             }
@@ -659,16 +659,16 @@ register const upstst_argt 	*infoPtr; 	/* ptr to entry in argTable */
 
 if (NULL == cmd_name) cmd_name = "";		/* blank command */
 
-fprintf (stderr,"%s Usage: %s",UPSTST_INDENT,
+(void) fprintf (stderr,"%s Usage: %s",UPSTST_INDENT,
    cmd_name);					/* main usage line */
 
 for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++) 
    {
    if (infoPtr->key == NULL) continue;	/* no key */
-   fprintf (stderr," %s",infoPtr->key);	/* print key */
+   (void) fprintf (stderr," %s",infoPtr->key);	/* print key */
    }
 
-fprintf (stderr,"\n");				/* end with new line */
+(void) fprintf (stderr,"\n");				/* end with new line */
 }
 
 
