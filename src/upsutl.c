@@ -24,6 +24,7 @@
  *                        string comparison. It's a copy of strcasecmp.
  *       24-Sep-1997, LR, added function str_strincmp, like str_stricmp,
  *                        except it will compare most n characters.
+ *       28-Oct-1997, EB, added function  upsutl_get_config
  *
  ***********************************************************************/
 
@@ -34,6 +35,7 @@
 #include <pwd.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
 /* #ifdef _SYSTYPE_SVR4 */
@@ -47,6 +49,7 @@
 #include "upserr.h"
 #include "upstyp.h"
 #include "upsmem.h"
+#include "upsfil.h"
 
 /*
  * Definition of public variables.
@@ -71,6 +74,30 @@ static char g_unknown_user[] = "UNKNOWN";
 /*
  * Definition of public functions.
  */
+
+/*-----------------------------------------------------------------------
+ * upsutl_get_config
+ *
+ * Read the configuration file associated with the passed database
+ *
+ * Input : Name of the ups database
+ * Output: none
+ * Return: A product structure with the config info in it.
+ */
+t_upstyp_product *upsutl_get_config( const char * const a_db)
+{
+  t_upstyp_product *read_product = NULL;
+  char *buffer = NULL;
+  
+  buffer = (char *)malloc(strlen(a_db) + (unsigned int )CONFIG_SIZE);
+  if (buffer) {
+    read_product = upsfil_read_file(buffer);
+  } else {
+    upserr_add(UPS_NO_MEMORY, UPS_WARNING, strlen(buffer));
+  }
+  
+  return(read_product);
+}
 
 /*-----------------------------------------------------------------------
  * upsutl_environment
@@ -307,89 +334,116 @@ void upsutl_stop_timing(void)
  *         instance accessed (version, flavor and qualifiers)
  *
  * Input : pointer to instance for which to save statistics,
- *         pointer to directory which holds 'statistics' directory,
  *         pointer to the command that was executed
+ *         flag which indicates if we should write statistics for all
+ *            instances no matter what
  * Output: none
  * Return: none
  */
-void upsutl_statistics(t_upstyp_instance const * const a_instance,
-		       char const * const a_dir, char const * const a_command)
+void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
+		       char const * const a_command)
 { 
+  
+  t_upslst_item *minst_item = NULL, *mproduct_item = NULL;
+  t_upstyp_matched_product *mproduct = NULL;
+  t_upstyp_matched_instance *minst = NULL;
   char stat_file[FILENAME_MAX+1];
-  int dir_s, stat_s, file_s;
-  int return_status;
+  int dir_s, stat_s, file_s, global_yes = 0;
   FILE *file_stream = 0;
   char mode[] = "a,access=lock";              /* create new file or append
 						 to existing one */
   char *time_date, *user;
   char tmpBuf[1000];
 
-  /* See if we were passed a directory for the statistics files */
-  if (a_dir != NULL) {
-    dir_s = (int )strlen(a_dir);
-    stat_s = (int )strlen(g_stat_dir);
-    file_s = (int )strlen(a_instance->product);
-    if ( (dir_s + stat_s + file_s + 1) < FILENAME_MAX) {
-      /* Construct the filename where the statistics are to be stored. */
-      strcpy(stat_file, a_dir);                 /* directory */
-      strcat(stat_file, g_stat_dir);            /* stats sub-dir */
-      strcat(stat_file, a_instance->product);   /* filename */
+  /* Get the current time and date */
+  time_date = upsutl_time_date();
 
-      /* See if we can open the file that we are supposed to write to. */
-      if ((file_stream = fopen(stat_file, mode)) != NULL) {
-	/* Get the current time and date */
-	time_date = upsutl_time_date();
+  /* Get the current user */
+  user = upsutl_user();
 
-	/* Get the current user */
-	user = upsutl_user();
+  for (mproduct_item = (t_upslst_item *)a_mproduct_list ;
+       mproduct_item ; mproduct_item = mproduct_item->next) {
+    mproduct = (t_upstyp_matched_product *)mproduct_item->data;
+    if (mproduct->db_info->config->statistics) {
+      global_yes = 1;          /* write statistics for everything in this db */
+    }
+    for (minst_item = (t_upslst_item *)mproduct->minst_list ;
+	 minst_item ; minst_item = minst_item->next) {
+      minst = (t_upstyp_matched_instance *)minst_item->data;
+      /* check to see if the instance indicates to keep statistics */
+      if (global_yes || minst->chain->statistics ||
+	                minst->version->statistics ||
+	                minst->table->statistics) {
+	if (! file_stream ) {       /* we need to still open the stream */
+	  dir_s = (int )strlen(mproduct->db_info->name);
+	  stat_s = (int )strlen(g_stat_dir);
+	  file_s = (int )strlen(mproduct->product);
+	  if ( (dir_s + stat_s + file_s + 1) < FILENAME_MAX) {
+	    /* Construct the filename where the statistics are to be stored. */
+	    strcpy(stat_file, mproduct->db_info->name);     /* directory */
+	    strcat(stat_file, g_stat_dir);                  /* stats sub-dir */
+	    strcat(stat_file, mproduct->product);           /* filename */
 
-	/* Write out the statistics to the file. To make the code easier
-	   to follow, assume an error occurred first, so we do not have to
-	   check each time.  Reset the return_status at end if all is ok. */
-	return_status = UPS_WRITE_FILE;
-
-	/* NOTE: time_date already has a carriage return in it */
-	sprintf(tmpBuf, "USER = %s\n   DATE = %s", user, time_date);
-	if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
-		   file_stream) == strlen(tmpBuf)) {
-	  sprintf(tmpBuf, "   COMMAND = %s\n", a_command);
+	    /* See if we can open the file that we are supposed to write to. */
+	    if ((file_stream = fopen(stat_file, mode)) == NULL) {
+	      /* Error opening file */
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
+			 strerror(errno));
+	    }
+	  } else {
+	    /* Error size of directory path to file is too long */
+	    upserr_add(UPS_NAME_TOO_LONG, UPS_WARNING, FILENAME_MAX);
+	  }
+	}
+	if (file_stream) {
+	  /* NOTE: time_date already has a carriage return in it */
+	  sprintf(tmpBuf, "USER = %s\n   DATE = %s", user, time_date);
 	  if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
 		     file_stream) == strlen(tmpBuf)) {
-	    sprintf(tmpBuf,
-		    "   FLAVOR = %s\n   QUALIFIERS = '%s'\n   VERSION = %s\n", 
-		    a_instance->flavor, a_instance->qualifiers,
-		    a_instance->version);
+	    sprintf(tmpBuf, "   COMMAND = %s\n", a_command);
 	    if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
 		       file_stream) == strlen(tmpBuf)) {
-	      sprintf(tmpBuf, "%s\n", DIVIDER);
-	      /* Write out divider */
+	      sprintf(tmpBuf,
+		    "   FLAVOR = %s\n   QUALIFIERS = '%s'\n   VERSION = %s\n", 
+		    minst->version->flavor, minst->version->qualifiers,
+		    minst->version->version);
 	      if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
 			 file_stream) == strlen(tmpBuf)) {
-		return_status = UPS_SUCCESS;
+		sprintf(tmpBuf, "%s\n", DIVIDER);
+		/* Write out divider */
+		if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
+			   file_stream) == strlen(tmpBuf)) {
+		} else {
+		  upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+			     strerror(errno));
+		  break;
+		}
+	      } else {
+		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+			   strerror(errno));
+		break;
 	      }
+	    } else {
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+			 strerror(errno));
+	      break;
 	    }
-	  }
-	} 
-	/* Check to see if we encountered an error writing the file */
-	if (return_status == UPS_WRITE_FILE) {
-	  upserr_add(UPS_WRITE_FILE, UPS_WARNING, stat_file);
+	  } else {
+	    upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+		       strerror(errno));
+	    break;
+	  } 
+	} else {     /* error opening file stream already added to buffer */
+	  break;
 	}
-      } else {
-	/* Error opening file */
-	upserr_add(UPS_OPEN_FILE, UPS_WARNING, stat_file);
       }
-    } else {
-      /* Error size of directory path to file is too long */
-      upserr_add(UPS_NAME_TOO_LONG, UPS_WARNING, FILENAME_MAX);
     }
-  } else {
-    /* Error no directry passed */
-    upserr_add(UPS_NO_STAT_DIR, UPS_WARNING);
-  }
 
-  /* Close the file if it was opened */
-  if (file_stream != NULL) {
-    fclose(file_stream);
+    /* Close the file if it was opened */
+    if (file_stream != NULL) {
+      fclose(file_stream);
+      file_stream = NULL;
+    }
   }
 }
 
