@@ -47,7 +47,7 @@ extern t_cmd_info g_cmd_info[];
 
 #define CHAIN "chain"
 #define VERSION "version"
-#define UPS_UNDECLARE "UPS undeclare: "
+#define UPS_UNDECLARE "UNDECLARE: "
 
 /*
  * Definition of public functions.

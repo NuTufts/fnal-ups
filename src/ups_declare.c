@@ -48,7 +48,7 @@ extern t_cmd_info g_cmd_info[];
 #define CHAIN "chain"
 #define VERSION "version"
 #define DECLARE "declare"
-#define UPS_DECLARE "UPS declare: "
+#define UPS_DECLARE "DECLARE: "
 
 static char buf[MAX_LINE_LEN];
 
