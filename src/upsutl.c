@@ -484,10 +484,10 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	  dir_s = (int )strlen(mproduct->db_info->name);
 	  stat_s = (int )strlen(g_stat_dir);
 	  file_s = (int )strlen(mproduct->product);
-	  if ( (dir_s + stat_s + file_s + 4) < FILENAME_MAX) {
+	  if ( (dir_s + stat_s + file_s + 3) < FILENAME_MAX) {
 	    /* Construct the filename where the statistics are to be stored. */
 	    strcpy(stat_file, mproduct->db_info->name);   /* directory */
-	    strcat(stat_file, "/../");                    /* move up 1 level */
+	    strcat(stat_file, "/..");                     /* move up 1 level */
 	    strcat(stat_file, g_stat_dir);                /* stats sub-dir */
 
 	    /* check to make sure the statistics directory exists first */
@@ -513,14 +513,14 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	if (file_stream) {
 	  /* NOTE: time_date already has a carriage return in it */
 	  if (fprintf(file_stream, "USER = %s\n   DATE = %s", user, time_date)
-	      == EOF) {
-	    if (fprintf(file_stream, "   COMMAND = %s\n", a_command) == EOF) {
+	      > 0) {
+	    if (fprintf(file_stream, "   COMMAND = %s\n", a_command) > 0) {
 	      if (fprintf(file_stream,
 		    "   FLAVOR = %s\n   QUALIFIERS = '%s'\n   VERSION = %s\n", 
 		    minst->version->flavor, minst->version->qualifiers,
-		    minst->version->version) == EOF) {
+		    minst->version->version) > 0) {
 		/* Write out divider */
-		if (fprintf(file_stream, "%s\n", DIVIDER) != EOF) {
+		if (fprintf(file_stream, "%s\n", DIVIDER) < 0) {
 		  upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 			     strerror(errno));
 		  break;
