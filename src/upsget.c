@@ -419,7 +419,7 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
   int found=0;
   int idx=0;
   int any=0;
-  char * value;
+  char * value = NULL;
   char * work;
   newstr[0] = '\0';
   if (!minstance) { return(oldstr); }
