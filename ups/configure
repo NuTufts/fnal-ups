@@ -75,35 +75,11 @@ if test $error = 1
 then
     exit 1
 fi
+b_slash='\'
 Node=`uname -n|cut -f1 -d'.'`
 
 BootStrap_Dir=$Ups_DB_Path/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS:-}
 
-#
-# Make an advanced shell for the products initialization script,
-# if we can.
-#
-cygsh=''
-if test x`echo $UPS_PROD_FLAVOR|grep CYG` != x
-then
-    cygsh=ash
-fi
-for sh in ${cygsh} bash ksh
-do
-    if test -x /usr/bin/${sh}
-    then
-        Name_Of_Sh=/usr/bin/${sh}
-        break
-    elif test -x /bin/${sh}
-    then
-        Name_Of_Sh=/bin/${sh}
-        break
-    fi
-done
-if test x${Name_Of_Sh:-} = x
-then
-    Name_Of_Sh=/bin/sh
-fi
 #
 # Parse the SETUPS_PATH from the dbconfig file
 #
@@ -176,22 +152,6 @@ XEoF
 
 chmod +rx $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 
-cat <<XEoF >$BootStrap_Dir/setups_find_home
-#!${Name_Of_Sh}
-#
-# $Name_Of_Sh was determined to be an appropriate shell when $Name_Of_Ups
-# was configured for $UPS_PROD_FLAVOR on $Node
-#
-# This script will return, on stdout, the resolved directory
-# associated with the only argument
-#
-eval Home=\${1}
-cat <<EoF 
-\$Home
-EoF
-XEoF
-
-chmod +x $BootStrap_Dir/setups_find_home
 #
 if test ! -x $BootStrap_Dir/$Setups_Products_Script
 then
@@ -204,11 +164,7 @@ echo '**' Creating $BootStrap_Dir/$Setups_Products_Script
 # are likely to be less than desired.
 #
 cat <<XEoF >$BootStrap_Dir/$Setups_Products_Script 
-#!${Name_Of_Sh}
-#
-# $Name_Of_Sh was determined to be an appropriate shell when $Name_Of_Ups
-# was configured for $UPS_PROD_FLAVOR on $Node
-#
+#!/bin/sh
 #
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
@@ -235,17 +191,54 @@ cat <<XEoF >$BootStrap_Dir/$Setups_Products_Script
 # This script was generated when $Name_Of_Ups was configured.
 #
 
-#Setups_Home=__Setups_Home__
-
-Products_List_Home=$Setups_Home
-
 BootStrap_Dir=$BootStrap_Dir
 
 Products_String_File=$Setups_Products_Init_File
 
 Setups_Products_Init_Default="$Setups_Products_Init_Default"
 
+if test -x /bin/echo
+then
+    ECHO=/bin/echo
+elif test  -x /usr/bin/echo
+then
+    ECHO=/usr/bin/echo
+else
+    ECHO=echo
+fi
+
 # =====  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE  =====
+
+if test \`echo \$Setups_Home|cut -c1\` != '/'
+then
+    cygsh=''
+    if test x`uname -s|grep CYG` != x
+    then
+	cygsh=ash
+    fi
+    for sh in \${cygsh} bash ksh sh
+    do
+	if test -x /usr/bin/\${sh}
+	then
+	    Name_Of_Sh=/usr/bin/\${sh}
+	    break
+	elif test -x /bin/\${sh}
+	then
+	    Name_Of_Sh=/bin/\${sh}
+	    break
+	fi
+    done
+    cat <<XxEoF >/tmp/Ash_\$$
+#!\${Name_Of_Sh}
+eval dir=${b_slash}\$1
+\$ECHO ${b_slash}\$dir
+XxEoF
+    chmod +x /tmp/Ash_\$$
+    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
+    rm -f /tmp/Ash_\$$ 
+fi
+
+Products_List_Home=\$Setups_Home
 
 Setups_Current=0
 
@@ -284,7 +277,36 @@ fi
 prod_set=no
 for Prod in \${Products_String}
 do
-    eval "Prod=\$Prod"
+#    eval "Prod=\$Prod"
+
+if test \`echo \$Prod|cut -c1\` != '/'
+then
+    cygsh=''
+    if test x`uname -s|grep CYG` != x
+    then
+	cygsh=ash
+    fi
+    for sh in \${cygsh} bash ksh sh
+    do
+	if test -x /usr/bin/\${sh}
+	then
+	    Name_Of_Sh=/usr/bin/\${sh}
+	    break
+	elif test -x /bin/\${sh}
+	then
+	    Name_Of_Sh=/bin/\${sh}
+	    break
+	fi
+    done
+    cat <<XxEoF >/tmp/Ash_\$$
+#!\${Name_Of_Sh}
+eval dir=${b_slash}\$1
+\$ECHO ${b_slash}\$dir
+XxEoF
+    chmod +x /tmp/Ash_\$$
+    Prod=\`(unset ENV; /tmp/Ash_\$$ \$Prod )\`
+    rm -f /tmp/Ash_\$$ 
+fi
     if test -d \$Prod
     then
 	if test \$prod_set = no
@@ -388,6 +410,8 @@ if ( \$Setups_Current == 0 ) then
 endif
 
 setenv SETUPS_DIR \$Setups_Home
+
+setenv Setups_Home \$Setups_Home
 
 set Name_Of_Ups=$Name_Of_Ups
 setenv UPS_SHELL csh
@@ -569,11 +593,46 @@ Name_Of_Ups=$Name_Of_Ups
 
 BootStrap_Dir=$BootStrap_Dir
   
+if test -x /bin/echo
+then
+    ECHO=/bin/echo
+elif test  -x /usr/bin/echo
+then
+    ECHO=/usr/bin/echo
+else
+    ECHO=echo
+fi
+
 # === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
 
-if test "\`echo \$Setups_Home|cut -c1\`" = "~"
+
+if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
-    Setups_Home=\`(unset ENV;\$BootStrap_Dir/setups_find_home \$Setups_Home)\`
+    cygsh=''
+    if test x`uname -s|grep CYG` != x
+    then
+	cygsh=ash
+    fi
+    for sh in \${cygsh} bash ksh sh
+    do
+	if test -x /usr/bin/\${sh}
+	then
+	    Name_Of_Sh=/usr/bin/\${sh}
+	    break
+	elif test -x /bin/\${sh}
+	then
+	    Name_Of_Sh=/bin/\${sh}
+	    break
+	fi
+    done
+    cat <<XxEoF >/tmp/Ash_\$$
+#!\${Name_Of_Sh}
+eval dir=${b_slash}\$1
+\$ECHO ${b_slash}\$dir
+XxEoF
+    chmod +x /tmp/Ash_\$$
+    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
+    rm -f /tmp/Ash_\$$ 
 fi
 
 export Setups_Home
@@ -725,7 +784,7 @@ do
 rm -f $BootStrap_Dir/ups_${Start_Or_Stop}
 echo '**' Creating $BootStrap_Dir/ups_${Start_Or_Stop}
 cat <<XEoF >$BootStrap_Dir/ups_${Start_Or_Stop}
-#!${Name_Of_Sh}
+#!/bin/sh
 #
 #================== Copyright Notice =====================
 # 
@@ -763,6 +822,16 @@ BootStrap_Dir=$BootStrap_Dir
 
 Setup_List=${Ups_DB_Path}/.upsfiles/${Start_Or_Stop}
 
+if test -x /bin/echo
+then
+    ECHO=/bin/echo
+elif test  -x /usr/bin/echo
+then
+    ECHO=/usr/bin/echo
+else
+    ECHO=echo
+fi
+
 # ===== DO NOT EDIT BELOW THIS LINE  ====  DO NOT REMOVE THIS LINE ====
 
 Setups_Current=0
@@ -770,6 +839,35 @@ Setups_Current=0
 if test \$Setups_Current = 0
 then
     Setups_Home=\$BootStrap_Dir
+fi
+
+if test \`echo \$Setups_Home|cut -c1\` != '/'
+then
+    cygsh=''
+    if test x`uname -s|grep CYG` != x
+    then
+	cygsh=ash
+    fi
+    for sh in \${cygsh} bash ksh sh
+    do
+	if test -x /usr/bin/\${sh}
+	then
+	    Name_Of_Sh=/usr/bin/\${sh}
+	    break
+	elif test -x /bin/\${sh}
+	then
+	    Name_Of_Sh=/bin/\${sh}
+	    break
+	fi
+    done
+    cat <<XxEoF >/tmp/Ash_\$$
+#!\${Name_Of_Sh}
+eval dir=${b_slash}\$1
+\$ECHO ${b_slash}\$dir
+XxEoF
+    chmod +x /tmp/Ash_\$$
+    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
+    rm -f /tmp/Ash_\$$ 
 fi
 
 # 
@@ -925,7 +1023,7 @@ then
 # machines.  Change this to the directory in which the
 # setups.* scripts live.
 
-Setups_Home_Dir=\$Setups_Dir
+Setups_Home_Dir=\$Setups_Home
 
 Setups_Product_Init_File=$Setups_Products_Init_File
 
@@ -1143,7 +1241,7 @@ then
 fi
 echo '**' Creating $BootStrap_Dir/current
 cat <<XEoF >$BootStrap_Dir/current
-#!${Name_Of_Sh}
+#!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #
@@ -1181,6 +1279,16 @@ BootStrap_Dir=$BootStrap_Dir
 
 # Setups_Products_Script=$Setups_Products_Script
 
+if test -x /bin/echo
+then
+    ECHO=/bin/echo
+elif test  -x /usr/bin/echo
+then
+    ECHO=/usr/bin/echo
+else
+    ECHO=echo
+fi
+
 # =====  DO NOT EDIT BELOW THIS LINE  ===   DO NOT REMOVE THIS LINE  ====
 
 Ups_Dir=$UPS_PROD_DIR
@@ -1197,6 +1305,36 @@ then
     echo '****' \$Name_Of_Ups current script cannot execute.
     exit 1
 fi
+
+if test \`echo \$Setups_Home|cut -c1\` != '/'
+then
+    cygsh=''
+    if test x`uname -s|grep CYG` != x
+    then
+	cygsh=ash
+    fi
+    for sh in \${cygsh} bash ksh sh
+    do
+	if test -x /usr/bin/\${sh}
+	then
+	    Name_Of_Sh=/usr/bin/\${sh}
+	    break
+	elif test -x /bin/\${sh}
+	then
+	    Name_Of_Sh=/bin/\${sh}
+	    break
+	fi
+    done
+    cat <<XxEoF >/tmp/Ash_\$$
+#!\${Name_Of_Sh}
+eval dir=${b_slash}\$1
+\$ECHO ${b_slash}\$dir
+XxEoF
+    chmod +x /tmp/Ash_\$$
+    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
+    rm -f /tmp/Ash_\$$ 
+fi
+
 if test ! -d \$Setups_Home
 then
     mkdir \$setups_Home
@@ -1227,7 +1365,7 @@ then
     echo '****' \$Name_Of_Ups current script failure
     exit 1
 else
-    chmod +rx $Setups_Home
+    chmod +rx \$Setups_Home
 fi
 #
 # Mark ALL BootStrap files current.
@@ -1346,7 +1484,7 @@ then
 fi
 echo '**' Creating $BootStrap_Dir/uncurrent
 cat <<XEoF >$BootStrap_Dir/uncurrent
-#!${Name_Of_Sh}
+#!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #
@@ -1383,6 +1521,16 @@ Name_Of_Ups=$Name_Of_Ups
 
 Setups_Home=$Setups_Home
 
+if test -x /bin/echo
+then
+    ECHO=/bin/echo
+elif test  -x /usr/bin/echo
+then
+    ECHO=/usr/bin/echo
+else
+    ECHO=echo
+fi
+
 # ===  DO NOT EDIT BELOW THIS LINE  =====  DO NOT REMOVE THIS LINE  =====
 
 Setups_Current=0
@@ -1392,6 +1540,35 @@ then
     echo '****' \$Name_Of_Ups \$UPS_PROD_VERSION \$UPS_PROD_FLAVOR
     echo '****' is not current.
     exit
+fi
+
+if test \`echo \$Setups_Home|cut -c1\` != '/'
+then
+    cygsh=''
+    if test x`uname -s|grep CYG` != x
+    then
+	cygsh=ash
+    fi
+    for sh in \${cygsh} bash ksh sh
+    do
+	if test -x /usr/bin/\${sh}
+	then
+	    Name_Of_Sh=/usr/bin/\${sh}
+	    break
+	elif test -x /bin/\${sh}
+	then
+	    Name_Of_Sh=/bin/\${sh}
+	    break
+	fi
+    done
+    cat <<XxEoF >/tmp/Ash_\$$
+#!\${Name_Of_Sh}
+eval dir=${b_slash}\$1
+\$ECHO ${b_slash}\$dir
+XxEoF
+    chmod +x /tmp/Ash_\$$
+    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
+    rm -f /tmp/Ash_\$$ 
 fi
 
 #
