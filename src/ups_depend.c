@@ -37,9 +37,16 @@
  * Declaration of private functions.
  */
 
+static void shutup (const char * const s_cmd);
+
+#define SHUTUP \
+  if ((&bit_bucket == 0) && 0) shutup (s_cmd);
+
 /*
  * Definition of global variables.
  */
+
+static long bit_bucket = 0;
 
 /*
  * Definition of public functions.
@@ -79,10 +86,12 @@ t_upslst_item *ups_depend( t_upsugo_command * const u_cmd,
 
     (void) upsact_print( u_cmd, 0, "setup", e_cmd, "" );
 
+  SHUTUP;
+
   return NULL;
 }
 
-/*
- * Definition of private functions.
- */
-
+static void shutup (const char * const s_cmd)
+{
+  bit_bucket ^= (long) s_cmd;
+}
