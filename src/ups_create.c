@@ -84,35 +84,55 @@ t_upslst_item *ups_create(const t_upsugo_command * const a_command_line,
       }
       product = ups_new_product();
 
-      /* no file - we can create it. first fill out the instances */
-      for (flavor_item = a_command_line->ugo_flavor ; flavor_item ;
-	   flavor_item = flavor_item->next) {
-	flavor = (char *)flavor_item->data;
-	for (quals_item = qualifier_list ; quals_item ;
-	     quals_item = quals_item->next) {
-	  quals = (char *)quals_item->data;
-	  instance = ups_new_instance();
-	  instance->flavor = upsutl_str_create(flavor, ' ');
-	  instance->qualifiers = upsutl_str_create(quals, ' ');
-	  if (a_command_line->ugo_description) {
-	    instance->description = 
-	      upsutl_str_create(a_command_line->ugo_description, ' ');
+      /* no file - we can create it. first fill out the instances. if no
+         particular list of flavors were entered, then just put flavor=any 
+	 in the file. */
+      if (a_command_line->ugo_f) {
+	for (flavor_item = a_command_line->ugo_flavor ; flavor_item ;
+	     flavor_item = flavor_item->next) {
+	  flavor = (char *)flavor_item->data;
+	  if (strcmp(flavor, ANY_FLAVOR)) {
+	    for (quals_item = qualifier_list ; quals_item ;
+		 quals_item = quals_item->next) {
+	      quals = (char *)quals_item->data;
+	      instance = ups_new_instance();
+	      instance->flavor = upsutl_str_create(flavor, ' ');
+	      instance->qualifiers = upsutl_str_create(quals, ' ');
+	      if (a_command_line->ugo_description) {
+		instance->description = 
+		  upsutl_str_create(a_command_line->ugo_description, ' ');
+	      }
+	      /* add the new instance to the list */
+	      inst_list = upslst_add(inst_list, instance);
+	    }
+	    /* move back to the beginning of the list for the next flavor */
+	    qualifier_list = upslst_first(qualifier_list);
 	  }
-	  /* add the new instance to the list */
-	  inst_list = upslst_add(inst_list, instance);
-	  
 	}
-	/* move back to the beginning of the list for the next flavor */
-	qualifier_list = upslst_first(qualifier_list);
+      } else {
+	/* just add one instance, a flavor=any instance */
+	  flavor = ANY_FLAVOR;
+	  for (quals_item = qualifier_list ; quals_item ;
+	       quals_item = quals_item->next) {
+	    quals = (char *)quals_item->data;
+	    instance = ups_new_instance();
+	    instance->flavor = upsutl_str_create(flavor, ' ');
+	    instance->qualifiers = upsutl_str_create(quals, ' ');
+	    if (a_command_line->ugo_description) {
+	      instance->description = 
+		upsutl_str_create(a_command_line->ugo_description, ' ');
+	    }
+	    /* add the new instance to the list */
+	    inst_list = upslst_add(inst_list, instance);
+	  }
+	  /* move back to the beginning of the list for the next flavor */
+	  qualifier_list = upslst_first(qualifier_list);
       }
       product->instance_list = upslst_first(inst_list);
 
       /* write the table file */
       product->file = upsutl_str_create("TABLE", ' ');
-      (void )upsfil_write_file(product, buffer, ' ', NOJOURNAL);
-      /* this free will free instances too */
-      product = (t_upstyp_product *)ups_free_product(product);
-      
+      (void )upsfil_write_file(product, buffer, ' ', NOJOURNAL);   
     } else {
       upserr_add(UPS_FILE_EXISTS, UPS_FATAL, buffer);
     }
