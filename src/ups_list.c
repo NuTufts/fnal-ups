@@ -325,6 +325,8 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
   int new_db;
   t_upslst_item *all_products = 0;
   t_upslst_item *name=0;
+  char *save_product;
+  save_product=upsutl_str_create(a_command_line->ugo_product,' ');
 
   /* Get all the requested instances */
   UPS_VERIFY=verify;		/* this is REALLY the ups verify command */ 
@@ -412,6 +414,8 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
 	 break;
        }
     }
+    /* restore original (in case it was * for next database) */
+    a_command_line->ugo_product=save_product;
   }
 /*  UPS_ERROR=list_error; */
   return 0;
