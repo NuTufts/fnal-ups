@@ -384,8 +384,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
-  size_t str_len=0;
   char *str_ptr;
+  char *str_val;
   int count=0;
   if (product->db_info) 
   { config_ptr = product->db_info->config;
@@ -418,19 +418,38 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { for ( ul_ptr = upslst_first( instance->version->user_list ); 
             ul_ptr; ul_ptr = ul_ptr->next, count++ )
       { if (strlen(l_ptr->data) == 7) /* no specific key give all */
-        { printf("%s ",ul_ptr->data); /* clearly a quick hack */
+        { printf("%s ",ul_ptr->data); /* Give keys and values */
         } else {
           str_ptr=l_ptr->data;
           str_ptr+=8;
-          str_len=strlen(str_ptr);
-          if (!strncmp(ul_ptr->data,str_ptr,str_len))
-          { str_ptr=ul_ptr->data;
-            str_ptr+=str_len;
-            str_ptr++;
-            printf("%s ",str_ptr);
-          }
+          str_val=0;
+          if (instance->chain) 
+             str_val = upskey_inst_getuserval( instance->chain,str_ptr);
+          if (instance->version && !str_val )
+             str_val = upskey_inst_getuserval( instance->version,str_ptr);
+          if (instance->table && !str_val )
+             str_val = upskey_inst_getuserval( instance->table,str_ptr);
+          if (!str_val) 
+          { printf("\"\" ");
+          } else {
+            printf("%s ",str_val);
+          } 
         } 
       }
+    }
+    if (!strncmp(l_ptr->data,"_",1))
+    { str_val=0;
+      if (instance->chain) 
+         str_val = upskey_inst_getuserval( instance->chain,l_ptr->data);
+      if (instance->version && !str_val )
+         str_val = upskey_inst_getuserval( instance->version,l_ptr->data);
+      if (instance->table && !str_val )
+         str_val = upskey_inst_getuserval( instance->table,l_ptr->data);
+      if (!str_val) 
+      { printf("\"\" ");
+      } else {
+        printf("%s ",str_val);
+      } 
     }
   }
   printf("\n");
