@@ -743,7 +743,7 @@ sub WriteTableFile {
 	    if ($tud) { $uud=$tud; } else { $uud="${basedir}/ups"; }
 	    if (checkfor("${uud}/tailor")) {
 	       $value.="   Action=Tailor\n";
-	       $value.="      execute(\${UPS_PROD_DIR}/ups/tailor,UPS_ENV)\n";
+	       $value.="      execute(\${UPS_UPS_DIR}/tailor,UPS_ENV)\n";
 	    }
 	    if (checkfor("${uud}/tailor.sh}")) {
 	       $value.="   Action=Tailor\n";
