@@ -49,15 +49,16 @@
  * Declaration of private functions.
  */
 
-static t_upstyp_instance *fill_new_dclr_instance(t_upstyp_instance *a_tinst,
-					    t_upstyp_instance *a_old_vinst,
-					    t_upsugo_command *new_command_line,
-					    char *a_prod_dir,
-					    char *a_ups_dir,
-					    char *a_table_dir,
-					    char *a_table_file);
+static t_upstyp_instance *fill_new_dclr_instance(
+                                      t_upstyp_instance * const a_tinst,
+				      t_upstyp_instance * const a_old_vinst,
+				      t_upsugo_command *const new_command_line,
+				      char * const a_prod_dir,
+				      char * const a_ups_dir,
+				      char * const a_table_dir,
+				      char * const a_table_file);
 static t_upstyp_instance *free_new_dclr_instance(
-						t_upstyp_instance *a_instance);
+					t_upstyp_instance * const a_instance);
 static t_upsugo_command *fill_ugo_struct( 
                                const t_upstyp_instance * const a_instance,
 			       const t_upsugo_command * const a_command_line);
@@ -528,13 +529,14 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
  * Output: <output>
  * Return: a new instance to use for declaring
  */
-static t_upstyp_instance *fill_new_dclr_instance(t_upstyp_instance *a_tinst,
-					    t_upstyp_instance *a_old_vinst,
-					    t_upsugo_command *new_command_line,
-					    char *a_prod_dir,
-					    char *a_ups_dir,
-					    char *a_table_dir,
-					    char *a_table_file)		 
+static t_upstyp_instance *fill_new_dclr_instance(
+				     t_upstyp_instance * const a_tinst,
+				     t_upstyp_instance * const a_old_vinst,
+				     t_upsugo_command * const new_command_line,
+				     char * const a_prod_dir,
+				     char * const a_ups_dir,
+				     char * const a_table_dir,
+				     char * const a_table_file)		 
 {
   t_upslst_item *tmp_item = NULL;
   t_upstyp_instance *ninst = ups_new_instance();
@@ -597,7 +599,8 @@ static t_upstyp_instance *fill_new_dclr_instance(t_upstyp_instance *a_tinst,
  * Output: <output>
  * Return: NULL
  */
-static t_upstyp_instance *free_new_dclr_instance(t_upstyp_instance *a_instance)
+static t_upstyp_instance *free_new_dclr_instance(
+				         t_upstyp_instance * const a_instance)
 {
   return ((t_upstyp_instance *)ups_free_instance(a_instance));
 }

@@ -44,7 +44,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 void list_K(const t_upstyp_matched_instance * const instance,
             const t_upsugo_command * const a_command_line, 
             const t_upstyp_matched_product * const product,
-	    int match_done );
+	    const int match_done );
 void print_chain(const t_upstyp_matched_instance * const instance,
                  char * const string);
 /*
@@ -655,7 +655,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 void list_K(const t_upstyp_matched_instance * const instance, 
             const t_upsugo_command * const command, 
             const t_upstyp_matched_product * const product,
-	    int match_done )
+	    const int match_done )
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *cinst_ptr = 0;

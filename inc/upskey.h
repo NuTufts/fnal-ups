@@ -131,11 +131,11 @@ typedef union upskey_config_u {
 #define UPSKEY_INST2ARR( inst ) (((t_upskey_instance_u *)inst)->arr)
 #define UPSKEY_CONF2ARR( conf ) (((t_upskey_config_u *)conf)->arr)
 
-#define UPSKEY_ISIN_VERSION( flag ) (flag&0x0001 ? 1 : 0)
-#define UPSKEY_ISIN_TABLE( flag )   (flag&0x0010 ? 1 : 0)
-#define UPSKEY_ISIN_CHAIN( flag )   (flag&0x0100 ? 1 : 0)
-#define UPSKEY_ISIN_CONFIG( flag )  (flag&0x1000 ? 1 : 0)
-#define UPSKEY_TRY_TRANSLATE( flag )  (flag&0x10000 ? 1 : 0)
+#define UPSKEY_ISIN_VERSION( flag ) (flag&0x00000001 ? 1 : 0)
+#define UPSKEY_ISIN_TABLE( flag )   (flag&0x00000010 ? 1 : 0)
+#define UPSKEY_ISIN_CHAIN( flag )   (flag&0x00000100 ? 1 : 0)
+#define UPSKEY_ISIN_CONFIG( flag )  (flag&0x00001000 ? 1 : 0)
+#define UPSKEY_TRY_TRANSLATE( flag )  (flag&0x00010000 ? 1 : 0)
 
 /*
  * Declaration of public functions.

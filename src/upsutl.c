@@ -705,7 +705,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	  global_yes = 1;      /* write statistics for everything in this db */
 	} else {
 	  global_yes = 0;
-	  len = strlen(mproduct->product);
+	  len = (int )strlen(mproduct->product);
 	  ptr = strstr(tmp_stat, mproduct->product);
 	  /* first check if the product is at the beginning of the list of is
 	     the only element in the list of products */
