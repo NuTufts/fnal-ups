@@ -111,6 +111,41 @@ static t_var_sub g_var_subs[] = {
 /*
  * Definition of public functions.
  */
+char *upsget_remall(const FILE * const stream, 
+                    const t_upstyp_db * const db,
+                    const t_upstyp_matched_instance * const instance,
+                    const t_upsugo_command * const command_line )
+{
+  if (command_line->ugo_shell == e_INVALID_SHELL)
+  { upserr_add(UPS_NOSHELL);
+  } else {
+    if (command_line->ugo_shell == e_BOURNE )
+    { fprintf((FILE *)stream,"unset UPS_PROD_NAME\n");
+      fprintf((FILE *)stream,"unset UPS_PROD_VERSION\n");
+      fprintf((FILE *)stream,"unset UPS_PROD_DIR\n");
+      fprintf((FILE *)stream,"unset UPS_VERBOSE\n");
+      fprintf((FILE *)stream,"unset UPS_EXTENDED\n");
+      fprintf((FILE *)stream,"unset UPS_THIS_DB\n");
+      fprintf((FILE *)stream,"unset UPS_OS_FLAVOR\n");
+      fprintf((FILE *)stream,"unset UPS_PROD_FLAVOR\n");
+      fprintf((FILE *)stream,"unset UPS_PROD_QUALIFIERS\n");
+      fprintf((FILE *)stream,"unset UPS_SHELL\n");
+      fprintf((FILE *)stream,"unset UPS_OPTIONS\n");
+    } else { 
+      fprintf((FILE *)stream,"unsetenv UPS_PROD_NAME\n");
+      fprintf((FILE *)stream,"unsetenv UPS_PROD_VERSION\n");
+      fprintf((FILE *)stream,"unsetenv UPS_PROD_DIR\n");
+      fprintf((FILE *)stream,"unsetenv UPS_VERBOSE\n");
+      fprintf((FILE *)stream,"unsetenv UPS_EXTENDED\n");
+      fprintf((FILE *)stream,"unsetenv UPS_THIS_DB\n");
+      fprintf((FILE *)stream,"unsetenv UPS_OS_FLAVOR\n");
+      fprintf((FILE *)stream,"unsetenv UPS_PROD_FLAVOR\n");
+      fprintf((FILE *)stream,"unsetenv UPS_PROD_QUALIFIERS\n");
+      fprintf((FILE *)stream,"unsetenv UPS_SHELL\n");
+      fprintf((FILE *)stream,"unsetenv UPS_OPTIONS\n");
+    }
+  }
+}
 char *upsget_allout(const FILE * const stream, 
                     const t_upstyp_db * const db,
                     const t_upstyp_matched_instance * const instance,
