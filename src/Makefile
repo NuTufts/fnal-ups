@@ -101,3 +101,14 @@ install :
 		find . \( -type d -name CVS -prune -o \
 			-name Makefile -name \*~ \) -exec rm -rf {} \; \
 	)
+
+make :
+	@if [ "$(CCENV)" = "" ]; then ccenv=`uname`; else ccenv=$(CCENV); fi; \
+	echo \
+	"make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile" \
+                                                        "-env $$ccenv *.c"; \
+	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
+                                                         -env $$ccenv *.c
+#START_DEPEND
+ups_error.o:	ups_error.c
+ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
