@@ -6,15 +6,16 @@ $^W=1;
 $debug = 0;
 $| = 1;
 
+@printlist = parseargs();
 print STDERR 1, "\% completed.  \r";
-make_hflavorlist();
-print STDERR int(30*100/$entries), "\% completed.  \r";
 
 #
 # we will have a tree for each product...
 #
 %trees = ();
 
+make_hflavorlist();
+print STDERR int(30*100/$entries), "\% completed.  \r";
 #
 # this builds a parent tree for *everything* now
 #
@@ -30,7 +31,8 @@ if ($debug) {
     }
 }
 
-for $prod (sort(keys(%trees))) {
+# for $prod (sort(keys(%trees))) {
+for $prod (@printlist) {
     print "\n";
     %visited = ();
     recurse_tree($trees{$prod}, $prod, '');
@@ -78,6 +80,55 @@ sub make_hflavorlist {
 	$hflavorlist{$ourflavor} = 1;
     }
 }
+
+#
+# pick on a few arguments, and run ups list...
+#
+sub parseargs {
+    my ($a, $root, @stuff, @rest, @res);
+
+    @res = ();
+    $a = join(' ', @ARGV);
+    $dashz=0;
+
+    #
+    # if they gave us a -z, set $PRODUCTS, and whine if they used -K
+    #
+    for (@ARGV) {
+        if ($dashz) {
+ 	   $::ENV{'PRODUCTS'} = $_;
+	   $dashz = 0
+        }
+	if (/^-.*z/) {
+	   $dashz = 1
+        }
+	if (/^-.*K/) {
+	    print STDERR "ERROR: -K not supported\n";
+	    return ();
+        }
+    }
+
+    # don't redirect stderr, this is how they find out about 
+    # command line errors, etc.
+
+    $cmd = "ups list -K+:database $a |";
+    print "cmd is $cmd\n" if $debug;
+    open(LIST, $cmd);
+
+    while (<LIST>) {
+	print "got $_" if $debug;
+	@stuff = m/"(.*?)"/g;
+	push(@res, makenode(@stuff));
+    }
+
+    # close will be false if the ups list had errors...
+    if (close(LIST)) {
+        return @res;
+    } else {
+	return ();
+    }
+}
+
 #
 # Walk the tree and pretty-print it.
 # if we've been to this node before, print it in parenthesis, and don't
