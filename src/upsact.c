@@ -4032,6 +4032,7 @@ static void f_unsetupenv( ACTION_PARAMS)
 
 static void f_proddir( ACTION_PARAMS)
 {
+  static char buf[MAX_LINE_LEN];
   t_upsact_cmd lcl_cmd;
   char *tmp_prod_dir = NULL;
   char *uprod_name;
@@ -4054,7 +4055,14 @@ static void f_proddir( ACTION_PARAMS)
     if (a_command_line->ugo_productdir) {
       tmp_prod_dir = a_command_line->ugo_productdir;
     } else if (a_minst->version && a_minst->version->prod_dir) {
-      tmp_prod_dir = a_minst->version->prod_dir;
+      if (UPSRELATIVE(a_minst->version->prod_dir) && a_db_info &&
+	  a_db_info->config && a_db_info->config->prod_dir_prefix) {
+	sprintf(buf, "%s/%s", a_db_info->config->prod_dir_prefix,
+		a_minst->version->prod_dir);
+	tmp_prod_dir = buf;
+      } else {
+	tmp_prod_dir = a_minst->version->prod_dir;
+      }
     }
     if (a_minst->version && tmp_prod_dir && a_minst->version->product) {
       uprod_name = upsutl_upcase(a_minst->version->product);
