@@ -733,6 +733,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	if ( \$mach == IRIX ) setenv MACH_OS IRIX
 	set Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
 	if ( \$MACH_OS == AIX ) set Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
+	if ( \$MACH_OS == Linux ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`'
 	#======================================================================
 	# Determine the unique set of possible flavors
 	#======================================================================
@@ -1001,6 +1002,10 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	then
 	    Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
 	fi
+	if test \$MACH_OS = Linux
+	then
+	    Full_Flavor=\$MACH_OS'+'\`uname -r\`'
+	fi
 	for level in 2 3 4 5 6 7 8 9
 	do
 	    fl=\`echo \$Full_Flavor|cut -f1-\$level -d'.'\`
@@ -1241,6 +1246,10 @@ for Start_Or_Stop in startup shutdown
 	if test \$MACH_OS = AIX
 	then
 	    Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
+	fi
+	if test \$MACH_OS = Linux
+	then
+	    Full_Flavor=\$MACH_OS'+'\`uname -r\`'
 	fi
 	for level in 2 3 4 5 6 7 8 9
 	do
