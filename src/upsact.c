@@ -59,6 +59,9 @@ int g_LOCAL_VARS_DEF = 0;
 int g_keep_temp_file = 0;
 char *g_temp_file_name = NULL;
 int g_COMPILE_FLAG = 0;
+extern int g_UPS_SHELL;
+
+static char *g_file_ext[e_MAX_SHELL] = {"sh", "csh"};
 
 /*
  * Private constants
@@ -141,7 +144,7 @@ static int do_exit_action( const t_upsact_cmd * const a_cmd );
 #define ACTION_PARAMS \
   const t_upstyp_matched_instance * const a_minst, \
   const t_upstyp_db * const a_db_info,             \
-  const t_upsugo_command * const a_command_line,   \
+  t_upsugo_command * const a_command_line,   \
   const FILE * const a_stream,                     \
   const t_upsact_cmd * const a_cmd
 
@@ -214,16 +217,6 @@ static void f_dodefaults( ACTION_PARAMS);
     } else {                                                            \
       /* use the default, nothing was entered */                        \
       delimiter = g_default_delimiter;                                  \
-    }
-
-#define GET_WHATS_LEFT()   \
-    /* we must set the value of the string expected when dropit removes the \
-       last item from the variable.  it is usually the delimiter except in  \
-       the case where the delimiter is a space. */                          \
-    if (*delimiter == *g_space_delimiter) {                                 \
-      whats_left = g_whats_left;                                            \
-    } else {                                                                \
-      whats_left = delimiter;                                               \
     }
 
 #define CHECK_FOR_PATH(thePath, theDelimiter)  \
@@ -335,7 +328,6 @@ static void f_dodefaults( ACTION_PARAMS);
 
 static char *g_default_delimiter = ":";
 static char *g_space_delimiter = " ";
-static char *g_whats_left = "";
 static int g_ups_cmd = e_invalid_action;
 static char g_buff[MAX_LINE_LEN];
 static char *g_shPath = "PATH";
@@ -2437,7 +2429,7 @@ static void f_envprepend( ACTION_PARAMS)
 
 static void f_envremove( ACTION_PARAMS)
 {
-  char *delimiter, *whats_left;
+  char *delimiter;
   
   CHECK_NUM_PARAM("envRemove");
 
@@ -2449,7 +2441,6 @@ static void f_envremove( ACTION_PARAMS)
   
     /* get the correct delimiter */
     GET_DELIMITER();
-    GET_WHATS_LEFT();
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
@@ -2832,7 +2823,7 @@ static void f_pathprepend( ACTION_PARAMS)
 
 static void f_pathremove( ACTION_PARAMS)
 {
-  char *delimiter, *whats_left;
+  char *delimiter;
   char *pathPtr;
   
   CHECK_NUM_PARAM("pathRemove");
@@ -2849,7 +2840,6 @@ static void f_pathremove( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       CHECK_FOR_PATH(g_shPath, g_shDelimiter);
-      GET_WHATS_LEFT();
 
       if (fprintf((FILE *)a_stream,
 	        "upstmp=\"`%s -S -p \"$%s\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
@@ -2860,7 +2850,6 @@ static void f_pathremove( ACTION_PARAMS)
       break;
     case e_CSHELL:
       CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
-      GET_WHATS_LEFT()
       if (fprintf((FILE *)a_stream,
           "setenv upstmp \"`%s -S -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"\") set %s=($upstmp)\nrehash\nunsetenv upstmp\n#\n",
 		  DROPIT, pathPtr, delimiter, delimiter, a_cmd->argv[1],
@@ -3481,122 +3470,132 @@ static void f_writecompilescript(ACTION_PARAMS)
   t_upstyp_matched_product *mproduct = 0;
   t_upslst_item *cmd_list = NULL;
   char *time_ptr;
-  int moved_to_old = 0, moved_to_timedate = 0;
+  int moved_to_old = 0, moved_to_timedate = 0, i, save_shell, save_g_shell;
   FILE *compile_file;
+  static char buf[MAX_LINE_LEN];
 
   /* skip this whole action if we are being called while compiling */
   if (! g_COMPILE_FLAG) {
-    CHECK_NUM_PARAM("writeCompileScript");
+    save_g_shell = g_UPS_SHELL;
+    save_shell = a_command_line->ugo_shell;
 
-    OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
+    /* we must create 2 files one csh variety and one sh variety. */
+    for (i = e_MIN_SHELL ; i < e_MAX_SHELL ; ++i) {
+      a_command_line->ugo_shell = i;
+      g_UPS_SHELL = i;
 
-    /* only proceed if we have a valid number of parameters */
-    if (UPS_ERROR == UPS_SUCCESS) {
-      /* this action does the following -
-	 1. locate the action=command section which matches the
-	       entered parameter
-	 2. if there is none, we are done, else, locate current compile
-	       file.
-	 3. if there is none, skip to next step. else, rename current one
-	       if desired. (on any error before completing the compile, this
-	       file will be renamed back to the original name if possible.
-	       of course this is not possible if we are overwriting the current
-	       file.)
-	 4. open compile file
-	 5. process actions and write them to the compile file.
-	 6. close compile file */
-      /* 1     first, setup the matched product */
-      mproduct = (t_upstyp_matched_product *)upsmem_malloc(
-					    sizeof(t_upstyp_matched_product));
-      
-      mproduct->db_info = (t_upstyp_db *)a_db_info;
-      upsmem_inc_refctr(a_db_info);
-      mproduct->minst_list = upslst_new((void *)a_minst);
-    
-      /*       get the action command list */
-      cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, mproduct,
-				a_cmd->argv[1], a_cmd->icmd );
+      CHECK_NUM_PARAM("writeCompileScript");
+
+      OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
+
+      /* only proceed if we have a valid number of parameters */
       if (UPS_ERROR == UPS_SUCCESS) {
-	/* 2      now that we have the list, locate the current compile file
-	          if there is one */
-	if (upsutl_is_a_file(a_cmd->argv[0]) == UPS_SUCCESS) {
-	  /* 3   the file exists. check argv[2] to see if we need to rename the
-	         file before writing the new one. if no flag was passed then
-	         just overwrite the file */
-	  if (a_cmd->argc == g_func_info[a_cmd->icmd].max_params) {
-	    /* the flag was there, now see what it is */
-	    if (! strcmp(a_cmd->argv[a_cmd->argc - 1], OLD_FLAG)) {
-	      /* append ".OLD" to the file name */
-	      sprintf(g_buff, "mv %s %s.%s\n", a_cmd->argv[0], a_cmd->argv[0],
-		      OLD_FLAG);
-	      DO_SYSTEM_MOVE(moved_to_old);
-	    } else if (! strcmp(a_cmd->argv[a_cmd->argc - 1], DATE_FLAG)) {
-	      /* append a timedate stamp to the file name */
-	      time_ptr = upsutl_time_date(STR_TRIM_PACK);
-	      sprintf(g_buff, "mv %s %s.%s\n", a_cmd->argv[0], a_cmd->argv[0],
-		      time_ptr);
-	      DO_SYSTEM_MOVE(moved_to_timedate);
+	/* this action does the following -
+	   1. locate the action=command section which matches the
+	      entered parameter
+	   2. if there is none, we are done, else, locate current compile
+	      file.
+	   3. if there is none, skip to next step. else, rename current one
+	      if desired. (on any error before completing the compile, this
+	      file will be renamed back to the original name if possible.
+	      of course this is not possible if we are overwriting the current
+	      file.)
+	   4. open compile file
+	   5. process actions and write them to the compile file.
+	   6. close compile file */
+	/* 1     first, setup the matched product */
+	mproduct = (t_upstyp_matched_product *)upsmem_malloc(
+					    sizeof(t_upstyp_matched_product));
+	mproduct->db_info = (t_upstyp_db *)a_db_info;
+	upsmem_inc_refctr(a_db_info);
+	mproduct->minst_list = upslst_new((void *)a_minst);
+    
+	/*       get the action command list */
+	cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, mproduct,
+				  a_cmd->argv[1], a_cmd->icmd );
+	if (UPS_ERROR == UPS_SUCCESS) {
+	  /* 2      now that we have the list, locate the current compile file
+	            if there is one, first we must add in the appropriate file
+		    extension */
+	  sprintf(buf, "%s.%s", a_cmd->argv[0], g_file_ext[i]);
+	  if (upsutl_is_a_file(buf) == UPS_SUCCESS) {
+	    /* 3   the file exists. check argv[2] to see if we need to rename
+	           the file before writing the new one. if no flag was passed 
+                   then just overwrite the file */
+	    if (a_cmd->argc == g_func_info[a_cmd->icmd].max_params) {
+	      /* the flag was there, now see what it is */
+	      if (! upsutl_stricmp(a_cmd->argv[a_cmd->argc - 1], OLD_FLAG)) {
+		/* append ".OLD" to the file name */
+		sprintf(g_buff, "mv %s %s.%s\n", buf, buf, OLD_FLAG);
+		DO_SYSTEM_MOVE(moved_to_old);
+	      } else if (! upsutl_stricmp(a_cmd->argv[a_cmd->argc - 1],
+					  DATE_FLAG)) {
+		/* append a timedate stamp to the file name */
+		time_ptr = upsutl_time_date(STR_TRIM_PACK);
+		sprintf(g_buff, "mv %s %s.%s\n", buf, buf, time_ptr);
+		DO_SYSTEM_MOVE(moved_to_timedate);
+	      }
+	    }
+	  } else {
+	    /* there currently is no compile file with this name.  reset the
+	       error status so we only need to test for success later */
+	    UPS_ERROR = UPS_SUCCESS;
+	  }
+	  /* if there was no error in renaming the file, then proceed */
+	  if (UPS_ERROR == UPS_SUCCESS) {
+	    /* 4    open file that we will write compiled commands out to */
+	    if ((compile_file = fopen(buf, "w")) == NULL) {
+	      upserr_add(UPS_OPEN_FILE, UPS_FATAL, buf);
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
+			 strerror(errno));
+	    } else {
+	      /* 5   process actions and write them to the compile file. mark
+		     that action functions are being called due to a compile
+		     command */
+	      g_COMPILE_FLAG = 1;
+	      upsact_process_commands(cmd_list, compile_file);
+	      g_COMPILE_FLAG = 0;
+
+	      /* 6   close the compile file */
+	      upsutl_unset_upsvars(compile_file, a_command_line, "");
+	      if (fclose(compile_file) == EOF) {
+		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose",
+			   strerror(errno));
+	      }
 	    }
 	  }
 	} else {
-	  /* there currently is no compile file with this name.  reset the
-	     error status so we only need to test for success later */
-	  UPS_ERROR = UPS_SUCCESS;
+	  /* could not get the list of commands, there must not be an
+	     action=argv[1] line in the file */
+	  upserr_add(UPS_NO_ACTION, UPS_WARNING, a_cmd->argv[1]);
 	}
-	/* if there was no error in renaming the file, then proceed */
-	if (UPS_ERROR == UPS_SUCCESS) {
-	  /* 4    open the file that we will write compiled commands out to */
-	  if ((compile_file = fopen(a_cmd->argv[0], "w")) == NULL) {
-	    upserr_add(UPS_OPEN_FILE, UPS_FATAL, a_cmd->argv[0]);
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
-		       strerror(errno));
-	  } else {
-	    /* 5   process actions and write them to the compile file. mark
-	           that the actions functions are being called due to a compile
-		   command */
-	    g_COMPILE_FLAG = 1;
-	    upsact_process_commands(cmd_list, compile_file);
-	    g_COMPILE_FLAG = 0;
-
-	    /* 6   close the compile file */
-	    if (fclose(compile_file) == EOF) {
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose",
-			 strerror(errno));
-	    }
-	  }
+      }
+      /* if we moved old compile file to a backup and then got an error while
+	 creating the new file, we should move the old file back so we don't
+	 break current things */
+      if ((moved_to_old || moved_to_timedate) && (UPS_ERROR != UPS_SUCCESS)) {
+	/* yes we did the move, and got an error, move the file back */
+	if (moved_to_old) {
+	  sprintf(g_buff, "mv %s.%s %s\n", buf, OLD_FLAG, buf);
+	} else {
+	  sprintf(g_buff, "mv %s.%s %s\n", buf, time_ptr, buf);
 	}
-      } else {
-	/* could not get the list of commands, there must not be an
-	   action=argv[1] line in the file */
-	upserr_add(UPS_NO_ACTION, UPS_WARNING, a_cmd->argv[1]);
+	/* since we are at end, it does not matter which flag we use here */
+	DO_SYSTEM_MOVE(moved_to_old);
+      }
+      /* release any memory we acquired */
+      if (mproduct && mproduct->minst_list) {
+	(void )upslst_free(mproduct->minst_list, ' ');
+	upsmem_free(mproduct);
+	upsmem_dec_refctr(a_db_info);
+      }
+      if (cmd_list) {
+	upsact_cleanup(cmd_list);
       }
     }
-
-    /* if we moved the old compile file to a backup and then got an error while
-       creating the new file, we should move the old file back so we don't
-       break current things */
-    if ((moved_to_old || moved_to_timedate) && (UPS_ERROR != UPS_SUCCESS)) {
-      /* yes we did the move, and got an error, move the file back */
-      if (moved_to_old) {
-	sprintf(g_buff, "mv %s.%s %s\n", a_cmd->argv[0], OLD_FLAG,
-		a_cmd->argv[0]);
-      } else {
-	sprintf(g_buff, "mv %s.%s %s\n", a_cmd->argv[0], time_ptr,
-		a_cmd->argv[0]);
-      }
-      /* since we are at the end, it does not matter which flag we use here */
-      DO_SYSTEM_MOVE(moved_to_old);
-    }
-
-    /* release any memory we acquired */
-    if (mproduct && mproduct->minst_list) {
-      (void )upslst_free(mproduct->minst_list, ' ');
-      upsmem_free(mproduct);
-      upsmem_dec_refctr(a_db_info);
-    }
-    if (cmd_list) {
-      upsact_cleanup(cmd_list);
-    }
+    /* reset the shell back to its original value. */
+    a_command_line->ugo_shell = save_shell;
+    g_UPS_SHELL = save_g_shell;
   }
 }
 

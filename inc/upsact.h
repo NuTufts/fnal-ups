@@ -159,7 +159,7 @@ typedef struct s_cmd_info {
 /* this one is the type of a action command handler */
 typedef void (*tpf_cmd)( const t_upstyp_matched_instance * const a_inst,
 			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
+			 t_upsugo_command * const a_command_line,
                          const FILE * const a_stream,
                          const t_upsact_cmd * const a_cmd);
 
