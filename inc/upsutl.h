@@ -54,6 +54,10 @@
  * Declaration of public functions.
  */
 
+int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
+			  const t_upstyp_db * const a_db_info,
+			  const char *a_node);
+char *upsutl_get_hostname( void );
 t_upstyp_product *upsutl_get_config( const char * const a_db);
 char *upsutl_environment(const char * const a_env_var);
 t_upslst_item *upsutl_free_matched_instance_list(
@@ -78,6 +82,8 @@ char  *upsutl_str_crecat( char * const str1, char * const str2 );
 int    upsutl_str_sort( char * const, const char );
 size_t upsutl_str_remove( char * const str, const char * const ct );
 size_t upsutl_str_remove_edges( char * const str, const char * const ct );
+int    upsutl_is_a_file(const char * const a_filename);
+
 
 /*
  * Declaration of private globals.
