@@ -168,6 +168,7 @@ case $ccenv in
 		fi
 #		defs="$defs CCCHK=\"-Xa -vc\""
 		defs="$defs CCCHK=\"-Xc -v\""
+                llibs="-lnsl"
 		;;
 
 	Linux)			
