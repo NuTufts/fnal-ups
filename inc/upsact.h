@@ -140,6 +140,7 @@ typedef struct upsact_cmd {
 typedef struct upsact_item {
   int                        level;
   int                        mode;
+  int                        unsetup;
   t_upsugo_command           *ugo;
   t_upstyp_matched_product   *mat;
   t_upstyp_action            *act;
@@ -196,6 +197,8 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 		  const char * const act_name,
 		  const int ups_cmd,
 		  char * sopt );
+t_upslst_item *upsact_trim_unsetup( t_upslst_item * const act_list,
+				    int * const top_unsetup ); 
 t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str );
 void upsact_cleanup( t_upslst_item *dep_list );
 t_upslst_item *upsact_check_files(
