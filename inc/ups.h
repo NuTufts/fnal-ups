@@ -24,7 +24,6 @@
 #define _UPS_H_
 
 /* all ups specific include files */
-#include "upsact.h"
 #include "upserr.h"
 #include "upsfil.h"
 #include "upskey.h"
