@@ -38,6 +38,7 @@
 /*
  * Definition of public variables.
  */
+extern int UPS_VERBOSE;
 
 /*
  * Declaration of private functions.
@@ -97,6 +98,8 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 #define NULL
 #endif
 
+#define VPREFIX  "UPSMAT: "
+
 #define TMP_LISTS_FREE() \
       if (tmp_flavor_list) {                                     \
 	/* set to initial value first */                         \
@@ -139,7 +142,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
  */
 
 /*-----------------------------------------------------------------------
- * umat_match_instance
+ * upsmat_match_instance
  *
  * Given the input from the command line, find the instance(s) in UPS
  * that most closely matches it.  if a ups database is passed in, only look
@@ -167,6 +170,10 @@ t_ups_match_product *upsmat_match_instance(
     } else {
       for ( db_item = (t_upslst_item *)a_command_line->ugo_db ; db_item ;
 	    db_item = db_item->next ) {
+	if (UPS_VERBOSE) {
+	  printf("%sSearching UPS database - %s\n", VPREFIX,
+		 (char *)db_item->data);
+	}
 	mproduct = match_instance_core(a_command_line,
 				       (char *)db_item->data, a_need_unique);
 	if (UPS_ERROR != UPS_SUCCESS) {
@@ -181,6 +188,9 @@ t_ups_match_product *upsmat_match_instance(
     }
   } else {
     /* We only want to search through a single db. */
+    if (UPS_VERBOSE) {
+      printf("%sSearching UPS database - %s\n", VPREFIX, (char *)a_db);
+    }
     mproduct = match_instance_core(a_command_line, (char *)a_db,
 				   a_need_unique);
   }
@@ -221,6 +231,10 @@ static t_ups_match_product *match_instance_core(
   /* see if we were passed a table file. if so, don't worry about
      version and chain files, just read the table file */
   if (a_command_line->ugo_M) {
+    if (UPS_VERBOSE) {
+      printf("%sMatching with Table file  - %s\n", VPREFIX,
+	     a_command_line->ugo_tablefile);
+    }
     num_matches = match_from_table(a_command_line->ugo_product,
 				   a_command_line->ugo_tablefile,
 				   a_command_line->ugo_tablefiledir,
@@ -240,6 +254,10 @@ static t_ups_match_product *match_instance_core(
   /* see if we were passed a version. if so, don't worry
      about chains, just read the associated version file */
   } else if (a_command_line->ugo_version != NULL) {
+    if (UPS_VERBOSE) {
+      printf("%sMatching with Version - %s\n", VPREFIX,
+	     a_command_line->ugo_version);
+    }
     num_matches = match_from_version(a_command_line->ugo_product,
 				     a_command_line->ugo_version,
 				     a_command_line->ugo_upsdir,
@@ -262,6 +280,9 @@ static t_ups_match_product *match_instance_core(
 	 chain_list = chain_list->next) {
       /* get the chain name */
       chain = (char *)chain_list->data;
+      if (UPS_VERBOSE) {
+	printf("%sMatching with Chain - %s\n", VPREFIX, chain);
+      }
       num_matches = match_from_chain(a_command_line->ugo_product, chain,
 				     a_command_line->ugo_upsdir,
 				     a_command_line->ugo_productdir, a_db, 
@@ -338,6 +359,10 @@ static int match_from_chain( const char * const a_product,
       tmp_num_matches = get_instance(read_product->instance_list,
 				     a_flavor_list, a_quals_list,
 				     a_need_unique, a_cinst_list);
+      if (UPS_VERBOSE) {
+	printf("%sFound %d instances in %s\n", VPREFIX, tmp_num_matches,
+	       buffer);
+      }
 
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the a_cinst_list */
@@ -359,6 +384,13 @@ static int match_from_chain( const char * const a_product,
 	   files  - set tmp_upsdir, tmp_productdir */
 	USE_CMD_LINE_INFO();
 
+	if (UPS_VERBOSE) {
+	  printf("%sMatching with Version %s in Product %s\n", VPREFIX,
+		 inst->version, inst->product);
+	  printf("%sUsing Flavor = %s, and Qualifiers = %s\n", VPREFIX,
+		 (char *)(tmp_flavor_list->data),
+		 (char *)(tmp_quals_list->data));
+	}
 	tmp_num_matches = match_from_version(inst->product, inst->version,
 					     tmp_upsdir, tmp_productdir, a_db,
 					     do_need_unique, tmp_flavor_list,
@@ -443,6 +475,10 @@ static int match_from_version( const char * const a_product,
       tmp_num_matches = get_instance(read_product->instance_list,
 				     a_flavor_list, a_quals_list,
 				     a_need_unique, a_vinst_list);
+      if (UPS_VERBOSE) {
+	printf("%sFound %d instances in %s\n", VPREFIX, tmp_num_matches,
+	       buffer);
+      }
 
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the a_vinst_list */
@@ -465,6 +501,13 @@ static int match_from_version( const char * const a_product,
 	   files - set tmp_upsdir, tmp_productdir */
 	USE_CMD_LINE_INFO();
 
+	if (UPS_VERBOSE) {
+	  printf("%sMatching with Version %s in Product %s using Table file %s\n",
+		 VPREFIX, inst->version, inst->product, inst->table_file);
+	  printf("%sUsing Flavor %s and Qualifiers %s\n", VPREFIX,
+		 (char *)(tmp_flavor_list->data),
+		 (char *)(tmp_quals_list->data));
+	}
 	tmp_num_matches = match_from_table(inst->product, inst->table_file,
 					   inst->table_dir, tmp_upsdir,
 					   tmp_productdir, a_db,
@@ -532,11 +575,16 @@ static int match_from_table( const char * const a_product,
   full_table_file = get_table_file_path(a_product, a_tablefile,
 					a_tablefiledir, a_upsdir, a_productdir,
 					a_db);
+
   if (full_table_file != NULL) {
     if ((read_product = upsfil_read_file(full_table_file)) != NULL) {
       /* get all the instances that match command line input */
        num_matches = get_instance(read_product->instance_list, a_flavor_list,
 				  a_quals_list, a_need_unique, a_tinst_list);
+       if (UPS_VERBOSE) {
+	 printf("%sFound %d instances in %s\n", VPREFIX, num_matches,
+		full_table_file);
+       }
 
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the tinst_list */

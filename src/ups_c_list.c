@@ -50,6 +50,8 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 /*
  * Definition of global variables.
  */
+#define VPREFIX "UPSLIST: "
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -136,6 +138,9 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
       prod_name = (char *)tmp_products->data;
       a_command_line->ugo_product = prod_name;
       
+      if (UPS_VERBOSE) {
+	printf("%sListing info for Product = %s\n", VPREFIX, prod_name);
+      }
       /* If all versions were specified get them all */
       if (a_command_line->ugo_version && 
 	  (! strcmp(a_command_line->ugo_version, ANY_MATCH))) {
