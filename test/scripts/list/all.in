@@ -1,4 +1,7 @@
 DATABASE=db1 
+	Product=jessie	Version=v2_0	Flavor=NULL
+		Qualifiers="red"	Chain=""
+
 	Product=lassie	Version=v1_0	Flavor=NULL
 		Qualifiers="nodbg:opt"	Chain=""
 
