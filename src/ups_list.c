@@ -34,6 +34,7 @@
 #include "upsutl.h"
 #include "upsmat.h"
 #include "upsfil.h"
+#include "upsver.h"
 #include "ups_list.h"
 
 /*
@@ -241,7 +242,9 @@ void ups_list( t_upsugo_command * const a_command_line )
   mproduct_list = ups_list_core(a_command_line);
   /*  upsugo_prtlst(mproduct_list,"the products");*/
   mproduct_list = upslst_first(mproduct_list);  /* point to the start */
+  upsver_mes(2,"Starting sort of product list\n");
   mproduct_list = upslst_sort0( mproduct_list , product_cmp );
+  upsver_mes(2,"Ending sort of product list\n");
   mproduct_list = upslst_first(mproduct_list);  /* point to the start */
 
   /* Output the requested information from the instances */
@@ -282,7 +285,7 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line)
    the ups_malloc the extra stuff won't be there... DjF
     a_command_line->ugo_chain = upslst_new((void *)ANY_MATCH);
 */
-    addr=upsutl_str_create("*",' ');
+    addr=upsutl_str_create(ANY_MATCH,' ');
     a_command_line->ugo_chain = upslst_new(addr);
   }
 
