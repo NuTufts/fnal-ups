@@ -116,9 +116,9 @@ clean spotless :
 make :
 	@if [ "$(CCENV)" = "" ]; then ccenv=`uname`; else ccenv=$(CCENV); fi; \
 	echo \
-	"make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile" \
+	"upsmake_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile" \
                                                         "-env $$ccenv *.c"; \
-	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
+	upsmake_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "upspremake make" IN THE
