@@ -387,14 +387,10 @@ int upsfil_exist( const char * const ups_file )
   /* will just check if a file exist,
     the main purpose is not to log/report any errors */
 
-  FILE *fh = fopen ( ups_file, "r" );
-  if ( fh ) {
-    fclose( fh );
+  if ( upsutl_is_a_file( ups_file ) == UPS_SUCCESS ) 
     return 1;
-  }
-  else {
+  else
     return 0;
-  }
 }
 
 void free_product( const void *key, void ** prod, void *cl ) 
@@ -1148,6 +1144,7 @@ int next_key( void )
   g_val[0] = 0;
   g_line[0] = 0;
   g_ikey = e_key_eof;
+  g_mkey = 0;
 
   while ( fgets( g_line, MAX_LINE_LEN, g_fh ) ) {
     g_line_count++;
