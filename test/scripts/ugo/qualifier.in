@@ -1,0 +1,10 @@
+Product:       *
+Flavor:          
+   value = CHOCOLATE 
+Qualifiers:    
+   value = 123,Bear,Canary,___big-dog,a,aardvark,cat,dog,fat-cat 
+   value = 123,Bear,Canary,___big-dog,a,aardvark,cat,dog 
+   value = 123,Bear,Canary,___big-dog,a,aardvark,dog,fat-cat 
+   value = 123,Bear,Canary,___big-dog,a,aardvark,dog 
+Chains:         
+   value = current 

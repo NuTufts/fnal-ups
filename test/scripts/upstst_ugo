@@ -1,0 +1,34 @@
+#!/bin/ksh
+# ============================================================================
+# test the file routines
+# ============================================================================
+cd $ERUPT_DIR/test/scripts/ugo
+$ERUPT_DIR/test/ups_test << EOD
+#ups_echo "================================================================="
+#
+ups_echo "testing simple parsing"
+#
+upsugo_next -options abc -out /dev/null -a -b -c -status UPS_INVALID_ARGUMENT 
+upserr_clear
+upsugo_next -options abc -out /dev/null -a -b -c 
+upserr_clear
+upsugo_next -options abc -out /dev/null -encmds 3 -a -b -c one, -a -b -c two, -a -b -c three 
+upserr_clear
+#
+ups_echo "testing qualifiers"
+#
+upsugo_next -options abcf -out simple.out -diff simple.in -a -b -c -f CHOCOLATE
+upsugo_next -options qf -out qualifier.out -diff qualifier.in -f CHOCOLATE -q "a,aardvark,Bear,Canary,?cat,dog,123,___big-dog,?fat-cat" 
+upserr_clear
+upsugo_next -options qf -out qualifier.out -diff qualifier.in -f CHOCOLATE -q "a,aardvark" -q "Bear,Canary,___,,,,dog,big-dog" -q "?fat-cat,?cat" -q "aardvark" 
+upserr_clear
+#
+ups_echo "testing chains"
+#
+upsugo_next -options colntdgf -out chain.out -diff chain.in -f CHOCOLATE -c -o -l -n -t -d -g dog -g cat -g "blue,red"
+#
+ups_echo "testing everything else"
+#
+upsugo_next -options aABCDeEFhjkKlmMNOpPrSTuUvVwWxXyYzZ -a -A hercules -B -C -D -e -E -F -h mercury -j -k -K -l -m /earth -M titan -N -O -p -P -r -S -T -u -U -v -V -w -W -x -X -y -Y -z -Z
+quit
+EOD
