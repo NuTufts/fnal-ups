@@ -3,6 +3,7 @@
 # test the action routines
 # ============================================================================
 cd $ERUPT_DIR/test/scripts/action/log
+UPS_SHELL=csh;export UPS_SHELL;
 env PRODUCTS=../db1 $ERUPT_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 #
@@ -16,5 +17,12 @@ upsact_print -out rover1.out  -diff rover1.in  setup rover  v1_0
 upsact_print -out rover2.out  -diff rover2.in  setup rover  v2_0 
 upsact_print -out snoopy1.out -diff snoopy1.in setup snoopy v2_0 -z ../db1:../db2 
 upsact_print -out snoopy2.out -diff snoopy2.in setup snoopy v3_0 -z ../db1:../db2 
+upsact_process_commands -out fly1.out -diff fly1.in setup fly v1_0 
 quit
 EOD
+
+UPS_SHELL=sh;export UPS_SHELL;
+env PRODUCTS=../db1 $ERUPT_DIR/test/ups_test << EOD2
+upsact_process_commands -out fly2.out -diff fly2.in setup fly v1_0 
+quit
+EOD2

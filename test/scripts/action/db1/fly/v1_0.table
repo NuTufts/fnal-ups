@@ -1,0 +1,61 @@
+FILE = TABLE
+PRODUCT = fly
+
+FLAVOR = NULL
+QUALIFIERS = ""
+
+ACTION = SETUP
+   doDefaults()
+# do environment variable tests
+   envset(OPERA,"AIDA FAUST")
+   envappend(OPERA,"MADAM_BUTTERFLY CARMEN",' ')
+   envprepend(OPERA,FIDELIO,' ')
+   envremove(OPERA,FAUST,' ')
+   envunset(OPERA)
+# do path tests
+   pathset(path,/bin:/usr/local/bin:/local/etc:/mybin)
+   pathAppend(path,emacs/bin,emacs/etc)
+   pathprepend(path,emacs/test)
+   pathremove(path,emacs)
+   pathremove(path,bin)
+# do file tests
+   filetest(blah,r,"can't read file")
+   makeDir(blah)
+# setup tests
+# execute tests
+   exeAccess(ls)
+   execute("ls -l",mystatus)
+   exeActionOptional(extra1)
+   exeActionOptional(extra2)
+   exeActionRequired(extra3)
+# compile tests
+   writeCompileFile(blah,flag)
+   sourceCompileReq(blah)
+   sourceCompileOpt(blah)
+# are predefined variables set?
+   envset(ups_prod_name,${UPS_PROD_NAME})
+   envset(ups_prod_version,${UPS_PROD_VERSION})
+   envset(ups_prod_flavor,${UPS_PROD_FLAVOR})
+   envset(ups_prod_qualifiers,${UPS_PROD_QUALIFIERS})
+   envset(ups_prod_dir,${UPS_PROD_DIR})
+   envset(ups_shell,${UPS_SHELL})
+   envset(ups_options,${UPS_OPTIONS})
+   envset(ups_origin,${UPS_ORIGIN})
+   envset(ups_verbose,${UPS_VERBOSE})
+   envset(ups_extended,${UPS_EXTENDED})
+   envset(ups_verbose,${UPS_VERBOSE})
+   envset(ups_extended,${UPS_EXTENDED})
+   envset(ups_this_db,${UPS_THIS_DB})
+   envset(products,${PRODUCTS})
+   envset(ups_compile,${UPS_COMPILE})
+# copy tests
+   copyInfo(info)
+   copyMan(man)
+   copyHtml(html)
+   copyNews(news)
+   uncopyMan(man)
+# source tests
+   sourceRequired(file,flag1,flag2)
+   sourceReqCheck(file,flag1,flag2)
+   sourceOptional(file,flag1,flag2)
+   sourceOptCheck(file,falg1,flag2)

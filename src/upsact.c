@@ -1301,7 +1301,7 @@ void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config->html_path) {
+    if (!a_db_info->config || !a_db_info->config->html_path) {
       upserr_vplace();
       upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "html");
     } else {  
@@ -1339,7 +1339,7 @@ void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config->info_path) {
+    if (!a_db_info->config || !a_db_info->config->info_path) {
       upserr_vplace();
       upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "info");
     } else {  
@@ -1379,7 +1379,7 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config->man_path) {
+    if (!a_db_info->config || !a_db_info->config->man_path) {
       upserr_vplace();
       upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "man");
     } else {  
@@ -1427,7 +1427,7 @@ void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config->man_path) {
+    if (!a_db_info->config || !a_db_info->config->man_path) {
       upserr_vplace();
       upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "man");
     } else {  
@@ -1482,7 +1482,7 @@ void f_copynews( const t_upstyp_matched_instance * const a_inst,
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to. */
-    if (!a_db_info->config->news_path) {
+    if (!a_db_info->config || !a_db_info->config->news_path) {
       upserr_vplace();
       upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "news");
     } else {  
@@ -1625,7 +1625,7 @@ void f_envremove( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
 		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) setenv %s $upstmp\nunsetenv upstmp\n#\n",
-		  a_cmd->argv[0], a_cmd->argv[0], delimiter,
+		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
@@ -1657,13 +1657,13 @@ void f_envset( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n#\n", a_cmd->argv[0],
+      if (fprintf((FILE *)a_stream, "%s=\"%s\";export %s\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s %s\n#\n", a_cmd->argv[0],
+      if (fprintf((FILE *)a_stream, "setenv %s \"%s\"\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
       }
@@ -1811,7 +1811,7 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "if [ ! %s %s ]; then\necho %s;\nreturn 1;\nfi;\n#\n",
+		  "if [ ! %s %s ]; then\necho \"%s\";\nreturn 1;\nfi;\n#\n",
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
 	FPRINTF_ERROR();
       }
@@ -1981,7 +1981,7 @@ void f_pathremove( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
 		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
-		  a_cmd->argv[0], a_cmd->argv[0], delimiter, 
+		  a_cmd->argv[0], a_cmd->argv[1], delimiter, 
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }

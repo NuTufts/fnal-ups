@@ -94,25 +94,24 @@ return (0);
 int upstst_act_process_commands (int argc, char ** const argv)
 {
 static char     *myfunc = "upsact_process_commands";
-static char     *options;			/* options */
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
 static char     *action;			/* file to diff */
 int		status;				/* function status */
 FILE		*ofd;				/* outfile file descriptor */
-upstst_argt     argt[] = {{"-options",UPSTST_ARGV_STRING,NULL,&options},
-                          {"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
+upstst_argt     argt[] = {{"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
                           {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
                           {"<action>", UPSTST_ARGV_STRING,NULL,&action},
                           {NULL,      UPSTST_ARGV_END,   NULL,NULL}};
-t_upsugo_command	*uc =0;			/* ups command */
+t_upsugo_command *uc =0;			/* ups command */
 char            diffcmd[132];                   /* diff command */
 int		stdout_dup;			/* dup of stdout */
+t_upslst_item  *cmd_list;			/* list of commands */
 
 /* parse command line
    ------------------ */
 
-outfile = NULL; difffile = NULL; options = NULL; action = NULL;
+outfile = NULL; difffile = NULL; action = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 if (outfile) 					/* don't use stdout */
@@ -134,7 +133,10 @@ UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
-   upsact_print(uc,NULL,action,options);
+   cmd_list = upsact_get_cmd(uc,NULL,action);
+   UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
+   upsact_process_commands(cmd_list, ofd);
+   UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    }
 
 /* dump the output to specified file and compare
