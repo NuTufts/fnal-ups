@@ -22,7 +22,8 @@ ups_list -out long.out -diff long.in -z db1 -a -l spot v2_0
 #
 # test getting keywords
 #
-ups_list -out key1.out -diff key1.in -z db1 -q long spot v2_0 -K "JUNK:_DUMMY:ARCHIVE_FILE:AUTHORIZED_NODES"
+ups_list -out /dev/null -z db1 -q long spot v2_0 -K "BLAH" -estatus UPS_INVALID_KEYWORD
+ups_list -out key1.out -diff key1.in -z db1 -q long spot v2_0 -K "ARCHIVE_FILE:AUTHORIZED_NODES:_DUMMY:DESCRIPTION"
 ups_list -out key2.out -diff key2.in -z db1 -a lassie -K +
 ups_list -out key3.out -diff key3.in -z db1 -a lassie -K +:DECLARED
 #
