@@ -154,7 +154,6 @@ if (-e reqcheck2) then
   setenv UPS_OS_FLAVOR IRIX+6.2
   setenv UPS_PROD_FLAVOR NULL
   setenv UPS_PROD_QUALIFIERS 
-  setenv UPS_SHELL csh
   setenv UPS_OPTIONS ""
   source reqcheck2
   setenv UPS_STATUS "$status"
@@ -170,7 +169,6 @@ if (-e reqcheck2) then
     unsetenv UPS_OS_FLAVOR
     unsetenv UPS_PROD_FLAVOR
     unsetenv UPS_PROD_QUALIFIERS
-    unsetenv UPS_SHELL
     unsetenv UPS_OPTIONS
     exit 1
   endif
@@ -184,7 +182,6 @@ if (-e reqcheck2) then
   unsetenv UPS_OS_FLAVOR
   unsetenv UPS_PROD_FLAVOR
   unsetenv UPS_PROD_QUALIFIERS
-  unsetenv UPS_SHELL
   unsetenv UPS_OPTIONS
   exit
 else
@@ -198,7 +195,6 @@ else
   unsetenv UPS_OS_FLAVOR
   unsetenv UPS_PROD_FLAVOR
   unsetenv UPS_PROD_QUALIFIERS
-  unsetenv UPS_SHELL
   unsetenv UPS_OPTIONS
   exit 1
 endif

@@ -17,7 +17,6 @@ if (-e requiredScript) then
   unsetenv UPS_OS_FLAVOR
   unsetenv UPS_PROD_FLAVOR
   unsetenv UPS_PROD_QUALIFIERS
-  unsetenv UPS_SHELL
   unsetenv UPS_OPTIONS
   exit
 else
@@ -31,7 +30,6 @@ else
   unsetenv UPS_OS_FLAVOR
   unsetenv UPS_PROD_FLAVOR
   unsetenv UPS_PROD_QUALIFIERS
-  unsetenv UPS_SHELL
   unsetenv UPS_OPTIONS
   exit 1
 endif

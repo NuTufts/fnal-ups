@@ -151,7 +151,6 @@ if [ -s reqcheck2 ]; then
   UPS_OS_FLAVOR=IRIX+6.2;export UPS_OS_FLAVOR
   UPS_PROD_FLAVOR=NULL;export UPS_PROD_FLAVOR
   UPS_PROD_QUALIFIERS=;export UPS_PROD_QUALIFIERS
-  UPS_SHELL=sh;export UPS_SHELL
   UPS_OPTIONS="";export UPS_OPTIONS
   . reqcheck2
   UPS_STATUS=$?
@@ -167,7 +166,6 @@ if [ -s reqcheck2 ]; then
     unset UPS_OS_FLAVOR
     unset UPS_PROD_FLAVOR
     unset UPS_PROD_QUALIFIERS
-    unset UPS_SHELL
     unset UPS_OPTIONS
     return 1
   fi
@@ -181,7 +179,6 @@ if [ -s reqcheck2 ]; then
   unset UPS_OS_FLAVOR
   unset UPS_PROD_FLAVOR
   unset UPS_PROD_QUALIFIERS
-  unset UPS_SHELL
   unset UPS_OPTIONS
   return
 else
@@ -195,7 +192,6 @@ else
   unset UPS_OS_FLAVOR
   unset UPS_PROD_FLAVOR
   unset UPS_PROD_QUALIFIERS
-  unset UPS_SHELL
   unset UPS_OPTIONS
   return 1
 fi
