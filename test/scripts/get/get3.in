@@ -1,6 +1,6 @@
 setenv UPS_PROD_NAME lassie
-setenv UPS_PROD_VERSION v2_0
-setenv UPS_PROD_DIR /NULL/lassie
+setenv UPS_PROD_VERSION "v2_0"
+setenv UPS_PROD_DIR "/NULL/lassie"
 unsetenv UPS_VERBOSE
 unsetenv UPS_EXTENDED
 setenv UPS_THIS_DB ../list/db1

@@ -27,3 +27,7 @@ ACTION = configure
    Execute("echo configure",NO_UPS_ENV)
 ACTION = unconfigure
    Execute("echo unconfigure",NO_UPS_ENV)
+ACTION = leash
+   Execute("echo leash",NO_UPS_ENV)
+ACTION = unleash
+   Execute("echo unleash",NO_UPS_ENV)

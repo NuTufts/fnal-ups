@@ -13,7 +13,7 @@ declare rover -status UPS_INVALID_SPECIFICATION
 declare rover v1_0 -f NULL -r /tmp
 declare rover v1_0 -f NULL -r /tmp -status UPS_INVALID_SPECIFICATION
 declare rover v1_0 -f IRIX -g leash -r /tmp
-#declare rover v1_0 -f IRIX -g leash
+declare rover v1_0 -f IRIX -g leash
 upserr_clear
 #
 # test most switches
@@ -22,12 +22,19 @@ declare rover v2_0 -f NULL -A backyard -b mycompile -D akc@kennel -g leash -L -m
 #
 # make sure actions are executed
 #
-declare spot v1_0 -f NULL -r '$UPS_DIR/test/scripts/declare/products/spot' -M ups -m spot.table -c -d -o -t -n -g leash
-declare spot v1_0 -f NULL -c -d -o -t -n -g leash 
-#declare spot v2_0 -C -c -r $UPS_DIR/test/scripts/declare/spot -m spot.table
+declare spot v1_0 -f NULL -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table -c -d -o -t -n -g leash 
+#declare spot v1_0 -f NULL -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table -c -d -o -t -n -g leash -out log/spot1.out -diff log/spot1.in
+#declare spot v1_0 -f NULL -c -d -o -t -n -g leash  
+#declare spot v2_0 -C -c -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table
 quit
 EOD
 diff dbclean/rover/leash.chain dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
 diff dbclean/rover/v1_0.version dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
 diff dbclean/rover/v2_0.version dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
-diff dbclean/spot/ dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff dbclean/spot/current.chain dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff dbclean/spot/new.chain dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff dbclean/spot/old.chain dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff dbclean/spot/test.chain dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff dbclean/spot/leash.chain dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff dbclean/spot/v1_0.version dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff dbclean/spot/v2_0.version dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
