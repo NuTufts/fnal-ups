@@ -1723,7 +1723,7 @@ int put_group( t_upslst_item * const l_inst,
 {
   int o_imargin;
   t_upslst_item *l_i = upslst_first( l_inst );
-  t_upstyp_instance *p_inst;
+  t_upstyp_instance *p_inst = 0;
 
   if ( upslst_count( l_inst ) == 0 ) 
     return 0;
