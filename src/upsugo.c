@@ -248,7 +248,7 @@
            *argbuf = 0;                                                    \
            break;                                                          \
          }                                                                 \
-         if(arg_str = ups_argv[++argindx])     \
+         if((arg_str = ups_argv[++argindx]))     \
          { addr=upsutl_str_create(arg_str,' ');                            \
            ELEMENT = addr;                                                 \
            break;                                                          \
