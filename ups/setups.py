@@ -55,8 +55,5 @@ EOF
 	    if os.environ.has_key('SETUP_PYTHON'):
 		self.unsetup("python")
 	    self.setup("python " + v)
-	    print "Switching to python in",os.environ['PYTHON_DIR']
-	    print "PYTHONPATH is", os.environ['PYTHONPATH']
-	    print "PYTHON_DIR is", os.environ['PYTHON_DIR']
 	    sys.argv.insert(0, os.environ['PYTHON_DIR']+'/bin/python')
 	    os.execve( os.environ['PYTHON_DIR']+'/bin/python', sys.argv, os.environ )
