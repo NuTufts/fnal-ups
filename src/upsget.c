@@ -617,8 +617,10 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
   { (void) strcat(newstr," -q ");
     (void) strcat(newstr,string);
   }
-  if ( command_line->ugo_v)
-  { (void) strcat(newstr," -v"); }
+/*  if (command_line->ugo_v)						*/
+/*  { (void) sprintf(newstr + strlen (newstr)," -%*.*s",		*/
+/*                   command_line->ugo_v, command_line->ugo_v,		*/
+/*                   "vvvvvvvvvv"); }					*/
   if ( command_line->ugo_j)
   { (void) strcat(newstr," -j"); }
   if ( command_line->ugo_r)
