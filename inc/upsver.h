@@ -22,3 +22,5 @@
 #define _UPSVER_H_
 
 void upsver_mes(const int vl, char * const format, ...);
+
+#endif /* _UPSVER_H_ */
