@@ -38,8 +38,8 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  maintained in the version file). In a future release, ups get may
  acquire additional functions.
  Options
-     -0, -1, -2, -3, -?, -c, -d, -F, -f, -g, -H, -M, -m, -n, -o, -q,
-     -r, -t, -u, -v, -Z, -z
+     -?, -c, -d, -F, -f, -g, -H, -M, -m, -n, -o, -q, -r, -t, -U, -V,
+     -v, -Z, -z
 
 .B "upd get -F options product [version]"
  upd get -F outputs a list of files that are maintained outside of the
@@ -49,7 +49,7 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  future release, upd get may acquire additional functions.
  Options
      -0, -1, -2, -3, -?, -c, -d, -F, -f, -g, -H, -h, -M, -m, -n, -o,
-     -q, -r, -t, -u, -v, -Z, -z
+     -q, -r, -t, -U, -v, -Z, -z
 
 .B "upd install options product [version]"
  Retrieves a product instance and by default its UPS product
@@ -69,13 +69,13 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  for piping information to another command.
  Options
      -0, -1, -2, -3, -?, -a, -c, -d, -f, -g, -H, -K, -l, -M, -m, -n,
-     -o, -q, -r, -t, -u, -v, -Z, -z
+     -o, -q, -r, -t, -U, -v, -Z, -z
 
 .B "upd list [options] [product] [version]"
  Performs ups list on the distribution UPS database(s).
  Options
      -0, -1, -2, -3, -?, -a, -c, -d, -f, -g, -H, -h, -K, -l, -M, -m,
-     -n, -o, -q, -r, -t, -u, -v, -Z, -z
+     -n, -o, -q, -r, -t, -U, -v, -Z, -z
 
 .B "upd update component options product [version]"
  Retrieves either the table file or ups subdirectory (depending on the
@@ -98,8 +98,8 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  Identifies UPS product requirements of the specified product or
  instance(s).
  Options
-     -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -j, -K, -l, -M, -n, -o,
-     -q, -R, -r, -s, -t, -u, -v, -Z, -z
+     -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -j, -K, -l, -M, -m, -n,
+     -o, -q, -R, -r, -t, -U, -V, -v, -Z, -z
 
 .B "upd depend [options] product [version]"
  Identifies UPS product requirements of the specified product or
@@ -107,7 +107,7 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  similarly to ups depend.
  Options
      -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -h, -j, -K, -l, -M, -n,
-     -o, -q, -R, -r, -s, -t, -u, -v, -Z, -z
+     -o, -q, -R, -r, -s, -t, -U, -v, -Z, -z
 
 .B "ups exist [options] product [version]"
  Determines if a setup command with the same options would likely
@@ -117,7 +117,7 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  for existence of a particular product instance.
  Options
      -0, -1, -2, -3, -?, -c, -d, -e, -f, -g, -H, -j, -k, -M, -m, -n,
-     -O, -o, -P, -q, -r, -t, -u, -V, -v, -Z, -z
+     -O, -o, -P, -q, -r, -t, -U, -V, -v, -Z, -z
 
 .B "upd exist [options] product [version]"
  Determines if a setup command with the same options would likely
@@ -129,7 +129,7 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  ups exist productname
  Options
      -0, -1, -2, -3, -?, -c, -d, -e, -f, -g, -H, -h, -j, -k, -M, -m,
-     -n, -O, -o, -P, -q, -r, -t, -u, -V, -v, -Z, -z
+     -n, -O, -o, -P, -q, -r, -t, -U, -V, -v, -Z, -z
 
 .B "upd addproduct [options] product version"
  Adds one or a combination of the following to the KITS database: a
@@ -167,14 +167,14 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  specified instances to determine if there are any errors or
  inconsistencies.
  Options
-     -0, -1, -2, -3, -?, -a, -c, -d, -f, -g, -H, -K, -l, -M, -m, -n,
-     -o, -q, -r, -t, -u, -v, -Z, -z
+     -0, -1, -2, -3, -?, -a, -c, -d, -f, -g, -H, -M, -m, -n, -o, -q,
+     -r, -t, -U, -v, -Z, -z
 
 .B "upd verify [options] [product] [version]"
  Performs ups verify on the distribution UPS database(s).
  Options
      -0, -1, -2, -3, -?, -a, -c, -d, -f, -g, -H, -h, -K, -l, -M, -m,
-     -n, -o, -q, -r, -t, -u, -v, -Z, -z
+     -n, -o, -q, -r, -t, -U, -v, -Z, -z
 
 .B "ups configure [options] product [version]"
  Runs the "configure" action of the product, usually to allow
@@ -182,7 +182,7 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  customization of the product.
  Options
      -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -M, -m, -n, -O, -o, -P,
-     -q, -r, -t, -U, -V, -v, -Z, -z
+     -q, -r, -s, -t, -U, -V, -v, -Z, -z
 
 \fBups copy [options] product [version] -G "[options] product version"\fP
  Designed as a ups product development tool allowing a new instance of a
@@ -198,14 +198,14 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  the chain information on an instance.
  Options
      -0, -1, -2, -3, -?, -A, -b, -C, -c, -D, -d, -f, -g, -H, -L, -M,
-     -m, -n, -O, -o, -q, -r, -s, -T, -t, -U, -u, -V, -v, -Z, -z
+     -m, -n, -O, -o, -q, -r, -T, -t, -U, -u, -v, -Z, -z
 
 .B "ups modify [options] product [version]"
  Allows user to manually edit product files and then performs
  syntax/content validation.
  Options
-     -0, -1, -2, -3, -?, -A, -a, -c, -d, -E, -e, -f, -H, -K, -k, -M,
-     -m, -N, -n, -o, -p, -q, -r, -s, -T, -U, -V, -v, -Z, -z
+     -?, -A, -a, -E, -f, -H, -M, -m, -N, -p, -q, -r, -T, -U, -V, -v,
+     -Z, -z
 
 .B "ups start [options] product [version]"
  Allows automatic startup for products that need to load drivers start
@@ -227,28 +227,28 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  product instance has tailor functions, the command must be run by the
  installer after the product is declared to the ups database.
  Options
-     -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -h, -K, -M, -m, -n, -O,
-     -o, -P, -q, -r, -s, -t, -U, -V, -v, -Z, -z
+     -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -K, -M, -m, -n, -O, -o,
+     -P, -q, -r, -s, -t, -U, -V, -v, -Z, -z
 
 .B "ups touch [options] product [version]"
  Changes the MODIFIED date and MODIFIER to the current time and the
  current user, respectively.
  Options
-     -0, -1, -2, -3, -?, -b, -c, -d, -f, -g, -H, -M, -m, -n, -o, -q,
-     -t, -v, -Z, -z
+     -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -n, -o, -q, -t, -v, -Z,
+     -z
 
 .B "ups unconfigure [options] product [version]"
  This calls the products "unconfigure" action, which should undo
  whatever the products "configure" action does.
  Options
-     -0, -1, -2, -3, -?, -c, -d, -e, -f, -g, -H, -K, -k, -M, -m, -n,
-     -O, -o, -P, -q, -r, -s, -t, -U, -V, -v, -Z, -z
+     -0, -1, -2, -3, -?, -c, -d, -f, -g, -H, -M, -m, -n, -O, -o, -P,
+     -q, -r, -s, -t, -U, -V, -v, -Z, -z
 
 .B "ups undeclare [options] product [version]"
  Allows removal of instances from the ups database.
  Options
-     -0, -1, -2, -3, -?, -C, -c, -d, -f, -g, -H, -K, -k, -M, -m, -n,
-     -O, -o, -o, -P, -q, -r, -s, -t, -U, -V, -v, -Y, -y, -Z, -z
+     -0, -1, -2, -3, -?, -C, -c, -d, -f, -g, -H, -M, -m, -n, -O, -o,
+     -q, -r, -t, -U, -V, -v, -Y, -y, -Z, -z
 
 .B "Command Option Descriptions"
 
