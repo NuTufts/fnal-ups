@@ -1492,6 +1492,14 @@ t_upslst_item *read_group( void )
 
     ups_free_instance( com_ptr );
 
+    if ( g_ikey == e_key_end ) {
+      next_key( 0 );
+    }
+    else if ( UPS_VERIFY ) {
+      printf( "Did not find end (END:) of group in file %s, line %d\n",
+	      g_filename, g_line_count);
+    }
+
     find_start_key();
     
     return upslst_first( l_inst_ptr );
