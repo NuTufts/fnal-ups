@@ -184,7 +184,7 @@ case $ccenv in
 		if [ $os_version -lt 6 ]; then
 			defs="$defs RANLIB=/usr/bin/ranlib"
 			size=""
-			cflags="$cflags -ansiposix -DSDSS_IRIX5"
+			cflags="$cflags -ansiposix -DUPS_IRIX5"
 			cflags="$cflags"
 		else
 			defs="$defs RANLIB=/bin/true"
