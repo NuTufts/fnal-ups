@@ -116,7 +116,7 @@ ups_append_release(char *buf)
 	return;
    }
 
-   if (0 != (p = strchr(basnuname.release, '('))) {
+   if (0 != (p = strchr(baseuname.release, '('))) {
 	/* releases with parens in them break stuff, so cut it off there */
 	*p = 0;
    }
