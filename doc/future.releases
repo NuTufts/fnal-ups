@@ -63,3 +63,5 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 17. allow automatic unsetting up of a compiled product to automatically
 	prepend an 'un' to the script name and optionally run that script.
+
+18. think about implementing QUALIFIERS=ANY in the table file.
