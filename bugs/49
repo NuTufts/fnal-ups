@@ -1,0 +1,16 @@
+Priority: Low
+State: Unverified
+
+Yes, upd cloneproduct does currently copy everything.  Changing that
+iss an item which is on the ups To Do list, but way down at the
+bottom.
+
+The problem is, if there are multiple instances sharing the same tar file,
+table file, etc. ups doesn't know whether it should remove them when you
+do a "ups undeclare -Y".  In practice, it always removes home directories
+and tarfiles, and never removes table files; both behaviours are
+technically wrong in various circumstances.  Therefore if you cloned
+a product without copying, then deleted one, the other one would be
+broken.
+
+
