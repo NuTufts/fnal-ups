@@ -133,7 +133,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
  { db_info = (t_upstyp_db *)db_list->data;
    mproduct_list = upsmat_instance(uc, db_list , not_unique);
    if (mproduct_list)    /* the product does exist */ 
-   { upsver_mes(1,"%sProduct %s currently exist in database %s\n",
+   { upsver_mes(1,"%sProduct %s currently exists in database %s\n",
                 UPS_UNDECLARE,
                 uc->ugo_product,
                 db_info->name);
