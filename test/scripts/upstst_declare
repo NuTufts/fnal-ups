@@ -5,6 +5,8 @@
 PRODUCTS="$UPS_DIR/test/scripts/declare/dbclean"; export PRODUCTS
 rm -rf $PRODUCTS
 mkdir $PRODUCTS
+mkdir $PRODUCTS/.upsfiles
+cp $UPS_DIR/test/scripts/declare/dbcmp/.upsfiles/dbconfig $PRODUCTS/.upsfiles
 cd $UPS_DIR/test/scripts/declare
 $UPS_DIR/test/ups_test << EOD
 #
