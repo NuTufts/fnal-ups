@@ -29,12 +29,12 @@
 COMMANDS    :
 configure   :?cdfgHmMnoOqrstUvVzZ: < unprinted comments go here >
 : Environmentally configure a product instance.
-copy        :?AcCdfgHmMnoOpqrtTUvVWXzZ:
+copy        :?AbcCdDfgHmMnoOpqrtTuUvVWXzZ0123:
 : Allow one instance of a product to be declared 
 : "like" another.
 create      :?fHmMpqvZ:
 : Create a template UPS table file.
-declare     :?AcCdfgHmMnoOpqrtTUvVzZ:
+declare     :?AbcCdDfgHmMnoOpqrtTuUvVzZ0123:
 : Add a product instance or a chain to a UPS Database.
 depend      :?cdotgfHKlmMqrUvVzZ:
 : List (for a specified UPS product instance) 
