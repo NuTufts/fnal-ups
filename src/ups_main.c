@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdlib.h>
 
 /* ups specific include files */
 #include "ups_main.h"
@@ -39,6 +40,7 @@
  * Definition of public variables.
  */
 extern int UPS_VERBOSE;
+int g_LOCAL_VARS_DEF = 0;
 
 /*
  * Declaration of private functions.
@@ -84,7 +86,7 @@ int main(int argc, char *argv[])
   t_upsugo_command *command_line = NULL;
   FILE *temp_file = NULL;
   char *temp_file_name = NULL;
-  int i = 0, empty_temp_file = 0;
+  int i = 0, empty_temp_file = 0, remove_this_file = 0;
 
   /* Figure out which command was entered */
   while (g_cmd_info[i].cmd) {
@@ -103,6 +105,12 @@ int main(int argc, char *argv[])
 
     if (command_line->ugo_Z) {
       upsutl_start_timing();
+    }
+
+    /* we will need this later after command_line goes away, so keep track
+       of it here. only attempt to save it if it has not already been saved */
+    if (! remove_this_file ) {
+      remove_this_file = command_line->ugo_V;
     }
 
     if (!command_line->ugo_help) {
@@ -179,15 +187,23 @@ int main(int argc, char *argv[])
     }
   }
 
-  /* output any errors and the timing information */
-  upserr_output();
-
   /* close the temp file */
   if (temp_file) {
     /* look and see where we are */
     if (ftell(temp_file) == 0L) {
       /* we are at the beginning of the file, nothing was written to it */
      empty_temp_file = 1;
+    } else {
+      /* write any closing info to the file */
+      if (g_LOCAL_VARS_DEF) {
+	/* ??? call dave's routine to undefine the local env variables */
+      }
+
+      /* we usually tell the file to delete itself.  however the user may
+	 override this */
+      if (! remove_this_file) {
+	fprintf(temp_file, "rm %s\n", temp_file_name);
+      }
     }
     if (fclose(temp_file) == EOF) {
       upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
@@ -196,10 +212,24 @@ int main(int argc, char *argv[])
     if (empty_temp_file) {
       (void )remove(temp_file_name);
     } else {
-      /* output the name of the temp file that was created */
-      (void )printf("%s\n", temp_file_name);
+      switch (g_cmd_info[i].cmd_index) {
+      case e_setup: 
+      case e_unsetup: 
+	/* output the name of the temp file that was created */
+	(void )printf("%s\n", temp_file_name);
+	break;
+      default:
+	/* source the file within the current process context */
+	if (system(temp_file_name) <= 0) {
+	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system", strerror(errno));
+	}
+	
+      }
     }
   }
+
+  /* output any errors and the timing information */
+  upserr_output();
 
   return 0;
 }
