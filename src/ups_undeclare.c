@@ -206,6 +206,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                 upserr_vplace();
                 return 0;
               }
+/* Only undeclare action when you undeclare a version not a chain
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                          mproduct,g_cmd_info[ups_command].cmd,
 					ups_command);
@@ -217,6 +218,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                 upserr_vplace();
                 return 0;
               }
+*/
             } else {
               if (UPS_ERROR != UPS_SUCCESS) /* just an error */
               { upsfil_clear_journal_files();
