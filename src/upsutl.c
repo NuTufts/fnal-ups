@@ -1021,8 +1021,6 @@ int upsutl_stricmp( const char *s1, const char *s2 )
       return 0;
     }
   }
-  /* added to appease the osf1 compiler.  we should never get here */
-  return 0;
 }
 
 /*-----------------------------------------------------------------------
@@ -1053,8 +1051,6 @@ int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
       return 0;
     }
   }
-  /* added to appease the osf1 compiler.  we should never get here */
-  return 0;
 }
 
 /*-----------------------------------------------------------------------

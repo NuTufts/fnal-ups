@@ -181,6 +181,8 @@
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsact.c", 'parameter "i_act" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsact.c", 'parameter "a_command_line" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1189 , 0,  "upsact.c", 'unrecognized character escape sequence');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsfil.c", 'parameter "key" was declared');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsfil.c", 'parameter "cl" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsmem.c", 'parameter \"a_bytes\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  undef, 'value returned from the function \"printf(...)\" is not used ');
 
