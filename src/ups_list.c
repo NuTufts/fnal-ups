@@ -249,11 +249,15 @@ t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
  * upslst_add_list
  *
  * Will append second list to the end of first list.
+ * If passed first list is null, it will return first list element of
+ * second list.
+ * If passed second list is null, it will return first list item of
+ * first list.
  *
  * Input : t_upslst_item *, pointer to first list.
  *         t_upslst_item *, pointer to second list to be appended.
  * Output: none
- * Return: t_upslst_item *, pointer to the first item of first list or 0
+ * Return: t_upslst_item *, pointer to the first item of list or 0
  */
 t_upslst_item *upslst_add_list( t_upslst_item * const list_ptr_1,
 				t_upslst_item * const list_ptr_2 )
@@ -261,21 +265,27 @@ t_upslst_item *upslst_add_list( t_upslst_item * const list_ptr_1,
   t_upslst_item *l_last_1 = 0;
   t_upslst_item *l_first_2 = 0;
 
-  if ( list_ptr_1 && list_ptr_2 ) {
-    l_last_1 = upslst_last( list_ptr_1 );
-    l_first_2 = upslst_first( list_ptr_2 );
-
-    l_last_1->next = l_first_2;
-    l_first_2->prev = l_last_1;
-  }
+  if ( !list_ptr_1 )
+    return upslst_first( list_ptr_2 );
+  else if ( !list_ptr_2 ) 
+    return upslst_first( list_ptr_1 );
   
-  return upslst_first( list_ptr_1 ? list_ptr_1 : list_ptr_2 );
+  l_last_1 = upslst_last( list_ptr_1 );
+  l_first_2 = upslst_first( list_ptr_2 );
+
+  l_last_1->next = l_first_2;
+  l_first_2->prev = l_last_1;
+  
+  return upslst_first( list_ptr_1 );
 }
 
 /*-----------------------------------------------------------------------
  * upslst_insert_list
  *
  * Will append second list to passed list element.
+ * If passed first list is null, it will return last list element of
+ * second list.
+ * If passed second list is null, it will return passed first list element.
  *
  * Input : t_upslst_item *, pointer to item where second list will be appended.
  *         t_upslst_item *, pointer to second list to be appended.
@@ -289,19 +299,22 @@ t_upslst_item *upslst_insert_list( t_upslst_item * const list_ptr_1,
   t_upslst_item *l_first_2 = 0;
   t_upslst_item *l_last_2 = 0;
 
-  if ( list_ptr_1 && list_ptr_2 ) {
-    l_next_1 = list_ptr_1->next;
-    l_first_2 = upslst_first( list_ptr_2 );
-    l_last_2 = upslst_last( list_ptr_2 );
-    
-    list_ptr_1->next = l_first_2;
-    l_first_2->prev = list_ptr_1;
-    
-    l_last_2->next = l_next_1;
-    if ( l_next_1 ) l_next_1->prev = l_last_2;
-  }
+  if ( !list_ptr_1 )
+    return upslst_last( list_ptr_2 );
+  else if ( !list_ptr_2 )
+    return list_ptr_1;
   
-  return ( l_last_2 ? l_last_2 : list_ptr_1 );
+  l_next_1 = list_ptr_1->next;
+  l_first_2 = upslst_first( list_ptr_2 );
+  l_last_2 = upslst_last( list_ptr_2 );
+    
+  list_ptr_1->next = l_first_2;
+  l_first_2->prev = list_ptr_1;
+    
+  l_last_2->next = l_next_1;
+  if ( l_next_1 ) l_next_1->prev = l_last_2;
+  
+  return l_last_2;
 }
 
 /*-----------------------------------------------------------------------
