@@ -25,6 +25,7 @@
  *       24-Sep-1997, LR, added function str_strincmp, like str_stricmp,
  *                        except it will compare most n characters.
  *       28-Oct-1997, EB, added function  upsutl_get_config
+ *       29-Oct-1997, EB, added function  upsutl_is_authorized
  *
  ***********************************************************************/
 
@@ -37,7 +38,8 @@
 #include <ctype.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/param.h>
 /* #ifdef _SYSTYPE_SVR4 */
 #include <dirent.h>
 /* #else
@@ -67,6 +69,16 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 #define NULL 0
 #endif
 
+#define CMP_AUTH_NODES(struct) \
+    if (struct && struct->authorized_nodes) {                   \
+      a_nodes = struct->authorized_nodes;                       \
+      if (strcmp(struct->authorized_nodes, ANY_MATCH) &&        \
+	  !strstr(struct->authorized_nodes, nodename)) {        \
+	is_auth = 0;                                            \
+      }                                                         \
+    }
+
+
 static clock_t g_start_cpu, g_finish_cpu;
 static time_t g_start_w, g_finish_w;
 static char g_stat_dir[] = "/statistics/";
@@ -75,6 +87,90 @@ static char g_unknown_user[] = "UNKNOWN";
  * Definition of public functions.
  */
 
+/*-----------------------------------------------------------------------
+ * upsutl_get_hostname
+ *
+ * Get the current hostname. Remove any domain information.
+ *
+ * Input : none
+ * Output: none
+ * Return: pointer to a buffer with the hostname in it
+ */
+char *upsutl_get_hostname( void )
+{
+  char *tmp_buf;
+  char nodename[MAXHOSTNAMELEN];
+
+  /* get the hostname */
+  if (! gethostname(nodename, MAXHOSTNAMELEN)) {
+    /* If buffer is of the form node.fnal.gov, seek to first '.' and terminate
+       the string. */
+    tmp_buf = nodename;
+    for (; *tmp_buf != '\0'; ++tmp_buf) { 
+       if (*tmp_buf == '.')  { 
+           *tmp_buf = '\0';
+           break;
+       }
+    }
+    tmp_buf = nodename;
+  } else {
+    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "gethostname", strerror(errno));
+    tmp_buf = NULL;
+  }
+  return(tmp_buf);
+}
+/*-----------------------------------------------------------------------
+ * upsutl_is_authorized
+ *
+ * Determine if the passed product instance is authorized for use on the
+ * current node.  The authorization information is stored in either the 
+ * dbconfig file info or in the product instance info.  
+ *
+ * Input : Matched instance structure, database configuration info and a 
+ *         product name
+ * Output: list of nodes on which the product is authorized
+ * Return: 0 if not authorized, else 1.
+ */
+int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
+			  const t_upstyp_db * const a_db_info, 
+			  const char *a_nodes)
+{
+  int is_auth = 1;
+  char *nodename = NULL;
+
+  a_nodes = NULL;
+
+  /* get the hostname */
+  if (nodename = upsutl_get_hostname()) {
+    /* first check in the product instances to see if there is any
+       authorization information there.  check in each file to make sure
+       that if there is a specific list of nodes, that the current node is
+       on it. in other words, assume the instance is authorized until told
+       differently. */
+    CMP_AUTH_NODES(a_minst->table);
+    if (is_auth) {
+      CMP_AUTH_NODES(a_minst->version);
+    }
+    if (is_auth) {
+      CMP_AUTH_NODES(a_minst->chain);
+    }
+    
+    if (is_auth) {
+      if (a_db_info) {
+	CMP_AUTH_NODES(a_db_info->config);
+      }
+    }
+
+    /* if no authorized nodes were specified, then we assume all */
+    if (! a_nodes) {
+      a_nodes = ANY_MATCH;
+    }
+  } else {
+    /* error when getting the node name */
+    is_auth = 0;
+  }
+  return(is_auth);
+}
 /*-----------------------------------------------------------------------
  * upsutl_get_config
  *
@@ -371,9 +467,10 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   for (mproduct_item = (t_upslst_item *)a_mproduct_list ;
        mproduct_item ; mproduct_item = mproduct_item->next) {
     mproduct = (t_upstyp_matched_product *)mproduct_item->data;
-    if (tmp_stat = mproduct->db_info->config->statistics) {
+    if ((mproduct->db_info->config) && 
+	(tmp_stat = mproduct->db_info->config->statistics)) {
       if ((! strcmp(tmp_stat, ANY_MATCH)) ||
-	  (! strstr(mproduct->product, tmp_stat))) {
+	  (strstr(tmp_stat, mproduct->product))) {
 	global_yes = 1;      /* write statistics for everything in this db */
       }
     }
@@ -388,17 +485,26 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	  dir_s = (int )strlen(mproduct->db_info->name);
 	  stat_s = (int )strlen(g_stat_dir);
 	  file_s = (int )strlen(mproduct->product);
-	  if ( (dir_s + stat_s + file_s + 1) < FILENAME_MAX) {
+	  if ( (dir_s + stat_s + file_s + 4) < FILENAME_MAX) {
 	    /* Construct the filename where the statistics are to be stored. */
-	    strcpy(stat_file, mproduct->db_info->name);     /* directory */
-	    strcat(stat_file, g_stat_dir);                  /* stats sub-dir */
-	    strcat(stat_file, mproduct->product);           /* filename */
+	    strcpy(stat_file, mproduct->db_info->name);   /* directory */
+	    strcat(stat_file, "/../");                    /* move up 1 level */
+	    strcat(stat_file, g_stat_dir);                /* stats sub-dir */
 
-	    /* See if we can open the file that we are supposed to write to. */
-	    if ((file_stream = fopen(stat_file, mode)) == NULL) {
-	      /* Error opening file */
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
-			 strerror(errno));
+	    /* check to make sure the statistics directory exists first */
+	    if (upsutl_is_a_file(stat_file) == UPS_NO_FILE) {
+	      /* no statistics directory, this is a warning error */
+	      upserr_add(UPS_NO_FILE, UPS_WARNING, stat_file);
+	    } else {
+
+	      strcat(stat_file, mproduct->product);         /* filename */
+
+	      /* See if we can open the file we are supposed to write to. */
+	      if ((file_stream = fopen(stat_file, mode)) == NULL) {
+		/* Error opening file */
+		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
+			   strerror(errno));
+	      }
 	    }
 	  } else {
 	    /* Error size of directory path to file is too long */
@@ -844,6 +950,28 @@ size_t upsutl_str_remove_edges( char * const str, const char * const str_remove 
   return strlen( str );
 }
 
+/*-----------------------------------------------------------------------
+ * upsutl_is_a_file
+ *
+ * Given a filename including path, see if the named file exists.
+ *
+ * Input : file name and path
+ * Output: none
+ * Return: UPS_SUCCESS if file exists, else UPS_NO_FILE
+ */
+int upsutl_is_a_file(const char * const a_filename)
+{
+  int status = UPS_SUCCESS;
+  struct stat buf;
+
+  if (stat(a_filename, &buf) == -1) {
+    status = UPS_NO_FILE;
+  }
+
+  return(status);
+  
+}
+
 /*
  * Definition of private functions
  */
@@ -853,3 +981,4 @@ int qsort_cmp_string( const void * c1, const void * c2 )
 {
   return strcmp( (const char *)c1, (const char *)c2 );
 }
+
