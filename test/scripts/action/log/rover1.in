@@ -1,0 +1,5 @@
+0:rover v1_0 -f NULL:dodefaults()
+   1:snoopy v1_0 -f NULL:dodefaults()
+   1:astro v1_0 -f NULL:dodefaults()
+   1:astro v1_0 -f NULL:sourcerequired( astro_v1_0 )
+0:rover v1_0 -f NULL:sourcerequired( rover_v1_0 )

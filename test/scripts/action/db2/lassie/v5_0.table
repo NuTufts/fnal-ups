@@ -1,0 +1,9 @@
+FILE = TABLE
+PRODUCT = lassie
+
+FLAVOR = NULL
+QUALIFIERS = ""
+
+ACTION=SETUP
+      source(db2)
+

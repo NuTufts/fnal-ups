@@ -1,0 +1,4 @@
+0:lassie v1_0 -f NULL:dodefaults()
+   1:spot v1_0 -f NULL:dodefaults()
+   1:spot v1_0 -f NULL:sourcerequired( spot_v1_0 )
+0:lassie v1_0 -f NULL:sourcerequired( lassie_v1_0 )

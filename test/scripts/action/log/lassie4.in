@@ -1,0 +1,3 @@
+0:lassie v4_0 -f NULL:dodefaults()
+   1:spot v3_0 -f NULL:sourcerequired( spot_v2_0 )
+0:lassie v4_0 -f NULL:sourcerequired( lassie_v4_0 )
