@@ -65,6 +65,7 @@ extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
 int g_simulate;
+static mode_t g_umask = 0;
 
 /*
  * Declaration of private functions.
@@ -87,6 +88,7 @@ int main(int argc, char *argv[])
   int i = e_setup, temp_shell = UPS_INVALID_SHELL;
   int rstatus = 0;              /* assume success */
   t_upslst_item *mproduct_list  = NULL;
+  mode_t old_umask;
 
   if (argv[1] && (strcmp(argv[1],"-?"))) {
     /* Figure out which command was entered */
@@ -127,12 +129,17 @@ int main(int argc, char *argv[])
 	if (! temp_file ) {                /* only open it once. */
 	  /* let the system get me a buffer */
 	  if ((g_temp_file_name = tmpnam(NULL)) != NULL) {
+	    /* See if we can open the file (rw) to write to. */
+	    old_umask = umask(g_umask);
+
 	    if ((temp_file = fopen(g_temp_file_name,"w")) == NULL) {
 	      /* error in open */
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
 			 strerror(errno));
 	      upserr_add(UPS_OPEN_FILE, UPS_FATAL, g_temp_file_name);
 	    }
+	    /* set this back to what it was */
+	    (void )umask(old_umask);
 	  } else {
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam", strerror(errno));
 	  }

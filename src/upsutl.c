@@ -109,8 +109,9 @@ static mode_t g_umask = 0;
 void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 		      const int a_command_index, const int a_simulate_flag)
 {
-  int empty_stream;
+  int empty_stream = 0;
   t_upsugo_command command_line;
+  mode_t mode = 0777;   /* rwx by owner and group */
 
   /* we will need the shell information when we call upsutl_remall from within
      upsutl_finish_temp_file */
@@ -177,14 +178,21 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	    /* simulation only, print the file name */
 	    (void )printf("%s\n", g_temp_file_name);
 	  } else {	
-	    if (system(g_temp_file_name) <= 0) {
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
+	    /* make sure the file is executable */
+	    if (! chmod(g_temp_file_name, mode)) {
+	      if (system(g_temp_file_name) < 0) {
+		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
+			   strerror(errno));
+		KEEP_OR_REMOVE_FILE();
+	      } else {
+		/* flush the journaling cache of files so the changes made
+		   internally are actually written out to disk */
+		upsfil_flush();
+	      }
+	    } else {
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "chmod",
 			 strerror(errno));
 	      KEEP_OR_REMOVE_FILE();
-	    } else {
-	      /* flush the journaling cache of files so the changes made
-		 internally are actually written out to disk */
-	      upsfil_flush();
 	    }
 	  }
 	}
