@@ -330,7 +330,7 @@ char * upsugo_getarg( const int , char **,char ** const );
 int upsugo_rearg(const int ,char **,int * const,char **);
 int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
-int upsugo_setfixed(struct ups_command * const uc);
+void upsugo_setfixed(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
 int upsugo_blddb(struct ups_command * const uc, char * inaddr);
 void upsugo_prtdb(t_upslst_item * const list_ptr,char * const title,const unsigned int,FILE * const fd);
@@ -388,7 +388,7 @@ if (!uc->ugo_H)
 ** ROUTINE	upsugo_setfixed()
 **
 */
-int upsugo_setfixed(struct ups_command * const uc)
+void upsugo_setfixed(struct ups_command * const uc)
 {
    char   * SHELL;                           /* SHELL value */
    static int shell=e_INVALID_SHELL;
@@ -780,7 +780,7 @@ int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *
 			lcv_new;
 	size_t		str_length = 0;
 	char		*temp;
-	unsigned char	*string;
+	char	*string;
 
         string = (char *) malloc(sizeof(char *));
         string = ",";
