@@ -390,10 +390,6 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
 		  /* we found the same instance already in the file */
 		  inst_already_there = 1;
 		  break;
-		} else {
-		  /* must handle the case where the instance in the file has
-		     flavor or qualifiers = "*" */
-		  /*?????*/
 		}
 	      }
 	      if (! inst_already_there) {
