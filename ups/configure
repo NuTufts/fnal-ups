@@ -749,14 +749,14 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	    set Full_Flavor="\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ ]*\\).*/\\1/'\`"
 
 	else
-	    setenv MACH_OS \`uname -s\`
+	    setenv MACH_OS "\`uname -s\`"
 	    set mach=\`echo \$MACH_OS|cut -c1-4\`
 	    if ( \$mach == IRIX ) setenv MACH_OS IRIX
 	    if ( \$mach == CYGW ) setenv MACH_OS CYGWIN32_NT
-	    set Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
-	    if ( \$MACH_OS == AIX ) set Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
-	    if ( \$MACH_OS == Linux ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`
-	    if ( \$MACH_OS == CYGWIN32_NT ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	    set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`'.'\`uname -v|sed -e 's/[ ()].*//'\`
+	    if ( "\$MACH_OS" == AIX ) set Full_Flavor="\$MACH_OS"'+'\`uname -v\`'.'\`uname -r\`
+	    if ( "\$MACH_OS" == Linux ) set Full_Flavor="\$MACH_OS"'+'\`uname -r\`
+	    if ( "\$MACH_OS" == CYGWIN32_NT ) set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`
 	endif
 
 	#======================================================================
@@ -831,7 +831,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	# a usable UPS_DIR.
 	#======================================================================
 	if ( \$?PRODUCTS && ! \$?UPS_DIR ) then
-	    foreach fl ( \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor \$MACH_OS NULL )
+	    foreach fl ( \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor "\$MACH_OS" NULL )
 	        if ( -f \${Setups_Home}/set\${Name_Of_Ups}.cache.\${fl} ) then
 		    eval setenv UPS_DIR \`\$cat \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}|\$grep -v '^#'\`
 	            if ( \$?UPS_DIR ) then
@@ -1031,23 +1031,23 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	    Full_Flavor=\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ ]*\\).*/\\1/'\`
 
 	else
-	    if test \`echo \$MACH_OS|cut -c1-4\` = IRIX
+	    if test "\`echo \$MACH_OS|cut -c1-4\`" = IRIX
 	    then
 		MACH_OS=IRIX
 	    fi
-	    if test \`echo \$MACH_OS|cut -c1-4\` = CYGW
+	    if test "\`echo \$MACH_OS|cut -c1-4\`" = CYGW
 	    then
 		MACH_OS=CYGWIN32_NT
 	    fi
 	    export MACH_OS
-	    Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
-	    if test \$MACH_OS = AIX
+	    Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`'.'\`uname -v|sed -e 's/[ ()].*//'\`
+	    if test "\$MACH_OS" = AIX
 	    then
-		Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
+		Full_Flavor="\$MACH_OS"'+'\`uname -v\`'.'\`uname -r\`
 	    fi
-	    if test \$MACH_OS = Linux -o $MACH_OS = CYGWIN32_NT
+	    if test "\$MACH_OS" = Linux -o $MACH_OS = CYGWIN32_NT
 	    then
-		Full_Flavor=\$MACH_OS'+'\`uname -r\`
+		Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`
 	    fi
 	fi
 	for level in 2 3 4 5 6 7 8 9
@@ -1121,7 +1121,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	#======================================================================
 	if test x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a x\$UPS_DIR = x
 	then
-	    for fl in \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor \$MACH_OS NULL
+	    for fl in \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor "\$MACH_OS" NULL
 	    do
 	        if test -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}
 	        then
@@ -1281,19 +1281,19 @@ for Start_Or_Stop in startup shutdown
                                               
 	Node=\`uname -n|cut -f1 -d'.'\`               
                                               
-	MACH_OS=\`uname -s\`                          
-	if test \`echo \$MACH_OS|cut -c1-4\` = IRIX    
+	MACH_OS="\`uname -s\`"
+	if test "\`echo \$MACH_OS|cut -c1-4\`" = IRIX    
 	then                                          
 	    MACH_OS=IRIX                              
 	fi                                            
-	Full_Flavor=\$MACH_OS'+'\`uname -r\`
-	if test \$MACH_OS = AIX
+	Full_Flavor="\$MACH_OS"'+'\`uname -r\`
+	if test "\$MACH_OS" = AIX
 	then
-	    Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
+	    Full_Flavor="\$MACH_OS"'+'\`uname -v\`'.'\`uname -r\`
 	fi
-	if test \$MACH_OS = Linux
+	if test "\$MACH_OS" = Linux
 	then
-	    Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	    Full_Flavor="\$MACH_OS"'+'\`uname -r\`
 	fi
 	for level in 2 3 4 5 6 7 8 9
 	do
@@ -1328,7 +1328,7 @@ for Start_Or_Stop in startup shutdown
 	#======================================================================
 	# execute the appropriate node.products or flavor.products file
 	#======================================================================
-	    for fl in \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor \$MACH_OS
+	    for fl in \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor "\$MACH_OS"
 	    do
 		if test -f \$starts_dir/\$fl.products
 		then
@@ -1448,18 +1448,18 @@ $sed 's%^	%%' <<XEoF > $BootStrap_Dir/${Script_Prefix}.common
 	# Determine a likely flavor to search for.  The actual search 
 	# should find something useful on this platform.
 	#======================================================================
-	MACH_OS=\`uname -s\`
-	if test \`echo \$MACH_OS|cut -c1-4\` = IRIX
+	MACH_OS="\`uname -s\`"
+	if test "\`echo \$MACH_OS|cut -c1-4\`" = IRIX
 	then
 	    MACH_OS=IRIX
 	fi
 	export MACH_OS
 	r=\`uname -r|cut -f1 -d'.'\`
-	if test \$MACH_OS = AIX
+	if test "\$MACH_OS" = AIX
 	then
 	    r=\`uname -v\`
 	fi
-	if test \$MACH_OS = HP-UX
+	if test "\$MACH_OS" = HP-UX
 	then
 	    r=\`uname -v|cut -f2 -d'.'\`
 	fi
@@ -1533,7 +1533,7 @@ $sed 's%^	%%' <<XEoF > $BootStrap_Dir/${Script_Prefix}.common
 			fi
 			if test x\${VERSION} != x -a x\${FLAVOR} != x
 			then
-			    if test \$FLAVOR = \$Flavor_Wanted -o \$FLAVOR = \$MACH_OS
+			    if test "\$FLAVOR" = "\$Flavor_Wanted" -o "\$FLAVOR" = "\$MACH_OS"
 			    then
 				Ups_Version_File=\${VERSION}.version
 				Ups_Flavor=\$FLAVOR
