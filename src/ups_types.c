@@ -38,7 +38,7 @@
 /*
  * Declaration of private functions
  */
-static int all_gone( void *ptr );
+static int all_gone( const void * const ptr );
 
 /*
  * Definition of public functions
@@ -71,7 +71,7 @@ t_ups_product *ups_new_product( void )
  * Output: none
  * Return: int, 0 on failer else 1.
  */
-int ups_free_product( t_ups_product *prod_ptr )
+int ups_free_product( t_ups_product * const prod_ptr )
 {
   t_upslst_item *l_ptr;
   void *inst_ptr;
@@ -123,7 +123,7 @@ t_ups_instance *ups_new_instance( void )
  * Output: none
  * Return: int, 0 on failer else 1.
  */
-int ups_free_instance( t_ups_instance *inst_ptr )
+int ups_free_instance( t_ups_instance * const inst_ptr )
 {
   t_upslst_item *l_ptr;
   void *act_ptr;
@@ -191,7 +191,7 @@ t_ups_action *ups_new_action( void )
  * Output: none
  * Return: int, 0 on failer else 1.
  */
-int ups_free_action( t_ups_action *act_ptr )
+int ups_free_action( t_ups_action * const act_ptr )
 {
   if ( !act_ptr ) return 0;
 
@@ -209,7 +209,7 @@ int ups_free_action( t_ups_action *act_ptr )
  * Definition of private functions
  */
 
-int all_gone( void *ptr )
+int all_gone( const void * const ptr )
 {
   return ( upsmem_get_refctr( ptr ) <= 0 );
 }

@@ -163,11 +163,11 @@ typedef struct ups_command
  * Declaration of public functions.
  */
 t_ups_product     *ups_new_product( void );
-int               ups_free_product( t_ups_product *prod_ptr );
+int               ups_free_product( t_ups_product * const prod_ptr );
 t_ups_instance    *ups_new_instance( void );
-int               ups_free_instance( t_ups_instance *inst_ptr );
+int               ups_free_instance( t_ups_instance * const inst_ptr );
 t_ups_action      *ups_new_action( void );
-int               ups_free_action( t_ups_action *act_ptr );
+int               ups_free_action( t_ups_action * const act_ptr );
 
 t_ups_command     *upsugo_next(const int ups_argc,const char *ups_argv[],const char *validopts);
 
