@@ -29,7 +29,7 @@
 #include <stdlib.h>
 
 /* ups specific include files */
-#include "../inc/ups_list.h"
+#include "ups_list.h"
 
 /*
  * Definition of public variables.
@@ -184,7 +184,7 @@ t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr )
  * upslst_delete
  *
  * Will delete item from list.
- * If option 'd' is passed the data elements are also freed.
+ * If option 'd' is passed the data element are also freed.
  *
  * Input : t_upslst_item *, pointer to a list
  *         void *, data element of item to be deletet.
@@ -267,12 +267,3 @@ t_upslst_item *upslst_last( t_upslst_item *list_ptr )
 /*
  * Definition of private functions.
  */
-
-
-
-
-
-
-
-
-

@@ -23,11 +23,12 @@
 
 /* standard include files */
 #include <stdlib.h>
+#include <string.h>                       /* for memset */
 
 /* ups specific include files */
-#include "../inc/ups_types.h"
-#include "../inc/ups_memory.h"
-#include "../inc/ups_list.h"
+#include "ups_types.h"
+#include "ups_memory.h"
+#include "ups_list.h"
 
 /*
  * Definition of public variables
