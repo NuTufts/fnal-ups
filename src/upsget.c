@@ -99,7 +99,8 @@
 }
 
 
-typedef char * (*var_func)(const t_upstyp_matched_instance * const instance,
+typedef char * (*var_func)(const t_upstyp_matched_product * const product,
+                           const t_upstyp_matched_instance * const instance,
                            const t_upsugo_command * const command_line );
 
 typedef struct s_var_sub {
@@ -158,7 +159,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
     for ( idx=0; g_var_subs[idx].string!=0; idx++) 
     { if (!strcmp(g_var_subs[idx].string,upto)) 
       { if (g_var_subs[idx].func)
-        {  value=g_var_subs[idx].func(instance,command_line);
+        {  value=g_var_subs[idx].func(product,instance,command_line);
            if(value) strcat(newstr,value);
         }
         found=1;
@@ -177,37 +178,43 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   }
 }
 
-char *upsget_prod_dir(const t_upstyp_matched_instance * const instance,
+char *upsget_prod_dir(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,prod_dir);
   return string;
 }
-char *upsget_product(const t_upstyp_matched_instance * const instance,
+char *upsget_product(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,product);
   return string;
 }
-char *upsget_version(const t_upstyp_matched_instance * const instance,
+char *upsget_version(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,version);
   return string;
 }
-char *upsget_flavor(const t_upstyp_matched_instance * const instance,
+char *upsget_flavor(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,flavor);
   return string;
 }
-char *upsget_qualifiers(const t_upstyp_matched_instance * const instance,
+char *upsget_qualifiers(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,qualifiers);
   return string;
 }
-char *upsget_shell(const t_upstyp_matched_instance * const instance,
+char *upsget_shell(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { 
   if (command_line->ugo_shell != e_INVALID_SHELL )
@@ -218,7 +225,8 @@ char *upsget_shell(const t_upstyp_matched_instance * const instance,
     }
   }
 }
-char *upsget_verbose(const t_upstyp_matched_instance * const instance,
+char *upsget_verbose(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char string[2];
   if (command_line->ugo_v)
@@ -227,7 +235,8 @@ char *upsget_verbose(const t_upstyp_matched_instance * const instance,
     sprintf(string,"");
   } return string;
 }
-char *upsget_options(const t_upstyp_matched_instance * const instance,
+char *upsget_options(const t_upstyp_matched_product * const product,
+                      const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { if (command_line->ugo_O)
   { return command_line->ugo_options;
