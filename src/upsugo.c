@@ -177,38 +177,32 @@
          uc->ugo_number = 4; \
          break;
 #define add_chain(CHAIN) \
-         addr=upsutl_str_create("current",' ');          \
-         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
-         uc->ugo_chain = upslst_first(uc->ugo_chain);
-
+         addr=upsutl_str_create(CHAIN,' ');              \
+         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); 
 #define case_c \
          case 'c':             \
          uc->ugo_c = 1;        \
          add_chain("current"); \
          break;
 #define case_d \
-         case 'd':                                       \
-         uc->ugo_d = 1;                                  \
-         addr=upsutl_str_create("development",' ');      \
-         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         case 'd':                 \
+         uc->ugo_d = 1;            \
+         add_chain("development"); \
          break;
 #define case_n \
-         case 'n':                                       \
-         uc->ugo_n = 1;                                  \
-         addr=upsutl_str_create("new",' ');              \
-         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         case 'n':         \
+         uc->ugo_n = 1;    \
+         add_chain("new"); \
          break;
 #define case_t \
-         case 't':                                       \
-         uc->ugo_t = 1;                                  \
-         addr=upsutl_str_create("test",' ');             \
-         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         case 't':          \
+         uc->ugo_t = 1;     \
+         add_chain("test"); \
          break;
 #define case_o \
-         case 'o':                                       \
-         uc->ugo_o = 1;                                  \
-         addr=upsutl_str_create("old",' ');              \
-         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         case 'o':         \
+         uc->ugo_o = 1;    \
+         add_chain("old"); \
          break;
 #define set_value( ELEMENT , ARG )                                         \
 {                                                                          \
@@ -516,9 +510,8 @@ int upsugo_ifornota(struct ups_command * const uc)
    }
    if (uc->ugo_a)                           /* did the user specify -a */
    { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
-     { addr=upsutl_str_create("*",' ');
-       upsver_mes(3,"%sNo chain specified set to %s\n",UPSUGO,addr); 
-       uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+     { upsver_mes(3,"%sNo chain specified set to *\n",UPSUGO); 
+       add_chain("*")
      }
      if (!uc->ugo_qualifiers) 
      { addr=upsutl_str_create("*",' ');
@@ -548,9 +541,8 @@ int upsugo_ifornota(struct ups_command * const uc)
      }
    } else {                         /* not -a but give defaults */
      if (!uc->ugo_chain && !uc->ugo_version)
-     { addr=upsutl_str_create("current",' ');
-       upsver_mes(3,"%sNo (-a) Adding chain %s\n",UPSUGO,addr); 
-       uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+     { upsver_mes(3,"%sNo (-a) Adding chain current\n",UPSUGO,addr); 
+       add_chain("current");
      }
      if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
      { addr=upsutl_str_create("",' ');
@@ -801,6 +793,8 @@ void upsugo_liststart(t_upsugo_command * const a_command_line)
 {
   /* move all lists in the command line to their first element.  there
      may be a better way to do this, maybe dave can take a look at it */
+/* leaving this alone could do it as I add but then I may do a LOT of 
+   upslst_first might as well do it once here                         */
   a_command_line->ugo_auth = upslst_first(a_command_line->ugo_auth);
   a_command_line->ugo_flavor = upslst_first(a_command_line->ugo_flavor);
   a_command_line->ugo_host = upslst_first(a_command_line->ugo_host);
@@ -1391,14 +1385,12 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
   if ( ugo_commands ) { /* subsequent call */ 
      /* dealloc your brain out */ 
      upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
-/* lint says it wasn't free, but there is NOTHING you can do about it*/
-     last_command=ugo_commands;      /* need pointer to drop & remove struct */
-     if (( ugo_commands=ugo_commands->next )!=0) {
-        upslst_delete( last_command, last_command->data, 'd');
-        luc = ugo_commands->data;
+     ugo_commands=upslst_delete(ugo_commands,ugo_commands->data, 'd');
+     if (ugo_commands && ugo_commands->data) /* && data needed? */
+     {  luc = ugo_commands->data;
         upsugo_setfixed(luc);
         UPS_VERBOSE = luc->ugo_v;
-	upsugo_liststart(luc);       /* move all lists to first element */
+	upsugo_liststart(luc);  /* move all lists to first element */
         return (t_upsugo_command *)ugo_commands->data; 
      } else {
         return 0;
