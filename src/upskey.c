@@ -86,14 +86,15 @@ static t_upskey_map g_key_map[] =
   { 20, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
   { 21, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
   { 22, "INFO_PATH",        NO,   NO,    5, 0x00001000 },
-  { 23, "HTML_PATH",        NO,   NO,    6, 0x00001000 },
+  { 23, "NEWS_PATH",        NO,   NO,    6, 0x00001000 },
+  { 24, "HTML_PATH",        NO,   NO,    7, 0x00001000 },
   
 
-  { 24, "GROUP:",           NO,   NO,   NO, 0x00000010 },
-  { 25, "COMMON:",          NO,   NO,   NO, 0x00000010 },
-  { 26, "END:",             NO,   NO,   NO, 0x00000010 },
+  { 25, "GROUP:",           NO,   NO,   NO, 0x00000010 },
+  { 26, "COMMON:",          NO,   NO,   NO, 0x00000010 },
+  { 27, "END:",             NO,   NO,   NO, 0x00000010 },
 
-  { 27,0,0,0,0 },
+  { 28,0,0,0,0 },
 };
 
 /*
