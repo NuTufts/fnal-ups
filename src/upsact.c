@@ -3876,7 +3876,7 @@ static void f_sourceoptcheck( ACTION_PARAMS)
 
 static void f_writecompilescript(ACTION_PARAMS)
 {
-  t_upstyp_matched_product *mproduct;
+  t_upstyp_matched_product *mproduct = 0;
   t_upslst_item *cmd_list = NULL;
   char *time_ptr;
   int moved_to_old = 0, moved_to_timedate = 0;
@@ -3987,7 +3987,7 @@ static void f_writecompilescript(ACTION_PARAMS)
     }
 
     /* release any memory we acquired */
-    if (mproduct->minst_list) {
+    if (mproduct && mproduct->minst_list) {
       (void )upslst_free(mproduct->minst_list, ' ');
       upsmem_free(mproduct);
       upsmem_dec_refctr(a_db_info);
