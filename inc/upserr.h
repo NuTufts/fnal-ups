@@ -79,8 +79,9 @@
 #define UPS_ACTION_PARSE        36
 #define UPS_UNSETUP_CLASH       37
 #define UPS_NO_ACTION           38
-#define UPS_INVALID_SPECIFICATION 39 
-#define UPS_NERR                40      /*  this one must always be last */
+#define UPS_NO_NEW_INSTANCE     39
+#define UPS_INVALID_SPECIFICATION 40 
+#define UPS_NERR                41      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
