@@ -60,30 +60,30 @@
  */
 static t_upskey_map g_key_map[] =
 {
-  {  0, "FILE",             0,    NO,   0x1111 },
-  {  1, "PRODUCT",          1,     0,   0x0111 },
-  {  2, "VERSION",          2,     1,   0x0111 }, 
-  {  3, "CHAIN",            3,     4,   0x0110 },
-  {  4, "UPS_DB_VERSION",   4,    NO,   0x1111 },
-  {  5, "FLAVOR",           NO,    2,   0x0111 },
-  {  6, "QUALIFIERS",       NO,    3,   0x0111 },
-  {  7, "DECLARER",         NO,    5,   0x0101 },
-  {  8, "DECLARED",         NO,    6,   0x0101 },
-  {  9, "PROD_DIR",         NO,    7,   0x0001 },
-  { 10, "UPS_DIR",          NO,    8,   0x0001 },
-  { 11, "TABLE_DIR",        NO,    9,   0x0001 },
-  { 12, "TABLE_FILE",       NO,   10,   0x0001 },
-  { 13, "ARCHIVE_FILE",     NO,   11,   0x0001 },
-  { 14, "AUTHORIZED_NODES", NO,   12,   0x1001 },
-  { 15, "DESCRIPTION",      NO,   13,   0x0100 },
-  { 16, "STATISTICS",       NO,   14,   0x1001 },
-  { 17, "DB_DIR",           NO,   15,   0x0000 },
-  { 18, "ACTION",           NO,   16,   0x0010 },
-  { 19, "UNKNOWN",          NO,   17,   0x0011 },
+  {  0, "FILE",             0,    NO,   0x00001111 },
+  {  1, "PRODUCT",          1,     0,   0x00000111 },
+  {  2, "VERSION",          2,     1,   0x00000111 }, 
+  {  3, "CHAIN",            3,     4,   0x00000110 },
+  {  4, "UPS_DB_VERSION",   4,    NO,   0x00001111 },
+  {  5, "FLAVOR",           NO,    2,   0x00000111 },
+  {  6, "QUALIFIERS",       NO,    3,   0x00000111 },
+  {  7, "DECLARER",         NO,    5,   0x00000101 },
+  {  8, "DECLARED",         NO,    6,   0x00000101 },
+  {  9, "PROD_DIR",         NO,    7,   0x00000001 },
+  { 10, "UPS_DIR",          NO,    8,   0x00000001 },
+  { 11, "TABLE_DIR",        NO,    9,   0x00000001 },
+  { 12, "TABLE_FILE",       NO,   10,   0x00000001 },
+  { 13, "ARCHIVE_FILE",     NO,   11,   0x00000001 },
+  { 14, "AUTHORIZED_NODES", NO,   12,   0x00001001 },
+  { 15, "DESCRIPTION",      NO,   13,   0x00000100 },
+  { 16, "STATISTICS",       NO,   14,   0x00001001 },
+  { 17, "DB_DIR",           NO,   15,   0x00000000 },
+  { 18, "ACTION",           NO,   16,   0x00000010 },
+  { 19, "UNKNOWN",          NO,   17,   0x00000011 },
 
-  { 20, "GROUP:",           NO,   NO,   0x0010 },
-  { 21, "COMMON:",          NO,   NO,   0x0010 },
-  { 22, "END:",             NO,   NO,   0x0010 },
+  { 20, "GROUP:",           NO,   NO,   0x00000010 },
+  { 21, "COMMON:",          NO,   NO,   0x00000010 },
+  { 22, "END:",             NO,   NO,   0x00000010 },
 
   { 23,0,0,0,0 },
 };
@@ -150,7 +150,7 @@ char *upskey_inst_setval( t_ups_instance * const inst,
 {
   t_upskey_map *key = upskey_get_map( skey );
   if ( key && key->i_index != NO ) {
-    char *new_val = (char *)upsmem_malloc( strlen( sval ) + 1 );
+    char *new_val = (char *)upsmem_malloc( (int)strlen( sval ) + 1 );
     strcpy( new_val, sval );
     return ( UPSKEY_INST2ARR( inst )[key->i_index] = new_val );
   }
@@ -206,7 +206,7 @@ char *upskey_prod_setval( t_ups_product * const prod,
 {
   t_upskey_map *key = upskey_get_map( skey );
   if ( key && key->p_index != NO ) {
-    char *new_val = (char *)upsmem_malloc( strlen( sval ) + 1 );
+    char *new_val = (char *)upsmem_malloc( (int)strlen( sval ) + 1 );
     strcpy( new_val, sval );
     return ( UPSKEY_PROD2ARR( prod )[key->p_index] = new_val );
   }
