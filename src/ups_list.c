@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_c_list.c
+ *       ups_list.c
  * 
  * DESCRIPTION: 
  *       This is the 'ups list' command.
