@@ -268,8 +268,10 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
      
 void upsfil_flush( void )
 {
+  /*
   printf( "total calls = %d, cache calls = %d\n", g_call_count, g_call_cache_count );
   upstbl_dump( g_ft );
+  */
 }
 
 
