@@ -44,6 +44,7 @@
 #include <sys/utsname.h>
 
 #include "ups_types.h"
+#include "ups_error.h"
 #include "ups_memory.h"
 
 #ifdef UPS_ID
@@ -282,8 +283,8 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    { my_argc=+1; 
      if(*arg_str == '-')      /* is it an option */
      { if (!strchr(validopts,*(arg_str+1))) { 
-          fprintf(stderr,"invalid option %s specified\n",arg_str+1); 
-          errflg=1;
+          upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, arg_str+1);
+/*          errflg=1; */
        }
        add_ver=0;
        switch(*(arg_str+1))      /* which flag was specified */
@@ -386,7 +387,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
-                 { errflg = 1;
+                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "g" );
                    break;
                  }
                  while((loc=strchr(arg_str,','))!=0) {
@@ -419,7 +420,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
-                 { errflg = 1;
+                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "f" );
                    break;
                  }
                  while((loc=strchr(arg_str,','))!=0) {
@@ -452,7 +453,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
-                 { errflg = 1;
+                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "h" );
                    break;
                  }
                  while((loc=strchr(arg_str,','))!=0) {
@@ -485,7 +486,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
-                 { errflg = 1;
+                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "K" );
                    break;
                  }
                  while((loc=strchr(arg_str,','))!=0) {
@@ -510,7 +511,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "m" );
                   break;
                 }
 		uc->ugo_tablefiledir = arg_str;
@@ -527,7 +528,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "M" );
                   break;
                 }
 		uc->ugo_tablefile = arg_str;
@@ -544,7 +545,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "N" );
                   break;
                 }
 		uc->ugo_anyfile = arg_str;
@@ -561,7 +562,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "O" );
                   break;
                 }
 		uc->ugo_options = arg_str;
@@ -578,7 +579,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "P" );
                   break;
                 }
 		uc->ugo_override = arg_str;
@@ -598,7 +599,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
-                 { errflg = 1;
+                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" );
                    break;
                  }
                     addr=str_create(arg_str);
@@ -618,7 +619,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "r" );
                   break;
                 }
 		uc->ugo_productdir = arg_str;
@@ -635,7 +636,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "T" );
                   break;
                 }
 		uc->ugo_archivefile = arg_str;
@@ -652,7 +653,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
               { if(*arg_str == '-')
-                { errflg = 1;
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "U" );
                   break;
                 }
 		uc->ugo_upsdir = arg_str;
@@ -677,7 +678,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
-                 { errflg = 1;
+                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "A" );
                    break;
                  }
                  while((loc=strchr(arg_str,','))!=0) {
@@ -710,7 +711,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
-                 { errflg = 1;
+                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "z" );
                    break;
                  }
                  while((loc=strchr(arg_str,','))!=0) {
@@ -779,8 +780,8 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
        }
      }
    }
-   if ((errflg ))
-   {   fprintf(stderr, "Valid options are %s\n",validopts); }
+/*    if ((errflg ))
+   {   fprintf(stderr, "Valid options are %s\n",validopts); } */
    ugo_commands=upslst_first(ugo_commands);
    return (t_ups_command *)ugo_commands->data; 
    } /* not subsequent call ... */
