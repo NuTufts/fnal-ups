@@ -17,41 +17,37 @@
  * MODIFICATIONS:
  *       22-jul-1997, LR, first, very preliminary
  *       25-jul-1997, DjF, added command line inputs
+ *       29-jul-1997, LR, New 'unified' t_ups_instance structure.
+ *                        Added function declarations for creating
+ *                        and destroying common types.
  *
  ***********************************************************************/
 
 #ifndef _UPS_TYPES_H_
 #define _UPS_TYPES_H_
 
-/*-----------------------------------------------------------------------
+/*
  * Standard include files, if needed for .h file
  */
 
-/*-----------------------------------------------------------------------
+/*
  * ups specific include files, if needed for .h file
  */
 #include "ups_list.h"
 
-/*-----------------------------------------------------------------------
+/*
  * Public typdef's
  */
 
-/* a 'full' product, not sure if that need to be public */
+/* a ups file, chaver will be chain name if file == CHAIN, else version */
 typedef struct ups_product
-{
-  char             *name;
-  t_ups_list_item  *instance_list;
-  t_ups_list_item  *chain_list;
-  t_ups_list_item  *action_list;
-} t_ups_product;
-
-/* a desciptor for an ups file, chaver can be product version or chain name */
-typedef struct ups_file_desc
 {
   char             *file;
   char             *product;
   char             *chaver;
-} t_ups_file_desc;
+  
+  t_upslst_item    *instance_list;
+} t_ups_product;
 
 /* a product instance */
 typedef struct ups_instance
@@ -61,6 +57,10 @@ typedef struct ups_instance
   char             *flavor;
   char             *qualifiers;
   
+  char             *chain;
+  char             *chain_declarer;
+  char             *chain_declared;
+  
   char             *declarer;
   char             *declared;
   char             *prod_dir;
@@ -69,34 +69,18 @@ typedef struct ups_instance
   char             *table_file;
   char             *archive_file;
   char             *authorized_nodes;
-  char             *description;
-  t_ups_list_item  *unknown;
+  char             *description;  
+  t_upslst_item    *unknown_list;
+  
+  t_upslst_item    *action_list;
+
 } t_ups_instance;
-
-/* a chain */
-typedef struct ups_chain
-{
-  char             *chain;
-  char             *prod_name;
-  char             *prod_version;
-  char             *prod_qualifiers;
-  char             *declarer;
-  char             *declared;
-
-  t_ups_instance   *instance;
-} t_ups_chain;
 
 /* an action */
 typedef struct ups_action
 {
   char             *action;
-  char             *prod_name;
-  char             *prod_version;
-  char             *prod_qualifiers;
-    
-  t_ups_list_item  *command_list;
-
-  t_ups_instance   *instance;
+  t_upslst_item    *command_list;
 } t_ups_action;
 
 /* Inputs from the command line */
@@ -106,8 +90,8 @@ typedef struct ups_command
     char    *ugo_version;     
     int     ugo_a;           /* All include                          */
     int     ugo_A;           /* Authorized Host(s)                   */
-    t_ups_list_item *ugo_auth_first;
-    t_ups_list_item *ugo_auth_last;
+    t_upslst_item *ugo_auth_first;
+    t_upslst_item *ugo_auth_last;
 /*  int     ugo_b;           UNDEFINED                               */
     int     ugo_B;           /* CODE INCOMPLETE                      */
     int     ugo_c;           /* current specified                    */
@@ -117,21 +101,21 @@ typedef struct ups_command
     int     ugo_e;           /* Define ups_extended                  */
     int     ugo_E;           /* Run Editor                           */
     int     ugo_f;           /* Flavor(s) specified                  */
-    t_ups_list_item *ugo_flavor_first;
-    t_ups_list_item *ugo_flavor_last;
+    t_upslst_item *ugo_flavor_first;
+    t_upslst_item *ugo_flavor_last;
     int     ugo_F;           /* Return list of files not in product  */
 /*  int     ugo_G;           UNDEFINED                               */
     int     ugo_g;           /* Did they request a "special" chain?  */
     int     ugo_h;           /* Host(s) specified                    */
-    t_ups_list_item *ugo_host_first;
-    t_ups_list_item *ugo_host_last;
+    t_upslst_item *ugo_host_first;
+    t_upslst_item *ugo_host_last;
 /*  int     ugo_H;           UNDEFINED                               */
     int     ugo_j;           /* applies to top level product         */
 /*  int     ugo_J;           UNDEFINED                               */
     int     ugo_k;           /* Don't do unsetup first               */
     int     ugo_K;           /* Keywords                             */
-    t_ups_list_item *ugo_key_first;
-    t_ups_list_item *ugo_key_last;
+    t_upslst_item *ugo_key_first;
+    t_upslst_item *ugo_key_last;
     int     ugo_l;           /* long (listing)                       */
 /*  int     ugo_L;           UNDEFINED                               */
     int     ugo_m;           /* Table file directory                 */
@@ -169,15 +153,24 @@ typedef struct ups_command
     int     ugo_y;           /* delete home dir, no query            */
     int     ugo_Y;           /* delete home dir, query               */
     int     ugo_z;           /* Database(s) were specified           */
-    t_ups_list_item *ugo_db_first;
-    t_ups_list_item *ugo_db_last;
+    t_upslst_item *ugo_db_first;
+    t_upslst_item *ugo_db_last;
     int     ugo_Z;           /* Time this command                    */
 /* these are associated with n,o,d,c,t,and g chains                  */
-    t_ups_list_item *ugo_chain_first;
-    t_ups_list_item *ugo_chain_last;
-
+    t_upslst_item *ugo_chain_first;
+    t_upslst_item *ugo_chain_last;
 } t_ups_command;
 
-t_ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts);
+/*
+ * Declaration of public functions.
+ */
+t_ups_product     *ups_new_product( void );
+int               ups_free_product( t_ups_product *prod_ptr );
+t_ups_instance    *ups_new_instance( void );
+int               ups_free_instance( t_ups_instance *inst_ptr );
+t_ups_action      *ups_new_action( void );
+int               ups_free_action( t_ups_action *act_ptr );
+
+t_ups_command     *upsugo_next(int ups_argc,char *ups_argv[],char *validopts);
 
 #endif /* _UPS_TYPES_H_ */
