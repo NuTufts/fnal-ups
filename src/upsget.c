@@ -155,11 +155,12 @@ void upsget_envout(const FILE * const stream,
                     const t_upsugo_command * const command_line )
 { char *name;
   get_element(name,product);
+  name = upsutl_upcase( name );
   if (command_line->ugo_shell == e_BOURNE )
   { fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n#\n",
     name,upsget_envstr(db,instance,command_line),name);
   } else {
-    fprintf((FILE *)stream,"setenv SETUP_%s=\"%s\"\n#\n",
+    fprintf((FILE *)stream,"setenv SETUP_%s \"%s\"\n#\n",
     name,upsget_envstr(db,instance,command_line));
   }
 }
