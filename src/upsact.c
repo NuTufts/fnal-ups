@@ -3021,7 +3021,7 @@ static void f_pathset( ACTION_PARAMS)
   }
 }
 
-#define g_SHPARAM "$@"
+#define g_SHPARAM "\"$@\""
 #define g_ACTPARAM "%s"
 #define g_CSHPARAM "\\!*" /* DjF added another \ need \ too! */
 

@@ -82,7 +82,7 @@ products="../db1";export products
 #
 ups_compile="";export ups_compile
 #
-rambo () { SlyStalone $@ ;}
+rambo () { SlyStalone "$@" ;}
 #
 unset rambo
 
