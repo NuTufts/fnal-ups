@@ -1409,7 +1409,11 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          if ( !uc->ugo_product ) 
          { uc->ugo_product = addr;
          } else { 
-           uc->ugo_version = addr ;
+           if ( !uc->ugo_version )
+           { uc->ugo_version = addr ;
+           } else { 
+             upserr_add(UPS_INVALID_ARGUMENT,UPS_FATAL,addr);
+           }
          } 
        }
      }

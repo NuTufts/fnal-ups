@@ -172,8 +172,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
    mproduct_list = upsmat_instance(uc, db_list , not_unique);
    if (UPS_ERROR != UPS_SUCCESS) 
    { return 0; 
-   }
-   /* if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); } */
+   } 
+/*   if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); }  */
    if (mproduct_list)    /* the product does exist */ 
    { upsver_mes(1,"Product %s currently exist in database %s\n",
                 uc->ugo_product,
@@ -295,6 +295,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          }
          /* build new chain instance */
          new_cinst=ups_new_instance();
+         new_cinst->product=upsutl_str_create( uc->ugo_product, ' ' );
          new_cinst->version=upsutl_str_create(save_version,' ');
          the_flavor=save_flavor->data;
          new_cinst->flavor=upsutl_str_create(the_flavor,' ');
@@ -363,6 +364,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     /* build new version instance */
     if (*file) /* instance doesn't exist */
     { new_vinst=ups_new_instance();
+      new_vinst->product=upsutl_str_create(uc->ugo_product,' ');
       new_vinst->version=upsutl_str_create(save_version,' ');
       the_flavor=save_flavor->data;
       new_vinst->flavor=upsutl_str_create(the_flavor,' ');
