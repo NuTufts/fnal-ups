@@ -747,7 +747,7 @@ int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
  */
 char *upsutl_upcase(const char * const a_str)
 {
-  char dum_str[MAX_LINE_LEN];
+  static char dum_str[MAX_LINE_LEN];
   int i, len = (int )strlen(a_str);
 
   for (i = 0 ; i < len ; ++i ) {
