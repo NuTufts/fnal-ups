@@ -80,7 +80,7 @@ static t_upskey_map g_key_map[] =
   { 15, "TABLE_FILE",       NO,   13,   NO, 0x00000001 },
   { 16, "ARCHIVE_FILE",     NO,   14,   NO, 0x00000001 },
   { 17, "AUTHORIZED_NODES", NO,   15,    2, 0x00001001 },
-  { 18, "DESCRIPTION",      NO,   16,   NO, 0x00000100 },
+  { 18, "DESCRIPTION",      NO,   16,   NO, 0x00000010 },
   { 19, "STATISTICS",       NO,   17,    3, 0x00001001 },
   { 20, "DB_DIR",           NO,   18,   NO, 0x00000000 },
   { 21, "ACTION",           NO,   19,   NO, 0x00000010 },
