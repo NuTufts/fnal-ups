@@ -426,10 +426,13 @@ static t_cmd_map g_cmd_maps[] = {
 int upsact_print( t_upsugo_command * const ugo_cmd,
 		  t_upstyp_matched_product *mat_prod,
 		  const char * const act_name,
-		  const char * const sopt )
+		  char * sopt )
 {
+  static char s_sopt[] = "";
   t_upslst_item *dep_list = 0;
-  int doact = strchr( sopt, 'a' ) ? 1 : 0;
+
+  if ( !sopt )
+    sopt = s_sopt;
 
   if ( !ugo_cmd || !act_name )
     return 0;
@@ -437,7 +440,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
   dep_list = upsact_get_cmd( ugo_cmd, mat_prod, act_name );
 
   /* print all actions */
-  if ( doact ) {
+  if ( strchr( sopt, 'a' ) ) {
     for ( ; dep_list; dep_list = dep_list->next )
       upsact_print_item( (t_upsact_item *)dep_list->data, sopt );
   }
@@ -591,9 +594,13 @@ void upsact_cleanup( t_upslst_item *dep_list )
  * Output: none
  * Return: none
  */
-void upsact_print_item( const t_upsact_item *const p_cur, const char * const sopt )
+void upsact_print_item( const t_upsact_item *const p_cur, 
+			char * sopt )
 {
+  static char s_sopt[] = "";
   int i;
+  if ( !sopt )
+    sopt = s_sopt;
 
   if ( !p_cur )
     return;
@@ -977,7 +984,7 @@ t_upsact_item *find_product( t_upslst_item* const dep_list,
 t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
 				 const t_upsact_item* const act_item )
 {
-  t_upslst_item *l_ptr = (t_upslst_item *)upslst_first( dep_list );
+  t_upslst_item *l_ptr = upslst_first( dep_list );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     t_upsact_item *act_ptr = (t_upsact_item *)l_ptr->data;
     if ( act_item->ugo == act_ptr->ugo )

@@ -69,7 +69,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 int upsact_print( t_upsugo_command * const ugo_cmd,
 		  t_upstyp_matched_product *mat_prod,
 		  const char * const act_name,
-		  const char * const sopt );
+		  char * sopt );
 t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str );
 void upsact_cleanup( t_upslst_item *dep_list );
 t_upslst_item *upsact_check_files(
@@ -78,7 +78,7 @@ t_upslst_item *upsact_check_files(
 			    char * const a_cmd);
 void upsact_free_upsact_cmd( t_upsact_cmd * const act_cmd );
 void upsact_print_cmd( const t_upsact_cmd * const cmd_cur );
-void upsact_print_item( const t_upsact_item *const p_cur, const char * const sopt );
+void upsact_print_item( const t_upsact_item *const p_cur, char * sopt );
 
 #endif /* _UPSACT_H_ */
 
