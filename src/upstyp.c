@@ -310,10 +310,7 @@ int ups_free_action( t_upstyp_action * const act_ptr )
   if ( !act_ptr ) return 0;
 
   if ( all_gone( act_ptr ) ) {
-    if ( act_ptr->action ) { 
-      upsmem_free( act_ptr->action );
-      act_ptr->action = 0;
-    }
+    if ( act_ptr->action ) { upsmem_free( act_ptr->action ); }
     if ( act_ptr->command_list ) { 
       act_ptr->command_list = upslst_free( act_ptr->command_list, 'd' );
     }
