@@ -83,18 +83,18 @@ BootStrap_Dir=$Ups_DB_Path/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FL
 # Make an advanced shell for the products initialization script,
 # if we can.
 #
-if [ -x /usr/bin/ksh ]
-then
-    Name_Of_Sh=/usr/bin/ksh
-elif [ -x /bin/ksh ]
-then
-    Name_Of_Sh=/bin/ksh
-elif [ -x /usr/bin/bash ]
+if [ -x /usr/bin/bash ]
 then
     Name_Of_Sh=/usr/bin/bash
 elif [ -x /bin/bash ]
 then
     Name_Of_Sh=/bin/bash
+elif [ -x /usr/bin/ksh ]
+then
+    Name_Of_Sh=/usr/bin/ksh
+elif [ -x /bin/ksh ]
+then
+    Name_Of_Sh=/bin/ksh
 else
     Name_Of_Sh=/bin/sh
 fi
@@ -260,7 +260,7 @@ then
 else
     Products_String="\${UPS_EXTRA_DIR} \${Setups_Products_Init_Default}"
 fi
-Products_String="\${Products_String:-} ${Ups_DB_Path:-}"
+#Products_String="\${Products_String:-} ${Ups_DB_Path:-}"
 #
 # Search the PRODUCTS string for existing directories.  They only 
 # count if they exist.  Format the result as a UPSII PRODUCTS
@@ -935,7 +935,7 @@ BootStrap_Dir=$BootStrap_Dir
 # the database was initialized
 #
 
-Product_String="$Setups_Products_Init_Default"
+Product_String="$Setups_Products_Init_Default $Ups_DB_Path"
 
 #
 # === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
