@@ -63,7 +63,7 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
  */
 static char *g_dollarsign = "$";
 #define VERIFY_DIR_SPEC(dir, tran)   \
-    if (dir) {                                                              \
+    if (dir && (dir[0] != '\0')) {                                          \
       char *trans_dir;                                                      \
       struct stat file_stat;                                                \
       if ( tran )                                                           \
@@ -306,7 +306,8 @@ static void ups_verify_table_instance(VERIFY_INST_PARAMS)
 
   /* check that there is no version specified here */
   if (a_inst->version) {
-    upserr_add(UPS_MISMATCH_VERSION, UPS_WARNING);
+    upserr_add(UPS_NO_VERSION, UPS_WARNING, 
+	       (a_inst->product ? a_inst->product : " "));
   }
   /* make sure that the value of qualifiers is not any */
   if (! strcmp(a_inst->qualifiers, ANY_FLAVOR)) {
