@@ -16,7 +16,7 @@ of this function is envRemove, not envUnset.
 <li>
 improved output of errors from ups verify.
 <li>
-Modifications to unsetup rules: I will only try to unsetup a product if
+Modifications to unsetup rules: it will only try to unsetup a product if
 SETUP_prodname is defined.
 </li>
 </ul>
