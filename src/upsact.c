@@ -36,6 +36,7 @@
 /* ups specific include files */
 #include "upsact.h"
 #include "upserr.h"
+#include "upsver.h"
 #include "upslst.h"
 #include "upsutl.h"
 #include "upsmem.h"
@@ -448,7 +449,8 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
     t_upsact_item *act0 = find_product( dep_list, ugo_cmd->ugo_product );
 
     /* add parent product to 'already done list' */
-    didit_list = upslst_add( didit_list, act0 );
+    if ( act0 )
+      didit_list = upslst_add( didit_list, act0 );
 
     for ( ; dep_list; dep_list = dep_list->next ) {
       t_upsact_item *act_ptr = (t_upsact_item *)dep_list->data;
@@ -827,8 +829,9 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
       if ( !new_cur ) {
 	if ( ignore_errors )
 	  upserr_clear();
-	else
+	else {
 	  SET_PARSE_ERROR( p_line );
+	}
       }
       else {
 	top_list = upslst_add( top_list, new_cur );
@@ -909,20 +912,15 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
 	}
 
-	if ( !new_ugo ) {
-	  SET_PARSE_ERROR( p_line );
-	  continue;
-	}
-
 	/* check if product is already at top level */
 
-	if ( p_cur->level > 0 ) {
+	if ( new_ugo && p_cur->level > 0 ) {
 	  new_cur = find_product( top_list, new_ugo->ugo_product );
 	}
 
 	/* check if product is already in setup list */
 	
-	if ( find_product( dep_list, new_ugo->ugo_product ) ) {
+	if ( new_ugo && find_product( dep_list, new_ugo->ugo_product ) ) {
 	  /* ??? free stuff */
 	  continue;
 	}
@@ -944,8 +942,9 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  if ( !new_cur ) {
 	    if ( ignore_errors )
 	      upserr_clear();
-	    else
+	    else {
 	      SET_PARSE_ERROR( p_line );
+	    }
 	    continue;
 	  }
 	}
@@ -1148,6 +1147,9 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     const char * const act_name )
 {		       
   t_upsact_item *act_item = 0;
+
+  if ( !ugo_cmd )
+    return 0;
 
   if ( !mat_prod ) {
     t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
