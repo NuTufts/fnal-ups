@@ -1434,7 +1434,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       new_act_itm = new_act_item( p_act_itm->ugo, p_act_itm->mat,  
 				  p_act_itm->level, i_cmd, p_cmd->argv[0] );
-
+      new_act_itm->unsetup = p_act_itm->unsetup;
 
       /* ignore errors if optional exeaction */
 
@@ -2241,7 +2241,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	      a_cmd_ugo = upsugo_bldcmd( cmd_line, g_cmd_info[e_unsetup].valid_opts );
 	      
 	      /* check if the product is setuped.
-		 this is a (kind of) hack, for not loosing the instance 
+		 this is a (kind of) hack, for not losing the instance 
 		 information when the product has not been setuped.
 	         - if it's not setuped, use the original instance
 	         - if it's setuped, use only the product name */
