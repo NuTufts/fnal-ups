@@ -99,7 +99,6 @@ int main(int argc, char *argv[])
   mode_t old_umask;
   int need_help = 0;
   char *on_what = NULL;
-  int temp_desc;
 
   if (argv[1] && (strcmp(argv[1],"-?"))) {
     /* Figure out which command was entered */
