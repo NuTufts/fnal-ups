@@ -193,7 +193,7 @@ char *upskey_inst_setval( t_upstyp_instance * const inst,
   t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->i_index != NO ) {
     char *new_val = (char *)upsmem_malloc( (int)strlen( sval ) + 1 );
-    strcpy( new_val, sval );
+    (void) strcpy( new_val, sval );
     return ( UPSKEY_INST2ARR( inst )[key->i_index] = new_val );
   }
   else
@@ -287,7 +287,7 @@ void upskey_inst_print( const t_upstyp_instance * const inst )
   
   for ( keys = g_key_info; keys->key; keys++ ) {
     if ( (ix = keys->i_index) != NO && UPSKEY_INST2ARR( inst )[ix] )
-      printf( "%s = %s\n", keys->key, UPSKEY_INST2ARR( inst )[ix] );    
+      (void) printf( "%s = %s\n", keys->key, UPSKEY_INST2ARR( inst )[ix] );    
   }
 }
 
@@ -327,7 +327,7 @@ char *upskey_prod_setval( t_upstyp_product * const prod,
   t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->p_index != NO ) {
     char *new_val = (char *)upsmem_malloc( (int)strlen( sval ) + 1 );
-    strcpy( new_val, sval );
+    (void) strcpy( new_val, sval );
     return ( UPSKEY_PROD2ARR( prod )[key->p_index] = new_val );
   }
   else
@@ -475,7 +475,7 @@ void upskey_prod_print( const t_upstyp_product * const prod )
   
   for ( (keys = g_key_info); keys->key; keys++ ) {
     if ( (ix = keys->p_index) != NO && UPSKEY_PROD2ARR( prod )[ix] ) 
-      printf( "%s = %s\n", keys->key, UPSKEY_PROD2ARR( prod )[ix] );
+      (void) printf( "%s = %s\n", keys->key, UPSKEY_PROD2ARR( prod )[ix] );
   }
 }
 
@@ -488,7 +488,7 @@ void upskey_conf_print( const t_upstyp_config * const conf )
   
   for ( keys = g_key_info; keys->key; keys++ ) {
     if ( (ix = keys->c_index) != NO && UPSKEY_CONF2ARR( conf )[ix] )
-      printf( "%s = %s\n", keys->key, UPSKEY_CONF2ARR( conf )[ix] );    
+      (void) printf( "%s = %s\n", keys->key, UPSKEY_CONF2ARR( conf )[ix] );    
   }
 }
 
