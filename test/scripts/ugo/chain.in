@@ -1,15 +1,12 @@
-Product:       *
-Flavor:          
-   value = CHOCOLATE 
-Qualifiers:    
-   value =  
-Chains:         
-   value = current 
-   value = old 
-   value = new 
-   value = test 
-   value = development 
-   value = dog 
-   value = cat 
-   value = blue 
-   value = red 
+Product:          *
+Flavor:           CHOCOLATE
+Qualifiers:       
+Chains:           current
+                  old
+                  new
+                  test
+                  development
+                  dog
+                  cat
+                  blue
+                  red

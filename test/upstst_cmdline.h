@@ -16,7 +16,7 @@ Revision history:-
 #include <sys/types.h>
 #endif
 
-#define UPSTST_MAXLINE 256
+#define UPSTST_MAXLINE 1024
 typedef char ups_cmd_t[UPSTST_MAXLINE];
 
 /*

@@ -1,8 +1,5 @@
-Product:       *
-Version:       *
-Flavor:          
-   value = CHOCOLATE 
-Qualifiers:    
-   value = * 
-Chains:         
-   value = current 
+Product:          *
+Version:          *
+Flavor:           CHOCOLATE
+Qualifiers:       *
+Chains:           current
