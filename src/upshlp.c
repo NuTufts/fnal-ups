@@ -124,8 +124,8 @@ int upshlp_command(const char * const what)
                 }
 
              } else {
-                fprintf(stdout,"Unrecognized data in UPS help file\n");
-                fprintf(stdout,"%s\n",line);
+                fprintf(stderr,"Unrecognized data in UPS help file\n");
+                fprintf(stderr,"%s\n",line);
                 return 1;
              }
            }
@@ -134,31 +134,31 @@ int upshlp_command(const char * const what)
     }
   }
   if ( !what || strlen( what ) <= 0 ) 
-  { fprintf(stdout,"UPS commands:\n\n");
-    fprintf(stdout,"for specific command options use \"ups COMMAND -?\"\n\n");
+  { fprintf(stderr,"UPS commands:\n\n");
+    fprintf(stderr,"for specific command options use \"ups COMMAND -?\"\n\n");
     for ( l_ptr = upslst_first(command_description); 
           l_ptr; l_ptr = l_ptr->next, count++ )
     { if (strncmp(last,l_ptr->data,12)) {
-         fprintf(stdout,"          %s",(char *)l_ptr->data ); 
+         fprintf(stderr,"          %s",(char *)l_ptr->data ); 
       } else {
-         fprintf(stdout,"                       %s",(char *)l_ptr->data+13 ); 
+         fprintf(stderr,"                       %s",(char *)l_ptr->data+13 ); 
       } strncpy(last,l_ptr->data,12);
     }
   } else { 
-    fprintf(stdout,"UPS help command: %s\n\n",what);
+    fprintf(stderr,"UPS help command: %s\n\n",what);
     for ( l_ptr = upslst_first(command_description); 
           l_ptr; l_ptr = l_ptr->next, count++ )
     { if (!strncmp(l_ptr->data,what,strlen(what))) {
-         fprintf(stdout,"          %s",(char *)l_ptr->data+13 );
+         fprintf(stderr,"          %s",(char *)l_ptr->data+13 );
          found=1;
       }
     }
     if (found) {
-       fprintf(stdout,"\n     Valid Options:\n");
+       fprintf(stderr,"\n     Valid Options:\n");
        for ( l_ptr = upslst_first(command_options); 
              l_ptr; l_ptr = l_ptr->next, count++ )
        { if (!strncmp(l_ptr->data,what,strlen(what))) {
-/*            fprintf(stdout,"          %s",(char *)l_ptr->data+13 ); */
+/*            fprintf(stderr,"          %s",(char *)l_ptr->data+13 ); */
             addr=l_ptr->data;
             option=addr+12;
          }
@@ -174,11 +174,11 @@ int upshlp_command(const char * const what)
               } else { 
                 *last=*(addr+1);
               }
-              fprintf(stdout,"          %s",(char *)l_ptr->data);
+              fprintf(stderr,"          %s",(char *)l_ptr->data);
            }
        }
     } else {
-      fprintf(stdout,"No help information available\n");
+      fprintf(stderr,"No help information available\n");
     }
   }
 /* test dump...
