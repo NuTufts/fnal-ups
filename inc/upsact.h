@@ -104,6 +104,8 @@ enum {
   e_sourceoptcheck,
   e_exeaccess,
   e_execute,
+  e_cshexecute,
+  e_shexecute,
   e_filetest,
   e_makedir,
   e_copyhtml,
