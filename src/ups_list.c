@@ -498,6 +498,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   for ( l_ptr = upslst_first( command->ugo_key ); 
         l_ptr; l_ptr = l_ptr->next, count++ )
   { FromVersion(table_file)
+    FromVersion(table_dir)
     FromVersion(ups_dir)
     FromVersion(prod_dir)
     FromVersion(archive_file)

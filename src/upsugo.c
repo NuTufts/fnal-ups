@@ -570,7 +570,7 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  { loc=strchr(inaddr,'|');
    if (loc) { *loc=':'; }
  }
- db=upsutl_str_create(inaddr,'p');
+ db=upsutl_str_create(inaddr,'p');  /* fix this leak!!! */
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
  memset (addr, 0, sizeof(struct upstyp_db));
  addr->name = db;
@@ -588,6 +588,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  char * oaddr;                         /* optional qualifier string */
  char * naddr;                         /* address for build red,opt */
  char * waddr;                         /* work address string */
+ char * taddr;                         /* another temporary address */
  char * loc;
  int onq=0;                            /* parsing a ? element */
  int onc=0;                            /* parsing a , element */
@@ -693,7 +694,10 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
       if ( *addr != 0 ) /* required as well as optional */
       { if (waddr) /* Added 30-Jan-1998 didn't think this could happen.. */ 
         { naddr=upsutl_str_crecat(addr,":");
-          naddr=upsutl_str_crecat(naddr,waddr);
+          taddr=upsutl_str_crecat(naddr,waddr); /* fix leak assign */
+          upsmem_free(naddr);
+          upsmem_free(waddr);
+          naddr=taddr;
         } else {
           naddr=addr;
         }
@@ -1122,6 +1126,7 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      char * setup_prod;                          /* SETUP_PROD name */
      char * setup_env;                           /* SETUP_PROD value */
      char * waddr;                               /* work address */
+     static char temp[256];
      struct ups_command * uc=0;
      int argc=0;
      int    count=0;
@@ -1129,8 +1134,8 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      int    verbose=0;
      char ** argv;
      t_upslst_item *hold = 0;
-     
-     setup_prod = (char *) malloc((size_t)(strlen(product) +7));
+     setup_prod=temp;
+     /* setup_prod = (char *) malloc((size_t)(strlen(product) +7));*/
      (void) strcpy(setup_prod,SETUPENV);
      (void) strcat(setup_prod,product);
      if((setup_env = (char *)getenv(setup_prod)) == 0)

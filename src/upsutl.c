@@ -932,7 +932,7 @@ char *upsutl_str_crecat( char * const str1, char * const str2 )
     new_str = upsutl_str_create( str1, ' ' );
   }
   else {
-    new_str = (char *)malloc( strlen( str1 ) + strlen( str2 ) +
+    new_str = (char *)upsmem_malloc( strlen( str1 ) + strlen( str2 ) +
 			      (unsigned int )1 );
     strcpy( new_str, str1 );
     strcat( new_str, str2 );
