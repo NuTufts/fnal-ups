@@ -104,8 +104,6 @@ enum {
   e_sourceoptcheck,
   e_exeaccess,
   e_execute,
-  e_cshexecute,
-  e_shexecute,
   e_filetest,
   e_copyhtml,
   e_copyinfo,
@@ -116,8 +114,10 @@ enum {
   e_copynews,
   e_writecompilescript,
   e_dodefaults,
-  e_nosetupenv,
-  e_noproddir
+  e_setupenv,
+  e_proddir,
+  e_unsetupenv,
+  e_unproddir
 };
 
 /*

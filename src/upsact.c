@@ -169,11 +169,6 @@ static void f_copynews( const t_upstyp_matched_instance * const a_inst,
 			const t_upsugo_command * const a_command_line,
 			const FILE * const a_stream,
 			const t_upsact_cmd * const a_cmd);
-static void f_cshexecute( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd);
 static void f_envappend( const t_upstyp_matched_instance * const a_inst,
 			 const t_upstyp_db * const a_db_info,
 			 const t_upsugo_command * const a_command_line,
@@ -234,11 +229,6 @@ static void f_pathset( const t_upstyp_matched_instance * const a_inst,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
 		       const t_upsact_cmd * const a_cmd);
-static void f_shexecute( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd);
 static void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
 			      const t_upstyp_db * const a_db_info,
 			      const t_upsugo_command * const a_command_line,
@@ -275,6 +265,26 @@ static void f_writecompilescript(
 			       const t_upsugo_command * const a_command_line,
 			       const FILE * const a_stream,
 			       const t_upsact_cmd * const a_cmd);
+static void f_setupenv( const t_upstyp_matched_instance * const a_inst,
+			const t_upstyp_db * const a_db_info,
+			const t_upsugo_command * const a_command_line,
+			const FILE * const a_stream,
+			const t_upsact_cmd * const a_cmd);
+static void f_proddir( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const t_upsact_cmd * const a_cmd);
+static void f_unsetupenv( const t_upstyp_matched_instance * const a_inst,
+			  const t_upstyp_db * const a_db_info,
+			  const t_upsugo_command * const a_command_line,
+			  const FILE * const a_stream,
+			  const t_upsact_cmd * const a_cmd);
+static void f_unproddir( const t_upstyp_matched_instance * const a_inst,
+		         const t_upstyp_db * const a_db_info,
+			 const t_upsugo_command * const a_command_line,
+			 const FILE * const a_stream,
+			 const t_upsact_cmd * const a_cmd);
 static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 			  const t_upstyp_db * const a_db_info,
 			  const t_upsugo_command * const a_command_line,
@@ -348,8 +358,11 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
      buf = upsutl_find_manpages(a_inst, a_db_info, pages);  \
    }
 
+#define SET_SETUP_PROD() \
+   upsget_envout(a_stream, a_db_info, a_inst, a_command_line);
+
 #define DO_SYSTEM_MOVE(move_flag)  \
-   if (system(buff) != 0) {                                               \
+   if (system(g_buff) != 0) {                                               \
      /* error from system call */                                         \
      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system", strerror(errno));  \
    } else {                                                               \
@@ -383,6 +396,7 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 
 static char *g_default_delimiter = ":";
 static int g_ups_cmd = e_invalid_action;
+static char g_buff[MAX_LINE_LEN];
 
 /* 
  * Note: This array should in princip be in ups_main.c, but since
@@ -464,8 +478,6 @@ t_cmd_map g_cmd_maps[] = {
   { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_invalid_cmd },
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
   { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
-  { "cshexecute", e_cshexecute, f_cshexecute, 1, 2, e_invalid_cmd },
-  { "shexecute", e_shexecute, f_shexecute, 1, 2, e_invalid_cmd },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
   { "copyhtml", e_copyhtml, f_copyhtml, 1, 1, e_invalid_cmd },
   { "copyinfo", e_copyinfo, f_copyinfo, 1, 1, e_invalid_cmd },
@@ -476,8 +488,10 @@ t_cmd_map g_cmd_maps[] = {
   { "copynews", e_copynews, f_copynews, 1, 1, e_invalid_cmd },
   { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd },
   { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults },
-  { "nosetupenv", e_nosetupenv, NULL, 0, 0, e_invalid_cmd },
-  { "noproddir", e_noproddir, NULL, 0, 0, e_invalid_cmd },
+  { "setupenv", e_setupenv, f_setupenv, 0, 0, e_unsetupenv },
+  { "proddir", e_proddir, f_proddir, 0, 0, e_unproddir },
+  { "unsetupenv", e_unsetupenv, f_unsetupenv, 0, 0, e_setupenv },
+  { "unproddir", e_unproddir, f_unproddir, 0, 0, e_proddir },
   { 0,0,0,0,0 }
 };
 
@@ -973,8 +987,10 @@ t_upslst_item *upsact_check_files(
 	case e_pathset:
 	case e_filetest:
 	case e_dodefaults:
-	case e_nosetupenv:
-	case e_noproddir:
+	case e_setupenv:
+	case e_proddir:
+	case e_unsetupenv:
+	case e_unproddir:
 	case e_exeaccess:
 	case e_uncopyman:
 	case e_writecompilescript:
@@ -2680,50 +2696,6 @@ static void f_execute( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_cshexecute( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd)
-{
-  CHECK_NUM_PARAM("cshexecute");
-
-  /* only proceed if we have a valid number of parameters and a stream to write
-     them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-    if (a_command_line->ugo_shell == e_CSHELL) {
-      f_execute(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
-    }
-  }
-}
-
-static void f_shexecute( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd)
-{
-  CHECK_NUM_PARAM("shexecute");
-
-  /* only proceed if we have a valid number of parameters and a stream to write
-     them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-    if (a_command_line->ugo_shell == e_BOURNE) {
-      f_execute(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
-    }
-  }
-}
-
 static void f_filetest( const t_upstyp_matched_instance * const a_inst,
 			const t_upstyp_db * const a_db_info,
 			const t_upsugo_command * const a_command_line,
@@ -3456,7 +3428,6 @@ static void f_writecompilescript(
 {
   t_upstyp_matched_product mproduct = {NULL, NULL, NULL};
   t_upslst_item *cmd_list = NULL;
-  char buff[MAX_LINE_LEN];
   char time_buff[MAX_LINE_LEN];
   char *time_ptr;
   int moved_to_old = 0, moved_to_timedate = 0;
@@ -3499,7 +3470,7 @@ static void f_writecompilescript(
 	    /* the flag was there, now see what it is */
 	    if (! strcmp(a_cmd->argv[a_cmd->argc - 1], OLD_FLAG)) {
 	      /* append ".OLD" to the file name */
-	      sprintf(buff, "mv %s %s.%s\n", a_cmd->argv[0], a_cmd->argv[0],
+	      sprintf(g_buff, "mv %s %s.%s\n", a_cmd->argv[0], a_cmd->argv[0],
 		      OLD_FLAG);
 	      DO_SYSTEM_MOVE(moved_to_old);
 	    } else if (! strcmp(a_cmd->argv[a_cmd->argc - 1], DATE_FLAG)) {
@@ -3509,7 +3480,7 @@ static void f_writecompilescript(
 
 	      /* remove any whitespace */
 	      (void )upsutl_str_remove(time_buff, WSPACE);
-	      sprintf(buff, "mv %s %s.%s\n", a_cmd->argv[0], a_cmd->argv[0],
+	      sprintf(g_buff, "mv %s %s.%s\n", a_cmd->argv[0], a_cmd->argv[0],
 		      time_buff);
 	      DO_SYSTEM_MOVE(moved_to_timedate);
 	    }
@@ -3554,10 +3525,10 @@ static void f_writecompilescript(
     if ((moved_to_old || moved_to_timedate) && (UPS_ERROR != UPS_SUCCESS)) {
       /* yes we did the move, and got an error, move the file back */
       if (moved_to_old) {
-	sprintf(buff, "mv %s.%s %s\n", a_cmd->argv[0], OLD_FLAG,
+	sprintf(g_buff, "mv %s.%s %s\n", a_cmd->argv[0], OLD_FLAG,
 		a_cmd->argv[0]);
       } else {
-	sprintf(buff, "mv %s.%s %s\n", a_cmd->argv[0], time_buff,
+	sprintf(g_buff, "mv %s.%s %s\n", a_cmd->argv[0], time_buff,
 		a_cmd->argv[0]);
       }
       /* since we are at the end, it does not matter which flag we use here */
@@ -3574,6 +3545,122 @@ static void f_writecompilescript(
   }
 }
 
+static void f_setupenv( const t_upstyp_matched_instance * const a_inst,
+			const t_upstyp_db * const a_db_info,
+			const t_upsugo_command * const a_command_line,
+			const FILE * const a_stream,
+			const t_upsact_cmd * const a_cmd)
+{
+  CHECK_NUM_PARAM("setupEnv");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    SET_SETUP_PROD();
+  }
+}
+
+static void f_unsetupenv( const t_upstyp_matched_instance * const a_inst,
+			  const t_upstyp_db * const a_db_info,
+			  const t_upsugo_command * const a_command_line,
+			  const FILE * const a_stream,
+			  const t_upsact_cmd * const a_cmd)
+{
+  t_upsact_cmd lcl_cmd;
+  char *uprod_name;
+
+  CHECK_NUM_PARAM("unSetupEnv");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    /* we will be calling the envunset action */
+    lcl_cmd.iact = a_cmd->iact;
+    lcl_cmd.argc = g_cmd_maps[e_envunset].min_params;   /* # of args */
+    lcl_cmd.icmd = e_envunset;
+    lcl_cmd.argv[0] = g_buff;
+
+    if (a_inst->version && a_inst->version->product) {
+      uprod_name = upsutl_upcase(a_inst->version->product);
+      if (UPS_ERROR == UPS_SUCCESS) {
+	sprintf(g_buff, "%s%s", SETUPENV,uprod_name);
+	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      }
+    }
+  }
+}
+
+static void f_proddir( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const t_upsact_cmd * const a_cmd)
+{
+  t_upsact_cmd lcl_cmd;
+  char *tmp_prod_dir = NULL;
+  char *uprod_name;
+
+  CHECK_NUM_PARAM("prodDir");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    /* we will be calling the envset action */
+    lcl_cmd.iact = a_cmd->iact;
+    lcl_cmd.argc = g_cmd_maps[e_envset].min_params;   /* # of args */
+    lcl_cmd.icmd = e_envset;
+    lcl_cmd.argv[0] = g_buff;
+
+    /* since the prod_dir may come from the command line we need to check
+       if the user entered one that we have to use */
+    if (a_command_line->ugo_productdir) {
+      tmp_prod_dir = a_command_line->ugo_productdir;
+    } else if (a_inst->version && a_inst->version->prod_dir) {
+      tmp_prod_dir = a_inst->version->prod_dir;
+    }
+    if (a_inst->version && tmp_prod_dir && a_inst->version->product) {
+      uprod_name = upsutl_upcase(a_inst->version->product);
+      if (UPS_ERROR == UPS_SUCCESS) {
+	sprintf(g_buff, "%s_DIR", uprod_name);
+	
+	lcl_cmd.argv[1] = tmp_prod_dir;
+	f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      }
+    }
+
+  }
+}
+
+static void f_unproddir( const t_upstyp_matched_instance * const a_inst,
+			 const t_upstyp_db * const a_db_info,
+			 const t_upsugo_command * const a_command_line,
+			 const FILE * const a_stream,
+			 const t_upsact_cmd * const a_cmd)
+{
+  t_upsact_cmd lcl_cmd;
+  char *uprod_name;
+
+  CHECK_NUM_PARAM("unProdDir");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    /* we will be calling the envunset action */
+    lcl_cmd.iact = a_cmd->iact;
+    lcl_cmd.argc = g_cmd_maps[e_envunset].min_params;   /* # of args */
+    lcl_cmd.icmd = e_envunset;
+    lcl_cmd.argv[0] = g_buff;
+
+    if (a_inst->version && a_inst->version->product) {
+      uprod_name = upsutl_upcase(a_inst->version->product);
+      if (UPS_ERROR == UPS_SUCCESS) {
+	sprintf(g_buff, "%s_DIR", uprod_name);
+	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      }
+    }
+  }
+}
+
 static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 			  const t_upstyp_db * const a_db_info,
 			  const t_upsugo_command * const a_command_line,
@@ -3581,37 +3668,20 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 			  const t_upsact_cmd * const a_cmd)
 {
   t_upsact_cmd lcl_cmd;
-  static char buff[MAX_LINE_LEN];
-  char *tmp_prod_dir = NULL;
   char *uprod_name;
 
   /* only proceed if we have a stream to write the output to */
   if (a_stream) {
     switch ( a_cmd->iact ) {
     case e_setup:	/* Define <PROD>_DIR and SETUP_<PROD> */
-      /* use our local copy since we have to change it */
+      /* use our local copy since we have to change it - we will be calling
+	 the proddir action */
       lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_cmd_maps[e_envset].min_params;   /* # of args */
-      lcl_cmd.icmd = e_envset;
-      lcl_cmd.argv[0] = buff;
+      lcl_cmd.argc = g_cmd_maps[e_proddir].min_params;   /* # of args */
+      lcl_cmd.icmd = e_proddir;
+      f_proddir(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 
-      /* since the prod_dir may come from the command line we need to check
-	 if the user entered one that we have to use */
-      if (a_command_line->ugo_productdir) {
-	tmp_prod_dir = a_command_line->ugo_productdir;
-      } else if (a_inst->version && a_inst->version->prod_dir) {
-	tmp_prod_dir = a_inst->version->prod_dir;
-      }
-      if (a_inst->version && tmp_prod_dir && a_inst->version->product) {
-	uprod_name = upsutl_upcase(a_inst->version->product);
-	if (UPS_ERROR == UPS_SUCCESS) {
-	  sprintf(buff, "%s_DIR", uprod_name);
-	  
-	  lcl_cmd.argv[1] = tmp_prod_dir;
-	  f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
-	}
-      }
-      upsget_envout(a_stream, a_db_info, a_inst, a_command_line);
+      SET_SETUP_PROD();
       break;
     case e_chain:	/* None */
       break;
@@ -3677,18 +3747,12 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_unsetup:
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_cmd_maps[e_envunset].min_params;   /* # of args */
-      lcl_cmd.icmd = e_envunset;
-      lcl_cmd.argv[0] = buff;
-      if (a_inst->version && a_inst->version->product) {
-	uprod_name = upsutl_upcase(a_inst->version->product);
-	if (UPS_ERROR == UPS_SUCCESS) {
-	  sprintf(buff, "%s_DIR", uprod_name);
-	  f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
-	  sprintf(buff, "%s%s", SETUPENV, uprod_name);
-	  f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
-	}
-      }
+      lcl_cmd.argc = g_cmd_maps[e_unproddir].min_params;   /* # of args */
+      lcl_cmd.icmd = e_unproddir;
+      f_unproddir(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      lcl_cmd.argc = g_cmd_maps[e_unsetupenv].min_params;   /* # of args */
+      lcl_cmd.icmd = e_unsetupenv;
+      f_unsetupenv(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       break;
     case e_untest:	/* None */
       break;
