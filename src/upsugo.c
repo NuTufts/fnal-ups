@@ -85,7 +85,7 @@ char ** argbuf;
     static char **   argpt = 0;
     static char * buff = 0;
     char * c;
-    char d[3];
+    static char d[3];
 
     if( argc < 2 )
 	{
@@ -738,6 +738,25 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
            add_ver=0;
          } else { 
            uc->ugo_product = addr;
+             if (uc->ugo_a)                   /* did the user specify -a */
+             { if (!uc->ugo_chain)            /* If no chain all chains  */
+               { addr=str_create("*");
+                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+               }
+               if (!uc->ugo_qualifiers) 
+               { addr=str_create("*");
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+               }
+             } else {                         /* not -a but give defaults */
+               if (!uc->ugo_chain)            /* If no chain current      */
+               { addr=str_create("current");
+                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+               }
+               if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
+               { addr=str_create("");
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+               }
+             }
            luc=uc;
            add_ver=1;
            ugo_commands = upslst_add(ugo_commands,uc);
@@ -766,6 +785,25 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
              add_ver=0;
            } else { 
              uc->ugo_product = addr;
+             if (uc->ugo_a)                   /* did the user specify -a */
+             { if (!uc->ugo_chain)            /* If no chain all chains  */
+               { addr=str_create("*");
+                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+               }
+               if (!uc->ugo_qualifiers) 
+               { addr=str_create("*");
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+               }
+             } else {                         /* not -a but give defaults */
+               if (!uc->ugo_chain)            /* If no chain current      */
+               { addr=str_create("current");
+                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+               }
+               if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
+               { addr=str_create("");
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+               }
+             }
              ugo_commands = upslst_add(ugo_commands,uc);
              uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
              luc=uc;
@@ -782,6 +820,37 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    }
 /*    if ((errflg ))
    {   fprintf(stderr, "Valid options are %s\n",validopts); } */
+/* no product specification */
+/* this DOES NOT MEAN no specifications on the command line the 
+   structure is only pushed (addlst) when the product is specified.  
+   Therefore if no product it must be pushed but all other flags 
+   were still done.
+*/
+   if (!ugo_commands) 
+   { addr=str_create("*");
+     uc->ugo_product = addr;
+             if (uc->ugo_a)                   /* did the user specify -a */
+             { if (!uc->ugo_chain)            /* If no chain all chains  */
+               { addr=str_create("*");
+                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+               }
+               if (!uc->ugo_qualifiers) 
+               { addr=str_create("*");
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+               }
+             } else {                         /* not -a but give defaults */
+               if (!uc->ugo_chain)            /* If no chain current      */
+               { addr=str_create("current");
+                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+               }
+               if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
+               { addr=str_create("");
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+               }
+             }
+/* need more ?? ... */
+     ugo_commands = upslst_add(ugo_commands,uc);
+   }
    ugo_commands=upslst_first(ugo_commands);
    return (t_ups_command *)ugo_commands->data; 
    } /* not subsequent call ... */
