@@ -4,7 +4,6 @@
  *               All Rights Reserved.                                         *
  *                                                                            *
  ******************************************************************************/
-/* char    *       upsugo_getarg          (int , char *, char **); */
 /* ==========================================================================
 **                                                                           
 ** DESCRIPTION
@@ -64,6 +63,8 @@ char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf);
 int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
+void upsugo_prtlst( t_upslst_item *list_ptr, char * const title );
+int upsugo_dump (struct ups_command * const uc);
 
 
 /* ===========================================================================
@@ -443,6 +444,147 @@ char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
 
 }
 
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_free
+**                                                                           
+** DESCRIPTION - free a ups command structure.
+** 
+** NOTE: This free's the data within the linked list of ugo_command structures
+**       it does NOT (yet? and how?) remove the structure from the linked list.
+**
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/                                                                           
+int upsugo_free (struct ups_command * const uc)
+{
+    if(uc)
+    { if ( uc->ugo_product ) 
+         upsmem_free(uc->ugo_product); 
+      if ( uc->ugo_version ) 
+         upsmem_free(uc->ugo_version); 
+      if ( uc->ugo_auth ) 
+         upslst_free(uc->ugo_auth,'d'); 
+      if ( uc->ugo_flavor ) 
+         upslst_free(uc->ugo_flavor,'d'); 
+      if ( uc->ugo_host ) 
+         upslst_free(uc->ugo_host,'d'); 
+      if ( uc->ugo_key ) 
+         upslst_free(uc->ugo_key,'d'); 
+      if ( uc->ugo_tablefiledir ) 
+         upsmem_free(uc->ugo_tablefiledir); 
+      if ( uc->ugo_tablefile ) 
+         upsmem_free(uc->ugo_tablefile); 
+      if ( uc->ugo_anyfile ) 
+         upsmem_free(uc->ugo_anyfile); 
+      if ( uc->ugo_options ) 
+         upsmem_free(uc->ugo_options); 
+      if ( uc->ugo_description ) 
+         upsmem_free(uc->ugo_description); 
+      if ( uc->ugo_override ) 
+         upsmem_free(uc->ugo_override); 
+      if ( uc->ugo_qualifiers ) 
+         upslst_free(uc->ugo_qualifiers,'d'); 
+      if ( uc->ugo_productdir ) 
+         upsmem_free(uc->ugo_productdir); 
+      if ( uc->ugo_archivefile ) 
+         upsmem_free(uc->ugo_archivefile); 
+      if ( uc->ugo_upsdir ) 
+         upsmem_free(uc->ugo_upsdir); 
+      if ( uc->ugo_db ) 
+         upslst_free(uc->ugo_db,'d'); 
+      if ( uc->ugo_chain ) 
+         upslst_free(uc->ugo_chain,'d'); 
+      upsmem_free(uc);
+    } return (0);
+}
+
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_dump
+**                                                                           
+** DESCRIPTION                                                               
+**
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/                                                                           
+int upsugo_dump (struct ups_command * const uc)
+{
+    if(uc)
+    { if ( uc->ugo_product ) 
+         fprintf(stdout,"Product: %s\n",uc->ugo_product); 
+      if ( uc->ugo_version ) 
+         fprintf(stdout,"Version: %s\n",uc->ugo_version); 
+      if ( uc->ugo_auth ) 
+         upsugo_prtlst(uc->ugo_auth,"Auth"); 
+      if ( uc->ugo_flavor ) 
+         upsugo_prtlst(uc->ugo_flavor,"Flavor"); 
+      if ( uc->ugo_host ) 
+         upsugo_prtlst(uc->ugo_host,"Host"); 
+      if ( uc->ugo_key ) 
+         upsugo_prtlst(uc->ugo_key,"Key"); 
+      if ( uc->ugo_tablefiledir ) 
+         fprintf(stdout,"Tablefiledir: %s\n",uc->ugo_tablefiledir); 
+      if ( uc->ugo_tablefile ) 
+         fprintf(stdout,"Tablefile: %s\n",uc->ugo_tablefile); 
+      if ( uc->ugo_anyfile ) 
+         fprintf(stdout,"Anyfile: %s\n",uc->ugo_anyfile); 
+      if ( uc->ugo_options ) 
+         fprintf(stdout,"Options: %s\n",uc->ugo_options); 
+      if ( uc->ugo_description ) 
+         fprintf(stdout,"Description: %s\n",uc->ugo_description); 
+      if ( uc->ugo_override ) 
+         fprintf(stdout,"Override: %s\n",uc->ugo_override); 
+      if ( uc->ugo_qualifiers ) 
+         upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers"); 
+      if ( uc->ugo_productdir ) 
+         fprintf(stdout,"Productdir: %s\n",uc->ugo_productdir); 
+      if ( uc->ugo_archivefile ) 
+         fprintf(stdout,"Archivefile: %s\n",uc->ugo_archivefile); 
+      if ( uc->ugo_upsdir ) 
+         fprintf(stdout,"Upsdir: %s\n",uc->ugo_upsdir); 
+      if ( uc->ugo_db ) 
+         upsugo_prtlst(uc->ugo_db,"DB"); 
+      if ( uc->ugo_chain ) 
+         upsugo_prtlst(uc->ugo_chain,"Chains"); 
+    } return (0);
+}
+
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_prtlst
+**                                                                           
+** DESCRIPTION                                                               
+**
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/
+void upsugo_prtlst( t_upslst_item *list_ptr , char * const title )
+{
+  t_upslst_item *l_ptr;
+  int count = 0;
+
+  /*
+   * Note use of upslst_first(), to be sure to start from first item
+   */
+  fprintf(stdout,"%s\n",title);
+  for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ )
+  { fprintf(stdout,"ref count %d\n",upsmem_get_refctr(l_ptr->data));
+    fprintf(stdout, "%03d: p=%08x, i=%08x, n=%08x, data=%s\n",
+            count, (int)l_ptr->prev, (int)l_ptr,
+            (int)l_ptr->next, (char *)l_ptr->data );
+  }
+}
+                                                     
 
 /* ==========================================================================
 **                                                                           
