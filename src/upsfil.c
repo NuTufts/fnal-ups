@@ -247,7 +247,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   const char *key = 0;
 
   UPS_ERROR = UPS_SUCCESS;
-  strcpy( g_filename, ups_file );
+  (void) strcpy( g_filename, ups_file );
   g_item_count = 0;
   g_line_count = 0;
 
@@ -301,18 +301,18 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
       upserr_vplace(); upserr_add( UPS_READ_FILE, UPS_WARNING, ups_file );
       
-      ups_free_product( g_pd );
+      (void) ups_free_product( g_pd );
       g_pd = 0;
       g_item_count = 0;
     }
   }
   
-  fclose( g_fh );
+  (void) fclose( g_fh );
 
   /* add product to cache */
 
   if ( g_ft && g_pd )
-    upstbl_put( g_ft, key, g_pd );
+    (void) upstbl_put( g_ft, key, g_pd );
 
   P_VERB_s_i_s( 1, "Read", g_item_count, "item(s)" );
 
@@ -339,16 +339,16 @@ void write_journal_file( const void *key, void ** prod, void *cl )
 
       /* remove file */
 
-      remove( key );
+      (void) remove( key );
 
       /* free product, and set prod pointer to zero for later removal 
          from cache (by a call to trim_cache) */
 
-      ups_free_product( *prod );
+      (void) ups_free_product( *prod );
       *prod = 0;
     }
     else {
-      upsfil_write_file( p, key, 'd', NOJOURNAL );
+      (void) upsfil_write_file( p, key, 'd', NOJOURNAL );
     }
   }
 
@@ -367,7 +367,7 @@ int upsfil_write_journal_files( void )
 {
   
   static char old_filename[MAX_LINE_LEN];
-  strcpy( old_filename, g_filename );
+  (void) strcpy( old_filename, g_filename );
 
   if ( g_ft ) {
     P_VERB( 1, "Writing ALL journal files" );
@@ -375,7 +375,7 @@ int upsfil_write_journal_files( void )
   }
   trim_cache();
 
-  strcpy( g_filename, old_filename );
+  (void) strcpy( g_filename, old_filename );
 
   return UPS_SUCCESS;
 }
@@ -426,7 +426,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   static char buff[MAX_LINE_LEN];
 
   t_upslst_item *l_ptr = 0;
-  strcpy( g_filename, ups_file );
+  (void) strcpy( g_filename, ups_file );
   g_item_count = 0;
   g_line_count = 0;
   
@@ -466,7 +466,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
       }
       key = upstbl_atom_string( ups_file );
       if ( !upstbl_get( g_ft, key ) ) {
-	upstbl_put( g_ft, key, g_pd );
+	(void) upstbl_put( g_ft, key, g_pd );
 	P_VERB_s( 1, "New (journal) product added to cache" );
       }
     }
@@ -482,9 +482,9 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     P_VERB_s( 1, "Removing file (product is empty)" );
     /* remove product from cache */
     if ( g_ft ) 
-      upstbl_remove( g_ft, key );
+      (void) upstbl_remove( g_ft, key );
     /* remove file */
-    remove( ups_file );
+    (void) remove( ups_file );
     return UPS_SUCCESS;
   }
 
@@ -495,7 +495,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   if ( copt == 'd' && 
        upsutl_is_a_file( ups_file ) == UPS_NO_FILE ) {
     int l;
-    strcpy( buff, ups_file );
+    (void) strcpy( buff, ups_file );
     l = (int )strlen( buff );
     while ( --l >= 0 && buff[l] != '/' ) buff[l] = 0;
     if (buff[l] == '/') buff[l] = 0;
@@ -526,12 +526,12 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 
   l_ptr = upslst_first( g_pd->comment_list );
   for( ; l_ptr; l_ptr = l_ptr->next ) {
-    fprintf( g_fh, "%s\n", (char *)l_ptr->data );
+    (void) fprintf( g_fh, "%s\n", (char *)l_ptr->data );
   }    
 
   /* set file type (g_ifile) */
 
-  cfilei();
+  (void) cfilei();
 
   if ( g_ifile == e_file_unknown ) {
     P_VERB_s( 1, "Unknown file type for writing" );
@@ -546,22 +546,22 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 
   case e_file_version:
     P_VERB_s( 1, "Writing version file" );
-    write_version_file();
+    (void) write_version_file();
     break;
 	
   case e_file_table:
     P_VERB_s( 1, "Writing table file" );
-    write_table_file();
+    (void) write_table_file();
     break;
 	
   case e_file_chain:
     P_VERB_s( 1, "Writing chain file" );
-    write_chain_file();
+    (void) write_chain_file();
     break;
   }
 
   
-  fclose( g_fh );
+  (void) fclose( g_fh );
 
   P_VERB_s_i_s( 1, "Write", g_item_count, "item(s)" );
 
@@ -569,7 +569,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 
   if ( g_ft ) {
     if ( !upstbl_get( g_ft, key ) ) {
-      upstbl_put( g_ft, key, g_pd );
+      (void) upstbl_put( g_ft, key, g_pd );
       P_VERB_s( 1, "New product added to cache" );
     }
   }    
@@ -628,7 +628,7 @@ void flush_product( const void *key, void ** prod, void *cl )
   /* free product */
 
   if ( *prod ) {
-    ups_free_product( *prod );
+    (void) ups_free_product( *prod );
     *prod = 0;
   }
 }     
@@ -639,7 +639,7 @@ void upsfil_flush( void )
   /* write journal files to disk and clean up cache */
 
   static char old_filename[MAX_LINE_LEN];
-  strcpy( old_filename, g_filename );
+  (void) strcpy( old_filename, g_filename );
 
   if ( g_ft ) {
     P_VERB( 1, "Flushing cache" );
@@ -648,14 +648,14 @@ void upsfil_flush( void )
     g_ft = 0;
   }
 
-  strcpy( g_filename, old_filename );
+  (void) strcpy( g_filename, old_filename );
 }
 
 void upsfil_stat( const int iopt )
 {
   /* print some statistic og the file cache */
 
-  printf( "total calls = %d, cache calls = %d (%.1f%%)\n", 
+  (void) printf( "total calls = %d, cache calls = %d (%.1f%%)\n", 
 	  g_call_count, g_call_cache_count, 
 	  g_call_count ? 100.0*(double)(g_call_cache_count)/(double)g_call_count : (double)0 );
 
@@ -681,7 +681,7 @@ int write_version_file( void )
 
   /* write file descriptor */
   
-  put_head_keys( upskey_verhead_arr() );
+  (void) put_head_keys( upskey_verhead_arr() );
   
   /* write instances */
   
@@ -700,10 +700,10 @@ int write_version_file( void )
     g_imargin = o_imargin;
 
     g_item_count++;
-    put_key( 0, "" );
-    put_key( 0, SEPARATION_LINE );
+    (void) put_key( 0, "" );
+    (void) put_key( 0, SEPARATION_LINE );
 
-    put_inst_keys( ikeys, inst_ptr, 0 );
+    (void) put_inst_keys( ikeys, inst_ptr, 0 );
 
   }  
 
@@ -719,7 +719,7 @@ int write_chain_file( void )
 
   /* write file descriptor */
   
-  put_head_keys( upskey_chnhead_arr() );
+  (void) put_head_keys( upskey_chnhead_arr() );
   
   /* write instances */
   
@@ -737,10 +737,10 @@ int write_chain_file( void )
     g_imargin = o_imargin;
 
     g_item_count++;
-    put_key( 0, "" );
-    put_key( 0, SEPARATION_LINE );
+    (void) put_key( 0, "" );
+    (void) put_key( 0, SEPARATION_LINE );
 
-    put_inst_keys( ikeys, inst_ptr, 0 );
+    (void) put_inst_keys( ikeys, inst_ptr, 0 );
   }  
 
   return 1;
@@ -760,8 +760,8 @@ int write_table_file( void )
 
   /* write file descriptor */
   
-  put_head_keys( upskey_tblhead_arr() );  
-  put_key( 0, "" );
+  (void) put_head_keys( upskey_tblhead_arr() );  
+  (void) put_key( 0, "" );
 
   /* REMEBER that the array of keys returned from upskey_*_arr() is static,
      so, the reason we set tbl_keys here, is because we only need the table
@@ -775,7 +775,7 @@ int write_table_file( void )
 
   for ( ig = 0; ig < e_group_count; ig++ ) {
 
-    find_group( l_copy, 's', 0 );
+    (void) find_group( l_copy, 's', 0 );
     while( (l_ptr = find_group( 0, ' ', g_groups[ ig ] )) ) {
 
       /* check for other and set common keys */
@@ -784,7 +784,7 @@ int write_table_file( void )
       for ( keys = g_groups[ ig ]; *keys != -1; keys++ )
 	common_mask[ *keys ] = 1;
 
-      put_group( l_ptr, tbl_keys, common_mask );
+      (void) put_group( l_ptr, tbl_keys, common_mask );
     }
 
     l_copy = find_group( 0, 'e', 0 );
@@ -805,10 +805,10 @@ int write_table_file( void )
     }
 
     g_item_count++;
-    put_key( 0, SEPARATION_LINE );
-    put_inst_keys( tbl_keys, inst_ptr, 1 );
+    (void) put_key( 0, SEPARATION_LINE );
+    (void) put_inst_keys( tbl_keys, inst_ptr, 1 );
     g_imargin = o_imargin;
-    put_key( 0, "" );    
+    (void) put_key( 0, "" );    
   }  
 
   return 1;
@@ -821,13 +821,13 @@ int write_action( t_upstyp_action * const act_ptr )
 
   if ( !act_ptr ) return 0;
 
-  put_key( "ACTION", act_ptr->action );
+  (void) put_key( "ACTION", act_ptr->action );
   
   g_imargin += 2;
   l_com = upslst_first( act_ptr->command_list );
   for( ; l_com; l_com = l_com->next ) {
     com = (char * )l_com->data;
-    put_key( 0, com );
+    (void) put_key( 0, com );
   }
   g_imargin -= 2;
 
@@ -884,7 +884,7 @@ int read_file( void )
       break;
 
     default: /* if not flavor or group, ignore it */
-      next_key( 0 );
+      (void) next_key( 0 );
     }
     
     if ( l_ptr ) {
@@ -918,7 +918,7 @@ t_upslst_item *read_comments( void )
       l_ptr = upslst_add( l_ptr, upsutl_str_create( g_line, ' ' ) );
     }
     else {
-      get_key();
+      (void) get_key();
       break;
     }
   }
@@ -939,7 +939,7 @@ int read_file_type( void )
 {
   /* all lines are ignore until a 'start_key' */
   
-  find_start_key();
+  (void) find_start_key();
   
   /* if first 'start_key' is not file type, generate an error */
 
@@ -976,12 +976,12 @@ int read_file_desc( void )
     return 0;
   }  
 
-  next_key( 0 );
+  (void) next_key( 0 );
 
   while ( !is_stop_key() ) {
 
     if ( g_ikey == e_key_user_defined ) {
-      sprintf( g_line, "%s = %s", g_key, g_val );
+      (void) sprintf( g_line, "%s = %s", g_key, g_val );
       g_pd->user_list = upslst_add( g_pd->user_list, 
 				    upsutl_str_create( g_line, ' ' ) );
     }
@@ -994,7 +994,7 @@ int read_file_desc( void )
 				   g_key, g_filename, g_line_count );
     }
 
-    next_key( 0 );
+    (void) next_key( 0 );
   }
 
   return 1;
@@ -1016,9 +1016,9 @@ void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
     {   vinst_ptr = (t_upstyp_instance *)vl_ptr->data;
         if ( verify_key == upsget_key(vinst_ptr) )
         { switch ( g_ifile )  
-          { case e_file_version: strcpy(file,"VERSION"); break;
-            case e_file_table: strcpy(file,"TABLE"); break;
-            case e_file_chain: strcpy(file,"CHAIN"); break;
+          { case e_file_version: (void) strcpy(file,"VERSION"); break;
+            case e_file_table: (void) strcpy(file,"TABLE"); break;
+            case e_file_chain: (void) strcpy(file,"CHAIN"); break;
           }
           upserr_add(UPS_DUPLICATE_INSTANCE, UPS_INFORMATIONAL, 
                      file , g_filename, 
@@ -1053,9 +1053,9 @@ void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
       { vinst_ptr = (t_upstyp_instance *)myl_ptr->data;
         if ( verify_key == upsget_key(vinst_ptr) )
         { switch ( g_ifile )  
-          { case e_file_version: strcpy(file,"VERSION"); break;
-            case e_file_table: strcpy(file,"TABLE"); break;
-            case e_file_chain: strcpy(file,"CHAIN"); break;
+          { case e_file_version: (void) strcpy(file,"VERSION"); break;
+            case e_file_table: (void) strcpy(file,"TABLE"); break;
+            case e_file_chain: (void) strcpy(file,"CHAIN"); break;
           }
           upserr_add(UPS_DUPLICATE_INSTANCE, UPS_INFORMATIONAL, 
                      file , g_filename, 
@@ -1131,7 +1131,7 @@ t_upstyp_instance *read_instance( void )
   
   inst_ptr->flavor = upsutl_str_create( g_val, ' ' );
 
-  next_key( 0 );
+  (void) next_key( 0 );
 
   while ( !is_stop_key() ) {
 
@@ -1150,12 +1150,12 @@ t_upstyp_instance *read_instance( void )
 	  upslst_add_list( inst_ptr->action_list, read_actions() );
 
       case e_key_qualifiers:
-	trim_qualifiers( g_val );
+	(void) trim_qualifiers( g_val );
 	inst_ptr->qualifiers = upsutl_str_create( g_val, ' ' );
 	break;
       
       case e_key_user_defined:
-	sprintf( g_line, "%s = %s", g_key, g_val );
+	(void) sprintf( g_line, "%s = %s", g_key, g_val );
 	inst_ptr->user_list = upslst_add( inst_ptr->user_list, 
 					  upsutl_str_create( g_line, ' ' ) );
 	break;
@@ -1167,9 +1167,9 @@ t_upstyp_instance *read_instance( void )
 
 	  if ( UPS_VERIFY ) { 
 	    if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0 ) { 
-	      printf("duplicate key in file %s line %d\n", 
+	      (void) printf("duplicate key in file %s line %d\n", 
 		     g_filename, g_line_count); 
-	      printf("key %s value %s \n", 
+	      (void) printf("key %s value %s \n", 
 		     g_key, g_val); 
 	    }
 	  }
@@ -1197,7 +1197,7 @@ t_upstyp_instance *read_instance( void )
 	break;
       }
       
-      next_key( 0 );
+      (void) next_key( 0 );
     }
 
   }
@@ -1208,7 +1208,7 @@ t_upstyp_instance *read_instance( void )
 
     if ( ! inst_ptr->qualifiers ) {
       if ( UPS_VERIFY )
-	printf( "no qualifiers found in file %s line %d\n", 
+	(void) printf( "no qualifiers found in file %s line %d\n", 
 		g_filename, g_line_count );
 
       inst_ptr->qualifiers = upsutl_str_create( "", ' ' );
@@ -1235,7 +1235,7 @@ t_upstyp_instance *read_common( void )
   
   inst_ptr = ups_new_instance();
 
-  next_key( 0 );
+  (void) next_key( 0 );
 
   while ( ! is_stop_key() ) {
 
@@ -1254,13 +1254,13 @@ t_upstyp_instance *read_common( void )
 
       case e_key_qualifiers:
 	if ( UPS_VERIFY ) { 
-	  printf( "read qualifiers key in a common section, in file %s, line %d",
+	  (void) printf( "read qualifiers key in a common section, in file %s, line %d",
 		  g_filename, g_line_count );
 	}
 	break;
       
       case e_key_user_defined:
-	sprintf( g_line, "%s = %s", g_key, g_val );
+	(void) sprintf( g_line, "%s = %s", g_key, g_val );
 	inst_ptr->user_list = upslst_add( inst_ptr->user_list, 
 					  upsutl_str_create( g_line, ' ' ) );
 	break;
@@ -1272,9 +1272,9 @@ t_upstyp_instance *read_common( void )
 
 	  if ( UPS_VERIFY ) { 
 	    if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0 ) { 
-	      printf("duplicate key in file %s line %d\n", 
+	      (void) printf("duplicate key in file %s line %d\n", 
 		     g_filename, g_line_count); 
-	      printf("key %s value %s \n", 
+	      (void) printf("key %s value %s \n", 
 		     g_key, g_val); 
 	    }
 	  }
@@ -1302,7 +1302,7 @@ t_upstyp_instance *read_common( void )
 	break;
       }
 
-      next_key( 0 );
+      (void) next_key( 0 );
 
     }
 
@@ -1362,7 +1362,7 @@ t_upstyp_action *read_action( void )
   act_ptr = ups_new_action();
   act_ptr->action = upsutl_str_create( g_val, ' ' );
 
-  next_key( 1 );
+  (void) next_key( 1 );
 
   while ( !is_stop_key() && g_ikey == e_key_unknown ) {
 
@@ -1372,7 +1372,7 @@ t_upstyp_action *read_action( void )
 	l_cmd = upslst_add( l_cmd, cmd_ptr );
     }
     
-    next_key( 1 );
+    (void) next_key( 1 );
     
   }
 
@@ -1397,13 +1397,13 @@ t_upstyp_config *read_config( void )
   while ( next_key( 0 ) != e_key_eof ) {
 
     if ( g_ikey == e_key_statistics ) {
-      upsutl_str_remove( g_val, WCHARSQ );  
-      upsutl_str_sort( g_val, ':' );
+      (void) upsutl_str_remove( g_val, WCHARSQ );  
+      (void) upsutl_str_sort( g_val, ':' );
       g_item_count++;
     }
       
     if ( g_ikey == e_key_user_defined ) {
-      sprintf( g_line, "%s = %s", g_key, g_val );
+      (void) sprintf( g_line, "%s = %s", g_key, g_val );
       g_pd->user_list = upslst_add( g_pd->user_list, 
 				    upsutl_str_create( g_line, ' ' ) );
     }
@@ -1481,11 +1481,11 @@ t_upslst_item *read_group( void )
     if ( g_ikey != e_key_group ) 
       return 0;
     
-    next_key( 0 );
+    (void) next_key( 0 );
 
     /* skip to next start key */
 
-    find_start_key();
+    (void) find_start_key();
   
     if ( g_ikey != e_key_flavor )
       return 0;
@@ -1508,21 +1508,21 @@ t_upslst_item *read_group( void )
       l_ptr = upslst_first( l_inst_ptr );
       for ( ; l_ptr; l_ptr = l_ptr->next ) {
 	inst_ptr = (t_upstyp_instance *)l_ptr->data;	
-	add_to_instance( inst_ptr, com_ptr );
+	(void) add_to_instance( inst_ptr, com_ptr );
       }
     }
 
-    ups_free_instance( com_ptr );
+    (void) ups_free_instance( com_ptr );
 
     if ( g_ikey == e_key_end ) {
-      next_key( 0 );
+      (void) next_key( 0 );
     }
     else if ( UPS_VERIFY ) {
-      printf( "Did not find end (END:) of group in file %s, line %d\n",
+      (void) printf( "Did not find end (END:) of group in file %s, line %d\n",
 	      g_filename, g_line_count);
     }
 
-    find_start_key();
+    (void) find_start_key();
     
     return upslst_first( l_inst_ptr );
 }
@@ -1550,7 +1550,7 @@ int find_start_key( void )
       upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
 				   g_key, g_filename, g_line_count );
     }
-    next_key( 0 );
+    (void) next_key( 0 );
   }
   return g_ikey;
 }
@@ -1634,7 +1634,7 @@ int get_key( void )
   /* check if line has a key/value pair */
   
   if ( !strchr( g_line, '=' ) ) {
-    strcpy( g_key, g_line );
+    (void) strcpy( g_key, g_line );
     has_val = 0;
   }
 
@@ -1662,7 +1662,7 @@ int get_key( void )
     }
     g_val[count] = 0;
 
-    upsutl_str_remove_end_quotes( g_val, QUOTES, 0 );  
+    (void) upsutl_str_remove_end_quotes( g_val, QUOTES, 0 );  
   }
 
   g_mkey = upskey_get_info( g_key );
@@ -1709,28 +1709,28 @@ int put_group( t_upslst_item * const l_inst,
   if ( upslst_count( l_inst ) == 0 ) 
     return 0;
 
-  put_key( 0, SEPARATION_LINE );
-  put_key( 0, "GROUP:");
+  (void) put_key( 0, SEPARATION_LINE );
+  (void) put_key( 0, "GROUP:");
   g_imargin += 2;
   o_imargin = g_imargin;
   for ( ; l_i; l_i = l_i->next ) {
 
     p_inst = (t_upstyp_instance *)l_i->data;
-    put_inst_keys_mask( keys, p_inst, 0, common_mask );
-    put_key( 0, "" );
+    (void) put_inst_keys_mask( keys, p_inst, 0, common_mask );
+    (void) put_key( 0, "" );
     g_imargin = o_imargin;
   }
 
   g_imargin -= 2;
-  put_key( 0, "COMMON:" );    
+  (void) put_key( 0, "COMMON:" );    
   g_imargin += 2;
 
-  put_inst_keys_mask( keys, p_inst, common_mask, 0 );
+  (void) put_inst_keys_mask( keys, p_inst, common_mask, 0 );
 
   g_imargin -= 2; 
-  put_key( 0, "" );
-  put_key( 0, "END:" );
-  put_key( 0, "" );
+  (void) put_key( 0, "" );
+  (void) put_key( 0, "END:" );
+  (void) put_key( 0, "" );
 
   return 1;
 }
@@ -1758,7 +1758,7 @@ int put_head_keys( int * ikeys )
     }
 
     map = &g_key_info[ *ikeys ];
-    put_key( map->key, 
+    (void) put_key( map->key, 
 	     UPSKEY_PROD2ARR( g_pd )[ map->p_index ] );
   }
 
@@ -1767,7 +1767,7 @@ int put_head_keys( int * ikeys )
   if ( do_user_def && g_pd->user_list ) {
     t_upslst_item *l_ptr = upslst_first( g_pd->user_list );
     for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      put_key( 0, l_ptr->data );
+      (void) put_key( 0, l_ptr->data );
     }
   }
 
@@ -1817,9 +1817,9 @@ int put_inst_keys( int * ikeys,
     /* statistics is the only ups key that has no value ... i hope */
 
     if ( *ikeys == e_key_statistics && val )
-      put_key( 0, "STATISTICS" );
+      (void) put_key( 0, "STATISTICS" );
     else
-      put_key( map->key, val );
+      (void) put_key( map->key, val );
 
     /* cosmetic */
 
@@ -1832,7 +1832,7 @@ int put_inst_keys( int * ikeys,
   if ( do_user_def && inst->user_list ) {
     t_upslst_item *l_ptr = upslst_first( inst->user_list );
     for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      put_key( 0, l_ptr->data );
+      (void) put_key( 0, l_ptr->data );
     }
   }
 
@@ -1842,7 +1842,7 @@ int put_inst_keys( int * ikeys,
     l_act = upslst_first( inst->action_list );
     for( ; l_act; l_act = l_act->next ) {
       p_act = (t_upstyp_action *)l_act->data;
-      write_action( p_act );
+      (void) write_action( p_act );
     }
   }
 
@@ -1902,9 +1902,9 @@ int put_inst_keys_mask( int * ikeys,
     /* statistics is the only ups key we know there has no value */
 
     if ( *ikeys == e_key_statistics && val )
-      put_key( 0, "STATISTICS" );
+      (void) put_key( 0, "STATISTICS" );
     else
-      put_key( map->key, val );
+      (void) put_key( map->key, val );
 
     /* cosmetic */
 
@@ -1917,7 +1917,7 @@ int put_inst_keys_mask( int * ikeys,
   if ( do_user_def && inst->user_list ) {
     t_upslst_item *l_ptr = upslst_first( inst->user_list );
     for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      put_key( 0, l_ptr->data );
+      (void) put_key( 0, l_ptr->data );
     }
   }
 
@@ -1927,7 +1927,7 @@ int put_inst_keys_mask( int * ikeys,
     l_act = upslst_first( inst->action_list );
     for( ; l_act; l_act = l_act->next ) {
       p_act = (t_upstyp_action *)l_act->data;
-      write_action( p_act );
+      (void) write_action( p_act );
     }
   }
 
@@ -1956,24 +1956,24 @@ int put_key( const char * const key, const char * const val )
   g_line_count++;
 
   for ( i=0; i<g_imargin; i++ )
-    fputc( ' ', g_fh );
+    (void) fputc( ' ', g_fh );
   if ( key && strlen( key ) > 0 ) {
-    fprintf( g_fh, "%s = ", key );
+    (void) fprintf( g_fh, "%s = ", key );
     if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
 	 !upsutl_stricmp( "DESCRIPTION", key ) ||
 	 !upsutl_stricmp( "AUTHORIZED_NODES", key ) )
-      fputc( '"', g_fh );
-    fprintf( g_fh, "%s", val );
+      (void) fputc( '"', g_fh );
+    (void) fprintf( g_fh, "%s", val );
     if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
 	 !upsutl_stricmp( "DESCRIPTION", key ) ||
 	 !upsutl_stricmp( "AUTHORIZED_NODES", key ) )
-      fputc( '"', g_fh );      
+      (void) fputc( '"', g_fh );      
   }
   else {
-    fprintf( g_fh, "%s", val );
+    (void) fprintf( g_fh, "%s", val );
   }
 
-  fputc( '\n', g_fh );
+  (void) fputc( '\n', g_fh );
   
   return 1;
 }
@@ -2060,8 +2060,8 @@ int trim_qualifiers( char * const str )
     str[i] = (char)tolower( (int)str[i] );
   */
   
-  upsutl_str_remove( str, WCHARSQ );  
-  upsutl_str_sort( str, ':' );
+  (void) upsutl_str_remove( str, WCHARSQ );  
+  (void) upsutl_str_sort( str, ':' );
 
   return (int)strlen( str );
 }
@@ -2108,7 +2108,7 @@ int add_to_instance( t_upstyp_instance * const inst,
   if ( inst_add->sav_inst ) {
     if ( ! inst->sav_inst )
       inst->sav_inst = ups_new_instance();      
-    add_to_instance( inst->sav_inst, inst_add->sav_inst );
+    (void) add_to_instance( inst->sav_inst, inst_add->sav_inst );
   }
 
   return 1;
@@ -2381,46 +2381,46 @@ void print_instance( t_upstyp_instance * const inst_ptr )
   
   if ( !inst_ptr ) return;
   
-  printf( "\nproduct = %s\nversion = %s\nflavor = %s\nqualifiers = %s\n",
+  (void) printf( "\nproduct = %s\nversion = %s\nflavor = %s\nqualifiers = %s\n",
 	  inst_ptr->product, inst_ptr->version, inst_ptr->flavor,
 	  inst_ptr->qualifiers );
   
-  printf( "chain = %s\ndeclarer = %s\ndeclared = %s\n",
+  (void) printf( "chain = %s\ndeclarer = %s\ndeclared = %s\n",
 	  inst_ptr->chain, inst_ptr->declarer, inst_ptr->declared );
   
-  printf( "modifier = %s\nmodified= %s\n",
+  (void) printf( "modifier = %s\nmodified= %s\n",
 	  inst_ptr->modifier, inst_ptr->modified );
   
-  printf( "origin = %s\nprod_dir = %s\nups_dir = %s\n",
+  (void) printf( "origin = %s\nprod_dir = %s\nups_dir = %s\n",
 	  inst_ptr->origin, inst_ptr->prod_dir, inst_ptr->ups_dir );
   
-  printf( "table_dir = %s\ntable_file = %s\narchive_file = %s\nauthorized_nodes = %s\n",
+  (void) printf( "table_dir = %s\ntable_file = %s\narchive_file = %s\nauthorized_nodes = %s\n",
 	  inst_ptr->table_dir, inst_ptr->table_file, inst_ptr->archive_file,
 	  inst_ptr->authorized_nodes );
   
-  printf( "description = %s\n",
+  (void) printf( "description = %s\n",
 	  inst_ptr->description );
 
   if ( inst_ptr->action_list ) {
-    printf( "Actions = \n" );
+    (void) printf( "Actions = \n" );
     l_ptr = upslst_first( inst_ptr->action_list );
     for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      print_action( l_ptr->data );
+      (void) print_action( l_ptr->data );
     }
   }
   else {
-    printf( "Actions = %s\n", (char*)0 );
+    (void) printf( "Actions = %s\n", (char*)0 );
   }
   
   if ( inst_ptr->user_list ) {
-    printf( "User Defined = \n" );
+    (void) printf( "User Defined = \n" );
     l_ptr = upslst_first( inst_ptr->user_list );
     for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      printf( "%s\n", (char *) l_ptr->data );
+      (void) printf( "%s\n", (char *) l_ptr->data );
     }
   }
   else {
-    printf( "User Defined = %s\n", (char*)0 );
+    (void) printf( "User Defined = %s\n", (char*)0 );
   }
 }
 
@@ -2430,17 +2430,17 @@ void print_action( t_upstyp_action * const act_ptr )
   
   if ( !act_ptr ) return;
 
-  printf ( "action = %s\n", act_ptr->action );
+  (void) printf ( "action = %s\n", act_ptr->action );
   
   if ( act_ptr->command_list ) {
-    printf( "Command list = \n" );
+    (void) printf( "Command list = \n" );
     l_ptr = upslst_first( act_ptr->command_list );
     for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      printf( "   %s\n", (char*)l_ptr->data );
+      (void) printf( "   %s\n", (char*)l_ptr->data );
     }
   }
   else {
-    printf( "Command list = %s\n", (char*)0 );
+    (void) printf( "Command list = %s\n", (char*)0 );
   }
 }
 
@@ -2450,14 +2450,14 @@ void g_print_product( t_upstyp_product * const prod_ptr )
 
   l_ptr = upslst_first( prod_ptr->comment_list );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
-    printf( "%s\n", (char *)l_ptr->data ); 
+    (void) printf( "%s\n", (char *)l_ptr->data ); 
   }
   
-  printf( "\nfile    = %s\n", prod_ptr->file );
-  printf( "product = %s\n", prod_ptr->product );
-  printf( "version  = %s\n", prod_ptr->version );
-  printf( "chain  = %s\n", prod_ptr->chain );
-  printf( "instance_list:\n" );
+  (void) printf( "\nfile    = %s\n", prod_ptr->file );
+  (void) printf( "product = %s\n", prod_ptr->product );
+  (void) printf( "version  = %s\n", prod_ptr->version );
+  (void) printf( "chain  = %s\n", prod_ptr->chain );
+  (void) printf( "instance_list:\n" );
   
   l_ptr = upslst_first( prod_ptr->instance_list );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
