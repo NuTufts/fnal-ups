@@ -172,8 +172,6 @@ char *upskey_inst_getval( t_upstyp_instance * const inst, const char * const ske
   t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->i_index != NO )
     return UPSKEY_INST2ARR( inst )[key->i_index];
-  else
-    ;
   return 0;  
 }
 
@@ -197,8 +195,6 @@ char *upskey_inst_setval( t_upstyp_instance * const inst,
     (void) strcpy( new_val, sval );
     return ( UPSKEY_INST2ARR( inst )[key->i_index] = new_val );
   }
-  else
-    ;
   return 0;  
 }
 
@@ -308,8 +304,6 @@ char *upskey_prod_getval( t_upstyp_product * const prod, const char * const skey
   t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->p_index != NO )
     return UPSKEY_PROD2ARR( prod )[key->p_index];
-  else
-    ;
   return 0;  
 }
 
@@ -333,8 +327,6 @@ char *upskey_prod_setval( t_upstyp_product * const prod,
     (void) strcpy( new_val, sval );
     return ( UPSKEY_PROD2ARR( prod )[key->p_index] = new_val );
   }
-  else
-    ;
   return 0;  
 }
 
