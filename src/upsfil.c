@@ -131,20 +131,27 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
     upserr_vplace();
     upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
     if (errno == ENOENT)
-       upserr_add( UPS_NO_FILE, UPS_FATAL, ups_file );
+      upserr_add( UPS_NO_FILE, UPS_FATAL, ups_file );
     else
-       upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
+      upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return 0;
   }
   
-  /* check if file is empty ??? */
-    
   g_pd = ups_new_product();
-  if ( !g_pd ) return 0;
-       
-  read_file();
+  if ( g_pd ) {       
+    if ( !read_file() ) {
+      
+      /* file was empty */      
+      upserr_vplace();
+      upserr_add( UPS_READ_FILE, UPS_WARNING, ups_file );
+      
+      ups_free_product( g_pd );
+      g_pd = 0;
+    }
+  }
   
-  fclose( g_fh );  
+  fclose( g_fh );
+  
   return g_pd;
 }
 
@@ -407,10 +414,11 @@ int write_action( t_upstyp_action * const act_ptr )
  *
  * Input : none
  * Output: none
- * Return: int, number of instances read
+ * Return: int, 1 if read any instances, else 0
  */
 int read_file( void )
 {
+  int iret = 0;
   t_upslst_item *l_ptr = 0;
   
   /* read comments */
@@ -452,11 +460,13 @@ int read_file( void )
       next_key();
     }
     
-    if ( l_ptr ) 
+    if ( l_ptr ) {
+      iret = 1;
       g_pd->instance_list = upslst_add_list( g_pd->instance_list, l_ptr );
+    }
   }
 	  
-  return 1;
+  return iret;
 }
 
 /*-----------------------------------------------------------------------
