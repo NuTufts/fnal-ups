@@ -110,7 +110,6 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_cur,
 				     const int iact );
 t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
 				     t_upslst_item *const cmd_list );
-int actname2enum( const char * const act_name );
 char *actitem2inststr( const t_upsact_item *const p_cur );
 int dbl2dbs( char * const db_name, t_upslst_item * const l_db );
 t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act );
@@ -489,13 +488,6 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
   else {
     t_upsugo_command *cur_ugo = 0;
     t_upslst_item *didit_list = 0;
-    t_upsact_item *act0 = find_product_str( dep_list, ugo_cmd->ugo_product );
-
-    /* add parent product to 'already done list' */
-    /* NO
-    if ( act0 )
-      didit_list = upslst_add( didit_list, act0 );
-    */
 
     for ( ; dep_list; dep_list = dep_list->next ) {
       t_upsact_item *act_ptr = (t_upsact_item *)dep_list->data;
@@ -833,6 +825,24 @@ void upsact_free_upsact_cmd( t_upsact_cmd * const act_cmd )
     free( act_cmd );
 }
 
+int upsact_action2enum( const char * const act_name )
+{
+  /* it will map an action name to the corresponding enum */
+
+  int iact = e_invalid_action, i = 0;
+
+  if ( act_name ) {
+    for ( i=0; g_cmd_info[i].cmd; i++ ) {
+      if (! upsutl_stricmp(g_cmd_info[i].cmd, act_name)) {
+	iact = i;
+	break;
+      }
+    }
+  }
+  
+  return iact;
+}
+
 /*=======================================================================
  *
  * Private functions
@@ -870,7 +880,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
   if ( !p_cur )
     return dep_list;
 
-  i_act = actname2enum( act_name );
+  i_act = upsact_action2enum( act_name );
 
   if ( !p_cur->act ) {
 
@@ -1108,7 +1118,7 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
   t_upslst_item *top_list = 0;
-  int i_act = actname2enum( act_name );
+  int i_act = upsact_action2enum( act_name );
   int i_cmd = 0;
   int ignore_errors;
   int add_item;
@@ -1373,24 +1383,6 @@ char *actitem2inststr( const t_upsact_item *const p_cur )
   }
 
   return buf;
-}
-
-int actname2enum( const char * const act_name )
-{
-  /* it will map an action name to the corresponding enum */
-
-  int iact = e_invalid_action, i = 0;
-
-  if ( act_name ) {
-    for ( i=0; g_cmd_info[i].cmd; i++ ) {
-      if (! upsutl_stricmp(g_cmd_info[i].cmd, act_name)) {
-	iact = i;
-	break;
-      }
-    }
-  }
-  
-  return iact;
 }
 
 int dbl2dbs( char * const s_db, t_upslst_item * const l_db )

@@ -185,6 +185,7 @@ t_upslst_item *upsact_check_files(
 void upsact_free_upsact_cmd( t_upsact_cmd * const act_cmd );
 void upsact_print_cmd( const t_upsact_cmd * const cmd_cur );
 void upsact_print_item( const t_upsact_item *const p_cur, char * sopt );
+int  upsact_action2enum( const char * const act_name );
 
 #endif /* _UPSACT_H_ */
 

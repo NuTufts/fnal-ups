@@ -64,7 +64,7 @@ UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
-   upsact_print(uc,NULL,action,options);
+   upsact_print(uc,NULL,action,options,upsact_action2enum(action));
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    }
 
@@ -133,7 +133,7 @@ UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
-   cmd_list = upsact_get_cmd(uc,NULL,action);
+   cmd_list = upsact_get_cmd(uc,NULL,action,upsact_action2enum(action));
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    upsact_process_commands(cmd_list, ofd);
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
