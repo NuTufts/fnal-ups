@@ -223,6 +223,7 @@
 &fe ('SunOS'	, 'acc'		, undef	, 'W'	, undef, 0, "upsutl.c", 'implicitly declaring function to return int: gethostname');
 &fe ('SunOS'	, 'acc'		, undef	, 'W'	, undef, 0, "upsutl.c", 'implicitly declaring function to return int: getuid');
 &fe ('SunOS'	, 'cc'		, undef	, 'W'	, undef, 0, "upsutl.c", 'initializer does not fit or is out of range:');
+&fe ('SunOS'	, 'cc'		, undef	, 'W'	, undef, 0, "upsact.c", 'dubious escape: \\\!');
 
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
