@@ -38,7 +38,6 @@
  */
 
 static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
-				 int a_first_pass,
 				 const FILE * const a_temp_file);
 
 /*
@@ -63,10 +62,9 @@ void ups_setup( const t_upsugo_command * const a_command_line,
 		const FILE * const a_temp_file)
 {
   t_upslst_item *mproduct_list = NULL;
-  int first_pass = 1;
 
   /* now find the desired instance and translate actions to the temp file */
-  mproduct_list = setup_core(a_command_line, first_pass, a_temp_file);
+  mproduct_list = setup_core(a_command_line, a_temp_file);
 
   /* check if we got an error */
   if (UPS_ERROR == UPS_SUCCESS) {
@@ -91,13 +89,11 @@ void ups_setup( const t_upsugo_command * const a_command_line,
  * and write them to the temp file.  This is done for all UPS product
  * requirements too.
  *
- * Input : information from the command line, a flag indicating if this is
- *         the first time through this routine, a stream.
+ * Input : information from the command line, a stream.
  * Output: <output>
  * Return: <return>
  */
 static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
-				 int a_first_pass,
 				 const FILE * const a_temp_file)
 {
   t_upslst_item *mproduct_list = NULL;
@@ -105,7 +101,6 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
   t_upstyp_matched_instance *minst = NULL;
   char *dummy = NULL;
   int need_unique = 1;
-  int not_first_pass = 0;
 
   /* get all the requested instances */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
@@ -117,24 +112,8 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 
     /* check if this product is authorized to be setup on this node */
     if (upsutl_is_authorized(minst, mproduct->db_info, dummy)) {
-      /* Check if we need to unsetup this product first.  There are two
-	 
-
-
-      /* We need to keep a list of the dependencies which involve setting up
-	 UPS managed products.  This is only done if this is the top level
-	 product, i.e. the product referenced on the command line.  This is
-	 because any product in the top level list of dependencies takes
-	 precedence over lower level dependencies even when they refer to
-	 different instances. */
-      if (a_first_pass) {
-	/* This is the top level. Look thru all of the dependencies for
-	   setup and save a list of those which are UPS product setups. */
-	
-	
-      }
-
-        printf("we got to here\n");      
+      /* Check if we need to unsetup this product first.  */
+      printf("we got to here\n");      
     } else {
       upserr_add(UPS_NOT_AUTH, UPS_FATAL, mproduct->product);
     }
