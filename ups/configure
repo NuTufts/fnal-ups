@@ -755,7 +755,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	    if ( \$mach == CYGW ) setenv MACH_OS CYGWIN32_NT
 	    set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`'.'\`uname -v|sed -e 's/[ ()].*//'\`
 	    if ( "\$MACH_OS" == AIX ) set Full_Flavor="\$MACH_OS"'+'\`uname -v\`'.'\`uname -r\`
-	    if ( "\$MACH_OS" == Linux ) set Full_Flavor="\$MACH_OS"'+'\`uname -r\`
+	    if ( "\$MACH_OS" == Linux ) set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`
 	    if ( "\$MACH_OS" == CYGWIN32_NT ) set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`
 	endif
 
@@ -1045,7 +1045,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	    then
 		Full_Flavor="\$MACH_OS"'+'\`uname -v\`'.'\`uname -r\`
 	    fi
-	    if test "\$MACH_OS" = Linux -o $MACH_OS = CYGWIN32_NT
+	    if test "\$MACH_OS" = Linux -o "\$MACH_OS" = CYGWIN32_NT
 	    then
 		Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`
 	    fi
