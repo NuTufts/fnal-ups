@@ -16,6 +16,7 @@
  *
  * MODIFICATIONS:
  *       28-Jul-1997, EB, first
+ *       13-Aug-1997, LR, added string handling upsutl_str_*
  *
  ***********************************************************************/
 
@@ -25,6 +26,7 @@
 #include <stdio.h>
 #include <pwd.h>
 #include <string.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -40,6 +42,7 @@
 /*
  * Declaration of private functions.
  */
+static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 
 /*
  * Definition of global variables.
@@ -131,7 +134,7 @@ int upsutl_statistics(t_ups_instance const * const a_instance,
   char stat_file[FILENAME_MAX+1];
   int dir_s, stat_s, file_s;
   int return_status;
-  FILE *file_stream;
+  FILE *file_stream = 0;
   char mode[] = "a,access=lock";              /* create new file or append
 						 to existing one */
   char *time_date, *user;
@@ -254,3 +257,145 @@ char *upsutl_user(void)
   }
   return (username);
 }
+
+
+/*-----------------------------------------------------------------------
+ * upsutl_str_sort
+ *
+ * Will sort items in a string, str. Item are delimeted by character c.
+ * (e.g "dd,ttt,b,aaa," becomes "aaa,b,dd,ttt")
+ *
+ * Input : char *, string to be sorted
+ *         char, delimeting character
+ * Output: none
+ * Return: int, number if items sorted
+ */
+int upsutl_str_sort( char * const str, const char c )
+{
+  static char buf[MAX_LINE_LEN];
+  char *cp, *cp0;  
+  char ct[2] = "\0\0";
+  size_t max_len = 0;
+  int count = 0, i = 0;
+
+  if ( !str || strlen( str ) <= 0 ) return 0;
+  
+  ct[0] = c;
+  memset( buf, 0, MAX_LINE_LEN );
+  
+  /* get max len of an item */
+
+  cp0 = str;
+  while ( (cp = strchr( cp0, c )) ) {
+    if ( max_len < (cp-cp0) ) max_len = cp-cp0;
+    cp0 = cp+1;
+    count++;
+  }
+  ++max_len;
+  ++count;
+
+  /* check size */
+  
+  if ( count*max_len >= MAX_LINE_LEN ) {    
+    upserr_add( UPS_LINE_TOO_LONG, UPS_FATAL, "upsutl_str_sort" );
+    return 0;
+  }
+
+  /* split, fill buf with evenly spaced items (qsort likes that) */
+
+  count = 0;
+  cp = strtok( str, ct );
+  do {
+    strcpy( &buf[count*max_len], cp );
+    count++;
+  } while( (cp=strtok( 0, ct )) );
+
+  /* sort */
+  
+  qsort( buf, count, max_len, qsort_cmp_string );
+
+  /* merge, write back to input */
+
+  strcpy( str, &buf[0] );
+  for ( i=1; i<count; i++ ) {
+    strcat( str, ct );
+    strcat( str, &buf[i*max_len] );
+  }
+
+  return count;
+}
+
+/*-----------------------------------------------------------------------
+ * upsutl_str_remove
+ *
+ * Will erase characters, defined in str_remove, from in str.
+ *
+ * Input : char *, string to be trimmed
+ *         char *, string of character to remove
+ * Output: none
+ * Return: int, length of trimmed string
+ */
+size_t upsutl_str_remove( char * const str, const char * const str_remove )
+{
+  char *cpf = str, *cp = str;  
+
+  if ( !str || strlen( str ) <= 0 ) return 0;
+
+  while ( cpf && *cpf ) {
+    if ( ! strchr( str_remove, *cpf ) ) {
+      *cp = *cpf;
+      cp++;
+    }
+    cpf++;
+  }
+  *cp = 0;
+
+  return strlen( str );    
+}
+
+/*-----------------------------------------------------------------------
+ * upsutl_str_remove_edges
+ *
+ * Will erase trailing and starting characters, defined in str_remove,
+ * from str
+ *
+ * Input : char *, string to be trimmed
+ *         char *, string of character to remove
+ * Output: none
+ * Return: int, length of trimmed string
+ */
+size_t upsutl_str_remove_edges( char * const str, const char * const str_remove )
+{
+  char *cp = str;
+  char *cstart = 0, *cend = 0;
+  size_t count = 0;
+  
+  while ( cp && strchr( str_remove, *cp ) ){ cp++; }
+  cstart = cp;
+  count = strlen( str );
+  cp = &str[count - 1];
+  while ( count && strchr( str_remove, *cp ) ){ cp--; count--; }
+  cend = cp;
+
+  if ( cend >= cstart && cstart >= str ) {
+    count = cend-cstart + 1;
+    memmove( str, cstart, count );
+    str[count] = 0;
+  }
+  else {
+    str[0] = 0;
+  }
+
+  return strlen( str );
+}
+
+/*
+ * Definition of private functions
+ */
+
+/* used by qsort */
+int qsort_cmp_string( const void *c1, const void *c2 )
+{
+  return strcmp( (const char *)c1, (const char *)c2 );
+}
+

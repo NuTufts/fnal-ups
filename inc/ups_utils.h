@@ -16,6 +16,7 @@
  *
  * MODIFICATIONS:
  *       28-Jul-1997, EB, first
+ *       13-Aug-1997, LR, added string handling upsutl_str_*
  *
  ***********************************************************************/
 
@@ -47,6 +48,10 @@ int upsutl_statistics(t_ups_instance const * const a_instance,
 		      char const * const a_dir, char const * const a_command);
 char *upsutl_time_date(void);
 char *upsutl_user(void);
+
+int        upsutl_str_sort( char * const, const char );
+size_t     upsutl_str_remove( char * const str, const char * const ct );
+size_t     upsutl_str_remove_edges( char * const str, const char * const ct );
 
 /*
  * Declaration of private globals.
