@@ -127,8 +127,6 @@ static t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 				    const char * const act_name );
 static t_upsact_item *copy_act_item( const t_upsact_item * const act_itm );
 static int cmp_ugo_db( const void * const d1, const void * const d2 );
-static t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
-				      t_upstyp_db * const db );
 static t_upslst_item* merge_ugo_db( t_upslst_item * const db_list1, 
 				    t_upslst_item * const db_list2 );
 static t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm, 
@@ -1268,23 +1266,6 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       new_ugo = get_ugo( p_cmd, 0, &unsetup_flag ); 
 
-      /* new_ugo can be null if doing unsetup
-	 not any more !!!
-      if ( ! new_ugo && (i_cmd & 2) )
-	continue;
-      */
-
-      /* if nessecary, reorder database list, that will only
-         be done for 1'st level dependencies */
-
-
-      /* for b4_11 ... no reorder
-      if ( new_ugo ) {
-	new_ugo->ugo_db = 
-	  prepend_ugo_db( new_ugo->ugo_db, p_act_itm->mat->db_info );
-      }
-      */
-
       /* get the action item */
 
       if ( i_cmd & 2 ) 
@@ -1596,7 +1577,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       new_act_itm->unsetup = unsetup_flag;
       new_act_itm->level = p_act_itm->level + 1;
-      P_VERB_s_s( 3, "Adding dependcy:", p_line );
+      P_VERB_s_s( 3, "Adding dependency:", p_line );
       dep_list = next_cmd( top_list, dep_list, new_act_itm, action_name, copt );
 
     }
@@ -1978,7 +1959,7 @@ t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
 
 int cmp_ugo_db( const void * const d1, const void * const d2 )
 {
-  /* a little helper for prepend_ugo_db and merge_ugo_db */
+  /* a little helper for merge_ugo_db */
 
   t_upstyp_db *db1 = (t_upstyp_db *)d1;
   t_upstyp_db *db2 = (t_upstyp_db *)d2;
@@ -1986,37 +1967,6 @@ int cmp_ugo_db( const void * const d1, const void * const d2 )
   if ( db1 && db2 && db1->name && db2->name )
     return upsutl_stricmp( db1->name, db2->name );
   return -1;
-}
-
-t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
-			       t_upstyp_db * const db )
-{
-  /* it will prepend or move passed database db to the top of the 
-     database list */
-
-  t_upslst_item *l_db = upslst_first( db_list );
-  t_upslst_item *f_db_itm = 0;
-  t_upstyp_db *f_db = 0;
-
-  if ( !db ) 
-    return db_list;
-
-  /* if passed database list contain passed db, remove it */
-
-  if ( (f_db_itm = upslst_find( l_db, db, cmp_ugo_db )) ) {
-    f_db = (t_upstyp_db *)f_db_itm->data;
-    l_db = upslst_delete( l_db, f_db, ' ' );
-  }
-  else {
-    upsmem_inc_refctr( db );
-    f_db = db;
-  }
-    
-  /* prepend database */
-
-  l_db = upslst_insert( l_db, f_db );
-
-  return l_db;
 }
 
 t_upslst_item* merge_ugo_db( t_upslst_item * const l_db1,
@@ -2040,7 +1990,7 @@ t_upslst_item* merge_ugo_db( t_upslst_item * const l_db1,
     if ( !db )
       continue;
 
-    /* if nessecary add database */
+    /* if necessary add database */
       
     if ( !upslst_find( l_1, db, cmp_ugo_db ) ) {
       upsmem_inc_refctr( db );
