@@ -28,6 +28,29 @@
 #* reqCat = PREREQ or POSTREQ
 #* reqOrder = artificial number added to maintain order of requisites...
 #
+#   I MUST explain DeSeTuP word cause, it along with this whole thing,
+#   it really rather weird...  When I create the requisite commands for
+#   setup I have to put the defaults in between the prereq's and the
+#   postreqs but in the process I'm also thumbing threw USE and BUILD
+#   and flavors, and well technically versions but tables are forced
+#   on versions for the conversion process.  So while I have to add the
+#   defaults I have no idea what will later be merged into like groups.
+#   I had two chioces, toss out the grouping which is very nice radically
+#   difficult and complete, or add the defaults numerous times base on
+#   what later would be grouped.  So I stuck in a place holder and replace
+#   the first occurance with the right stuff and delete all the additional
+#   placeholders that *might* be there.  Then I substitute the whole setup
+#   actions with unsetup and stick in the unsetup action.
+#
+#   That solves the setup and unsetup defaults in the pre and post reqs
+#   now I still need to handle the tailor's, start's, and all the other
+#   misc.  The problem is to this point I avoided looking INTO the product
+#   and just used the product definition.  But since I have to I will
+#   ass/u/me that is a products version has a tailor, or appropriate, for
+#   one flavor it has for all flavors.   So I will try to keep a base dir
+#   for the last product defined and base all defintions of the other
+#   actions base on that version and the last flavor.
+
 use Getopt::Std;
 
 #  Define valid options (only the option 'f' takes an argument)
@@ -252,7 +275,8 @@ sub writeflvrReqs {
              }
              if ( ! $CatFlag && $reqCat eq "POSTREQ" ) {
                 $CatFlaq=1;
-                $flvrverHash{$flavor}{$version}{$reqType}.=&add_defaults;
+                   $flvrverHash{$flavor}{$version}{$reqType}.=&add_setup;
+                   $basedir=&prod_dir;
              }
           }
           @use = sort keys %{ $reqHash{$reqType}{$reqCat} };
@@ -356,7 +380,8 @@ sub WriteTableFile {
                 print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
                 }
              open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
-             $ReqHash{$flvr} = &add_defaults;
+                $ReqHash{$flvr} = &add_setup;
+#                $ReqHash{$flvr}.= &add_unsetup;
              }
         }
     }
@@ -388,7 +413,14 @@ sub WriteTableFile {
        }
        print TableFile "Common:\n";
        print TableFile "   Action=setup\n";
+       $key=~s/DaSeTuP/      doDefaults()\n      source(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
+       $key=~s/DaSeTuP//g;
        print TableFile "$key";
+       $key=~s/setup/unsetup/g;
+       print TableFile "   Action=unsetup\n";
+       print TableFile "$key";
+       $baseactions=&add_misactions;
+       print TableFile "${baseactions}";
        print TableFile "End:\n";
        print TableFile "# End Group definition\n";
        print TableFile "#*************************************************\n";
@@ -627,11 +659,19 @@ sub table_file {
     my $type = $_[0];
     return $flvrverHash{$flvr}{$version}{$type} 
 }
-sub add_defaults {
+sub add_setup {
+    my $value;
+#    $value ="      doDefaults()\n";
+#    $value.="      source(\${UPS_PROD_DIR}/ups/setup.\${UPS_SHELL})\n";
+    $value="DaSeTuP"
+} 
+sub add_unsetup {
     my $value;
     $value ="      doDefaults()\n";
-    $value.="      source(\${UPS_PROD_DIR}/ups/setup.\${UPS_SHELL})\n";
-    $basedir=&prod_dir;
+    $value.="      source(\${UPS_PROD_DIR}/ups/unsetup.\${UPS_SHELL})\n";
+} 
+sub add_misactions { 
+    $value="";
     if (open(TMPFILE,"${basedir}/ups/tailor")) {
        close TMPFILE;
        $value.="   Action=Tailor\n";
@@ -639,7 +679,7 @@ sub add_defaults {
     }
     if (open(TMPFILE,"${basedir}/ups/configure")) {
        close TMPFILE;
-       $value.="   Action=condifure\n";
+       $value.="   Action=configure\n";
        $value.="      source(\${UPS_PROD_DIR}/ups/configure)\n";
     }
     if (open(TMPFILE,"${basedir}/ups/start")) {
