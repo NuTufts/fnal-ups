@@ -45,7 +45,7 @@ extern int UPS_VERBOSE;
  */
 static t_upstyp_matched_product *match_instance_core(
 			   const t_upsugo_command * const a_command_line,
-			   const char * const a_db,
+			   const t_upstyp_db * const a_db_info,
 			   const char * const a_prod_name,
 			   const t_upslst_item * const a_chain_list,
 			   const t_upslst_item * const a_version,
@@ -57,7 +57,7 @@ static int match_from_chain( const char * const a_product,
 			     const char * const a_version,
 			     const char * const a_upsdir,
 			     const char * const a_productdir,
-			     const char * const a_db,
+			     const t_upstyp_db * const a_db_info,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
@@ -67,7 +67,7 @@ static int match_from_version( const char * const a_product,
 			       const char * const a_version,
 			       const char * const a_upsdir,
 			       const char * const a_productdir,
-			       const char * const a_db,
+			       const t_upstyp_db * const a_db_info,
 			       const int a_need_unique,
 			       const t_upslst_item * const a_flavor_list,
 			       const t_upslst_item * const a_quals_list,
@@ -77,7 +77,7 @@ static int match_from_table( const char * const a_product,
 			     const char * const a_tablefiledir,
 			     const char * const a_upsdir,
 			     const char * const a_productdir,
-			     const char * const a_db,
+			     const t_upstyp_db * const a_db_info,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
@@ -87,7 +87,7 @@ static char *get_table_file_path( const char * const a_prodname,
 				  const char * const a_tablefiledir,
 				  const char * const a_upsdir,
 				  const char * const a_productdir,
-				  const char * const a_db);
+				  const t_upstyp_db * const a_db_info);
 static int is_a_file(const char * const a_filename);
 static t_upstyp_product *read_chain(const char * const a_db,
 				    const char * const a_prod,
@@ -146,7 +146,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
       }
 
 #define GET_ALL_FILES(suffix, file_list) \
-	location = upsutl_get_prod_dir(the_db, prod_name);           \
+	location = upsutl_get_prod_dir(db_info->name, prod_name);    \
 	file_list = upsutl_get_files(location, suffix);              \
 	upsmem_free(location);
 
@@ -174,8 +174,8 @@ static int get_instance(const t_upslst_item * const a_read_instances,
       }
 
 #define GET_NEW_MPRODUCT() \
-      minst_list = upslst_first(minst_list);                              \
-      mproduct = ups_new_matched_product(a_db, a_prod_name, minst_list);
+      minst_list = upslst_first(minst_list);                                  \
+      mproduct = ups_new_matched_product(a_db_info, a_prod_name, minst_list);
 
 #define GET_NEW_MINST(inst_type) \
       minst = ups_new_matched_instance();                          \
@@ -243,16 +243,17 @@ static int get_instance(const t_upslst_item * const a_read_instances,
  * Output: None
  * Return: a list of matched products
  */
-t_upslst_item *upsmat_match_instance(
-				 const t_upsugo_command * const a_command_line,
-				 const int a_need_unique)
+t_upslst_item *upsmat_match_instance(t_upsugo_command * const a_command_line,
+				     const int a_need_unique)
 {
+  t_upstyp_db *db_info = NULL;
   t_upslst_item *db_item, *all_products = NULL, *product_item;
   t_upslst_item *all_versions = NULL;
   t_upslst_item *chain_item, *all_chains = NULL, *all_tmp_chains = NULL;
   t_upstyp_matched_product *mproduct = NULL;
   t_upslst_item *mproduct_list = NULL;
-  char *the_db, *prod_name, *the_chain, *new_string = NULL, *location = NULL;
+  t_upstyp_product *config_ptr = NULL;
+  char *prod_name, *the_chain, *new_string = NULL, *location = NULL;
   char do_delete = 'd';
   int got_all_products = 0, got_all_versions = 0;
   int any_version = 0, any_chain = 0;
@@ -291,19 +292,28 @@ t_upslst_item *upsmat_match_instance(
       /* we have at least one db */
       for (db_item = a_command_line->ugo_db ; db_item ;
 	   db_item = db_item->next) {
-	the_db = (char *)(db_item->data);
+	db_info = (t_upstyp_db *)db_item->data;
 	if (UPS_VERBOSE) {
-	  printf("%sSearching UPS database - %s\n", VPREFIX, the_db);
+	  printf("%sSearching UPS database - %s\n", VPREFIX, db_info->name);
 	}
 	/* If the user did not enter a product name, get all the product names
 	   in the current db. */
 	if (! got_all_products) {
-	  all_products = upsutl_get_files(the_db, (char *)ANY_MATCH);
+	  all_products = upsutl_get_files(db_info->name, (char *)ANY_MATCH);
 	}
 
 	if (all_products) {
 	  /* make sure if we need a unique instance that we only have one */
 	  CHECK_UNIQUE(all_products);
+
+	  /* read in the config file associated with this database and
+	     save it */
+	  if (!db_info->config) {
+	    config_ptr = upsutl_get_config(db_info->name);
+	    if (config_ptr) {
+	      db_info->config = config_ptr->config;
+	    }
+	  }
 
 	  /* for each product, get all the requested instances */
 	  for (product_item = all_products ; product_item ;
@@ -352,7 +362,7 @@ t_upslst_item *upsmat_match_instance(
 	    }
 	      
 	    /* now do the instance matching */
-	    mproduct = match_instance_core(a_command_line, the_db,
+	    mproduct = match_instance_core(a_command_line, db_info,
 					   prod_name, all_chains,
 					   all_versions, a_need_unique,
 					   any_version, any_chain);
@@ -429,7 +439,7 @@ t_upslst_item *upsmat_match_instance(
  */
 static t_upstyp_matched_product *match_instance_core(
 				 const t_upsugo_command * const a_command_line,
-				 const char * const a_db,
+				 const t_upstyp_db * const a_db_info,
 				 const char * const a_prod_name,
 				 const t_upslst_item * const a_chain_list,
 				 const t_upslst_item * const a_version_list,
@@ -458,7 +468,7 @@ static t_upstyp_matched_product *match_instance_core(
 				   a_command_line->ugo_tablefile,
 				   a_command_line->ugo_tablefiledir,
 				   a_command_line->ugo_upsdir,
-				   a_command_line->ugo_productdir, a_db, 
+				   a_command_line->ugo_productdir, a_db_info, 
 				   a_need_unique, a_command_line->ugo_flavor,
 				   a_command_line->ugo_qualifiers,
 				   &minst_list);
@@ -480,7 +490,7 @@ static t_upstyp_matched_product *match_instance_core(
       tmp_num_matches = match_from_version(a_prod_name, version,
 					   a_command_line->ugo_upsdir,
 					   a_command_line->ugo_productdir,
-					   a_db, a_need_unique,
+					   a_db_info, a_need_unique,
 					   a_command_line->ugo_flavor,
 					   a_command_line->ugo_qualifiers, 
 					   &minst_list);
@@ -502,7 +512,7 @@ static t_upstyp_matched_product *match_instance_core(
 	   chain_list = chain_list->next) {
 	/* get the chain name */
 	chain = (char *)chain_list->data;
-	read_product = read_chain(a_db, a_prod_name, chain, &dummy);
+	read_product = read_chain(a_db_info->name, a_prod_name, chain, &dummy);
 	if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
 	  for (cinst_list = read_product->instance_list ; cinst_list ;
 	       cinst_list = cinst_list->next) {
@@ -567,13 +577,14 @@ static t_upstyp_matched_product *match_instance_core(
 	printf("%sMatching with Chain - %s\n", VPREFIX, chain);
       }
       tmp_num_matches = match_from_chain(a_prod_name, chain, 
-					a_command_line->ugo_version,
-					a_command_line->ugo_upsdir,
-					a_command_line->ugo_productdir, a_db, 
-					a_need_unique,
-					a_command_line->ugo_flavor,
-					a_command_line->ugo_qualifiers, 
-					a_any_version, &minst_list);
+					 a_command_line->ugo_version,
+					 a_command_line->ugo_upsdir,
+					 a_command_line->ugo_productdir,
+					 a_db_info, 
+					 a_need_unique,
+					 a_command_line->ugo_flavor,
+					 a_command_line->ugo_qualifiers, 
+					 a_any_version, &minst_list);
       /* we had an error, if it was an error that the requested file could
 	 not be found and we are asking for many instances, then continue
 	 with the next version.  else get out. */
@@ -613,7 +624,7 @@ static int match_from_chain( const char * const a_product,
 			     const char * const a_version,
 			     const char * const a_upsdir,
 			     const char * const a_productdir,
-			     const char * const a_db,
+			     const t_upstyp_db * const a_db_info,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
@@ -630,7 +641,7 @@ static int match_from_chain( const char * const a_product,
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
 
-  read_product = read_chain(a_db, a_product, a_chain, &buffer);
+  read_product = read_chain(a_db_info->name, a_product, a_chain, &buffer);
   if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
     /* get all the instances that match command line input */
     tmp_num_matches = get_instance(read_product->instance_list,
@@ -692,7 +703,7 @@ static int match_from_chain( const char * const a_product,
 	}
 	tmp_num_matches = match_from_version(inst->product, inst->version,
 					     tmp_upsdir, tmp_productdir,
-					     a_db,
+					     a_db_info,
 					     do_need_unique, tmp_flavor_list,
 					     tmp_quals_list, a_minst_list);
 	if (tmp_num_matches == 0) {
@@ -740,7 +751,7 @@ static int match_from_version( const char * const a_product,
 			       const char * const a_version,
 			       const char * const a_upsdir,
 			       const char * const a_productdir,
-			       const char * const a_db,
+			       const t_upstyp_db * const a_db_info,
 			       const int a_need_unique,
 			       const t_upslst_item * const a_flavor_list,
 			       const t_upslst_item * const a_quals_list,
@@ -759,10 +770,10 @@ static int match_from_version( const char * const a_product,
   int do_need_unique = 1;
 
   /* Get total length of version file name including path */
-  file_chars = (int )(strlen(a_version) + strlen(a_product) + strlen(a_db) + 
-               sizeof(VERSION_SUFFIX) + 4);
+  file_chars = (int )(strlen(a_version) + strlen(a_product) +
+		      strlen(a_db_info->name) + sizeof(VERSION_SUFFIX) + 4);
   if (file_chars <= FILENAME_MAX) {
-    sprintf(buffer, "%s/%s/%s%s", a_db, a_product, a_version,
+    sprintf(buffer, "%s/%s/%s%s", a_db_info->name, a_product, a_version,
 	    VERSION_SUFFIX);
     read_product = upsfil_read_file(&buffer[0]);
     if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
@@ -811,7 +822,7 @@ static int match_from_version( const char * const a_product,
 	      tmp_num_matches = match_from_table(inst->product,
 						 inst->table_file,
 						 inst->table_dir, tmp_upsdir,
-						 tmp_productdir, a_db,
+						 tmp_productdir, a_db_info,
 						 do_need_unique,
 						 tmp_flavor_list, 
 						 tmp_quals_list, a_minst_list);
@@ -866,7 +877,7 @@ static int match_from_table( const char * const a_product,
 			     const char * const a_tablefiledir,
 			     const char * const a_upsdir,
 			     const char * const a_productdir,
-			     const char * const a_db,
+			     const t_upstyp_db * const a_db_info,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
 			     const t_upslst_item * const a_quals_list,
@@ -878,7 +889,7 @@ static int match_from_table( const char * const a_product,
 
   full_table_file = get_table_file_path(a_product, a_tablefile,
 					a_tablefiledir, a_upsdir, a_productdir,
-					a_db);
+					a_db_info);
 
   if (full_table_file != NULL) {
     if ((read_product = upsfil_read_file(full_table_file)) != NULL) {
@@ -916,19 +927,20 @@ static int match_from_table( const char * const a_product,
  *    Look in each of the following successively till the file is found.  If
  *    the file is not found, it is an error.  If one of the pieces is missing,
  *    say - ups_dir - then that step is skipped.  NOTE: there is no default for
- *    the table file name.
+ *    the table file name. if the prod_dir_prefix is missing that step is
+ *    still done with the prefix just left off.
  *
  *         tablefiledir/tablefile
  *         ./tablefile
  *         ups_dir/tablefile
- *         prod_dir/ups_dir/tablefile
+ *         prod_dir_prefix/prod_dir/ups_dir/tablefile
  *         db/prodname/tablefile
  * 
  *
  * Input : product name
  *         table file name
  *         table file directory
- *         ups directory
+ *         ups directory information
  *         product dir
  *         ups database directory
  * Output: none
@@ -939,7 +951,7 @@ static char *get_table_file_path( const char * const a_prodname,
 				  const char * const a_tablefiledir,
 				  const char * const a_upsdir,
 				  const char * const a_productdir,
-				  const char * const a_db)
+				  const t_upstyp_db * const a_db_info)
 {
   char buffer[FILENAME_MAX+1];   /* max size of file name and path on system */
   char *path_ptr = NULL;
@@ -990,23 +1002,39 @@ static char *get_table_file_path( const char * const a_prodname,
     }
     /* try prod_dir/ups_dir/tablefile */
     if ((found == 0) && (a_upsdir != NULL) && (a_productdir != NULL)) {
-      if ((total_chars += (int )strlen(a_productdir) + 1) <= FILENAME_MAX) {
-	sprintf(buffer, "%s/%s/%s", a_productdir, a_upsdir, a_tablefile);
-	if (is_a_file(buffer) == UPS_SUCCESS) {
-	  G_SAVE_PATH(total_chars);        /* found it */
-	  found = 1;
+      if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
+	if ((total_chars += (int )strlen(a_productdir) + 
+	                    (int )strlen(a_db_info->config->prod_dir_prefix) +
+	                    1) <= FILENAME_MAX) {
+	  sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
+		                         a_productdir, a_upsdir, a_tablefile);
+	  if (is_a_file(buffer) == UPS_SUCCESS) {
+	    G_SAVE_PATH(total_chars);        /* found it */
+	    found = 1;
+	  }
+	} else {
+	  upserr_vplace();
+	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
 	}
       } else {
-	upserr_vplace();
-	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	if ((total_chars += (int )strlen(a_productdir) + 1) <= FILENAME_MAX) {
+	  sprintf(buffer, "%s/%s/%s", a_productdir, a_upsdir, a_tablefile);
+	  if (is_a_file(buffer) == UPS_SUCCESS) {
+	    G_SAVE_PATH(total_chars);        /* found it */
+	    found = 1;
+	  }
+	} else {
+	  upserr_vplace();
+	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	}
       }
     }
     /* try db/prod_name/tablefile */
-    if ((found == 0) && (a_db != NULL) && (a_prodname != NULL)) {
-      if ((total_chars = file_chars + (int )(strlen(a_prodname) + strlen(a_db))
-	                 + 1)
+    if ((found == 0) && (a_db_info != NULL) && (a_prodname != NULL)) {
+      if ((total_chars = file_chars + (int )(strlen(a_prodname) +
+					     strlen(a_db_info->name)) + 1)
 	  <= FILENAME_MAX) {
-	sprintf(buffer, "%s/%s/%s", a_db, a_prodname, a_tablefile);
+	sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname, a_tablefile);
 	if (is_a_file(buffer) == UPS_SUCCESS) {
 	  G_SAVE_PATH(total_chars);        /* found it */
 	}
