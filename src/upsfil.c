@@ -1054,6 +1054,7 @@ t_upstyp_instance *read_instance( void )
       else {
 	upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
 				     g_key, g_filename, g_line_count );
+
 	/* ups_free_instance( inst_ptr ); 
 	   return 0; */
       }
@@ -1082,8 +1083,21 @@ t_upstyp_instance *read_instance( void )
 
   }
 
-  if ( inst_ptr ) 
+  if ( inst_ptr ) {
+
+    /* something special for qualifiers, if not in file, set it to default */
+
+    if ( ! inst_ptr->qualifiers ) {
+      if ( UPS_VERIFY )
+	printf( "no qualifiers found in file %s line %d\n", 
+		g_filename, g_line_count );
+      
+
+      inst_ptr->qualifiers = upsutl_str_create( "", ' ' );
+    }
+
     g_item_count++;
+  }
 
   return inst_ptr;
 }
