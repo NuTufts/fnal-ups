@@ -25,8 +25,8 @@
 #include <stdio.h>
 
 /* ups specific include files */
-#include "ups_error.h"
-#include "ups_memory.h"
+#include "upserr.h"
+#include "upsmem.h"
 
 /*
  * Definition of public variables.
