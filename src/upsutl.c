@@ -369,33 +369,29 @@ t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
  * removed from the returned string.
  * 
  * Input : Directory where to get files, pattern to match in files
- * Output: none
- * Return: A list of the file names
+ * Output: a list of the file names
+ * Return: none
  */
-t_upslst_item * upsutl_get_files(const char * const a_dir,
-				 const char * const a_pattern)
+void upsutl_get_files(const char * const a_dir,
+		      const char * const a_pattern,
+		      t_upslst_item ** const a_file_list)
 {
 /* #ifdef _SYSTYPE_SVR4 */
   struct dirent *dir_line = NULL;
 /* #else
   struct direct *dir_line = NULL;
 #endif */
-  t_upslst_item *file_list = NULL;
   DIR *dir = NULL;
   char *new_string = NULL;
-  
+
   if ((dir = opendir(a_dir))) {
     if (! strcmp(a_pattern, ANY_MATCH)) {
       /* read each directory item and add it to the list */
       while ((dir_line = readdir(dir)) != NULL) {
 	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
 	  if ((new_string = upsutl_str_create(dir_line->d_name, ' '))) {
-	    file_list = upslst_add(file_list, (void *)new_string);
-	  } else {
-	    /* the only error from upsutl_str_create is a memory error, clean
-	       up and get out */
-	    upslst_free(file_list, 'd');
-	    break;
+	    *a_file_list = upslst_add((t_upslst_item *)*a_file_list,
+				      (void *)new_string);
 	  }
 	}
       }
@@ -407,27 +403,18 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
 	  new_string = upsutl_strstr(dir_line->d_name, a_pattern);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    if (new_string) {
-	      file_list = upslst_add(file_list, (void *)new_string);
+	      *a_file_list = upslst_add((t_upslst_item *)*a_file_list,
+					(void *)new_string);
 	    }
-	  } else {
-	    /* the only error from upsutl_strstr is a memory error, clean up
-	       and get out */
-	    upslst_free(file_list, 'd');
-	    break;
 	  }
 	}
       }
     }
-
     /* this guy will free 'dir' */
     closedir(dir);
-
-    /* point back to the beginning of the list */
-    file_list = upslst_first(file_list);
   } else {
     upserr_add(UPS_OPEN_FILE, UPS_WARNING, a_dir);
   }
-  return (file_list);
 }
 
 /*-----------------------------------------------------------------------
@@ -443,28 +430,27 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
 char *upsutl_get_prod_dir(const char * const a_db,
 			  const char * const a_prod_name)
 {
-  char *prod_dir = NULL;
-  int prod_name_len;
+  static char prod_dir[MAX_LINE_LEN];
+  char *prod_ptr = prod_dir;
 
-  /* make sure a_db and a_prod_name are not both NULL */
-  if (a_db || a_prod_name) {
-    prod_name_len = (int )strlen(a_prod_name);
-    prod_dir = (char *)upsmem_malloc((int )strlen(a_db) + prod_name_len + 2);
+  /* There are 3 cases to handle -  both a_db and a_prod_name exist,
+     or only one of the 2 exists.  We do not care about the case where only
+     a_db exists as we need a product name too */
+  if (a_prod_name) {
     if (a_db) {
-      strcpy(prod_dir, a_db);       /* add the db directory */
+      if (((int )strlen(a_db) + (int )strlen(a_prod_name)) < MAX_LINE_LEN) {
+	sprintf(prod_ptr, "%s/%s", a_db, a_prod_name);
+      }
+    } else {
+      if ((int )strlen(a_prod_name) < MAX_LINE_LEN) {
+	strcpy(prod_ptr, a_prod_name);
+      }
     }
-
-    /* only add the / divider if we have both a db and a product name */
-    if (a_db && a_prod_name) {
-      strncat(prod_dir, "/", 1);        /* and a / */
-    }
-
-    if (a_prod_name) {                            /* and the product name */
-      strncat(prod_dir, a_prod_name, (unsigned int )prod_name_len);
-    }
+  } else {
+    prod_ptr = NULL;
   }
 
-  return(prod_dir);
+  return(prod_ptr);
 }
 
 /*-----------------------------------------------------------------------
@@ -791,8 +777,6 @@ char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
 	new_string[i] = new_string[j];
       }
 
-    } else {
-      upserr_add(UPS_NO_MEMORY, UPS_FATAL, str_len);
     }
   }
 

@@ -68,8 +68,9 @@ t_upslst_item *upsutl_free_matched_product_list(
 t_upslst_item *upsutl_free_matched_instance_list(
 					   t_upslst_item ** const a_inst_list);
 t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list);
-t_upslst_item *upsutl_get_files(const char * const a_dir,
-				const char * const a_pattern);
+void upsutl_get_files(const char * const a_dir,
+		      const char * const a_pattern,
+		      t_upslst_item ** const a_file_list);
 char *upsutl_get_prod_dir(const char * const a_db,
 			  const char * const a_prod_name);
 void upsutl_start_timing(void);

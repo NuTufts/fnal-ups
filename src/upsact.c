@@ -988,7 +988,7 @@ void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
 	}
 
 	/* Get a list of all the files in the specified directory */
-	man_list = upsutl_get_files(buf, ANY_MATCH);
+	upsutl_get_files(buf, ANY_MATCH, &man_list);
 
 	for (man_item = man_list ; man_item ; man_item = man_item->next) {
 	  if (fprintf((FILE *)a_stream, "rm %s/%s\n", 
