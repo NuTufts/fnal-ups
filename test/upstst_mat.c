@@ -108,12 +108,15 @@ t_upslst_item 			*prod_ptr;		/* product ptr */
 t_upslst_item 			*inst_ptr;		/* instance ptr */
 t_upstyp_matched_product 	*prod;			/* product match */
 t_upstyp_matched_instance	*inst;			/* instance match */
+t_upstyp_db			*db;			/* database */
 
 
 if(!mp) return;
 for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
    prod = (t_upstyp_matched_product *) prod_ptr->data;
+   db = (t_upstyp_db *) prod->db_info;
+   if (db) fprintf(fd,"D:NAME=%s\n", db->name);
    for (inst_ptr = prod->minst_list; inst_ptr; inst_ptr = inst_ptr->next)
       {
       inst = (t_upstyp_matched_instance *) inst_ptr->data;

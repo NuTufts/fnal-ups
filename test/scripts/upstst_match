@@ -44,5 +44,10 @@ upsmat_instance -out snoopy2.out -diff snoopy2.in -z ../db1 -H IRIX+5 snoopy v1_
 upsmat_instance -out snoopy3.out -diff snoopy3.in -z ../db1 -H IRIX+5 snoopy v1_0 -q pigpen
 upsmat_instance -out snoopy4.out -diff snoopy4.in -z ../db1 -H IRIX+5 snoopy v1_0 -q ?pigpen -unique
 upsmat_instance -out snoopy5.out -diff snoopy5.in -z ../db1 -H IRIX+5 snoopy v1_0 -q lucy:linus:pigpen:violet 
+#
+# multiple db tests
+#
+upsmat_instance -out lassie6.out -diff lassie6.in -z ../db1:../db2 -f NULL -a lassie v2_0
+upsmat_instance -out lassie7.out -diff lassie7.in -z ../db1:../db2 -f NULL -q nodbg:opt lassie v2_0 -unique
 quit
 EOD
