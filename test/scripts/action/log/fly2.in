@@ -18,7 +18,7 @@ else
 fi
 export OPERA
 #
-OPERA="`$UPS_DIR/bin/dropit -p "$OPERA" -i' ' -d' ' FAUST`";
+OPERA="`$UPS_DIR/bin/dropit -e -p "$OPERA" -i' ' -d' ' FAUST`";
 if [ "x${OPERA:-}" = "x" ]; then unset OPERA; fi
 #
 unset OPERA
@@ -31,11 +31,11 @@ PATH="${PATH-}:emacs/bin";export PATH
 #
 PATH="emacs/test:${PATH-}";export PATH
 #
-upstmp="`$UPS_DIR/bin/dropit -S -p "$PATH" -i':' -d':' emacs`";
+upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' emacs`";
 if [ $? -eq 0 -a "$upstmp" != "" ]; then PATH=$upstmp; fi
 unset upstmp;
 #
-upstmp="`$UPS_DIR/bin/dropit -S -p "$PATH" -i':' -d':' bin`";
+upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' bin`";
 if [ $? -eq 0 -a "$upstmp" != "" ]; then PATH=$upstmp; fi
 unset upstmp;
 #

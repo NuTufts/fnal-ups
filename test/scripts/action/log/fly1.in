@@ -16,7 +16,7 @@ else
   setenv OPERA "FIDELIO ${OPERA}"
 endif
 #
-setenv OPERA "`$UPS_DIR/bin/dropit -p "'"$OPERA"'" -i' ' -d' ' FAUST`"
+setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' FAUST`"
 if ("x${OPERA}" == "x") unsetenv OPERA
 #
 unsetenv OPERA
@@ -32,12 +32,12 @@ rehash
 set path=(emacs/test $path)
 rehash
 #
-setenv upstmp "`$UPS_DIR/bin/dropit -S -p "'"$path"'" -i' ' -d' ' emacs`"
+setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' emacs`"
 if ($status == 0 && "$upstmp" != "") set path=($upstmp)
 rehash
 unsetenv upstmp
 #
-setenv upstmp "`$UPS_DIR/bin/dropit -S -p "'"$path"'" -i' ' -d' ' bin`"
+setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' bin`"
 if ($status == 0 && "$upstmp" != "") set path=($upstmp)
 rehash
 unsetenv upstmp

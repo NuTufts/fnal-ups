@@ -1,9 +1,10 @@
-unsetenv TMPDIR
+setenv TMPDIR "`$UPS_DIR/bin/dropit -e -p "'"$TMPDIR"'" -i':' -d':' /tmp`"
+if ("x${TMPDIR}" == "x") unsetenv TMPDIR
 #
-setenv OPERA "`$UPS_DIR/bin/dropit -p "'"$OPERA"'" -i' ' -d' ' FIDELIO`"
+setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' FIDELIO`"
 if ("x${OPERA}" == "x") unsetenv OPERA
 #
-setenv OPERA "`$UPS_DIR/bin/dropit -p "'"$OPERA"'" -i' ' -d' ' MADAM_BUTTERFLY CARMEN`"
+setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' MADAM_BUTTERFLY CARMEN`"
 if ("x${OPERA}" == "x") unsetenv OPERA
 #
 unsetenv OPERA
