@@ -508,7 +508,7 @@ int upsugo_ifornota(struct ups_command * const uc)
        } else {
          upsugo_bldfvr(uc);
 /* test flavor=* in table */
-         addr=upsutl_str_create("*",' ');  
+         addr=upsutl_str_create(ANY_FLAVOR,' ');  
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
 /* */
        }
@@ -524,7 +524,7 @@ int upsugo_ifornota(struct ups_command * const uc)
      }
      if (!uc->ugo_flavor) upsugo_bldfvr(uc);
 /* test flavor=* in table */
-         addr=upsutl_str_create("*",' ');  
+         addr=upsutl_str_create(ANY_FLAVOR,' ');  
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
 /* */
    }
