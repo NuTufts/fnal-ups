@@ -44,7 +44,7 @@ depend      :?cdotgfHKlmMqrUvVzZ:
 exist       :?BcdefgHjkmMoOqrtUvVzZ:
 : Determine if a setup command with the same options 
 : would likely succeed.
-flavor      :?fHl0123:
+flavor      :?fHlZ0123:
 : Print flavor of a machine, optionally by 
 : level, or table generated for searching
 get         :?cdfFgHmMnoqrtUvVzZ:
