@@ -44,7 +44,6 @@
 #include "upskey.h"
 #include "upsugo.h"
 #include "upsget.h"
-#include "ups_main.h"
 
 /*
  * Definition of public variables.
@@ -365,6 +364,7 @@ static char *g_default_delimiter = ":";
  * <byte>: <description>
  *   0   : specify if that action has a default set of commands
  */
+
 t_cmd_info g_cmd_info[] = {
   {e_current,       "current", 0, 0x00000001, e_invalid_action},
   {e_development,   "development", 0, 0x00000000, e_invalid_action},
@@ -401,43 +401,6 @@ t_cmd_info g_cmd_info[] = {
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
             "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
-};
-
-enum {
-  e_invalid_cmd = -1,
-  e_setupoptional = 0,
-  e_setuprequired,
-  e_unsetupoptional,
-  e_unsetuprequired, /* this action have to be the last setup/unsetup action */
-  e_sourcecompilereq,
-  e_sourcecompileopt,
-  e_envappend,
-  e_envremove,
-  e_envprepend,
-  e_envset,
-  e_envunset,
-  e_pathappend,
-  e_pathremove,
-  e_pathprepend,
-  e_pathset,
-  e_sourcerequired,
-  e_sourceoptional,
-  e_sourcereqcheck,
-  e_sourceoptcheck,
-  e_exeaccess,
-  e_execute,
-  e_filetest,
-  e_makedir,
-  e_copyhtml,
-  e_copyinfo,
-  e_copyman,
-  e_uncopyman,
-  e_copynews,
-  e_writecompilescript,
-  e_dodefaults,
-  e_nodefaults,
-  e_nosetupenv,
-  e_noproddir
 };
 
 /* These action commands are listed in order of use.  Hopefully the more

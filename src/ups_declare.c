@@ -31,6 +31,7 @@
 /*
  * Definition of public variables.
  */
+extern t_cmd_info g_cmd_info[];
 
 /*
  * Declaration of private functions.

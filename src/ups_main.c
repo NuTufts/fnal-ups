@@ -44,6 +44,7 @@
 #include "upsutl.h"
 #include "upshlp.h"
 #include "upsget.h"
+#include "upsact.h"
 #include "ups_declare.h"
 #include "ups_undeclare.h"
 #include "ups_flavor.h"
@@ -56,6 +57,7 @@ extern int UPS_VERBOSE;
 extern int g_LOCAL_VARS_DEF;
 extern int g_keep_temp_file;
 extern char *g_temp_file_name;
+extern t_cmd_info g_cmd_info[];
 
 /*
  * Declaration of private functions.
