@@ -1015,12 +1015,45 @@ int upsugo_free (struct ups_command * const uc)
          upsmem_free(uc->ugo_archivefile); 
       if ( uc->ugo_upsdir ) 
          upsmem_free(uc->ugo_upsdir); 
-      if ( uc->ugo_db ) 
-         upslst_free(uc->ugo_db,'d'); 
+      if ( uc->ugo_db )
+	 upsugo_free_ugo_db( uc->ugo_db );
       if ( uc->ugo_chain ) 
          upslst_free(uc->ugo_chain,'d'); 
       upsmem_free(uc);
     } return (0);
+}
+
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_free_ugo_db
+**                                                                           
+** DESCRIPTION                                                               
+**
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/                                                                           
+void upsugo_free_ugo_db( t_upslst_item * const ugo_db ) 
+{
+  t_upslst_item *l_db;
+
+  if ( ! ugo_db )
+    return;
+
+  upsmem_dec_refctr( ugo_db );
+  if ( upsmem_get_refctr( ugo_db ) > 0 )
+    return;
+
+  l_db = upslst_first( ugo_db );
+  for ( ; l_db; l_db = l_db->next ) {
+    t_upstyp_db* db = (t_upstyp_db * )l_db->data;
+    upsmem_free( db->name );
+    upsmem_free( db );
+  }
+  upslst_free( ugo_db,' ');
+
 }
 
 /* ==========================================================================

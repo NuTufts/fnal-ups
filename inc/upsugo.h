@@ -29,6 +29,7 @@
 
 /* ups specific include files, if needed for .h file */
 #include "upslst.h"
+#include "upstyp.h"
 
 /*
  * Public typdef's
@@ -142,6 +143,7 @@ t_upsugo_command     *upsugo_bldcmd(char * const cmdstr,
 			       char * const validopts);
 int         upsugo_bldfvr(struct ups_command * const uc);
 int         upsugo_free(struct ups_command * const uc);
+void        upsugo_free_ugo_db( t_upslst_item * const ugo_db );
 void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title ,
 		           const unsigned int prnt_ptr);
 int         upsugo_dump (struct ups_command * const uc, 
