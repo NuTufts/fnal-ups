@@ -85,6 +85,9 @@ void ups_declare( t_upsugo_command * const uc ,
   char *the_chain;
   char *the_flavor;
   char *the_qualifiers;
+  char *saddr;				/* start address for -O manipulation */
+  char *eaddr;				/* end address for -O manipulation */
+  char *naddr;				/* new address for -O manipulation */
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
   t_upstyp_instance *new_cinst;             /* new chain instance  */
@@ -98,6 +101,14 @@ void ups_declare( t_upsugo_command * const uc ,
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
   time_t seconds=0;
+  char * save_table_dir;		/* match won't work "how I want" */
+  char * save_table_file;		/* with table specifications     */
+  uc->ugo_m=0;
+  uc->ugo_M=0;
+  save_table_dir=uc->ugo_tablefiledir;
+  save_table_file=uc->ugo_tablefile;
+  uc->ugo_tablefile=0;
+  uc->ugo_tablefiledir=0;
 
   if (!uc->ugo_product || !uc->ugo_version )
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
@@ -310,14 +321,32 @@ void ups_declare( t_upsugo_command * const uc ,
       new_vinst->declarer=username;
       new_vinst->declared=declared_date;
       new_vinst->prod_dir=uc->ugo_productdir;
-      new_vinst->table_dir=uc->ugo_tablefiledir;
-      new_vinst->table_file=uc->ugo_tablefile;
+/*      new_vinst->table_dir=uc->ugo_tablefiledir;
+        new_vinst->table_file=uc->ugo_tablefile;   */
+      new_vinst->table_dir=save_table_dir;
+      new_vinst->table_file=save_table_file;
       new_vinst->ups_dir=uc->ugo_upsdir;
       new_vinst->origin=uc->ugo_origin;
       new_vinst->compile_file=uc->ugo_compile_file;
       new_vinst->compile_dir=uc->ugo_compile_dir;
-      if (uc->ugo_O) /* single value quicky must seperate by : lines */
-      { new_vinst->user_list = upslst_add(new_vinst->user_list,uc->ugo_options);
+      if (uc->ugo_O)
+      { if ( strchr(uc->ugo_options,':') == 0)
+        { new_vinst->user_list = 
+             upslst_add(new_vinst->user_list,uc->ugo_options);
+        } else {
+          saddr=uc->ugo_options;
+          while ((eaddr = strchr(saddr,':')) != 0 )
+          { *eaddr='\0';
+            naddr=upsutl_str_create(saddr,' ');
+            new_vinst->user_list = 
+               upslst_add(new_vinst->user_list,naddr);
+            *eaddr=':'; /* put back : want to free whole list later */
+            saddr=eaddr+1;
+          }
+          naddr=upsutl_str_create(saddr,' ');
+          new_vinst->user_list = 
+             upslst_add(new_vinst->user_list,naddr);
+        }
       }
       if (uc->ugo_L)
       { new_vinst->statistics=upsutl_str_create("",' '); }
