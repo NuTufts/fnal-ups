@@ -1,7 +1,0 @@
-In order to use the setup and unsetup scripts in this directory, you must
-first edit the file -
-
-	new_database
-
-and make it point to your converted ups database.
-
