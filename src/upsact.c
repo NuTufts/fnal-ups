@@ -477,10 +477,11 @@ t_cmd_map g_func_info[] = {
   { "proddir", e_proddir, f_proddir, 0, 0, e_unproddir, 0x00000001 },
   { "unsetupenv", e_unsetupenv, f_unsetupenv, 0, 0, e_setupenv, 0x00000001 },
   { "unproddir", e_unproddir, f_unproddir, 0, 0, e_proddir, 0x00000001 },
-  { "if", e_if, f_if, 1, 1, e_endif, 0x00000001},
+  { "if", e_if, f_if, 1, 1, e_endunless, 0x00000001},
   { "endif", e_endif, f_endif, 1, 1, e_unless, 0x00000001 },
-  { "endunless", e_endunless, f_endif, 1, 1, e_if, 0x00000001 },
   { "else", e_else, f_else, 0, 0, e_else, 0x00000001 },
+  { "unless", e_unless, f_unless, 1, 1, e_endif, 0x00000001 },
+  { "endunless", e_endunless, f_endif, 1, 1, e_if, 0x00000001 },
   { 0,0,0,0,0, 0x00000000 }
 };
 
@@ -3931,7 +3932,7 @@ static void f_if( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "if %s\nthen\n", a_cmd->argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s; if [ $? = 0 ]\nthen\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
