@@ -1015,7 +1015,7 @@ char *upsutl_time_date(void)
 
   /* Get the current time and date */
   now = time(NULL);
-  len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d %H:%M:%S GMT",
+  len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d %H.%M.%S GMT",
 			  gmtime(&now));
   if (len == 0) {
     buf_ptr = NULL;
