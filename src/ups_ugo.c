@@ -866,7 +866,6 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                  { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "g" );
                    break;
                  }
-                 addr=arg_str; /* in case no commas ... */
                  while((loc=strchr(arg_str,','))!=0) {
                     addr=arg_str;
                     arg_str=loc+1;
@@ -874,7 +873,7 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                     addr=upsutl_str_create(addr,'p');
 		    uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  }
-                 addr=upsutl_str_create(addr,'p');
+                 addr=upsutl_str_create(arg_str,'p');
                  uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  break;
                }
@@ -992,7 +991,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "m" );
                   break;
                 }
-		uc->ugo_tablefiledir = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_tablefiledir = addr;
                 break;
               }
               errflg = 1;
@@ -1010,7 +1010,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "M" );
                   break;
                 }
-		uc->ugo_tablefile = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_tablefile = addr;
                 break;
               }
               errflg = 1;
@@ -1028,7 +1029,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "N" );
                   break;
                 }
-		uc->ugo_anyfile = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_anyfile = addr;
                 break;
               }
               errflg = 1;
@@ -1046,7 +1048,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "O" );
                   break;
                 }
-		uc->ugo_options = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_options = addr;
                 break;
               }
               errflg = 1;
@@ -1083,7 +1086,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "P" );
                   break;
                 }
-		uc->ugo_override = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_override = addr;
                 break;
               }
               errflg = 1;
@@ -1114,7 +1118,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "r" );
                   break;
                 }
-		uc->ugo_productdir = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_productdir = addr;
                 break;
               }
               errflg = 1;
@@ -1132,7 +1137,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "T" );
                   break;
                 }
-		uc->ugo_archivefile = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_archivefile = addr;
                 break;
               }
               errflg = 1;
@@ -1150,7 +1156,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "U" );
                   break;
                 }
-		uc->ugo_upsdir = arg_str;
+                addr=upsutl_str_create(arg_str,'p');
+		uc->ugo_upsdir = addr;
                 break;
               }
               errflg = 1;
