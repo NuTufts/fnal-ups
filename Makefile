@@ -67,15 +67,15 @@ VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 #------------------------------------------------------------------
 # this is an *example* of a mythical product with a GNU Configure
 # based module "gnuproduct", an X11R6 imake based module "xproduct", 
-# and a locally developed product that uses "premake"
+# and a locally developed product that uses "upspremake"
 # "all" should probably depend on the product directory being set.
 
 UPSDBG=
 INSURE=
 
 all: 	proddir_is_set
-	cd src; premake $(UPSDBG) $(INSURE)
-	cd test; premake $(UPSDBG) $(INSURE)
+	cd src; upspremake $(UPSDBG) $(INSURE)
+	cd test; upspremake $(UPSDBG) $(INSURE)
 
 test: FORCE
 	cd test/scripts; upstst_all
@@ -91,12 +91,12 @@ insure:
 
 clean:
 	for subdir in src inc test doc bin lib; do \
-	   ( cd $$subdir; echo "cleaning $$subdir"; premake clean ); \
+	   ( cd $$subdir; echo "cleaning $$subdir"; upspremake clean ); \
 	done
 
 spotless:
 	for subdir in src inc test doc bin lib; do \
-	   ( cd $$subdir; echo "cleaning $$subdir"; premake spotless ); \
+	   ( cd $$subdir; echo "cleaning $$subdir"; upspremake spotless ); \
 	done
 
 # we indirect this a level so we can customize it for bundle products
