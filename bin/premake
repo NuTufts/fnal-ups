@@ -102,7 +102,6 @@ Valid flags are:
 	-f makefile	Alternate makefile name
 	-fulloptimise	Compile with full optimisation (may be undebuggable)
 	-help		Print this message
-	-insight        Compile with insight (under IRIX only)
 	-optimise	Compile with optimisation
 	-log file	Log make output to a file
 	-i              Compile with Insure (only on IRIX)
