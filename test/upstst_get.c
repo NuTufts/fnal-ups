@@ -24,7 +24,7 @@ static void upstst_trans_dump (const t_upslst_item * const ,
 
 int upstst_get_translation (int argc, char ** const argv)
 {
-static char     	*myfunc = "upsget_translation";
+static char     	*funcname = "upsget_translation";
 int             	status;                         /* status of parse */
 int             	estatus = UPS_SUCCESS;          /* expected status */
 t_upsugo_command	*uc = 0;			/* ups command */
@@ -157,7 +157,7 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
 
 int upstst_get_allout (int argc, char ** const argv)
 {
-static char     	*myfunc = "upsget_allout";
+static char     	*funcname = "upsget_allout";
 int             	status;                         /* status of parse */
 int             	estatus = UPS_SUCCESS;          /* expected status */
 t_upsugo_command	*uc = 0;			/* ups command */

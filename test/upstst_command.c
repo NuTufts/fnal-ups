@@ -16,13 +16,13 @@ Include files:-
 
 /* ==========================================================================
 
-    upstst_declare - tests ups list 
+    upstst_commands - tests ups all the commands with the generic interface
 
    ==========================================================================*/
 
-int upstst_declare(int argc, char ** const argv)
+
+int upstst_command(int argc, char ** const argv, const void * const myfunc(),const char * const funcname, const int calledby)
 {
-static char     *myfunc = "upsugo_declare";
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
 static char	*estatus_str;                   /*expected status str */
@@ -68,7 +68,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
       upserr_output(); upserr_clear();
       return (0);
       }
-   ups_declare(uc,stdout,e_declare);
+   *myfunc(uc,stdout,calledby);
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    }
 
@@ -89,3 +89,58 @@ if (difffile && outfile)
 return (0);
 }
 
+int upstst_declare(int argc, char ** const argv)
+{ return(upstst_command(argc,argv, 
+          (void *)&ups_declare,"ups_declare",e_declare)); }
+
+int upstst_undeclare(int argc, char ** const argv)
+{ return(upstst_command(argc,argv, 
+          (void *)&ups_undeclare,"ups_undeclare",e_undeclare)); }
+
+int upstst_configure(int argc, char ** const argv)
+{ return(upstst_command(argc,argv, 
+          (void *)&ups_configure,"ups_configure",e_configure)); }
+
+int upstst_unconfigure(int argc, char ** const argv)
+{ return(upstst_command(argc,argv, 
+          (void *)&ups_unconfigure,"ups_unconfigure",e_unconfigure)); }
+
+int upstst_tailor(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_tailor,"ups_tailor",e_tailor)); }
+
+int upstst_copy(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_copy,"ups_copy",e_copy)); }
+
+int upstst_start(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_start,"ups_start",e_start)); }
+
+int upstst_stop(int argc, char ** const argv)
+{ return(upstst_command(argc,argv, (void *)&ups_stop,"ups_stop",e_stop)); }
+
+int upstst_create(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_create,"ups_create",e_create)); }
+
+int upstst_flavor(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_flavor,"ups_flavor",e_flavor)); }
+
+int upstst_get(int argc, char ** const argv)
+{ return (upstst_command(argc,argv,(void *)&ups_get,"ups_get",e_get)); }
+
+int upstst_modify(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_modify,"ups_modify",e_modify)); }
+
+int upstst_setup(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_setup,"ups_setup",e_setup));}
+
+int upstst_unsetup(int argc, char ** const argv)
+{ return(upstst_command(argc,argv, 
+          (void *)&ups_unsetup,"ups_unsetup",e_unsetup)); }
+
+int upstst_unk(int argc, char ** const argv)
+{ return (upstst_command(argc,argv, (void *)&ups_unk,"ups_unk",e_unk)); }
+
+int upstst_depend(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_depend,"ups_depend",e_depend)); }
+
+int upstst_touch(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)&ups_touch,"ups_touch",e_touch)); }

@@ -1,8 +1,8 @@
 #!/bin/sh
 # ============================================================================
-# test ups get
+# test ups tailor
 # ============================================================================
-cd $UPS_DIR/test/scripts/get
+cd $UPS_DIR/test/scripts/tailor
 $UPS_DIR/test/ups_test << EOD
 
 quit

@@ -22,7 +22,7 @@ Include files:-
 
 int upstst_ugo_env (int argc, char ** const argv)
 {
-static char     *myfunc = "upsugo_env";
+static char     *funcname = "upsugo_env";
 int             status;                         /* status of parse */
 int             estatus = UPS_SUCCESS;          /* expected status */
 static char     *estatus_str;                   /* expected status string */
@@ -95,7 +95,7 @@ return (0);
    ==========================================================================*/
 int upstst_ugo_next (int argc, char ** const argv)
 {
-static char     *myfunc = "upsugo_next";
+static char     *funcname = "upsugo_next";
 int             status;                         /* status of parse */
 int             estatus = UPS_SUCCESS;          /* expected status */
 static char     *estatus_str;                   /* expected status string */
@@ -181,7 +181,7 @@ return (0);
 
 int upstst_ugo_bldcmd (int argc, char ** const argv)
 {
-static char     *myfunc = "upsugo_bldcmd";
+static char     *funcname = "upsugo_bldcmd";
 int             status;                         /* status of parse */
 int             estatus = UPS_SUCCESS;          /* expected status */
 static char     *estatus_str;                   /* expected status string */

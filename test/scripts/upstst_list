@@ -10,19 +10,19 @@ $UPS_DIR/test/ups_test << EOD
 #
 # all instances of all products sorted alphabetically
 #
-ups_list -out all.out -diff all.in -z db1 -a
+list -out all.out -diff all.in -z db1 -a
 #
 # long listing  - let's see it all for an instance with not much, and for
 #   	and instance with the whole shabang.
 #
-ups_list -out long.out -diff long.in -z db1 -a -l spot v2_0
+list -out long.out -diff long.in -z db1 -a -l spot v2_0
 #
 # test getting keywords
 #
-ups_list -out /dev/null -z db1 -q long spot v2_0 -K "BLAH" -estatus UPS_INVALID_KEYWORD
-ups_list -out key1.out -diff key1.in -z db1 -q long spot v2_0 -K "ARCHIVE_FILE:AUTHORIZED_NODES:_DUMMY:DESCRIPTION"
-ups_list -out key2.out -diff key2.in -z db1 -a lassie -K +
-ups_list -out key3.out -diff key3.in -z db1 -a lassie -K +:DECLARED
+list -out /dev/null -z db1 -q long spot v2_0 -K "BLAH" -estatus UPS_INVALID_KEYWORD
+list -out key1.out -diff key1.in -z db1 -q long spot v2_0 -K "ARCHIVE_FILE:AUTHORIZED_NODES:_DUMMY:DESCRIPTION"
+list -out key2.out -diff key2.in -z db1 -a lassie -K +
+list -out key3.out -diff key3.in -z db1 -a lassie -K +:DECLARED
 #
 # need to test multiple databases
 quit

@@ -1,8 +1,8 @@
 #!/bin/sh
 # ============================================================================
-# test ups get
+# test ups flavor
 # ============================================================================
-cd $UPS_DIR/test/scripts/get
+cd $UPS_DIR/test/scripts/flavor
 $UPS_DIR/test/ups_test << EOD
 
 quit

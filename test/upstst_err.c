@@ -74,7 +74,7 @@ int	upstst_err_add (int argc, char ** const argv)
 {
 
 int 		status;
-static char	*myfunc = "upserr_add";
+static char	*funcname = "upserr_add";
 static char	*severity;
 static char	*error_str;
 int		error;

@@ -22,7 +22,7 @@ Include files:-
 
 int upstst_act_print (int argc, char ** const argv)
 {
-static char     *myfunc = "upsact_print";
+static char     *funcname = "upsact_print";
 static char     *options;			/* options */
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
@@ -94,7 +94,7 @@ return (0);
 
 int upstst_act_process_commands (int argc, char ** const argv)
 {
-static char     *myfunc = "upsact_process_commands";
+static char     *funcname = "upsact_process_commands";
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
 static char     *action;			/* file to diff */

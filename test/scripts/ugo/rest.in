@@ -14,7 +14,8 @@ Tablefile:        titan
 Anyfile:          sam:shameful
 Options:          -power_steering -ac -abs
 Description:      It was a dark and stormy night.
-Override:         valhalla:xanadu
+LongListing
+OutputActOnly
 Qualifiers:       *
 Productdir:       /myprod:/yourprod
 Archivefile:      a.tar:b.tar

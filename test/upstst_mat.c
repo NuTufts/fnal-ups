@@ -23,7 +23,7 @@ static void upstst_match_dump (const t_upslst_item * const );
 
 int upstst_mat_instance (int argc, char ** const argv)
 {
-static char     	*myfunc = "upsmat_instance";
+static char     	*funcname = "upsmat_instance";
 int             	status;                         /* status of parse */
 int             	estatus = UPS_SUCCESS;          /* expected status */
 t_upsugo_command	*uc = 0;			/* ups command */

@@ -22,7 +22,7 @@ Include files:-
 
 int upstst_list (int argc, char ** const argv)
 {
-static char     *myfunc = "upsugo_list";
+static char     *funcname = "upsugo_list";
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
 int		status;				/* function status */

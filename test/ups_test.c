@@ -32,9 +32,16 @@ int upstst_ugo_env(int, char**);  	int upstst_ugo_next(int, char**);
 int upstst_ugo_bldcmd(int, char**);
 int upstst_mat_instance(int, char**); 	
 int upstst_get_translation(int, char**);int upstst_get_allout(int, char**);
-int upstst_list(int, char**);
-int upstst_declare(int, char**);
 int upstst_act_print(int, char**);	int upstst_act_process_commands(int, char**); 
+int upstst_list(int, char**);		int upstst_depend(int, char**);
+int upstst_declare(int, char**);	int upstst_undeclare(int, char**);
+int upstst_configure(int, char**);	int upstst_unconfigure(int, char**);
+int upstst_tailor(int, char**);		int upstst_copy(int, char**);
+int upstst_start(int, char**);		int upstst_stop(int, char**);
+int upstst_create(int, char**);		int upstst_flavor(int, char**);
+int upstst_get(int, char**);		int upstst_modify(int, char**);
+int upstst_setup(int, char**);		int upstst_unsetup(int, char**);
+int upstst_touch(int, char**); 		int upstst_unk(int, char**);		
 
 /*=============================================================================
 Routine:
@@ -63,12 +70,28 @@ upstst_cmd_table_t upstst_my_cmds[] = {
 	"upsmat_instance",	upstst_mat_instance,
 	"upsget_translation",	upstst_get_translation,
 	"upsget_allout",	upstst_get_allout,
-	"ups_list",		upstst_list,
-	"ups_declare",		upstst_declare,
 	"upsact_print",		upstst_act_print,
 	"upsact_process_commands",upstst_act_process_commands, 
+	"list",			upstst_list,
+	"depend",		upstst_depend,
+	"declare",		upstst_declare,
+	"undeclare",		upstst_undeclare,
+	"configure",		upstst_configure,
+	"unconfigure",		upstst_unconfigure,
+	"tailor",		upstst_tailor,
+	"copy",			upstst_copy,
+	"start",		upstst_start,
+	"stop",			upstst_stop,
+	"create",		upstst_create,
+	"flavor",		upstst_flavor,
+	"get",			upstst_get,
+	"modify",		upstst_modify,
+	"setup",		upstst_setup,
+	"unsetup",		upstst_unsetup,
+	"touch",		upstst_touch,
+	"unk",			upstst_unk,
 	NULL,			0};
-
+
 upstst_commandloop ("ups_test> ", upstst_my_cmds);
 return(0);
 }

@@ -53,7 +53,7 @@ extern int              upstst_debug;            /* debug flag */
       }						\
    if (macstatus != estatus)			\
       {						\
-      fprintf (stderr, "function: %s\n",myfunc);\
+      fprintf (stderr, "function: %s\n",funcname);\
       fprintf (stderr, "%s: %s, %s: %s\n",	\
          "actual status",g_error_ascii[macstatus],\
 	 "expected status", g_error_ascii[estatus]);\
@@ -69,7 +69,7 @@ extern int              upstst_debug;            /* debug flag */
 #define UPSTST_CHECK_UPS_ERROR(estatus) {		\
    if (UPS_ERROR != estatus)				\
       {							\
-      fprintf(stderr,"function: %s\n",myfunc);		\
+      fprintf(stderr,"function: %s\n",funcname);		\
       fprintf(stderr,"%s: %s, %s: %s\n","actual status",\
          g_error_ascii[UPS_ERROR],"expected status", 	\
          g_error_ascii[estatus]);			\
@@ -90,7 +90,7 @@ extern int              upstst_debug;            /* debug flag */
 	    }						\
       if (!g_error_ascii[i])				\
          {						\
-         fprintf (stderr, "function: %s\n",myfunc);	\
+         fprintf (stderr, "function: %s\n",funcname);	\
          fprintf (stderr,				\
             "Invalid error code specified: %s\n",	\
             estring);					\
