@@ -53,6 +53,40 @@ extern t_cmd_info g_cmd_info[];
  * Definition of public functions.
  */
 
+void print_action( t_upstyp_action * const act_ptr )
+{
+  t_upslst_item *l_ptr = 0;
+ 
+  if ( !act_ptr ) return;
+
+  printf ( "action = %s\n", act_ptr->action );
+ 
+  if ( act_ptr->command_list ) {
+    printf( "Command list = \n" );
+    l_ptr = upslst_first( act_ptr->command_list );
+    for ( ; l_ptr; l_ptr = l_ptr->next ) {
+      printf( "   %s\n", (char*)l_ptr->data );
+    }
+  }
+  else {
+    printf( "Command list = %s\n", (char*)0 );
+  }
+}
+
+void abc(t_upstyp_instance * const inst_ptr)
+{
+ t_upslst_item *l_ptr=0;
+
+ if ( inst_ptr->action_list ) 
+ {
+    printf( "Actions = \n" );
+    l_ptr = upslst_first( inst_ptr->action_list );
+    for ( ; l_ptr; l_ptr = l_ptr->next ) {
+      print_action( l_ptr->data );
+    }
+ }
+}
+
 /*-----------------------------------------------------------------------
  * ups_declare
  *
@@ -92,7 +126,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upstyp_instance *cinst;                 /* chain instance      */
   t_upstyp_instance *new_cinst;             /* new chain instance  */
 /*  t_upslst_item *vinst_list;                 version instance list */
-/*  t_upstyp_instance *vinst;                  version instance      */
+/*  t_upstyp_instance *vinst;               /*   version instance      */
+  t_upstyp_instance *tinst;                 /*   table instance      */
   t_upstyp_instance *new_vinst;             /* new version instance  */
   char *username;
   struct tm *mytime;
@@ -348,8 +383,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          strcpy(buffer,file);
        } else { 
          upsver_mes(1,"Instance in version file allready exists\n");
-         *file='\0'; /* don't do create instance */
-         buffer[0]='\0';
+         buffer[0]=0; /* don't create instance */
+         mproduct_list = upslst_first(mproduct_list);
+         mproduct = (t_upstyp_matched_product *)mproduct_list->data;
        }
     } else { /* new version does NOT exist at all */
       product = ups_new_product();
@@ -362,7 +398,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       product->version = upsutl_str_create(uc->ugo_version,' ');
     }
     /* build new version instance */
-    if (*file) /* instance doesn't exist */
+    if (buffer) /* instance doesn't exist */
     { new_vinst=ups_new_instance();
       new_vinst->product=upsutl_str_create(uc->ugo_product,' ');
       new_vinst->version=upsutl_str_create(save_version,' ');
@@ -377,12 +413,25 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       new_vinst->prod_dir=upsutl_str_create(uc->ugo_productdir,' ');
 /*      new_vinst->table_dir=uc->ugo_tablefiledir;
         new_vinst->table_file=uc->ugo_tablefile;   */
+      uc->ugo_tablefiledir=save_table_dir;
+      uc->ugo_tablefile=save_table_file;
       new_vinst->table_dir=upsutl_str_create(save_table_dir,' ');
       new_vinst->table_file=upsutl_str_create(save_table_file,' ');
       new_vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' ');
       new_vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
       new_vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
       new_vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
+/* If I'm creating a totally matched version I have to create the matched 
+   product structure by hand since it really doesn't exist yet on disk
+   and a call to get it will fail
+*/
+      minst = ups_new_matched_instance();
+      minst->version=new_vinst;
+      tinst = upsmat_version(new_vinst,db_info);
+      minst->table=tinst;
+      minst_list = upslst_add(minst_list,minst);
+      mproduct = ups_new_matched_product(db_info, uc->ugo_product,
+                                         minst_list);
       if (!uc->ugo_r )
       { upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL, 
                uc->ugo_product, "product home", 
@@ -408,13 +457,36 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         }
       }
       if (uc->ugo_L)
-      { new_vinst->statistics=upsutl_str_create("",' '); }
+      { new_vinst->statistics=upsutl_str_create("",' '); 
+      }
       product->instance_list = 
           upslst_add(product->instance_list,new_vinst);
       upsver_mes(1,"Adding version %s to %s\n",
                  new_vinst->version,
                  buffer);
       (void )upsfil_write_file(product, buffer, ' ', JOURNAL);  
+    } 
+/* Process the declare action */
+    cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                               mproduct, g_cmd_info[ups_command].cmd,
+                               ups_command);
+    if (UPS_ERROR == UPS_SUCCESS) 
+    { upsact_process_commands(cmd_list, tmpfile); 
+      upsact_cleanup(cmd_list);
+    } else {
+      upsfil_clear_journal_files();
+      upserr_vplace();
+      return 0;
+    } 
+/* Let them know if there is a tailor action for this product */
+    cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                               mproduct, g_cmd_info[e_tailor].cmd,
+                               e_tailor);
+    if (UPS_ERROR == UPS_SUCCESS) 
+    { if (cmd_list)
+      { upsver_mes(0,"A UPS tailor exists for this product\n");
+        upsact_cleanup(cmd_list);
+      }
     } 
     uc->ugo_chain=save_chain;
     if (uc->ugo_chain)
@@ -429,14 +501,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         chain_list->next=0;
         chain_list->prev=0;
         uc->ugo_chain=chain_list;
-        mproduct_list = upsmat_instance(uc, db_list , need_unique);
-        if (UPS_ERROR != UPS_SUCCESS) 
-        { upsfil_clear_journal_files();
-          upserr_vplace();
-          return 0; 
-        }
-        chain_list->next = save_next;
-        chain_list->prev = save_prev;
         cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                   mproduct, the_chain,
 				  ups_command);
@@ -447,26 +511,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
           upsfil_clear_journal_files();
           upserr_vplace();
           return 0;
-        } 
-        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-				  mproduct, g_cmd_info[ups_command].cmd,
-				  ups_command);
-        if (UPS_ERROR == UPS_SUCCESS) 
-        { upsact_process_commands(cmd_list, tmpfile); 
-          upsact_cleanup(cmd_list);
-        } else {
-          upsfil_clear_journal_files();
-          upserr_vplace();
-          return 0;
-        } 
-        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                   mproduct, g_cmd_info[e_tailor].cmd,
-                                   e_tailor);
-        if (UPS_ERROR == UPS_SUCCESS) 
-        { if (cmd_list)
-          { upsver_mes(0,"A UPS tailor exists for this product\n");
-            upsact_cleanup(cmd_list);
-          }
         } 
         if (strstr(the_chain,"current"))
         { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -483,6 +527,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
             upsact_cleanup(cmd_list);
           } 
         }
+        chain_list->next = save_next;
+        chain_list->prev = save_prev;
       }
     }
     return 0;
