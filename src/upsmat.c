@@ -365,46 +365,52 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		   (char *)a_command_line->ugo_tablefile);
 	  for (db_item = db_list ; db_item ; db_item = db_item->next) {
 	    db_info = (t_upstyp_db *)db_item->data;
-	    upsver_mes(MATVLEVEL, "%sSearching UPS database - %s\n", VPREFIX,
-		     db_info->name);
-	    /* If the user did not enter a product name, get all the product
-	       names in the current db. */
-	    if (! got_all_products) {
-	      upsutl_get_files(db_info->name, (char *)ANY_MATCH,
-			       &all_products);
-	    }
-	    
-	    if (all_products) {
-	      /* make sure if we need a unique instance that we only have 1 */
-	      CHECK_UNIQUE(all_products, "products");
-
-	      /* read in the config file associated with this database and
-		 save it */
-	      GET_CONFIG_FILE();
-	      
-	      /* for each product, get all the requested instances */
-	      for (product_item = all_products ; product_item ;
-		   product_item = product_item->next) {
-		prod_name = (char *)product_item->data;
-		
-		upsver_mes(MATVLEVEL, "%sLooking for Product = %s\n",
-			   VPREFIX, prod_name);
-		mproduct = match_instance_core(a_command_line, db_info, 
-					       prod_name, NULL, NULL,
-					       a_need_unique, any_version,
-					       any_chain);
-		/* update the mproduct_list structure with the new info */
-		ADD_TO_MPRODUCT_LIST();
-	      }
-	      /* may no longer need product list - free it */
+ 
+	    /* first check to see that the specified database exists. */
+	    if (upsutl_is_a_file(db_info->name) == UPS_SUCCESS) {
+	      upsver_mes(MATVLEVEL, "%sSearching UPS database - %s\n", VPREFIX,
+			 db_info->name);
+	      /* If the user did not enter a product name, get all the product
+		 names in the current db. */
 	      if (! got_all_products) {
-		all_products = upslst_free(all_products, do_delete);
+		upsutl_get_files(db_info->name, (char *)ANY_MATCH,
+				 &all_products);
 	      }
-	    }
-	    /* if we have a match and are asking for a unique one, we do not
-	       need to go to the next db */
-	    if (a_need_unique && mproduct) {
-	      break;
+	    
+	      if (all_products) {
+		/* make sure if we need unique instance that we only have 1 */
+		CHECK_UNIQUE(all_products, "products");
+
+		/* read in the config file associated with this database and
+		   save it */
+		GET_CONFIG_FILE();
+	      
+		/* for each product, get all the requested instances */
+		for (product_item = all_products ; product_item ;
+		     product_item = product_item->next) {
+		  prod_name = (char *)product_item->data;
+		
+		  upsver_mes(MATVLEVEL, "%sLooking for Product = %s\n",
+			     VPREFIX, prod_name);
+		  mproduct = match_instance_core(a_command_line, db_info, 
+						 prod_name, NULL, NULL,
+						 a_need_unique, any_version,
+						 any_chain);
+		  /* update the mproduct_list structure with the new info */
+		  ADD_TO_MPRODUCT_LIST();
+		}
+		/* may no longer need product list - free it */
+		if (! got_all_products) {
+		  all_products = upslst_free(all_products, do_delete);
+		}
+	      }
+	      /* if we have a match and are asking for a unique one, we do not
+		 need to go to the next db */
+	      if (a_need_unique && mproduct) {
+		break;
+	      }
+	    } else {
+	      upserr_add(UPS_NOT_A_DIR, UPS_WARNING, db_info->name);
 	    }
 	  }
 	} else {
@@ -414,156 +420,158 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	/* we have at least one db */
 	for (db_item = db_list ; db_item ; db_item = db_item->next) {
 	  db_info = (t_upstyp_db *)db_item->data;
-	  upsver_mes(MATVLEVEL, "%sSearching UPS database - %s\n", VPREFIX, 
-		     db_info->name);
-	  /* If the user did not enter a product name, get all product names
-	     in the current db. */
-	  if (! got_all_products) {
-	    upsutl_get_files(db_info->name, (char *)ANY_MATCH, &all_products);
-	  }
-	  
-	  if (all_products) {
-	    /* make sure if we need a unique instance that we only have one */
-	    CHECK_UNIQUE(all_products, "products");
+	  /* first check to see that the specified database exists. */
+	  if (upsutl_is_a_file(db_info->name) == UPS_SUCCESS) {
+	    upsver_mes(MATVLEVEL, "%sSearching UPS database - %s\n", VPREFIX, 
+		       db_info->name);
+	    /* If the user did not enter a product name, get all product names
+	       in the current db. */
+	    if (! got_all_products) {
+	      upsutl_get_files(db_info->name, (char *)ANY_MATCH,
+			       &all_products);
+	    }
+	    if (all_products) {
+	      /* make sure if we need unique instance that we only have one */
+	      CHECK_UNIQUE(all_products, "products");
 	    
-	    /* read in the config file associated with this database and
-	       save it */
-	    GET_CONFIG_FILE();
+	      /* read in the config file associated with this database and
+		 save it */
+	      GET_CONFIG_FILE();
 	    
-	    /* for each product, get all the requested instances */
-	    for (product_item = all_products ; product_item ;
-		 product_item = product_item->next) {
-	      prod_name = (char *)product_item->data;
-	      location = upsutl_get_prod_dir(db_info->name, prod_name);
+	      /* for each product, get all the requested instances */
+	      for (product_item = all_products ; product_item ;
+		   product_item = product_item->next) {
+		prod_name = (char *)product_item->data;
+		location = upsutl_get_prod_dir(db_info->name, prod_name);
+		
+		upsver_mes(MATVLEVEL, "%sLooking for Product = %s\n", VPREFIX,
+			   prod_name);
 	      
-	      upsver_mes(MATVLEVEL, "%sLooking for Product = %s\n", VPREFIX,
-			 prod_name);
-	      
-	      /* make sure that the product actually exists. */
-	      if (upsutl_is_a_file(location) == UPS_SUCCESS) {
-		/* Check if chains were requested. if a specific version was
-		   passed, but no chain, the we will want to report all chains.
-		   this is only true in the case where we are not looking for a
-		   unique instance. this way we do not require setup to open up
-		   all of the chain files */
-		if (a_command_line->ugo_chain ||
-		    (a_command_line->ugo_version && !a_need_unique)) {
-		  /* we may have already made a list of them above. check
-		     before doing anything here */
-		  if (! got_all_chains) {
-		    if (a_command_line->ugo_version) {
-		      /* a specific version was entered so we want to report on
-			 all chains that point to the specified version */
-		      chain_item = upslst_new(upsutl_str_create(ANY_MATCH,
-							    STR_TRIM_DEFAULT));
-		      allocate_new_chain = 1;
-		    } else {
-		      chain_item = a_command_line->ugo_chain;
-		    }
-		    for ( tmp_chain = chain_item ; tmp_chain ;
-			  tmp_chain = tmp_chain->next) {
-		      the_chain = (char *)(tmp_chain->data);
-		      if (! NOT_EQUAL_ANY_MATCH(the_chain)) {
-			/* get all the chains in the current product area */
-			upsutl_get_files(location, (char *)CHAIN_SUFFIX,
-					 &all_chains);
-			any_chain = 1;            /* originally chain was *  */
-			
+		/* make sure that the product actually exists. */
+		if (upsutl_is_a_file(location) == UPS_SUCCESS) {
+		  /* Check if chains were requested. if a specific version was
+		     passed, but no chain, the we will want to report all
+		     chains. this is only true in the case where we are not
+		     looking for a unique instance. this way we do not require
+		     setup to open up all of the chain files */
+		  if (a_command_line->ugo_chain ||
+		      (a_command_line->ugo_version && !a_need_unique)) {
+		    /* we may have already made a list of them above. check
+		       before doing anything here */
+		    if (! got_all_chains) {
+		      if (a_command_line->ugo_version) {
+			/* a specific version was entered so want to report on
+			   all chains that point to the specified version */
+			chain_item = upslst_new(upsutl_str_create(ANY_MATCH,
+							   STR_TRIM_DEFAULT));
+			allocate_new_chain = 1;
 		      } else {
-			/* Now add this chain to the master list */
-			all_chains = upslst_add(all_chains, the_chain);
+			chain_item = a_command_line->ugo_chain;
+		      }
+		      for ( tmp_chain = chain_item ; tmp_chain ;
+			    tmp_chain = tmp_chain->next) {
+			the_chain = (char *)(tmp_chain->data);
+			if (! NOT_EQUAL_ANY_MATCH(the_chain)) {
+			  /* get all the chains in the current product area */
+			  upsutl_get_files(location, (char *)CHAIN_SUFFIX,
+					   &all_chains);
+			  any_chain = 1;          /* originally chain was *  */
+			} else {
+			  /* Now add this chain to the master list */
+			  all_chains = upslst_add(all_chains, the_chain);
+			}
+		      }
+		      /* clean up memory */
+		      if (allocate_new_chain) {
+			chain_item = upslst_free(chain_item, 'd');
 		      }
 		    }
-
-		    /* clean up memory */
-		    if (allocate_new_chain) {
-		      chain_item = upslst_free(chain_item, 'd');
-		    }
+		    /* make sure if we need unique instance we only have one */
+		    CHECK_UNIQUE(all_chains, "chains");
 		  }
-		  /* make sure if we need unique instance we only have one */
-		  CHECK_UNIQUE(all_chains, "chains");
-		}
 		
-		/* Look to see if a version was specified. */
-		if (a_command_line->ugo_version) {
+		  /* Look to see if a version was specified. */
+		  if (a_command_line->ugo_version) {
+		    if (! got_all_versions) {
+		      /* get all the versions in the current product area */
+		      upsutl_get_files(location, (char *)VERSION_SUFFIX,
+				       &all_versions);
+		      any_version = 1;          /* originally version was *  */
+		    }
+		    /* make sure if need unique instance that only have one */
+		    CHECK_UNIQUE(all_versions, "versions");
+		  }
+		  /* now do the instance matching */
+		  mproduct = match_instance_core(a_command_line, db_info,
+						 prod_name, all_chains,
+						 all_versions, a_need_unique,
+						 any_version, any_chain);
+		  
+		  /* update the mproduct_list structure with the new info */
+		  ADD_TO_MPRODUCT_LIST();
+		  
+		  /* may no longer need version list - free it */
 		  if (! got_all_versions) {
-		    /* get all the versions in the current product area */
-		    upsutl_get_files(location, (char *)VERSION_SUFFIX,
-				     &all_versions);
-		    any_version = 1;            /* originally version was *  */
+		    all_versions = upslst_free(all_versions, do_delete);
 		  }
-		  /* make sure if need unique instance that we only have one */
-		  CHECK_UNIQUE(all_versions, "versions");
-		}
+		  
+		  /* may no longer need chain list - free it */
+		  if (! got_all_chains) {
+		    all_chains = upslst_free(all_chains, do_delete);
+		  }
 		
-		/* now do the instance matching */
-		mproduct = match_instance_core(a_command_line, db_info,
-					       prod_name, all_chains,
-					       all_versions, a_need_unique,
-					       any_version, any_chain);
-		
-		/* update the mproduct_list structure with the new info */
-		ADD_TO_MPRODUCT_LIST();
-		
-		/* may no longer need version list - free it */
-		if (! got_all_versions) {
-		  all_versions = upslst_free(all_versions, do_delete);
-		}
-		
-		/* may no longer need chain list - free it */
-		if (! got_all_chains) {
-		  all_chains = upslst_free(all_chains, do_delete);
-		}
-		
-		/* get out of the loop if we got an error */
-		if (UPS_ERROR != UPS_SUCCESS) {
-		  if (!a_need_unique) {
-		    /* we are looking for possibly many instances.  skip the
-		       error if current instance could not be found and look
-		       for the next one.  error message is in error buffer. */
-		    if (UPS_ERROR == UPS_NO_TABLE_MATCH ||
-			UPS_ERROR == UPS_NO_VERSION_MATCH) {
-		      g_ups_error = UPS_ERROR;
-		      /* erase the last error from the error buffer */
-		      upserr_backup();
-		    }
-		    else {
-		      /* it was another error so pay attention to it. */
-		      break;
-		    }
-		  } else {
-		    /* we are only looking for one instance. if we are looking
-		       thru multiple databases, and have not reached the last
-		       one, then ignore the error and continue on to the next
-		       prod or db. */
-		    if (db_item->next) {
-		      /* there are more databases to look thru. erase the error
-			 and continue. still to do - need to make sure on the
-			 number of times to backup. */
-		      upserr_backup();
-		      upserr_backup();
+		  /* get out of the loop if we got an error */
+		  if (UPS_ERROR != UPS_SUCCESS) {
+		    if (!a_need_unique) {
+		      /* we are looking for possibly many instances.  skip the
+			 error if current instance could not be found and look
+			 for the next one. error message is in error buffer. */
+		      if (UPS_ERROR == UPS_NO_TABLE_MATCH ||
+			  UPS_ERROR == UPS_NO_VERSION_MATCH) {
+			g_ups_error = UPS_ERROR;
+			/* erase the last error from the error buffer */
+			upserr_backup();
+		      }
+		      else {
+			/* it was another error so pay attention to it. */
+			break;
+		      }
 		    } else {
-		      /* this was the last db on the list so we need to handle
-			 the error */
-		      break;
+		      /* we are only looking for 1 instance. if we are looking
+			 thru multiple databases, and have not reached the last
+			 one, then ignore the error and continue on to the next
+			 prod or db. */
+		      if (db_item->next) {
+			/* there are more databases to look thru. erase error
+			   and continue. still to do - need to make sure on the
+			   number of times to backup. */
+			upserr_backup();
+			upserr_backup();
+		      } else {
+			/* this was last db on the list so we need to handle
+			   the error */
+			break;
+		      }
 		    }
 		  }
+		} else {
+		  /* the entered product does not exist in this database */
+		  upsver_mes(MATVLEVEL, "%sProduct - %s does not exist\n",
+			     VPREFIX, location);
 		}
-	      } else {
-		/* the entered product does not exist in this database */
-		upsver_mes(MATVLEVEL, "%sProduct - %s does not exist\n",
-			   VPREFIX, location);
+	      }
+	      /* may no longer need product list - free it */
+	      if (! got_all_products) {
+		all_products = upslst_free(all_products, do_delete);
 	      }
 	    }
-	    /* may no longer need product list - free it */
-	    if (! got_all_products) {
-	      all_products = upslst_free(all_products, do_delete);
+	    /* if we have a match and are asking for a unique one, we do not 
+	       need to go to the next db */
+	    if (a_need_unique && mproduct) {
+	      break;
 	    }
-	  }
-	  /* if we have a match and are asking for a unique one, we do not need
-	     to go to the next db */
-	  if (a_need_unique && mproduct) {
-	    break;
+	  } else {
+	    upserr_add(UPS_NOT_A_DIR, UPS_WARNING, db_info->name);	    
 	  }
 	}
       }
