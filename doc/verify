@@ -1,0 +1,16 @@
+
+Things to remember to verify when reading a ups file.
+=====================================================
+
+- Better error return when reading invalid keywords,
+  e.g reading 'FLAVIR' when 'FLAVOR' was expected.
+
+- Check keyword spelling,
+  e.g reading invalid keyword 'COMNEN'.
+
+- Check delimiter in QUALIFIERS,
+  e.g if any char not [0,9,a,z,A,Z] and ':' print a warning.
+  
+- Check that each FLAVOR is followed by a QUALIFIERS.
+
+- Check that no VERSION is specified in a TABLE file.
