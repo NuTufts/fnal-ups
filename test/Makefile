@@ -31,8 +31,8 @@ OBJECTS =
 
 LDFLAGS = $(LLIBS)
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
-	upstst_misc.o upstst_parse.o upstst_error.o upstst_files.o	\
-	upstst_ugo.o upstst_match.o
+	upstst_misc.o upstst_parse.o upstst_err.o upstst_fil.o	\
+	upstst_ugo.o upstst_mat.o
 #=============================================================================
 # TARGETS
 #=============================================================================
@@ -126,9 +126,6 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
-test_ups_help.o:	test_ups_help.c
-test_ups_ugo.o:	test_ups_ugo.c
-test_ups_utils.o:	test_ups_utils.c
 test_upserr.o:	test_upserr.c
 test_upserr.o:	$(ERUPT_DIR)/inc/upserr.h
 test_upsfil.o:	test_upsfil.c
@@ -158,6 +155,22 @@ test_upsmem.o:	$(ERUPT_DIR)/inc/upslst.h
 test_upsmem.o:	$(ERUPT_DIR)/inc/upserr.h
 ups_test.o:	ups_test.c
 ups_test.o:	./upstst_cmdtable.h
+ups_test.o:	$(ERUPT_DIR)/inc/ups.h
+ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_test.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_test.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_test.o:	$(ERUPT_DIR)/inc/ups_commands.h
+ups_test.o:	$(ERUPT_DIR)/inc/upsfil.h
+ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_test.o:	$(ERUPT_DIR)/inc/upskey.h
+ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_test.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_test.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_test.o:	$(ERUPT_DIR)/inc/upsmem.h
+ups_test.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_test.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_cmdline.o:	upstst_cmdline.c
 upstst_cmdline.o:	./upstst_cmdline.h
 upstst_cmdloop.o:	upstst_cmdloop.c
@@ -168,20 +181,73 @@ upstst_cmdproc.o:	upstst_cmdproc.c
 upstst_cmdproc.o:	./upstst_cmdline.h
 upstst_cmdproc.o:	./upstst_parse.h
 upstst_cmdproc.o:	./upstst_cmdtable.h
-upstst_error.o:	upstst_error.c
-upstst_error.o:	./upstst_parse.h
-upstst_error.o:	./upstst_macros.h
-upstst_files.o:	upstst_files.c
-upstst_files.o:	./upstst_parse.h
-upstst_files.o:	./upstst_macros.h
-upstst_match.o:	upstst_match.c
-upstst_match.o:	./upstst_parse.h
-upstst_match.o:	./upstst_macros.h
+upstst_err.o:	upstst_err.c
+upstst_err.o:	./upstst_parse.h
+upstst_err.o:	./upstst_macros.h
+upstst_err.o:	$(ERUPT_DIR)/inc/upserr.h
+upstst_fil.o:	upstst_fil.c
+upstst_fil.o:	$(ERUPT_DIR)/inc/ups.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upserr.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/ups_commands.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upsfil.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upskey.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upsmem.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upsutl.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_fil.o:	./upstst_parse.h
+upstst_fil.o:	./upstst_macros.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upserr.h
+upstst_mat.o:	upstst_mat.c
+upstst_mat.o:	$(ERUPT_DIR)/inc/ups.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upserr.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/ups_commands.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upsfil.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upskey.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upsmem.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upsutl.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_mat.o:	./upstst_parse.h
+upstst_mat.o:	./upstst_macros.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upserr.h
 upstst_misc.o:	upstst_misc.c
 upstst_misc.o:	./upstst_parse.h
 upstst_misc.o:	./upstst_macros.h
+upstst_misc.o:	$(ERUPT_DIR)/inc/upserr.h
 upstst_parse.o:	upstst_parse.c
 upstst_parse.o:	./upstst_parse.h
 upstst_ugo.o:	upstst_ugo.c
+upstst_ugo.o:	$(ERUPT_DIR)/inc/ups.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upserr.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_commands.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upsfil.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upskey.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upsmem.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upsutl.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_ugo.o:	./upstst_parse.h
 upstst_ugo.o:	./upstst_macros.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upserr.h
