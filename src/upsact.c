@@ -3770,7 +3770,7 @@ static void f_proddir( ACTION_PARAMS)
 {
   static char buf[MAX_LINE_LEN];
   t_upsact_cmd lcl_cmd;
-  char *tmp_prod_dir = NULL;
+  char *tmp_prod_dir = NULL, *tmp_prod_name = NULL;
   char *uprod_name;
 
   CHECK_NUM_PARAM("prodDir");
@@ -3790,6 +3790,13 @@ static void f_proddir( ACTION_PARAMS)
        if the user entered one that we have to use */
     if (a_command_line->ugo_productdir) {
       tmp_prod_dir = a_command_line->ugo_productdir;
+      if (! a_minst->version) {
+	/* we do not have a version file read in.  therefore use the product
+	   name from the command line */
+	tmp_prod_name = a_command_line->ugo_product;
+      } else {
+	tmp_prod_name = a_minst->version->product;
+      }
     } else if (a_minst->version && a_minst->version->prod_dir) {
       if (UPSRELATIVE(a_minst->version->prod_dir) && a_db_info &&
 	  a_db_info->config && a_db_info->config->prod_dir_prefix) {
@@ -3799,9 +3806,10 @@ static void f_proddir( ACTION_PARAMS)
       } else {
 	tmp_prod_dir = a_minst->version->prod_dir;
       }
+      tmp_prod_name = a_minst->version->product;
     }
-    if (a_minst->version && tmp_prod_dir && a_minst->version->product) {
-      uprod_name = upsutl_upcase(a_minst->version->product);
+    if (tmp_prod_dir && tmp_prod_name) {
+      uprod_name = upsutl_upcase(tmp_prod_name);
       if (UPS_ERROR == UPS_SUCCESS) {
 	sprintf(g_buff, "%s_DIR", uprod_name);
 	
