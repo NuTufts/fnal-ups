@@ -109,7 +109,8 @@
 #define UPS_INVALID_ANY_QUALS   66
 #define UPS_COMMAND_FAILED      67
 #define UPS_DB_CORRUPTION       68
-#define UPS_NERR                69      /*  this one must always be last */
+#define UPS_STATISTICS          69
+#define UPS_NERR                70      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
