@@ -298,7 +298,20 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
      override this */
   if (g_temp_file_name && ! g_COMPILE_FLAG && ! g_keep_temp_file &&
       (strcmp (g_temp_file_name, "/dev/null") != 0)) {
+
+    /* Save the last exit status, so we don't think we succeeded
+    ** 'cause we could remove the tmp file...
+    */
+    switch(a_command_line->ugo_shell) {
+    case e_BOURNE:
+      (void) fprintf((FILE *)a_stream, "\nrc=$?\n");
+      break;
+    case e_CSHELL:
+      (void) fprintf((FILE *)a_stream, "\nset rc=$status\n");
+      break;
+    }
     (void) fprintf((FILE *)a_stream, "%s/bin/rm -f %s\n", a_prefix, g_temp_file_name);
+    (void) fprintf((FILE *)a_stream, "test $rc = 0\n", a_prefix, g_temp_file_name);
   }
 }
 

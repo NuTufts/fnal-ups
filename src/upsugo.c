@@ -707,6 +707,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  char *optionals[10]; /* OH NO!! artifical limit of 10 optionals */
  char *fix_inaddr;
  int is_decl;
+ t_upslst_item *l_ptr = 0;
 
  uc->ugo_reqqualifiers = strdup(inaddr);
 
@@ -834,6 +835,9 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
       (void) upsutl_str_sort(naddr,':'); 
       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
     }
+ }
+ for ( l_ptr = upslst_first(uc->ugo_qualifiers); l_ptr; l_ptr = l_ptr->next) {
+  upsver_mes(3,"%s Qualifier  %s in qual list\n",UPSUGO,l_ptr->data);
  }
  return(0);
 }
