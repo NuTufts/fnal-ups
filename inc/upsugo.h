@@ -1,7 +1,7 @@
 /***********************************************************************
  *
  * FILE:
- *       ups_types.h
+ *       upsugo.h
  * 
  * DESCRIPTION: 
  *       Common types for ups
