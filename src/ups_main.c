@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   int rstatus = 0;              /* assume success */
   t_upslst_item *mproduct_list  = NULL;
 
-  if (argv[1]) {
+  if (argv[1] && (strcmp(argv[1],"-?"))) {
     /* Figure out which command was entered */
     while (g_cmd_info[i].cmd) {
       if (! strcmp(g_cmd_info[i].cmd, argv[1])) {
