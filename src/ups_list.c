@@ -211,6 +211,13 @@ void list_K(const t_upstyp_matched_instance * const instance,
       printf("	CHAIN=%s", minst_ptr->INSTANCE->chain);              \
     } printf("\n");                                                  \
 }
+int product_cmp ( const void * const d1, const void * const d2 )
+{
+  t_upstyp_product *a1 = (t_upstyp_product *)d1;
+  t_upstyp_product *a2 = (t_upstyp_product *)d2;
+
+  return upsutl_stricmp( a1->product, a2->product );
+}
 /*
  * Definition of public functions.
  */
@@ -234,6 +241,8 @@ void ups_list( t_upsugo_command * const a_command_line )
   mproduct_list = ups_list_core(a_command_line);
   /*  upsugo_prtlst(mproduct_list,"the products");*/
   mproduct_list = upslst_first(mproduct_list);  /* point to the start */
+  mproduct_list = upslst_sort0( mproduct_list , product_cmp );
+  mproduct_list = upslst_first(mproduct_list);  /* point to the start */
 
   /* Output the requested information from the instances */
   /*  upsugo_dump(a_command_line);*/
@@ -249,6 +258,7 @@ void ups_list( t_upsugo_command * const a_command_line )
   tmp_mprod_list = upslst_free(tmp_mprod_list, ' ');
 
 }
+
 
 /*-----------------------------------------------------------------------
  * ups_list_core
