@@ -60,7 +60,6 @@ t_upstyp_matched_product *ups_new_matched_product(
 				      const char * const a_prod_name,
 				      const t_upslst_item * const a_minst_list)
 {
-  t_upslst_item *minst_item;
   t_upstyp_matched_product *mprod_ptr =
    (t_upstyp_matched_product *)upsmem_malloc(sizeof(t_upstyp_matched_product));
 
