@@ -124,14 +124,20 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
          fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->chain->flavor,
              inst->chain->qualifiers);
          }
-      fprintf(fd,"V:PRODUCT=%s, VERSION=%s, ", inst->version->product,
+      if (inst->version)
+         {
+         fprintf(fd,"V:PRODUCT=%s, VERSION=%s, ", inst->version->product,
              inst->version->version);
-      fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->version->flavor,
+         fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->version->flavor,
              inst->version->qualifiers);
-      fprintf(fd,"T:PRODUCT=%s, VERSION=%s, ", inst->table->product,
+         }
+      if (inst->table)
+         {
+         fprintf(fd,"T:PRODUCT=%s, VERSION=%s, ", inst->table->product,
              inst->table->version);
-      fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->table->flavor,
+         fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->table->flavor,
              inst->table->qualifiers);
+         }
       }
    }
 }
