@@ -2,6 +2,8 @@ FILE = VERSION
 PRODUCT = puffin
 VERSION = v2_0
 
+#*************************************************
+#
 FLAVOR = IRIX
 QUALIFIERS = "nodebug:superoptimized"
   DECLARED = 1-1-98
@@ -11,6 +13,8 @@ QUALIFIERS = "nodebug:superoptimized"
   TABLE_DIR = ups
   TABLE_FILE = v2_0.table
 
+#*************************************************
+#
 FLAVOR = IRIX+6.2
 QUALIFIERS = ""
   DECLARED = 1-1-98
@@ -20,6 +24,8 @@ QUALIFIERS = ""
   TABLE_DIR = ups
   TABLE_FILE = v2_0.table
 
+#*************************************************
+#
 FLAVOR = OSF1
 QUALIFIERS = ""
   DECLARED = 1-1-98

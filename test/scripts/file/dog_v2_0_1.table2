@@ -2,14 +2,12 @@ FILE = TABLE
 PRODUCT = tiny
 VERSION = v2_0
 
-#*************************************************
-#
 GROUP:
   FLAVOR = IRIX+6.2
   QUALIFIERS = ""
   
   FLAVOR = IRIX
-  QUALIFIERS = "nodebug:superoptimized"
+  QUALIFIERS = "superoptimized:nodebug"
   
 COMMON:
   ACTION = CONFIGURE
@@ -25,8 +23,6 @@ COMMON:
 
 END:
 
-#*************************************************
-#
 FLAVOR = IRIX
 QUALIFIERS = "nodebug"
   ACTION = CONFIGURE
@@ -40,8 +36,6 @@ QUALIFIERS = "nodebug"
     setupRequired("cat v2_7")
     setupRequired("dog v1_7")
 
-#*************************************************
-#
 FLAVOR = IRIX
 QUALIFIERS = "superoptimized"
   ACTION = CONFIGURE
