@@ -91,16 +91,6 @@ alias rambo "SlyStalone !*"
 #
 unalias rambo
 #
-cp info/* /tmp/info
-#
-cp man/* /tmp/man
-#
-cp catman/* /tmp/catman
-#
-cp html/* /tmp/html
-#
-cp news/* /tmp/news
-#
 if (-e reqfile1) then
   source reqfile1
 else
