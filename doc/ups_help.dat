@@ -36,7 +36,7 @@ create      :?fHmMpqvZ:
 : Create a template UPS table file.
 declare     :?AcCdfgHmMnoOpqrtTUvVzZ:
 : Add a product instance or a chain to a UPS Database.
-depend      :?cdotgfHKmMqrUvVzZ:
+depend      :?cdotgfHKlmMqrUvVzZ:
 : List (for a specified UPS product instance) 
 : UPS product requirements or all UPS product instances 
 : that have the specified UPS product instance as a 
