@@ -362,6 +362,9 @@ static t_upsugo_command *g_ugo_cmd = 0;
 /* this one, will hold the list of setuped products */
 static t_upslst_item *g_prod_done = 0;
 
+/* this one, is a pointer to the top level action item from the command line */
+static t_upsact_item *g_act_itm;
+
 /* 
  * Note: This array should in princip be in ups_main.c, but since
  * ups_main is not part of the ups library, it's here.
@@ -657,6 +660,7 @@ t_upslst_item *upsact_get_dep( t_upsugo_command * const ugo_cmd,
   /* create a list of 1'st level dependecies,
      these instances have precedence over products at lower (higher ?) levels */
 
+  g_act_itm = act_itm;
   top_list = next_top_prod( top_list, act_itm, act_name );
   
   /* add top product to dep list */
@@ -717,6 +721,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   /* create a list of 1'st level dependecies,
      these instances have precedence over products at lower (higher ?) levels */
 
+  g_act_itm = act_itm;
   top_list = next_top_prod( top_list, act_itm, act_name );
   
   /* get the dependency list */
@@ -1582,6 +1587,32 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       P_VERB_s_s( 3, "Adding dependency:", p_line );
       dep_list = next_cmd( top_list, dep_list, new_act_itm, action_name, copt );
 
+      /* write out statistics info */
+
+      if ((copt != 'd') && (new_act_itm->unsetup || (!(i_cmd & 2))))
+      {
+        char setup_string [256];
+        t_upslst_item mproduct;
+        int i;
+        char *p = setup_string;
+
+        mproduct.next = mproduct.prev = 0;
+        mproduct.data = new_act_itm->mat;
+        strcpy (setup_string, actitem2str (g_act_itm));
+        for (i = 0; i < 2; ++i)
+        {
+          p += strspn (p, " ");
+          p += strcspn (p, " ");
+        }
+        *p = '\0';
+
+        (void) sprintf (setup_string, "%ssetup%s %s",
+                        ((i_cmd & 2) ? "un" : ""),
+                        ((i_cmd & 1) ? "required" : "optional"),
+                        setup_string);
+        upsutl_statistics ((t_upslst_item const * const) &mproduct, setup_string);
+
+      }
     }
   }
 
