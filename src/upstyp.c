@@ -68,7 +68,6 @@ t_upstyp_matched_product *ups_new_matched_product(
   mprod_ptr->product = (char *)a_prod_name;
   upsmem_inc_refctr((void *)a_prod_name);
   mprod_ptr->minst_list = (t_upslst_item *)a_minst_list;
-  upsmem_inc_refctr((void *)a_minst_list);
 
   return mprod_ptr;
 }
