@@ -622,9 +622,13 @@ if ($error == 0) {
   print STDOUT "  UPS_SHELL=sh;export UPS_SHELL\n";
   print STDOUT "  UPS_DIR=$upsdir;export UPS_DIR\n";
   print STDOUT "  PRODUCTS=$userHash{$userArray[$UPS_DB][0]}\n";
-  print STDOUT "  ups declare -c -2 ups $upsver\n";
-  print STDOUT "  ups declare -c -2 perl $perlver\n";
-  print STDOUT "  ups declare -c -0 upd $updver\n";
+  print STDOUT "  ups declare -c -2 ups $userHash{$userArray[$UPS_VERSION][0]}\n";
+  if ($perldir ne "") {
+   print STDOUT "  ups declare -c -2 perl $userHash{$userArray[$PERL_VERSION][0]}\n";
+  }
+  if ($upddir ne "") {
+    print STDOUT "  ups declare -c -0 upd $userHash{$userArray[$UPD_VERSION][0]}\n";
+  }
   print STDOUT "\n";
   print STDOUT "               You must change the fermi.[c]shrc files to source\n";
   print STDOUT "               the new setups.[c]sh files if they are different\n";
