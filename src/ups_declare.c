@@ -188,7 +188,7 @@ void ups_declare( t_upsugo_command * const uc )
                 upsver_mes(1,"Deleting %s of version %s\n",
                            the_chain,
                            cinst->version);
-                (void )upsfil_write_file(product, file); 
+                (void )upsfil_write_file(product, file, ' '); 
             /* Do unchain action */
             /* un_the_chain???
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -228,7 +228,7 @@ void ups_declare( t_upsugo_command * const uc )
                   the_chain,
                   new_cinst->version,
                   file);
-       (void )upsfil_write_file(product, file);  
+       (void )upsfil_write_file(product, file, ' ');  
     }
 /************************************************************************
  *
@@ -293,6 +293,6 @@ void ups_declare( t_upsugo_command * const uc )
     upsver_mes(1,"Adding version %s to %s\n",
                new_vinst->version,
                file);
-    (void )upsfil_write_file(product, file);  
+    (void )upsfil_write_file(product, file, ' ');  
     }
 }

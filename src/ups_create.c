@@ -138,7 +138,7 @@ static void create_core(const t_upsugo_command * const a_command_line,
 
       /* write the table file */
       product->file = upsutl_str_create("TABLE", ' ');
-      (void )upsfil_write_file(product, buffer);
+      (void )upsfil_write_file(product, buffer, ' ');
       /* this free will free instances too */
       product = (t_upstyp_product *)ups_free_product(product);
       

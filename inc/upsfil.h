@@ -36,7 +36,8 @@
 
 t_upstyp_product  *upsfil_read_file( const char * const ups_file );
 int               upsfil_write_file( t_upstyp_product * const prod_ptr,
-				     const char * const ups_file );
+				     const char * const ups_file,
+				     const char copt );
 void              upsfil_flush( void );
 void              upsfil_stat( const int iopt );
 void              g_print_product( t_upstyp_product * const prod_ptr );

@@ -237,11 +237,14 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
  *
  * Input : t_upstyp_product *, a pointer to a product
  *         char *, path to a ups file
+ *         char, 'd' means it will create a (one level) 
+ *               directory if needed.
  * Output: none
  * Return: int, UPS_SUCCESS just fine, else UPS_<error> number.
  */
 int upsfil_write_file( t_upstyp_product * const prod_ptr,
-		       const char * const ups_file )
+		       const char * const ups_file,
+		       const char copt )
 {
   t_upslst_item *l_ptr = 0;
   g_filename = ups_file;
@@ -259,7 +262,22 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
     return UPS_OPEN_FILE;
   }
-  
+
+  /* check if directory exist */
+
+  if ( copt == 'd' && 
+       upsutl_is_a_file( ups_file ) == UPS_NO_FILE ) {
+    int l;
+    char buf[MAX_LINE_LEN];
+    strcpy( buf, ups_file );
+    l = strlen( buf );
+    while ( --l >= 0 && buf[l] != '/' ) buf[l] = 0;
+    if ( l > 0 && upsutl_is_a_file( buf ) == UPS_NO_FILE )
+      mkdir( buf, 0775 );
+  }
+
+  /* open file */
+
   g_fh = fopen ( ups_file, "w" );
   if ( ! g_fh ) {
     P_VERB_s( 1, "Open file for write ERROR" );

@@ -148,7 +148,7 @@ void ups_tailor_update_nodes(void)
 	    inst->authorized_nodes = new_nodes;
 
 	    /* now rewrite the file out */
-	    (void )upsfil_write_file(read_product, buffer);
+	    (void )upsfil_write_file(read_product, buffer, ' ');
 
 	    /* no need to look through any more instances */
 	    break;
