@@ -8,7 +8,7 @@ PROD_DIR_PREFIX = /usr/products
 
 # keep statistics about the following products:
 #   (uncomment to get stats!)
-# STATISTICS = ups, upd, perl
+# STATISTICS = ups:upd:perl
 
 #
 # manpages, info files, get copied here:
