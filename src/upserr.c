@@ -236,7 +236,7 @@ void upserr_add (const int a_error_index, ...)
   if ( (a_error_index < UPS_NERR) && (a_error_index > UPS_INVALID)) {
     /* format the error and put it in the error buf */
     va_start(args, a_error_index);
-    vsprintf(buf, g_error_messages[a_error_index], args);
+    void vsprintf(buf, g_error_messages[a_error_index], args);
     va_end(args);
 
     /* figure out if it was an informational message or not.  if so, do
@@ -247,20 +247,20 @@ void upserr_add (const int a_error_index, ...)
   }
   else {
     /* This was an invalid error message request */
-    sprintf(buf, "ERROR: Invalid error message number %d.\n", a_error_index);
+    void sprintf(buf, "ERROR: Invalid error message number %d.\n", a_error_index);
     UPS_ERROR = UPS_INVALID;
   }
 
   /* Check if we need to add error location information to output too */
   if (UPS_VERBOSE && g_ups_line) {
-    sprintf(buf, "%s (line number %d in file %s)\n", buf, g_ups_line,
+    void sprintf(buf, "%s (line number %d in file %s)\n", buf, g_ups_line,
 	    g_ups_file);
     g_ups_line = 0;          /* reset so next time do not give false info */
   }
 
   /* Malloc space for the message so we can save it and copy it in. */
   tmpBufPtr = (char *)malloc(strlen(buf) + 1);  /* leave room for the \0 too */
-  strcpy(tmpBufPtr, buf);
+  void strcpy(tmpBufPtr, buf);
 
   /* Add the error message to the error buf.  If we are at the bottom of
      the buf, go back to the top and overwrite the oldest message */
@@ -376,7 +376,7 @@ void upserr_output (void)
     for (i = g_buf_start; i != g_buf_counter; ++i) {
       if (i < G_ERROR_BUF_MAX) {
 	if (g_error_buf[i]) {
-	  fputs(g_error_buf[i], stderr);
+	  void fputs(g_error_buf[i], stderr);
 	}
       } else {
 	i = G_ERROR_INIT;
@@ -385,7 +385,7 @@ void upserr_output (void)
 
     /* catch the last one we missed */
     if (g_error_buf[g_buf_counter]) {
-      fputs(g_error_buf[g_buf_counter], stderr);
+      void fputs(g_error_buf[g_buf_counter], stderr);
     }
   }
 }
