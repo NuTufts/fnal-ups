@@ -162,27 +162,21 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           } else { 
             printf("CHAIN: %s", minst_ptr->chain->chain);
           } printf("\n");
-          if (a_command_line->ugo_l) 
-          {  printf("HOME: %s\n", minst_ptr->chain->prod_dir);
-             printf("UPS: %s\n", minst_ptr->chain->ups_dir);
-             printf("TABLE_DIR: %s\n", minst_ptr->chain->table_dir);
-             printf("TABLE_FILE: %s\n", minst_ptr->chain->table_file);
-          }
         } else { 
           if (minst_ptr->version )
           {  printf("VERSION: %s\n", minst_ptr->version->version);
              printf("FLAVOR: %s\n", minst_ptr->version->flavor);
 	     printf("QUALIFIERS: %s\n", minst_ptr->version->qualifiers);
              printf("CHAIN:\n");
-             if (a_command_line->ugo_l) 
-             {  printf("HOME: %s\n", minst_ptr->version->prod_dir);
-                printf("UPS: %s\n", minst_ptr->version->ups_dir);
-                printf("TABLE_DIR: %s\n", minst_ptr->version->table_dir);
-                printf("TABLE_FILE: %s\n", minst_ptr->version->table_file);
-             }
           } else { 
             printf("No chain or version WHAT???\n");
           }
+        }
+        if (a_command_line->ugo_l && minst_ptr->version )
+        { printf("HOME: %s\n", minst_ptr->version->prod_dir);
+          printf("UPS: %s\n", minst_ptr->version->ups_dir);
+          printf("TABLE_DIR: %s\n", minst_ptr->version->table_dir);
+          printf("TABLE_FILE: %s\n", minst_ptr->version->table_file);
         }
         printf("\n\n");
       } else { 
