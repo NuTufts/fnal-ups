@@ -160,6 +160,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
 	  } else {
 	    /* output the name of the temp file that was created */
+	    upsver_mes(1,"Sourcing file %s\n",g_temp_file_name);
 	    (void )printf("%s\n", g_temp_file_name);
 	  }
 	  /* if we were asked to save the file, output the name again so the
@@ -180,8 +181,14 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	    /* simulation only, print the file name */
 	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
 	  } else {	
+	    /* if we were asked to save the file, output the name so the
+	       user can see it. */
+	    if (g_keep_temp_file) {
+	      upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
+	    }	   
 	    /* make sure the file is executable */
 	    if (! chmod(g_temp_file_name, mode)) {
+	      upsver_mes(1,"Executing file %s\n",g_temp_file_name);
 	      if (system(g_temp_file_name) < 0) {
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			   strerror(errno));
