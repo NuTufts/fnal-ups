@@ -788,32 +788,23 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	  }
 	}
 	if (file_stream) {
-	  if (fprintf(file_stream, "USER = %s\n   DATE = %s\n", user,
-		      time_date)
-	      > 0) {
-	    if (fprintf(file_stream, "   COMMAND = %s\n", a_command) > 0) {
-	      if (minst->version) {
-		(void )fprintf(file_stream,
-		    "   FLAVOR = %s\n   QUALIFIERS = '%s'\n   VERSION = %s\n", 
-			    minst->version->flavor, minst->version->qualifiers,
-			    minst->version->version);
-	      } else if (minst->table) {
-		(void )fprintf(file_stream,
-		    "   FLAVOR = %s\n   QUALIFIERS = '%s'\n   VERSION = %s\n", 
-			    minst->table->flavor, minst->table->qualifiers,
-			    minst->table->version);
-	      }
-	      /* Write out divider */
-	      if (fprintf(file_stream, "%s\n", DIVIDER) < 0) {
-		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
-			   strerror(errno));
-		break;
-	      }
-	    } else {
+	  /* note the format of this output should be the same as that for 
+	     ups list -K+, with the extra information added on at the end */
+	  if (fprintf(file_stream, "\"%s\" ", mproduct->product)) {
+	    if (minst->version) {
+	      (void )fprintf(file_stream, "\"%s\" \"%s\" \"%s\" \"\" ",
+			     minst->version->version, minst->version->flavor,
+			     minst->version->qualifiers);
+	    } else if (minst->table) {
+	      (void )fprintf(file_stream, "\"\" \"%s\" \"%s\" \"\" ",
+			     minst->version->flavor,
+			     minst->version->qualifiers);
+	    }
+	    if (! fprintf(file_stream, "\"%s\" \"%s\" \"%s\"\n", user,
+			  time_date, a_command))
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 			 strerror(errno));
 	      break;
-	    }
 	  } else {
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 		       strerror(errno));
