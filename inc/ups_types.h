@@ -224,5 +224,6 @@ t_ups_command     *upsugo_env(char * const product,
 int         upsugo_free(struct ups_command * const uc);
 void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title );
 int         upsugo_dump (struct ups_command * const uc);
+int         upshlp_command(const char * const what);
 #endif /* _UPS_TYPES_H_ */
 
