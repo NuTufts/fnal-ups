@@ -8,7 +8,7 @@ Include files:-
 */
 
 #include <unistd.h>
-char *g_temp_file_name;
+extern char *g_temp_file_name;
 
 /* ups specific include files */
 #include "ups.h"
