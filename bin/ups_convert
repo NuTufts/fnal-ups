@@ -374,17 +374,17 @@ sub WriteTableFile {
            open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
            $ReqHash{$flvr} = &table_file ("$reqType");
            delete $flvrverHash{$flvr}{$version}{"$reqType"};
-        } else {
+        } 
+# else {
 # Need for force table files even if there is no requirements - Sep 11
-          if ("$reqType" == "USE") { 
-             if ("$opt_v") { 
-                print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
-                }
-             open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
-                $ReqHash{$flvr} = &add_setup;
-#                $ReqHash{$flvr}.= &add_unsetup;
-             }
-        }
+#          if ("$reqType" == "USE") { 
+#             if ("$opt_v") { 
+#                print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
+#                }
+#             open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
+#                $ReqHash{$flvr} = &add_setup;
+#             }
+#        }
     }
     if ( ! $TableFileInfo ) { 
        print TableFile "File=Table\n";
@@ -420,11 +420,12 @@ sub WriteTableFile {
        print TableFile "   Action=setup\n";
 # back to the OLD way AGAIN...
 #       print TableFile "     doDefaults()\n";
-       $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
-       $key=~s/DaSeTuP//g;
        if (checkfor("${basedir}/ups/setup.sh")) {
-           print TableFile "$key";
+          $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
+       } else { 
+          $key=~s/DaSeTuP//g;
        }
+       print TableFile "$key";
 # remove unsetup all together...
 #       $key=~s/setup/unsetup/g;
 #       $key=~s/     doDefaults\(\)\n//g;
@@ -717,13 +718,13 @@ sub add_misactions {
        $value.="      doDefaults()\n";
        $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
     }
-    if (checkfor("${basedir}/ups/configure")) {
-       $value.="   Action=Unconfigure\n";
-       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
-       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/unconfigure)\n";
-       $value.="      doDefaults()\n";
-       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
-    }
+#    if (checkfor("${basedir}/ups/configure")) {
+#       $value.="   Action=Unconfigure\n";
+#       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
+#       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/unconfigure)\n";
+#       $value.="      doDefaults()\n";
+#       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
+#    }
     if (checkfor("${basedir}/ups/start")) {
        $value.="   Action=start\n";
        $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
@@ -745,13 +746,13 @@ sub add_misactions {
        $value.="      doDefaults()\n";
        $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
     }
-    if (checkfor("${basedir}/ups/current")) {
-       $value.="   Action=Uncurrent\n";
-       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
-       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/uncurrent)\n";
-       $value.="      doDefaults()\n";
-       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
-    }
+#    if (checkfor("${basedir}/ups/current")) {
+#       $value.="   Action=Uncurrent\n";
+#       $value.="      envSet(\${UPS_PROD_NAME}_DIR,\${UPS_PROD_DIR})\n";
+#       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/uncurrent)\n";
+#       $value.="      doDefaults()\n";
+#       $value.="      envUnset(\${UPS_PROD_NAME}_DIR)\n";
+#    }
     return $value
 }
 sub split_os { 
