@@ -12,13 +12,13 @@ fi
 export OPERA
 #
 if [ "${OPERA:-}" = "" ]; then
-  OPERA=FIDELIO
+  OPERA="FIDELIO"
 else
   OPERA="FIDELIO ${OPERA}"
 fi
 export OPERA
 #
-upstmp=`dropit -p "$OPERA" -i' ' -d' ' FAUST`;
+upstmp="`dropit -p "'"$OPERA"'" -i' ' -d' ' FAUST`";
 if [ $? -eq 0 -a "$upstmp" != " " ]; then OPERA=$upstmp; fi
 unset upstmp;
 #
@@ -30,11 +30,11 @@ PATH="${PATH-}:emacs/bin";export PATH
 #
 PATH="emacs/test:${PATH-}";export PATH
 #
-upstmp=`dropit -p "$PATH" -i':' -d':' emacs`;
+upstmp="`dropit -p "'"$PATH"'" -i':' -d':' emacs`";
 if [ $? -eq 0 -a "$upstmp" != ":" ]; then PATH=$upstmp; fi
 unset upstmp;
 #
-upstmp=`dropit -p "$PATH" -i':' -d':' bin`;
+upstmp="`dropit -p "'"$PATH"'" -i':' -d':' bin`";
 if [ $? -eq 0 -a "$upstmp" != ":" ]; then PATH=$upstmp; fi
 unset upstmp;
 #

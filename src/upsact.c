@@ -2503,7 +2503,7 @@ static void f_envremove( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit -p \"$%s\" -i'%s' -d'%s' %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		"upstmp=\"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
 		  delimiter, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2511,7 +2511,7 @@ static void f_envremove( ACTION_PARAMS)
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-	     "setenv upstmp \"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s \"$upstmp\"\nunsetenv upstmp\n#\n",
+	     "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s \"$upstmp\"\nunsetenv upstmp\n#\n",
 		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
 		  delimiter, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2889,7 +2889,7 @@ static void f_pathremove( ACTION_PARAMS)
     case e_BOURNE:
       CHECK_FOR_PATH(g_shPath, g_shDelimiter);
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit -p \"$%s\" -i'%s' -d'%s' %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+	        "upstmp=\"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  pathPtr, delimiter, delimiter, a_cmd->argv[1], delimiter, 
 		  pathPtr) < 0) {
 	FPRINTF_ERROR();
@@ -2898,7 +2898,7 @@ static void f_pathremove( ACTION_PARAMS)
     case e_CSHELL:
       CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
       if (fprintf((FILE *)a_stream,
-          "setenv upstmp \"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
+          "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
 		  pathPtr, delimiter, delimiter, a_cmd->argv[1], delimiter,
 		  pathPtr) < 0) {
 	FPRINTF_ERROR();

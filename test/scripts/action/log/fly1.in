@@ -11,13 +11,13 @@ else
 endif
 #
 if (! ${?OPERA}) then
-  setenv OPERA FIDELIO
+  setenv OPERA "FIDELIO"
 else
   setenv OPERA "FIDELIO ${OPERA}"
 endif
 #
-setenv upstmp "`dropit -p "$OPERA" -i' ' -d' ' FAUST`"
-if ($status == 0 && "$upstmp" != " ") setenv OPERA $upstmp
+setenv upstmp "`dropit -p "'"$OPERA"'" -i' ' -d' ' FAUST`"
+if ($status == 0 && "$upstmp" != " ") setenv OPERA "$upstmp"
 unsetenv upstmp
 #
 unsetenv OPERA
@@ -31,12 +31,12 @@ rehash
 set path=(emacs/test $path)
 rehash
 #
-setenv upstmp "`dropit -p "$path" -i' ' -d' ' emacs`"
+setenv upstmp "`dropit -p "'"$path"'" -i' ' -d' ' emacs`"
 if ($status == 0 && "$upstmp" != " ") set path=$upstmp
 rehash
 unsetenv upstmp
 #
-setenv upstmp "`dropit -p "$path" -i' ' -d' ' bin`"
+setenv upstmp "`dropit -p "'"$path"'" -i' ' -d' ' bin`"
 if ($status == 0 && "$upstmp" != " ") set path=$upstmp
 rehash
 unsetenv upstmp
@@ -106,7 +106,7 @@ endif
 #
 if (-e reqcheck1) then
   source reqcheck1
-  setenv UPS_STATUS $status
+  setenv UPS_STATUS "$status"
   if ("$UPS_STATUS" != "0") then
     echo "Error $UPS_STATUS while sourcing reqcheck1
     unsetenv UPS_STATUS
@@ -124,7 +124,7 @@ endif
 #
 if (-e optcheck) then
   source optcheck
-  setenv UPS_STATUS $status
+  setenv UPS_STATUS "$status"
   if ("$UPS_STATUS" != "0") then
     echo "Error $UPS_STATUS while sourcing optcheck
     unsetenv UPS_STATUS
@@ -140,7 +140,7 @@ endif
 #
 if (-e optcheck) then
   source optcheck
-  setenv UPS_STATUS $status
+  setenv UPS_STATUS "$status"
   if ("$UPS_STATUS" != "0") then
     echo "Error $UPS_STATUS while sourcing optcheck
     unsetenv UPS_STATUS
@@ -163,7 +163,7 @@ if (-e reqcheck2) then
   setenv UPS_SHELL csh
   setenv UPS_OPTIONS ""
   source reqcheck2
-  setenv UPS_STATUS $status
+  setenv UPS_STATUS "$status"
   if ("$UPS_STATUS" != "0") then
     echo "Error $UPS_STATUS while sourcing reqcheck2
     unsetenv UPS_STATUS
