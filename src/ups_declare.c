@@ -153,7 +153,7 @@ void ups_declare( t_upsugo_command * const uc )
    } db_info=0;
   } 
   if (!db_info) 
-  { upslst_first(db_list);
+  { db_list = upslst_first(uc->ugo_db);
     db_info = (t_upstyp_db *)db_list->data;
   } 
 /* restore everything */
@@ -161,7 +161,6 @@ void ups_declare( t_upsugo_command * const uc )
   uc->ugo_version=save_version;
   uc->ugo_flavor=save_flavor;
   uc->ugo_qualifiers=save_qualifiers;
-
 /************************************************************************
  *
  * If there was any chain specified at all we need to look at chain files
@@ -203,7 +202,7 @@ void ups_declare( t_upsugo_command * const uc )
                cinst=cinst_list->data;
                product->instance_list = 
                   upslst_delete(product->instance_list,cinst,'d');
-               upsver_mes(1,"Deleting %s of version %s\n",
+               upsver_mes(1,"Deleting %s chain of version %s\n",
                              the_chain,
                              cinst->version);
                (void )upsfil_write_file(product, file,' '); 
@@ -241,11 +240,11 @@ void ups_declare( t_upsugo_command * const uc )
          new_cinst->declared=declared_date;
          product->instance_list = 
             upslst_add(product->instance_list,new_cinst);
-         upsver_mes(1,"Adding chain %s version %s to %s\n",
+         upsver_mes(1,"Adding %s chain version %s to %s\n",
                     the_chain,
                     new_cinst->version,
                     file);
-         (void )upsfil_write_file(product, file,' ');  
+         (void )upsfil_write_file(product, file,'d');  
 /*         product = (t_upstyp_product *)ups_free_product(product); */
         }
       }
@@ -312,7 +311,7 @@ void ups_declare( t_upsugo_command * const uc )
     upsver_mes(1,"Adding version %s to %s\n",
                new_vinst->version,
                file);
-    (void )upsfil_write_file(product, file, ' ');  
+    (void )upsfil_write_file(product, file, 'd');  
     }
     if (uc->ugo_chain) { printf("chain actions not done yet!!\n"); }
 }

@@ -113,7 +113,7 @@ void ups_undeclare( t_upsugo_command * const uc )
   { printf("To Declare a product you must specify A flavor \n");
     exit(1);
   }
-  mproduct_list = upsmat_instance(uc, db_list , need_unique);
+  mproduct_list = upsmat_instance(uc, db_list , not_unique);
   if (!mproduct_list)
   { printf("Can find NO matching product entry - doing NOTHING\n");
     exit(1);
