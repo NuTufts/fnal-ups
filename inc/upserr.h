@@ -39,28 +39,30 @@
    the #define (g_error_ascii) 
    ======================================================================= */
 
-#define UPS_INVALID           -1
-#define UPS_SUCCESS           0
-#define UPS_OPEN_FILE         1
-#define UPS_READ_FILE         2
-#define UPS_INVALID_KEYWORD   3
-#define UPS_NO_DATABASE       4
-#define UPS_TIME              5
-#define UPS_NAME_TOO_LONG     6
-#define UPS_NO_STAT_DIR       7
-#define UPS_WRITE_FILE        8
-#define UPS_INVALID_ARGUMENT  9
-#define UPS_NO_VERSION_MATCH  10
-#define UPS_FILENAME_TOO_LONG 11
-#define UPS_NO_TABLE_MATCH    12
-#define UPS_NO_FILE           13
-#define UPS_NO_MEMORY         14
-#define UPS_LINE_TOO_LONG     15
-#define UPS_UNKNOWN_FILETYPE  16
-#define UPS_NOVALUE_ARGUMENT  17
-#define UPS_INVALID_ACTION    18
-#define UPS_NEED_UNIQUE       19
-#define UPS_NERR              20      /*  this one must always be last */
+#define UPS_INVALID             -1
+#define UPS_SUCCESS             0
+#define UPS_OPEN_FILE           1
+#define UPS_READ_FILE           2
+#define UPS_INVALID_KEYWORD     3
+#define UPS_NO_DATABASE         4
+#define UPS_TIME                5
+#define UPS_NAME_TOO_LONG       6
+#define UPS_NO_STAT_DIR         7
+#define UPS_WRITE_FILE          8
+#define UPS_INVALID_ARGUMENT    9
+#define UPS_NO_VERSION_MATCH    10
+#define UPS_FILENAME_TOO_LONG   11
+#define UPS_NO_TABLE_MATCH      12
+#define UPS_NO_FILE             13
+#define UPS_NO_MEMORY           14
+#define UPS_LINE_TOO_LONG       15
+#define UPS_UNKNOWN_FILETYPE    16
+#define UPS_NOVALUE_ARGUMENT    17
+#define UPS_INVALID_ACTION      18
+#define UPS_INVALID_ACTION_ARG  19
+#define UPS_INVALID_SHELL       20
+#define UPS_NEED_UNIQUE         21
+#define UPS_NERR                22      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
