@@ -516,45 +516,45 @@ void upscpy_news(UPSCPY_PARAMS)
  *   product man page should be copied to. This sub directory is determined
  *   from man_file, which is a pointer to the name of a product man file.
  *   It is in the format:
- *        <prod>.[1-8,l][a-z][.z,Z]
+ *        <prod>.[0-9][a-zA-Z][.gz,.z,.Z]
  *   Examples:
  *      man_file        sectional sub directory
  *      --------        -----------------------
  *      foo.1                     1
  *      foo.3a                    3
- *      foo.b                     l (el)
- *      foo.8a.Z                  8
+ *      foo.l                     l (el)
+ *      foo.8a.gz                 8
  *
  * INPUT  : man_file - name of the product man file
  * OUTPUT : none
  * RETURNS:
- *   the sectional sub directory letter which could be one of 1-8, or l (el).
+ *   the sectional sub directory letter which could be practically any char,
  *   or 0 if this file did not have a file extension
  ***/
 #define NO_EXTENSION '\0'
 static char get_man_subdir(char * const a_man_file)
 {
    char *sp;
+   char next_c;
    char ret_val = NO_EXTENSION;
 
-   for (sp = a_man_file; *sp != '\0'; sp++) {
-     if (*sp == '.')  {
-       ret_val = *++sp;
-       /* check to see if this file extension is of the possible man types -
-          i.e. - '0-9' or '0-9[a-zA-Z]' or 'n' or 'l'.  if not, ignore this
-          file it is probably not a man or catman file. */
-       if (! isdigit((int )*sp)) {
-         if ((*sp != 'n') && (*sp != 'l')) {
-           /* this character was not a digit or a 'n' or a 'l' */
-           ret_val = NO_EXTENSION;
-           break;
-         }
-       } else if ((*++sp != '\0') && (*++sp != '\0')) {
-         /* the file extension is longer than 2 characters , not a man file */
-         ret_val = NO_EXTENSION;
+   if ((sp = strrchr (a_man_file, '/')) == NULL) sp = a_man_file;  /* skip over directories */
+   while ((next_c = *sp++) != '\0') {
+     if (next_c == '.')  {
+       ret_val = *sp++;
+       /* check to see if this file extension is 1 or 2 characters
+          (but no dots), possibly followed by a compression extension. */
+       if (ret_val == '.')
+         continue;
+       if ((ret_val == '\0') || ((next_c = *sp++) == '\0'))
          break;
-       }
-       break;
+       if ((next_c != '.') && (*sp == '\0'))
+         break;
+       if ((strcmp (sp, ".z") == 0) ||
+           (strcmp (sp, ".Z") == 0) ||
+           (strcmp (sp, ".gz") == 0))
+         break;
+       ret_val = NO_EXTENSION;
      }
    }
    return(ret_val);
