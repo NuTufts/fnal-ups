@@ -5,5 +5,5 @@ FLAVOR = NULL
 QUALIFIERS = ""
 
 ACTION=SETUP
-      source(db2)
+      sourceRequired(db2, UPS_ENV)
 
