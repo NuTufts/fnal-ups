@@ -282,6 +282,11 @@ sub dodeps {
 	   while(<DEPEND>) {
 	       print "got $_" if $debug;
                chomp();
+               #
+	       # trailing blanks and -j flags really confuse things..
+	       #
+               s/\s*\Z//o;
+	       s/ -j//o;
 
  	       if ( m/\A\|__/o ) {
                   $direct = 1;
@@ -290,7 +295,6 @@ sub dodeps {
                }
 
 	       s/\A[|_ ]*//o;
-
 	       push(@addto, $_);
 
 	       s/ -g .*//o;
