@@ -1,4 +1,4 @@
-/****************************Copyright Notice ******************************
+/*****************************Copyright Notice ********************************
  *                                                                            *
  * Copyright (c) 1991 Universities Research Association, Inc.                 *
  *               All Rights Reserved.                                         *
@@ -181,6 +181,8 @@
            ELEMENT = addr;                                                 \
            break;                                                          \
          }                                                                 \
+         errflg = 1;                                                       \
+         break;                                                            \
 } 
 #define build_list( LIST_ELEMENT , ARG )                                   \
 {                                                                          \
@@ -213,73 +215,71 @@
            LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                   \
            break;                                                          \
          }                                                                 \
+         errflg = 1;                                                       \
+         break;                                                            \
 }
 #define case_g \
-         case 'g':                        \
-         uc->ugo_g = 1;                   \
-         build_list (uc->ugo_chain , "g") \
-         errflg = 1;                      \
-         break; 
+         case 'g':       \
+         uc->ugo_g = 1;  \
+         build_list (uc->ugo_chain , "g") 
 #define case_f \
-         case 'f':                         \
-         uc->ugo_f = 1;                    \
-         build_list (uc->ugo_flavor , "f") \
-         errflg = 1;                       \
-         break; 
+         case 'f':       \
+         uc->ugo_f = 1;  \
+         build_list (uc->ugo_flavor , "f") 
 #define case_h \
-         case 'h':                       \
-         uc->ugo_h = 1;                  \
-         build_list (uc->ugo_host , "h") \
-         errflg = 1;                     \
-         break; 
+         case 'h':       \
+         uc->ugo_h = 1;  \
+         build_list (uc->ugo_host , "h") 
 #define case_K \
-         case 'K':                      \
-         uc->ugo_K = 1;                 \
-         build_list (uc->ugo_key , "K") \
-         errflg = 1;                    \
-         break; 
+         case 'K':       \
+         uc->ugo_K = 1;  \
+         build_list (uc->ugo_key , "K") 
 #define case_A \
-         case 'A':                       \
-         uc->ugo_A = 1;                  \
-         build_list (uc->ugo_auth , "A") \
-         errflg = 1;                     \
-         break; 
-#define case_z \
-         case 'z':                     \
-         uc->ugo_z = 1;                \
-         build_list (uc->ugo_db , "z") \
-         errflg = 1;                   \
-         break; 
+         case 'A':       \
+         uc->ugo_A = 1;  \
+         build_list (uc->ugo_auth , "A") 
+/* make database a list of database default structures */
+/* #define case_z \
+         case 'z':       \
+         uc->ugo_z = 1;  \
+         build_list (uc->ugo_db , "z") 
+*/
 #define case_m \
-         case 'm':                              \
-         uc->ugo_m = 1;                         \
-         set_value (uc->ugo_tablefiledir , "m") \
-         errflg = 1;                            \
-         break; 
+         case 'm':       \
+         uc->ugo_m = 1;  \
+         set_value (uc->ugo_tablefiledir , "m") 
 #define case_M \
-         case 'M':                              \
-         uc->ugo_M = 1;                         \
-         set_value (uc->ugo_tablefile , "M")    \
-         errflg = 1;                            \
-         break; 
+         case 'M':       \
+         uc->ugo_M = 1;  \
+         set_value (uc->ugo_tablefile , "M")    
 #define case_N \
-         case 'N':                            \
-         uc->ugo_N = 1;                       \
-         set_value (uc->ugo_anyfile , "N")    \
-         errflg = 1;                          \
-         break; 
+         case 'N':       \
+         uc->ugo_N = 1;  \
+         set_value (uc->ugo_anyfile , "N")    
 #define case_O \
-         case 'O':                            \
-         uc->ugo_O = 1;                       \
-         set_value (uc->ugo_options , "O")    \
-         errflg = 1;                          \
-         break; 
+         case 'O':       \
+         uc->ugo_O = 1;  \
+         set_value (uc->ugo_options , "O") 
 #define case_p \
-         case 'p':                                \
-         uc->ugo_p = 1;                           \
-         set_value (uc->ugo_description , "p")    \
-         errflg = 1;                              \
-         break; 
+         case 'p':       \
+         uc->ugo_p = 1;  \
+         set_value (uc->ugo_description , "p")
+#define case_P \
+         case 'P':       \
+         uc->ugo_P = 1;  \
+         set_value (uc->ugo_override , "P")
+#define case_r           \
+         case 'r':       \
+         uc->ugo_r = 1;  \
+         set_value (uc->ugo_productdir , "r")
+#define case_T           \
+         case 'T':       \
+         uc->ugo_T = 1;  \
+         set_value (uc->ugo_archivefile , "T")
+#define case_U           \
+         case 'U':       \
+         uc->ugo_U = 1;  \
+         set_value (uc->ugo_upsdir , "U")
 
    int	errflg = 0;
    t_upslst_item *ugo_commands = 0;
@@ -294,7 +294,9 @@ int upsugo_rearg(const int ,char **,int * const,char **);
 int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
+int upsugo_blddb(struct ups_command * const uc, char * inaddr);
 int upsugo_dump (struct ups_command * const uc);
+void upsugo_prtdb( t_upslst_item * const list_ptr, char * const title );
 void upsugo_liststart(struct ups_command * const a_command_line);
 
 
@@ -480,13 +482,42 @@ int upsugo_ifornota(struct ups_command * const uc)
                 PRODUCTS = upsutl_str_create(addr,' ');
                 addr=loc+1; 
                 while(*addr==' ') { addr=addr+1; }
-                uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS);
+                upsugo_blddb(uc,PRODUCTS);
+/*              uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS); */
         }
         PRODUCTS = upsutl_str_create(addr,' ');
-        uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS);
+/*      uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS); */
+        upsugo_blddb(uc,PRODUCTS);
      }
    } 
    return(0);
+}
+/* ===========================================================================
+** ROUTINE	upsugo_blddb()
+**
+*/
+int upsugo_blddb(struct ups_command * const uc, char * inaddr)
+{
+ char * loc;
+ char * db;
+ struct upstyp_db * addr;
+ while((loc=strchr(inaddr,':'))!=0)
+ {  db=inaddr;
+   inaddr=loc+1;
+   *loc = 0;
+   db=upsutl_str_create(db,'p');
+   addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
+   bzero (addr,sizeof(struct upstyp_db));
+   addr->name = db;
+   uc->ugo_db = upslst_add(uc->ugo_db,addr);
+ }
+ db=upsutl_str_create(inaddr,'p');
+ addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
+ bzero (addr,sizeof(struct upstyp_db));
+ addr->name = db;
+ uc->ugo_db = upslst_add(uc->ugo_db,addr);
+ *inaddr = 0;
+ return(0);
 }
 /* ===========================================================================
 ** ROUTINE	upsugo_bldqual()
@@ -928,7 +959,7 @@ int upsugo_dump (struct ups_command * const uc)
       if ( uc->ugo_upsdir ) 
          fprintf(stdout,"Upsdir: %s\n",uc->ugo_upsdir); 
       if ( uc->ugo_db ) 
-         upsugo_prtlst(uc->ugo_db,"DB"); 
+         upsugo_prtdb(uc->ugo_db,"DB"); 
       if ( uc->ugo_chain ) 
          upsugo_prtlst(uc->ugo_chain,"Chains"); 
       if ( uc->ugo_help )
@@ -965,7 +996,37 @@ void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title )
             (int)l_ptr->next, (char *)l_ptr->data );
   }
 }
-                                                     
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_prtdb
+**                                                                           
+** DESCRIPTION                                                               
+**
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/
+void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title )
+{
+  t_upslst_item *l_ptr;
+  struct upstyp_db *addr;
+  int count = 0;
+
+  /*
+   * Note use of upslst_first(), to be sure to start from first item
+   */
+  fprintf(stdout,"%s\n",title);
+  for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ )
+  { fprintf(stdout,"ref count %d\n",upsmem_get_refctr(l_ptr->data));
+    fprintf(stdout, "%03d: p=%08x, i=%08x, n=%08x, ",
+            count, (int)l_ptr->prev, (int)l_ptr, (int)l_ptr->next);
+    addr=l_ptr->data;
+    fprintf(stdout, "data=%s\n", (char *)addr->name);
+  }
+}
+
 
 /* ==========================================================================
 **                                                                           
@@ -1149,102 +1210,33 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          case_c case_d case_n case_t case_o
          /* List elements */
          case_g            /* also a chain */
-         case_f
-         case_K
-         case_A
-         case_z
+         case_f case_K case_A 
          /* single values */ 
-         case_m
-         case_M
-         case_N
-         case_O
-         case_p
-         case 'P':
-              uc->ugo_P = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_override = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "P" );
-                  break;
-                }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_override = addr;
-                break;
-              }
-              errflg = 1;
-              break;
+         case_m case_M case_N case_O case_p
+         case_P case_r case_T case_U
          case 'q':
               uc->ugo_q = 1;
               if ( *argbuf ) 
               { test=upsugo_bldqual(uc,*argbuf); *argbuf=0; break; }
-               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-               { if(*arg_str == '-')
-                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" );
-                   break;
-                 }
-                 test=upsugo_bldqual(uc,arg_str); break;
-               }
-               errflg = 1;
-               break;
-         case 'r':
-              uc->ugo_r = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_productdir = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
               { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "r" );
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" );
                   break;
                 }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_productdir = addr;
-                break;
+                test=upsugo_bldqual(uc,arg_str); break;
               }
               errflg = 1;
               break;
-         case 'T':
-              uc->ugo_T = 1;
+         case 'z':
+              uc->ugo_z = 1;
               if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_archivefile = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { test=upsugo_blddb(uc,*argbuf); *argbuf=0; break; }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
               { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "T" );
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "z" );
                   break;
                 }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_archivefile = addr;
-                break;
-              }
-              errflg = 1;
-              break;
-         case 'U':
-              uc->ugo_U = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_upsdir = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "U" );
-                  break;
-                }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_upsdir = addr;
-                break;
+                test=upsugo_blddb(uc,arg_str); break;
               }
               errflg = 1;
               break;
