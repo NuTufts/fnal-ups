@@ -408,7 +408,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    }
 
 	    /* make sure that the product actually exists. */
-	    if (upsfil_exist(location)) {
+	    if (upsutl_is_a_file(location) == UPS_SUCCESS) {
 	      /* Check if chains were requested. if a specific version was
 		 passed, but no chain, the we will want to report all chains.
 		 this is only true in the case where we are not looking for a
