@@ -6,6 +6,7 @@ PRODUCTS="$UPS_DIR/test/scripts/declare/dbclean"; export PRODUCTS
 rm -rf $PRODUCTS
 rm -rf /tmp/man
 rm -rf /tmp/catman
+rm -rf /tmp/info
 mkdir $PRODUCTS
 mkdir $PRODUCTS/.upsfiles
 cp $UPS_DIR/test/scripts/declare/dbcmp/.upsfiles/dbconfig $PRODUCTS/.upsfiles
