@@ -167,26 +167,21 @@ char *upsget_allout(const FILE * const stream,
                     const t_upstyp_db * const db,
                     const t_upstyp_matched_instance * const instance,
                     const t_upsugo_command * const command_line )
-{ char work[80];
-  char *addr;
+{ char *addr;
   char *name;
   if (command_line->ugo_shell == e_INVALID_SHELL)
   { upserr_add(UPS_NOSHELL);
   } else {
     get_element(name,product);
-    strcpy(work,name);
-    strcat(work,"_DIR");
-    addr=work;
-    while (*addr) {*addr=toupper((int)*addr);++addr;}
+    if (!name)
+    { name = " ";      /* no name in file, set to space */      
+    }
     if (command_line->ugo_shell == e_BOURNE )
     { fprintf((FILE *)stream,"UPS_PROD_NAME=%s;export UPS_PROD_NAME\n",name);
       fprintf((FILE *)stream,"UPS_PROD_VERSION=%s;export UPS_PROD_VERSION\n",
                upsget_version(db,instance,command_line));
       fprintf((FILE *)stream,"UPS_PROD_DIR=%s;export UPS_PROD_DIR\n",
                upsget_prod_dir(db,instance,command_line));
-/*      fprintf((FILE *)stream,"%s=%s;export %s\n",work,
-               upsget_prod_dir(db,instance,command_line),work);
-*/
       addr=upsget_verbose(db,instance,command_line);
       if (addr) 
       { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr); }
