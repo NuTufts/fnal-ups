@@ -132,6 +132,7 @@ static char 			*string =
 	\nSetup        = ${UPS_SETUP}\
 	\nOrigin       = ${UPS_ORIGIN}\
 	\nCompile      = ${UPS_COMPILE}\
+	\nUps_dir      = ${UPS_UPS_DIR}\
 	\nPRODUCTS     = ${PRODUCTS}\
 	\nJunk         = ${JUNK}\
 	";

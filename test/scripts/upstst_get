@@ -9,10 +9,13 @@ env UPS_SHELL=csh $UPS_DIR/test/ups_test << EOD
 #
 upsget_translation -z ../list/db1 -f NULL -q "nodbg:opt" lassie v2_0 -e -O "-blah" -out get1.out -diff get1.in
 upsget_translation -z ../list/db1 -f NULL -q "nodbg:opt" lassie v2_0 -r /dog/house -out get2.out -diff get2.in
+upsget_translation -z ../list/db1 -f NULL -q "red" jessie v2_0 -out get5.out -diff get5.in
 upsget_allout -z ../list/db1 -f NULL -q "nodbg:opt" lassie v2_0 -out get3.out -diff get3.in
 quit
 EOD
 env UPS_SHELL=sh $UPS_DIR/test/ups_test << EOD2
 upsget_allout -z ../list/db1 -f NULL -q "nodbg:opt" lassie v2_0 -out get4.out -diff get4.in
+# need to do jessie to check relative path here too 
+upsget_allout -z ../list/db1 -f NULL -q "red" jessie v2_0 -out relchk.out -diff relchk.in
 quit
 EOD2
