@@ -47,6 +47,8 @@ elif [ $arch = Linux -o $arch = linux ]; then
 	ccenv="Linux"
 elif [ $arch = AIX ]; then
         ccenv="AIX"
+elif expr "$arch" : "Interix" >/dev/null; then
+        ccenv="Interix"
 elif expr "$arch" : "CYGWIN" >/dev/null; then
         ccenv="CYGWIN"
 else
@@ -187,6 +189,17 @@ case $ccenv in
 		defs="$defs CCCHK=\"-Wall\""
 		;;
 
+	Interix*)			# Running cygwin32 under Windows NT
+		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
+		cc="gcc"
+		if [ "$opt" != "" ]; then
+			cflags="$cflags -O" 
+		fi
+		if [ "$dbg" != "" ]; then 
+			cflags="$cflags -g" 
+		fi
+		defs="$defs CCCHK=\"-Wall\""
+		;;
 	CYGWIN*)			# Running cygwin32 under Windows NT
 		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
 		cc="gcc"
