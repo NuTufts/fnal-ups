@@ -481,6 +481,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   char *str_ptr;
   char *str_val;
   int count=0;
+  int exists=1;
   if (product->db_info) 
   { config_ptr = product->db_info->config;
   }
@@ -534,6 +535,34 @@ void list_K(const t_upstyp_matched_instance * const instance,
         }
       } 
     }
+/* look for "processed values" spam? */
+    if (!strncmp(l_ptr->data,"@",1))
+    { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
+      { if (instance->version)
+        { printf("\"%s\" ",upsutl_get_table_file_path(command->ugo_product,
+                                                 instance->version->table_file,
+                                                 instance->version->table_dir,
+                                                 instance->version->ups_dir,
+                                                 instance->version->prod_dir,
+                                                 product->db_info,
+                                                 exists) );
+        } else {
+          printf("\"\" "); 
+        }
+      } else {
+        if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
+        { printf("\"");
+          if (product->db_info) 
+          { config_ptr = product->db_info->config;
+            if (config_ptr) 
+            { if (config_ptr->prod_dir_prefix) 
+              { printf("%s",config_ptr->prod_dir_prefix); }
+            }
+          }
+          printf("%s\" ", instance->version->prod_dir);
+        }
+      }
+    }
   }
   printf("\n");
 }
@@ -556,3 +585,4 @@ void print_chain(const t_upstyp_matched_instance * const instance,
     printf("\" "); /* end " */
   }
 }
+
