@@ -412,7 +412,6 @@ char *upsget_translation_tilde( char * const oldstr )
     { (void) strcat( buf, s_loc ); /* Something left after translation tack on */
     }
     return buf;
-  } else {
   }
   return 0;
 }
@@ -734,7 +733,6 @@ char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
     prefix_string = upsutl_str_crecat(prefix_string,"/"); 
     prefix_string = upsutl_str_crecat(prefix_string,string); 
     return prefix_string;
-  } else { 
   }
   return string;
 } 
@@ -903,7 +901,6 @@ char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
   if (command_line->ugo_v)
   { (void) sprintf(string,"%.1d",command_line->ugo_v);
     return (string);
-  } else {
   } 
   return(NOT);
 }
