@@ -232,7 +232,7 @@ static int g_ups_error;
     ADD_TO_MPRODUCT_LIST();
 
 #define GET_CONFIG_FILE() \
-    if (!db_info->config) {                          \
+    if (db_info && !db_info->config) {               \
       config_ptr = upsutl_get_config(db_info->name); \
       if (config_ptr) {                              \
 	db_info->config = config_ptr->config;        \
