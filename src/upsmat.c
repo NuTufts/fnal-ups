@@ -344,6 +344,9 @@ t_upslst_item *upsmat_match_instance(
     /* no longer need chain list - free it */
     all_chains = upslst_free(all_chains, do_delete);
   }      
+
+  /* back up to the front of the list */
+  mproduct_list = upslst_first(mproduct_list);
   return(mproduct_list);
 }
 
