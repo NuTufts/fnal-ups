@@ -746,7 +746,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
                   al_ptr; al_ptr = al_ptr->next, count++ )
           { ac_ptr=al_ptr->data;
             if(!upsutl_stricmp(buffer,"actions"))
-            { printf("\"%s\" ",ac_ptr->action);
+            { printf("\"%s:%d\" ",ac_ptr->action,
+                     upslst_count(ac_ptr->command_list));
               found=1;
             } else { 
               if(strlen(buffer)<8) /* action only or action= (nothing) */
