@@ -1,4 +1,18 @@
-<h1>UPS v4_4</h1>
+<h1>UPS v4_3b</h1>
+<p>
+<ul>
+<li>
+Fixed bug in upsact when doing WriteCompileScript for a product already setup.
+<li>
+EnvSetIfNotSet now has no undo.
+<li>
+Better handling of envremove/pathremove, especially for cases
+where the value parameter uses backticks.  
+<li>
+Better handling of exeAccess, eliminating the use of 'hash' in the Korn shell
+family, and printing error messages as appropriate.
+</ul>
+<h1>UPS v4_3a</h1>
 <p>
 <ul>
 <li>
