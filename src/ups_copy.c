@@ -68,11 +68,15 @@ extern t_cmd_map g_func_info[];
  * Definition of public functions.
  */
 
+static char buf[MAX_LINE_LEN];
+
 #define COPY_TO_INSTANCE(ugo_elem, old_inst, inst_elem)  \
   if (new_command_line && new_command_line->ugo_elem) {                 \
     new_instance->inst_elem = (char *)new_command_line->ugo_elem;       \
+    upsmem_inc_refctr(new_command_line->ugo_elem);                      \
   } else if (old_inst->inst_elem) {                                     \
     new_instance->inst_elem = old_inst->inst_elem;                      \
+    upsmem_inc_refctr(old_inst->inst_elem);                             \
   } else {                                                              \
     new_instance->inst_elem = 0;                                        \
   }
@@ -81,8 +85,10 @@ extern t_cmd_map g_func_info[];
   if (new_command_line && new_command_line->ugo_flag &&                 \
       new_command_line->ugo_elem) {                                     \
     new_instance->inst_elem = (char *)new_command_line->ugo_elem;       \
+    upsmem_inc_refctr(new_command_line->ugo_elem);                      \
   } else if (old_version_instance->inst_elem) {                         \
     new_instance->inst_elem = old_version_instance->inst_elem;          \
+    upsmem_inc_refctr(old_version_instance->inst_elem);                 \
   } else {                                                              \
     new_instance->inst_elem = 0;                                        \
   }
@@ -100,19 +106,28 @@ extern t_cmd_map g_func_info[];
 #define SET_DCLR_LINE(ugo_elem, inst_elem, ugo_flag)  \
    if (a_instance->inst_elem) {                               \
      new_command_line->ugo_flag = TRUE;                       \
+     if (new_command_line->ugo_elem) {                        \
+       upsmem_free(new_command_line->ugo_elem);               \
+     }                                                        \
      new_command_line->ugo_elem = a_instance->inst_elem;      \
+     upsmem_inc_refctr(a_instance->inst_elem);                \
    } else {                                                   \
      new_command_line->ugo_flag = FALSE;                      \
      new_command_line->ugo_elem = NULL;                       \
    }
 
-#define SET_DCLR_LINE_LIST(ugo_elem, inst_elem, ugo_flag)            \
-   if (a_instance->inst_elem) {                                      \
-     new_command_line->ugo_flag = TRUE;                               \
-     new_command_line->ugo_elem = upslst_new(a_instance->inst_elem);  \
-   } else {                                                          \
-     new_command_line->ugo_flag = FALSE;                              \
-     new_command_line->ugo_elem = NULL;                               \
+#define SET_DCLR_LINE_LIST(ugo_elem, inst_elem, ugo_flag)                   \
+   if (a_instance->inst_elem) {                                             \
+     new_command_line->ugo_flag = TRUE;                                     \
+     if (new_command_line->ugo_elem) {                                      \
+       new_command_line->ugo_elem = upslst_free(new_command_line->ugo_elem, \
+						'd');                       \
+     }                                                                      \
+     new_command_line->ugo_elem = upslst_new(a_instance->inst_elem);        \
+     upsmem_inc_refctr(a_instance->inst_elem);                              \
+   } else {                                                                 \
+     new_command_line->ugo_flag = FALSE;                                    \
+     new_command_line->ugo_elem = NULL;                                     \
    }
 
 /*-----------------------------------------------------------------------
@@ -133,7 +148,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
   t_upstyp_matched_product *mproduct;
   t_upstyp_matched_instance *minst;
   t_upslst_item *cmd_list, *action_item, *command_item;
-  t_upslst_item *chain_item, *instance_item;
+  t_upslst_item *chain_item, *instance_item, *new_list, *tmp_list_item;
   t_upstyp_action *action;
   char *tmp_buf2, *tmp_file_buf_ptr, *chain;
   char tmp_buf[MAX_LINE_LEN], tmp_file_buf[L_tmpnam];
@@ -142,9 +157,11 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
   t_upstyp_instance *new_instance, *old_table_instance, *instance;
   t_upstyp_instance *old_version_instance;
   t_upsact_cmd *command;
-  t_upsugo_command *dep_command_line = NULL, *new_command_line;
+  t_upsugo_command *dep_command_line = NULL, *new_command_line = NULL;
   t_upsugo_command *dclr_command_line;
-  t_upstyp_product write_product, *write_product_ptr = &write_product;
+  t_upstyp_product write_product = {NULL, NULL, NULL, NULL, NULL, 
+                                    NULL, NULL, NULL, NULL, NULL, 0};
+  t_upstyp_product *write_product_ptr = &write_product;
   t_upstyp_product *dum_product;
   t_upstyp_db new_db_info, *new_db_info_ptr;
 
@@ -226,6 +243,10 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 
 	if (old_table_instance && old_table_instance->action_list) {
 	  new_instance->action_list = old_table_instance->action_list;
+	  for (tmp_list_item = new_instance->action_list ; tmp_list_item ;
+	       tmp_list_item = tmp_list_item->next) {
+	    upsmem_inc_refctr(tmp_list_item->data);
+	  }
 	}
 
 	/*       fill in the instance fields that are maintained by UPS */
@@ -388,21 +409,41 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 		the version instance from the matched product */
 	COPY_TO_INSTANCE(ugo_version, old_version_instance, version);
 	COPY_TO_INSTANCE(ugo_origin, old_version_instance, origin);
-	new_instance->prod_dir = new_prod_dir;
-	new_instance->ups_dir = new_ups_dir;
-	new_instance->table_dir = new_table_dir;
-	new_instance->table_file = new_table_file;
+	new_instance->prod_dir = upsutl_str_create(new_prod_dir, ' ');
+	new_instance->ups_dir = upsutl_str_create(new_ups_dir, ' ');
+	new_instance->table_dir = upsutl_str_create(new_table_dir, ' ');
+	new_instance->table_file = upsutl_str_create(new_table_file, ' ');
 	COPY_TO_INSTANCE(ugo_archivefile, old_version_instance, archive_file);
 	COPY_TO_INSTANCE(ugo_compile_file, old_version_instance, compile_file);
 	COPY_TO_INSTANCE(ugo_compile_dir, old_version_instance, compile_dir);
-	if (new_command_line->ugo_auth) {
-	  COPY_TO_INSTANCE(ugo_auth->data, old_version_instance,
-			   authorized_nodes);
+	if (new_command_line && new_command_line->ugo_auth) {
+	  buf[0] = '\0';
+	  for (new_list = new_command_line->ugo_auth ; new_list ;
+	       new_list = new_list->next) {
+	    if (buf[0] == '\0') {
+	      sprintf(buf, "%s", (char *)new_list->data);
+	    } else {
+	      sprintf(buf, "%s%s%s", buf, UPS_SEPARATOR,
+		      (char *)new_list->data);
+	    }
+	  }
+	  new_instance->authorized_nodes = upsutl_str_create(buf, ' ');
+	} else if (old_version_instance->authorized_nodes) {
+	  new_instance->authorized_nodes =
+	    old_version_instance->authorized_nodes;
+	  upsmem_inc_refctr(new_instance->authorized_nodes);
+	} else {
+	  new_instance->authorized_nodes = 0;
 	}
+
+	/* only copy the first db as we set this up above to only have one db
+	   in it */
 	COPY_TO_INSTANCE(ugo_db->data, old_version_instance, db_dir);
 	
-	new_instance->declarer = new_instance->modifier;
-	new_instance->declared = new_instance->modified;
+	new_instance->declarer = upsutl_str_create(new_instance->modifier,
+						   ' ');
+	new_instance->declared = upsutl_str_create(new_instance->modified,
+						   ' ');
 
 	/* remove info that is specific to the table file, now we are
 	   constructing a version file instance */
@@ -463,14 +504,8 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
       }
     }
 
-  /* memory clean up time still needs to be done do not free anything that
-     is a result of reading a file in. that file is in the cache too.*/
-    if (new_instance) {
-      /* we just adjusted the pointers of all the info in this file so we
-	 do not want to actually free the whole thing, but just what was
-	 malloced during ups_new_instance */
-      upsmem_free(new_instance);
-    }
+  /* memory clean up time still needs to be done. do not free anything that
+     is a result of reading/writing a file. that file is in the cache. */
     if (new_command_line) {
       (void )upsugo_free(new_command_line);
     }
@@ -511,7 +546,10 @@ static t_upsugo_command *fill_ugo_struct(
   new_command_line->ugo_product = a_instance->product;
   new_command_line->ugo_version = a_instance->version;
   new_command_line->ugo_f = TRUE;
-  new_command_line->ugo_flavor = upslst_new(a_instance->flavor);
+  new_command_line->ugo_flavor = upslst_new(upsutl_str_create(ANY_FLAVOR,
+							      ' '));
+  new_command_line->ugo_flavor = upslst_insert(new_command_line->ugo_flavor,
+					       a_instance->flavor);
   new_command_line->ugo_q = TRUE;
   new_command_line->ugo_qualifiers = upslst_new(a_instance->qualifiers);
   new_command_line->ugo_r = TRUE;
