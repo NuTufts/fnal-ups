@@ -16,6 +16,9 @@ Header file with useful things for wrapper routines
 #ifdef __sun
 extern int fileno(FILE *);
 #endif
+#ifdef __linux__
+extern int fileno(FILE *);
+#endif
 
 /* Global variables
    ================ */
