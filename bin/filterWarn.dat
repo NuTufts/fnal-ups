@@ -223,7 +223,7 @@
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 
-&fe (undef	, 'gcc'		, undef	, undef	, undef, 0, "upsutl.c", 'In function `upsutl_get_hostname\'');
+&fe (undef	, 'gcc'		, undef	, undef	, undef, 1, "upsutl.c", 'In function `upsutl_get_hostname\'');
 
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
