@@ -130,7 +130,9 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 				  const int i_act );
 int lst_cmp_str( t_upslst_item * const l1, 
 		 t_upslst_item * const l2 );
-void trim_delimiter( char * str );
+void upsutl_str_remove_end_quotes( char * str, 
+				   char * const quotes,  
+				   char * const wspaces );
 int do_exit_action( const t_upsact_cmd * const a_cmd );
 
 /* functions to handle specific action commands */
@@ -298,7 +300,7 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       delimiter =                                                       \
 	(a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);            \
       /* trim delimiter for quotes */                                   \
-      trim_delimiter( delimiter );                                      \
+      upsutl_str_remove_end_quotes( delimiter, "\"\'", 0 );             \
     } else {                                                            \
       /* use the default, nothing was entered */                        \
       delimiter = g_default_delimiter;                                  \
@@ -1384,6 +1386,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
  */
 int parse_params( const char * const a_params, char **argv )
 {
+  static char trim_chars[] = " \t\n\r\f";
   char *ptr = (char *)a_params, *saved_ptr = NULL;
   char *new_ptr;
   int count = 0;
@@ -1432,7 +1435,7 @@ int parse_params( const char * const a_params, char **argv )
         /* and add it to the list */
 	
 	*ptr = '\0';
-	upsutl_str_remove_edges( saved_ptr, WSPACE );
+	upsutl_str_remove_end_quotes( saved_ptr, "\"\'", trim_chars );
 	argv[count++] = saved_ptr;
 	
       }
@@ -1453,7 +1456,7 @@ int parse_params( const char * const a_params, char **argv )
     
     /* Get the last one too */
 
-    upsutl_str_remove_edges( saved_ptr, WSPACE );
+    upsutl_str_remove_end_quotes( saved_ptr, "\"\'", trim_chars );
     argv[count++] = saved_ptr;
   }
   
@@ -1826,23 +1829,32 @@ char *actitem2str( const t_upsact_item *const p_act_itm )
   return buf;
 }
 
-void trim_delimiter( char * str )
+void upsutl_str_remove_end_quotes( char * str, 
+				   char * const quotes, 
+				   char * const wspace )
 {
-  /* just to trim the delimiter: get rid of starting and
+  /* to trim a string paired quotes: get rid of starting and
      trailing quotes. the passed string are expected to be
      trimmed of starting and trailing blanks */
 
   int len = (int)strlen( str );
+  char *qu = 0;
 
-  if ( len < 2 )
+  if ( wspace )
+    upsutl_str_remove_edges( str, wspace );
+
+  if ( !quotes || len < 2 )
     return;
 
-  if ( (str[0] == '\"' && str[len-1] == '\"') ||
-       (str[0] == '\'' && str[len-1] == '\'') ) {
-    char *sp1 = &str[1], *sp2 = &str[len-1];
-    for ( ; sp1 < sp2; str++, sp1++ ) *str = *sp1;
-    *str = 0;
+  for ( qu = quotes; qu && *qu; qu++ ) {
+    if ( (str[0] == *qu && str[len-1] == *qu) ) {
+      char *sp1 = &str[1], *sp2 = &str[len-1];
+      for ( ; sp1 < sp2; str++, sp1++ ) *str = *sp1;
+      *str = 0;
+      break;
+    }
   }
+  
 }
 
 t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
@@ -1887,8 +1899,9 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 
   if ( !mat_prod ) {
     t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
-    if ( !l_mproduct || !l_mproduct->data )
+    if ( !l_mproduct || !l_mproduct->data ) {
       return 0;
+    }
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
     upslst_free( l_mproduct, ' ' );
   }
