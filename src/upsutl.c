@@ -66,7 +66,7 @@ extern char *g_temp_file_name;
 extern int g_keep_temp_file;
 extern int g_COMPILE_FLAG;
 extern t_cmd_info g_cmd_info[];
-
+int g_DID_COPY_MAN = 0;
 /*
  * Declaration of private functions.
  */
@@ -192,6 +192,8 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	      if (system(g_temp_file_name) < 0) {
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			   strerror(errno));
+		upserr_add(UPS_COMMAND_FAILED, UPS_FATAL,
+			  g_cmd_info[a_command_index].cmd);
 		KEEP_OR_REMOVE_FILE();
 	      } else {
 		/* flush the journaling cache of files so the changes made
@@ -247,6 +249,12 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
   if (g_LOCAL_VARS_DEF) {
     /* undefine the local env variables */
     (void )upsget_remall(a_stream, a_command_line, a_prefix);
+  }
+
+  if (g_DID_COPY_MAN) {
+    /* make sure that the status returned after copying man/catman/info files
+       is success.  it does not matter if they could not be copied */
+    fprintf((FILE *)a_stream, "echo > /dev/null\n");
   }
 
   /* we usually tell the file to delete itself.  however the user may

@@ -34,6 +34,8 @@
  * Definition of public variables.
  */
 
+extern int g_DID_COPY_MAN;
+
 /*
  * Private constants
  */
@@ -76,6 +78,9 @@ static char get_man_subdir(char * const a_man_file);
     upserr_vplace(); \
     upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 
+#define RESET_STATUS() \
+    g_DID_COPY_MAN = 1;
+
 #define SYSTEM_ERROR() \
     upserr_vplace(); \
     upserr_add(UPS_SYSTEM_ERROR, UPS_INFORMATIONAL, "system", strerror(errno));
@@ -85,21 +90,6 @@ static char get_man_subdir(char * const a_man_file);
  */
 
 static char g_buff[MAX_LINE_LEN];
-/* static char *g_default_delimiter = ":";
-static char *g_space_delimiter = " ";
-static char *g_whats_left = "";
-static int g_ups_cmd = e_invalid_action;
-static char *g_shPath = "PATH";
-static char *g_cshPath = "path";
-static char *g_shDelimiter = ":";
-static char *g_cshDelimiter = " ";
-*/
-
-/* this one, is a pointer to the ugo_command from the command line */
-/*
-static t_upsugo_command *g_ugo_cmd = 0;
-*/
-
 
 /*=======================================================================
  *
@@ -146,6 +136,10 @@ void upscpy_info(UPSCPY_PARAMS)
           if (system(buffer))
           { SYSTEM_ERROR();
           }
+	  /* it is possible that the copy did not succeed.  we do not want 
+	     the system command to get a bad status return so put this in the
+	     end of the file to reset status to success */
+	  RESET_STATUS();
         }
       }
     }
@@ -253,6 +247,10 @@ void upscpy_man(UPSCPY_PARAMS)
               }
             }
           }   /* while ((dir_line ... */
+	  /* it is possible that the copy did not succeed.  we do not want 
+	     the system command to get a bad status return so put this in the
+	     end of the file to reset status to success */
+	  RESET_STATUS();
         }  /* if ((dir = ... */
       }
       if (UPS_ERROR != UPS_SUCCESS)
@@ -314,6 +312,10 @@ void upscpy_catman(UPSCPY_PARAMS)
               }
             }
           }   /* while ((dir_line ... */
+	  /* it is possible that the copy did not succeed.  we do not want 
+	     the system command to get a bad status return so put this in the
+	     end of the file to reset status to success */
+	  RESET_STATUS();
         }  /* if ((dir = ... */
       }
       if (UPS_ERROR != UPS_SUCCESS)
@@ -399,6 +401,10 @@ void upscpy_rmman(UPSCPY_PARAMS)
               }
             }
           }   /* while ((dir_line ... */
+	  /* it is possible that the copy did not succeed.  we do not want 
+	     the system command to get a bad status return so put this in the
+	     end of the file to reset status to success */
+	  RESET_STATUS();
         }  /* if ((dir = ... */
       }
       if (UPS_ERROR != UPS_SUCCESS)
@@ -459,6 +465,10 @@ void upscpy_rmcatman(UPSCPY_PARAMS)
               }
             }
           }   /* while ((dir_line ... */
+	  /* it is possible that the copy did not succeed.  we do not want 
+	     the system command to get a bad status return so put this in the
+	     end of the file to reset status to success */
+	  RESET_STATUS();
         }  /* if ((dir = ... */
         upserr_vplace();
       }
