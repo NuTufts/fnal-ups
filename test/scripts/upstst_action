@@ -3,7 +3,7 @@
 # test the action routines
 # ============================================================================
 cd $UPS_DIR/test/scripts/action/log
-UPS_SHELL=csh;export UPS_SHELL;
+SHELL=csh;export SHELL;
 env PRODUCTS=../db1 $UPS_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 #
