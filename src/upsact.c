@@ -41,6 +41,7 @@
 /*
  * Definition of public variables.
  */
+extern int g_LOCAL_VARS_DEF;
 
 /*
  * Private constants
@@ -1522,6 +1523,7 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
     /* define all of the UPS local variables that the user may need. */
     upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
     if (UPS_ERROR == UPS_SUCCESS) {
+      g_LOCAL_VARS_DEF = 1;   /* keep track that we defined local variables */
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
 	if (fprintf((FILE *)a_stream, ". %s;\n", a_cmd->argv[0]) < 0) {
@@ -1579,6 +1581,7 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
+	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	    if (fprintf((FILE *)a_stream, "  . %s;\n;\nfi;\nfi;\n", 
 			a_cmd->argv[0]) < 0) {
 	      upserr_vplace();
@@ -1608,6 +1611,7 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
+	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	    if (fprintf((FILE *)a_stream, "  source %s\n\nendif\nendif\n", 
 			a_cmd->argv[0]) < 0) {
 	      upserr_vplace();
@@ -1647,6 +1651,7 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
     /* define all of the UPS local variables that the user may need. */
     upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
+    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
     if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
@@ -1710,6 +1715,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
+	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	    if (fprintf((FILE *)a_stream,
 			"  . %s;\n  if [ $? -eq 1 ]; then return 1; fi;\nfi;\nfi;\n", 
 			a_cmd->argv[0]) < 0) {
@@ -1740,6 +1746,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
+	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	    if (fprintf((FILE *)a_stream,
 			"  source %s\n  if ($status == 1) return 1/nendif\nendif\nendif\n", 
 			a_cmd->argv[0]) < 0) {
