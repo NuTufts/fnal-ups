@@ -42,7 +42,7 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 12. Fully support news and html files more generally.
 
-13.  The ability for the upsdb-admin to configure, on a per-db level, what
+13. The ability for the upsdb-admin to configure, on a per-db level, what
 	happens under various circumstances.  For example,
 	in some later version of ups the sys/prod-admin should be able to say
 	things like "when a product is declared, copy the html files to
@@ -51,3 +51,7 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	prodadmin@here.there" or "when somebody sets up a test version of a
 	product, prepend the MAN_SOURCE_DIR into their MAN_PATH so that they
 	can access the man pages for the test version", etc.
+
+14. Let declared files be the umask and ownership of the database in which
+	they currently reside.
+
