@@ -28,6 +28,7 @@
 #include <string.h>
 
 /* ups specific include files */
+#include "ups_utils.h"
 #include "ups_files.h"
 #include "ups_types.h"
 #include "ups_list.h"
@@ -59,20 +60,16 @@ static int            write_action( t_ups_action *act );
 /* Line parsing */
 static int            get_key( void );
 static int            next_key( void );
-static size_t         trim_line( void );
 static int            is_stop_key( void );
 static int            is_start_key( void );
 static int            put_key( const char * const key, const char * const val );
 
 /* Utils */
-static char           *qualifiers_create( char * const str );
+static int            trim_qualifiers( char * const str );
 static char           *str_create( char * const str );
 static int            is_space( const char c );
 static int            ckeyi( void );
 static int            cfilei( void );
-static size_t         trim_qualifiers( char * const str );
-static int            upsutl_split_sort_merge( char * const, const char );
-static int            qsort_cmp_string( const void *, const void * );
 
 /* Print stuff */
 static void           print_instance( t_ups_instance * const inst_ptr );
@@ -127,14 +124,14 @@ enum e_ups_file {
   e_file_count
 };
 
-#define MAX_LINE_LENGTH 1024 /* max length of a line */
+#define CHAR_REMOVE " \t\n\r\f\""
 
 static t_ups_product  *g_pd = 0; /* current product to fill */
 static FILE           *g_fh = 0; /* file handle */
 
-static char           g_line[MAX_LINE_LENGTH] = "";  /* current line */
-static char           g_key[MAX_LINE_LENGTH] = "";   /* current key */
-static char           g_val[MAX_LINE_LENGTH] = "";   /* current value */
+static char           g_line[MAX_LINE_LEN] = "";  /* current line */
+static char           g_key[MAX_LINE_LEN] = "";   /* current key */
+static char           g_val[MAX_LINE_LEN] = "";   /* current value */
 static int            g_ikey = e_key_unknown;        /* current key as enum */  
 static int            g_ifile = e_file_unknown;      /* current file type as enum */
 
@@ -444,9 +441,9 @@ t_upslst_item *read_comments( void )
 {
   t_upslst_item *l_ptr = 0;
   
-  while ( fgets( g_line, MAX_LINE_LENGTH, g_fh ) ) {
+  while ( fgets( g_line, MAX_LINE_LEN, g_fh ) ) {
 
-    if ( !trim_line() ) continue;   
+    if ( !upsutl_str_remove_edges( g_line, CHAR_REMOVE ) ) continue;   
     if ( g_line[0] == '#' ) {
       l_ptr = upslst_add( l_ptr, str_create( g_line ) );
     }
@@ -567,7 +564,6 @@ t_ups_instance *read_instance( void )
 
     case e_key_qualifiers:
       trim_qualifiers( g_val );
-      upsutl_split_sort_merge( g_val, ',' );
       inst_ptr->qualifiers = str_create( g_val );
       break;
     
@@ -806,11 +802,11 @@ int next_key( void )
   g_line[0] = 0;
   g_ikey = e_key_eof;
 
-  while ( fgets( g_line, MAX_LINE_LENGTH, g_fh ) ) {
+  while ( fgets( g_line, MAX_LINE_LEN, g_fh ) ) {
 
     if ( strlen( g_line ) < 1 ) continue;
     if ( g_line[0] == '#' ) continue;
-    if ( !trim_line() ) continue;
+    if ( !upsutl_str_remove_edges( g_line, CHAR_REMOVE ) ) continue;
 
     if ( get_key() != e_key_eol ) {
       return g_ikey;
@@ -906,38 +902,6 @@ int put_key( const char * const key, const char * const val )
   return 1;
 }
      
-/*-----------------------------------------------------------------------
- * trim_line
- *
- * Will erase trailing and starting white spaces on current line (g_line)
- *
- * Input : none
- * Output: none
- * Return: int, length of trimmed line
- */
-size_t trim_line( void )
-{
-  char *cp = g_line;
-  char *cstart = 0;
-  char *cend = 0;
-  int count = 0;
-  
-  while ( cp && is_space( *cp ) ){ cp++; }
-  cstart = cp;
-  count = strlen( g_line );
-  cp = &g_line[count - 1];
-  while ( count && is_space( *cp ) ){ cp--; count--; }
-  cend = cp;
-
-  count = 0;
-  for ( cp=cstart; cp<=cend; cp++, count++ ) {
-    g_line[count] = *cp;
-  }
-  g_line[count] = 0;
-
-  return strlen( g_line );
-}
-
 int is_start_key( void )
 {
   if ( g_ikey == e_key_flavor ) 
@@ -964,80 +928,25 @@ int is_stop_key( void )
   return 0;
 }
 
+int trim_qualifiers( char * const str )
+{
+  int i, len;
+  
+  if ( !str || strlen( str ) <= 0 ) return 0;
+
+  len = (int)strlen( str );
+  for ( i=0; i<len; i++ )
+    str[i] = tolower( str[i] );
+  
+  upsutl_str_remove( str, CHAR_REMOVE );  
+  upsutl_str_sort( str, ',' );
+
+  return strlen( str );
+}
+
 /*
  * Utils
  */
-
-int upsutl_split_sort_merge( char * const str, const char c )
-{
-  static char buf[256];
-  char *p, *p0;
-  
-  char ct[2] = "\0\0";
-  size_t max_len = 0;
-  int count = 0, i = 0;
-
-  if ( ! str || strlen( str ) <= 0 ) return 0;
-
-  ct[0] = c;
-  memset( buf, 0, 256 );
-  
-  /* get max len of an item */
-
-  p0 = str;
-  while ( (p = strchr( p0, c )) ) {
-    if ( max_len < (p-p0) ) max_len = p-p0;
-    p0 = p+1;
-  }
-  ++max_len;
-
-  /* split, fill buf with evenly spaced items */
-
-  p = strtok( str, ct );
-  do {
-    strcpy( &buf[count*max_len], p );
-    count++;
-  } while( (p=strtok( 0, ct )) );
-
-  /* sort */
-  
-  qsort( buf, count, max_len, qsort_cmp_string );
-
-  /* merge, write back to input */
-
-  strcpy( str, &buf[0] );
-  for ( i=1; i<count; i++ ) {
-    strcat( str, ct );
-    strcat( str, &buf[i*max_len] );
-  }
-
-  return count;
-}
-
-int qsort_cmp_string( const void *c1, const void *c2 )
-{
-  int i = strcmp( (const char *)c1, (const char *)c2 );
-  return i;
-}
-
-size_t trim_qualifiers( char * const str )
-{
-  static char buf[256];
-  char *cp = str;  
-  int count = 0;
-
-  while ( cp && *cp ) {
-    if ( !is_space( *cp ) && *cp != '"' ) {
-      buf[count] = *cp;
-      count++;
-    }
-    cp++;
-  }
-  buf[count] = 0;
-  strcpy( str, buf );
-
-  return strlen( str );    
-}
 
 char *str_create( char * const str )
 {
