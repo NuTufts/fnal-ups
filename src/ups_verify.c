@@ -58,10 +58,16 @@ static void ups_verify_table_instance(VERIFY_INST_PARAMS);
 static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
 					const char * const a_product_name);
 
+static void shutup(VERIFY_INST_PARAMS);		/* pretend to use all of the parameters we've defined */
+#define SHUTUP \
+  if ((&bit_bucket == 0) && 0) shutup (a_inst, a_db, a_minst, a_command_line);
+
 /*
  * Definition of global variables.
  */
 static char *g_dollarsign = "$";
+static long bit_bucket = 0;
+
 #define VERIFY_DIR_SPEC(dir, tran)   \
     if (dir && (dir[0] != '\0')) {                                          \
       char *trans_dir;                                                      \
@@ -220,6 +226,7 @@ static void ups_verify_chain_instance(VERIFY_INST_PARAMS)
   if (! strcmp(a_inst->qualifiers, ANY_FLAVOR)) {
     upserr_add(UPS_INVALID_ANY_QUALS, UPS_INFORMATIONAL, "CHAIN");
   }
+  SHUTUP;
 }
 /*-----------------------------------------------------------------------
  * ups_verify_version_instance
@@ -380,4 +387,14 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
   CHECK_FOR_COMMA(a_inst->qualifiers);
   CHECK_FOR_COMMA(a_inst->authorized_nodes);
   CHECK_FOR_COMMA(a_inst->statistics);
+  SHUTUP;
+}
+
+
+static void shutup(VERIFY_INST_PARAMS)
+{
+  bit_bucket ^= (long) a_inst;
+  bit_bucket ^= (long) a_db;
+  bit_bucket ^= (long) a_minst;
+  bit_bucket ^= (long) a_command_line;
 }
