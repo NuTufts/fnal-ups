@@ -89,7 +89,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 29 */  "%s: Unsetup of %s failed, continuing with setup\n",
 /* 30 */  "%s: Cannot create file %s, it already exists\n",
 /* 31 */  "%s: No table file name was specified on the command line\n"
-/* 32 this is the last */
+/* 32 */  "%s: Version specified allready exists\n"
+/* 33 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -125,7 +126,8 @@ char *g_error_ascii[] = {
    /* UPS_UNSETUP_FAILED      29 */ "UPS_UNSETUP_FIALED",
    /* UPS_FILE_EXISTS         30 */ "UPS_FILE_EXISTS",
    /* UPS_NO_TABLE_FILE       31 */ "UPS_NO_TABLE_FILE",
-   /* UPS_NERR                32 */ "UPS_NERR",
+   /* UPS_VERSION_EXISTS      32 */ "UPS_NO_TABLE_FILE",
+   /* UPS_NERR                33 */ "UPS_NERR",
    0 };
 
 /*
