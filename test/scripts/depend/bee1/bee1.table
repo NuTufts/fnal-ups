@@ -4,12 +4,7 @@ PRODUCT = bee1
 GROUP:
 
 FLAVOR = NULL
-
+QUALIFIERS = ""
 
 COMMON:
-
-
-setupRequired("bee5 v1_0")
 END:
-
-

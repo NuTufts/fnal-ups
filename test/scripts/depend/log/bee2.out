@@ -1,0 +1,2 @@
+bee5 v1_0 -f NULL -z ../db1
+bee1  -f NULL -z ../db1 -m bee2.table -g current

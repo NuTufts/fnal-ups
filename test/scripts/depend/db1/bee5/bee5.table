@@ -1,15 +1,14 @@
 FILE = TABLE
-PRODUCT = bee1
+PRODUCT = bee5
 
 GROUP:
 
 FLAVOR = NULL
+QUALIFIERS = ""
+
 
 
 COMMON:
 
 
-setupRequired("bee5 v1_0")
 END:
-
-
