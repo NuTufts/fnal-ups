@@ -636,7 +636,7 @@ int upsutl_stricmp( const char *s1, const char *s2 )
  * Output: none
  * Return: as strcmp.
  */
-int upsutl_strincmp( const char *s1, const char *s2, size_t n )
+int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
 {
   register unsigned char u1, u2;
   register int i = 0;
@@ -647,7 +647,7 @@ int upsutl_strincmp( const char *s1, const char *s2, size_t n )
     if (stricmp_charmap[u1] != stricmp_charmap[u2]) {
       return stricmp_charmap[u1] - stricmp_charmap[u2];
     }
-    if (++i == n || u1 == '\0') {
+    if (++i == (int )n || u1 == '\0') {
       return 0;
     }
   }
