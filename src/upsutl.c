@@ -84,10 +84,60 @@ static clock_t g_start_cpu, g_finish_cpu;
 static time_t g_start_w, g_finish_w;
 static char g_stat_dir[] = "/statistics/";
 static char g_unknown_user[] = "UNKNOWN";
+static char g_buffer[FILENAME_MAX+1];
 /*
  * Definition of public functions.
  */
 
+/*-----------------------------------------------------------------------
+ * upsutl_find_manpages
+ *
+ * Return a string containing the location of the products' man pages
+ *
+ * Input : an instance, and db configuration info
+ * Output: none
+ * Return: static string containing the location of the products' man pages
+ */
+char *upsutl_find_manpages( const t_upstyp_matched_instance * const a_inst,
+			    const t_upstyp_db * const a_db_info)
+{
+  t_upstyp_instance *vinst;
+
+  g_buffer[0] = '\0';    /* we want to fill this anew */
+
+  /* Check for a PROD_DIR_PREFIX first */
+  if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
+    strcat(g_buffer, a_db_info->config->prod_dir_prefix);
+    strcat(g_buffer, "/");
+  }
+
+  /* the information we need is in the version file match */
+  if ((vinst = a_inst->version)) {
+    /* see if we have a ups dir or not */
+    if (vinst->ups_dir) {
+      /* if UPS_DIR does not begin with a "/", use
+	 PROD_DIR/UPS_DIR/toman */
+      if (strcmp("/", (char *)&vinst->ups_dir[0])) {
+	/* UPS_DIR does not begin with a "/" */
+	if (vinst->prod_dir) {
+	  strcat(g_buffer, vinst->prod_dir);
+	  strcat(g_buffer, "/");
+	}
+      }
+      strcat(g_buffer, vinst->ups_dir);
+      strcat(g_buffer, "/toman/");
+    } else {
+      /* no UPS dir, use $PROD_DIR/ups/toman */
+      if (vinst->prod_dir) {
+	strcat(g_buffer, vinst->prod_dir);
+	strcat(g_buffer, "/");
+      }
+      strcat(g_buffer, "ups/toman/");
+    }
+  }
+  
+  return ((char *)(&g_buffer[0]));
+}
 /*-----------------------------------------------------------------------
  * upsutl_get_hostname
  *
