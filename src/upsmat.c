@@ -242,7 +242,7 @@ static int g_ups_error;
 
 
 #define FREE_CONFIG_FILE() \
-    if (db_info->config) {                                    \
+    if (db_info && db_info->config) {               \
       db_info->config = upsutl_free_config(db_info->config);  \
     }
 

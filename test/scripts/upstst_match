@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 # ============================================================================
 # test the file routines
 # ============================================================================
@@ -6,8 +6,6 @@ unset PRODUCTS
 cd $ERUPT_DIR/test/scripts/match/log
 $ERUPT_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
-#
-upsmat_instance -status UPS_OPEN_FILE
 #
 # see if things work without a table file specified
 #
@@ -24,9 +22,9 @@ upsmat_instance -out rover4.out -diff rover4.in -z ../db1 -f IRIX+5.3 -q"nodbg:o
 #
 # table file tests with spot
 #
-upsmat_instance -out spot1.out -diff spot1.in -H IRIX+5 -M ../db1/spot/spot.table -q"nodbg:opt" spot
-upsmat_instance -out spot1.out -diff spot1.in -H IRIX+5 -m ../db1/spot -M spot.table -q"nodbg:opt" spot
-upsmat_instance -out spot2.out -diff spot2.in -H IRIX+5 -M ../db1/spot/spot.table -q"nodbg:opt" -unique spot
+upsmat_instance -out spot1.out -diff spot1.in -H IRIX+5 -m ../db1/spot/spot.table -q"nodbg:opt" spot
+upsmat_instance -out spot1.out -diff spot1.in -H IRIX+5 -M ../db1/spot -m spot.table -q"nodbg:opt" spot
+upsmat_instance -out spot2.out -diff spot2.in -H IRIX+5 -m ../db1/spot/spot.table -q"nodbg:opt" -unique spot
 #
 # chain tests with lassie
 #

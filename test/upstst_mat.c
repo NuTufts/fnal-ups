@@ -34,26 +34,36 @@ static char     	*estatus_str;                   /*expected status str */
 static int		unique;				/* unique flag name */
 static char		*outfile;			/* filename to output */
 static char		*difffile;			/* file to diff */
+static char		*database;			/* ups database */
 FILE			*ofd;				/* outfile fd */
 int			stdout_dup;			/* dup of stdout */
+t_upslst_item		*dblist = NULL;
+t_upstyp_db		dbaddr;
 
 upstst_argt     	argt[] = 
-   {{"-unique",	  UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
-    {"-out",	  UPSTST_ARGV_STRING,NULL,		&outfile},
-    {"-diff",     UPSTST_ARGV_STRING,NULL,		&difffile},
-    {"-status",   UPSTST_ARGV_STRING,NULL,   		&estatus_str},
-    {NULL,        UPSTST_ARGV_END,NULL,			NULL}};
+   {{"-unique",	UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
+    {"-out",	UPSTST_ARGV_STRING,NULL,		&outfile},
+    {"-diff",   UPSTST_ARGV_STRING,NULL,		&difffile},
+    {"-db", 	UPSTST_ARGV_STRING,NULL,		&database},
+    {"-status", UPSTST_ARGV_STRING,NULL,   		&estatus_str},
+    {NULL,      UPSTST_ARGV_END,NULL,			NULL}};
 
 
 /* parse command line
    ------------------ */
 
 estatus_str = NULL; 
-unique = NULL; outfile = NULL; difffile = NULL;
+unique = NULL; outfile = NULL; difffile = NULL; database = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 
+if (database) 
+   {
+   dbaddr.name = database;
+   dbaddr.config= NULL;
+   dblist = upslst_new(&dbaddr);
+   }
 /* let's get our output file descriptor setup
    ------------------------------------------ */
 
@@ -80,7 +90,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        upserr_output(); upserr_clear();
        return (0);
        }
-   mp = upsmat_instance(uc,NULL,unique);
+   mp = upsmat_instance(uc,dblist,unique);
    if (UPS_ERROR != estatus)                    	/* error? */
        {
        fprintf(stderr,"%s: %s, %s: %s\n","actual status",

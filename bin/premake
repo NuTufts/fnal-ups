@@ -354,5 +354,5 @@ fi
 
 eval $makeCmd ${logPipe:-}
 status=`cat .status.$$`
-
 exit $status
+

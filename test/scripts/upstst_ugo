@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 # ============================================================================
 # test the file routines
 # ============================================================================
@@ -49,3 +49,9 @@ upsugo_next -out prodi.out -diff prodi.in -H IRIX+5.3 -q"But caption: you have s
 
 quit
 EOD
+
+unset PRODUCTS
+$ERUPT_DIR/test/ups_test << EOD2
+upsugo_next -out /dev/null -status UPS_NO_DATABASE
+quit
+EOD2
