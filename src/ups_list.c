@@ -147,7 +147,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
     { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
 /* A as in a single product loop */
       if (!a_command_line->ugo_K) /* keywords is a whole different animal */ 
-      { printf("DATABASE: %s\n",mproduct->db);
+      { printf("DATABASE: %s\n",mproduct->db_info->name);
         printf("PRODUCT: %s\n",mproduct->product);
         if (minst_ptr->chain) 
         { printf ("VERSION: %s\n", minst_ptr->chain->version);
