@@ -30,6 +30,7 @@
 #include "upslst.h"
 #include "upstyp.h"
 #include "ups_setup.h"
+#include "ups_start.h"
 #include "ups_list.h"
 #include "ups_unk.h"
 #include "upserr.h"
@@ -150,7 +151,7 @@ int main(int argc, char *argv[])
 	  break;
 	case e_modify: ups_unk(command_line, argv[1], e_modify);
 	  break;
-	case e_start: ups_unk(command_line, argv[1], e_start);
+	case e_start: ups_start(command_line, temp_file, e_start);
 	  break;
 	case e_stop: ups_unk(command_line, argv[1], e_stop);
 	  break;
@@ -220,9 +221,10 @@ int main(int argc, char *argv[])
 	break;
       default:
 	/* source the file within the current process context */
-	if (system(temp_file_name) <= 0) {
+	/*	if (system(temp_file_name) <= 0) {
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system", strerror(errno));
-	}
+	}*/
+	(void )printf("(usually sourced) %s\n", temp_file_name);  /* output it for now */
 	
       }
     }
