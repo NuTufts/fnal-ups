@@ -115,13 +115,26 @@ static int g_MATCH_DONE = 0;
   }                                                     \
 }
 #define OutputConfig() \
-{ FromConfig(upd_usercode_dir,"UPD_UserCode_Dir") \
-  FromConfig(setups_dir,"Setups_Dir")             \
-  FromConfig(ups_db_version,"DB_Version")         \
-  FromConfig(prod_dir_prefix,"Prod_dir_prefix")   \
-  FromConfig(man_target_dir,"Man_Target_dir")     \
-  FromConfig(html_target_dir,"Html_Target_dir")   \
-  FromConfig(info_target_dir,"Info_Target_dir")   \
+{ FromConfig(upd_usercode_dir,"UPD_UserCode_Dir")                 \
+  if(!upsutl_stricmp(l_ptr->data,"@upd_usercode_dir"))            \
+  { valid=1;                                                      \
+    if (config_ptr->upd_usercode_dir)                             \
+    { if((env_string=                                             \
+      upsget_translation_env(config_ptr->upd_usercode_dir))!=0)   \
+      { printf("\"%s\" ", env_string);                            \
+      } else {                                                    \
+        printf("\"%s\" ", config_ptr->upd_usercode_dir);          \
+      }                                                           \
+    } else {                                                      \
+      printf("\"\" ");                                            \
+    }                                                             \
+  }                                                               \
+  FromConfig(setups_dir,"Setups_Dir")                             \
+  FromConfig(ups_db_version,"DB_Version")                         \
+  FromConfig(prod_dir_prefix,"Prod_dir_prefix")                   \
+  FromConfig(man_target_dir,"Man_Target_dir")                     \
+  FromConfig(html_target_dir,"Html_Target_dir")                   \
+  FromConfig(info_target_dir,"Info_Target_dir")                   \
 }
 
 #define FromAny(ELEMENT) \
@@ -662,6 +675,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
   static char buffer[20];
+  char *env_string=0;  /* environment translation string */
   char *nodes=0;
   char *str_val;
   char *addr;
