@@ -148,6 +148,9 @@ flavor_sub(char *flavor, struct ups_command * uc)
 #define case_2 case '2': uc->ugo_number = 3; break;
 #define case_3 case '3': uc->ugo_number = 4; break;
 #define case_4 case '4': uc->ugo_number = 5; break;
+#define case_5 case '5': uc->ugo_number = 6; break;
+#define case_6 case '6': uc->ugo_number = 7; break;
+#define case_7 case '7': uc->ugo_number = 8; break;
 
 /* Add a specified chain to the list */
 #define add_chain(CHAIN) \
@@ -1526,7 +1529,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
           case_b case_D case_G case_m 
           case_M case_N case_O case_p 
           case_r case_T case_u case_U 
-          case_0 case_1 case_2 case_3 case_4 /* number sets */
+          case_0 case_1 case_2 case_3 case_4 case_5 case_6 case_7 /* number sets */
           case_q case_z               /* special cases */
           default:
              errflg = 1;

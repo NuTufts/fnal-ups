@@ -95,6 +95,7 @@ ups_append_OS(char *buf)
        return;
    }
 
+
    (void) strcpy (buf,baseuname.sysname);	/* get sysname */
    if (!strncmp(buf,"IRIX",4))  		/* Slam all IRIXanything */
    { 
@@ -138,6 +139,21 @@ ups_append_release(char *buf)
      if(0 != tpoint)
        (void)strcpy(baseuname.release, tpoint+1);
    }
+#if defined(__GLIBC_PREREQ)			
+#if __GLIBC_PREREQ(2,0)				/* on linux, need glibc ver */
+    {
+      char *tpoint;
+      extern char *gnu_get_libc_version(void);
+      char *glibc_version = gnu_get_libc_version();
+
+      tpoint = strchr(baseuname.release,'.');
+      if (tpoint) 
+	  tpoint = strchr(tpoint+1,'.');  /* after kernel verision */
+      if (tpoint)
+	  strcpy(tpoint+1, glibc_version);
+    }
+#endif
+#endif
    (void) strcat(buf,baseuname.release);     /* add in release */
 }
 
