@@ -331,6 +331,7 @@ char * upsugo_getarg( const int , char **,char ** const );
 int upsugo_rearg(const int ,char **,int * const,char **);
 int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
+int upsugo_setfixed(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
 int upsugo_blddb(struct ups_command * const uc, char * inaddr);
 void upsugo_prtdb(t_upslst_item * const list_ptr,char * const title,const unsigned int,FILE * const fd);
@@ -383,6 +384,26 @@ if (!uc->ugo_H)
    uc->ugo_osname=0;
  } 
  return(0);
+}
+/* ===========================================================================
+** ROUTINE	upsugo_setfixed()
+**
+*/
+int upsugo_setfixed(struct ups_command * const uc)
+{
+   char   * SHELL;                           /* SHELL value */
+   static int shell=e_INVALID_SHELL;
+   if (shell==e_INVALID_SHELL)
+   { if((SHELL = (char *)getenv("SHELL")) == 0)
+     { upserr_add(UPS_NOSHELL);
+     } else { 
+       if (strstr(SHELL,"csh"))
+       { shell=e_CSHELL;
+       } else { 
+         shell=e_BOURNE;
+       }
+     }
+   } uc->ugo_shell=shell;
 }
 /* ===========================================================================
 ** ROUTINE	upsugo_ifornota()
@@ -1173,6 +1194,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
      if ( ugo_commands=ugo_commands->next ) {
         upslst_delete( last_command, last_command->data, 'd');
         luc = ugo_commands->data;
+        upsugo_setfixed(luc);
         UPS_VERBOSE = luc->ugo_v;
 	upsugo_liststart(luc);       /* move all lists to first element */
         return (t_upsugo_command *)ugo_commands->data; 
@@ -1251,26 +1273,18 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        }
      }
    }
-/*    if ((errflg ))
-   {   fprintf(stderr, "Valid options are %s\n",validopts); } */
-/* no product specification */
-/* this DOES NOT MEAN no specifications on the command line the 
-   structure is only pushed (addlst) when the product is specified.  
-   Therefore if no product it must be pushed but all other flags 
-   were still done.
-*/
    if (!ugo_commands) 
    { addr=upsutl_str_create("*",' ');
      uc->ugo_product = addr;
-/*     if (!uc->ugo_flavor) upsugo_bldfvr(uc); */
      upsugo_ifornota(uc);             
-/* need more ?? ... */
      ugo_commands = upslst_add(ugo_commands,uc);
    }
    ugo_commands=upslst_first(ugo_commands);
    luc = ugo_commands->data;
+   upsugo_setfixed(luc);
    UPS_VERBOSE=luc->ugo_v;
+/* don't want to change now but I don't think this is right??? */
    upsugo_liststart(luc);       /* move all lists to first element */
    return (t_upsugo_command *)ugo_commands->data; 
-   } /* not subsequent call ... */
+   }
 }
