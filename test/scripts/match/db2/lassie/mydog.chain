@@ -9,7 +9,7 @@
 # version=VERSION
 File=Chain
 Product=lassie
-Chain=current
+Chain=mydog
 # 
 Flavor=NULL
 Qualifiers="nodbg:opt"

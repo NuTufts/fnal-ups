@@ -24,3 +24,4 @@ QUALIFIERS = "long"
   _DUMMY = "this should be recognized"
   MODIFIED = 1-12-98
   MODIFIER = astro
+  ORIGIN = /asteroid

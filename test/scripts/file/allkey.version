@@ -24,3 +24,4 @@ QUALIFIERS = "long"
   DESCRIPTION = "spot is a good dog who loves me the best."
   ARCHIVE_FILE = akc.tar.z
   _DUMMY = "this should be recognized"
+  ORIGIN = /mycvsrepository

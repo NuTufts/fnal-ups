@@ -10,7 +10,8 @@ $ERUPT_DIR/test/ups_test << EOD
 # see if things work without a table file specified
 #
 upsmat_instance -status UPS_NO_TABLE_MATCH -z ../db0 notable v2_0
-upsmat_instance -out notable.out -diff notable.in -z ../db0 notable v1_0
+upsmat_instance -out notable1.out -diff notable1.in -status UPS_NO_TABLE_MATCH -z ../db0 notable -a
+upsmat_instance -out notable2.out -diff notable2.in -z ../db0 notable v1_0
 # 
 # simple tests with rover
 #
@@ -28,6 +29,7 @@ upsmat_instance -out spot2.out -diff spot2.in -H IRIX+5 -m ../db1/spot/spot.tabl
 #
 # chain tests with lassie
 #
+upsmat_instance -out lassie0.out -diff lassie0.in -z ../db1 -H IRIX+5 -a lassie
 upsmat_instance -out lassie1.out -diff lassie1.in -z ../db1 -H IRIX+5 -a -c lassie
 upsmat_instance -out lassie1.out -diff lassie1.in -z ../db1 -H IRIX+5 -a -g current lassie
 upsmat_instance -out lassie2.out -diff lassie2.in -z ../db1 -H IRIX+5 -a -g current:test lassie

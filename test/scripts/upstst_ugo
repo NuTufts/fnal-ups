@@ -3,6 +3,10 @@
 # test the file routines
 # ============================================================================
 PRODUCTS="/thunder 	   /lightening"; export PRODUCTS
+SETUP_titanic="doomed -H IRIX+5" ; export SETUP_titanic
+SETUP_lusitania="lusitania -f CHERRY v1_0" ; export SETUP_lusitania
+SETUP_bismark="bismark -g current -q a?b?c -f RUM_RAISIN"; export SETUP_bismark
+
 cd $ERUPT_DIR/test/scripts/ugo
 $ERUPT_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
@@ -46,6 +50,18 @@ upsugo_next -out prodg.out -diff prodg.in -H IRIX+5.3 -q"?mouse : ?cat :dog" Pro
 upsugo_next -out prodh.out -diff prodh.in -H IRIX+5.3 -q"?no?comma?here" ProdH
 # should pack....
 upsugo_next -out prodi.out -diff prodi.in -H IRIX+5.3 -q"But caption: you have spaces " ProdI
+#
+# test upsugo_env
+#
+upsugo_env -out titanic.out -diff titanic.in titanic
+upsugo_env -out lusitania.out -diff lusitania.in lusitania 
+upsugo_env -out bismark.out -diff bismark.in bismark 
+#
+# test upsugo_bldcmd
+#
+upsugo_bldcmd -out titanic.out -diff titanic.in "doomed -H IRIX+5"
+upsugo_bldcmd -out lusitania.out -diff lusitania.in "lusitania -f CHERRY v1_0"
+upsugo_bldcmd -out bismark.out -diff bismark.in "bismark -g current -q a?b?c -f RUM_RAISIN"
 
 quit
 EOD

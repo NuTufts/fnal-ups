@@ -1,0 +1,7 @@
+Product:          lusitania
+Version:          v1_0
+Flavor:           CHERRY
+Qualifiers:       
+DB:               /thunder
+                  /lightening
+ugo_v 0 and UPS_VERBOSE 0
