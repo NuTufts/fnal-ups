@@ -40,7 +40,6 @@
  */
 void ups_list( t_upsugo_command * const a_command_line );
 
-
 /*
  * Declaration of private globals.
  */
