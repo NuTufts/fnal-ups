@@ -47,6 +47,7 @@ int get_instance(const t_upslst_item * const a_read_instances,
 			t_upslst_item **a_list_instances);
 static void print_inst(t_upslst_item * const inst_list);
 static char *get_ups_string(const char * const old_string);
+#def NEED_get_ups_string
 #endif
 
 #ifdef MATCH_TABLE
@@ -285,6 +286,7 @@ static void test_match_chain(const int argc, char *argv[])
 }
 #endif
 
+#ifdef NEED_get_ups_string
 static char *get_ups_string(const char * const old_string)
 {
   int bytes;
@@ -296,6 +298,5 @@ static char *get_ups_string(const char * const old_string)
 
   return new_string;
 }
-
-
-
+#undef NEED_get_ups_string
+#endif
