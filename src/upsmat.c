@@ -1154,9 +1154,8 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	    break;
   	  }
 	}
-	/* if we got a match and we only want one, break.  if we got a match
-	   and want as many as we can get but not any-match (*), break */
-	if (got_match && (a_need_unique || !(want_all_f || want_all_q))) {
+	/* if we got a match and we only want one, break. */
+	if (got_match && a_need_unique) {
 	  /* go get the next flavor */
 	  break;
 	}
