@@ -155,9 +155,10 @@ static int g_ups_error;
 	}                                                              \
       }
 
-#define CHECK_NO_FILE(file) \
+#define CHECK_NO_FILE() \
       if ((UPS_ERROR == UPS_NO_FILE) && ! a_need_unique) {      \
-	upserr_clear();						\
+	upserr_backup();					\
+	upserr_backup();					\
       } 
 
 #define CHECK_SOFT_ERR() \
@@ -166,7 +167,8 @@ static int g_ups_error;
               UPS_ERROR == UPS_NO_TABLE_MATCH ||                        \
               UPS_ERROR == UPS_NO_VERSION_MATCH) && ! a_need_unique) {  \
 	   g_ups_error = UPS_ERROR;                                     \
-	   upserr_clear();						\
+	   upserr_backup();						\
+	   upserr_backup();						\
 	 }                                                              \
          else {								\
 	   break;                                                       \
@@ -214,9 +216,7 @@ static int g_ups_error;
 				   product, NULL, NULL, a_need_unique, \
                                    any_version, any_chain);            \
     if (UPS_ERROR != UPS_SUCCESS) {                                    \
-      if (UPS_ERROR == UPS_NO_FILE && ! a_need_unique) {               \
-	upserr_clear();                                                \
-      }                                                                \
+      CHECK_NO_FILE();                                                 \
     }                                                                  \
     /* update the mproduct_list structure with the new info */         \
     ADD_TO_MPRODUCT_LIST();
@@ -756,7 +756,7 @@ static t_upstyp_matched_product *match_instance_core(
 	     instance then clear out the error.  otherwise if a ups list is
 	     done on an entire db for v2_0, all products without a v2_0 will
 	     generate an error */
-	  CHECK_NO_FILE(chain);
+	  CHECK_NO_FILE();
 	}
       }
 
@@ -944,7 +944,7 @@ static int match_from_chain( const char * const a_product,
        instance then clear out the error.  otherwise if a ups list is done 
        on an entire db for v2_0, all products without a v2_0 will generate
        an error */
-    CHECK_NO_FILE(a_db_info->name);
+    CHECK_NO_FILE();
   }
   
 return num_matches;
@@ -1072,7 +1072,7 @@ static int match_from_version( const char * const a_product,
 	 instance then clear out the error.  otherwise if a ups list is done 
 	 on an entire db for v2_0, all products without a v2_0 will generate
 	 an error */
-      CHECK_NO_FILE(&buffer[0]);
+      CHECK_NO_FILE();
     }
   } else {
     upserr_vplace();
