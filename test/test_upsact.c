@@ -162,8 +162,7 @@ int  main( const int argc, char * const argv[] )
  */
 static void test_upsact_parse(void)
 {
-  char *params = NULL;
-  int action_val = -1, i;
+  int i;
   char *action_line[] = {
     "FILETEST(myfile  ,\"-w  \",  \"can't touch this\"  )",
     "SETUPOPTIONAL(\"-d -f purina -q siamese kitty \")",
@@ -194,11 +193,10 @@ static void test_upsact_parse(void)
 t_upsact_cmd *cmd;
 t_upsugo_command *ugo_cmd = 0;
 t_upslst_item *mproduct_list;
-t_upstyp_action *act;
-t_upslst_item *l_dep;
   
   for ( i = 0; action_line[i]; i++ ) {  
-    if ( !(cmd = upsact_parse_cmd( action_line[i] )) ) {
+    cmd = upsact_parse_cmd( action_line[i] );
+    if ( !cmd ) {
       (void) printf("\nInvalid action - %s\n", action_line[i]);
     }
     else {
