@@ -1094,7 +1094,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       /* ignore errors if optional exeaction */
 
-      if ( !new_act_itm ) {
+      if ( !new_act_itm || !new_act_itm->act ) {
 	if ( i_cmd & 1 ) {
 	  SET_PARSE_ERROR( p_line );
 	}
@@ -1251,7 +1251,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       /* ignore errors if optional exeaction */
 
-      if ( !new_act_itm ) {
+      if ( !new_act_itm || !new_act_itm->act ) {
 	if ( i_cmd & 1 ) {
 	  SET_PARSE_ERROR( p_line );
 	}
