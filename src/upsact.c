@@ -1990,7 +1990,8 @@ int cmp_ugo_db( const void * const d1, const void * const d2 )
   if ( db1 && db2 && db1->name && db2->name )
     return upsutl_stricmp( db1->name, db2->name );
   else
-    return -1;
+    ;
+  return -1;
 }
 
 t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
