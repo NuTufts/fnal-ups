@@ -74,7 +74,9 @@
 #define UPS_NO_TABLE_FILE       31
 #define UPS_VERSION_EXISTS      32
 #define UPS_TABLEFILE_AND_VERSION 33
-#define UPS_NERR                34      /*  this one must always be last */
+#define UPS_NO_SETUP_ENV        34
+#define UPS_NO_PRODUCT          35
+#define UPS_NERR                36      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"

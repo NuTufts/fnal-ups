@@ -90,8 +90,10 @@ static char *g_error_messages[UPS_NERR] = {
 /* 30 */  "%s: Cannot create file %s, it already exists\n",
 /* 31 */  "%s: No table file name was specified on the command line\n",
 /* 32 */  "%s: Version specified already exists\n",
-/* 33 */  "%s: Version/Chain and Table file both cannot be specified on the command line \n"
-/* 34 this is the last */
+/* 33 */  "%s: Version/Chain and Table file both cannot be specified on the command line \n",
+/* 34 */  "%s: Cannot do unsetup, SETUP_%s is not defined\n",
+/* 35 */  "%s: Cannot do %s, no product specified on command line\n"
+/* 36 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -129,7 +131,9 @@ char *g_error_ascii[] = {
    /* UPS_NO_TABLE_FILE       31 */ "UPS_NO_TABLE_FILE",
    /* UPS_VERSION_EXISTS      32 */ "UPS_NO_TABLE_FILE",
    /* UPS_TABLEFILE_AND_VERSION 33 */ "UPS_TABLEFILE_AND_VERSION",
-   /* UPS_NERR                34 */ "UPS_NERR",
+   /* UPS_NO_SETUP_ENV        34 */ "UPS_NO_SETUP_ENV",
+   /* UPS_NO_PRODUCT          35 */ "UPS_NO_PRODUCT",
+   /* UPS_NERR                36 */ "UPS_NERR",
    0 };
 
 /*
