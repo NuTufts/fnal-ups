@@ -539,7 +539,7 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
 { static char *string;
   static char *prefix_string;
   static char *nostring = '\0';
-  if (command_line->ugo_r)
+  if (command_line && command_line->ugo_r)
   { string=command_line->ugo_productdir;
   } else { 
     get_element(string,prod_dir);
@@ -567,7 +567,7 @@ char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   static char *prefix_string;
-  if (command_line->ugo_U)
+  if (command_line && command_line->ugo_U)
   { string=command_line->ugo_upsdir;
   } else { 
     get_element(string,ups_dir);
@@ -857,8 +857,9 @@ int upsget_key(const t_upstyp_instance * const instance)
   static char buffer[MAX_LINE_LEN];
   char *skey=buffer;
   int i;
-  sprintf(skey,"%s%s%s%s",instance->product,
-                          instance->version,
+  static char *nostring = '\0';
+  sprintf(skey,"%s%s%s%s",(instance->product ? instance->flavor : nostring),
+                          (instance->version ? instance->version : nostring),
                           instance->flavor,
                           instance->qualifiers);
   if ( !g_ft )
