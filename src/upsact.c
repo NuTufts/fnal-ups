@@ -41,7 +41,7 @@
 /*
  * Definition of public variables.
  */
-extern int g_LOCAL_VARS_DEF;
+int g_LOCAL_VARS_DEF = 0;
 
 /*
  * Private constants
