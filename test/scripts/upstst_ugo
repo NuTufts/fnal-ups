@@ -7,7 +7,7 @@ cd $ERUPT_DIR/test/scripts/ugo
 $ERUPT_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 #
-ups_echo "testing simple parsing"
+# testing simple parsing
 #
 upsugo_next -options "" -out /dev/null -a -b -c -status UPS_INVALID_ARGUMENT 
 upserr_clear
@@ -16,7 +16,7 @@ upserr_clear
 upsugo_next -out /dev/null -encmds 3 -a -b -c one, -a -b -c two, -a -b -c three 
 upserr_clear
 #
-ups_echo "testing qualifiers"
+# testing qualifiers
 #
 upsugo_next -out simple.out -diff simple.in -a -b -c -f CHOCOLATE
 upsugo_next -out qualifier.out -diff qualifier.in -f CHOCOLATE -q "a:aardvark:Bear:Canary:?cat:dog:123:___big-dog:?fat-cat" 
@@ -24,25 +24,28 @@ upserr_clear
 upsugo_next -out qualifier2.out -diff qualifier2.in -f CHOCOLATE -f VANILLA -f ROCKYROAD -q "a:aardvark" -q "Bear:Canary:___::::dog:big-dog:123" -q "?fat-cat:?cat" -q "aardvark" 
 upserr_clear
 #
-ups_echo "testing chains"
+# testing chains
 #
 upsugo_next -out chain.out -diff chain.in -f CHOCOLATE -c -o -l -n -t -d -g dog -g cat -g "blue:red"
 upserr_clear
 #
-ups_echo "testing everything else"
+# testing everything else
+#
+# note that -a changes the output of Flavor. Do not specify a "-f" in the
+# test because we want to make sure it Flavor is '*'.
 #
 upsugo_next -out rest.out -diff rest.in -a -A hercules:neptune:zeus -B -C -D -e -E -F -h "  levinworth :alcatraz" -j -k -K west:largo:limepie -l -m /jupiter:/mars -M titan -N sam:shameful -O power_steering:ac:abs -p "It was a dark and stormy night." -P valhalla:xanadu -r /myprod:/yourprod -S -T a.tar:b.tar -u -U /fred:/barney -v -V -w -W -x -X -y -Y -z"popeye:sinbad:   ahab"   -Z
 #
 upsugo_next -out proda.out -diff proda.in -fIRIX:AIX ProdA
 upsugo_next -out prodb.out -diff prodb.in -f"IRIX:AIX" ProdB
 upsugo_next -out prodc.out -diff prodc.in -f "IRIX :AIX" ProdC
-upsugo_next -out prodd.out -diff prodd.in -p"EEK, I haven't a clue scooby doo " ProdD
-upsugo_next -out prode.out -diff prode.in -q?cat ProdE
-upsugo_next -out prodf.out -diff prodf.in -q"?cat:dog" ProdF
-upsugo_next -out prodg.out -diff prodg.in -q"?mouse : ?cat :dog" ProdG
-upsugo_next -out prodh.out -diff prodh.in -q"?no?comma?here" ProdH
+upsugo_next -out prodd.out -diff prodd.in -p"EEK! I haven't a clue scooby doo" ProdD
+upsugo_next -out prode.out -diff prode.in -H IRIX+5.3 -q?cat ProdE
+upsugo_next -out prodf.out -diff prodf.in -H IRIX+5.3 -q"?cat:dog" ProdF
+upsugo_next -out prodg.out -diff prodg.in -H IRIX+5.3 -q"?mouse : ?cat :dog" ProdG
+upsugo_next -out prodh.out -diff prodh.in -H IRIX+5.3 -q"?no?comma?here" ProdH
 # should pack....
-upsugo_next -out prodi.out -diff prodi.in -q"But caption: you have spaces " ProdI
+upsugo_next -out prodi.out -diff prodi.in -H IRIX+5.3 -q"But caption: you have spaces " ProdI
 
 quit
 EOD

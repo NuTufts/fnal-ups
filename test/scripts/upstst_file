@@ -14,7 +14,7 @@ upsfil_write_file -status UPS_OPEN_FILE /junk/junk/junk
 upserr_clear
 upsfil_read_file -status UPS_NO_FILE blah
 upserr_clear
-upsfil_read_file -status UPS_UNKNOWN_FILETYPE dummy.file
+upsfil_read_file -status UPS_READ_FILE dummy.file
 upserr_clear
 quit
 EOD
