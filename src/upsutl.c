@@ -153,7 +153,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
     file_chars = (int )strlen(a_tablefile) + 2;  /* length plus trailing null 
 						    and leading '/' */
     /* try tablefiledir/tablefile */
-    if (a_tablefiledir != NULL) {
+    if ((a_tablefiledir != NULL) && (a_tablefiledir[0] == '/')) {
       if ((total_chars = file_chars + (int )strlen(a_tablefiledir))
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s", a_tablefiledir, a_tablefile);
@@ -189,7 +189,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       }
     } else {
       /* try ups_dir/tablefile */
-      if ((found == 0) && (a_upsdir != NULL)) {
+      if ((found == 0) && (a_upsdir != NULL) && (a_upsdir[0] == '/')) {
 	if ((total_chars = file_chars + (int )strlen(a_upsdir))
 	    <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s", a_upsdir, a_tablefile);
