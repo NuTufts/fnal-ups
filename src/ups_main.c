@@ -21,10 +21,13 @@
 
 /* standard include files */
 #include <string.h>
+#include <stdio.h>
+#include <errno.h>
 
 /* ups specific include files */
 #include "upslst.h"
 #include "upstyp.h"
+#include "ups_setup.h"
 #include "ups_list.h"
 #include "ups_unk.h"
 #include "upserr.h"
@@ -105,7 +108,9 @@ t_cmd_info g_cmd_info[] = {
 int main(int argc, char *argv[])
 {
   t_upsugo_command *command_line = NULL;
-  int i = 0;
+  FILE *temp_file = NULL;
+  char *temp_file_name = NULL;
+  int i = 0, empty_temp_file = 0;
 
   /* Figure out which command was entered */
   while (g_cmd_info[i].cmd) {
@@ -128,43 +133,60 @@ int main(int argc, char *argv[])
 
     if (!command_line->ugo_help) {
       /* no help requested - do the command */
-      switch (g_cmd_info[i].cmd_index) {
-      case e_setup: ups_unk(command_line, argv[1]);
-	break;
-      case e_unsetup: ups_unk(command_line, argv[1]);
-	break;
-      case e_list: ups_list(command_line);
-	break;
-      case e_configure: ups_unk(command_line, argv[1]);
-	break;
-      case e_copy: ups_unk(command_line, argv[1]);
-	break;
-      case e_declare: ups_unk(command_line, argv[1]);
-	break;
-      case e_depend: ups_unk(command_line, argv[1]);
-	break;
-      case e_exist: ups_unk(command_line, argv[1]);
-	break;
-      case e_modify: ups_unk(command_line, argv[1]);
-	break;
-      case e_start: ups_unk(command_line, argv[1]);
-	break;
-      case e_stop: ups_unk(command_line, argv[1]);
-	break;
-      case e_tailor: ups_unk(command_line, argv[1]);
-	break;
-      case e_unconfigure: ups_unk(command_line, argv[1]);
-	break;
-      case e_undeclare: ups_unk(command_line, argv[1]);
-	break;
-      case e_create: ups_unk(command_line, argv[1]);
-	break;
-      case e_get: ups_unk(command_line, argv[1]);
-	break;
-      case e_validate: ups_unk(command_line, argv[1]);
-	break;
-      case e_unk: ups_unk(command_line, argv[1]);
-	break;
+
+      /* open the temp file. this is where shell specific action code will\
+         be put */
+      if (! temp_file ) {                /* only open it once. */
+	/* let the system get me a buffer */
+	if ((temp_file_name = tmpnam(NULL)) != NULL) {
+	  if ((temp_file = fopen(temp_file_name,"w")) == NULL) {
+	    /* error in open */
+	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
+	  }
+	} else {
+	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam", strerror(errno));
+	}
+      }
+
+      if (UPS_ERROR == UPS_SUCCESS) {
+	switch (g_cmd_info[i].cmd_index) {
+	case e_setup: ups_unk(command_line, argv[1]);
+	  break;
+	case e_unsetup: ups_unk(command_line, argv[1]);
+	  break;
+	case e_list: ups_list(command_line);
+	  break;
+	case e_configure: ups_unk(command_line, argv[1]);
+	  break;
+	case e_copy: ups_unk(command_line, argv[1]);
+	  break;
+	case e_declare: ups_unk(command_line, argv[1]);
+	  break;
+	case e_depend: ups_unk(command_line, argv[1]);
+	  break;
+	case e_exist: ups_unk(command_line, argv[1]);
+	  break;
+	case e_modify: ups_unk(command_line, argv[1]);
+	  break;
+	case e_start: ups_unk(command_line, argv[1]);
+	  break;
+	case e_stop: ups_unk(command_line, argv[1]);
+	  break;
+	case e_tailor: ups_unk(command_line, argv[1]);
+	  break;
+	case e_unconfigure: ups_unk(command_line, argv[1]);
+	  break;
+	case e_undeclare: ups_unk(command_line, argv[1]);
+	  break;
+	case e_create: ups_unk(command_line, argv[1]);
+	  break;
+	case e_get: ups_unk(command_line, argv[1]);
+	  break;
+	case e_validate: ups_unk(command_line, argv[1]);
+	  break;
+	case e_unk: ups_unk(command_line, argv[1]);
+	  break;
+	}
       }
     } else {
       /* output help */
@@ -185,6 +207,25 @@ int main(int argc, char *argv[])
 
   /* output any errors and the timing information */
   upserr_output();
+
+  /* close the temp file */
+  if (temp_file) {
+    /* look and see where we are */
+    if (ftell(temp_file) == 0L) {
+      /* we are at the beginning of the file, nothing was written to it */
+     empty_temp_file = 1;
+    }
+    if (fclose(temp_file) == EOF) {
+      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
+    }
+    /* if nothing was written to the file, delete it, */
+    if (empty_temp_file) {
+      remove(temp_file_name);
+    } else {
+      /* output the name of the temp file that was created */
+      printf("%s\n", temp_file_name);
+    }
+  }
 
   return 0;
 }
