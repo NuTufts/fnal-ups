@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_list.c
+ *       upslst.c
  * 
  * DESCRIPTION: 
  *       A double linked list (ideas from old ups_list).
@@ -40,8 +40,8 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_LIST_H_
-#define _UPS_LIST_H_
+#ifndef _UPSLST_H_
+#define _UPSLST_H_
 
 /* standard include files, if needed for .h file */
 
@@ -93,7 +93,7 @@ t_upslst_item *upslst_sort0( t_upslst_item * const c,
  * Declarations of public variables.
  */
 
-#endif /* _UPS_LIST_H_ */
+#endif /* _UPSLST_H_ */
 
 
 

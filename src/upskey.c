@@ -1,7 +1,7 @@
 /***********************************************************************
  *
  * FILE:
- *       ups_keys.c
+ *       upskey.c
  * 
  * DESCRIPTION: 
  *       Translations for ups keys
@@ -25,10 +25,10 @@
 #include <string.h>
 
 /* ups specific include files */
-#include "ups_types.h"
-#include "ups_memory.h"
-#include "ups_utils.h"
-#include "ups_keys.h"
+#include "upstyp.h"
+#include "upsmem.h"
+#include "upsutl.h"
+#include "upskey.h"
 
 /*
  * Definition of public variables
@@ -164,6 +164,37 @@ char *upskey_inst_setval( t_ups_instance * const inst,
   }
   else
     return 0;  
+}
+
+/*-----------------------------------------------------------------------
+ * upskey_inst_getaction
+ *
+ * Will return from an instance, the action with the passed name
+ *
+ * Input : t_ups_instance *, an instance.
+ *         char *, action name
+ * Output: none.
+ * Return: t_ups_action *, a pointer to an action or 0.
+ */
+t_ups_action *upskey_inst_getaction( t_ups_instance * const inst,
+				     const char * const action_name )
+{
+  t_ups_action *act_ptr = 0;
+  t_upslst_item *act_list = 0;
+
+  if ( !action_name || !inst || !inst->action_list )
+    return 0;
+
+  act_list = upslst_first( inst->action_list );
+  for ( ; act_list; act_list = act_list->next ) {
+    t_ups_action *act = (t_ups_action *)act_list->data;
+    if ( !upsutl_stricmp( action_name, act->action ) ) {
+      act_ptr = act;
+      break;
+    }
+  }
+
+  return act_ptr;
 }
 
 void upskey_inst_print( const t_ups_instance * const inst )

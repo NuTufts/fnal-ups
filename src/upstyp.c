@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_types.c
+ *       upstyp.c
  * 
  * DESCRIPTION: 
  *       Creation and destuction of common types for ups.
@@ -27,10 +27,10 @@
 #include <string.h> /* for memset */
 
 /* ups specific include files */
-#include "ups_types.h"
-#include "ups_memory.h"
-#include "ups_list.h"
-#include "ups_error.h"
+#include "upstyp.h"
+#include "upsmem.h"
+#include "upslst.h"
+#include "upserr.h"
 
 /*
  * Definition of public variables

@@ -1,7 +1,7 @@
 /***********************************************************************
  *
  * FILE:
- *       ups_keys.h
+ *       upskey.h
  * 
  * DESCRIPTION: 
  *       Translations for ups keys
@@ -19,8 +19,8 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_KEYS_H_
-#define _UPS_KEYS_H_
+#ifndef _UPSKEY_H_
+#define _UPSKEY_H_
 
 /*
  * Standard include files, if needed for .h file
@@ -29,7 +29,7 @@
 /*
  * ups specific include files, if needed for .h file
  */
-#include "ups_types.h"
+#include "upstyp.h"
 
 /*
  * Constants.
@@ -120,7 +120,10 @@ char         *upskey_inst_getval( t_ups_instance * const inst,
 char         *upskey_inst_setval( t_ups_instance * const inst,
 				  const char * const skey,
 				  const char * const sval );
+t_ups_action *upskey_inst_getaction( t_ups_instance * const inst,
+				     const char * const action_name );
 void         upskey_inst_print( const t_ups_instance * const prod );
+
 char         *upskey_prod_getval( t_ups_product * const prod,
 				  const char * const skey );
 char         *upskey_prod_setval( t_ups_product * const prod,
@@ -133,4 +136,4 @@ void         upskey_conf_print( const t_ups_config * const conf );
  * Declarations of public variables.
  */
 
-#endif /* _UPS_KEYS_H_ */
+#endif /* _UPSKEY_H_ */

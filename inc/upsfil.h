@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_files.h
+ *       upsfil.h
  * 
  * DESCRIPTION: 
  *       Will read an ups file, and fill corresponding data structures.
@@ -19,14 +19,14 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_FIL_H_
-#define _UPS_FIL_H_
+#ifndef _UPSFIL_H_
+#define _UPSFIL_H_
 
 /* standard include files, if needed for .h file */
 #include <stdio.h>
 
 /* ups specific include files, if needed for .h file */
-#include "ups_types.h"
+#include "upstyp.h"
 
 /* public typdef's */
 
@@ -46,7 +46,7 @@ void           g_print_product( t_ups_product * const prod_ptr );
 #define VERSION_SUFFIX  ".version"
 #define CHAIN_SUFFIX    ".chain"
 
-#endif /* _UPS_FIL_H_ */
+#endif /* _UPSFIL_H_ */
 
 
 

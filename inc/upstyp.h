@@ -1,7 +1,7 @@
 /***********************************************************************
  *
  * FILE:
- *       ups_types.h
+ *       upstyp.h
  * 
  * DESCRIPTION: 
  *       Common types for ups
@@ -29,8 +29,8 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_TYPES_H_
-#define _UPS_TYPES_H_
+#ifndef _UPSTYP_H_
+#define _UPSTYP_H_
 
 /*
  * Standard include files, if needed for .h file
@@ -39,7 +39,7 @@
 /*
  * ups specific include files, if needed for .h file
  */
-#include "ups_list.h"
+#include "upslst.h"
 
 /*
  * Public typdef's
@@ -225,5 +225,5 @@ int         upsugo_free(struct ups_command * const uc);
 void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title );
 int         upsugo_dump (struct ups_command * const uc);
 int         upshlp_command(const char * const what);
-#endif /* _UPS_TYPES_H_ */
+#endif /* _UPSTYP_H_ */
 

@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_list.c
+ *       upslst.c
  * 
  * DESCRIPTION: 
  *       A double linked list (ideas from old ups_list).
@@ -44,8 +44,8 @@
 #include <stdlib.h>
 
 /* ups specific include files */
-#include "ups_list.h"
-#include "ups_memory.h"
+#include "upslst.h"
+#include "upsmem.h"
 
 /*
  * Definition of public variables.

@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_files.c
+ *       upsfil.c
  * 
  * DESCRIPTION: 
  *       Will read an ups file, and fill corresponding data structures.
@@ -28,13 +28,13 @@
 #include <string.h>
 
 /* ups specific include files */
-#include "ups_utils.h"
-#include "ups_types.h"
-#include "ups_list.h"
-#include "ups_memory.h"
-#include "ups_error.h"
-#include "ups_keys.h"
-#include "ups_files.h"
+#include "upsutl.h"
+#include "upstyp.h"
+#include "upslst.h"
+#include "upsmem.h"
+#include "upserr.h"
+#include "upskey.h"
+#include "upsfil.h"
 
 /*
  * Definition of public variables
@@ -252,14 +252,8 @@ int write_version_file( void )
     }
 
     put_key( 0, "" );
-    put_key( "FLAVOR", inst_ptr->flavor );
-    
-    /* qualifiers are special */
-  
-    if ( inst_ptr->qualifiers )
-      put_key( "QUALIFIERS", inst_ptr->qualifiers );
-    else 
-      put_key( "QUALIFIERS", "\"\"" );
+    put_key( "FLAVOR", inst_ptr->flavor );    
+    put_key( "QUALIFIERS", inst_ptr->qualifiers );
     
     g_imargin += 2;    
     put_key( "DECLARED", inst_ptr->declared );
@@ -302,13 +296,7 @@ int write_chain_file( void )
 
     put_key( 0, "" );
     put_key( "FLAVOR", inst_ptr->flavor );
-    
-    /* qualifiers are special */
-  
-    if ( inst_ptr->qualifiers )
-      put_key( "QUALIFIERS", inst_ptr->qualifiers );
-    else 
-      put_key( "QUALIFIERS", "\"\"" );
+    put_key( "QUALIFIERS", inst_ptr->qualifiers );
     
     g_imargin += 2;
     put_key( "VERSION", inst_ptr->version );
@@ -346,13 +334,7 @@ int write_table_file( void )
     for ( l_ptr = upslst_first( l_ptr ); l_ptr; l_ptr = l_ptr->next ) {
       inst_ptr = (t_ups_instance *)l_ptr->data;
       put_key( "FLAVOR", inst_ptr->flavor );
-    
-      /* qualifiers are special */
-  
-      if ( inst_ptr->qualifiers )
-	put_key( "QUALIFIERS", inst_ptr->qualifiers );
-      else 
-        put_key( "QUALIFIERS", "\"\"" );
+      put_key( "QUALIFIERS", inst_ptr->qualifiers );
       put_key( 0, "" );
       
     }
@@ -382,13 +364,7 @@ int write_table_file( void )
     }
 
     put_key( "FLAVOR", inst_ptr->flavor );
-    
-    /* qualifiers are special */
-  
-    if ( inst_ptr->qualifiers )
-      put_key( "QUALIFIERS", inst_ptr->qualifiers );
-    else 
-      put_key( "QUALIFIERS", "\"\"" );
+    put_key( "QUALIFIERS", inst_ptr->qualifiers );
     
     g_imargin += 2;
     put_key( "DESCRIPTION", inst_ptr->description );
@@ -948,17 +924,24 @@ int put_key( const char * const key, const char * const val )
 {
   int i = 0;
 
-  if ( !val ) return 0;
+  if ( !val && upsutl_stricmp( "QUALIFIERS", key ) )
+    return 0;
 
-  /*  if ( strlen( val ) > 0 ) { */
-    for ( i=0; i<g_imargin; i++ )
-      fputc( ' ', g_fh );
-
-    if ( key && strlen( key ) > 0 ) 
-      fprintf( g_fh, "%s = ", key );
-  
+  for ( i=0; i<g_imargin; i++ )
+    fputc( ' ', g_fh );
+  if ( key && strlen( key ) > 0 ) {
+    fprintf( g_fh, "%s = ", key );
+    if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
+	 !upsutl_stricmp( "DESCRIPTION", key ) )
+      fputc( '\"', g_fh );
     fprintf( g_fh, "%s", val );
-  /*  } */
+    if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
+	 !upsutl_stricmp( "DESCRIPTION", key ) )
+      fputc( '\"', g_fh );      
+  }
+  else {
+    fprintf( g_fh, "%s", val );
+  }
 
   fputc( '\n', g_fh );
   
