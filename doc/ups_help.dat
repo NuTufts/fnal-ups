@@ -29,7 +29,7 @@
 COMMANDS    :
 configure   :?cdfgHmMnoOqrtUvVzZ: 
 : Environmentally configure a product instance.
-copy        :?AcCdfgHmMnoOpPqrtTUvVWXzZ:
+copy        :?AcCdfgHmMnoOpqrtTUvVWXzZ:
 : Allow one instance of a product to be declared "like" another.
 create      :?fHmMpqvZ:
 : Create a template UPS table file.
@@ -93,7 +93,6 @@ OPTIONS     :
 -o :old chain 
 -O :"options" : set $UPS_OPTIONS to "options" 
 -p :"description" : product description 
--P :productName : product name override 
 -q :qualifiers : required or optional qualifiers that are 
 :to be part of the instance 
 -r :dir : set $PROD_DIR to dir 
