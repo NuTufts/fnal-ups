@@ -38,11 +38,11 @@ CFLAGScia = $(INCDIRS)
 OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 	  upsfil.o upsugo.o upsmat.o upskey.o upshlp.o
 
-COMMAND_OBJECTS = ups_list.o
+COMMAND_OBJECTS = ups_list.o ups_unk.o
 
 CIAOBJECTS = upserr.a upslst.a upsmem.o upsutl.a upstyp.a \
 	     upsfil.a upsugo.a upsmat.a ups_list.a  \
-	     upskey.a upshlp.a
+	     upskey.a upshlp.a ups_unk.o
 
 LDFLAGS = $(LLIBS)
 
@@ -117,8 +117,6 @@ make :
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
 # src DIRECTORY TO GENERATE IT
 #START_DEPEND
-ups_action.o:	ups_action.c
-ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_list.o:	ups_list.c
 ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsmem.h
@@ -129,16 +127,39 @@ ups_list.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsfil.h
 ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	ups_main.c
 ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_main.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_unk.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_unk.o:	ups_unk.c
+ups_unk.o:	$(ERUPT_DIR)/inc/ups_unk.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upslst.h
+upsact.o:	upsact.c
+upsact.o:	$(ERUPT_DIR)/inc/upsact.h
+upsact.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsact.o:	$(ERUPT_DIR)/inc/upslst.h
+upsact.o:	$(ERUPT_DIR)/inc/upserr.h
+upsact.o:	$(ERUPT_DIR)/inc/upslst.h
+upsact.o:	$(ERUPT_DIR)/inc/upsutl.h
+upsact.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsact.o:	$(ERUPT_DIR)/inc/upslst.h
+upsact.o:	$(ERUPT_DIR)/inc/upsmem.h
+upsact.o:	$(ERUPT_DIR)/inc/upskey.h
+upsact.o:	$(ERUPT_DIR)/inc/upstyp.h
 upserr.o:	upserr.c
 upserr.o:	$(ERUPT_DIR)/inc/upserr.h
 upsfil.o:	upsfil.c
@@ -174,6 +195,8 @@ upslst.o:	$(ERUPT_DIR)/inc/upslst.h
 upslst.o:	$(ERUPT_DIR)/inc/upsmem.h
 upsmat.o:	upsmat.c
 upsmat.o:	$(ERUPT_DIR)/inc/upsmat.h
+upsmat.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsmat.o:	$(ERUPT_DIR)/inc/upslst.h
 upsmat.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsmat.o:	$(ERUPT_DIR)/inc/upslst.h
 upsmat.o:	$(ERUPT_DIR)/inc/upserr.h
@@ -198,6 +221,7 @@ upsugo.o:	upsugo.c
 upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upsugo.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upsugo.o:	$(ERUPT_DIR)/inc/upserr.h
 upsugo.o:	$(ERUPT_DIR)/inc/upsmem.h
 upsugo.o:	$(ERUPT_DIR)/inc/upsutl.h
