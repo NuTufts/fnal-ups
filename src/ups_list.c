@@ -25,14 +25,14 @@
 #include <stdio.h>
 
 /* ups specific include files */
+#include "upslst.h"
+#include "upsmem.h"
+#include "upstyp.h"
+#include "upserr.h"
+#include "upsutl.h"
+#include "upsmat.h"
+#include "upsfil.h"
 #include "ups_list.h"
-#include "ups_memory.h"
-#include "ups_types.h"
-#include "ups_error.h"
-#include "ups_utils.h"
-#include "ups_match.h"
-#include "ups_files.h"
-#include "ups_commands.h"
 
 /*
  * Definition of public variables.

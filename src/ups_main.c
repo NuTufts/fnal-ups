@@ -22,10 +22,10 @@
 /* standard include files */
 
 /* ups specific include files */
+#include "upslst.h"
+#include "upstyp.h"
 #include "ups_list.h"
-#include "ups_types.h"
-#include "ups_commands.h"
-#include "ups_error.h"
+#include "upserr.h"
 
 /*
  * Definition of public variables.
