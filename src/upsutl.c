@@ -112,7 +112,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 {
   int empty_stream = 0;
   t_upsugo_command command_line;
-  mode_t mode = 0777;   /* rwx by owner and group */
+  mode_t mode = (mode_t )0777;   /* rwx by owner and group and all*/
 
   /* we will need the shell information when we call upsutl_remall from within
      upsutl_finish_temp_file */
@@ -1051,6 +1051,8 @@ int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
       return 0;
     }
   }
+  /* added to appease the osf1 compiler.  we should never get here */
+  return 0;
 }
 
 /*-----------------------------------------------------------------------
@@ -1123,7 +1125,7 @@ char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
  * Return: character string containing the current time and date
  *          formatted like "YYYY-MM-DD HH:MM:SS TZ"
  */
-char *upsutl_time_date(int a_flag)
+char *upsutl_time_date(const int a_flag)
 {
   time_t now, len;
   static char buff[MAX_LINE_LEN];
@@ -1238,8 +1240,8 @@ char *upsutl_str_crecat( char * const str1, char * const str2 )
     new_str = upsutl_str_create( str1, ' ' );
   }
   else {
-    new_str = (char *)upsmem_malloc( strlen( str1 ) + strlen( str2 ) +
-			      (unsigned int )1 );
+    new_str = (char *)upsmem_malloc( (int )(strlen( str1 ) + strlen( str2 ) +
+			      (unsigned int )1) );
     strcpy( new_str, str1 );
     strcat( new_str, str2 );
   }
@@ -1401,7 +1403,7 @@ size_t upsutl_str_remove_end_quotes( char * str,
   char *qu = 0;
 
   if ( !str )
-    return len;
+    return (size_t )len;
 
   if ( spaces )
     upsutl_str_remove_edges( str, spaces );

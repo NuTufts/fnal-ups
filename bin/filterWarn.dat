@@ -190,6 +190,7 @@
 
 &fe ('OSF1'	, undef		, undef	, 'I'	, undef, 2, undef, 'of padding have been implicitly inserted prior to this member for proper');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef, 'is not used - if this is intended, it should be cast to');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, "upsutl.c", 'In this statement, the identifier \"gethostname\" is implicitly declared');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/stdib\.h',     'In this declaration, a storage class without a declarator is meaningless');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xlib\.h', 'The type of the function');
 
