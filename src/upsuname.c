@@ -8,15 +8,12 @@
 #define HOST_BUF_SIZE 1024
 
 char **
-ups_have_flavor_override(char *hostname) {
+ups_have_flavor_override() {
     static char **res = 0;
     static char *parts[3];
-    static char filename[HOST_BUF_SIZE];
-    static char buffer[HOST_BUF_SIZE];
     char *override;
     char *scan;
     extern char *getenv();
-    int fd;
 
     if (res) { 		
 	/* we've been here before... */
@@ -88,7 +85,7 @@ ups_append_OS(char *buf)
    if (uname(&baseuname) == -1) 
 	return;      				/* do uname */
 
-   if (0 != (p = ups_have_flavor_override(baseuname.nodename))) {
+   if (0 != (p = ups_have_flavor_override())) {
        (void)strcpy(buf, p[0]);
        return;
    }
@@ -110,7 +107,7 @@ ups_append_release(char *buf)
    if (uname(&baseuname) == -1) 
        return;     				/* do uname */
 
-   if (0 != (p = ups_have_flavor_override(baseuname.nodename))) {
+   if (0 != (p = ups_have_flavor_override())) {
 	(void)strcat(buf, p[1]);
 	return;
    }
@@ -131,3 +128,15 @@ ups_append_release(char *buf)
    (void) strcat(buf,baseuname.release);     /* add in release */
 }
 
+void
+ups_append_default_quals(char *buf) {
+   char **p;
+
+   if (strlen(buf) > 0) {
+	(void)strcat(buf,":");
+   }
+   if (0 != (p = ups_have_flavor_override())) {
+	(void)strcat(buf, p[2]);
+	return;
+   }
+}

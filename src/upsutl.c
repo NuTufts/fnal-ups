@@ -1169,10 +1169,11 @@ int upsutl_str_sort( char * const str, const char c )
 
   count = 0;
   cp = strtok( str, ct );
-  do {
+  while ( cp ) {
     (void) strcpy( &buf[count*max_len], cp );
     count++;
-  } while( (cp=strtok( 0, ct )) );
+    cp=strtok( 0, ct );
+  }
 
   /* sort */
   
