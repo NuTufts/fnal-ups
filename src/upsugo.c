@@ -601,6 +601,55 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  return(0);
 }
 /* ===========================================================================
+** ROUTINE	upsugo_old2newquals()
+**
+** We've changed the definition of optional and mandatory qualifiers
+** The old style was ?optional:mandatory:mandatory
+** the new is optional:+mandatory:+mandatory
+** rather than fix the old code below, we simply convert the syntax
+**
+*/
+static char *
+ugo_old2newquals( char *inaddr ) {
+    static char buf[1024]; /* OH NO!! bogus limit on qualifier length... */
+    char *p2 = buf, *p1 = inaddr;
+
+    /* if first qual is mandatory, skip the plus, else put in the ? for it */
+    if (*p1 == '"') {
+        *p2++ = *p1++;
+         if (*p1 == '"') {
+	     return inaddr;
+         }
+    }
+    if (*p1 == '+') {
+       p1++;
+    } else {
+       *p2++ = '?';
+    }
+
+    while (*p1 != 0) {
+       if ( *p1 == ':' ) {
+            *p2++ = *p1++;
+	    if (*p1 == '+' ) {
+	       p1++;
+	    } else {
+	       *p2++ = '?';
+	    }
+	    if (*p1 == '?') {
+                *p1++;
+            }
+       } else {
+            *p2++ = *p1++;
+       }
+       if (p1 == buf + sizeof(buf)) {
+	   *p2 = 0;
+	   return buf;
+       }
+    }
+    *p2 = 0;
+    return buf;
+}
+/* ===========================================================================
 ** ROUTINE	upsugo_bldqual()
 **
 ** build the optional and required all possible combination list 
@@ -624,6 +673,10 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  int i,j;
  int opinit=0;
  char * optionals[10]; /* OH NO!! artifical limit of 10 optionals */
+
+ uc->ugo_reqqualifiers = strdup(inaddr);
+
+ inaddr = ugo_old2newquals( inaddr );
 
  if ( strchr(inaddr,'?') == 0) {       /* no optional qualifiers */
   addr=upsutl_str_create(inaddr,'p');

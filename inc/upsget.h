@@ -51,6 +51,9 @@ char *upsget_flavor(const t_upstyp_db * const,
 char *upsget_qualifiers(const t_upstyp_db * const,
                         const t_upstyp_matched_instance * const ,
                         const t_upsugo_command * const );
+char *upsget_reqqualifiers(const t_upstyp_db * const,
+                        const t_upstyp_matched_instance * const ,
+                        const t_upsugo_command * const );
 char *upsget_shell(const t_upstyp_db * const,
                    const t_upstyp_matched_instance * const ,
                    const t_upsugo_command * const );

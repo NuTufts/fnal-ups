@@ -136,6 +136,7 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_THIS_DB", upsget_this_db, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_OS_FLAVOR", upsget_OS_flavor, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_PROD_FLAVOR", upsget_flavor, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_REQ_QUALIFIERS", upsget_reqqualifiers, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_PROD_QUALIFIERS", upsget_qualifiers, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_SHELL", upsget_shell, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_OPTIONS", upsget_options, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_QUOTE_STRING },
@@ -913,6 +914,18 @@ char *upsget_qualifiers(const t_upstyp_db * const db_info_ptr,
   SHUTUP;
   return string;
 }
+
+char *upsget_reqqualifiers(const t_upstyp_db * const db_info_ptr,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ static char *string;
+
+  string = command_line->ugo_reqqualifiers;
+
+  SHUTUP;
+  return string;
+}
+
 char *upsget_shell(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
