@@ -365,44 +365,44 @@ ups_new_instance 286 src/upstyp.c     t_upstyp_instance *ups_new_instance( void 
 ups_new_matched_instance 136 src/upstyp.c     t_upstyp_matched_instance *ups_new_matched_instance( void )
 ups_new_matched_product  58 src/upstyp.c     t_upstyp_matched_product *ups_new_matched_product(
 ups_new_product  216 src/upstyp.c     t_upstyp_product *ups_new_product( void )
-HASHATOM        1127 src/upsget.c     #define HASHATOM( k ) ((unsigned int)(k)>>2)
-LOOK_FOR_FILE   1343 src/upsget.c     #define LOOK_FOR_FILE()   \
-TRANSLATE_ENV   1353 src/upsget.c     #define TRANSLATE_ENV(dst_var, source_var)  \
+HASHATOM        1126 src/upsget.c     #define HASHATOM( k ) ((unsigned int)(k)>>2)
+LOOK_FOR_FILE   1342 src/upsget.c     #define LOOK_FOR_FILE()   \
+TRANSLATE_ENV   1352 src/upsget.c     #define TRANSLATE_ENV(dst_var, source_var)  \
 get_element       63 src/upsget.c     #define get_element(STRING,ELEMENT)              \
-shutup          1500 src/upsget.c     static void shutup (const t_upstyp_db * const db_info_ptr,
+shutup          1499 src/upsget.c     static void shutup (const t_upstyp_db * const db_info_ptr,
 t_var_sub        117 src/upsget.c     } t_var_sub;
-upsget_OS_flavor1038 src/upsget.c     char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
-upsget_allout    257 src/upsget.c     void upsget_allout(const FILE * const stream, 
-upsget_archive_file 681 src/upsget.c     char *upsget_archive_file(const t_upstyp_db * const db_info_ptr,
-upsget_catman_source_dir1213 src/upsget.c     char *upsget_catman_source_dir( const t_upstyp_matched_instance * const a_inst,
-upsget_chain_file1070 src/upsget.c     t_upstyp_product *upsget_chain_file(const char * const a_db,
-upsget_compile   777 src/upsget.c     char *upsget_compile(const t_upstyp_db * const db_info_ptr,
-upsget_database  980 src/upsget.c     char *upsget_database(const t_upstyp_db * const db_info_ptr,
-upsget_envout    229 src/upsget.c     void upsget_envout(const FILE * const stream, 
-upsget_envstr    622 src/upsget.c     char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
-upsget_extended  956 src/upsget.c     char *upsget_extended(const t_upstyp_db * const db_info_ptr,
-upsget_flavor    888 src/upsget.c     char *upsget_flavor(const t_upstyp_db * const db_info_ptr,
-upsget_info_source_dir1261 src/upsget.c     char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
-upsget_key      1129 src/upsget.c     int upsget_key(const t_upstyp_instance * const instance)
-upsget_man_source_dir1156 src/upsget.c     char *upsget_man_source_dir( const t_upstyp_matched_instance * const a_inst,
-upsget_options   967 src/upsget.c     char *upsget_options(const t_upstyp_db * const db_info_ptr,
-upsget_origin    863 src/upsget.c     char *upsget_origin(const t_upstyp_db * const db_info_ptr,
-upsget_prod_dir  718 src/upsget.c     char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
-upsget_product   871 src/upsget.c     char *upsget_product(const t_upstyp_db * const db_info_ptr,
-upsget_qualifiers 896 src/upsget.c     char *upsget_qualifiers(const t_upstyp_db * const db_info_ptr,
-upsget_remall    184 src/upsget.c     void upsget_remall(const FILE * const stream, 
-upsget_shell     904 src/upsget.c     char *upsget_shell(const t_upstyp_db * const db_info_ptr,
-upsget_source    924 src/upsget.c     char *upsget_source(const t_upstyp_db * const db_info_ptr,
-upsget_table_file1357 src/upsget.c     char *upsget_table_file( const char * const a_prodname,
-upsget_this_db  1017 src/upsget.c     char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
-upsget_tilde_dir 998 src/upsget.c     char *upsget_tilde_dir(char * const addr)
-upsget_translation 452 src/upsget.c     char *upsget_translation( const t_upstyp_matched_instance * const minstance,
-upsget_translation_env 335 src/upsget.c     char *upsget_translation_env( char * const oldstr )
-upsget_translation_tilde 408 src/upsget.c     char *upsget_translation_tilde( char * const oldstr )
-upsget_ups_dir   752 src/upsget.c     char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
-upsget_verbose   944 src/upsget.c     char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
-upsget_version   879 src/upsget.c     char *upsget_version(const t_upstyp_db * const db_info_ptr,
-upsget_version_file1103 src/upsget.c     t_upstyp_product *upsget_version_file(const char * const a_db,
+upsget_OS_flavor1037 src/upsget.c     char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
+upsget_allout    256 src/upsget.c     void upsget_allout(const FILE * const stream, 
+upsget_archive_file 680 src/upsget.c     char *upsget_archive_file(const t_upstyp_db * const db_info_ptr,
+upsget_catman_source_dir1212 src/upsget.c     char *upsget_catman_source_dir( const t_upstyp_matched_instance * const a_inst,
+upsget_chain_file1069 src/upsget.c     t_upstyp_product *upsget_chain_file(const char * const a_db,
+upsget_compile   776 src/upsget.c     char *upsget_compile(const t_upstyp_db * const db_info_ptr,
+upsget_database  979 src/upsget.c     char *upsget_database(const t_upstyp_db * const db_info_ptr,
+upsget_envout    228 src/upsget.c     void upsget_envout(const FILE * const stream, 
+upsget_envstr    621 src/upsget.c     char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
+upsget_extended  955 src/upsget.c     char *upsget_extended(const t_upstyp_db * const db_info_ptr,
+upsget_flavor    887 src/upsget.c     char *upsget_flavor(const t_upstyp_db * const db_info_ptr,
+upsget_info_source_dir1260 src/upsget.c     char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
+upsget_key      1128 src/upsget.c     int upsget_key(const t_upstyp_instance * const instance)
+upsget_man_source_dir1155 src/upsget.c     char *upsget_man_source_dir( const t_upstyp_matched_instance * const a_inst,
+upsget_options   966 src/upsget.c     char *upsget_options(const t_upstyp_db * const db_info_ptr,
+upsget_origin    862 src/upsget.c     char *upsget_origin(const t_upstyp_db * const db_info_ptr,
+upsget_prod_dir  717 src/upsget.c     char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
+upsget_product   870 src/upsget.c     char *upsget_product(const t_upstyp_db * const db_info_ptr,
+upsget_qualifiers 895 src/upsget.c     char *upsget_qualifiers(const t_upstyp_db * const db_info_ptr,
+upsget_remall    183 src/upsget.c     void upsget_remall(const FILE * const stream, 
+upsget_shell     903 src/upsget.c     char *upsget_shell(const t_upstyp_db * const db_info_ptr,
+upsget_source    923 src/upsget.c     char *upsget_source(const t_upstyp_db * const db_info_ptr,
+upsget_table_file1356 src/upsget.c     char *upsget_table_file( const char * const a_prodname,
+upsget_this_db  1016 src/upsget.c     char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
+upsget_tilde_dir 997 src/upsget.c     char *upsget_tilde_dir(char * const addr)
+upsget_translation 451 src/upsget.c     char *upsget_translation( const t_upstyp_matched_instance * const minstance,
+upsget_translation_env 334 src/upsget.c     char *upsget_translation_env( char * const oldstr )
+upsget_translation_tilde 407 src/upsget.c     char *upsget_translation_tilde( char * const oldstr )
+upsget_ups_dir   751 src/upsget.c     char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
+upsget_verbose   943 src/upsget.c     char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
+upsget_version   878 src/upsget.c     char *upsget_version(const t_upstyp_db * const db_info_ptr,
+upsget_version_file1102 src/upsget.c     t_upstyp_product *upsget_version_file(const char * const a_db,
 var_func         109 src/upsget.c                                const t_upsugo_command * const command_line );
 CMP_AUTH_NODES   350 src/upsutl.c     #define CMP_AUTH_NODES(struct) \
 KEEP_OR_REMOVE_FILE  90 src/upsutl.c     #define KEEP_OR_REMOVE_FILE()   \
