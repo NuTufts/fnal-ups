@@ -87,3 +87,24 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	This isn't an immediate need, but it's the kind of systematic bug we
 	ran into in the past, where the brains to fix it should be at a
 	higher level.
+
+20. DESCRIPTION: should be available as a local variable in the table
+   file.  You should be able to
+   
+        action=describe
+          execute("echo ${UPS_DESCRIPTION}")
+
+   as a user-defined command.
+   
+   [*all* keywords should be available within
+   the table files, for symmetry and ease of documentation.  "If it's
+   a keyword, you have access to it (spelled with a leading UPS_)
+   as a local variable in the table file].
+
+21. The compile keyword UPS_COMPILE should be split into UPS_COMPILE_DIR and
+	UPS_COMPILE_FILE.  The product developer would have control over the
+	file one and the installer over the dir one. they should be able to
+	be set something like -
+     COMPILE_FILE=${UPS_PROD_NAME}_${UPS_PROD_VERSION}.setup-compiled
+  
+22.
