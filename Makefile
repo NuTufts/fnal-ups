@@ -233,7 +233,7 @@ build_n_test:
 # utility targets; check for variables, test file list generation
 #---------------------------------------------------------------------------
 CHECKIT_DEF= checkit() {\
-	    test ! -z "$$1"||(echo "$$2 needs to be set";false)\
+	    test ! -z "$$1"||(echo "$$2 needs to be set";false);\
 	}
 
 dproducts_is_set: check_template_vars
