@@ -1,0 +1,8 @@
+Priority: High
+State: Confirmed
+
+'ups declare' is running "tailor" actions.
+
+This appears to be new behavior in ups v4_6; a ups declare should
+be running the "declare" "configure" and chain actions for any
+chains being declared, but it should not run "tailor".
