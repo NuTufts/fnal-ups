@@ -177,7 +177,7 @@ if ($#ARGV == 0) {
   ["OLD_DB", "colon separated list of old UPS database locations", " ", "0"],
   ["NEW_DB", "colon separated list of new UPS database locations", " ", "1"],
   ["UPS_OLD_DB", "directory of the UPS database where the old ups was declared", " ", "0"],
-  ["UPS_DB", "directory of the UPS database where ups itself is declared", " ", "1"],
+  ["UPS_DB", "directory of the UPS database where the new ups will be declared", " ", "1"],
   ["UPD_USERCODE_DIR", "directory of the UPD usercode directory", "UPS_DB/.updfiles", "1"],
   ["UPDCONFIG", "directory of the edited 'updconfig' file", " ", "0"],
   ["SETUPS_DIR", "directory where to install the UPS login scripts (setups.[c]sh)", "/usr/local/etc", "1"],
