@@ -100,7 +100,7 @@ unset rambo
 if [ -s reqfile1 ]; then
   . reqfile1
 else
-  echo "File (reqfile1)  not found"
+  echo "File (reqfile1) not found"
   return 1
 fi
 #
@@ -114,7 +114,7 @@ if [ -s reqcheck1 ]; then
   fi
   unset UPS_STATUS
 else
-  echo "File (reqcheck1)  not found"
+  echo "File (reqcheck1) not found"
   return 1
 fi
 #
@@ -135,7 +135,6 @@ fi
 #
 if [ -s optfile ]; then
   . optfile
-  return
 fi
 #
 if [ -s optcheck ]; then
@@ -147,7 +146,6 @@ if [ -s optcheck ]; then
     return 1
   fi
   unset UPS_STATUS
-  return
 fi
 #
 if [ -s reqcheck2 ]; then
@@ -159,9 +157,8 @@ if [ -s reqcheck2 ]; then
     return 1
   fi
   unset UPS_STATUS
-  return
 else
-  echo "File (reqcheck2)  not found"
+  echo "File (reqcheck2) not found"
   return 1
 fi
 #

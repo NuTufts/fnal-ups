@@ -101,7 +101,7 @@ unalias rambo
 if (-e reqfile1) then
   source reqfile1
 else
-  echo "File (reqfile1)  not found"
+  echo "File (reqfile1) not found"
   exit 1
 endif
 #
@@ -115,7 +115,7 @@ if (-e reqcheck1) then
   endif
   unsetenv UPS_STATUS
 else
-  echo "File (reqcheck1)  not found"
+  echo "File (reqcheck1) not found"
   exit 1
 endif
 #
@@ -136,7 +136,6 @@ endif
 #
 if (-e optfile) then
   source optfile
-  exit
 endif
 #
 if (-e optcheck) then
@@ -148,7 +147,6 @@ if (-e optcheck) then
     exit 1
   endif
   unsetenv UPS_STATUS
-  exit
 endif
 #
 if (-e reqcheck2) then
@@ -160,9 +158,8 @@ if (-e reqcheck2) then
     exit 1
   endif
   unsetenv UPS_STATUS
-  exit
 else
-  echo "File (reqcheck2)  not found"
+  echo "File (reqcheck2) not found"
   exit 1
 endif
 #
