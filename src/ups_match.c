@@ -264,7 +264,8 @@ static t_ups_match_product *match_instance_core(
     
   /* see if we were passed a version. if so, don't worry
      about chains, just read the associated version file */
-  } else if (a_version_list) {
+/*  } else if (a_version_list) { */
+  } else if (!a_chain_list) {
     for (version_list = (t_upslst_item *)a_version_list; version_list;
 	 version_list = version_list->next) {
       /* get the version */

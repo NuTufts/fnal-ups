@@ -35,13 +35,14 @@ CFLAGScia = $(INCDIRS)
 #
 #
 OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.o \
-	  ups_files.o ups_ugo.o ups_match.o ups_action.o ups_keys.o
+	  ups_files.o ups_ugo.o ups_match.o ups_action.o ups_keys.o \
+	  ups_help.o
 
 COMMAND_OBJECTS = ups_c_list.o
 
 CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a ups_types.a \
 	     ups_files.a ups_ugo.a ups_match.a ups_c_list.a ups_action.a \
-             ups_keys.a
+             ups_keys.a ups_help.a
 
 LDFLAGS = $(LLIBS)
 

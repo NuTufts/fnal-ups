@@ -16,6 +16,7 @@
  *
  * MODIFICATIONS:
  *       14-Aug-1997, EB, first
+ *       Sep 19 1997, DjF, Taking over...
  *
  ***********************************************************************/
 
@@ -81,9 +82,12 @@ void ups_c_list( t_ups_command * const a_command_line )
     
     /* Get all the requested instances */
     mproduct_list = upsc_list_core(a_command_line, (char *)(db_item->data));
+    upsugo_prtlst(mproduct_list,"the products");
     mproduct_list = upslst_first(mproduct_list);  /* point to the start */
 
     /* Output the requested information from the instances */
+    upsugo_dump(a_command_line);
+    fprintf(stdout,"the database %s\n",db_item->data);
     list_output(mproduct_list, a_command_line, (char *)(db_item->data));
 
     /* free the matched products */
@@ -155,9 +159,9 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
 	}
 	/* if no chains were entered, get all possible chains so we can match
 	   versions up with their chains. */
-	if (! a_command_line->ugo_chain) {
+	if (! a_command_line->ugo_chain) { 
 	  all_tmp_chains = upsutl_get_files(prod_dir, (char *)CHAIN_SUFFIX);
-	}
+        }
 	upsmem_free(prod_dir);
 
 	if (all_versions) {
@@ -250,25 +254,25 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) {
     mproduct = (t_ups_match_product *)tmp_mprod_list->data;
-
-    for (tmp_chain_list = mproduct->chain_list ; tmp_chain_list ;
-	 tmp_chain_list = tmp_chain_list->next) {
-      instance = (t_ups_instance *)tmp_chain_list->data;
-      printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,
-	     instance->chain, instance->version);
-      printf("FLAVOR=%s, QUALIFIERS=%s\n", instance->flavor,
-	     instance->qualifiers);
+    if (a_command_line->ugo_chain) {
+       for (tmp_chain_list = mproduct->chain_list ; tmp_chain_list ;
+            tmp_chain_list = tmp_chain_list->next) 
+       { instance = (t_ups_instance *)tmp_chain_list->data;
+         printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,
+                 instance->chain, instance->version);
+         printf("FLAVOR=%s, QUALIFIERS=%s\n", instance->flavor,
+                 instance->qualifiers);
+       }
+    } else { 
+       for (tmp_vers_list = mproduct->version_list ; tmp_vers_list ;
+            tmp_vers_list = tmp_vers_list->next) 
+       { instance = (t_ups_instance *)tmp_vers_list->data;
+         printf("V:PRODUCT=%s, VERSION=%s, ", instance->product,
+                instance->version);
+         printf("FLAVOR=%s, QUALIFIERS=%s\n", instance->flavor,
+                 instance->qualifiers);
+       }
     }
-
-    for (tmp_vers_list = mproduct->version_list ; tmp_vers_list ;
-	 tmp_vers_list = tmp_vers_list->next) {
-      instance = (t_ups_instance *)tmp_vers_list->data;
-      printf("V:PRODUCT=%s, VERSION=%s, ", instance->product,
-	     instance->version);
-      printf("FLAVOR=%s, QUALIFIERS=%s\n", instance->flavor,
-	     instance->qualifiers);
-    }
-
     for (tmp_table_list = mproduct->table_list ; tmp_table_list ;
 	 tmp_table_list = tmp_table_list->next) {
       instance = (t_ups_instance *)tmp_table_list->data;
