@@ -65,10 +65,14 @@ static int            is_start_key( void );
 static int            put_key( const char * const key, const char * const val );
 
 /* Utils */
+static char           *qualifiers_create( char * const str );
 static char           *str_create( char * const str );
 static int            is_space( const char c );
 static int            ckeyi( void );
 static int            cfilei( void );
+static size_t         trim_qualifiers( char * const str );
+static int            upsutl_split_sort_merge( char * const, const char );
+static int            qsort_cmp_string( const void *, const void * );
 
 /* Print stuff */
 static void           print_instance( t_ups_instance * const inst_ptr );
@@ -562,6 +566,8 @@ t_ups_instance *read_instance( void )
       break;
 
     case e_key_qualifiers:
+      trim_qualifiers( g_val );
+      upsutl_split_sort_merge( g_val, ',' );
       inst_ptr->qualifiers = str_create( g_val );
       break;
     
@@ -961,6 +967,78 @@ int is_stop_key( void )
 /*
  * Utils
  */
+
+int upsutl_split_sort_merge( char * const str, const char c )
+{
+  static char buf[256];
+  char *p, *p0;
+  
+  char ct[2] = "\0\0";
+  size_t max_len = 0;
+  int count = 0, i = 0;
+
+  if ( ! str || strlen( str ) <= 0 ) return 0;
+
+  ct[0] = c;
+  memset( buf, 0, 256 );
+  
+  /* get max len of an item */
+
+  p0 = str;
+  while ( (p = strchr( p0, c )) ) {
+    if ( max_len < (p-p0) ) max_len = p-p0;
+    p0 = p+1;
+  }
+  ++max_len;
+
+  /* split, fill buf with evenly spaced items */
+
+  printf( "ct = %s\n", ct );
+  p = strtok( str, ct );
+  do {
+    strcpy( &buf[count*max_len], p );
+    count++;
+  } while( (p=strtok( 0, ct )) );
+
+  /* sort */
+  
+  qsort( buf, count, max_len, qsort_cmp_string );
+
+  /* merge, write back to input */
+
+  strcpy( str, &buf[0] );
+  for ( i=1; i<count; i++ ) {
+    strcat( str, ct );
+    strcat( str, &buf[i*max_len] );
+  }
+
+  return count;
+}
+
+int qsort_cmp_string( const void *c1, const void *c2 )
+{
+  int i = strcmp( (const char *)c1, (const char *)c2 );
+  return i;
+}
+
+size_t trim_qualifiers( char * const str )
+{
+  static char buf[256];
+  char *cp = str;  
+  int count = 0;
+
+  while ( cp && *cp ) {
+    if ( !is_space( *cp ) && *cp != '"' ) {
+      buf[count] = *cp;
+      count++;
+    }
+    cp++;
+  }
+  buf[count] = 0;
+  strcpy( str, buf );
+
+  return strlen( str );    
+}
 
 char *str_create( char * const str )
 {
