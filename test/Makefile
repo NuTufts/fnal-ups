@@ -55,6 +55,9 @@ integration_tests : ups_test
 # Main programs.
 #
 
+test_ups_list : test_ups_list.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+
 test_upserr : test_upserr.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
 
