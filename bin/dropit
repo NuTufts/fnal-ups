@@ -31,22 +31,26 @@ dropit() {
 
     # parse arguments
 
+    # first fix it up with getopt, eval/sed silliness is to handle -d' '
+
+    eval set : `getopt ci:n:d:p:easf "$@" | sed -e 's/ \( *\) / "\1" /g'`
+    shift
+
+    # next go through the list
+
     while [ $# -gt 1 ]
     do
 	case "x$1" in
 	x-c) d_d=" "; d_pi=" "; shift 1;;
 	x-i) d_i="$2"; d_pi="$2"; shift 2;;
-	x-i' ') d_i=' '; shift 1;;
-	x-i':') d_i=':'; shift 1;;
 	x-n) d_n="$2"; shift 2;;
 	x-d) d_d="$2"; shift 2;;
-	x-d' ') d_d=' '; shift 1;;
-	x-d':') d_d=':'; shift 1;;
 	x-p) d_p="$2"; d_i="$d_pi"; shift 2;;
 	x-e) d_a=true; d_e=true; shift 1;;
 	x-a) d_a=true; shift 1;;
 	x-s) d_s=true; shift 1;;
 	x-f) d_f=true; shift 1;;
+	x--) shift 1; break;;
 	*) break;;
 	esac
     done
@@ -83,6 +87,11 @@ dropit() {
 
     for d_substring in "$@"
     do
+        if [ "$d_substring" = "/bin" -o "$d_substring" = "" ]
+	then
+	    echo "dropit: skipping drop of '$d_substring' -- too dangerous" >&2
+	    continue
+	fi
 	# escape wildcards, etc. in substring (e.g. SunOS+5)
 	d_substringp="`echo $d_substring |
 	    sed -e 's|[^a-zA-Z_0-9()]|\\\\&|g'`"
