@@ -229,7 +229,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
  */
 
 /*-----------------------------------------------------------------------
- * upsmat_match_instance
+ * upsmat_instance
  *
  * Given the input from the command line, determine which products, versions
  * and chains were asked for.  Then call the matching routine to fetch them.
@@ -240,7 +240,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
  * Output: None
  * Return: a list of matched products
  */
-t_upslst_item *upsmat_match_instance(t_upsugo_command * const a_command_line,
+t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 				     const int a_need_unique)
 {
   t_upstyp_db *db_info = NULL;

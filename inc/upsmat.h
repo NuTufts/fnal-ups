@@ -39,7 +39,7 @@
 /*
  * Declaration of public functions.
  */
-t_upslst_item *upsmat_match_instance(t_upsugo_command * const a_command_line,
+t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 				     const int a_need_unique);
 
 /*

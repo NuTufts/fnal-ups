@@ -108,7 +108,7 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
   int not_first_pass = 0;
 
   /* get all the requested instances */
-  mproduct_list = upsmat_match_instance((t_upsugo_command *)a_command_line,
+  mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
 					need_unique);
   if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
     /* get the product to be set up */

@@ -12,8 +12,6 @@ Include files:-
 #include "upstst_parse.h"
 #include "upstst_macros.h"
 
-static void upstst_ugo_dump (const t_upsugo_command * const uc, FILE * const fd);
-
 /* ==========================================================================
 
     upstst_ugo_env - tests upsugo_env
@@ -131,62 +129,3 @@ if (difffile && outfile)
 return (0);
 }
 
-/* ==========================================================================
-
-    upstst_ugo_dump - static function to display contents of command buffer
-
-   ==========================================================================*/
-
-static void upstst_ugo_dump (const t_upsugo_command * const uc, FILE * const fd)
-{
-#define upstst_ugo_dumplist(title,ptr) 				\
-   {								\
-   t_upslst_item *l_ptr;					\
-   fprintf(fd,"%s",title);					\
-   for (l_ptr = upslst_first(ptr); l_ptr; l_ptr = l_ptr->next)	\
-      {								\
-      if (l_ptr == upslst_first(ptr))				\
-         fprintf (fd,"%s\n", (char *)l_ptr->data);		\
-      else							\
-         fprintf (fd,"                  %s\n",  (char *)l_ptr->data);	\
-      }								\
-   }
-
-if(!uc) return;
-if ( uc->ugo_product ) 
-   fprintf(fd,"Product:          %s\n",uc->ugo_product);
-if ( uc->ugo_version )
-   fprintf(fd,"Version:          %s\n",uc->ugo_version);
-if ( uc->ugo_auth )
-   upstst_ugo_dumplist("Authorized Nodes: " ,uc->ugo_auth);
-if ( uc->ugo_flavor )
-   upstst_ugo_dumplist("Flavor:           ",uc->ugo_flavor);
-if ( uc->ugo_host )
-   upstst_ugo_dumplist("Host:             ",uc->ugo_host);
-if ( uc->ugo_key )
-   upstst_ugo_dumplist("Key:              ",uc->ugo_key);
-if ( uc->ugo_tablefiledir )
-   fprintf(fd,"Tablefiledir:     %s\n",uc->ugo_tablefiledir);
-if ( uc->ugo_tablefile )
-   fprintf(fd,"Tablefile:        %s\n",uc->ugo_tablefile);
-if ( uc->ugo_anyfile )
-   fprintf(fd,"Anyfile:          %s\n",uc->ugo_anyfile);
-if ( uc->ugo_options )
-   fprintf(fd,"Options:          %s\n",uc->ugo_options);
-if ( uc->ugo_description )
-   fprintf(fd,"Description:      %s\n",uc->ugo_description);
-if ( uc->ugo_override )
-   fprintf(fd,"Override:         %s\n",uc->ugo_override);
-if ( uc->ugo_qualifiers )
-   upstst_ugo_dumplist("Qualifiers:       ",uc->ugo_qualifiers);
-if ( uc->ugo_productdir )
-   fprintf(fd,"Productdir:       %s\n",uc->ugo_productdir);
-if ( uc->ugo_archivefile )
-   fprintf(fd,"Archivefile:      %s\n",uc->ugo_archivefile);
-if ( uc->ugo_upsdir )
-   fprintf(fd,"Upsdir:           %s\n",uc->ugo_upsdir);
-if ( uc->ugo_db )
-   upstst_ugo_dumplist("DB:               ",uc->ugo_db);
-if ( uc->ugo_chain )
-   upstst_ugo_dumplist("Chains:           ",uc->ugo_chain);
-}

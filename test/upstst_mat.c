@@ -15,13 +15,13 @@ Include files:-
 static void upstst_match_dump (const t_upslst_item * const , FILE * const);
 /* ==========================================================================
 
-    upstst_mat_match_instance - tests upsmat_match_instace
+    upstst_mat_instance - tests upsmat_instace
 
    ==========================================================================*/
 
-int upstst_mat_match_instance (int argc, char ** const argv)
+int upstst_mat_instance (int argc, char ** const argv)
 {
-static char     	*myfunc = "upsmat_match_instance";
+static char     	*myfunc = "upsmat_instance";
 int             	status;                         /* status of parse */
 int             	estatus = UPS_SUCCESS;          /* expected status */
 t_upsugo_command	*uc = 0;			/* ups command */
@@ -71,7 +71,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        upserr_output(); upserr_clear();
        return (0);
        }
-   mp = upsmat_match_instance(uc,unique);
+   mp = upsmat_instance(uc,unique);
    if (UPS_ERROR != estatus)                    	/* error? */
        {
        fprintf(stderr,"%s: %s, %s: %s\n","actual status",

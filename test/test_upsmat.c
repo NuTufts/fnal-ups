@@ -129,7 +129,7 @@ static void test_match(int argc, char *argv[])
 
  /* get the options for each iteration of the command and do it */
   while (command_line = upsugo_next(argc, &argv[2], (char *)list_valid_opts)) {
-    mproduct_list = upsmat_match_instance(command_line, need_unique);
+    mproduct_list = upsmat_instance(command_line, need_unique);
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_output();
       break;

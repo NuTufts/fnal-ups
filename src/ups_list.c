@@ -290,7 +290,7 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line)
   }
 
   /* Get all the instances that the user requested */
-  mproduct_list = upsmat_match_instance(a_command_line, need_unique);
+  mproduct_list = upsmat_instance(a_command_line, need_unique);
 
   return(mproduct_list);
 }
