@@ -38,8 +38,7 @@ declare     ::
 depend      ::
 : List (for a specified UPS product instance) 
 : UPS product requirements or all UPS product instances 
-: that have the specified UPS product instance as a 
-: requirement.
+: which this product depends upon
 exist       ::
 : Determine if a setup command with the same options 
 : would likely succeed.
@@ -57,6 +56,8 @@ list        ::
 modify      ::
 : Allow editor modification of the UPS Database files.  
 : The altered files are verified before being rewritten.
+parent        ::
+: List products which depend on specified product instances.
 setup       ::
 : Prepare the environment in order to be able 
 : to use a product instance.

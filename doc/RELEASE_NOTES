@@ -1,3 +1,33 @@
+Changes made in the v4_5_3 release of ups (2000-10-06): 
+
+Added "ups parent" command, which takes the same options as "ups list".  
+Users should note it is rather slow, and stacking multiple
+products on one command line saves time, i.e.
+	ups parent perl, python
+is twice as fast as
+	ups parent perl
+	ups parent python
+
+Added support for UPS_OVERRIDE environment variable, so you can
+set UPS_OVERRIDE to "-H IRIX+6.5.1" (or whatever flavor is
+appropriate)  to change ups's mind about the local flavor of
+the system.
+
+Added code in setups.{csh,sh} to read ${SETUPS_DIR}/ups_override.${Node}
+(where ${Node} is the not-qualified hostname), if it's present, 
+ and set the UPS_OVERRIDE variable mentioned above, so that you 
+can create that file and globally change ups's mind about the 
+default flavors on that system.
+
+Changes to the configure script to deal with read-only clones in AFS                space for $SETUPS_DIR
+
+Table file actions PathPrepend() PathAppend() and PathSet() now are
+based on EnvPrepend() EnvAppend() and EnvSet(), which corrects
+several bugs fixed in one but not the other.
+
+Fixed a bug causing a core dump if commands were issued with several
+optional qualifiers and no mandatory ones.
+
 Changes made in the v4_5_2 release of ups (2000-06-02):
 
 Added a check in undeclare for the -C switch to inhibit un<chain> actions.

@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
   char *on_what = NULL;
 
 
-  if (argv[1] && (0 == strcmp(argv[1],"parent"))) {
+  if (argv[1] && (0 == strcmp(argv[1],"parent")) && 0 != strcmp(argv[2],"-?")) {
 
       /* ups parent is an external perl script */
 

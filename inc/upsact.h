@@ -62,6 +62,7 @@ enum {
   e_setup,               /* This one starts the UPS commands */
   e_unsetup,
   e_list,
+  e_parent,
   e_configure,
   e_copy,
   e_declare,

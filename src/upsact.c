@@ -400,6 +400,7 @@ t_cmd_info g_cmd_info[] = {
   {e_exist,       "exist",       "?cdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
 /*  {e_modify,      "modify",      "?aA:E:f:H:m:M:Np:q:r:T:U:vVz:Z", 0x00000010, e_invalid_action},	*/
   {e_modify,      "modify",      "?Acd:E:f:H:m:M:nNop:q:r:tT:U:vVz:Z", 0x00000010, e_invalid_action},
+  {e_parent,        "parent",    "?acdf:g:H:K:lm:M:noq:r:tU:vz:Z0123", 0x00000010, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:Pq:r:stU:vVwz:Z0123", 0x00000010, e_invalid_action},
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_tailor,      "tailor",      "?cdf:g:H:K:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
