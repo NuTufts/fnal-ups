@@ -17,6 +17,7 @@
  * MODIFICATIONS:
  *       Sep 17 1997, DjF, First.
  *       Jan 6  1998, EB, Get help file from ERUPT_DIR/doc
+ *       Feb 19 1998, lr, Get help file from UPS_DIR/doc
  *
  ***********************************************************************/
 
@@ -75,7 +76,7 @@ int upshlp_command(const char * const what)
 
   last =  (char *) malloc(13);
 
-  erupt_dir = getenv("ERUPT_DIR");
+  erupt_dir = getenv("UPS_DIR");
   if (erupt_dir) {
      /* we got one */
      sprintf(buff, "%s/doc/ups_help.dat", erupt_dir);
