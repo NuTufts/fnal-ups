@@ -46,7 +46,7 @@ CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsfil.A upsugo.A upsmat.A ups_list.A  \
 	     upskey.A upshlp.A ups_unk.A ups_setup.A \
 	     upsver.A upsact.A upsget.A ups_start.A \
-	     ups_stop.a
+	     ups_stop.A
 
 LDFLAGS = $(LLIBS)
 
