@@ -117,6 +117,7 @@ typedef struct upstyp_instance
   t_upslst_item    *user_list;
 
   struct upstyp_instance *sav_inst;
+  int              flag;       /* used by verify in upsmat */
 
 } t_upstyp_instance;
 
