@@ -38,11 +38,9 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 9. Expand the functionality of the fileTest action.
 
-10. Full support for environment variables in table files.
+10. Fully support news and html files more generally.
 
-11. Fully support news and html files more generally.
-
-12. The ability for the upsdb-admin to configure, on a per-db level, what
+11. The ability for the upsdb-admin to configure, on a per-db level, what
 	happens under various circumstances.  For example,
 	in some later version of ups the sys/prod-admin should be able to say
 	things like "when a product is declared, copy the html files to
@@ -52,7 +50,11 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	product, prepend the MAN_SOURCE_DIR into their MAN_PATH so that they
 	can access the man pages for the test version", etc.
 
-13. Let declared files be the umask and ownership of the database in which
+12. Let declared files be the umask and ownership of the database in which
 	they currently reside.
 
-14. Implement the -x option.
+13. Implement the -x option.
+
+14. Allow ups to be distributed as a uu encoded shell script.
+
+15. Implement a command line interface for ups modify.
