@@ -47,6 +47,7 @@ extern t_cmd_info g_cmd_info[];
 
 #define CHAIN "chain"
 #define VERSION "version"
+#define UPS_UNDECLARE "UPS undeclare: "
 
 /*
  * Definition of public functions.
@@ -131,7 +132,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
  { db_info = (t_upstyp_db *)db_list->data;
    mproduct_list = upsmat_instance(uc, db_list , not_unique);
    if (mproduct_list)    /* the product does exist */ 
-   { upsver_mes(1,"Product %s currently exist in database %s\n",
+   { upsver_mes(1,"%sProduct %s currently exist in database %s\n",
+                UPS_UNDECLARE,
                 uc->ugo_product,
                 db_info->name);
      if ( uc->ugo_version ) /* insert all chains in command */
@@ -171,7 +173,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
           chain_list->next = save_next;
           chain_list->prev = save_prev;
           if (mproduct_list)
-          { upsver_mes(1,"Match on chain %s found \n",chain_list->data);
+          { upsver_mes(1,"%sMatch on chain %s found \n",
+                       UPS_UNDECLARE,chain_list->data);
             mproduct_list = upslst_first(mproduct_list);
             mproduct = (t_upstyp_matched_product *)mproduct_list->data;
             minst_list = (t_upslst_item *)mproduct->minst_list;
@@ -186,7 +189,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
               cinst = cinst_list ? cinst_list->data : 0;
               product->instance_list = 
                  upslst_delete(product->instance_list,cinst,'d');
-              upsver_mes(1,"Deleting %s of version %s\n",
+              upsver_mes(1,"%sDeleting %s of version %s\n",
+                           UPS_UNDECLARE,
                             the_chain,
                             cinst ? cinst->version : "(null)" );
               (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
@@ -262,7 +266,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         }
         product->instance_list = 
            upslst_delete(product->instance_list,vinst,'d');
-        upsver_mes(1,"Deleting version %s\n",
+        upsver_mes(1,"%sDeleting version %s\n",
+                      UPS_UNDECLARE,
                       vinst->version);
         (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
         if (!uc->ugo_C)
