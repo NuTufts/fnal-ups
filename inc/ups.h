@@ -25,6 +25,7 @@
 
 /* all ups specific include files */
 #include "upsact.h"
+#include "upscpy.h"
 #include "upserr.h"
 #include "upsfil.h"
 #include "upsget.h"

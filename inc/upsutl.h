@@ -60,6 +60,12 @@
 
 void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 		      const int a_command_index, const int a_simulate_flag);
+void upsutl_copy_info( const t_upstyp_matched_instance * const a_minst,
+                       const FILE * const a_stream,
+                       const t_upstyp_db * const a_db_info);
+void upsutl_copy_man( const t_upstyp_matched_instance * const a_minst,
+                       const FILE * const a_stream,
+                       const t_upstyp_db * const a_db_info);
 char *upsutl_get_table_file_path( const char * const a_prodname,
 				  const char * const a_tablefile,
 				  const char * const a_tablefiledir,
