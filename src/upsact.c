@@ -2057,7 +2057,9 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 		 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
     if ( p_cmd && ((i_cmd = p_cmd->icmd) != e_invalid_cmd) ) {
-      if ( (i_uncmd = g_func_info[p_cmd->icmd].icmd_undo) != e_invalid_cmd ) {
+
+      if ( (i_uncmd = g_func_info[i_cmd].icmd_undo) != e_invalid_cmd ) {
+
 	strcpy( buf,  g_func_info[i_uncmd].cmd );
 
 	argc = g_func_info[i_cmd].max_params;
@@ -2101,6 +2103,29 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 
 	  /* SPECIAL end */ 
 
+	}
+	else if ( i_cmd == e_setuprequired ||
+		  i_cmd == e_setupoptional ) {
+
+	  /* SPECIAL when using a SETUP action to create an UNSETUP,
+	     only use the product name */
+
+	  if ( argc > 0 ) {
+	    char *cmd_line = p_cmd->argv[0];
+	    t_upsugo_command *a_cmd_ugo = 0;
+
+	    if ( ! strchr( cmd_line, ' ' ) ) {
+	      strcat( buf, cmd_line );
+	    }
+	    else {
+	      a_cmd_ugo = upsugo_bldcmd( cmd_line, g_cmd_info[e_unsetup].valid_opts );
+	      strcat( buf, a_cmd_ugo->ugo_product );
+	      upsugo_free( a_cmd_ugo );
+	    }
+	  }
+	  else if ( argc > 0 ) {
+	      strcat( buf, p_cmd->argv[0] );
+	  }
 	}
 	else {
 	  
