@@ -551,6 +551,7 @@ setenv UPS_SHELL csh
 # Determine probable flavor names for the version of $Name_Of_Ups
 # which would execute on this platform.
 #
+unset MACH_OS
 setenv MACH_OS \`uname -s\`
 set mach=\`echo \$MACH_OS|cut -c1-4\`
 if ( \$mach == IRIX ) setenv MACH_OS IRIX
