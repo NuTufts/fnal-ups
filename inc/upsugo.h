@@ -25,6 +25,7 @@
 /*
  * Standard include files, if needed for .h file
  */
+#include <stdio.h>
 
 /* ups specific include files, if needed for .h file */
 #include "upslst.h"
