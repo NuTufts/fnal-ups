@@ -539,8 +539,11 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 
   /* create a partial action structure for top product */
 
-  if ( !(new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name )) ) 
+  if ( !(new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name )) ) {
+    upserr_vplace();
+    upserr_add( UPS_NO_PRODUCT_FOUND, UPS_FATAL, ugo_cmd->ugo_product );
     return 0;
+  }
 
   /* create a list of 1'st level dependecies,
      they have precedence over products at other levels */

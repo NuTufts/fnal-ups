@@ -97,7 +97,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 37 */  "%s: Mismatch in unsetup and SETUP_ env. variable for %s\n",
 /* 38 */  "%s: There is no ACTION=%s section in this table file.\n",
 /* 39 */  "%s: No instance to copy to specified on command line.\n",
-/* 40 */  "%s: Invalid Specification for %s -\n\t%s\n"
+/* 40 */  "%s: Invalid Specification for %s -\n\t%s\n",
+/* 41 */  "%s: No instance found for product: \'%s\'\n"
 };
 
 char *g_error_ascii[] = {
@@ -142,7 +143,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_ACTION           38 */ "UPS_NO_ACTION",
    /* UPS_NO_NEW_INSTANCE     39 */ "UPS_NO_NEW_INSTANCE",
    /* UPS_INVALID_SPECIFICATION 40 */ "UPS_INVALID_SPECIFICATION",
-   /* UPS_NERR                41 */ "UPS_NERR",
+   /* UPS_NO_PRODUCT_FOUND    41 */ "UPS_NO_PRODUCT_FOUND",
+   /* UPS_NERR                42 */ "UPS_NERR",
    0 };
 
 /*
