@@ -1,3 +1,4 @@
    asta v1_0 -f NULL -z ../db2:dodefaults()
       lassie v5_0 -f NULL -z ../db1:dodefaults()
       lassie v5_0 -f NULL -z ../db1:sourcerequired(lassie_v5_0)
+      snif v1_0 -f NULL -z ../db2:dodefaults()

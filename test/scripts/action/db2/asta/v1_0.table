@@ -7,3 +7,4 @@ QUALIFIERS = ""
 ACTION = SETUP
    doDefaults()
    setupRequired("lassie v5_0")
+   setupRequired("snif v1_0")
