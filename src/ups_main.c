@@ -49,6 +49,7 @@
 #include "upsget.h"
 #include "upsact.h"
 #include "upsver.h"
+#include "upsfil.h"
 #include "ups_declare.h"
 #include "ups_undeclare.h"
 #include "ups_flavor.h"
