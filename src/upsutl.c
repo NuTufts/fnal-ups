@@ -48,6 +48,9 @@
 /* #else
 #include <sys/dir.h>
 #endif */
+#ifdef _SGIAPI
+extern int gethostname(char *, int);
+#endif
 
 /* ups specific include files */
 #include "upsutl.h"
