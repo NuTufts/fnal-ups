@@ -38,7 +38,7 @@ static char		*database;			/* ups database */
 FILE			*ofd;				/* outfile fd */
 int			stdout_dup;			/* dup of stdout */
 t_upslst_item		*dblist = NULL;
-t_upstyp_db		*dbaddr;
+t_upstyp_db		*dbaddr = NULL;
 
 upstst_argt     	argt[] = 
    {{"-unique",	UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
