@@ -573,7 +573,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   }
 
   /* make sure we have cleaned up */
-  /* free the db configuration info, it we previously read it in */
+  /* free the db configuration info, if we previously read it in */
   FREE_CONFIG_FILE();
 
   if (all_products) {
