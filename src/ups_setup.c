@@ -197,7 +197,7 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
  * it does, , translate the variable, find the appropriate instance and
  * write the unsetup commands to the stream.
  *
- * Input : a list of commands, an output stream
+ * Input : a list of commands(t_upsact_item), an output stream
  * Output: none
  * Return: none
  */
