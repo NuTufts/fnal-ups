@@ -1,16 +1,25 @@
-setenv TMPDIR "`$UPS_DIR/bin/dropit -e -p "'"$TMPDIR"'" -i':' -d':' /tmp`"
-if ("x${TMPDIR}" == "x") unsetenv TMPDIR
+if (${?OPERA}) then
+  setenv upstmp "FIDELIO"
+  setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' "'"$upstmp"'"`"
+  if ("${OPERA}" == "") unsetenv OPERA
+  unsetenv upstmp
+endif
 #
-setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' FIDELIO`"
-if ("x${OPERA}" == "x") unsetenv OPERA
-#
-setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' MADAM_BUTTERFLY CARMEN`"
-if ("x${OPERA}" == "x") unsetenv OPERA
+if (${?OPERA}) then
+  setenv upstmp "MADAM_BUTTERFLY CARMEN"
+  setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' "'"$upstmp"'"`"
+  if ("${OPERA}" == "") unsetenv OPERA
+  unsetenv upstmp
+endif
 #
 unsetenv OPERA
 #
-setenv SYMPHONY "`$UPS_DIR/bin/dropit -e -p "'"$SYMPHONY"'" -i' ' -d';' EROICA`"
-if ("x${SYMPHONY}" == "x") unsetenv SYMPHONY
+if (${?SYMPHONY}) then
+  setenv upstmp "EROICA"
+  setenv SYMPHONY "`$UPS_DIR/bin/dropit -e -p "'"$SYMPHONY"'" -i';' -d';' "'"$upstmp"'"`"
+  if ("${SYMPHONY}" == "") unsetenv SYMPHONY
+  unsetenv upstmp
+endif
 #
 unsetenv FLY_DIR
 #
