@@ -3,10 +3,10 @@ PRODUCT = fly
 
 FLAVOR = NULL
 QUALIFIERS = ""
-INFO_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/info
-HTML_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/html
-MAN_SOURCE_DIR = ${UPS_DIR}/test/scripts/action
-CATMAN_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/catman
+INFO_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/info
+HTML_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/html
+MAN_SOURCE_DIR = ${UPS_DIR}/test/scripts/prod/action
+CATMAN_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/catman
 
 ACTION = SETUP
    doDefaults()
