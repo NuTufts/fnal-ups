@@ -103,16 +103,16 @@ then
 fi
 if [ x${Setups_Home:-} = x ]
 then
-    echo '**'
+#    echo '**'
     echo '**' $Setups_Flag not defined in $Ups_DB_Path/.upsfiles/dbconfig
     echo '**' Using /usr/local/etc
-    echo '**'
+#    echo '**'
     Setups_Home=/usr/local/etc
 else
-    echo '**'
+#    echo '**'
     echo '**' $Setups_Flag defined as $Setups_Home in 
     echo '**' $Ups_DB_Path/.upsfiles/dbconfig
-    echo '**'
+#    echo '**'
 fi
 
 
@@ -144,13 +144,13 @@ then
 # Woops.  Can't write in the home directory of ups.
 # This is fatal.
 #
-    echo '****'
-    echo '****'
+#    echo '****'
+#    echo '****'
     echo '****' Unable to write to $Ups_Dir
     echo '****'
     echo '****' $Name_Of_Ups configure failure
-    echo '****'
-    echo '****'
+#    echo '****'
+#    echo '****'
     exit 1
 fi
 
@@ -160,13 +160,13 @@ then
 # Can't write into the ups area.
 # This is  also fatal.  We must create the ups scripts.
 #
-    echo '****'
-    echo '****'
+#    echo '****'
+#    echo '****'
     echo '****' Unable to write to $Ups_Dir/ups
     echo '****'
     echo '****' $Name_Of_Ups configure failure
-    echo '****'
-    echo '****'
+#    echo '****'
+#    echo '****'
     exit 1
 fi
 
@@ -177,31 +177,31 @@ fi
 
 if [ ! -w $Ups_Dir/bootstrap ]
 then
-    echo '****'
-    echo '****'
+#    echo '****'
+#    echo '****'
     echo '****' Unable to write to $Ups_Dir/bootstrap
     echo '****'
     echo '****' $Name_Of_Ups configure failure
-    echo '****'
-    echo '****'
+#    echo '****'
+#    echo '****'
     exit 1
 fi
 rm -f $Ups_Dir/bootstrap/*
 if [ -x /usr/local/bin/funame ] 
 then
-    echo '**'
+#    echo '**'
     echo '**' WARNING: /usr/local/bin/funame exixts.
     echo '**           Please remove this file before declaring ups current'
     echo '**           It has the same name as a file in ups.'
-    echo '**'
+#    echo '**'
 fi
 if [ -x /usr/local/bin/dropit ]
 then
-    echo '**'
+#    echo '**'
     echo '**' WARNING: /usr/local/bin/dropit exists.
     echo '**           Please remove this file before declaring ups current'
     echo '**           It has the same name as a file in ups.'
-    echo '**'
+#    echo '**'
 fi
 #
 #
@@ -239,9 +239,9 @@ fi
 #
 if [ ! -x $Ups_Dir/bootstrap/$Setups_Products_Script ]
 then
-echo '**'
+#echo '**'
 echo '**' Creating $Ups_Dir/bootstrap/$Setups_Products_Script
-echo '**'
+#echo '**'
 #
 # Create the script to create PRODUCTS.  NOTE: This script is 
 # preferably a korn shell, but may, with slight loss of 
@@ -361,9 +361,9 @@ fi
 #
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.csh ]
 then
-echo '**'
+#echo '**'
 echo '**' Creating $Ups_Dir/bootstrap/${Script_Prefix}.csh
-echo '**'
+#echo '**'
 cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.csh
 #!/bin/csh
 #
@@ -475,11 +475,11 @@ endif
 # DO NOT EXIT - this might be the login shell.
 #
 if (! \$?UPS_DIR ) then
-    echo '****'
+#    echo '****'
     echo '****'
     echo '**** Unable to initialize the UPSII environment'
     echo '****'
-    echo '****'
+#    echo '****'
 else
 #
 # If we have successfully managed to find a usable version of $Name_Of_Ups,
@@ -515,9 +515,9 @@ fi
 #
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.sh ]
 then
-echo '**'
+#echo '**'
 echo '**' Creating $Ups_Dir/bootstrap/${Script_Prefix}.sh
-echo '**'
+#echo '**'
 cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.sh
 #!/bin/sh
 #
@@ -628,7 +628,7 @@ if [ x\`echo \${PRODUCTS:-}|cut -c1\` != x/ ]
 then
     if [ -x \${Setups_Home}/$Setups_Products_Script ] 
     then
-        eval \`\${Setups_Home}/$Setups_Products_Script\`
+        eval \`(unset ENV;\${Setups_Home}/$Setups_Products_Script)\`
     fi   
 fi
 #
@@ -666,10 +666,10 @@ if [ x\${UPS_DIR:-} = x ]
 then
     if [ -x \$Setups_Home/${Script_Prefix}.common ]
     then
-        eval \`\$Setups_Home/${Script_Prefix}.common sh\`
+        eval \`(unset ENV;\$Setups_Home/${Script_Prefix}.common sh)\`
     elif [ -x /usr/local/etc/${Script_Prefix}.common ]
     then
-        eval \`/usr/local/etc/${Script_Prefix}.common sh\`
+        eval \`(unset ENV;/usr/local/etc/${Script_Prefix}.common sh)\`
     fi
 fi
 if [ x\${UPS_DIR:-} != x ]
@@ -723,9 +723,9 @@ then
 for Start_Or_Stop in startup shutdown
 do
 rm -f $Ups_Dir/ups/ups_${Start_Or_Stop}
-echo '**'
+#echo '**'
 echo '**' Creating $Ups_Dir/ups/ups_${Start_Or_Stop}
-echo '**'
+#echo '**'
 cat <<XEoF >$Ups_Dir/ups/ups_${Start_Or_Stop}
 #!/bin/sh 
 #
@@ -776,10 +776,8 @@ else
 fi 
 if [ ! -f \$Setups_Home/\${Script_Prefix}.sh ]
 then
-    echo '****'
     echo '****' \$Name_Of_Ups initialization file 
     echo '****' \$Setups_Home/\${Script_Prefix}.sh not found
-    echo '****'
     exit 1
 else	
     . \$Setups_Home/\${Script_Prefix}.sh
@@ -863,9 +861,9 @@ fi
 #
 if [ ! -r $Ups_Dir/bootstrap/${Script_Prefix}.common ]
 then
-    echo '**'
+#    echo '**'
     echo '**' Creating $Ups_Dir/bootstrap/${Script_Prefix}.common
-    echo '**'
+#    echo '**'
     cat <<XEoF > $Ups_Dir/bootstrap/${Script_Prefix}.common 
 #!/bin/sh 
 # Copyright (c) 1998 Universities Research Association, Inc.
@@ -1116,9 +1114,9 @@ if [ -r $Ups_Dir/ups/current ]
 then
     rm -f $Ups_Dir/ups/current
 fi
-echo '**'
+#echo '**'
 echo '**' Creating $Ups_Dir/ups/current
-echo '**'
+#echo '**'
 cat <<XEoF >$Ups_Dir/ups/current
 #!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
@@ -1165,6 +1163,12 @@ then
 fi
 
 error='0'
+if [ ! -f \$Ups_Dir/bootstrap/${Script_Prefix}.common ]
+then
+    echo '****' Configure script has failed or was not executed.
+    echo '****' \$Name_Of_Ups current script cannot execute.
+    exit 1
+fi
 #
 # If the $Setups_Home is in AFS space, 
 # force it to the read/write area.
@@ -1180,13 +1184,8 @@ then
 fi
 if [ ! -w \$Setups_Home ]
 then
-    echo '****'
-    echo '****'
     echo '****' Unable to write to \$Setups_Home
-    echo '****'
     echo '****' \$Name_Of_Ups current script failure
-    echo '****'
-    echo '****'
     exit 1
 fi
 #
@@ -1206,6 +1205,7 @@ Ups_Dir=\`echo \$Ups_Dir|sed 's%/afs/fnal.gov/products%/afs/.fnal.gov/products%'
 #
 if [ -w /usr/local/etc ]
 then
+    echo '**' Copying bootstrap/${Script_Prefix}.common to /usr/local/etc
     cp \$Ups_Dir/bootstrap/${Script_Prefix}.common /usr/local/etc
 fi
 #
@@ -1228,15 +1228,14 @@ fi
         fi
         if [ \$Diff_rc != '0' ]
         then
+	    echo '**' Copying bootstrap/\$file to \$Setups_Home
             cp \$Ups_Dir/bootstrap/\$file \$Setups_Home
 	    if [ \$? != '0' ]
 	    then
 		error='1'
-		echo '****' 
 		echo '****' An error has prevented the copy of
 		echo '****' \$Ups_Dir/bootstrap/\$file to 
 		echo '****' \$Setups_Home
-		echo '****'
 	    else
 #
 # The removal of the file avoids a possible clash if
@@ -1250,6 +1249,7 @@ fi
 		rm -f \$Ups_Dir/bootstrap/\$file
 	    fi
 	else
+	    echo '**' bootstrap/\$file identical to \$Setups_Home/\$file - not copied.
 	    rm -f \$Ups_Dir/bootstrap/\$file
         fi
     done
@@ -1257,10 +1257,7 @@ fi
 
 if [ \$error = '1' ]
 then
-    echo '****' 
     echo '**** Error(s) have caused the current script to fail'
-    echo '****'
-    echo '****'
     exit 1
 fi
 #
@@ -1279,6 +1276,7 @@ do
 	    then
 	        mkdir \$Startup_Home/\$Start_Or_Stop
 	    fi
+	    echo '**' Copying ups_\${Start_Or_Stop} to \$Startup_Home/\$Start_Or_Stop
     	    cp \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/\$Start_Or_Stop/ups_\${Start_Or_Stop}
             cp  \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/\$Start_Or_Stop/ups_\${Start_Or_Stop}.sh       
             cp  \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/\$Start_Or_Stop/ups_\${Start_Or_Stop}.csh
@@ -1290,6 +1288,8 @@ do
 	fi     
    fi
 done
+
+echo '**' Current script completed successfully
     
 XEoF
 #
@@ -1306,9 +1306,9 @@ if [ -w $Ups_Dir/ups/uncurrent ]
 then
     rm -f $Ups_Dir/ups/uncurrent
 fi
-echo '**'
+#echo '**'
 echo '**' Creating $Ups_Dir/ups/uncurrent
-echo '**'
+#echo '**'
 cat <<XEoF >$Ups_Dir/ups/uncurrent
 #!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
@@ -1367,8 +1367,6 @@ else
 #
 # If we can't remove the file, print error message and fail.
 #
-    echo '****' 
-    echo '****'
     echo '****' Cannot remove \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR
     echo '****' Insuffient privilege.
     echo '****'
@@ -1378,7 +1376,6 @@ else
     echo '****' Please notify your System Administrator.
     echo '****'
     echo '****' \$Name_Of_Ups uncurrent script failed
-    echo '****'
 #    exit 1
 fi
 XEoF
