@@ -403,7 +403,11 @@ void list_output(const t_upslst_item * const a_mproduct_list,
               { printf("%s",config_ptr->prod_dir_prefix); }
             }
           }
-          printf("%s\n", minst_ptr->version->prod_dir);
+          if (minst_ptr->version->prod_dir)
+          { printf("%s", minst_ptr->version->prod_dir);
+          }
+          printf("\n");
+
           if (minst_ptr->version->compile_dir || 
               minst_ptr->version->compile_file)
           { printf("\t\tCompile=");
