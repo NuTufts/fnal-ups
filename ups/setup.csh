@@ -5,6 +5,11 @@
 # First append the bin directory to the path.  Append it so that the command
 # 'ups' will be taken from here and not from the old declared ups product.
 #
+if ("${?ERUPT_DIR}" == "0") then
+    setenv ERUPT_DIR $UPS_DIR
+    setenv set_erupt_dir 1
+endif
+
 set path=(${ERUPT_DIR}/bin $path)
 rehash
 
@@ -31,4 +36,6 @@ else
     alias unsetup       source \` `echo $ERUPT_DIR`/bin/ups unsetup '\!*' \` 
 endif
 
-
+if (${?set_erupt_dir}) then
+    unsetenv set_erupt_dir
+endif
