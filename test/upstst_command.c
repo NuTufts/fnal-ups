@@ -68,7 +68,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
       upserr_output(); upserr_clear();
       return (0);
       }
-   *myfunc(uc,stdout,calledby);
+   (*myfunc)(uc,stdout,calledby);
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    if (UPS_ERROR != UPS_SUCCESS) continue;
    upsfil_flush();
@@ -140,10 +140,10 @@ int upstst_unsetup(int argc, char ** const argv)
           (void *)&ups_unsetup,"ups_unsetup",e_unsetup)); }
 
 int upstst_unk(int argc, char ** const argv)
-{ return (upstst_command(argc,argv, (void *)&ups_unk,"ups_unk",e_unk)); }
+{ return (upstst_command(argc,argv, (void *)ups_unk,"ups_unk",e_unk)); }
 
 int upstst_depend(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_depend,"ups_depend",e_depend)); }
+{ return(upstst_command(argc,argv,(void *)ups_depend,"ups_depend",e_depend)); }
 
 int upstst_touch(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_touch,"ups_touch",e_touch)); }
+{ return(upstst_command(argc,argv,(void *)ups_touch,"ups_touch",e_touch)); }
