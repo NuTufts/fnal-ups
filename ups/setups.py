@@ -45,14 +45,24 @@ EOF
 	exec c1
 
     def use_python(self,v):
+
+        self.use_package("python", v, "SETUP_PYTHON")
+
+    def use_package(self, p, v, s):
 	if ( v == "" ):
 	    vm = '.*';
 	else:
 	    vm = v;
 
-	if ( not os.environ.has_key('SETUP_PYTHON') or None == re.search('python '+vm,os.environ.get('SETUP_PYTHON',''))):
-	    if os.environ.has_key('SETUP_PYTHON'):
-		self.unsetup("python")
-	    self.setup("python " + v)
+	if ( not os.environ.has_key(s) or None == re.search(p+' '+vm,os.environ.get(s,''))):
+	    if os.environ.has_key(s):
+		self.unsetup(p)
+	    self.setup(p + ' ' + v)
 	    sys.argv.insert(0, os.environ['PYTHON_DIR']+'/bin/python')
 	    os.execve( os.environ['PYTHON_DIR']+'/bin/python', sys.argv, os.environ )
+
+    def ups(self, *args):
+        f = os.popen( os.environ['UPS_DIR'] + '/bin/ups ' + string.join(args))
+        res = f.read()
+        f.close()
+        return res
