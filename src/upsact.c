@@ -1248,8 +1248,8 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       /* note: action name is parents action name */
 
-      top_list = next_top_prod( top_list, new_act_itm,  action_name );
       P_VERB_s_s( 3, "Execute action:", p_line );
+      top_list = next_top_prod( top_list, new_act_itm,  action_name );
     }
     else if ( !(p_act_itm->ugo->ugo_j) ) {
 
@@ -1485,7 +1485,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       t_upsact_item *new_act_itm = 0;
       int unsetup_flag = 0;
 
-      /* quit if option P set and optional command */
+      /* quit if option R set and optional command */
 
       if ( p_act_itm->ugo->ugo_R && !(i_cmd & 1) )
 	continue;
@@ -1796,7 +1796,7 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
 			   int is_act_build,
 			   int * const unsetup_flag )
 {
-  /* it will, for un/setup action functions build the corresponding
+  /* it will, for un/setup/chain action functions build the corresponding
      ugo command structure, using upsugo_bldcmd */
 
 
@@ -1833,7 +1833,14 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
       }
     }      
 
-    a_ugo = upsugo_bldcmd( g_buff, g_cmd_info[i_act].valid_opts );
+    {
+      int real_act=i_act;
+      if ((real_act == e_current) || (real_act == e_development) || (real_act == e_new) || 
+          (real_act == e_old) || (real_act == e_test)) real_act=e_declare;
+      if ((real_act == e_uncurrent) || (real_act == e_undevelopment) || (real_act == e_unnew) || 
+          (real_act == e_unold) || (real_act == e_untest)) real_act=e_undeclare;
+      a_ugo = upsugo_bldcmd( g_buff, g_cmd_info[real_act].valid_opts );
+    }
   }
 
   /* ignore UPS_NO_DATABASE if we have one from command line */
