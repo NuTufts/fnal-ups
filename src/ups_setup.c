@@ -91,6 +91,9 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	     unsetup */
 	  memset(&prod_only_ugo, 0, sizeof(t_upsugo_command));
 	  prod_only_ugo.ugo_product = a_command_line->ugo_product;
+	  if (a_command_line->ugo_j) {
+	    prod_only_ugo.ugo_j = a_command_line->ugo_j;
+	  }
 	  cmd_list = upsact_get_cmd(&prod_only_ugo, mproduct,
 				    g_cmd_info[e_unsetup].cmd, e_unsetup);
 	  /* the above routine will return all of the commands associated with
