@@ -44,10 +44,19 @@ static void
 destroy_Cell(cell)
 struct Cell_s *cell;
 {
+/* 
+** This used to not be ifdefed, and sometimes free-ed
+** things that were not malloc-ed. (like the "." string,
+** and argv[n], etc.
+** besides, we free a bunch of stuff and then exit, so
+** why waste the cygles? -- mengel
+*/
+#ifdef slow_me_down_and_free_things_not_malloced
     if(cell) {
-	if(cell->value) free(cell->value);
+        if(cell->value) free(cell->value); 
 	free(cell);
     }
+#endif
 }
 
 static void
@@ -424,7 +433,7 @@ char **envp;
 		} else {
 		    pathlist = current->next;
 		}
-		destroy_Cell(current);
+		destroy_Cell(current); 
 	    } else {
 		previous = current;
 	    }
