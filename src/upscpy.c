@@ -554,9 +554,9 @@ static char get_man_subdir(char * const a_man_file)
          break;
        if ((next_c != '.') && (*sp == '\0'))
          break;
-       if ((strcmp (sp, ".z") == 0) ||
-           (strcmp (sp, ".Z") == 0) ||
-           (strcmp (sp, ".gz") == 0))
+       if ((strcmp (sp, "z") == 0) ||
+           (strcmp (sp, "Z") == 0) ||
+           (strcmp (sp, "gz") == 0))
          break;
        ret_val = NO_EXTENSION;
      }
