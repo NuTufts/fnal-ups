@@ -38,6 +38,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <sys/utsname.h>
+#include <string.h>
 
 #include "ups.h"
 #include "upsuname.h"
