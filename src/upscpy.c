@@ -293,7 +293,7 @@ void upscpy_catman(UPSCPY_PARAMS)
        /* ok we have a destination, now see if we have a source, if not
           assume the default */
     { /* GET_SOURCE(catman_source, catman_source_dir); */
-      catman_source = upsget_man_source_dir(a_minst, a_db_info,a_command_line);
+      catman_source = upsget_catman_source_dir(a_minst, a_db_info,a_command_line);
       /* open the source directory and see what type of structure we have */
       if ((dir = opendir(catman_source)))
          /* read each directory item and figure out what to do with it */
@@ -446,7 +446,7 @@ void upscpy_rmcatman(UPSCPY_PARAMS)
       /* ok we have a destination, now see if we have a source, if not
          assume the default */
     { /* GET_SOURCE(catman_source, man_source_dir); */
-      catman_source = upsget_man_source_dir(a_minst, a_db_info,a_command_line);
+      catman_source = upsget_catman_source_dir(a_minst, a_db_info,a_command_line);
       /* open the source directory and see what type of structure we have */
       if ((dir = opendir(catman_source))) 
         /* read each directory item and figure out what to do with it */
