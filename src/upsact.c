@@ -294,13 +294,6 @@ static void f_dodefaults( ACTION_PARAMS);
     upserr_vplace(); \
     upserr_add( UPS_NO_ACTION, UPS_FATAL, str );
 
-#define TO_MUCH_FOR_UNSETUP( ugo_cmd ) \
-    ( ugo_cmd->ugo_version || ugo_cmd->ugo_c || ugo_cmd->ugo_d || \
-      ugo_cmd->ugo_o || ugo_cmd->ugo_n || ugo_cmd->ugo_t || \
-      ugo_cmd->ugo_g || ugo_cmd->ugo_z || ugo_cmd->ugo_q || \
-      ugo_cmd->ugo_f || ugo_cmd->ugo_M || ugo_cmd->ugo_m ) 
-
-
 #define P_VERB_s( iver, str ) \
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s\n", \
 				  str ? str : "(null)" )
@@ -1703,7 +1696,7 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
     /* check if instance can differ from SETUP_prod, if it can we will use 
        that instance */
 
-    use_cmd = TO_MUCH_FOR_UNSETUP( a_cmd_ugo );
+    use_cmd = TOO_MUCH_FOR_UNSETUP( a_cmd_ugo );
 
   }
 
@@ -1874,7 +1867,7 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
      defined in $SETUP_prod */
 
   if ( i_act == e_unsetup ) {
-    if ( ! TO_MUCH_FOR_UNSETUP( the_ugo_cmd ) ) {
+    if ( ! TOO_MUCH_FOR_UNSETUP( the_ugo_cmd ) ) {
 
       strcpy( s_pname, the_ugo_cmd->ugo_product );
       pname = upsutl_upcase( s_pname );

@@ -38,6 +38,12 @@
  */
 #define UPS_MAX_ARGC 100
 
+#define TOO_MUCH_FOR_UNSETUP( ugo_cmd ) \
+    ( ugo_cmd->ugo_version || ugo_cmd->ugo_c || ugo_cmd->ugo_d || \
+      ugo_cmd->ugo_o || ugo_cmd->ugo_n || ugo_cmd->ugo_t || \
+      ugo_cmd->ugo_g || ugo_cmd->ugo_z || ugo_cmd->ugo_q || \
+      ugo_cmd->ugo_f || ugo_cmd->ugo_M || ugo_cmd->ugo_m ) 
+
 /* commands and situations that could be in ACTION=situation line */
 enum {
   e_invalid_action = -1, /* From here to e_setup is the actions there is */
