@@ -81,7 +81,7 @@ static t_upskey_map g_key_map[] =
   { 16, "STATISTICS",       NO,   14,    3, 0x00001001 },
   { 17, "DB_DIR",           NO,   15,   NO, 0x00000000 },
   { 18, "ACTION",           NO,   16,   NO, 0x00000010 },
-  { 19, "UNKNOWN",          NO,   17,   NO, 0x00000011 },
+  { 19, "USER",             NO,   17,   NO, 0x00000011 },
 
   { 20, "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
   { 21, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
@@ -196,6 +196,38 @@ t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
   }
 
   return act_ptr;
+}
+
+/*-----------------------------------------------------------------------
+ * upskey_inst_getuserval
+ *
+ * Will return from an instance, the value defined by the passed user key
+ *
+ * Input : t_upstyp_instance *, an instance.
+ *         char *, action name
+ * Output: none.
+ * Return: char *, a pointer to a string or 0.
+ */
+char *upskey_inst_getuserval( t_upstyp_instance * const inst,
+			      const char * const skey )
+{
+  t_upslst_item *usr_l = 0;
+  char *sp = 0;
+  size_t len = 0;
+
+  if ( !inst || !inst->user_list || !skey ) 
+    return 0;
+
+  len = strlen( skey );
+  usr_l = upslst_first( inst->user_list );
+  for ( ; usr_l; usr_l = usr_l->next ) {
+    if ( (sp = strchr( (char *)usr_l->data, '=' )) ) {
+      if ( !upsutl_strincmp( (char *)usr_l->data, skey, len ) )
+	return ++sp;
+    }
+  }
+
+  return 0;
 }
 
 void upskey_inst_print( const t_upstyp_instance * const inst )

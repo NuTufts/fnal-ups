@@ -123,6 +123,8 @@ char         *upskey_inst_setval( t_upstyp_instance * const inst,
 				  const char * const sval );
 t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
 				     const char * const action_name );
+char         *upskey_inst_getuserval(t_upstyp_instance * const inst,
+				  const char * const skey ); 
 void         upskey_inst_print( const t_upstyp_instance * const prod );
 
 char         *upskey_prod_getval( t_upstyp_product * const prod,
