@@ -36,7 +36,8 @@ static char g_Specified_args[ARGSIZ];
 /* Forward declarations
    ==================== */
 
-static int 	upstst_pass1 (int * const, char ** const, upstst_argt * const);
+static int 	upstst_pass1 (int * const, char ** const, upstst_argt * const, 
+                              const unsigned int options);
 static int  	upstst_pass2 (int * const, char **, upstst_argt * const);
 static int   	assign_defaults(upstst_argt * const);
 
@@ -51,10 +52,11 @@ ROUTINE: upstst_parse
 
 Process an argv array according to a table of expected command-line options.
 
- (int ) upstst_parse(int *argcPtr, char **argv, shArgvInfo *argTable)
+ (int ) upstst_parse(int *argcPtr, char **argv, shArgvInfo *argTable, int options)
           argcPtr  - Pointer to the argument count address
           argv     - Command line argument array
           argTable - Table of expected command-line options
+	  options  - options
   Note: parameters marked by # will be changed as side effects.
 
 DESCRIPTION:
@@ -67,7 +69,7 @@ RETURNS:
    UPSTST_BADSYNTAX 	: on error. 
 */
 int upstst_parse(int * const argcPtr, char ** const argv, 
-   upstst_argt * const argTable)
+   upstst_argt * const argTable, const unsigned int options)
 {
 int 			retValue, length;
 register upstst_argt 	*ptr;
@@ -94,13 +96,13 @@ if (length >= ARGSIZ)
 
 g_Specified_args[0] = NULL;
 
-retValue = upstst_pass1(argcPtr, argv, argTable);	/* take out switch */
+retValue = upstst_pass1(argcPtr, argv, argTable, options);/* take out switch */
 if (retValue) return (retValue);			/* return error */
 
 retValue = upstst_pass2(argcPtr, argv, argTable);	/* take out param */
 if (retValue) return (retValue);			/* return error */
 
-if (*argcPtr > 1)  					/* no leftovers! */
+if (*argcPtr > 1 && options & UPSTST_PARSE_NOLEFTOVERS)	/* no leftovers! */
    {         
    fprintf (stderr,"Syntax Error: unprocessed command line parameters remain ");
    fprintf (stderr,"\n    (check for extra parameters or invalid options)\n");
@@ -154,19 +156,18 @@ RETURNS:
    UPSTST_SUCCESS   : if command-line options parsed successfully
    UPSTST_BADSYNTAX : on error. Reason for error is put in interp->result
 ============================================================================= */
-static int upstst_pass1(int * const argcPtr, char ** const argv, upstst_argt * const argTable)
+static int upstst_pass1(int * const argcPtr, char ** const argv, upstst_argt * const argTable, const unsigned int options)
 {
 upstst_argt *infoPtr;
-				/* Pointer to the current entry in the
-				 * table of argument descriptions. */
+			/* Pointer to the current entry in the
+			 * table of argument descriptions. */
 upstst_argt *matchPtr;	/* Descriptor that matches current argument. */
 char *curArg;		/* Current argument */
-int srcIndex;		/* Location from which to read next argument
-				 * from argv. */
+int srcIndex;		/* Location from which to read next argument from argv*/
 int dstIndex;		/* Index into argv to which next unused
 				 * argument should be copied (never greater
 				 * than srcIndex). */
-int length;			/* Number of characters in current argument. */
+size_t length;		/* Number of characters in current argument. */
 char tmpKeyBuf[30];
 
 #define upstst_missing_arg(myarg) {					\
@@ -184,7 +185,7 @@ for (srcIndex = dstIndex = 1; srcIndex < *argcPtr; )
    {
    curArg = argv[srcIndex];
    srcIndex++;
-   length = (int) strlen(curArg);
+   length = strlen(curArg);
    if (length == 0) 
       {
 	  /*
@@ -201,13 +202,20 @@ for (srcIndex = dstIndex = 1; srcIndex < *argcPtr; )
 	 * matchPtr.
 	 */
 
-    if (!strcmp(curArg,"-usage")) return UPSTST_USAGE;
+   if (!strcmp(curArg,"-usage")) return UPSTST_USAGE;
    matchPtr = NULL;
    for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
 
       {
       if (infoPtr->key == NULL)  continue;
-      if ((strncmp(infoPtr->key, curArg, (unsigned int)length) != 0)) continue;
+      if (options && UPSTST_PARSE_EXACTMATCH)
+         {
+         if (strcmp(infoPtr->key, curArg)) continue;
+         }
+      else
+         {
+         if (strncmp(infoPtr->key, curArg, length)) continue;
+         }
       if (infoPtr->key[length] == 0) 
 	 {
 	 matchPtr = infoPtr;

@@ -30,7 +30,7 @@ upstst_argt	argt[] = {{NULL, UPSTST_ARGV_END, NULL, NULL}};
 /* parse command line
    ------------------ */
 
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 
 /* echo date
@@ -61,7 +61,7 @@ upstst_argt	argt[] = {
    ------------------ */
 
 mystring = NULL;
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE (status, argt, argv[0]);
 
 /* echo string to stderr
@@ -93,7 +93,7 @@ upstst_argt	argt[] = {
    ------------------ */
 
 level = -1; testflag = FALSE;
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE (status, argt, argv[0]);
 
 /* either set or show debug level

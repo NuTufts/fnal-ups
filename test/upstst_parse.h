@@ -4,6 +4,8 @@
  *
  */
 
+#define UPSTST_PARSE_NOLEFTOVERS	0x00000001
+#define UPSTST_PARSE_EXACTMATCH		0x00000002
 #ifndef _UPSTST_PARSE_H
 #define _UPSTST_PARSE_H
 
@@ -27,7 +29,7 @@ typedef struct {
                          * depends on type. */
 } upstst_argt;
 
-int upstst_parse(int * const, char ** const , upstst_argt * const);
+int upstst_parse(int * const, char ** const , upstst_argt * const, const unsigned int options);
 int upstst_split(char *, int * const, char *** const);
 
 void upstst_print_usage (const upstst_argt * const argTable,const char *cmd_name);

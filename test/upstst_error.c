@@ -30,7 +30,7 @@ upstst_argt	argt[] = {{NULL, UPSTST_ARGV_END, NULL, NULL}};
 /* parse command line
    ------------------ */
 
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 
 upserr_output();					/* output error */
@@ -54,7 +54,7 @@ upstst_argt	argt[] = {{NULL, UPSTST_ARGV_END, NULL, NULL}};
 /* parse command line
    ------------------ */
 
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 
 upserr_clear();						/* clear buffer */
@@ -85,7 +85,7 @@ upstst_argt	argt[] = {{"<error>",  UPSTST_ARGV_STRING,NULL,&error_str},
    ------------------ */
 
 severity = UPS_INFORMATIONAL; error_str = NULL;
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 
 UPSTST_CHECK_ESTATUS (error_str,error);			/* get error */

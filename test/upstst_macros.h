@@ -42,26 +42,26 @@ extern int              upstst_debug;            /* debug flag */
    }
 
 #define UPSTST_CHECK_CALL(type,returnval,estatus) {	\
-   int status;						\
-   if (type == UPSTST_ZEROSUCCESS) status = (int)(returnval);	\
-   else if (type == UPSTST_NONZEROSUCCESS)		\
-      {							\
-      if (returnval) status = UPS_SUCCESS;		\
-      else status = UPS_ERROR;				\
-      }							\
-   if (status != estatus)				\
-      {							\
-      fprintf (stderr, "%s: %s, %s: %s\n",		\
-         "actual status",g_error_ascii[status],		\
+   int status = 0;				\
+   if (type == UPSTST_ZEROSUCCESS) 		\
+      status = (int)(returnval);		\
+   else if (type == UPSTST_NONZEROSUCCESS)	\
+      {						\
+      if (returnval) status = UPS_SUCCESS;	\
+      else status = UPS_ERROR;			\
+      }						\
+   if (status != estatus)			\
+      {						\
+      fprintf (stderr, "%s: %s, %s: %s\n",	\
+         "actual status",g_error_ascii[status],	\
 	 "expected status", g_error_ascii[estatus]); 	\
-      if (status)					\
-         {						\
-         upserr_output();				\
-         upserr_clear();				\
-         }						\
-      return(UPSTST_ERROR);				\
-      }							\
-   return(UPSTST_SUCCESS);				\
+      if (status)				\
+         {					\
+         upserr_output();			\
+         upserr_clear();			\
+         }					\
+      return(UPSTST_ERROR);			\
+      }						\
    }
 
 #define UPSTST_CHECK_ESTATUS(estring,estatus) {		\

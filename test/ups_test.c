@@ -28,6 +28,7 @@ int upstst_debug_level(int, char **);
 int upstst_err_output(int, char **);	int upstst_err_clear(int, char**);
 int upstst_err_add(int, char**);
 int upstst_fil_read_file(int, char**);  int upstst_fil_write_file(int, char**);
+int upstst_ugo_env(int, char**);  	int upstst_ugo_next(int, char**);
 
 /*=============================================================================
 Routine:
@@ -50,6 +51,8 @@ upstst_cmd_table_t upstst_my_cmds[] = {
   	"upserr_add",		upstst_err_add,
 	"upsfil_read_file",	upstst_fil_read_file,
 	"upsfil_write_file",	upstst_fil_write_file,
+	"upsugo_env",		upstst_ugo_env,
+	"upsugo_next",		upstst_ugo_next,
 	NULL,			0};
 
 upstst_commandloop ("ups_test> ", upstst_my_cmds);

@@ -41,7 +41,7 @@ upstst_argt     argt[] = {{"<filename>",UPSTST_ARGV_STRING,NULL,&filename},
    ------------------ */
 
 estatus_str = NULL;
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 
@@ -65,7 +65,7 @@ upstst_argt     argt[] = {{"<filename>",UPSTST_ARGV_STRING,NULL,&filename},
    ------------------ */
 
 estatus_str = NULL;
-status = upstst_parse (&argc, argv, argt);
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 
