@@ -34,15 +34,15 @@ CFLAGScia = $(INCDIRS)
 
 #
 #
+
 OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
-	  upsfil.o upsugo.o ups_match.o upskey.o \
-	  ups_help.o
+	  upsfil.o upsugo.o upsmat.o upskey.o upshlp.o
 
-COMMAND_OBJECTS = ups_c_list.o
+COMMAND_OBJECTS = ups_list.o
 
-CIAOBJECTS = upserr.a  upslst.a upsmem.o upsutl.a upstyp.a \
-	     upsfil.a upsugo.a ups_match.a ups_c_list.a \
-             upskey.a ups_help.a
+CIAOBJECTS = upserr.a upslst.a upsmem.o upsutl.a upstyp.a \
+	     upsfil.a upsugo.a upsmat.a ups_list.a  \
+	     upskey.a upshlp.a
 
 LDFLAGS = $(LLIBS)
 
@@ -117,10 +117,28 @@ make :
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
 # src DIRECTORY TO GENERATE IT
 #START_DEPEND
-ups_c_list.o:	ups_c_list.c
-ups_c_list.o:	$(ERUPT_DIR)/inc/ups_commands.h
+ups_action.o:	ups_action.c
+ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_list.o:	ups_list.c
+ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsmem.h
+ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_list.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsfil.h
+ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_main.o:	ups_main.c
-ups_main.o:	$(ERUPT_DIR)/inc/ups_commands.h
+ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_main.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_main.o:	$(ERUPT_DIR)/inc/upserr.h
 upserr.o:	upserr.c
 upserr.o:	$(ERUPT_DIR)/inc/upserr.h
 upsfil.o:	upsfil.c
@@ -136,6 +154,12 @@ upsfil.o:	$(ERUPT_DIR)/inc/upskey.h
 upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsfil.o:	$(ERUPT_DIR)/inc/upsfil.h
 upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upshlp.o:	upshlp.c
+upshlp.o:	$(ERUPT_DIR)/inc/upstyp.h
+upshlp.o:	$(ERUPT_DIR)/inc/upslst.h
+upshlp.o:	$(ERUPT_DIR)/inc/upsutl.h
+upshlp.o:	$(ERUPT_DIR)/inc/upstyp.h
+upshlp.o:	$(ERUPT_DIR)/inc/upslst.h
 upskey.o:	upskey.c
 upskey.o:	$(ERUPT_DIR)/inc/upstyp.h
 upskey.o:	$(ERUPT_DIR)/inc/upslst.h
@@ -171,7 +195,14 @@ upstyp.o:	$(ERUPT_DIR)/inc/upsmem.h
 upstyp.o:	$(ERUPT_DIR)/inc/upslst.h
 upstyp.o:	$(ERUPT_DIR)/inc/upserr.h
 upsugo.o:	upsugo.c
+upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upsugo.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsugo.o:	$(ERUPT_DIR)/inc/upserr.h
+upsugo.o:	$(ERUPT_DIR)/inc/upsmem.h
+upsugo.o:	$(ERUPT_DIR)/inc/upsutl.h
+upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upsutl.o:	upsutl.c
 upsutl.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsutl.o:	$(ERUPT_DIR)/inc/upstyp.h
