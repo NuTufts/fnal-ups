@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "ups_error.h"
 #include "ups_files.h"
 
 int  main( const int argc, char * const argv[] )
@@ -23,7 +24,7 @@ int  main( const int argc, char * const argv[] )
     }
   }
   
-
+  upserr_output();
   return 0;
 }
 
