@@ -1022,6 +1022,7 @@ void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
     t_upslst_item *myn_ptr = 0;
     t_upstyp_instance *vinst_ptr = 0;
     static char file[10];
+    static char *nostring = "";
     myn_ptr = upslst_first(n_ptr);
     for ( ; myn_ptr; myn_ptr = myn_ptr->next ) 
     { vinst_ptr = (t_upstyp_instance *)myn_ptr->data;
@@ -1037,7 +1038,8 @@ void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
           }
           upserr_add(UPS_DUPLICATE_INSTANCE, UPS_INFORMATIONAL, 
                      file , g_filename, 
-                     vinst_ptr->product,vinst_ptr->version, 
+                     (vinst_ptr->product ? vinst_ptr->product : nostring),
+		     (vinst_ptr->version ? vinst_ptr->version : nostring), 
                      vinst_ptr->flavor,vinst_ptr->qualifiers,
                      verify_key);
         }
