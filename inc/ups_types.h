@@ -131,6 +131,7 @@ typedef struct ups_command
     int     ugo_P;           /* override product name                */
     char    *ugo_override; 
     int     ugo_q;           /* CODE INCOMPLETE                      */
+    t_upslst_item *ugo_qualifiers;
 /*  int     ugo_Q;           UNDEFINED                               */
     int     ugo_r;           /* set product dir to value             */
     char    *ugo_productdir; 
