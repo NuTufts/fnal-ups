@@ -495,22 +495,9 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		      /* we are looking for possibly many instances.  skip the
 			 error if current instance could not be found and look
 			 for the next one. error message is in error buffer. */
-		      if (UPS_ERROR == UPS_NO_VERSION_MATCH  ||
-			  UPS_ERROR == UPS_NO_TABLE_MATCH) {
-			if (UPS_ERROR == UPS_NO_TABLE_MATCH) {
+		      if (UPS_ERROR == UPS_NO_TABLE_MATCH) {
 			  g_ups_error = UPS_ERROR;
-			} else if (! all_versions) {
-			  /* if the user asked for versions and we did not find
-			     them, ignore the error, not all products will have
-			     the same versions.  however if the user asked for
-			     chains and we could not find the version this is
-			     an error we need to report. */
-			  g_ups_error = UPS_ERROR;
-			  /* erase the last error from the error buffer */
-			  upserr_backup();
-			}
-		      }
-		      else {
+		      } else {
 			/* it was another error so pay attention to it. */
 			break;
 		      }
