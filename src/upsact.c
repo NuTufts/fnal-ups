@@ -2358,7 +2358,8 @@ static void f_envappend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\";export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=%s\nelse\n  %s=\"${%s}%s%s\"\nfi\nexport %s\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1],
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2370,7 +2371,8 @@ static void f_envappend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "setenv %s \"${%s}%s%s\"\n#\n",
+      if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s %s\nelse\n  setenv %s \"${%s}%s%s\"\nendif\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1], 
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter,
 		  a_cmd->argv[1]) < 0) {
 	FPRINTF_ERROR();
@@ -2408,7 +2410,8 @@ static void f_envprepend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\";export %s\n#\n",
+      if (fprintf((FILE *)a_stream, "if [ \"${%s:-}\" = \"\" ]; then\n  %s=%s\nelse\n  %s=\"%s%s${%s}\"\nfi\nexport %s\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1],
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2420,7 +2423,8 @@ static void f_envprepend( ACTION_PARAMS)
 	   stuff */
 	f_envremove(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       }
-      if (fprintf((FILE *)a_stream, "setenv %s \"%s%s${%s}\"\n#\n",
+      if (fprintf((FILE *)a_stream, "if (! ${?%s}) then\n  setenv %s %s\nelse\n  setenv %s \"%s%s${%s}\"\nendif\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1], 
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
