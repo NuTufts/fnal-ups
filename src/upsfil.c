@@ -248,6 +248,9 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 		       const char * const ups_file,
 		       const char copt )
 {
+  const char *key = 0;
+  static char buff[MAX_LINE_LEN];
+
   t_upslst_item *l_ptr = 0;
   g_filename = ups_file;
   g_item_count = 0;
@@ -265,13 +268,21 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     return UPS_OPEN_FILE;
   }
 
+  /* get table key */
+
+  if ( g_use_cache ) {
+    if ( !g_ft )
+      g_ft = upstbl_new( 300 );
+    key = upstbl_atom_string( ups_file );
+  }
+
   /* check if prod_ptr is empty, if empty remove the file */
 
   if ( upslst_count( prod_ptr->instance_list ) <= 0 ) {
-    const char *key = upstbl_atom_string( ups_file );
     P_VERB_s( 1, "Removing file (product is empty)" );
     /* remove product from cache */
-    upstbl_remove( g_ft, key );
+    if ( g_ft ) 
+      upstbl_remove( g_ft, key );
     /* remove file */
     remove( ups_file );
     return UPS_SUCCESS;
@@ -283,12 +294,11 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   if ( copt == 'd' && 
        upsutl_is_a_file( ups_file ) == UPS_NO_FILE ) {
     int l;
-    char buf[MAX_LINE_LEN];
-    strcpy( buf, ups_file );
-    l = (int )strlen( buf );
-    while ( --l >= 0 && buf[l] != '/' ) buf[l] = 0;
-    if ( l > 0 && upsutl_is_a_file( buf ) == UPS_NO_FILE )
-      mkdir( buf, 0775 );
+    strcpy( buff, ups_file );
+    l = (int )strlen( buff );
+    while ( --l >= 0 && buff[l] != '/' ) buff[l] = 0;
+    if ( l > 0 && upsutl_is_a_file( buff ) == UPS_NO_FILE )
+      mkdir( buff, 0775 );
   }
 
   /* open file */
@@ -349,6 +359,18 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   fclose( g_fh );
 
   P_VERB_s_i_s( 1, "Write", g_item_count, "item(s)" );
+
+  /* if new product, add it to cache */
+
+  if ( g_ft ) {
+    if ( !upstbl_get( g_ft, key ) ) {
+      upstbl_put( g_ft, key, g_pd );
+      P_VERB_s( 1, "New product added to cache" );
+    }
+    else {
+      P_VERB_s( 1, "New product already in cache" );
+    }
+  }    
 
   g_fh = 0;
   g_filename = 0;
