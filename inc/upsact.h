@@ -76,14 +76,16 @@ enum {
 };
 
 
-/* there must be one of these for each action and they must be in the same
+/* there must be one of these for each action command and they must be in the same
    order as in the array in upsact.c */
 enum {
   e_invalid_cmd = -1,
   e_setupoptional = 0,
   e_setuprequired,
   e_unsetupoptional,
-  e_unsetuprequired, /* this action have to be the last setup/unsetup action */
+  e_unsetuprequired,
+  e_exeactionoptional,
+  e_exeactionrequired,  /* the order of the (un)setup and exeaction enums are importend */
   e_sourcecompilereq,
   e_sourcecompileopt,
   e_envappend,
@@ -129,6 +131,7 @@ typedef struct upsact_cmd {
 
 typedef struct upsact_item {
   int                        level;
+  int                        mode;
   t_upsugo_command           *ugo;
   t_upstyp_matched_product   *mat;
   t_upstyp_action            *act;

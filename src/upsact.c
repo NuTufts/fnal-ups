@@ -92,11 +92,13 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 t_upslst_item *dep_list,
 			 t_upsact_item * const p_cur,
 			 const char * const act_name );
-t_upslst_item *get_top_prod( t_upsact_item *const p_cur, 
+t_upslst_item *next_top_prod( t_upslst_item * top_list,
+			     t_upsact_item *const p_cur, 
 			     const char *const act_name );
 t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 			  t_upstyp_matched_product * mat_prod,
 			  const char * const act_name );
+char          *get_mode( const t_upsact_item *const p_act ); 
 t_upsact_item *find_product_str( t_upslst_item *const dep_list,
 			     const char *const prod_name );
 t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
@@ -104,13 +106,14 @@ t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
 t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     t_upstyp_matched_product *mat_prod,
 			     const int level,
+			     const int mode,
 			     const char * const act_name );
 t_upstyp_action *new_default_action( t_upsact_item *const p_cur, 
 				     const char * const act_name, 
 				     const int iact );
 t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
 				     t_upslst_item *const cmd_list );
-char *actitem2inststr( const t_upsact_item *const p_cur );
+char *actitem2str( const t_upsact_item *const p_cur );
 int dbl2dbs( char * const db_name, t_upslst_item * const l_db );
 t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act );
 int lst_cmp_str( t_upslst_item * const l1, t_upslst_item * const l2 );
@@ -369,7 +372,7 @@ t_cmd_info g_cmd_info[] = {
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVWXz:Z", 0x00000000, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_invalid_action},
-  {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
+  {e_depend,      "depend",      "?cdotg:f:H:K:lm:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z", 0x00000000, e_invalid_action},
@@ -393,13 +396,15 @@ t_cmd_info g_cmd_info[] = {
  * setup and unsetup are at the front of the array.  The actions in this
  * array MUST appear in the same order as in the above enumeration. NOTE:
  * the 4th and 5th parameters are the minimum and maximum parameters expected
- * by the action.
+ * by the action. The six parameter is the corresponding 'undo' command.
  */
 static t_cmd_map g_cmd_maps[] = {
   { "setupoptional", e_setupoptional, NULL, 0, 0, e_unsetupoptional },
   { "setuprequired", e_setuprequired, NULL, 0, 0, e_unsetuprequired },
   { "unsetupoptional", e_unsetupoptional, NULL, 0, 0, e_setupoptional },
   { "unsetuprequired", e_unsetuprequired, NULL, 0, 0, e_setuprequired },
+  { "exeactionoptional", e_exeactionoptional, NULL, 1, 1, e_invalid_cmd },
+  { "exeactionrequired", e_exeactionrequired, NULL, 1, 1, e_invalid_cmd },
   { "sourcecompilereq", e_sourcecompilereq, f_sourcecompilereq, 1, 1, e_invalid_cmd },
   { "sourcecompileopt", e_sourcecompileopt, f_sourcecompileopt, 1, 1, e_invalid_cmd },
   { "envappend", e_envappend, f_envappend, 2, 3, e_envremove },
@@ -475,9 +480,9 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 
   dep_list = upsact_get_cmd( ugo_cmd, mat_prod, act_name, ups_cmd );
 
-  /* option a: print all action commands for all instances */
+  /* option l: print all action commands for all instances */
 
-  if ( strchr( sopt, 'a' ) ) {
+  if ( strchr( sopt, 'l' ) ) {
     for ( ; dep_list; dep_list = dep_list->next )
       upsact_print_item( (t_upsact_item *)dep_list->data, sopt );
   }
@@ -491,13 +496,13 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 
     for ( ; dep_list; dep_list = dep_list->next ) {
       t_upsact_item *act_ptr = (t_upsact_item *)dep_list->data;
-      if ( act_ptr->ugo == cur_ugo )
+
+      if ( act_ptr->ugo == cur_ugo || find_product_ptr( didit_list, act_ptr ) )
 	continue;
-      if ( ! find_product_ptr( didit_list, act_ptr ) ) {
-	didit_list = upslst_add( didit_list, act_ptr );
-	upsact_print_item( act_ptr, sopt );
-	cur_ugo = act_ptr->ugo;
-      }
+
+      didit_list = upslst_add( didit_list, act_ptr );
+      upsact_print_item( act_ptr, sopt );
+      cur_ugo = act_ptr->ugo;
     }    
   }
 
@@ -521,31 +526,42 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       const char * const act_name,
 			       int ups_cmd )
 {
-  t_upsact_item *new_cur;
+  t_upsact_item *act_itm;
   t_upslst_item *top_list = 0;
   t_upslst_item *dep_list = 0;
+  int i_act = e_invalid_action;
+  int i_mod = e_invalid_cmd;
 
   g_ups_cmd = ups_cmd;
+
+  /* set a 'fake' action command mode */
+
+  i_act = upsact_action2enum( act_name );
+  if ( i_act == e_setup )
+    i_mod = e_setuprequired;
+  else if ( i_act == e_unsetup )
+    i_mod = e_unsetuprequired;
+
 
   if ( !ugo_cmd || !act_name )
     return 0;
 
   /* create a partial action structure for top product */
 
-  if ( !(new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name )) ) {
+  if ( !(act_itm = new_act_item( ugo_cmd, mat_prod, 0, i_mod, act_name )) ) {
     upserr_vplace();
     upserr_add( UPS_NO_PRODUCT_FOUND, UPS_FATAL, ugo_cmd->ugo_product );
     return 0;
   }
 
   /* create a list of 1'st level dependecies,
-     they have precedence over products at other levels */
+     there instance have precedence over products at higher levels */
 
-  top_list = get_top_prod( new_cur, act_name );
+  top_list = next_top_prod( top_list, act_itm, act_name );
   
-  /* get the list, next_cmd is recursive */
+  /* get the dependency list */
 
-  dep_list = next_cmd( top_list, dep_list, new_cur, act_name );
+  dep_list = next_cmd( top_list, dep_list, act_itm, act_name );
 
   return upslst_first( dep_list );
 }
@@ -562,7 +578,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
  */
 t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 {
-  static char trim_chars[] = " \t\n\r\f)";
+  static char trim_chars[] = " \t\n\r\f);";
   t_upsact_cmd *pcmd;
   char *act_s = (char *)cmd_str, *act_e = NULL, *act_p = NULL;
   int icmd = e_invalid_action;
@@ -579,7 +595,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
     return 0;
 
   /* create a new command structure, with space for the command string.
-     the created argv array is then (just) a list of pointers into that string. */
+     the created argv array is just a list of pointers into that string. */
   
   pcmd = (t_upsact_cmd *)malloc( sizeof( t_upsact_cmd ) + strlen( act_s ) + 1 );
   pcmd->pmem = (char *)(pcmd + 1);
@@ -594,11 +610,11 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
     /* save pointer to parenthese and
        get rid of trailing spaces in name of action command */
 
-    act_e = act_p;
+    act_e = act_p - 1;
     while ( act_e && *act_e && isspace( *(act_e) ) ){ --act_e; }    
     len = act_e - act_s;
 
-    /* look for action in the supported action array */
+    /* look for action command in the supported action array */
     
     for ( i = 0; g_cmd_maps[i].cmd; ++i ) {
       if ( !upsutl_strincmp( act_s, g_cmd_maps[i].cmd, (size_t)len ) ) {
@@ -608,7 +624,8 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 
 	act_s = act_p + 1;
 		 
-	/* trim off whitespace & the ending ")" */
+	/* trim off whitespace & the ending ")", we will also get rid
+           of ending ';' */
 
 	upsutl_str_remove_edges( act_s, trim_chars );
 
@@ -649,8 +666,7 @@ void upsact_cleanup( t_upslst_item *dep_list )
  *
  * options (sopt):
  *    always : print correspoding product instance.
- *    'l'    : also print instance level
- *    'a'    : also print corresponding action command
+ *    'l'    : also print corresponding action commands
  *    't'    : also print indentions (corresponding to level)
  *
  * Input : t_upsact_item *, action item
@@ -662,21 +678,25 @@ void upsact_print_item( const t_upsact_item *const p_cur,
 			char * sopt )
 {
   static char s_sopt[] = "";
+  char *s_mode = 0;
   int i;
   if ( !sopt )
     sopt = s_sopt;
 
   if ( !p_cur )
     return;
+
+  s_mode = get_mode( p_cur );
   
   if ( strchr( sopt, 't' ) ) for ( i=0; i<p_cur->level; i++ ) { printf( "   " ); }
-  if ( strchr( sopt, 'l' ) ) printf( "%d:", p_cur->level );
-  printf( "%s", actitem2inststr( p_cur ) );
-  if ( strchr( sopt, 'a' ) ) {
+  printf( "%s:", s_mode );
+  printf( "%s", actitem2str( p_cur ) );
+  if ( strchr( sopt, 'l' ) ) {
     printf( ":" );
     upsact_print_cmd( p_cur->cmd );
   }
-  else printf( "\n" );
+  else 
+    printf( "\n" );
 }
 
 /*-----------------------------------------------------------------------
@@ -701,9 +721,9 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
   printf( "%s(", g_cmd_maps[icmd].cmd );
   for ( i = 0; i < cmd_cur->argc; i++ ) {
     if ( i == cmd_cur->argc - 1 ) 
-      printf( " %s ", cmd_cur->argv[i] );
+      printf( "%s", cmd_cur->argv[i] );
     else
-      printf( " %s,", cmd_cur->argv[i] );
+      printf( "%s, ", cmd_cur->argv[i] );
   }
   printf( ")\n" ); 
 }
@@ -865,7 +885,7 @@ int upsact_action2enum( const char * const act_name )
  */
 t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 t_upslst_item *dep_list,
-			 t_upsact_item *const p_cur,
+			 t_upsact_item *const p_act_itm,
 			 const char *const act_name )
 {
   static char s_current_act_line[MAX_LINE_LEN] = "";
@@ -875,130 +895,175 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
   int i_act = e_invalid_action;
-  int ignore_errors = 0;
+  int i_cmd = e_invalid_cmd;
+  int i_omod = e_invalid_cmd;
 
-  if ( !p_cur )
+  if ( !p_act_itm )
     return dep_list;
 
   i_act = upsact_action2enum( act_name );
 
-  if ( !p_cur->act ) {
+  if ( !p_act_itm->act ) {
 
     /* if we don't have an action, take care of defaults cases, controlled by: 
        g_cmd_info.flags, g_cmd_info.uncmd_index and g_cmd_maps.icmd_undo */
 
-    if ( !(p_cur->act = new_default_action( p_cur, act_name, i_act )) )
+    if ( !(p_act_itm->act = new_default_action( p_act_itm, act_name, i_act )) )
       return dep_list;
   }
   
-  l_cmd = p_cur->act->command_list;
+  i_omod = p_act_itm->mode;
+  l_cmd = p_act_itm->act->command_list;
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
-    ignore_errors = 0;
 
     /* translate and parse command */
 
-    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
+    p_line = upsget_translation( p_act_itm->mat, p_act_itm->ugo,
 				 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
 
-    if ( p_cmd && p_cmd->icmd >= 0 ) {
-      p_cmd->iact = i_act;
-      if ( p_cmd->icmd > e_unsetuprequired ) {
+    if ( !p_cmd || p_cmd->icmd == e_invalid_cmd ) {
+      SET_PARSE_ERROR( p_line );
+      continue;
+    }
 
-	/* here we add an action item to the list (no dependency action) */
+    p_cmd->iact = i_act;
+    i_cmd = p_cmd->icmd;
+    if ( i_cmd > e_exeactionrequired ) {
 
-	t_upsact_item *new_cur = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
-	new_cur->level = p_cur->level;
-	new_cur->ugo = p_cur->ugo;
-	new_cur->mat = p_cur->mat;
-	new_cur->act = p_cur->act;
-	new_cur->cmd = p_cmd;
-	dep_list = upslst_add( dep_list, new_cur );
-	continue;
-      }
-      else if ( !p_cur->ugo->ugo_j ) {
+      /* STANDARD action commands to be added to the list
+	 ================================================ */
 
-	/* here we do the dependencies: (un)setup* */
+      t_upsact_item *new_act_itm = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
+      new_act_itm->level = p_act_itm->level;
+      new_act_itm->mode = p_act_itm->mode;
+      new_act_itm->ugo = p_act_itm->ugo;
+      new_act_itm->mat = p_act_itm->mat;
+      new_act_itm->act = p_act_itm->act;
+      new_act_itm->cmd = p_cmd;
+      dep_list = upslst_add( dep_list, new_act_itm );
+    }
+    else if ( i_cmd > e_unsetuprequired ) {
 
-	t_upsact_item *new_act = 0;
-	t_upsugo_command *new_ugo = 0;
+      /* EXECUTE another action
+	 ====================== */
 
-	/* handle unsetup ... that's special, we will compare command line to the
-           product actually setup and get the instance from $SETUP_prodname */
+      char *action_name = (char *)act_name;
+      t_upsact_item *new_act_itm = 0;
+      
+      /* note: mode is parents mode */
+      
+      int i_mod = i_omod;
 
-	if ( p_cmd->icmd == e_unsetuprequired ||
-	     p_cmd->icmd == e_unsetupoptional ) {
-	  if ( !(new_ugo = get_SETUP_prod( p_cmd, i_act )) )
-	    continue;
-	}
+      /* except for required/optional */
+      
+      if ( !(i_cmd & 1) && (i_omod & 1) )
+	i_mod = i_cmd - 1;
 
-	/* get/set current db: set db to current database if database is not 
-           specified on command line, else ugo_bldcmd knows what to do */
+      new_act_itm = new_act_item( p_act_itm->ugo, p_act_itm->mat,  
+				  p_act_itm->level, i_mod, p_cmd->argv[0] );
 
-	else if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
-	     dbl2dbs( s_current_db, p_cur->ugo->ugo_db ) > 0 ) {
-	  strcpy( s_current_act_line, p_cmd->argv[0] ); 
-	  strcat( s_current_act_line, s_current_db );
-	  new_ugo = upsugo_bldcmd( s_current_act_line, g_cmd_info[i_act].valid_opts );
+      /* ignore errors if optional (un)setup */
+
+      if ( !new_act_itm ) {
+	if ( i_mod & 1 ) {
+	  SET_PARSE_ERROR( p_line );
 	}
 	else {
-	  new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
+	  upserr_clear();
 	}
-
-	/* if product is at the top level, use that one */
-
-	if ( new_ugo && p_cur->level > 0 ) {
-	  new_act = find_product_str( top_list, new_ugo->ugo_product );
-	}
-
-	/* if product is already in our setup list, go to next product */
-	
-	if ( new_ugo && find_product_str( dep_list, new_ugo->ugo_product ) ) {
-	  /* !!! free stuff */
-	  continue;
-	}
-	
-	/* new_act is only set if product found at the top level, else
-           we will have to create a new_act from a ugo */
-
-	if ( !new_act ) {
-	  switch ( p_cmd->icmd ) 
-	  {
-	  case e_setupoptional:
-	    ignore_errors = 1;
-	  case e_setuprequired:	    
-	    new_act = new_act_item( new_ugo, 0, 0, "SETUP");
-	    break;	
-	  case e_unsetupoptional:
-	    ignore_errors = 1;
-	  case e_unsetuprequired: 
-	    new_act = new_act_item( new_ugo, 0, 0, "UNSETUP");
-	    break;
-	  }
-
-	  /* ignore errors if optional (un)setup */
-
-	  if ( !new_act ) {
-	    if ( ignore_errors )
-	      upserr_clear();
-	    else {
-	      SET_PARSE_ERROR( p_line );
-	    }
-	    continue;
-	  }
-	}
-
-	/* here we have a new action, increment dependency level and
-           parse atcion (by calling next_cmd) */
-
-	new_act->level = p_cur->level + 1;
-	dep_list = next_cmd( top_list, dep_list, new_act, act_name );
-	P_VERB_s_s( 3, "Adding dependcy:", p_line );
 	continue;
       }
+
+      /* note: action name is parents action name */
+
+      dep_list = next_cmd( top_list, dep_list, new_act_itm,  action_name );
+      P_VERB_s_s( 3, "Execute action:", p_line );
     }
-    else {
-      SET_PARSE_ERROR( p_line );
+    else if ( !(p_act_itm->ugo->ugo_j) ) {
+
+      /* DEPENDENCIES
+	 ============ */
+
+      char *action_name = (char *)act_name;
+      t_upsact_item *new_act_itm = 0;
+      t_upsugo_command *new_ugo = 0;
+      int i_mod = i_cmd;
+
+      /* if previous command was optinal ... the this one too */
+      
+      if ( (i_cmd & 1) && !(i_omod & 1) )
+	i_mod = i_cmd - 1;
+
+      /* translate product to a ugo_command */
+
+      if ( (i_cmd & 2) && g_ups_cmd != e_depend ) {
+
+	/* handle unsetup ... that's special, we will compare command line to the
+	   product actually setup and get the instance from $SETUP_<prodname>.
+	   currently only 'ups depend' will not use the current environment. */
+
+	if ( !(new_ugo = get_SETUP_prod( p_cmd, i_act )) )
+	  continue;
+      }
+      else {
+	char *p_cmd_argv = p_cmd->argv[0];
+
+	/* get current database, if not defined on command line */
+
+	if ( ! strstr( p_cmd_argv, "-z" ) && p_act_itm->ugo->ugo_z && 
+	     dbl2dbs( s_current_db, p_act_itm->ugo->ugo_db ) > 0 ) {
+	    strcpy( s_current_act_line, p_cmd->argv[0] ); 
+	    strcat( s_current_act_line, s_current_db );
+	    p_cmd_argv = s_current_act_line;
+	}
+	
+	new_ugo = upsugo_bldcmd( p_cmd_argv, g_cmd_info[i_act].valid_opts );
+      }
+
+      /* if product is at the top level, use that one */
+      
+      if ( new_ugo && p_act_itm->level > 0 ) {
+	new_act_itm = find_product_str( top_list, new_ugo->ugo_product );
+      }
+
+      /* if product is already in our setup list, go to next product */
+	
+      if ( new_ugo && find_product_str( dep_list, new_ugo->ugo_product ) ) {
+	/* !!! free stuff */
+	continue;
+      }
+	
+      /* new_act_itm is only set if product found at the top level, else
+	 we will have to create a new_act_itm from a ugo */
+
+      if ( !new_act_itm ) {
+
+	if ( i_mod & 2 ) 
+	  action_name = g_cmd_info[e_unsetup].cmd;
+	else
+	  action_name = g_cmd_info[e_setup].cmd;
+
+	new_act_itm = new_act_item( new_ugo, 0, 0, i_mod, action_name );
+
+	/* ignore errors if optional (un)setup */
+
+	if ( !new_act_itm ) {
+	  if ( i_mod & 1 ) {
+	    SET_PARSE_ERROR( p_line );
+	  }
+	  else {
+	    upserr_clear();
+	  }
+	  continue;
+	}
+      }
+
+      /* new action, increment dependency level and parse it */
+
+      new_act_itm->level = p_act_itm->level + 1;
+      dep_list = next_cmd( top_list, dep_list, new_act_itm, action_name );
+      P_VERB_s_s( 3, "Adding dependcy:", p_line );
     }
   }
   
@@ -1098,46 +1163,97 @@ int parse_params( const char * const a_params, char **argv )
 }
 
 /*-----------------------------------------------------------------------
- * get_top_prod
+ * next_top_prod
  *
  * Will fill the passed list of action item with translated actions.
- * It will not follow depencies. It's very close to 'next_cmd'.
- * (actally, it should probaly had been a part of next_cmd).
+ * It will not follow depencies. It's very close to 'next_cmd', so
+ * close that common stuff should be shared.
+ * It's recursive.
  *
  * Input : t_upsact_item *, action item
  *         char *, action name
  * Output: none
  * Return: t_upslst_item *, a list of top action items
  */
-t_upslst_item *get_top_prod( t_upsact_item *const p_cur, 
-			     const char *const act_name )
+t_upslst_item *next_top_prod( t_upslst_item * top_list,
+			      t_upsact_item *const p_act_itm, 
+			      const char *const act_name )
 {
   static char current_act_line[MAX_LINE_LEN] = "";
   static char current_db[MAX_LINE_LEN] = "";
-  t_upslst_item *l_cmd = p_cur->act ? p_cur->act->command_list : 0;
+
+  t_upslst_item *l_cmd = 0;
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
-  t_upslst_item *top_list = 0;
-  int i_act = upsact_action2enum( act_name );
-  int i_cmd = 0;
-  int ignore_errors;
-  int add_item;
+  int i_act = e_invalid_action;
+  int i_cmd = e_invalid_cmd;
+  int i_omod = e_invalid_cmd;
+
+  if ( p_act_itm && p_act_itm->act ) {
+    i_act = upsact_action2enum( act_name );
+    i_omod = p_act_itm->mode;
+    l_cmd = p_act_itm->act->command_list;
+  }
+  else {
+    return top_list;
+  }
 
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
-    ignore_errors = 0;
-    add_item = 0;
-    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
+    p_line = upsget_translation( p_act_itm->mat, p_act_itm->ugo,
 				 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
     i_cmd = p_cmd ? p_cmd->icmd : -1;
+
+    if ( !p_cmd || p_cmd->icmd == e_invalid_cmd ) {
+      SET_PARSE_ERROR( p_line );
+      continue;
+    }
+    else if ( i_cmd > e_exeactionrequired ) {
+      continue;
+    }
     
-    if ( i_cmd >= 0 && i_cmd <= e_unsetuprequired ) {
-      t_upsact_item *new_cur = 0;
+    if ( i_cmd > e_unsetuprequired ) {
+
+      char *action_name = (char *)act_name;
+      t_upsact_item *new_act_itm = 0;
+      
+      /* note: mode is parents mode */
+      
+      int i_mod = i_omod;
+
+      /* except for required/optional */
+      
+      if ( !(i_cmd & 1) && (i_omod & 1) )
+	i_mod = i_cmd - 1;
+
+      new_act_itm = new_act_item( p_act_itm->ugo, p_act_itm->mat,  
+				  p_act_itm->level, i_mod, p_cmd->argv[0] );
+
+      /* ignore errors if optional (un)setup */
+
+      if ( !new_act_itm ) {
+	if ( i_mod & 1 ) {
+	  SET_PARSE_ERROR( p_line );
+	}
+	else {
+	  upserr_clear();
+	}
+	continue;
+      }
+
+      /* note: action name is parents action name */
+
+      top_list = next_top_prod( top_list, new_act_itm,  action_name );
+      P_VERB_s_s( 3, "Execute action:", p_line );
+    }
+    else if ( !(p_act_itm->ugo->ugo_j) ) {
+
+      t_upsact_item *new_act_itm = 0;
       t_upsugo_command *new_ugo = 0;
       p_cmd->iact = i_act;
 
-      if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
-	   dbl2dbs( current_db, p_cur->ugo->ugo_db ) > 0 ) {
+      if ( !strstr( p_cmd->argv[0], "-z" ) && p_act_itm->ugo->ugo_z && 
+	   dbl2dbs( current_db, p_act_itm->ugo->ugo_db ) > 0 ) {
 	strcpy( current_act_line, p_cmd->argv[0] ); 
 	strcat( current_act_line, current_db );
 	new_ugo = upsugo_bldcmd( current_act_line, g_cmd_info[i_act].valid_opts );
@@ -1146,30 +1262,21 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
 	new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
       }
 
-      switch (i_cmd ) 
-      {
-      case e_setupoptional:
-	ignore_errors = 1;
-      case e_setuprequired:
-	new_cur = new_act_item( new_ugo, 0, 0, "SETUP");
-	break;	
+      if ( i_cmd & 2 ) 
+	new_act_itm = new_act_item( new_ugo, 0, 0, i_cmd, "unsetup");
+      else
+	new_act_itm = new_act_item( new_ugo, 0, 0, i_cmd, "setup");
 
-      case e_unsetupoptional:
-	ignore_errors = 1;
-      case e_unsetuprequired:
-	new_cur = new_act_item( new_ugo, 0, 0, "UNSETUP");
-	break;
-      }
-
-      if ( !new_cur ) {
-	if ( ignore_errors )
-	  upserr_clear();
-	else {
+      if ( !new_act_itm ) {
+	if ( i_cmd & 1 ) {
 	  SET_PARSE_ERROR( p_line );
+	}
+	else {
+	  upserr_clear();
 	}
       }
       else {
-	top_list = upslst_add( top_list, new_cur );
+	top_list = upslst_add( top_list, new_act_itm );
       }
     }
   }
@@ -1334,6 +1441,44 @@ t_upsact_item *find_product_str( t_upslst_item* const dep_list,
   return 0;    
 }
 
+char *get_mode( const t_upsact_item *const p_act )
+{
+  /* will buil a string representing the action items mode:
+     'nc' where n is the action level, c is a single character,
+     describing: 'o' optional action, 'r' required action and
+     't' top level action */
+
+  static char s_mode[8];
+  char *sm = "--";
+
+  if ( p_act->mode == e_invalid_cmd ) {
+    sm = "--";
+  }
+  else if ( p_act->mode & 4 ) {  /* exeaction */
+    if ( p_act->mode & 1 ) 
+      sm = "er";  /* required */
+    else
+      sm = "eo";  /* optional */
+  }
+  else if ( p_act->mode & 2 ) {  /* unsetup */
+    if ( p_act->mode & 1 ) 
+      sm = "ur";
+    else
+      sm = "uo";
+  }
+  else {                         /* setup */
+    if ( p_act->mode & 1 ) 
+      sm = "sr";
+    else
+      sm = "so";
+  }
+
+  sprintf( s_mode, "%d:%s", p_act->level, sm );
+
+  return s_mode;
+}
+
+
 t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
 				 const t_upsact_item* const act_item )
 {
@@ -1349,7 +1494,7 @@ t_upsact_item *find_product_ptr( t_upslst_item* const dep_list,
   return 0;    
 }
 
-char *actitem2inststr( const t_upsact_item *const p_cur )
+char *actitem2str( const t_upsact_item *const p_act_itm )
 {
   /* given an act_item it will create a string representing the 
      corresponding product instance. the result is the string
@@ -1359,13 +1504,19 @@ char *actitem2inststr( const t_upsact_item *const p_cur )
   t_upstyp_matched_instance *mat_inst;
   t_upslst_item *l_item;
   
-  if ( !p_cur )
+  if ( !p_act_itm )
     return 0;
 
-  l_item = upslst_first( p_cur->mat->minst_list );
+  /* instance id */
+
+  l_item = upslst_first( p_act_itm->mat->minst_list );
   mat_inst = (t_upstyp_matched_instance *)l_item->data;
-  strcpy( buf, upsget_envstr( p_cur->mat->db_info, mat_inst, p_cur->ugo ) );
-  l_item = upslst_first( p_cur->ugo->ugo_chain );
+  strcpy( buf, upsget_envstr( p_act_itm->mat->db_info, mat_inst, p_act_itm->ugo ) );
+
+
+  /* chain information */
+
+  l_item = upslst_first( p_act_itm->ugo->ugo_chain );
   if ( l_item && l_item->data ) {
     strcat( buf, " -g " );
     strcat( buf, (char *)l_item->data );
@@ -1388,7 +1539,7 @@ char *actitem2inststr( const t_upsact_item *const p_cur )
 int dbl2dbs( char * const s_db, t_upslst_item * const l_db )
 {
   /* from a list of typ_db items it will create a string of databases
-     corresponding including -z option */
+     including the -z string */
 
   t_upslst_item *l_item = 0;
   int c_db = 0;
@@ -1434,6 +1585,7 @@ void trim_delimiter( char * str )
 t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     t_upstyp_matched_product *mat_prod,
 			     const int level,
+			     const int mode,
 			     const char * const act_name )
 {		       
   t_upsact_item *act_item = 0;
@@ -1453,6 +1605,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 
   act_item = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
   act_item->level = level;
+  act_item->mode = mode;
   act_item->ugo = ugo_cmd;
   act_item->mat = mat_prod;
   act_item->act = get_act( ugo_cmd, mat_prod, act_name );
@@ -1461,7 +1614,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
   return act_item;
 }
 
-t_upstyp_action *new_default_action( t_upsact_item *const p_cur, 
+t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm, 
 				     const char * const act_name, 
 				     const int iact )
 {
@@ -1469,33 +1622,33 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_cur,
      1) reverse action, if exist (g_cmd_info.uncmd_index)
      2) a dodefault() action, if default bit set (g_cmd_info.flags) */
 
-  t_upstyp_action *new_act = 0;
+  t_upstyp_action *p_act = 0;
   int i_uncmd = 0;
 
   if ( iact == e_invalid_action )
     return 0;
 
   if ( (i_uncmd = g_cmd_info[iact].uncmd_index) != e_invalid_action ) {
-    t_upstyp_action* act_p = get_act( p_cur->ugo, p_cur->mat, g_cmd_info[i_uncmd].cmd );
+    t_upstyp_action* act_p = get_act( p_act_itm->ugo, p_act_itm->mat, g_cmd_info[i_uncmd].cmd );
 
-    new_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
-    new_act->action = (char *)malloc( strlen( act_name ) + 1 );
-    strcpy( new_act->action, act_name );
-    new_act->command_list = reverse_command_list( p_cur, act_p->command_list );
+    p_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
+    p_act->action = (char *)malloc( strlen( act_name ) + 1 );
+    strcpy( p_act->action, act_name );
+    p_act->command_list = reverse_command_list( p_act_itm, act_p->command_list );
   }      
   else if ( (g_cmd_info[iact].flags)&0x00000001 ) {
-    new_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
-    new_act->action = (char *)malloc( strlen( act_name ) + 1 );
-    strcpy( new_act->action, act_name );
-    new_act->command_list = 0;
-    new_act->command_list = upslst_add( new_act->command_list, 
+    p_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
+    p_act->action = (char *)malloc( strlen( act_name ) + 1 );
+    strcpy( p_act->action, act_name );
+    p_act->command_list = 0;
+    p_act->command_list = upslst_add( p_act->command_list, 
 					upsutl_str_create( "dodefaults()", ' ' ) );
   }
 
-  return new_act;
+  return p_act;
 }
 
-t_upslst_item *reverse_command_list( t_upsact_item *const p_cur, 
+t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm, 
 				     t_upslst_item *const cmd_list )
 {
   /* it will, given a list of action command lines, reverse each 
@@ -1516,7 +1669,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
 
     /* translate and parse command */
 
-    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
+    p_line = upsget_translation( p_act_itm->mat, p_act_itm->ugo,
 				 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
     if ( p_cmd && ((i_cmd = p_cmd->icmd) != e_invalid_cmd) ) {
