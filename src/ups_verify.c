@@ -52,6 +52,7 @@ extern t_cmd_map g_func_info[];
       const t_upstyp_matched_instance * const a_minst,  \
       const t_upsugo_command * const a_command_line
 
+static void ups_verify_chain_instance(VERIFY_INST_PARAMS);
 static void ups_verify_version_instance(VERIFY_INST_PARAMS);
 static void ups_verify_table_instance(VERIFY_INST_PARAMS);
 static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
@@ -165,6 +166,10 @@ void ups_verify_matched_instance(const t_upstyp_db * const a_db,
 			      const char * const a_product_name)
 {
   if (a_minst) {
+    if (a_minst->chain) {
+      ups_verify_version_instance(a_minst->chain, a_db, a_minst, 
+				  a_command_line);
+    }
     if (a_minst->version) {
       ups_verify_generic_instance(a_minst->version, a_db, a_minst,
 				  a_command_line, a_product_name);
@@ -186,6 +191,34 @@ void ups_verify_matched_instance(const t_upstyp_db * const a_db,
  * Definition of private functions.
  */
 
+/*-----------------------------------------------------------------------
+ * ups_verify_chain_instance
+ *
+ * Verify the information in a chain instance
+ *
+ * Input : the instance to verify, information from the dbconfig file,
+ *          a matched instance and info
+ *          from the command line and a product name
+ * Output: none
+ * Return: none
+ */
+static void ups_verify_chain_instance(VERIFY_INST_PARAMS)
+{
+  /* the following elements of an instance structure are verified here -
+	       flavor
+	       qualifiers
+	       version
+   */
+  
+  /* make sure that the value of flavor is not any */
+  if (! strcmp(a_inst->flavor, ANY_FLAVOR)) {
+    upserr_add(UPS_INVALID_ANY_FLAVOR, UPS_WARNING, "CHAIN");
+  }
+  /* make sure that the value of qualifiers is not any */
+  if (! strcmp(a_inst->qualifiers, ANY_FLAVOR)) {
+    upserr_add(UPS_INVALID_ANY_QUALS, UPS_INFORMATIONAL, "CHAIN");
+  }
+}
 /*-----------------------------------------------------------------------
  * ups_verify_version_instance
  *
@@ -214,6 +247,15 @@ static void ups_verify_version_instance(VERIFY_INST_PARAMS)
   if (a_inst->compile_dir && (!a_inst->compile_file)) {
     upserr_add(UPS_VERIFY_COMPILE_DIR, UPS_WARNING, a_inst->version);
   }
+  /* make sure that the value of flavor is not any */
+  if (! strcmp(a_inst->flavor, ANY_FLAVOR)) {
+    upserr_add(UPS_INVALID_ANY_FLAVOR, UPS_WARNING, "VERSION");
+  }
+  /* make sure that the value of qualifiers is not any */
+  if (! strcmp(a_inst->qualifiers, ANY_FLAVOR)) {
+    upserr_add(UPS_INVALID_ANY_QUALS, UPS_INFORMATIONAL, "VERSION");
+  }
+
   /* if we are checking syntax only, do not look for external files */
   if (! a_command_line->ugo_S) {
     /* Make sure the following files exist */
@@ -252,6 +294,10 @@ static void ups_verify_table_instance(VERIFY_INST_PARAMS)
   /* check that there is no version specified here */
   if (a_inst->version) {
     upserr_add(UPS_MISMATCH_VERSION, UPS_WARNING);
+  }
+  /* make sure that the value of qualifiers is not any */
+  if (! strcmp(a_inst->qualifiers, ANY_FLAVOR)) {
+    upserr_add(UPS_INVALID_ANY_QUALS, UPS_INFORMATIONAL);
   }
   /* if we are checking syntax only, do not look for external files */
   if (! a_command_line->ugo_S) {
@@ -319,4 +365,3 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
   CHECK_FOR_COMMA(a_inst->authorized_nodes);
   CHECK_FOR_COMMA(a_inst->statistics);
 }
-
