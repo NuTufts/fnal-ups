@@ -54,6 +54,8 @@
 #include "upsmem.h"
 #include "upsfil.h"
 #include "upsget.h"
+#include "upsact.h"
+#include "upsver.h"
 
 /*
  * Definition of public variables.
@@ -62,6 +64,7 @@ extern int g_LOCAL_VARS_DEF;
 extern char *g_temp_file_name;
 extern int g_keep_temp_file;
 extern int g_COMPILE_FLAG;
+extern t_cmd_info g_cmd_info[];
 
 /*
  * Declaration of private functions.
@@ -75,6 +78,13 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 #define NULL 0
 #endif
 
+#define KEEP_OR_REMOVE_FILE()   \
+   if (! g_keep_temp_file) {                  \
+     (void )remove(g_temp_file_name);         \
+   } else {                                 \
+     (void )printf("%s\n", g_temp_file_name); \
+   }
+
 static clock_t g_start_cpu, g_finish_cpu;
 static time_t g_start_w, g_finish_w;
 static char g_stat_dir[] = "statistics/";
@@ -86,6 +96,117 @@ static mode_t g_umask = 0;
  * Definition of public functions.
  */
 
+/*-----------------------------------------------------------------------
+ * upsutl_finish_up
+ *
+ * Write any remaining thing to the temp file, close it, and execute it.
+ * Flush the journal files too.
+ *
+ * Input : a file descriptor
+ * Output: none
+ * Return: none
+ */
+void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
+		      const int a_command_index, const int a_simulate_flag)
+{
+  int empty_stream;
+  t_upsugo_command command_line;
+
+  /* we will need the shell information when we call upsutl_remall from within
+     upsutl_finish_temp_file */
+  command_line.ugo_shell = a_shell;
+  
+  /* close the temp file */
+  if (a_stream) {
+    /* look and see where we are */
+    if (ftell((FILE *)a_stream) == 0L) {
+      /* we are at the beginning of the file, nothing was written to it */
+      empty_stream = 1;
+      upsver_mes(1,"Empty temp file deleted %s\n",g_temp_file_name);
+    } else {      
+      /* write any closing info to the file */
+      (void )upsutl_finish_temp_file(a_stream, &command_line, "");
+    }
+    if (fclose((FILE *)a_stream) == EOF) {
+      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
+    }
+    /* if nothing was written to the file, delete it, */
+    if (empty_stream) {
+      (void )remove(g_temp_file_name);
+      switch (g_cmd_info[a_command_index].cmd_index) {
+      case e_setup: 
+      case e_unsetup: 
+	/* output the name of the a null file so the automatic sourcing does
+	   not give an error */
+	(void )printf("/dev/null\n");
+	break;
+      }
+      /* flush the journaling cache of files so the changes made internally are
+	 actually written out to disk. only do this when command succeeds  */
+      if (UPS_ERROR == UPS_SUCCESS) {
+	upsfil_flush();
+      }
+    } else {
+      if (UPS_ERROR == UPS_SUCCESS ) {
+	switch (g_cmd_info[a_command_index].cmd_index) {
+	case e_setup: 
+	case e_unsetup: 
+	  /* see if this is only a simulation first */
+	  if (a_simulate_flag) {
+	    /* yes, output this to short circuit the automatic sourcing */
+	    printf("/dev/null\n");
+	  }
+	  /* output the name of the temp file that was created */
+	  (void )printf("%s\n", g_temp_file_name);
+	  
+	  /* if we were asked to save the file, output the name again so the
+	     user can see it. the first output was eaten by the sourcing */
+	  if (g_keep_temp_file) {
+	    (void )printf("%s\n", g_temp_file_name);
+	  }
+	  break;
+	case e_exist:
+	  /* just get rid of the file. (unless asked not to) we do not need it,
+	     we just wanted to see if we could create it */
+	  KEEP_OR_REMOVE_FILE();
+	  break;
+	default:
+	  /* check to see if we are supposed to execute the file or just
+	     report that it is there. */
+	  if (a_simulate_flag) {
+	    /* simulation only, print the file name */
+	    (void )printf("%s\n", g_temp_file_name);
+	  } else {	
+	    if (system(g_temp_file_name) <= 0) {
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
+			 strerror(errno));
+	      KEEP_OR_REMOVE_FILE();
+	    } else {
+	      /* flush the journaling cache of files so the changes made
+		 internally are actually written out to disk */
+	      upsfil_flush();
+	    }
+	  }
+	}
+      } else {  /* there was an error while doing the command */
+	switch (g_cmd_info[a_command_index].cmd_index) {
+	case e_setup:
+	case e_unsetup:
+	  /* we must remove the file because otherwise the setup/unsetup 
+	     command will try and source it and only half change the user's
+	     environment */
+	  (void )remove(g_temp_file_name);
+	  /* print the following so automatic sourcing does'nt give an error */
+	  printf("/dev/null\n");
+	  break;
+	default:
+	  /* keep the file if we were asked to */
+	  KEEP_OR_REMOVE_FILE();
+	}
+      }
+    }
+  }
+}
 /*-----------------------------------------------------------------------
  * upsutl_get_table_file_path
  *

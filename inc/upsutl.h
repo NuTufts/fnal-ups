@@ -58,6 +58,8 @@
  * Declaration of public functions.
  */
 
+void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
+		      const int a_command_index, const int a_simulate_flag);
 char *upsutl_get_table_file_path( const char * const a_prodname,
 				  const char * const a_tablefile,
 				  const char * const a_tablefiledir,
