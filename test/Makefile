@@ -39,16 +39,19 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : test_ups_error test_ups_list
+all : test_ups_error test_ups_list test_ups_memory
 
 #
 # Main programs.
 #
 
-test_ups_error : $$@.o $(LIB)/libups.a
+test_ups_error : test_ups_error.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
 test_ups_list : test_ups_list.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
+
+test_ups_memory : test_ups_memory.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
 #
@@ -82,6 +85,12 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
-test_ups_error.o: test_ups_error.c $(ERUPT_DIR)/inc/ups_error.h
-test_ups_list.o: test_ups_list.c $(ERUPT_DIR)/inc/ups_list.h
-
+test_ups_error.o:	test_ups_error.c
+test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
+test_ups_list.o:	test_ups_list.c
+test_ups_list.o:	./../inc/ups_list.h
+test_ups_memory.o:	test_ups_memory.c
+test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
+test_upsugo_utils.o:	test_upsugo_utils.c
+test_upsugo_utils.o:	./../inc/ups_types.h
+test_upsugo_utils.o:	./../inc/ups_list.h
