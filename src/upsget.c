@@ -537,12 +537,28 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { static char *string;
+  static char *prefix_string;
   if (command_line->ugo_r)
   { string=command_line->ugo_productdir;
   } else { 
     get_element(string,prod_dir);
   }
-  return string;
+  if (UPSRELATIVE(string))
+  { if (db_info_ptr->config)
+    { if (db_info_ptr->config->prod_dir_prefix)
+      { prefix_string = upsutl_str_create(db_info_ptr->config->prod_dir_prefix,' '); 
+        prefix_string = upsutl_str_crecat(prefix_string,"/"); 
+        prefix_string = upsutl_str_crecat(prefix_string,string); 
+        return prefix_string;
+      } else { 
+        return string;
+      }
+    } else { 
+      return string;
+    }
+  } else {
+    return string;
+  }
 }
 char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
