@@ -3,9 +3,9 @@
 # test the file routines
 # ============================================================================
 PRODUCTS="/thunder 	   /lightening"; export PRODUCTS
-SETUP_titanic="doomed -H IRIX+5" ; export SETUP_titanic
-SETUP_lusitania="lusitania -f CHERRY v1_0" ; export SETUP_lusitania
-SETUP_bismark="bismark -g current -q a?b?c -f RUM_RAISIN"; export SETUP_bismark
+SETUP_TITANIC="doomed -H IRIX+5" ; export SETUP_TITANIC
+SETUP_LUSITANIA="lusitania -f CHERRY v1_0" ; export SETUP_LUSITANIA
+SETUP_BISMARK="bismark -g current -q a?b?c -f RUM_RAISIN"; export SETUP_BISMARK
 
 cd $UPS_DIR/test/scripts/ugo
 $UPS_DIR/test/ups_test << EOD
