@@ -79,6 +79,7 @@ extern char *g_ups_file;
 
 
 #define upserr_place() g_ups_line=__LINE__; g_ups_file=(char *)__FILE__;
+#define upserr_vplace() if (UPS_VERBOSE) { upserr_place() }
 
 #endif /* _UPS_ERROR_H_ */
 
