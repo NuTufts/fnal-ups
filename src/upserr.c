@@ -68,7 +68,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 07 */  "%s: No statistics directory specified.\n",
 /* 08 */  "%s: Unable to write file %s.\n",
 /* 09 */  "%s: Invalid argument specified \"%s\"\n",
-/* 10 */  "%s: No instance matches were made between the chain file (%s) and the version (%s)\n",
+/* 10 */  "%s: No instance matches were made between the chain file (%s) and the version file (%s.version)\n",
 /* 11 */  "%s: The passed filename was longer than the allowed system maximum (%d)\n",
 /* 12 */  "%s: No instance matches were made between the \nversion file (%s) and the \ntable file (%s) for flavor (%s) and qualifiers (%s)\n",
 /* 13 */  "%s: File not found - %s\n",
@@ -103,7 +103,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 42 */  "%s: Duplicate instance in %s file\n   %s \n   key = \"%s\" \"%s\" \"%s\" \"%s\" hash(%d)\n",
 /* 43 */  "%s: Specified %s file %s\n   does not exist in specified or default locations\n", /* file not found not good enough */
 /* 44 */  "%s: Missing match in %s file \n   File: %s\n",
-/* 45 */  "%s: Product \'%s\' has no %s %s\n",
+/* 45 */  "%s: Product \'%s\' has no %s %s %s\n",
 /* 46 */  "%s: Found no match for product \'%s\'\n",
 /* 47 */  "%s: Unexpected key word \'%s\' in \'%s\', line %d\n",
 /* 48 */  "%s: File cache is corrupt\n",
@@ -125,7 +125,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 64 */  "%s: The \'execute\' function must have \'UPS_ENV\' or \'NO_UPS_ENV\' as a second parameter, not \'%s\'\n",
 /* 65 */  "%s: Flavor=ANY is not allowed in a %s file\n",
 /* 66 */  "%s: Qualifiers=ANY is not allowed in a %s file\n",
-/* 67 */  "%s: Ups command \'%s\' failed when processing temp file.\n"
+/* 67 */  "%s: Ups command \'%s\' failed when processing temp file.\n",
+/* 68 */  "%s: Possible UPS database (%s) corruption in product \'%s\'.\n"
 };
 
 char *g_error_ascii[] = {
@@ -197,7 +198,8 @@ char *g_error_ascii[] = {
    /* UPS_INVALID_ANY_FLAVOR  65 */ "UPS_INVALID_ANY_FLAVOR",
    /* UPS_INVALID_ANY_QUALS   66 */ "UPS_INVALID_ANY_QUALS",
    /* UPS_COMMAND_FAILED      67 */ "UPS_COMMAND_FAILED",
-   /* UPS_NERR                68 */ "UPS_NERR",
+   /* UPS_DB_CORRUPTION       68 */ "UPS_DB_CORRUPTION",
+   /* UPS_NERR                69 */ "UPS_NERR",
    0 };
 
 /*
