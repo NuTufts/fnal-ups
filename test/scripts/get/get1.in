@@ -11,7 +11,7 @@ UPSFIL: ../list/db1/lassie/lassie.table - Open file for read
 UPSFIL: ../list/db1/lassie/lassie.table - Read 5 item(s)
 UPSMAT: Found 1 instances in ../list/db1/lassie/lassie.table
 Name         = lassie	
-tilde        = /dir/filename	
+Tilde        = /dir/filename	
 Version      = v2_0	
 Flavor       = NULL	
 Qualifiers   = nodbg:opt	

@@ -8,7 +8,7 @@ ACTION = SETUP
    doDefaults()
 # do environment variable tests
    envset(OPERA,"AIDA FAUST")
-   envappend(OPERA,"MADAM_BUTTERFLY CARMEN",' ')
+   envappend(OPERA,"MADAM_BUTTERFLY CARMEN"," ")
    envprepend(OPERA,FIDELIO,' ')
    envremove(OPERA,FAUST,' ')
    envunset(OPERA)

@@ -99,7 +99,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        if (UPS_ERROR) { upserr_output(); upserr_clear(); }
        }
    upstst_match_dump(mp);
-   if (mp) upsutl_free_matched_instance_list(mp);
+/*   if (mp) upsutl_free_matched_instance_list(mp); */
    }
 
 /* dump the output to specified file and compare
