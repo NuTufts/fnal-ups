@@ -448,7 +448,8 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
 	 key = key->next) {
     keymap = upskey_get_info((char *)key->data);
     if ((((int )(((char *)key->data)[0]) == '+') ||
-         ((int )(((char *)key->data)[0]) == '@'))
+         ((int )(((char *)key->data)[0]) == '@') ||
+         ((int )(((char *)key->data)[0]) == '_'))
         || (keymap && 
 	(UPSKEY_ISIN_VERSION(keymap->flag) ||
 	 UPSKEY_ISIN_TABLE(keymap->flag) ||
