@@ -46,6 +46,73 @@ static int all_gone( const void * const ptr );
  */
 
 /*-----------------------------------------------------------------------
+ * ups_new_matched_product
+ *
+ * Will create an empty t_upstyp_matched_product structure.
+ *
+ * Input : none
+ * Output: none
+ * Return: t_upstyp_matched_product *, a pointer to a matched product structure
+ */
+t_upstyp_matched_product *ups_new_matched_product(const char * const a_db,
+				      const char * const a_prod_name,
+				      const t_upslst_item * const a_minst_list)
+{
+  t_upstyp_matched_product *mprod_ptr =
+   (t_upstyp_matched_product *)upsmem_malloc(sizeof(t_upstyp_matched_product));
+
+  mprod_ptr->db = (char *)a_db;
+  mprod_ptr->product = (char *)a_prod_name;
+  mprod_ptr->minst_list = (t_upslst_item *)a_minst_list;
+
+  return mprod_ptr;
+}
+
+/*-----------------------------------------------------------------------
+ * ups_free_matched_product
+ *
+ * Free a matched product structure.
+ *
+ * Input : pointer to matched product structure
+ * Output: none
+ * Return: NULL
+ */
+t_upstyp_matched_product *ups_free_matched_product(
+                                 t_upstyp_matched_product * const a_mproduct)
+{
+  if (! a_mproduct) {
+    /* we incremented the ref counter in the ups_new_matched_product function,
+       doing a free here will decrement it or free it */
+    if (all_gone(a_mproduct)) {
+      upsmem_free(a_mproduct->db);
+    }
+    upsmem_free((void *)a_mproduct);
+  }
+
+  return NULL;
+}
+
+/*-----------------------------------------------------------------------
+ * ups_new_matched_instance
+ *
+ * Will create an empty t_upstyp_matched_instance structure.
+ *
+ * Input : none
+ * Output: none
+ * Return: t_upstyp_matched_instance *, pointer to a matched instance structure
+ */
+t_upstyp_matched_instance *ups_new_matched_instance( void )
+{
+  t_upstyp_matched_instance *inst_ptr =
+    (t_upstyp_matched_instance *)upsmem_malloc(
+					    sizeof(t_upstyp_matched_instance));
+
+  memset( inst_ptr, 0, sizeof( t_upstyp_matched_instance ) );
+
+  return inst_ptr;
+}
+
+/*-----------------------------------------------------------------------
  * ups_new_product
  *
  * Will create an empty t_upstyp_product structure.
@@ -59,13 +126,8 @@ t_upstyp_product *ups_new_product( void )
   t_upstyp_product *prod_ptr =
     (t_upstyp_product *)upsmem_malloc( sizeof( t_upstyp_product ) );
 
-  if ( prod_ptr ) {
-    memset( prod_ptr, 0, sizeof( t_upstyp_product ) );
-  }
-  else {
-    upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_product ) );
-  }
+  memset( prod_ptr, 0, sizeof( t_upstyp_product ) );
+
   return prod_ptr;
 }
 
@@ -129,13 +191,8 @@ t_upstyp_instance *ups_new_instance( void )
   t_upstyp_instance *inst_ptr =
     (t_upstyp_instance *)upsmem_malloc( sizeof( t_upstyp_instance ) );
   
-  if ( inst_ptr ) {
-    memset( inst_ptr, 0, sizeof( t_upstyp_instance ) );
-  }
-  else {
-    upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_instance ) );
-  }
+  memset( inst_ptr, 0, sizeof( t_upstyp_instance ) );
+
   return inst_ptr;
 }
 
@@ -205,13 +262,8 @@ t_upstyp_action *ups_new_action( void )
   t_upstyp_action *act_ptr =
     (t_upstyp_action *)upsmem_malloc( sizeof( t_upstyp_action ) );
   
-  if ( act_ptr ) {
-    memset( act_ptr, 0, sizeof( t_upstyp_action ) );
-  }
-  else {
-    upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_action ) );
-  }
+  memset( act_ptr, 0, sizeof( t_upstyp_action ) );
+
   return act_ptr;
 }
 
@@ -252,13 +304,8 @@ t_upstyp_config *ups_new_config( void )
   t_upstyp_config *conf_ptr =
     (t_upstyp_config *)upsmem_malloc( sizeof( t_upstyp_config ) );
   
-  if ( conf_ptr ) {
-    memset( conf_ptr, 0, sizeof( t_upstyp_config ) );
-  }
-  else {
-    upserr_vplace();
-    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_upstyp_config ) );
-  }
+  memset( conf_ptr, 0, sizeof( t_upstyp_config ) );
+
   return conf_ptr;
 }
 
@@ -288,62 +335,6 @@ int ups_free_config( t_upstyp_config * const conf_ptr )
   }
 
   return 1;
-}
-
-/*-----------------------------------------------------------------------
- * ups_new_mp
- *
- * Return an initialized matched product structure.
- *
- * Input : db name, list of chain instances, list of version intances,
- *         list of table intsances, list of matched flavors, 
- *         list of matched qualifiers
- * Output: none
- * Return: pointer to matched product structure, NULL if error.
- */
-t_upstyp_match_product *ups_new_mp(const char * const a_db,
-				t_upslst_item * const a_chain_list,
-				t_upslst_item * const a_vers_list,
-				t_upslst_item * const a_table_list)
-{
-  t_upstyp_match_product *mproduct;
-  
-  mproduct = (t_upstyp_match_product *)upsmem_malloc(sizeof(t_upstyp_match_product));
-  if (mproduct != NULL) {
-    upsmem_inc_refctr(a_db);      /* don't free db till we no longer need it */
-    mproduct->db = (char *)a_db;
-    mproduct->chain_list = a_chain_list;
-    mproduct->version_list = a_vers_list;
-    mproduct->table_list = a_table_list;
-  } else {
-    upserr_vplace();
-    upserr_add(UPS_NO_MEMORY, UPS_FATAL, sizeof(t_upstyp_match_product));
-  }
-
-  return mproduct;
-}
-
-/*-----------------------------------------------------------------------
- * ups_free_mp
- *
- * Free a matched product structure.
- *
- * Input : pointer to matched product structure
- * Output: none
- * Return: NULL
- */
-t_upstyp_match_product *ups_free_mp(t_upstyp_match_product * const a_mproduct)
-{
-  if (! a_mproduct) {
-    /* we incremented the ref counter in the ups_new_mp function, doing a
-       free here will decrement it or free it */
-    if (all_gone(a_mproduct)) {
-      upsmem_free(a_mproduct->db);
-    }
-    upsmem_free((void *)a_mproduct);
-  }
-
-  return NULL;
 }
 
 /*
