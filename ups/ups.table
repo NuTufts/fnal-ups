@@ -13,13 +13,18 @@ Common:
    Action=configure
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
      execute(${UPS_PROD_DIR}/ups/configure, UPS_ENV)
+
    Action=current
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
+     exeActionRequired(configure)
      execute(${UPS_THIS_DB}/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/current, UPS_ENV)
+
    Action=uncurrent
      execute(${UPS_THIS_DB}/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/uncurrent, UPS_ENV)
+
    Action=unconfigure
      execute(${UPS_THIS_DB}/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/unconfigure, UPS_ENV)
+
    Action=setup
      setupenv()
      proddir()
