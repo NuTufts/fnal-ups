@@ -109,6 +109,7 @@ typedef struct ups_command
     t_upslst_item *ugo_chain;
     int     ugo_help;        /* Help flag                            */
     int     ugo_shell;       /* shell variant that the user has      */
+    int     ugo_number;      /* -0,-1,-2,etc value offset by +1      */
 } t_upsugo_command;
 
 /* 
@@ -134,6 +135,7 @@ t_upsugo_command     *upsugo_env(char * const product,
 			       char * const validopts);
 t_upsugo_command     *upsugo_bldcmd(char * const cmdstr,
 			       char * const validopts);
+int         upsugo_bldfvr(struct ups_command * const uc);
 int         upsugo_free(struct ups_command * const uc);
 void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title ,
 		           const unsigned int prnt_ptr);

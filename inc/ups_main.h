@@ -62,6 +62,7 @@ enum {
   e_get,
   e_validate,
   e_help,
+  e_flavor,
   e_unk                  /* This one must always be at the end */
 };
 

@@ -54,5 +54,6 @@
 #include "ups_unk.h"
 #include "ups_unsetup.h"
 #include "ups_undeclare.h"
+#include "ups_flavor.h"
 
 #endif /* _UPS_H_ */
