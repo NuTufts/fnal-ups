@@ -66,6 +66,7 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
   t_upstyp_matched_product *mproduct = NULL;
   t_upstyp_matched_instance *minst = NULL;
   t_upslst_item *cmd_list = NULL, *mproduct_list = NULL;
+  static t_upsugo_command prod_only_ugo;
   char *dummy = NULL;
   int need_unique = 1, top_unsetup = 0;
 
@@ -84,10 +85,14 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
       if (upsutl_is_authorized(minst, mproduct->db_info, &dummy)) {
 	/* Check if we need to unsetup this product first.  */
 	if (a_command_line->ugo_k == 0) {
-	  /* get all the unsetup commands */
-	  cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
-				    mproduct, g_cmd_info[e_unsetup].cmd,
-				    a_ups_command);
+	  /* get all the unsetup commands.  we must pass a command structure
+	     that only has a product name in it.  then upsact will look for
+	     the appropriate setup_prod environment variables to do the
+	     unsetup */
+	  memset(&prod_only_ugo, 0, sizeof(t_upsugo_command));
+	  prod_only_ugo.ugo_product = a_command_line->ugo_product;
+	  cmd_list = upsact_get_cmd(&prod_only_ugo, mproduct,
+				    g_cmd_info[e_unsetup].cmd, e_unsetup);
 	  /* the above routine will return all of the commands associated with
 	     the matched instance.  including commands associated with
 	     dependencies that may not be setup.  so we need to weed those
