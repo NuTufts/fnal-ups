@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_memory.c
+ *       upsmem.c
  * 
  * DESCRIPTION: 
  *       This file contains routines for memory management

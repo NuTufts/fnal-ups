@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_error.c
+ *       upserr.c
  * 
  * DESCRIPTION: 
  *       This module contains the error handling functions.
