@@ -53,7 +53,7 @@ upstst_argt     	argt[] =
    ------------------ */
 
 estatus_str = NULL; 
-unique = NULL; outfile = NULL; difffile = NULL; database = NULL;
+unique = 0; outfile = NULL; difffile = NULL; database = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
