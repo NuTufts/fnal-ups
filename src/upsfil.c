@@ -195,7 +195,7 @@ static int               g_ikey = e_key_unknown;     /* current key as enum */
 static int               g_ifile = e_file_unknown;   /* current file type as enum */
 
 static int               g_imargin = 0;
-static const char        *g_filename = 0;
+static char              g_filename[MAX_LINE_LEN] = "";
 static int               g_item_count = 0;
 static int               g_line_count = 0;
 
@@ -246,7 +246,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   const char *key = 0;
 
   UPS_ERROR = UPS_SUCCESS;
-  g_filename = ups_file;
+  strcpy( g_filename, ups_file );
   g_item_count = 0;
   g_line_count = 0;
 
@@ -316,7 +316,6 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   P_VERB_s_i_s( 1, "Read", g_item_count, "item(s)" );
 
   g_fh = 0;
-  g_filename = 0;
 
   return g_pd;
 }
@@ -331,10 +330,7 @@ void write_journal_file( const void *key, void ** prod, void *cl )
      upstbl_map will produce a fatal error if table is been modified
      during a traverse */
 
-  char *old_filename = (char *)g_filename;
   t_upstyp_product *p = (t_upstyp_product *)*prod;
-
-  g_filename = key;
 
   if ( p->journal == JOURNAL ) {
     if ( upslst_count( p->instance_list ) <= 0 ) {
@@ -355,7 +351,6 @@ void write_journal_file( const void *key, void ** prod, void *cl )
     }
   }
 
-  g_filename = old_filename;
 }
 
 /*-----------------------------------------------------------------------
@@ -370,11 +365,16 @@ void write_journal_file( const void *key, void ** prod, void *cl )
 int upsfil_write_journal_files( void )
 {
   
+  static char old_filename[MAX_LINE_LEN];
+  strcpy( old_filename, g_filename );
+
   if ( g_ft ) {
     P_VERB( 1, "Writing ALL journal files" );
     upstbl_map( g_ft, write_journal_file, NULL );
   }
   trim_cache();
+
+  strcpy( g_filename, old_filename );
 
   return UPS_SUCCESS;
 }
@@ -425,7 +425,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   static char buff[MAX_LINE_LEN];
 
   t_upslst_item *l_ptr = 0;
-  g_filename = ups_file;
+  strcpy( g_filename, ups_file );
   g_item_count = 0;
   g_line_count = 0;
   
@@ -567,9 +567,15 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   }    
 
   g_fh = 0;
-  g_filename = 0;
 
   return UPS_SUCCESS;
+}
+
+const char *upsfil_last_file( void )
+{
+  /* will return the name of the current or last file */
+  
+  return g_filename;
 }
 
 t_upstyp_product  *upsfil_is_in_cache( const char * const ups_file )
@@ -624,12 +630,17 @@ void upsfil_flush( void )
 
   /* write journal files to disk and clean up cache */
 
+  static char old_filename[MAX_LINE_LEN];
+  strcpy( old_filename, g_filename );
+
   if ( g_ft ) {
     P_VERB( 1, "Flushing cache" );
     upstbl_map( g_ft, flush_product, NULL );
     upstbl_free( &g_ft );
     g_ft = 0;
   }
+
+  strcpy( g_filename, old_filename );
 }
 
 void upsfil_stat( const int iopt )

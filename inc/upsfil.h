@@ -34,6 +34,7 @@
  * Declaration of public functions
  */
 
+const char        *upsfil_last_file( void );
 t_upstyp_product  *upsfil_read_file( const char * const ups_file );
 int               upsfil_write_file( t_upstyp_product * const prod_ptr,
 				     const char * const ups_file,
