@@ -16,8 +16,12 @@ else
   setenv OPERA "FIDELIO ${OPERA}"
 endif
 #
-setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' FAUST`"
-if ("x${OPERA}" == "x") unsetenv OPERA
+if (${?OPERA}) then
+  setenv upstmp "FAUST"
+  setenv OPERA "`$UPS_DIR/bin/dropit -e -p "'"$OPERA"'" -i' ' -d' ' "'"$upstmp"'"`"
+  if ("${OPERA}" == "") unsetenv OPERA
+  unsetenv upstmp
+endif
 #
 unsetenv OPERA
 #
@@ -32,12 +36,14 @@ rehash
 set path=(emacs/test $path)
 rehash
 #
-setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' emacs`"
+setenv upstmp "emacs"
+setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' "$upstmp"`"
 if ($status == 0 && "$upstmp" != "") set path=($upstmp)
 rehash
 unsetenv upstmp
 #
-setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' bin`"
+setenv upstmp "bin"
+setenv upstmp "`$UPS_DIR/bin/dropit -e -S -p "'"$path"'" -i' ' -d' ' "$upstmp"`"
 if ($status == 0 && "$upstmp" != "") set path=($upstmp)
 rehash
 unsetenv upstmp
@@ -47,9 +53,11 @@ echo "can't read file"
 exit 1
 endif
 #
-which ls
-if ($status == 1) exit 1
-#
+which ls |& grep ls > /dev/null
+if ($status == 1) then
+  echo "exeAccess failed for ls"
+  exit 1
+endif
 setenv mystatus "`ls -l`"
 #
 echo "from extra1"
