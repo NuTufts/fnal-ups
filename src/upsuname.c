@@ -95,6 +95,10 @@ ups_append_OS(char *buf)
    { 
         (void) strcpy(buf,"IRIX");
    }
+   if (!strncmp(buf,"CYGWIN",6))  		/* Slam all IRIXanything */
+   { 
+        (void) strcpy(buf,"CYGWIN32_NT");
+   }
 }
 
 void
