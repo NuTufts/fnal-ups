@@ -41,11 +41,11 @@
  */
 void ups_verify_matched_instance(const t_upstyp_db * const a_db,
 			      const t_upstyp_matched_instance * const a_minst,
-			      const t_upsugo_command * a_command_line,
+			      const t_upsugo_command * const a_command_line,
 			      const char * const a_product_name);
 void ups_verify_dbconfig(const t_upstyp_db * const a_db,
 			 const t_upstyp_matched_instance * const a_minst,
-			 const t_upsugo_command * a_command_line);
+			 const t_upsugo_command * const a_command_line);
 
 /*
  * Declaration of private globals.

@@ -60,13 +60,13 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS);
 /*
  * Definition of global variables.
  */
-#define g_DOLLARSIGN  "$"
+static char *g_dollarsign = "$";
 #define VERIFY_DIR_SPEC(dir)   \
     if (dir) {                                                              \
       char *trans_dir;                                                      \
       struct stat file_stat;                                                \
       trans_dir = upsget_translation(a_minst, a_db, a_command_line, dir);   \
-      if (strstr(trans_dir, g_DOLLARSIGN)) {                                \
+      if (strstr(trans_dir, g_dollarsign)) {                                \
         upserr_add(UPS_VERIFY_ENV_VAR, UPS_WARNING, dir);                   \
       }                                                                     \
       if (! stat(trans_dir, &file_stat)) {                                  \
@@ -83,7 +83,7 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS);
     if (file) {                                                              \
       char *trans_file;                                                      \
       trans_file = upsget_translation(a_minst, a_db, a_command_line, file);  \
-      if (strstr(trans_file, g_DOLLARSIGN)) {                                \
+      if (strstr(trans_file, g_dollarsign)) {                                \
         upserr_add(UPS_VERIFY_ENV_VAR, UPS_WARNING, file);                   \
       }                                                                      \
       if (upsutl_is_a_file(trans_file) == UPS_NO_FILE) {                     \
@@ -114,7 +114,7 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS);
  */
 void ups_verify_dbconfig(const t_upstyp_db * const a_db,
 			 const t_upstyp_matched_instance * const a_minst,
-			 const t_upsugo_command * a_command_line)
+			 const t_upsugo_command * const a_command_line)
 {
   /* verify that each keyword whose value points to a directory, points to a
      valid directory spec */
@@ -160,7 +160,7 @@ void ups_verify_dbconfig(const t_upstyp_db * const a_db,
  */
 void ups_verify_matched_instance(const t_upstyp_db * const a_db,
 			      const t_upstyp_matched_instance * const a_minst,
-			      const t_upsugo_command * a_command_line,
+			      const t_upsugo_command * const a_command_line,
 			      const char * const a_product_name)
 {
   if (a_minst) {
