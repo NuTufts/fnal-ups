@@ -351,7 +351,7 @@ char *upsget_translation_env( char * const oldstr )
         upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
       }
     }
-    /* move pass the '}' */
+    /* move past the '}' */
     ++s_loc;    
   }
   if ( buf[0] ) 
@@ -364,12 +364,10 @@ char *upsget_translation_env( char * const oldstr )
       return buf2;
     }
   } else {
-    if ((buf2=upsget_translation_tilde(oldstr))==0)
-    { return 0;
-    } else {
+    if ((buf2=upsget_translation_tilde(oldstr))!=0)
       return buf2;
-    }
   }
+  return 0;
 }
 char *upsget_translation_tilde( char * const oldstr )
 {
