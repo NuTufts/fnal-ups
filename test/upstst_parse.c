@@ -710,7 +710,7 @@ while( *input )
       tmp_argv[(*argc)++] = input;		/* take full arg as is */
       while (*input && !(isspace((int)*input))) 
          {
-         *input++;				/* copy full word */
+         input++;				/* copy full word */
 	 if (*input == '"')
             { *input = 0; getquote(); input++; }
          }
