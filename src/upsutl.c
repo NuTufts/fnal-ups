@@ -53,10 +53,14 @@
 #include "upstyp.h"
 #include "upsmem.h"
 #include "upsfil.h"
+#include "upsget.h"
 
 /*
  * Definition of public variables.
  */
+extern int g_LOCAL_VARS_DEF;
+extern int g_temp_file_name;
+extern int g_keep_temp_file;
 
 /*
  * Declaration of private functions.
@@ -88,6 +92,30 @@ static char g_buffer[FILENAME_MAX+1];
 /*
  * Definition of public functions.
  */
+
+/*-----------------------------------------------------------------------
+ * upsutl_finish_temp_file
+ *
+ * Write any closing information to the temp file.
+ *
+ * Input : an open file stream and a command line structure
+ * Output: none
+ * Return: none
+ */
+void upsutl_finish_temp_file( const FILE * const a_stream,
+			      const t_upsugo_command * const a_command_line)
+{
+  if (g_LOCAL_VARS_DEF) {
+    /* undefine the local env variables */
+    (void )upsget_remall(a_stream, a_command_line);
+  }
+
+  /* we usually tell the file to delete itself.  however the user may
+     override this */
+  if (! g_keep_temp_file) {
+    fprintf(a_stream, "/bin/rm -f %s\n", g_temp_file_name);
+  }
+}
 
 /*-----------------------------------------------------------------------
  * upsutl_find_manpages

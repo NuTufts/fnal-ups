@@ -55,6 +55,8 @@
  * Declaration of public functions.
  */
 
+void upsutl_finish_temp_file( const FILE * const a_stream,
+			      const t_upsugo_command * const a_command_line);
 char *upsutl_find_manpages( const t_upstyp_matched_instance * const a_inst,
 			    const t_upstyp_db * const a_db_info);
 int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
