@@ -230,6 +230,14 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
     if (UPS_ERROR == UPS_SUCCESS && !a_simulate_flag) {
       upsfil_flush();
     }
+
+    /* if this is the setup command we must short circuit the sourcing */
+    switch (g_cmd_info[a_command_index].cmd_index) {
+    case e_setup:
+    case e_unsetup:
+      printf("/dev/null\n");
+      break;
+    }
   }
 }
 
