@@ -101,7 +101,7 @@ static t_upskey_map g_key_map[] =
   { 32, "COMMON:",          NO,   NO,   NO, 0x00000010 },
   { 33, "END:",             NO,   NO,   NO, 0x00000010 },
 
-  { 32,0,0,0,0 },
+  { 34,0,0,0,0 },
 };
 
 /*
