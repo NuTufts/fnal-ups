@@ -1,4 +1,83 @@
-Changes made in the v4_5_1 release of ups:
+Changes made in the v4_5_2 release of ups (2000-06-02):
+
+Added a check in undeclare for the -C switch to inhibit un<chain> actions.
+Removed the "unnew" line from the test/scripts/undeclare/log/spot2.in test
+log file because undeclare -C is working properly now.
+
+Fixed the problem in which an unsetup would do none of the actions from
+an exeActionRequired/Optional reference.  That is, an unsetup with
+  Action=unsetup
+    exeActionRequired (do_something)
+  Action=do_something
+    someFunction () ...
+would incorrectly not do any someFunction entries.  This was fixed by
+copying the p_act_item->unsetup flag to the new_act_item structure
+created in the next_cmd routine when handling exeActionRequired/Optional.
+
+Fixed the problem in upsact.c which caused crashes in user-defined
+actions with setupRequired/Optional functions including setup options
+when a flavor was specified on the command line.  For example, a
+user-defined action with the line 'setupRequired (-j <prod>)' would
+crash if used with a command line like 'ups user-action -H flavor'.
+
+Added handling of the -e, -j and -v options in unsetupRequired/Optional
+functions for previously setup products.  All other options are ignored.
+This allows the use of 'unsetupRequired (-j <prod>)' in an unsetup
+action with the expected results.  Previously, all options were ignored,
+and only the options recorded in the SETUP_<prod> string were used.
+
+Fixed the parsing of the SETUP_<prod> variable during unsetups to
+properly handle quoted strings, like the value of the -O options.  This
+allows the use of a line like 'exeActionRequired (do_${UPS_OPTIONS})'
+in a setup action, without causing errors at unsetup time due to having
+an unexpected pair of quotes around the ${UPS_OPTIONS} value.
+
+Dropped the recording of a -v in SETUP_<prod> environment variables.
+Unsetups, especially automatic ones, will proceed quietly unless -v is
+used on the command line or in unsetupRequired/Optional calls.
+
+Added statistics file logging for dependent products.  The last string
+in the record will now indicate whether setupRequired or setupOptional
+was used, and what top-level product was responsible:
+  "Z" "z1" "NULL" "" "" "user" "2000-05-09 22.19.37 GMT" "setuprequired A a1"
+Also fixed the null action string in ups_main.c's statistics logging for
+user-defined actions.
+
+Removed the touch of the product directory and archive file, and added
+the -f option to the deletion of the archive file in the ups_undeclare.c
+file.  Cygwin doesn't allow touching directories, and the touches are
+superfluous with the -f, which was already on the product directory
+removal.  Cleaned up the clean-up code in the test/scripts/upstst_declare
+script to use rm -rf and no touch.
+
+Added status checking and error handling to the code in upsfil.c which
+removes the journal and chain files (for undeclares).  Added the
+UPS_REMOVE_FILE error message for these checks.
+
+Fixed the 'clean' targets in the doc and man directory Makefiles to not
+remove the files necessary for man ups and ups -? to work.  This problem
+was introduced in the v4_5 changes to the Makefiles.
+
+Turned on keyword substitution in the handling of ${ARCHIVE_FILE}, as 
+an aid in making relocatable ups distributions on CDs, et cetera.
+
+Added the @ form of the COMPILE_FILE keyword to the list -K command.
+
+Removed the a option from and added the chain options (c, d, n, o, t) 
+to the modify command.
+
+Added the product name to the verbose "Skipping (un)configure/current ..."
+message text in the ups_(un)declare modules.
+
+Added status checking after calls to upsfil_write_file in ups_(un)declare.
+
+Added some spaces after semicolons in shell commands for readability.
+
+Removed the 'ups' alias definition from the ups table file.
+
+
+
+Changes made in the v4_5_1 release of ups (2000-02-17):
 
 Changed the umask setting during temporary file creation to have group
 and world write access disabled, instead of all access enabled.  Fixed
@@ -20,7 +99,8 @@ INFO_TARGET_DIR which is unimplemented still.
 
 
 
-Changes made in the v4_5 release of ups:
+
+Changes made in the v4_5 release of ups (1999-12-17):
 
 Added tests of the -C option to inhibit executing unchain actions in the
 declare and undeclare routines.  Reworked the code some to emit -v messages
