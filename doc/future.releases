@@ -2,12 +2,15 @@
 version of the reconstructed UPS and needs to be added in a subsequent version.
 
 1. Support wildcarding flavors e.g. : -f IRIX*
+
 2. Allow versions of specified UPS required products to be a version number
         or greater, or a version range.
+
 3. Provide support for a report generator, browsing tool etc. -
 	- dependency tree tool
 	- allow releases with no parents to be located
 	- all reports have an option to be generated in html
+
 4. When doing a declare, warn user if the UPS required products do not exist.
 
 5. When creating the temp file, first define a function that undefined all
@@ -37,12 +40,9 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 10. Full support for environment variables in table files.
 
-11. Change the single function doDefaults to be a separate one for each
-	supported action (i.e. - doDefaultSetup())
+11. Fully support news and html files more generally.
 
-12. Fully support news and html files more generally.
-
-13. The ability for the upsdb-admin to configure, on a per-db level, what
+12. The ability for the upsdb-admin to configure, on a per-db level, what
 	happens under various circumstances.  For example,
 	in some later version of ups the sys/prod-admin should be able to say
 	things like "when a product is declared, copy the html files to
@@ -52,6 +52,7 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	product, prepend the MAN_SOURCE_DIR into their MAN_PATH so that they
 	can access the man pages for the test version", etc.
 
-14. Let declared files be the umask and ownership of the database in which
+13. Let declared files be the umask and ownership of the database in which
 	they currently reside.
 
+14. Implement the -x option.
