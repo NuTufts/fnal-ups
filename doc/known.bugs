@@ -1,0 +1,10 @@
+  o On AIX 3 in ksh the following happens -
+
+	$ $UPS_DIR/bin/ups setup html
+        /dev/null
+        $ setup html
+        setup[29]: /dev/null:  not found.
+        $
+
+ o
+
