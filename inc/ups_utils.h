@@ -50,6 +50,8 @@ char *upsutl_environment(const char * const a_env_var);
 t_upslst_item *upsutl_free_inst_list( t_upslst_item **a_inst_list);
 t_upslst_item *upsutl_get_files(const char * const a_dir,
 				const char * const a_pattern);
+char *upsutl_get_prod_dir(const char * const a_db,
+			  const char * const a_prod_name);
 void upsutl_start_timing(void);
 void upsutl_stop_timing(void);
 int upsutl_statistics(t_ups_instance const * const a_instance,
