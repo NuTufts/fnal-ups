@@ -260,10 +260,10 @@ char *upskey_inst_getuserval( t_upstyp_instance * const inst,
   usr_l = upslst_first( inst->user_list );
   for ( ; usr_l; usr_l = usr_l->next ) {
     sp_d = (char *)usr_l->data;
-    if ( (sp_e = strchr( sp_d, '=' )) ) {
+    if ( (sp_e = strstr( sp_d, " = " )) ) {
       if ( (len == (size_t )(sp_e - sp_d)) && 
 	   !upsutl_strincmp( sp_d, skey, len ) )
-	return ++sp_e;
+	return (sp_e + 3);
     }
     else if ( (len == strlen( sp_d )) && 
 	      !upsutl_strincmp( sp_d, skey, len ) ) {
