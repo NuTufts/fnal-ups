@@ -398,37 +398,37 @@ upsugo_prtdb    1131 src/upsugo.c     void upsugo_prtdb( t_upslst_item * const l
 upsugo_prtlst   1090 src/upsugo.c     void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title ,
 upsugo_rearg     844 src/upsugo.c     int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *argv_new[])
 upsugo_setshell  380 src/upsugo.c     void upsugo_setshell(struct ups_command * const uc)
-CMP_AUTH_NODES   341 src/upsutl.c     #define CMP_AUTH_NODES(struct) \
+CMP_AUTH_NODES   342 src/upsutl.c     #define CMP_AUTH_NODES(struct) \
 KEEP_OR_REMOVE_FILE  84 src/upsutl.c     #define KEEP_OR_REMOVE_FILE()   \
-qsort_cmp_string1317 src/upsutl.c     int qsort_cmp_string( const void * c1, const void * c2 )
-upsutl_finish_temp_file 277 src/upsutl.c     void upsutl_finish_temp_file( const FILE * const a_stream,
+qsort_cmp_string1318 src/upsutl.c     int qsort_cmp_string( const void * c1, const void * c2 )
+upsutl_finish_temp_file 278 src/upsutl.c     void upsutl_finish_temp_file( const FILE * const a_stream,
 upsutl_finish_up 111 src/upsutl.c     int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
-upsutl_free_config 432 src/upsutl.c     t_upstyp_config *upsutl_free_config( const t_upstyp_config * const a_db_config)
-upsutl_free_inst_list 507 src/upsutl.c     t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
-upsutl_free_matched_instance_list 478 src/upsutl.c     t_upslst_item *upsutl_free_matched_instance_list(
-upsutl_free_matched_product_list 448 src/upsutl.c     t_upslst_item *upsutl_free_matched_product_list(
-upsutl_get_config 399 src/upsutl.c     t_upstyp_product *upsutl_get_config( const char * const a_db)
-upsutl_get_files 537 src/upsutl.c     void upsutl_get_files(const char * const a_dir,
-upsutl_get_hostname 306 src/upsutl.c     char *upsutl_get_hostname( void )
-upsutl_get_prod_dir 607 src/upsutl.c     char *upsutl_get_prod_dir(const char * const a_db,
-upsutl_is_a_file1299 src/upsutl.c     int upsutl_is_a_file(const char * const a_filename)
-upsutl_is_authorized 350 src/upsutl.c     int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
-upsutl_start_timing 642 src/upsutl.c     void upsutl_start_timing(void)
-upsutl_statistics 689 src/upsutl.c     void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
-upsutl_stop_timing 658 src/upsutl.c     void upsutl_stop_timing(void)
-upsutl_str_create1054 src/upsutl.c     char *upsutl_str_create( char * const str, const char copt )
-upsutl_str_crecat1097 src/upsutl.c     char *upsutl_str_crecat( char * const str1, char * const str2 )
-upsutl_str_remove1193 src/upsutl.c     size_t upsutl_str_remove( char * const str, const char * const str_remove )
-upsutl_str_remove_edges1222 src/upsutl.c     size_t upsutl_str_remove_edges( char * const str, const char * const str_remove )
-upsutl_str_remove_end_quotes1262 src/upsutl.c     size_t upsutl_str_remove_end_quotes( char * str, 
-upsutl_str_sort 1127 src/upsutl.c     int upsutl_str_sort( char * const str, const char c )
-upsutl_stricmp   876 src/upsutl.c     int upsutl_stricmp( const char *s1, const char *s2 )
-upsutl_strincmp  905 src/upsutl.c     int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
-upsutl_strstr    959 src/upsutl.c     char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
-upsutl_time_date 992 src/upsutl.c     char *upsutl_time_date(const int a_flag)
-upsutl_unset_upsvars 259 src/upsutl.c     void upsutl_unset_upsvars( const FILE * const a_stream,
-upsutl_upcase    933 src/upsutl.c     char *upsutl_upcase(const char * const a_str)
-upsutl_user     1024 src/upsutl.c     char *upsutl_user(void)
+upsutl_free_config 433 src/upsutl.c     t_upstyp_config *upsutl_free_config( const t_upstyp_config * const a_db_config)
+upsutl_free_inst_list 508 src/upsutl.c     t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
+upsutl_free_matched_instance_list 479 src/upsutl.c     t_upslst_item *upsutl_free_matched_instance_list(
+upsutl_free_matched_product_list 449 src/upsutl.c     t_upslst_item *upsutl_free_matched_product_list(
+upsutl_get_config 400 src/upsutl.c     t_upstyp_product *upsutl_get_config( const char * const a_db)
+upsutl_get_files 538 src/upsutl.c     void upsutl_get_files(const char * const a_dir,
+upsutl_get_hostname 307 src/upsutl.c     char *upsutl_get_hostname( void )
+upsutl_get_prod_dir 608 src/upsutl.c     char *upsutl_get_prod_dir(const char * const a_db,
+upsutl_is_a_file1300 src/upsutl.c     int upsutl_is_a_file(const char * const a_filename)
+upsutl_is_authorized 351 src/upsutl.c     int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
+upsutl_start_timing 643 src/upsutl.c     void upsutl_start_timing(void)
+upsutl_statistics 690 src/upsutl.c     void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
+upsutl_stop_timing 659 src/upsutl.c     void upsutl_stop_timing(void)
+upsutl_str_create1055 src/upsutl.c     char *upsutl_str_create( char * const str, const char copt )
+upsutl_str_crecat1098 src/upsutl.c     char *upsutl_str_crecat( char * const str1, char * const str2 )
+upsutl_str_remove1194 src/upsutl.c     size_t upsutl_str_remove( char * const str, const char * const str_remove )
+upsutl_str_remove_edges1223 src/upsutl.c     size_t upsutl_str_remove_edges( char * const str, const char * const str_remove )
+upsutl_str_remove_end_quotes1263 src/upsutl.c     size_t upsutl_str_remove_end_quotes( char * str, 
+upsutl_str_sort 1128 src/upsutl.c     int upsutl_str_sort( char * const str, const char c )
+upsutl_stricmp   877 src/upsutl.c     int upsutl_stricmp( const char *s1, const char *s2 )
+upsutl_strincmp  906 src/upsutl.c     int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
+upsutl_strstr    960 src/upsutl.c     char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
+upsutl_time_date 993 src/upsutl.c     char *upsutl_time_date(const int a_flag)
+upsutl_unset_upsvars 260 src/upsutl.c     void upsutl_unset_upsvars( const FILE * const a_stream,
+upsutl_upcase    934 src/upsutl.c     char *upsutl_upcase(const char * const a_str)
+upsutl_user     1025 src/upsutl.c     char *upsutl_user(void)
 upsver_mes        56 src/upsver.c     void upsver_mes (const int vl, char * const format, ...)
 TOO_MUCH_FOR_UNSETUP  41 inc/upsact.h     #define TOO_MUCH_FOR_UNSETUP( ugo_cmd ) \
 UPSACT_CMD_NEEDS_DB 185 inc/upsact.h     #define UPSACT_CMD_NEEDS_DB( flag ) (flag&0x00000010 ? 1 : 0)
