@@ -20,6 +20,8 @@
  *       26-Aug-1997, LR, fixed bug in str_sort.
  *                        added option 'p' to str_create.
  *                        added function str_crecat.
+ *       11-Sep-1997, LR, added function str_stricmp, case insensitive
+ *                        string comparison. It's a copy of strcasecmp.
  *
  ***********************************************************************/
 
@@ -63,6 +65,7 @@ int upsutl_statistics(t_ups_instance const * const a_instance,
 char *upsutl_time_date(void);
 char *upsutl_user(void);
 
+int   upsutl_stricmp( const char *s1, const char *s2 );
 char  *upsutl_strstr( const char * const a_str, const char * const a_pattern);
 char  *upsutl_str_create( char * const str, const char copt );
 char  *upsutl_str_crecat( char * const str1, char * const str2 );
