@@ -396,7 +396,7 @@ t_upslst_item *upsmat_match_instance(t_upsugo_command * const a_command_line,
     MATCH_TABLE_ONLY();
   } else {
     /* we have no db and no table file or no product name, this is an error */
-    upserr_add(UPS_NO_DATABASE);
+    upserr_add(UPS_NO_DATABASE, UPS_FATAL);
   }
 
   /* make sure we have cleaned up */

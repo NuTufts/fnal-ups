@@ -76,7 +76,7 @@ void *upsmem_malloc(const int a_bytes)
     } else {
       /* we did not get the memory.  the following routine should not return
 	 here, but should exit */
-      upserr_add(UPS_NO_MEMORY, numBytes);
+      upserr_add(UPS_NO_MEMORY, UPS_FATAL, numBytes);
       upsmem_malloc_error((int)numBytes);
     }
     
