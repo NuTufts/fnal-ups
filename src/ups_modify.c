@@ -93,7 +93,7 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   make_file_list();
 
   if ( g_file_count <= 0 ) {
-    printf( "No file matched argument.\n" );
+    fprintf( stdout, "No file matched argument.\n" );
     return g_mp_list;
   }
 
