@@ -45,6 +45,7 @@
 #include "upshlp.h"
 #include "upsget.h"
 #include "ups_declare.h"
+#include "ups_get.h"
 
 /*
  * Definition of public variables.
@@ -178,7 +179,7 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_create: ups_create(command_line, e_create);
 	    break;
-	  case e_get: ups_unk(command_line, argv[1], e_get);
+	  case e_get: ups_get(command_line, temp_file, e_get);
 	    break;
 	  case e_validate: ups_unk(command_line, argv[1], e_validate);
 	    break;
