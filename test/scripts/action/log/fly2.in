@@ -22,7 +22,7 @@ OPERA="`$UPS_DIR/bin/dropit -p "$OPERA" -i' ' -d' ' FAUST`";
 #
 unset OPERA
 #
-if [ ! ${TMPDIR-} ]; then TMPDIR="/tmp";export TMPDIR;fi;
+if [ "x${TMPDIR}" = "x" ]; then TMPDIR="/tmp";export TMPDIR;fi;
 #
 PATH="/bin:/usr/local/bin:/local/etc:/mybin";export PATH
 #
