@@ -144,11 +144,7 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
       /* If all versions were specified get them all */
       if (a_command_line->ugo_version && 
 	  (! strcmp(a_command_line->ugo_version, ANY_MATCH))) {
-	prod_dir = (char *)upsmem_malloc((int )(strlen(a_db) + 
-						strlen(prod_name)) + 2);
-	prod_dir = strcpy(prod_dir, a_db);           /* add the db directory */
-	prod_dir = strcat(prod_dir, "/");            /* and a / */
-	prod_dir = strcat(prod_dir, prod_name);      /* and the product name */
+	prod_dir = get_prod_dir(a_db, prod_name);
 
 	/* get 2 lists, one with all the chains and one with all the
 	   versions (minus any suffix (e.g. - .chain and .version) */
@@ -161,6 +157,29 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
 	  if ((new_string = upsutl_str_create(a_command_line->ugo_version, ' '))) {
 	    all_versions = upslst_add(all_versions, new_string);
 	  } 
+	}
+      }
+
+      /* Check if all chains were requested */
+      for (tmp_chain_item = a_command_line->ugo_chain ; tmp_chain_item ;
+	   tmp_chain_item = tmp_chain_item->next) {
+	tmp_chain = (char *)(tmp_chain_item->data);
+	if (! strcmp(tmp_chain, ANY_MATCH)) {
+	  /* we want to replace this list item with a list of all chains. if
+	     we have already gotten this list, do this, else get the list */
+	  if (! all_chains) {
+	    /* get the list */
+	    prod_dir = get_prod_dir(a_db, prod_name);
+	    all_chains = upsutl_get_files(prod_dir, (char *)CHAIN_SUFFIX);
+	    upsmem_free(prod_dir);
+	  }
+	  bogus_chain_item = tmp_chain_item;   /* save for later delete */
+
+	  /* add chain list in place */
+	  tmp_chain_item = upslst_????(tmp_chain_item, all_chains);
+
+	  /* remove the "*" element from the chain list */
+	  bogus_chain_item = upslst_delete(bogus_chain_item, 'd')
 	}
       }
 
