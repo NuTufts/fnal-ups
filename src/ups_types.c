@@ -145,6 +145,7 @@ int ups_free_instance( t_ups_instance * const inst_ptr )
     if ( inst_ptr->prod_dir ) { upsmem_free( inst_ptr->prod_dir ); }
     if ( inst_ptr->ups_dir ) { upsmem_free( inst_ptr->ups_dir ); }
     if ( inst_ptr->table_dir ) { upsmem_free( inst_ptr->table_dir ); }
+    if ( inst_ptr->table_file ) { upsmem_free( inst_ptr->table_file ); }
     if ( inst_ptr->archive_file ) { upsmem_free( inst_ptr->archive_file ); }
     if ( inst_ptr->authorized_nodes ) { upsmem_free( inst_ptr->authorized_nodes ); }
     if ( inst_ptr->description ) { upsmem_free( inst_ptr->description ); }
