@@ -713,19 +713,38 @@ sub add_misactions {
     $value="";
     if (checkfor("${basedir}/ups/tailor")) {
        $value.="   Action=Tailor\n";
+       $value ="      doDefaults()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/tailor)\n";
     }
     if (checkfor("${basedir}/ups/configure")) {
-       $value.="   Action=configure\n";
+       $value.="   Action=Configure\n";
+       $value ="      doDefaults()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/configure)\n";
+    }
+    if (checkfor("${basedir}/ups/configure")) {
+       $value.="   Action=Unconfigure\n";
+       $value ="      doDefaults()\n";
+       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/unconfigure)\n";
     }
     if (checkfor("${basedir}/ups/start")) {
        $value.="   Action=start\n";
+       $value ="      doDefaults()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/start)\n";
     }
     if (checkfor("${basedir}/ups/stop")) {
        $value.="   Action=stop\n";
+       $value ="      doDefaults()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/stop)\n";
+    }
+    if (checkfor("${basedir}/ups/current")) {
+       $value.="   Action=Current\n";
+       $value ="      doDefaults()\n";
+       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/current)\n";
+    }
+    if (checkfor("${basedir}/ups/current")) {
+       $value.="   Action=Uncurrent\n";
+       $value ="      doDefaults()\n";
+       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/uncurrent)\n";
     }
     return $value
 }
