@@ -1,9 +1,11 @@
 FILE = table
 
+
 GROUP:
 
 FLAVOR = ANY
 QUALIFIERS = ""
+man_source_dir = ups/toman
 
 COMMON:
 
