@@ -83,6 +83,9 @@ test: FORCE
 debug: 	
 	make UPSDBG="-debug -filter" all
 
+debugonly: 	
+	make UPSDBG="-debug" all
+
 insure: 	
 	make INSURE=-i UPSDBG=-debug all
 
