@@ -770,7 +770,8 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 		        unsetenv UPS_DIR
 		        unsetenv SETUP_UPS
 		    endif
-		    unset fi
+		    unset f1
+		    unset field
 		    unset fq
 		    unset Ups_Flavor
 		endif
@@ -856,9 +857,9 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	# Because this is designed to be sourced, it is nice to unset the local
 	# shell variables
 	#======================================================================
-	unset $Setups_Commands error f1 field Full_Flavor Flavor_2 
+	unset $Setups_Commands Setups_Commands error f1 field Full_Flavor Flavor_2 
 	unset Flavor_3 Flavor_4 Flavor_5 Flavor_6 Flavor_7 Flavor_8 Flavor_9
-	unset Node NODE node BootStrap_Dir Setups_Current mach fl Flavor  Setups_Home Name_Of_Ups
+	unset Node NODE node BootStrap_Dir Setups_Current mach fl Flavor Setups_Home Name_Of_Ups
 	unsetenv Setups_Home
 XEoF
 #
@@ -1130,10 +1131,10 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	# Because this is designed to be "sourced", its nice to unset the shell
 	# variables.
 	#======================================================================
-	unset $Setups_Commands error f1 field Full_Flavor Flavor_2 
+	unset $Setups_Commands Setups_Commands error f1 field Full_Flavor Flavor_2 
 	unset Flavor_3 Flavor_4 Flavor_5 Flavor_6 Flavor_7 Flavor_8 Flavor_9
 	unset Setups_Dir_Resolve
-	unset Node BootStrap_Dir Setups_Current fl Flavor Setups_Home  Name_Of_Ups
+	unset Node BootStrap_Dir Setups_Current fl Flavor Setups_Home Name_Of_Ups
 XEoF
 #======================================================================
 # End of the creation of the setups.sh script.  
