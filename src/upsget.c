@@ -37,6 +37,7 @@
  * Definition of public variables.
  */
 
+#define g_UPSGET "UPSGET: "
 #define UPSPRE "${UPS_"
 #define TILDE "~"
 static char g_buffer[FILENAME_MAX+1];
@@ -1088,6 +1089,10 @@ char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
    if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {  \
      path_ptr = buffer;                                                  \
      found = 1;                                                          \
+     upsver_mes(1, "%sFound table file in '%s'\n", g_UPSGET, buffer);    \
+   } else {                                                              \
+     upsver_mes(1, "%sCould not find table file in '%s'\n", g_UPSGET,    \
+                buffer);                                                 \
    }
 
 #define TRANSLATE_ENV(dst_var, source_var)  \
@@ -1117,8 +1122,8 @@ char *upsget_table_file( const char * const a_prodname,
       /* first translate any environmental variables */
       TRANSLATE_ENV(tmp_tfd, a_tablefiledir);
 
-      if ((total_chars = file_chars + (int )strlen(tmp_tfd))
-	  <= FILENAME_MAX) {
+      if (((total_chars = file_chars + (int )strlen(tmp_tfd))
+	  <= FILENAME_MAX) && (!UPSRELATIVE(tmp_tfd))) {
 	sprintf(buffer, "%s/%s", tmp_tfd, a_tablefile);
 	LOOK_FOR_FILE();
       } else {
@@ -1172,7 +1177,7 @@ char *upsget_table_file( const char * const a_prodname,
 	}
       }
       /* try ups_dir/tablefile */
-      if ((found == 0) && (tmp_ud != NULL)) {
+      if ((found == 0) && (tmp_ud != NULL) && (!UPSRELATIVE(tmp_ud))) {
 	if ((total_chars = file_chars + (int )strlen(tmp_ud))
 	    <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s", tmp_ud, a_tablefile);
