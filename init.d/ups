@@ -19,6 +19,10 @@ case $state in
      kfile=`echo $initd | sed -e 's;init.d/;rc0.d/K01;'`
      ln -s $initd $sfile
      ln -s $initd $kfile
+     sfile=`echo $initd | sed -e 's;init.d/;rc5.d/S99;'`
+     kfile=`echo $initd | sed -e 's;init.d/;rc6.d/K01;'`
+     ln -s $initd $sfile
+     ln -s $initd $kfile
      ;;
   *)
      echo "usage: $0 {start|stop|config}"
