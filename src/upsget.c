@@ -693,8 +693,8 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
   } else { 
     get_element(string,prod_dir);
   }
-  if (!string)             /* The only why this could happen is if you */
-  { string=buffer;         /* declare a product with no -r */
+  if (!string)             /* The only way this could happen is if you */
+  { /* string=buffer; */   /* declare a product with no -r.  That's okay */
   } else {
     if((env_string=upsget_translation_env(string))!=0)
     { string=env_string;
@@ -707,15 +707,10 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
         prefix_string = upsutl_str_crecat(prefix_string,"/"); 
         prefix_string = upsutl_str_crecat(prefix_string,string); 
         return prefix_string;
-      } else { 
-        return ( string ? string : nostring ) ;
       }
-    } else { 
-      return ( string ? string : nostring ) ;
     }
-  } else {
-    return ( string ? string : nostring ) ;
   }
+  return ( string ? string : nostring ) ;
 }
 
 char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
