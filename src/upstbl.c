@@ -126,7 +126,7 @@ const char *upstbl_atom_new( const char * const str,
     return NULL;
 
   for ( h = 0, i = 0; i < len; i++ )
-    h = (h<<1) + scatter[(unsigned char)str[i]];
+    h = (h<<1) + scatter[(unsigned int) ((unsigned char *) str)[i]];
   h &= NELEMS(buckets)-1;
 
   for ( p = buckets[h]; p; p = p->link )
