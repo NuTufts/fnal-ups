@@ -56,34 +56,34 @@ integration_tests : ups_test
 #
 
 test_ups_list : test_ups_list.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upsact : test_upsact.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upserr : test_upserr.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upsfil : test_upsfil.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upslst : test_upslst.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upsmem : test_upsmem.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upsutl : test_upsutl.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upsmat : test_upsmat.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 test_upsugo: test_upsugo.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
 
 ups_test : ups_test.o $(UPS_TEST_OBJECTS)
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(UPS_TEST_OBJECTS) $(LDFLAGS)
+	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(UPS_TEST_OBJECTS) $(LDFLAGS)
 
 upstst_cmdline.o : upstst_cmdline.c $(LIB)/libups.a
 	$(CC) -c -o $@   $< 
