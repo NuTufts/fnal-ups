@@ -86,7 +86,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 26 */  "%s: Error when writing to temp file while processing %s action\n",
 /* 27 */  "%s: Invalid number of parameters for action %s, must be between %i and %i (found %i)\n"
 /* 28 */  "%s: Unable to determine user shell, value = %s\n",
-/* 29 this is the last */
+/* 29 */  "%s: Unsetup of %s failed, continuing with setup\n",
+/* 30 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -118,8 +119,9 @@ char *g_error_ascii[] = {
    /* UPS_NO_DESTINATION      25 */ "UPS_NO_DESTINATION",		    
    /* UPS_ACTION_WRITE_ERROR  26 */ "UPS_ACTION_WRITE_ERROR",
    /* UPS_INVALID_ACTION_PARAMS 27 */ "UPS_INVALID_ACTION_PARAMS",
-   /* UPS_NOSHELL                28 */ "UPS_NOSHELL",
-   /* UPS_NERR                29 */ "UPS_NERR",
+   /* UPS_NOSHELL             28 */ "UPS_NOSHELL",
+   /* UPS_UNSETUP_FAILED      29 */ "UPS_UNSETUP_FIALED",
+   /* UPS_NERR                30 */ "UPS_NERR",
    0 };
 
 /*

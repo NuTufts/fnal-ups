@@ -69,7 +69,8 @@
 #define UPS_ACTION_WRITE_ERROR  26
 #define UPS_INVALID_ACTION_PARAMS 27
 #define UPS_NOSHELL             28
-#define UPS_NERR                29      /*  this one must always be last */
+#define UPS_UNSETUP_FAILED      29
+#define UPS_NERR                30      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
