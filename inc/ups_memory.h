@@ -34,6 +34,23 @@
  * Types.
  */
 
+/* Union needed for correctly aligning memory */
+typedef union _Align  {
+   char             filler_1;
+   char            *filler_2;
+   short            filler_3;
+   long             filler_4;
+   int              filler_5;
+   int             *filler_6;
+   double           filler_7;
+   float            filler_8;
+   void            *filler_9;
+   int            (*filler_10)();
+} ALIGN;
+
+#define MAXALIGN (sizeof(ALIGN))
+#define ALIGN(x) ((((x)+MAXALIGN-1)/MAXALIGN)*MAXALIGN)
+
 /*
  * Declaration of public functions.
  */

@@ -60,14 +60,18 @@
 void *upsmem_malloc(const int a_bytes)
 {
   int *dataPtr = 0;
+  unsigned int numBytes;
 
   /* Return if no memory requested */
   if (a_bytes > 0) {
-    dataPtr = (int *)malloc((unsigned int)(a_bytes +
-					   (int )(sizeof(UPSMEM_INT))));
+    numBytes = ( unsigned int )(a_bytes + (int )(sizeof(UPSMEM_INT)));
+    numBytes = ALIGN(numBytes);         /* make sure alignment is proper */
+    dataPtr = (int *)malloc(numBytes);
     if (dataPtr != 0) {
       /* We got the memory, initialize it */
       *dataPtr = 0;
+
+      /* return to the user a pointer pointing past the reference counter */
       dataPtr = (int *)UPSMEM_GET_USER(dataPtr);
     }
   }
