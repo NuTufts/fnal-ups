@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* ups specific include files */
 #include "upsact.h"
@@ -57,7 +58,11 @@
 
 
 /* this one is the type of a action command handler */
-typedef int (*tpf_cmd)( const t_upsact_cmd * const cmd_ptr, const char copt );
+typedef void (*tpf_cmd)( const t_upstyp_matched_instance * const a_inst,
+			 const t_upstyp_db * const a_db_info,
+			 const t_upsugo_command * const a_command_line,
+                         const FILE * const a_stream,
+                         const t_upsact_cmd * const a_cmd);
 
 /* this one is the type for a single action command */
 typedef struct s_cmd_map {
@@ -72,16 +77,16 @@ typedef struct s_cmd_map {
  * Declaration of private functions.
  */
 
-int parse_params( const char * a_params,
+int parse_params( const char * const a_params,
 		   char *argv[] );
-t_upslst_item *next_cmd( t_upstyp_action *action,
+t_upslst_item *next_cmd( t_upstyp_action * const action,
 			 t_upslst_item *dep_list,
-			 t_upsact_item *p_cur, 
+			 t_upsact_item *const p_cur, 
 			 const char * const act_name );
-t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
-			  t_upstyp_matched_product *mat_prod,
-			  char *act_name );
-t_upsact_item *find_product( t_upslst_item *dep_list,
+t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
+			  t_upstyp_matched_product * mat_prod,
+			  const char * const act_name );
+t_upsact_item *find_product( const t_upslst_item *const dep_list,
 			     const char *const prod_name );
 
 /* functions to handle specific action commands */
@@ -90,151 +95,131 @@ void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc, const char ** const a_argv);
+		 const t_upsact_cmd * const a_cmd);
 void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc, const char ** const a_argv);
+		 const t_upsact_cmd * const a_cmd);
 void f_copyman( const t_upstyp_matched_instance * const a_inst,
 		const t_upstyp_db * const a_db_info,
 		const t_upsugo_command * const a_command_line,
 		const FILE * const a_stream,
-		const struct s_cmd_map * const a_cmd_map,
-		const int a_argc, const char ** const a_argv);
+		const t_upsact_cmd * const a_cmd);
 void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc, const char ** const a_argv);
+		  const t_upsact_cmd * const a_cmd);
 void f_copynews( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc, const char ** const a_argv);
+		 const t_upsact_cmd * const a_cmd);
 void f_envappend( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc, const char ** const a_argv);
+		  const t_upsact_cmd * const a_cmd);
 void f_envprepend( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc, const char ** const a_argv);
+		   const t_upsact_cmd * const a_cmd);
 void f_envremove( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc, const char ** const a_argv);
+		  const t_upsact_cmd * const a_cmd);
 void f_envset( const t_upstyp_matched_instance * const a_inst,
 	       const t_upstyp_db * const a_db_info,
 	       const t_upsugo_command * const a_command_line,
 	       const FILE * const a_stream,
-	       const struct s_cmd_map * const a_cmd_map,
-	       const int a_argc, const char ** const a_argv);
+	       const t_upsact_cmd * const a_cmd);
 void f_envunset( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc, const char ** const a_argv);
+		 const t_upsact_cmd * const a_cmd);
 void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc, const char ** const a_argv);
+		  const t_upsact_cmd * const a_cmd);
 void f_execute( const t_upstyp_matched_instance * const a_inst,
 		const t_upstyp_db * const a_db_info,
 		const t_upsugo_command * const a_command_line,
 		const FILE * const a_stream,
-		const struct s_cmd_map * const a_cmd_map,
-		const int a_argc, const char ** const a_argv);
+		const t_upsact_cmd * const a_cmd);
 void f_filetest( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc, const char ** const a_argv);
+		 const t_upsact_cmd * const a_cmd);
 void f_pathappend( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc, const char ** const a_argv);
+		   const t_upsact_cmd * const a_cmd);
 void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
 		    const t_upstyp_db * const a_db_info,
 		    const t_upsugo_command * const a_command_line,
 		    const FILE * const a_stream,
-		    const struct s_cmd_map * const a_cmd_map,
-		    const int a_argc, const char ** const a_argv);
+		    const t_upsact_cmd * const a_cmd);
 void f_pathremove( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc, const char ** const a_argv);
+		   const t_upsact_cmd * const a_cmd);
 void f_pathset( const t_upstyp_matched_instance * const a_inst,
 		const t_upstyp_db * const a_db_info,
 		const t_upsugo_command * const a_command_line,
 		const FILE * const a_stream,
-		const struct s_cmd_map * const a_cmd_map,
-		const int a_argc, const char ** const a_argv);
+		const t_upsact_cmd * const a_cmd);
 void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc, const char ** const a_argv);
+		       const t_upsact_cmd * const a_cmd);
 void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc, const char ** const a_argv);
+		       const t_upsact_cmd * const a_cmd);
 void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc, const char ** const a_argv);
+		       const t_upsact_cmd * const a_cmd);
 void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc, const char ** const a_argv);
+		       const t_upsact_cmd * const a_cmd);
 void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc, const char ** const a_argv);
+		   const t_upsact_cmd * const a_cmd);
 
 #define CHECK_NUM_PARAM(action) \
-    if ((a_argc < a_cmd_map->min_params) ||                     \
-        (a_argc > a_cmd_map->max_params)) {                     \
+    if ((a_cmd->argc < g_cmd_maps[a_cmd->icmd].min_params) ||   \
+        (a_cmd->argc > g_cmd_maps[a_cmd->icmd].max_params)) {   \
       upserr_vplace();                                          \
       upserr_add(UPS_INVALID_ACTION_PARAMS, UPS_FATAL,          \
-                 action, a_cmd_map->min_params,                 \
-                 a_cmd_map->max_params, a_argc);                \
+                 action, g_cmd_maps[a_cmd->icmd].min_params,    \
+                 g_cmd_maps[a_cmd->icmd].max_params,            \
+		 a_cmd->argc);                                  \
     }
 
 #define GET_DELIMITER() \
-    if (a_argc == a_cmd_map->max_params) {                        \
-      /* remember arrays start at 0, so subtract one here */      \
-      delimiter = (char *)&a_argv[a_cmd_map->max_params-1];       \
-    } else {                                                      \
-      /* use the default, nothing was entered */                  \
-      delimiter = &g_default_delimiter[0];                        \
+    if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].max_params) {            \
+      /* remember arrays start at 0, so subtract one here */            \
+      delimiter =                                                       \
+	(char *)&(a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);   \
+    } else {                                                            \
+      /* use the default, nothing was entered */                        \
+      delimiter = &g_default_delimiter[0];                              \
     }
 
 #define GET_ERR_MESSAGE(msg_ptr) \
@@ -358,7 +343,7 @@ static t_cmd_map g_cmd_maps[] = {
  * Output: none
  * Return: t_upsact_tree *,
  */
-t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
+t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product *mat_prod,
 			       const char * const act_name )
 {
@@ -532,9 +517,9 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
  * Output: none
  * Return: t_upsact_action *,
  */
-t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
-  	                         t_upstyp_matched_product *mat_prod,
-			         char *act_name )
+t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
+			  t_upstyp_matched_product * mat_prod,
+			  const char * const act_name )
 {
   t_upstyp_matched_instance *mat_inst;
   t_upsugo_command *u_cmd;
@@ -543,7 +528,7 @@ t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
     return 0;
 
   if ( !mat_prod ) {
-    t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, 1 );
+    t_upslst_item *l_mproduct = upsmat_instance( (t_upsugo_command *)ugo_cmd, 1 );
     if ( !l_mproduct || !l_mproduct->data )
       return 0;
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
@@ -563,9 +548,9 @@ t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
  * Output: none
  * Return: t_upsact_cmd *,
  */
-t_upslst_item *next_cmd( t_upstyp_action *action,
+t_upslst_item *next_cmd( t_upstyp_action * const action,
 			 t_upslst_item *dep_list,
-			 t_upsact_item *p_cur,
+			 t_upsact_item * const p_cur,
 			 const char * const act_name )
 {
   static char * valid_switch = "AacCdfghKtmMNoOPqrTuUv";
@@ -629,10 +614,10 @@ t_upslst_item *next_cmd( t_upstyp_action *action,
   return dep_list;
 }
 
-t_upsact_item *find_product( t_upslst_item* dep_list,
+t_upsact_item *find_product( const t_upslst_item* const dep_list,
 			     const char *const prod_name )
 {
-  t_upslst_item *l_ptr = upslst_first( dep_list );
+  t_upslst_item *l_ptr = upslst_first( (t_upslst_item *)dep_list );
 
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     t_upsact_item *p_item = (t_upsact_item *)l_ptr->data;
@@ -659,7 +644,7 @@ t_upsact_item *find_product( t_upslst_item* dep_list,
  * Output: pointer to array of arguments
  * Return: number of arguments found
  */
-int parse_params( const char * a_params, char **argv )
+int parse_params( const char * const a_params, char **argv )
 {
   char *ptr = (char *)a_params, *saved_ptr = NULL;
   char *new_ptr;
@@ -737,19 +722,49 @@ int parse_params( const char * a_params, char **argv )
 }
 
 
+/*-----------------------------------------------------------------------
+ * upsact_process_commands
+ *
+ * Given a list of commands, call each associated function to output the
+ * shell specific code.
+ *
+ * Input : list of upsact_cmd items
+ *         a stream to write to
+ * Output: 
+ * Return: none
+ */
+void upsact_process_commands( const t_upslst_item * const a_cmd_list,
+			      const FILE * const a_stream)
+{
+  t_upslst_item *cmd_item;
+  t_upsact_item *the_cmd;
+
+  for (cmd_item = (t_upslst_item *)a_cmd_list ; cmd_item ;
+       cmd_item = cmd_item->next ) {
+    the_cmd = (t_upsact_item *)cmd_item->data;
+    
+    /* call the function associated with the command */
+    if (g_cmd_maps[the_cmd->cmd->icmd].func) {
+      g_cmd_maps[the_cmd->cmd->icmd].func(
+		  (t_upstyp_matched_instance *)the_cmd->mat->minst_list->data,
+		  the_cmd->mat->db_info, the_cmd->ugo, a_stream, the_cmd->cmd);
+      if (UPS_ERROR != UPS_SUCCESS) {
+	break;
+      }
+    }
+  }
+}
+
+
 /* Action handling - the following routines are the ones that output shell
  *   specific code for each action supported by UPS
  */
-
-
 
 void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc,
-		 const char ** const a_argv)
+		 const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("copyHtml");
 
@@ -766,7 +781,7 @@ void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
       case e_BOURNE:
       case e_CSHELL:
 	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
-		    a_argv[0], a_db_info->config->html_path) < 0) {
+		    a_cmd->argv[0], a_db_info->config->html_path) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
@@ -777,7 +792,8 @@ void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
       }
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     }
   }
@@ -787,9 +803,7 @@ void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc,
-		 const char ** const a_argv)
+		 const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("copyInfo");
 
@@ -806,7 +820,7 @@ void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
       case e_BOURNE:
       case e_CSHELL:
 	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
-		    a_argv[0], a_db_info->config->info_path) < 0) {
+		    a_cmd->argv[0], a_db_info->config->info_path) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
@@ -817,7 +831,8 @@ void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
       }
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     }
   }
@@ -827,9 +842,7 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
 		const t_upstyp_db * const a_db_info,
 		const t_upsugo_command * const a_command_line,
 		const FILE * const a_stream,
-		const struct s_cmd_map * const a_cmd_map,
-		const int a_argc,
-		const char ** const a_argv)
+		const t_upsact_cmd * const a_cmd)
 {
   char *buf = NULL;
 
@@ -847,9 +860,9 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (a_argc == 1) {
+	if (a_cmd->argc == 1) {
 	  /* the user specified a source in the action */
-	  buf = (char *)a_argv[0];
+	  buf = (char *)a_cmd->argv[0];
 	} else {
 	  /* we have to construct a source */
 	  buf = upsutl_find_manpages(a_inst, a_db_info);
@@ -866,7 +879,8 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
       }
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     }
   }
@@ -876,9 +890,7 @@ void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc,
-		  const char ** const a_argv)
+		  const t_upsact_cmd * const a_cmd)
 {
   char *buf = NULL;
   t_upslst_item *man_item, *man_list;
@@ -897,10 +909,10 @@ void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (a_argc == 1) {
+	if (a_cmd->argc == 1) {
 	  /* the user specified a source in the action (gotten from current
 	     action */
-	  buf = (char *)a_argv[0];
+	  buf = (char *)a_cmd->argv[0];
 	} else {
 	  /* we have to construct a source */
 	  buf = upsutl_find_manpages(a_inst, a_db_info);
@@ -926,7 +938,8 @@ void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
       }
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     }
   }
@@ -936,9 +949,7 @@ void f_copynews( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc,
-		 const char ** const a_argv)
+		 const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("copyNews");
 
@@ -955,7 +966,7 @@ void f_copynews( const t_upstyp_matched_instance * const a_inst,
       case e_BOURNE:
       case e_CSHELL:
 	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
-		    a_argv[0], a_db_info->config->news_path) < 0) {
+		    a_cmd->argv[0], a_db_info->config->news_path) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
@@ -966,7 +977,8 @@ void f_copynews( const t_upstyp_matched_instance * const a_inst,
       }
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     }
   }
@@ -976,9 +988,7 @@ void f_envappend( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc,
-		  const char ** const a_argv)
+		  const t_upsact_cmd * const a_cmd)
 {
   char *delimiter;
   
@@ -993,15 +1003,16 @@ void f_envappend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=\${%s-}%s%s;export %s\n", a_argv[0],
-		  a_argv[0], delimiter, a_argv[1], a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s=\${%s-}%s%s;export %s\n",
+		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s \${%s}%s%s\n", a_argv[0],
-		  a_argv[0], delimiter, a_argv[1]) < 0) {
+      if (fprintf((FILE *)a_stream, "setenv %s \${%s}%s%s\n", a_cmd->argv[0],
+		  a_cmd->argv[0], delimiter, a_cmd->argv[1]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1012,7 +1023,8 @@ void f_envappend( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1021,9 +1033,7 @@ void f_envprepend( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc,
-		   const char ** const a_argv)
+		   const t_upsact_cmd * const a_cmd)
 {
   char *delimiter;
   
@@ -1038,15 +1048,16 @@ void f_envprepend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n", a_argv[0],
-		  a_argv[1], delimiter, a_argv[0], a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n",
+		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s %s%s\${%s}\n", a_argv[0],
-		  a_argv[1], delimiter, a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "setenv %s %s%s\${%s}\n", a_cmd->argv[0],
+		  a_cmd->argv[1], delimiter, a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1058,7 +1069,8 @@ void f_envprepend( const t_upstyp_matched_instance * const a_inst,
 
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1067,9 +1079,7 @@ void f_envremove( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc,
-		  const char ** const a_argv)
+		  const t_upsact_cmd * const a_cmd)
 {
   char *delimiter;
   
@@ -1086,7 +1096,8 @@ void f_envremove( const t_upstyp_matched_instance * const a_inst,
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
 		  "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n",
-		  a_argv[0], a_argv[1], delimiter, a_argv[0]) < 0) {
+		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1094,7 +1105,8 @@ void f_envremove( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
 		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) setenv %s $upstmp\nunsetenv upstmp\n",
-		  a_argv[0], a_argv[0], delimiter, a_argv[0]) < 0) {
+		  a_cmd->argv[0], a_cmd->argv[0], delimiter,
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1105,7 +1117,8 @@ void f_envremove( const t_upstyp_matched_instance * const a_inst,
     
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     }
   }
@@ -1115,9 +1128,7 @@ void f_envset( const t_upstyp_matched_instance * const a_inst,
 	       const t_upstyp_db * const a_db_info,
 	       const t_upsugo_command * const a_command_line,
 	       const FILE * const a_stream,
-	       const struct s_cmd_map * const a_cmd_map,
-	       const int a_argc,
-	       const char ** const a_argv)
+	       const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("envSet");
 
@@ -1127,15 +1138,15 @@ void f_envset( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_argv[0], a_argv[1],
-		  a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_cmd->argv[0],
+		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s %s\n", a_argv[0], a_argv[1])
-	  < 0) {
+      if (fprintf((FILE *)a_stream, "setenv %s %s\n", a_cmd->argv[0],
+		  a_cmd->argv[1]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1146,7 +1157,8 @@ void f_envset( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1155,9 +1167,7 @@ void f_envunset( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc,
-		 const char ** const a_argv)
+		 const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("envUnset");
 
@@ -1167,13 +1177,13 @@ void f_envunset( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "unset %s\n", a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "unset %s\n", a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "unsetenv %s\n", a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "unsetenv %s\n", a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1184,7 +1194,8 @@ void f_envunset( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1193,9 +1204,7 @@ void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
 		  const t_upstyp_db * const a_db_info,
 		  const t_upsugo_command * const a_command_line,
 		  const FILE * const a_stream,
-		  const struct s_cmd_map * const a_cmd_map,
-		  const int a_argc,
-		  const char ** const a_argv)
+		  const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("exeAccess");
 
@@ -1207,14 +1216,14 @@ void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
 		  "hash %s;\nif [ $? -eq 1 ]; then return 1; fi\n",
-		  a_argv[0]) < 0) {
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream, "whereis %s\nif ($status == 1) return 1\n",
-		  a_argv[0]) < 0) {
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1225,7 +1234,8 @@ void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1234,9 +1244,7 @@ void f_execute( const t_upstyp_matched_instance * const a_inst,
 		const t_upstyp_db * const a_db_info,
 		const t_upsugo_command * const a_command_line,
 		const FILE * const a_stream,
-		const struct s_cmd_map * const a_cmd_map,
-		const int a_argc,
-		const char ** const a_argv)
+		const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("execute");
 
@@ -1246,15 +1254,15 @@ void f_execute( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n", a_argv[1],
-		  a_argv[0], a_argv[1]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n", a_cmd->argv[1],
+		  a_cmd->argv[0], a_cmd->argv[1]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n", a_argv[1],
-		  a_argv[0])< 0) {
+      if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n", a_cmd->argv[1],
+		  a_cmd->argv[0])< 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1265,7 +1273,8 @@ void f_execute( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1274,9 +1283,7 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
 		 const FILE * const a_stream,
-		 const struct s_cmd_map * const a_cmd_map,
-		 const int a_argc,
-		 const char ** const a_argv)
+		 const t_upsact_cmd * const a_cmd)
 {
   char *err_message;
   
@@ -1287,20 +1294,20 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
     /* get the correct error message */
-    GET_ERR_MESSAGE((char *)a_argv[a_cmd_map->max_params-1]);
+    GET_ERR_MESSAGE((char *)a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
 		  "if [ ! %s %s ]; then\necho %s;\nreturn 1;\nfi;\n",
-		  a_argv[1], a_argv[0], err_message) < 0) {
+		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream, "if ( ! %s %s ) return 1\n", 
-		  a_argv[1], a_argv[0], err_message) < 0) {
+		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1311,7 +1318,8 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1320,9 +1328,7 @@ void f_pathappend( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc,
-		   const char ** const a_argv)
+		   const t_upsact_cmd * const a_cmd)
 {
   char *delimiter;
   
@@ -1337,15 +1343,16 @@ void f_pathappend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=${%s-}%s%s;export %s\n", a_argv[0],
-		  a_argv[0], delimiter, a_argv[1], a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s=${%s-}%s%s;export %s\n",
+		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n", a_argv[0],
-		  a_argv[0], a_argv[1]) < 0) {
+      if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n",
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1356,7 +1363,8 @@ void f_pathappend( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1365,9 +1373,7 @@ void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
 		    const t_upstyp_db * const a_db_info,
 		    const t_upsugo_command * const a_command_line,
 		    const FILE * const a_stream,
-		    const struct s_cmd_map * const a_cmd_map,
-		    const int a_argc,
-		    const char ** const a_argv)
+		    const t_upsact_cmd * const a_cmd)
 {
   char *delimiter;
   
@@ -1382,15 +1388,16 @@ void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n", a_argv[0],
-		  a_argv[1], delimiter, a_argv[0], a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n",
+		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n", a_argv[0],
-		  a_argv[1], a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n",
+		  a_cmd->argv[0], a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1402,7 +1409,8 @@ void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
 
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1411,9 +1419,7 @@ void f_pathremove( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc,
-		   const char ** const a_argv)
+		   const t_upsact_cmd * const a_cmd)
 {
   char *delimiter;
   
@@ -1430,7 +1436,8 @@ void f_pathremove( const t_upstyp_matched_instance * const a_inst,
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
 		  "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n",
-		  a_argv[0], a_argv[1], delimiter, a_argv[0]) < 0) {
+		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1438,7 +1445,8 @@ void f_pathremove( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
 		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) set %s=$upstmp\nrehash\nunsetenv upstmp\n",
-		  a_argv[0], a_argv[0], delimiter, a_argv[0]) < 0) {
+		  a_cmd->argv[0], a_cmd->argv[0], delimiter, 
+		  a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1449,7 +1457,8 @@ void f_pathremove( const t_upstyp_matched_instance * const a_inst,
     
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     }
   }
@@ -1459,9 +1468,7 @@ void f_pathset( const t_upstyp_matched_instance * const a_inst,
 		const t_upstyp_db * const a_db_info,
 		const t_upsugo_command * const a_command_line,
 		const FILE * const a_stream,
-		const struct s_cmd_map * const a_cmd_map,
-		const int a_argc,
-		const char ** const a_argv)
+		const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("pathSet");
 
@@ -1471,15 +1478,15 @@ void f_pathset( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_argv[0], a_argv[1],
-		  a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_cmd->argv[0],
+		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n", a_argv[0],
-		  a_argv[1]) < 0) {
+      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n", a_cmd->argv[0],
+		  a_cmd->argv[1]) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       }
@@ -1490,7 +1497,8 @@ void f_pathset( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1499,9 +1507,7 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc,
-		       const char ** const a_argv)
+		       const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("sourceRequired");
 
@@ -1514,13 +1520,13 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
     if (UPS_ERROR == UPS_SUCCESS) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
-	if (fprintf((FILE *)a_stream, ". %s;\n", a_argv[0]) < 0) {
+	if (fprintf((FILE *)a_stream, ". %s;\n", a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
 	break;
       case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "source %s\n", a_argv[0]) < 0) {
+	if (fprintf((FILE *)a_stream, "source %s\n", a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
@@ -1535,7 +1541,8 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1544,9 +1551,7 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc,
-		       const char ** const a_argv)
+		       const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("sourceOptional");
 
@@ -1556,13 +1561,14 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_cmd->argv[0])
+	  < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if [ ! -r %s -o ! -x %s]; then\n  echo File to be optionally sourced (%s) is not readable or not executable;\nelse\n",
-		    a_argv[0], a_argv[0], a_argv[0]) < 0) {
+		    a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	} else {
@@ -1570,7 +1576,7 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    if (fprintf((FILE *)a_stream, "  . %s;\n;\nfi;\nfi;\n", 
-			a_argv[0]) < 0) {
+			a_cmd->argv[0]) < 0) {
 	      upserr_vplace();
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
 			 strerror(errno));
@@ -1584,13 +1590,14 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "if (-e %s) then\n\n", a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "if (-e %s) then\n\n", a_cmd->argv[0])
+	  < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if (! -r %s || ! -x %s) then\n  echo File to be optionally sourced (%s) is not readable or not executable\nelse\n", 
-		  a_argv[0], a_argv[0], a_argv[0]) < 0) {
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	} else {
@@ -1598,7 +1605,7 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    if (fprintf((FILE *)a_stream, "  source %s\n\nendif\nendif\n", 
-			a_argv[0]) < 0) {
+			a_cmd->argv[0]) < 0) {
 	      upserr_vplace();
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
 			 strerror(errno));
@@ -1617,7 +1624,8 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1626,9 +1634,7 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc,
-		       const char ** const a_argv)
+		       const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("sourceReqCheck");
 
@@ -1642,7 +1648,7 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
       case e_BOURNE:
 	if (fprintf((FILE *)a_stream,
 		    ". %s;\nif [ $? -eq 1 ]; then return 1; fi;\n",
-		    a_argv[0]) < 0) {
+		    a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
@@ -1650,7 +1656,7 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
       case e_CSHELL:
 	if (fprintf((FILE *)a_stream,
 		    "source %s\nif ($status == 1) return 1/n",
-		    a_argv[0]) < 0) {
+		    a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	}
@@ -1666,7 +1672,8 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
 
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1675,9 +1682,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 		       const t_upstyp_db * const a_db_info,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
-		       const struct s_cmd_map * const a_cmd_map,
-		       const int a_argc,
-		       const char ** const a_argv)
+		       const t_upsact_cmd * const a_cmd)
 {
   CHECK_NUM_PARAM("sourceOptCheck");
 
@@ -1687,13 +1692,14 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_cmd->argv[0])
+	  < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if [ ! -r %s -o ! -x %s]; then\n  echo File to be optionally sourced (%s) is not readable or not executable;\nelse\n",
-		    a_argv[0], a_argv[0], a_argv[0]) < 0) {
+		    a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	} else {
@@ -1702,7 +1708,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    if (fprintf((FILE *)a_stream,
 			"  . %s;\n  if [ $? -eq 1 ]; then return 1; fi;\nfi;\nfi;\n", 
-			a_argv[0]) < 0) {
+			a_cmd->argv[0]) < 0) {
 	      upserr_vplace();
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
 			 strerror(errno));
@@ -1716,13 +1722,14 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "if (-e %s) then\n\n", a_argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "if (-e %s) then\n\n", a_cmd->argv[0])
+	  < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if (! -r %s || ! -x %s) then\n  echo File to be optionally sourced (%s) is not readable or not executable\nelse\n", 
-		  a_argv[0], a_argv[0], a_argv[0]) < 0) {
+		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  upserr_vplace();
 	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 	} else {
@@ -1731,7 +1738,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    if (fprintf((FILE *)a_stream,
 			"  source %s\n  if ($status == 1) return 1/nendif\nendif\nendif\n", 
-			a_argv[0]) < 0) {
+			a_cmd->argv[0]) < 0) {
 	      upserr_vplace();
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
 			 strerror(errno));
@@ -1750,7 +1757,8 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
@@ -1759,9 +1767,7 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const struct s_cmd_map * const a_cmd_map,
-		   const int a_argc,
-		   const char ** const a_argv)
+		   const t_upsact_cmd * const a_cmd)
 {
   int dummy = 0;
 
@@ -1771,10 +1777,8 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
   
     switch ( dummy /* place command enum here */ ) {
     case e_setup:	/* Define <PROD>_DIR and SETUP_<PROD> */
-      f_pathset(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map, a_argc,
-		a_argv);
-      f_envset(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map, a_argc,
-	       a_argv);
+      f_pathset(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+      f_envset(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_chain:	/* None */
       break;
@@ -1785,7 +1789,7 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_create:	/* None */
       break;
     case e_current:     /* Copy man pages to man page area in dbconfig file */
-      f_copyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map, a_argc, a_argv);
+      f_copyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_declare:	/* None */
       break;
@@ -1818,8 +1822,7 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_unconfigure:	/* None */
       break;
     case e_uncurrent:   /* Remove the man pages from the man page area */
-      f_uncopyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map,
-		  a_argc, a_argv);
+      f_uncopyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_undeclare:	/* None */
       break;
@@ -1843,7 +1846,8 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
     }
   }
 }
