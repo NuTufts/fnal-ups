@@ -675,7 +675,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
-  t_upstyp_db *db_ptr;
+  t_upstyp_db *db_ptr = 0;
   static char buffer[20];
   static char actbuf1[MAX_LINE_LEN];
   static char actbuf2[MAX_LINE_LEN];

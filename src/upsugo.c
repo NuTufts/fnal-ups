@@ -416,7 +416,7 @@ void upsugo_setshell(struct ups_command * const uc)
 */
 int upsugo_ifornota(struct ups_command * const uc)
 {
-   char   * addr;
+   char   * addr = 0;
    char   * PRODUCTS;                           /* PRODUCTS value */
    char   * loc;
    static char temp[1024];

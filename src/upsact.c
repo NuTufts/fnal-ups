@@ -3722,7 +3722,7 @@ static void f_writecompilescript(ACTION_PARAMS)
 {
   t_upstyp_matched_product *mproduct = NULL;
   t_upslst_item *cmd_list = NULL;
-  char *time_ptr;
+  char *time_ptr = 0;
   int moved_to_old = 0, moved_to_timedate = 0, i, save_shell, save_g_shell;
   FILE *compile_file;
   static char buf[MAX_LINE_LEN];

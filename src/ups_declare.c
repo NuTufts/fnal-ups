@@ -184,7 +184,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upstyp_matched_instance *minst = NULL;
   int not_unique = 0;
   int need_unique = 1;
-  t_upstyp_product *product;
+  t_upstyp_product *product = 0;
   char buffer[FILENAME_MAX+1];
   char *file=buffer;
   char *saddr;				/* start address for -O manipulation */
