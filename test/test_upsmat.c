@@ -79,6 +79,7 @@ int match_from_version( const char * const a_product,
 static void test_match_chain(const int argc, char *argv[]);
 int match_from_chain( const char * const a_product,
 			const char * const a_chain,
+			const char * const a_version,
 			const char * const a_upsdir,
 			const char * const a_productdir,
 			const char * const a_db,
@@ -302,7 +303,7 @@ static void test_match_chain(const int argc, char *argv[])
   flavor_list = upslst_first(flavor_list);
   quals_list = upslst_first(quals_list);
 
-  num_matches = match_from_chain("tigger", argv[2], (char *)NULL,
+  num_matches = match_from_chain("tigger", argv[2], "*", (char *)NULL,
 				 (char *)NULL, ups_db, need_unique, 
 				 flavor_list, quals_list, &cinst_list,
 				 &vinst_list, &tinst_list);
