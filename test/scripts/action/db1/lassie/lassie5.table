@@ -1,0 +1,11 @@
+FILE = TABLE
+PRODUCT = lassie
+
+FLAVOR = NULL
+QUALIFIERS = ""
+   ACTION=SETUP
+      doDefaults()
+      source(lassie_v5_0)
+   ACTION=UNSETUP
+      doDefaults()
+
