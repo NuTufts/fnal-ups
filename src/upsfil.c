@@ -335,17 +335,23 @@ void write_journal_file( const void *key, void ** prod, void *cl )
 
   if ( p->journal == JOURNAL ) {
     if ( upslst_count( p->instance_list ) <= 0 ) {
-      P_VERB_s( 1, "Removing empty journal file" );
-
-      /* remove file */
-
-      (void) remove( key );
 
       /* free product, and set prod pointer to zero for later removal 
          from cache (by a call to trim_cache) */
 
       (void) ups_free_product( *prod );
       *prod = 0;
+
+      /* remove file */
+
+      P_VERB_s( 1, "Removing empty journal file" );
+      if (remove( key ) != 0)
+      {
+        P_VERB_s( 1, "Removing journal file ERROR" );
+        upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "remove", strerror(errno));
+        upserr_vplace(); upserr_add( UPS_REMOVE_FILE, UPS_FATAL, key );
+        return;
+      }
     }
     else {
       (void) upsfil_write_file( p, key, 'd', NOJOURNAL );
@@ -357,7 +363,6 @@ void write_journal_file( const void *key, void ** prod, void *cl )
     if (&bit_bucket == 0)
     {
       bit_bucket ^= (long) cl;
-      bit_bucket ^= (long) key;
     }
   }
   
@@ -503,7 +508,13 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     if ( g_ft ) 
       (void) upstbl_remove( g_ft, key );
     /* remove file */
-    (void) remove( ups_file );
+    if (remove( ups_file ) != 0)
+    {
+      P_VERB_s( 1, "Removing file ERROR" );
+      upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "remove", strerror(errno));
+      upserr_vplace(); upserr_add( UPS_REMOVE_FILE, UPS_FATAL, ups_file );
+      return UPS_REMOVE_FILE;
+    }
     return UPS_SUCCESS;
   }
 
