@@ -291,7 +291,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
      { return 0; 
      } 
      if (mproduct_list)    /* the product does exist */ 
-     { upsver_mes(1,"%sProduct %s currently exist in database %s\n",
+     { upsver_mes(1,"%sProduct %s currently exists in database %s\n",
                   UPS_DECLARE,
                   uc->ugo_product,
                   db_info->name);
@@ -327,7 +327,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  uc->ugo_product,
                  the_chain,CHAIN_SUFFIX);
          if (upsfil_exist(buffer))        /* does chain file exist at all */
-         { upsver_mes(1,"%sChain %s currently exist\n",UPS_DECLARE,the_chain);
+         { upsver_mes(1,"%sChain %s currently exists\n",UPS_DECLARE,the_chain);
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
            uc->ugo_chain=chain_list;
@@ -370,16 +370,25 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
                  unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
                  (void) sprintf(unchain,"un%s",the_chain);
-                 cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                            mproduct, unchain,ups_command);
-                 if (UPS_ERROR == UPS_SUCCESS) 
-                 { upsact_process_commands(cmd_list, tmpfile); 
-                   upsact_cleanup(cmd_list);
-                 } else {
-                   (void) upsfil_clear_journal_files();
-                   upserr_vplace();
-                   return 0 ;
+                 if (!uc->ugo_C)
+                 {
+                   cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                              mproduct, unchain,ups_command);
+                   if (UPS_ERROR == UPS_SUCCESS) 
+                   { upsact_process_commands(cmd_list, tmpfile); 
+                     upsact_cleanup(cmd_list);
+                   } else {
+                     (void) upsfil_clear_journal_files();
+                     upserr_vplace();
+                     return 0 ;
+                   }
                  }
+                 else
+                 {
+                   upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
+                                 UPS_DECLARE, unchain, cinst->version);
+                 }
+                 free (unchain);
                }
              } else { 
                /* this is a better match */
@@ -436,7 +445,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          return 0; 
        }
        if (!mproduct_list) 
-       { upsver_mes(1,"%sVersion exists adding additional instance\n",
+       { upsver_mes(1,"%sVersion exists, adding additional instance\n",
                     UPS_DECLARE);
          product = upsget_version_file(db_info->name,
                                        uc->ugo_product,
@@ -446,7 +455,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
        } else { 
          if (!save_chain) /* declaring the same this over and not chains */
          { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
-                      "Specified product and version currently exists");
+                      "Specified product and version currently exist");
            return 0;
          }
          upsver_mes(chain,
@@ -550,45 +559,59 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         return 0;
       } 
     } 
-      if (!uc->ugo_C) /* Don't do anything but declare actions */
+    if (version) /* only do configure if version was actually defined */
+    {
+      if (!uc->ugo_C)
+      {
                       /* Do configure actions                  */
-      { if (version) /* only do configure if version was actually defined */
-        { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                     mproduct, g_cmd_info[e_configure].cmd,
-                                     ups_command);
-          if (UPS_ERROR == UPS_SUCCESS) 
-          { upsact_process_commands(cmd_list, tmpfile); 
-            upsact_cleanup(cmd_list);
-          } else {
-            (void) upsfil_clear_journal_files();
-            upserr_vplace();
-            return 0;
-          }
-/* Let them know if there is a tailor action for this product */
-          cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                     mproduct, g_cmd_info[e_tailor].cmd,
-                                     ups_command);
-          if (UPS_ERROR == UPS_SUCCESS) 
-          { if (cmd_list)
-            { upsver_mes(0,"%sA UPS tailor exists for this product\n",
-	          UPS_DECLARE);
-              upsact_cleanup(cmd_list);
-            }
-          } 
+        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                   mproduct, g_cmd_info[e_configure].cmd,
+                                   ups_command);
+        if (UPS_ERROR == UPS_SUCCESS) 
+        { upsact_process_commands(cmd_list, tmpfile); 
+          upsact_cleanup(cmd_list);
+        } else {
+          (void) upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0;
         }
-      uc->ugo_chain=save_chain;
-      if (uc->ugo_chain)
-      { uc->ugo_flavor=save_flavor;
-        uc->ugo_qualifiers=save_qualifiers;
-        uc->ugo_version=save_version;
-        for (chain_list = uc->ugo_chain ; chain_list ;
-             chain_list = chain_list->next)
-        { the_chain = (char *)(chain_list->data);
-          save_next = chain_list->next;
-          save_prev = chain_list->prev;
-          chain_list->next=0;
-          chain_list->prev=0;
-          uc->ugo_chain=chain_list;
+      }
+      else
+      {
+        upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
+                      UPS_DECLARE, g_cmd_info[e_configure].cmd, new_vinst->version);
+      }
+
+/* Let them know if there is a tailor action for this product */
+      if (!uc->ugo_C)
+      {
+        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                   mproduct, g_cmd_info[e_tailor].cmd,
+                                   ups_command);
+        if (UPS_ERROR == UPS_SUCCESS) 
+        { if (cmd_list)
+          { upsver_mes(0,"%sA UPS tailor exists for this product\n",
+	          UPS_DECLARE);
+            upsact_cleanup(cmd_list);
+          }
+        } 
+      }
+    }
+    uc->ugo_chain=save_chain;
+    if (uc->ugo_chain)
+    { uc->ugo_flavor=save_flavor;
+      uc->ugo_qualifiers=save_qualifiers;
+      uc->ugo_version=save_version;
+      for (chain_list = uc->ugo_chain ; chain_list ;
+           chain_list = chain_list->next)
+      { the_chain = (char *)(chain_list->data);
+        save_next = chain_list->next;
+        save_prev = chain_list->prev;
+        chain_list->next=0;
+        chain_list->prev=0;
+        uc->ugo_chain=chain_list;
+        if (!uc->ugo_C)
+        {
           cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                     mproduct, the_chain,
                                     ups_command);
@@ -600,6 +623,14 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
             upserr_vplace();
             return 0;
           } 
+        } 
+        else
+        {
+          upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
+                        UPS_DECLARE, the_chain, uc->ugo_version);
+        }
+        if (!uc->ugo_C)
+        {
           if (strstr(the_chain,"current"))
           { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                        mproduct, g_cmd_info[e_start].cmd,
@@ -615,14 +646,14 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  UPS_DECLARE);
               upsact_cleanup(cmd_list);
             } 
-              upscpy_man(minst,db_info,uc,tmpfile);
-              upscpy_catman(minst,db_info,uc,tmpfile);
-              upscpy_info(minst,db_info,uc,tmpfile);
+            upscpy_man(minst,db_info,uc,tmpfile);
+            upscpy_catman(minst,db_info,uc,tmpfile);
+            upscpy_info(minst,db_info,uc,tmpfile);
           }
           chain_list->next = save_next;
           chain_list->prev = save_prev;
         }
       }
-    } 
+    }
     return 0;
 }
