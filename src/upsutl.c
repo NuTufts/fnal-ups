@@ -1255,7 +1255,7 @@ size_t upsutl_str_remove_edges( char * const str, const char * const str_remove 
 }
 
 /*-----------------------------------------------------------------------
- * upsutl_str_remove_quotes
+ * upsutl_str_remove_end_quotes
  *
  * Will erase trailing and starting quotes, defined in quotes.
  * If passed 'spaces' is defined it will first remove trailing
@@ -1274,12 +1274,15 @@ size_t upsutl_str_remove_end_quotes( char * str,
   int len = 0;
   char *qu = 0;
 
+  if ( !str )
+    return len;
+
   if ( spaces )
     upsutl_str_remove_edges( str, spaces );
 
   len = (int)strlen( str );
   if ( !quotes || len < 2 )
-    return;
+    return len;
 
   for ( qu = quotes; qu && *qu; qu++ ) {
     if ( (str[0] == *qu && str[len-1] == *qu) ) {

@@ -62,7 +62,7 @@ int g_COMPILE_FLAG = 0;
 #define OPEN_PAREN '('
 #define CLOSE_PAREN ')'
 #define SLASH "/"
-#define WSPACE " \t\n\r\f\""
+#define WSPACE " \t\n\r\f"
 #define EXIT "EXIT"
 #define CONTINUE "CONTINUE"
 #define UPS_ENV "UPS_ENV"
@@ -130,9 +130,6 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 				  const int i_act );
 int lst_cmp_str( t_upslst_item * const l1, 
 		 t_upslst_item * const l2 );
-void upsutl_str_remove_end_quotes( char * str, 
-				   char * const quotes,  
-				   char * const wspaces );
 int do_exit_action( const t_upsact_cmd * const a_cmd );
 
 /* functions to handle specific action commands */
@@ -1384,7 +1381,6 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
  */
 int parse_params( const char * const a_params, char **argv )
 {
-  static char trim_chars[] = " \t\n\r\f";
   char *ptr = (char *)a_params, *saved_ptr = NULL;
   char *new_ptr;
   int count = 0;
@@ -1433,7 +1429,7 @@ int parse_params( const char * const a_params, char **argv )
         /* and add it to the list */
 	
 	*ptr = '\0';
-	upsutl_str_remove_end_quotes( saved_ptr, "\"\'", trim_chars );
+	upsutl_str_remove_end_quotes( saved_ptr, "\"\'", WSPACE );
 	argv[count++] = saved_ptr;
 	
       }
@@ -1454,7 +1450,7 @@ int parse_params( const char * const a_params, char **argv )
     
     /* Get the last one too */
 
-    upsutl_str_remove_end_quotes( saved_ptr, "\"\'", trim_chars );
+    upsutl_str_remove_end_quotes( saved_ptr, "\"\'", WSPACE );
     argv[count++] = saved_ptr;
   }
   
@@ -1827,34 +1823,6 @@ char *actitem2str( const t_upsact_item *const p_act_itm )
   return buf;
 }
 
-void upsutl_str_remove_end_quotes( char * str, 
-				   char * const quotes, 
-				   char * const wspace )
-{
-  /* to trim a string paired quotes: get rid of starting and
-     trailing quotes. the passed string are expected to be
-     trimmed of starting and trailing blanks */
-
-  int len = (int)strlen( str );
-  char *qu = 0;
-
-  if ( wspace )
-    upsutl_str_remove_edges( str, wspace );
-
-  if ( !quotes || len < 2 )
-    return;
-
-  for ( qu = quotes; qu && *qu; qu++ ) {
-    if ( (str[0] == *qu && str[len-1] == *qu) ) {
-      char *sp1 = &str[1], *sp2 = &str[len-1];
-      for ( ; sp1 < sp2; str++, sp1++ ) *str = *sp1;
-      *str = 0;
-      break;
-    }
-  }
-  
-}
-
 t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
 {
   /* from a passed upsact_item it will make a copy */
@@ -1898,6 +1866,8 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
   if ( !mat_prod ) {
     t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
     if ( !l_mproduct || !l_mproduct->data ) {
+      upserr_vplace();
+      upserr_add( UPS_NO_MATCH, UPS_FATAL, ugo_cmd->ugo_product );
       return 0;
     }
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
