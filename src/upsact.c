@@ -478,9 +478,9 @@ t_cmd_map g_func_info[] = {
  * Return: t_upsact_tree *,
  */
 int upsact_print( t_upsugo_command * const ugo_cmd,
-		  t_upstyp_matched_product *mat_prod_in,
+		  t_upstyp_matched_product * const mat_prod_in,
 		  const char * const act_name,
-		  int ups_cmd,
+		  const int ups_cmd,
 		  char * sopt )
 {
   static char s_sopt[] = "";
@@ -616,7 +616,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 t_upslst_item *upsact_get_dep( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product * const mat_prod,
 			       const char * const act_name,
-			       int ups_cmd )
+			       const int ups_cmd )
 {
   t_upsact_item *act_itm;
   t_upslst_item *top_list = 0;
@@ -672,7 +672,7 @@ t_upslst_item *upsact_get_dep( t_upsugo_command * const ugo_cmd,
 t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product * const mat_prod,
 			       const char * const act_name,
-			       int ups_cmd )
+			       const int ups_cmd )
 {
   t_upsact_item *act_itm;
   t_upslst_item *top_list = 0;
@@ -729,7 +729,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 
   /* get rid of leading spaces */
   
-  while ( act_s && *act_s && isspace( *(act_s) ) ){ ++act_s; }
+  while ( act_s && *act_s && isspace( (unsigned long )(*(act_s)) ) ){ ++act_s; }
 
   if ( !act_s || !*act_s )
     return 0;
@@ -748,14 +748,14 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
        get rid of trailing spaces in name of action command */
 
     act_e = act_p - 1;
-    while ( act_e && *act_e && isspace( *(act_e) ) ){ --act_e; }    
+    while ( act_e && *act_e && isspace( (unsigned long )(*(act_e)) ) ){ --act_e; }    
     len = act_e - act_s + 1;
 
     /* look for action command in the supported action array */
     
     for ( i = 0; g_func_info[i].cmd; ++i ) {
 
-	if ( len != strlen(g_func_info[i].cmd) )
+	if ( len != (int )strlen(g_func_info[i].cmd) )
 	continue;
 
       if ( !upsutl_strincmp( act_s, g_func_info[i].cmd, (size_t)len ) ) {
@@ -909,7 +909,7 @@ t_upsact_cmd *upsact_new_upsact_cmd( const char * const act_str )
 {
   t_upsact_cmd *cmd_ptr = 0;
 
-  cmd_ptr = (t_upsact_cmd *)upsmem_malloc( sizeof( t_upsact_cmd ) + strlen( act_str ) + 1 );
+  cmd_ptr = (t_upsact_cmd *)upsmem_malloc( (int )(sizeof( t_upsact_cmd ) + strlen( act_str ) + 1) );
   cmd_ptr->pbuf = (char *)(cmd_ptr + 1);
   
   strcpy( cmd_ptr->pbuf, act_str );
@@ -2337,10 +2337,10 @@ static void f_copyinfo( ACTION_PARAMS)
     }
       
 #define PROCESS_DIR(dir_name, dir_size, type, keyword)   \
-    if (! strncmp(dir_line->d_name, dir_name, dir_size)) {               \
+    if (! strncmp(dir_line->d_name, dir_name, (unsigned int )dir_size)) { \
       DIR *file_dir = NULL;                                              \
       struct dirent *file_dir_line = NULL;                               \
-      if ((dir_size == strlen(dir_line->d_name))) {                      \
+      if ((dir_size == (int )strlen(dir_line->d_name))) {                \
 	/* the directory is = to dir_name */                             \
 	if ((file_dir = opendir(filename))) {                            \
 	  while ((file_dir_line = readdir(file_dir))) {                  \
@@ -2406,7 +2406,7 @@ static void f_copyman( ACTION_PARAMS)
 		  /* this is a file, if it is a man file, copy it to the man
 		     area */
 		  if ((file = fopen(filename, "r"))) {
-		    while((isspace(c=fgetc(file)))) ;   /* skip empty spaces */
+		    while((isspace((unsigned long )(c=(unsigned char )fgetc(file))))) ;   /* skip empty spaces */
 		    if (c == FIRST_MAN_CHAR) {
 		      COPY_FILES(filename, a_db_info->config->man_target_dir, "man");
 		    }
@@ -2479,7 +2479,7 @@ static void f_copycatman( ACTION_PARAMS)
 		  /* this is a file, if it is a catman file, copy it to the man
 		     area */
 		  if ((file = fopen(filename, "r"))) {
-		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    while(isspace((unsigned long )(c=(unsigned char )fgetc(file)))) ;   /* skip empty spaces */
 		    if (c != FIRST_MAN_CHAR) {
 		      COPY_FILES(filename,
 				 a_db_info->config->catman_target_dir, "cat");
@@ -2520,7 +2520,7 @@ static void f_copycatman( ACTION_PARAMS)
     }
 
 #define UNPROCESS_DIR(dir_name, dir_size, type, keyword)   \
-    if (! strncmp(dir_line->d_name, dir_name, dir_size)) {             \
+    if (! strncmp(dir_line->d_name, dir_name, (unsigned int )dir_size)) { \
       DIR *file_dir = NULL;                                            \
       struct dirent *file_dir_line = NULL;                             \
       if ((file_dir = opendir(filename))) {                            \
@@ -2576,7 +2576,7 @@ static void f_uncopyman( ACTION_PARAMS)
 		  /* this is a file, if it is a man file, remove it from the
 		     man area */
 		  if ((file = fopen(filename, "r"))) {
-		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    while(isspace((unsigned long )(c=(unsigned char )fgetc(file)))) ;   /* skip empty spaces */
 		    if (c == FIRST_MAN_CHAR) {
 		      REMOVE_FILES(dir_line->d_name, 
 				   a_db_info->config->man_target_dir, "man");
@@ -2648,7 +2648,7 @@ static void f_uncopycatman( ACTION_PARAMS)
 		  /* this is a file, if it is a man file, remove it from the
 		     man area */
 		  if ((file = fopen(filename, "r"))) {
-		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
+		    while(isspace((unsigned long )(c=(unsigned char )fgetc(file)))) ;   /* skip empty spaces */
 		    if (c != FIRST_MAN_CHAR) {
 		      REMOVE_FILES(dir_line->d_name, 
 				   a_db_info->config->catman_target_dir,
