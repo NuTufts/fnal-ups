@@ -406,7 +406,11 @@ sub WriteTableFile {
           ( $sos, $qual ) = &split_os ( $os );
           print TableFile "Flavor=$sos\n";
           if ( $reqType eq "BUILD" ) {
-             $qual="build $qual";
+             if ( $qual ) { 
+                $qual="build:$qual";
+             } else { 
+                $qual="build";
+             }
           }
           print TableFile "Qualifiers=\"$qual\"\n";
           print TableFile "\n";
@@ -500,7 +504,7 @@ sub AddChainRec {
 # Add another chain because build attributes will now be a qualifier...
     if ( &build_reqs ) { 
     print ChainFile "Flavor=$sos\n";
-    print ChainFile "Qualifiers=\"build $qual\"\n";
+    print ChainFile "Qualifiers=\"build:$qual\"\n";
     print ChainFile "Version=$ver\n";
     print ChainFile "Declarer=$who\n";
     print ChainFile "Declared=$when\n";
@@ -591,7 +595,7 @@ sub WriteVersionRecs {
     print VersionFile "# Starting group definition\n";
     print VersionFile "Group:\n";
     print VersionFile "   FLAVOR=$sos\n";
-    print VersionFile "   QUALIFIERS=\"build $qual\"\n";
+    print VersionFile "   QUALIFIERS=\"build:$qual\"\n";
     print VersionFile "   DECLARED=$instanceHash{$flvr}{$version}[$#WHEN]\n";
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
@@ -709,7 +713,11 @@ sub split_os {
       my $eek;
       $rqual="";
       @eek = split ( /\+/, $os );
-      for ($i=2; $i < $#eek+1 ;++$i) { $rqual .= "$eek[$i] "; }
+      for ($i=2; $i < $#eek+1 ;++$i) { $rqual .= "$eek[$i]:"; }
+# take off last :
+      if ($rqual) { 
+         chop($rqual);
+      }
       if ( $eek[1] ) { 
          $ros = "$eek[0]+$eek[1]";
       } else {

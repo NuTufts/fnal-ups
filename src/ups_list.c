@@ -140,40 +140,63 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upstyp_matched_instance *minst_ptr = NULL;
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
-       tmp_mprod_list = tmp_mprod_list->next) {
-    mproduct = (t_upstyp_matched_product *)tmp_mprod_list->data;
+       tmp_mprod_list = tmp_mprod_list->next) 
+  { mproduct = (t_upstyp_matched_product *)tmp_mprod_list->data;
     for (tmp_minst_list = mproduct->minst_list ; tmp_minst_list ;
-	 tmp_minst_list = tmp_minst_list->next) {
-      minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
-      if (minst_ptr->chain) {
-	printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ",
-	       minst_ptr->chain->product,
-	       minst_ptr->chain->chain, minst_ptr->chain->version);
-	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->chain->flavor,
-	       minst_ptr->chain->qualifiers);
+	 tmp_minst_list = tmp_minst_list->next) 
+    { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
+/* A as in a single product loop */
+      if (!a_command_line->ugo_K) /* keywords is a whole different animal */ 
+      { printf("DATABASE: %s\n",mproduct->db);
+        printf("PRODUCT: %s\n",mproduct->product);
+        if (minst_ptr->chain) 
+        { printf ("VERSION: %s\n", minst_ptr->chain->version);
+          printf("FLAVOR: %s\n", minst_ptr->chain->flavor);
+          printf("QUALIFIERS: %s\n", minst_ptr->chain->qualifiers);
+          if (minst_ptr->xtra_chains) 
+          { printf("CHAINS: %s", minst_ptr->chain->chain);
+            for (clist = minst_ptr->xtra_chains ; clist ; clist = clist->next)
+            { cinst_ptr = (t_upstyp_instance *)clist->data;
+              printf(",%s", cinst_ptr->chain );
+            }
+          } else { 
+            printf("CHAIN: %s", minst_ptr->chain->chain);
+          } printf("\n");
+          if (a_command_line->ugo_l) 
+          {  printf("HOME: %s\n", minst_ptr->chain->prod_dir);
+             printf("UPS: %s\n", minst_ptr->chain->ups_dir);
+             printf("TABLE_DIR: %s\n", minst_ptr->chain->table_dir);
+             printf("TABLE_FILE: %s\n", minst_ptr->chain->table_file);
+          }
+        } else { 
+          if (minst_ptr->version )
+          {  printf("VERSION: %s\n", minst_ptr->version->version);
+             printf("FLAVOR: %s\n", minst_ptr->version->flavor);
+	     printf("QUALIFIERS: %s\n", minst_ptr->version->qualifiers);
+             printf("CHAIN:\n");
+             if (a_command_line->ugo_l) 
+             {  printf("HOME: %s\n", minst_ptr->version->prod_dir);
+                printf("UPS: %s\n", minst_ptr->version->ups_dir);
+                printf("TABLE_DIR: %s\n", minst_ptr->version->table_dir);
+                printf("TABLE_FILE: %s\n", minst_ptr->version->table_file);
+             }
+          } else { 
+            printf("No chain or version WHAT???\n");
+          }
+        }
+        printf("\n\n");
+      } else { 
+        printf(" NO K support yet\n");
       }
-      if (minst_ptr->xtra_chains) {
-	for (clist = minst_ptr->xtra_chains ; clist ; clist = clist->next) {
-	  cinst_ptr = (t_upstyp_instance *)clist->data;
-	  printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ",
-		 cinst_ptr->product, cinst_ptr->chain, cinst_ptr->version);
-	  printf("FLAVOR=%s, QUALIFIERS=%s\n", cinst_ptr->flavor,
-		 cinst_ptr->qualifiers);
-	}
-      }
-      if (minst_ptr->version ) {
-	printf("V:PRODUCT=%s, VERSION=%s, ", minst_ptr->version->product,
-	       minst_ptr->version->version);
-	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->version->flavor,
-	       minst_ptr->version->qualifiers);
-      }
+    }
+/* end product loop */
+  }
+}
+/*
       if (minst_ptr->table) {
 	printf("T:PRODUCT=%s, ", minst_ptr->table->product);
 	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->table->flavor,
 	       minst_ptr->table->qualifiers);
       }
-    }
-    printf("\n\n");
-  }
-}
+*/
 

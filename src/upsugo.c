@@ -458,7 +458,7 @@ int upsugo_ifornota(struct ups_command * const uc)
        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      }
    } else {                         /* not -a but give defaults */
-     if (!uc->ugo_chain )
+     if (!uc->ugo_chain && !uc->ugo_version)
      { addr=upsutl_str_create("current",' ');
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
      }
