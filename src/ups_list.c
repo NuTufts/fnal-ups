@@ -793,7 +793,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
           if (UPSRELATIVE(instance->version->ups_dir))
           { printf("%s/", upsget_prod_dir(product->db_info,instance,command));
           } 
-          printf("%s\" ", instance->version->ups_dir);
+          printf("%s\" ", instance->version->ups_dir ? instance->version->ups_dir : "" );
         } 
       }
       if (!valid) 
