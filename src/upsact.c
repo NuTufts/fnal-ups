@@ -109,6 +109,12 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
 		const FILE * const a_stream,
 		const struct s_cmd_map * const a_cmd_map,
 		const int a_argc, const char ** const a_argv);
+void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc, const char ** const a_argv);
 void f_copynews( const t_upstyp_matched_instance * const a_inst,
 		 const t_upstyp_db * const a_db_info,
 		 const t_upsugo_command * const a_command_line,
@@ -294,6 +300,7 @@ enum {
   e_copyhtml,
   e_copyinfo,
   e_copyman,
+  e_uncopyman,
   e_copynews,
   e_dodefaults,
   e_nodefaults,
@@ -331,7 +338,8 @@ static t_cmd_map g_cmd_maps[] = {
   { "filetest", e_filetest, f_filetest, 2, 3 },
   { "copyhtml", e_copyhtml, f_copyhtml, 1, 1 },
   { "copyinfo", e_copyinfo, f_copyinfo, 1, 1 },
-  { "copyman", e_copyman, f_copyman, 1, 1 },
+  { "copyman", e_copyman, f_copyman, 0, 1 },
+  { "uncopyman", e_uncopyman, f_uncopyman, 0, 1 },
   { "copynews", e_copynews, f_copynews, 1, 1 },
   { "dodefaults", e_dodefaults, f_dodefaults, 0, 0 },
   { "nodefaults", e_nodefaults, NULL, 0, 0 },
@@ -670,6 +678,8 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
 		const int a_argc,
 		const char ** const a_argv)
 {
+  char *buf = NULL;
+
   CHECK_NUM_PARAM("copyMan");
 
   /* only proceed if we have a valid number of parameters and a stream to write
@@ -684,10 +694,77 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
+	if (a_argc == 1) {
+	  /* the user specified a source in the action */
+	  buf = (char *)a_argv[0];
+	} else {
+	  /* we have to construct a source */
+	  buf = upsutl_find_manpages(a_inst, a_db_info);
+	}
 	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
-		    a_argv[0], a_db_info->config->man_path) < 0) {
+		    buf, a_db_info->config->man_path) < 0) {
 	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",strerror(errno));
+	}
+	break;
+      default:
+	upserr_vplace();
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      }
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_vplace();
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      }
+    }
+  }
+}
+
+void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc,
+		  const char ** const a_argv)
+{
+  char *buf = NULL;
+  t_upslst_item *man_item, *man_list;
+
+  CHECK_NUM_PARAM("uncopyMan");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+
+    /* Make sure we have somewhere to copy the files to. */
+    if (!a_db_info->config->man_path) {
+      upserr_vplace();
+      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "man");
+    } else {  
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+      case e_CSHELL:
+	if (a_argc == 1) {
+	  /* the user specified a source in the action (gotten from current
+	     action */
+	  buf = (char *)a_argv[0];
+	} else {
+	  /* we have to construct a source */
+	  buf = upsutl_find_manpages(a_inst, a_db_info);
+	}
+
+	/* Get a list of all the files in the specified directory */
+	man_list = upsutl_get_files(buf, ANY_MATCH);
+
+	for (man_item = man_list ; man_item ; man_item = man_item->next) {
+	  if (fprintf((FILE *)a_stream, "rm %s/%s\n", 
+		      a_db_info->config->man_path, (char *)man_item->data)
+	      < 0) {
+	    upserr_vplace();
+	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
+		       strerror(errno));
+	    break;
+	  }
 	}
 	break;
       default:
@@ -1539,144 +1616,76 @@ void f_doDefaults( const t_upstyp_matched_instance * const a_inst,
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
-    switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      switch ( dummy /* place command enum here */ ) {
-      case e_setup:
-	/* Define <PROD>_DIR and SETUP_<PROD> */
-	break;
-      case e_chain:	/* None */
-	break;
-      case e_configure:	/* None */
-	break;
-      case e_copy:
-	break;
-      case e_create:
-	break;
-      case e_current:
-	break;
-      case e_declare:
-	break;
-      case e_depend:
-	break;
-      case e_development:	/* None */
-	break;
-      case e_exist:
-	break;
-      case e_get:
-	break;
-      case e_list:
-	break;
-      case e_modify:
-	break;
-      case e_new:	/* None */
-	break;
-      case e_old:	/* None */
-	break;
-      case e_start:	/* None */
-	break;
-      case e_stop:	/* None */
-	break;
-      case e_tailor:	/* None */
-	break;
-      case e_test:	/* None */
-	break;
-      case e_unchain:	/* None */
-	break;
-      case e_unconfigure:	/* None */
-	break;
-      case e_uncurrent:
-	break;
-      case e_undeclare:
-	break;
-      case e_undevelopment:	/* None */
-	break;
-      case e_unk:	/* None */
-	break;
-      case e_unnew:	/* None */
-	break;
-      case e_unold:	/* None */
-	break;
-      case e_unsetup:
-	break;
-      case e_untest:	/* None */
-	break;
-      case e_validate:
-	break;
-      default:
-	break;
-      }
+    switch ( dummy /* place command enum here */ ) {
+    case e_setup:	/* Define <PROD>_DIR and SETUP_<PROD> */
+      f_pathset(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map, a_argc,
+		a_argv);
+      f_envset(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map, a_argc,
+	       a_argv);
       break;
-    case e_CSHELL:
-      switch ( dummy /* place command enum here */ ) {
-      case e_setup:
-	/* Define <PROD>_DIR and SETUP_<PROD> */
-	break;
-      case e_chain:	/* None */
-	break;
-      case e_configure:	/* None */
-	break;
-      case e_copy:
-	break;
-      case e_create:
-	break;
-      case e_current:
-	break;
-      case e_declare:
-	break;
-      case e_depend:
-	break;
-      case e_development:
-	break;
-      case e_exist:
-	break;
-      case e_get:
-	break;
-      case e_list:
-	break;
-      case e_modify:
-	break;
-      case e_new:	/* None */
-	break;
-      case e_old:	/* None */
-	break;
-      case e_start:	/* None */
-	break;
-      case e_stop:	/* None */
-	break;
-      case e_tailor:	/* None */
-	break;
-      case e_test:	/* None */
-	break;
-      case e_unchain:	/* None */
-	break;
-      case e_unconfigure:	/* None */
-	break;
-      case e_uncurrent:
-	break;
-      case e_undeclare:
-	break;
-      case e_undevelopment:	/* None */
-	break;
-      case e_unk:	/* None */
-	break;
-      case e_unnew:	/* None */
-	break;
-      case e_unold:	/* None */
-	break;
-      case e_unsetup:
-	break;
-      case e_untest:	/* None */
-	break;
-      case e_validate:	/* None */
-	break;
-      default:
-	break;
-      }
+    case e_chain:	/* None */
+      break;
+    case e_configure:	/* None */
+      break;
+    case e_copy:    	/* None */
+      break;
+    case e_create:	/* None */
+      break;
+    case e_current:     /* Copy man pages to man page area in dbconfig file */
+      f_copyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map, a_argc, a_argv);
+      break;
+    case e_declare:	/* None */
+      break;
+    case e_depend:	/* None */
+      break;
+    case e_development:	/* None */
+      break;
+    case e_exist:	/* None */
+      break;
+    case e_get: 	/* None */
+      break;
+    case e_list:	/* None */
+      break;
+    case e_modify:	/* None */
+      break;
+    case e_new :	/* None */
+      break;
+    case e_old:   	/* None */
+      break;
+    case e_start:	/* None */
+      break;
+    case e_stop:	/* None */
+      break;
+    case e_tailor:	/* None */
+      break;
+    case e_test:	/* None */
+      break;
+    case e_unchain:	/* None */
+      break;
+    case e_unconfigure:	/* None */
+      break;
+    case e_uncurrent:   /* Remove the man pages from the man page area */
+      f_uncopyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd_map,
+		  a_argc, a_argv);
+      break;
+    case e_undeclare:	/* None */
+      break;
+    case e_undevelopment:	/* None */
+      break;
+    case e_unk:	/* None */
+      break;
+    case e_unnew:	/* None */
+      break;
+    case e_unold:	/* None */
+      break;
+    case e_unsetup:
+      break;
+    case e_untest:	/* None */
+      break;
+    case e_validate:	/* None */
       break;
     default:
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      break;
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
