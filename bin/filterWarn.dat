@@ -155,19 +155,10 @@
 #
 #   | OS       | cc  |source| sev  |number|xtra|fileRE:textRE:parseExpr
 
-&fe ('IRIX64' , undef, undef, 'W', undef, 0, "(X11/Xlib|unistd)\.h\$");
-&fe ('IRIX64' , undef, undef, 'W', 1164 , 0);
-# In the next pattern, "\*\*" rather than "[*][*]" confuses filterWarn
-&fe ('IRIX64' , undef, undef, 'W', 1174 , 0, "^tcl", "(char\\s\\*\\*a(rg)?v|int\s+a(rg)?c|parameter \"a(rg)?[cv]\")");
-&fe ('IRIX64' , undef, undef, 'W', 1174 , 0, "", "parameter\\s+.*\\s+[cC]lientData");
-&fe ('IRIX64' , undef, undef, 'W', 1209 , 0, "", "(shAssert\\s*\\(|while\\s*\\(1\\)|(END_)?CATCH)" );
-&fe ('IRIX64' , undef, undef, 'W', 1209 , 0); # controlling expression is constant
-&fe ('IRIX64' , undef, undef, 'W', 1412 , 0, "", "\\s*==\\s*\\(TYPE\\)");
-&fe ('IRIX64' , undef, undef, 'W', 1413 , 0);
-&fe ('IRIX64' , undef, undef, 'W', 1429 , 0, "sys/time.h");
-&fe ('IRIX64' , undef, undef, 'W', 1506 , 0);
-&fe ('IRIX64', 'ld(32|64)', undef, 'W',   85 , 0, "", "definition of main in \\S+ preempts that definition in \\S+libftn\\.");
-&fe ('IRIX64' ,'ld(32|64)', undef, 'W',   84 , 0); # library not used for resolving any symbol
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "upsget.c", 'parameter \"command_line\" was declared but');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "upsget.c", 'parameter \"instance\" was declared but');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 5,  "upsget.c", 'parameter \"db_info_ptr\" was declared but');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 2,  "upsmem.c", 'parameter \"a_bytes\" was declared but never');
 
 
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
@@ -185,51 +176,13 @@
 
 &fe ('OSF1'	, undef		, undef	, 'I'	, undef, 2, undef, 'of padding have been implicitly inserted prior to this member for proper');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef, 'is not used - if this is intended, it should be cast to');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/stdlib\.h',
-     'In this declaration, a storage class without a declarator is meaningless');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/stdib\.h',     'In this declaration, a storage class without a declarator is meaningless');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xlib\.h', 'The type of the function');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xresource\.h',
-     'The type of the function XrmQGetResource defaults to "int"');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shFits.c',
-     'A comment is neither preceeded nor followed by white space');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
-     'In this statement, the enum variable ".*" is used in an arithmetic operation');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
-     'In the initializer for [^ ]* a level of braces was omitted');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
-     'The last statement in non-void function ".*" is not a return statement');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xutil\.h',
-     'The type of the function [^ ]* defaults to');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
-     'the unsigned char or unsigned short value ".*" is being widened to int rather than unsigned int, which differs from unsigned preserving semantics');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
-     'The type of the function shSCHTRS_yy[^ ]* defaults to "int"');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
-     'Non-void function "shSCHTRS_yy.*" with implicit return type int does not contain a return statement');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
-     'The type of the parameter [^ ]* defaults to "int"');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
-     'In this statement, the identifier ".*" is implicitly declared as a function');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
-     'The declaration of the function shSCHTRS_yy[^ ]* has an empty parameter list');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
-     'The type of the function shSe_yy[^ ]* defaults to "int"');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
-     'The declaration of the function shSe_yy[^ ]* has an empty parameter list');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
-     'Non-void function "shSe_yy.*" with implicit return type int does not contain a return statement');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
-     'The type of the parameter [^ ]* defaults to "int"');
-&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
-     'In this statement, the identifier "shSe_.*" is implicitly declared as a function');
-&fe ('OSF1'   , undef         , undef , 'I'   , undef, undef, undef,
-     'Inlining .* within .*');
 
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 #*******************************************************************************
-
 #*******************************************************************************
 #
 # SunOS.
@@ -238,7 +191,9 @@
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 
-&fe ('SunOS'	, 'acc'		, undef	, 'W'	, undef, 0, undef, 'implicitly declaring function to return int: gettimeofday');
+&fe ('SunOS'	, 'acc'		, undef	, 'W'	, undef, 0, "upsutl.c", 'implicitly declaring function to return int: gethostname');
+&fe ('SunOS'	, 'acc'		, undef	, 'W'	, undef, 0, "upsutl.c", 'implicitly declaring function to return int: getuid');
+&fe ('SunOS'	, 'cc'		, undef	, 'W'	, undef, 0, "upsutl.c", 'initializer does not fit or is out of range:');
 
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
@@ -253,8 +208,7 @@
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 
-&fe ('gcc'	, undef		, undef	, 'W'	, undef, 0, undef, 'implicitly declaration of function `gettimeofday\'');
-&fe ('gcc'	, undef		, undef	, 'W'	, undef, 0, undef, '`rcsid\' defined but not used');
+&fe ('gcc'	, undef		, undef	, undef	, undef, 0, "upsutl.c", 'In function `upsutl_get_hostname\'');
 
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
