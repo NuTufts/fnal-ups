@@ -108,7 +108,16 @@ static char *g_error_messages[UPS_NERR] = {
 /* 47 */  "%s: Unexpected key word \'%s\' in \'%s\', line %d\n",
 /* 48 */  "%s: File cache is corrupt\n",
 /* 49 */  "%s: No qualifiers found - in \'%s\', line %d\n",
-/* 50 */  "%s: No \'PROD_DIR\' keyword for product \'%s\'\n"
+/* 50 */  "%s: No \'PROD_DIR\' keyword for product \'%s\'\n",
+/* 51 */  "%s: Chain keyword \'%s\' must match name of file it is in \'%s\'\n",
+/* 52 */  "%s: Version keyword \'%s\' must match name of file it is in \'%s\'\n",
+/* 53 */  "%s: Verifying product \'%s\'\n",
+/* 54 */  "%s: Environment Variables must be of the form \${var} - not as in  \'%s\'\n",
+/* 55 */  "%s:  \'%s\' is not a directory\n",
+/* 56 */  "%s:  \'%s\'is not an allowable separator in \'%s\'\n",
+/* 57 */  "%s: TABLE_FILE keyword not specified when TABLE_DIR was, in version \'%s\'\n",
+/* 58 */  "%s: COMPILE_FILE keyword was not specified when COMPILE_DIR was, in version \'%s\'\n",
+/* 59 */  "%s: Product keyword \'%s\' must match name of product it is in \'%s\'\n"
 };
 
 char *g_error_ascii[] = {
@@ -163,7 +172,16 @@ char *g_error_ascii[] = {
    /* UPS_FILEMAP_CORRUPT     48 */ "UPS_FILEMAP_CORRUPT",
    /* UPS_NO_QUALIFIER        49 */ "UPS_NO_QUALIFIER",
    /* UPS_NO_PROD_DIR         50 */ "UPS_NO_PROD_DIR",
-   /* UPS_NERR                51 */ "UPS_NERR",
+   /* UPS_MISMATCH_CHAIN      51 */ "UPS_MISMATCH_CHAIN",
+   /* UPS_MISMATCH_VERSION    52 */ "UPS_MISMATCH_VERSION",
+   /* UPS_VERIFY_PRODUCT      53 */ "UPS_VERIFY_PRODUCT",
+   /* UPS_VERIFY_ENV_VAR      54 */ "UPS_VERIFY_ENV_VAR",
+   /* UPS_NOT_A_DIR           55 */ "UPS_NOT_A_DIR",
+   /* UPS_INVALID_SEPARATOR   56 */ "UPS_INVALID_SEPARATOR",
+   /* UPS_VERIFY_TABLE_DIR    57 */ "UPS_VERIFY_TABLE_DIR",
+   /* UPS_VERIFY_COMPILE_DIR  58 */ "UPS_VERIFY_COMPILE_DIR",
+   /* UPS_MISMATCH_PROD_NAME  59 */ "UPS_MISMATCH_PROD_NAME",
+   /* UPS_NERR                60 */ "UPS_NERR",
    0 };
 
 /*

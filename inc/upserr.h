@@ -91,7 +91,16 @@
 #define UPS_FILEMAP_CORRUPT     48
 #define UPS_NO_QUALIFIER        49
 #define UPS_NO_PROD_DIR         50
-#define UPS_NERR                51      /*  this one must always be last */
+#define UPS_MISMATCH_CHAIN      51
+#define UPS_MISMATCH_VERSION    52
+#define UPS_VERIFY_PRODUCT      53
+#define UPS_VERIFY_ENV_VAR      54
+#define UPS_NOT_A_DIR           55
+#define UPS_INVALID_SEPARATOR   56
+#define UPS_VERIFY_TABLE_DIR    57
+#define UPS_VERIFY_COMPILE_DIR  58
+#define UPS_MISMATCH_PROD_NAME  59
+#define UPS_NERR                60      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
