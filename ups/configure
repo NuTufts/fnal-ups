@@ -247,6 +247,11 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
+    TeMp=/tmp
+    if test x\${TMPDIR:-} != x
+    then
+	TeMp=\$TMPDIR
+    fi
     for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
@@ -259,14 +264,14 @@ then
 	    break
 	fi
     done
-    cat <<XxEoF >/tmp/Ash_\$$
+    cat <<XxEoF >\$TeMp/Ash_\$$
 #!\${Name_Of_Sh}
 eval dir=${b_slash}\$1
 \$ECHO ${b_slash}\$dir
 XxEoF
-    chmod +x /tmp/Ash_\$$
-    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
-    rm -f /tmp/Ash_\$$ 
+    chmod +x \$TeMp/Ash_\$$
+    Setups_Home=\`(unset ENV; \$TeMp/Ash_\$$ \$Setups_Home )\`
+    rm -f \$TeMp/Ash_\$$ 
 fi
 
 Products_List_Home=\$Setups_Home
@@ -308,6 +313,11 @@ fi
 prod_set=no
 for Prod in \${Products_String}
 do
+    TeMp=/tmp
+    if test x\${TMPDIR:-} != x
+    then
+        TeMp=\$TMPDIR
+    fi
     if test \`echo \$Prod|cut -c1\` != '/'
     then
     	for sh in $Setups_Advanced_Sh_Str
@@ -322,14 +332,14 @@ do
 	    	break
 	    fi
         done
-        cat <<XxEoF >/tmp/Ash_\$$
+        cat <<XxEoF >\$TeMp/Ash_\$$
 #!\${Name_Of_Sh}
 eval dir=${b_slash}\$1
 \$ECHO ${b_slash}\$dir
 XxEoF
-        chmod +x /tmp/Ash_\$$
-        Prod=\`(unset ENV; /tmp/Ash_\$$ \$Prod )\`
-        rm -f /tmp/Ash_\$$ 
+        chmod +x \$TeMp/Ash_\$$
+        Prod=\`(unset ENV; \$TeMp/Ash_\$$ \$Prod )\`
+        rm -f \$TeMp/Ash_\$$ 
     fi
     if test -d \$Prod
     then
@@ -628,6 +638,11 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
+    TeMp=/tmp
+    if test x\${TMPDIR:-} != x
+    then
+        TeMp=\$TMPDIR
+    fi
     for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
@@ -640,14 +655,14 @@ then
 	    break
 	fi
     done
-    cat <<XxEoF >/tmp/Ash_\$$
+    cat <<XxEoF >\$TeMp/Ash_\$$
 #!\${Name_Of_Sh}
 eval dir=${b_slash}\$1
 \$ECHO ${b_slash}\$dir
 XxEoF
-    chmod +x /tmp/Ash_\$$
-    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
-    rm -f /tmp/Ash_\$$ 
+    chmod +x \$TeMp/Ash_\$$
+    Setups_Home=\`(unset ENV; \$TeMp/Ash_\$$ \$Setups_Home )\`
+    rm -f \$TeMp/Ash_\$$ 
 fi
 
 export Setups_Home
@@ -853,6 +868,11 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
+    TeMp=/tmp
+    if test x\${TMPDIR:-} != x
+    then
+        TeMp=\$TMPDIR
+    fi
     for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
@@ -865,14 +885,14 @@ then
 	    break
 	fi
     done
-    cat <<XxEoF >/tmp/Ash_\$$
+    cat <<XxEoF >\$TeMp/Ash_\$$
 #!\${Name_Of_Sh}
 eval dir=${b_slash}\$1
 \$ECHO ${b_slash}\$dir
 XxEoF
-    chmod +x /tmp/Ash_\$$
-    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
-    rm -f /tmp/Ash_\$$ 
+    chmod +x \$TeMp/Ash_\$$
+    Setups_Home=\`(unset ENV; \$TeMp/Ash_\$$ \$Setups_Home )\`
+    rm -f \$TeMp/Ash_\$$ 
 fi
 
 # 
@@ -1301,6 +1321,11 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
+    TeMp=/tmp
+    if test x\${TMPDIR:-} != x
+    then
+        TeMp=\$TMPDIR
+    fi
     for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
@@ -1313,14 +1338,14 @@ then
 	    break
 	fi
     done
-    cat <<XxEoF >/tmp/Ash_\$$
+    cat <<XxEoF >\$TeMp/Ash_\$$
 #!\${Name_Of_Sh}
 eval dir=${b_slash}\$1
 \$ECHO ${b_slash}\$dir
 XxEoF
-    chmod +x /tmp/Ash_\$$
-    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
-    rm -f /tmp/Ash_\$$ 
+    chmod +x \$TeMp/Ash_\$$
+    Setups_Home=\`(unset ENV; \$TeMp/Ash_\$$ \$Setups_Home )\`
+    rm -f \$TeMp/Ash_\$$ 
 fi
 
 if test ! -d \$Setups_Home
@@ -1521,6 +1546,11 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
+    TeMp=/tmp
+    if test x\${TMPDIR:-} != x
+    then
+        TeMp=\$TMPDIR
+    fi
     for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
@@ -1533,14 +1563,14 @@ then
 	    break
 	fi
     done
-    cat <<XxEoF >/tmp/Ash_\$$
+    cat <<XxEoF >\$TeMp/Ash_\$$
 #!\${Name_Of_Sh}
 eval dir=${b_slash}\$1
 \$ECHO ${b_slash}\$dir
 XxEoF
-    chmod +x /tmp/Ash_\$$
-    Setups_Home=\`(unset ENV; /tmp/Ash_\$$ \$Setups_Home )\`
-    rm -f /tmp/Ash_\$$ 
+    chmod +x \$TeMp/Ash_\$$
+    Setups_Home=\`(unset ENV; \$TeMp/Ash_\$$ \$Setups_Home )\`
+    rm -f \$TeMp/Ash_\$$ 
 fi
 
 #
