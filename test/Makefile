@@ -36,8 +36,7 @@ UNIT_TESTS = test_upserr test_upslst test_upsmem test_upsutl test_upsugo \
 
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
 	upstst_misc.o upstst_parse.o upstst_err.o upstst_fil.o	\
-	upstst_ugo.o upstst_mat.o upstst_get.o upstst_list.o	\
-	upstst_act.o upstst_command.o
+	upstst_ugo.o upstst_mat.o upstst_get.o upstst_act.o upstst_command.o
 #=============================================================================
 # TARGETS
 #=============================================================================

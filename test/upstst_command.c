@@ -23,16 +23,21 @@ Include files:-
 
 int upstst_command(int argc, char ** const argv, const void * const myfunc(),const char * const funcname, const int calledby)
 {
-static char	*outfile;			/* filename to output */
-static char     *difffile;			/* file to diff */
+static char	*f_stdout;			/* filename to output */
+static char     *f_stdout_diff;			/* file to diff */
+static char	*f_action;			/* filename to output actions */
+static char     *f_action_diff;			/* file to diff */
 static char	*estatus_str;                   /*expected status str */
 int		estatus = UPS_SUCCESS;          /* expected status */
 int		status;				/* function status */
-FILE		*ofd;				/* outfile file descriptor */
-upstst_argt     argt[] = {{"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
-                          {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
-                          {"-status", UPSTST_ARGV_STRING,NULL,&estatus_str},
-                          {NULL,      UPSTST_ARGV_END,   NULL,NULL}};
+FILE		*ofd;				/* f_stdout file descriptor */
+FILE		*afd;				/* f_stdout file descriptor */
+upstst_argt     argt[] = {{"-out",     UPSTST_ARGV_STRING,NULL,&f_stdout},
+                          {"-actout",  UPSTST_ARGV_STRING,NULL,&f_action_diff},
+                          {"-diff",    UPSTST_ARGV_STRING,NULL,&f_stdout_diff},
+                          {"-actdiff", UPSTST_ARGV_STRING,NULL,&f_action_diff},
+                          {"-status",  UPSTST_ARGV_STRING,NULL,&estatus_str},
+                          {NULL,       UPSTST_ARGV_END,   NULL,NULL}};
 t_upsugo_command	*uc =0;			/* ups command */
 char            diffcmd[132];                   /* diff command */
 int		stdout_dup;			/* dup of stdout */
@@ -40,17 +45,24 @@ int		stdout_dup;			/* dup of stdout */
 /* parse command line
    ------------------ */
 
-outfile = NULL; difffile = NULL; estatus_str = NULL;
+f_action = f_action_diff = f_stdout = f_stdout_diff = estatus_str = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
-if (outfile) 					/* don't use stdout */
+if (f_stdout) 					/* don't use stdout */
    {
-   if (!(ofd = fopen(outfile,"w")))		/* open file */
-      { perror(outfile); return (1); }
+   if (!(ofd = fopen(f_stdout,"w")))		/* open file */
+      { perror("f_stdout"); return (1); }
    }
 else
    {ofd = stdout;}
+
+if (!f_action)
+   f_action = "/dev/null";
+
+if (!(afd = fopen(f_action,"w")))
+      { perror("f_action"); return (1); }
+
 
 stdout_dup = dup(STDOUT_FILENO);		/* dup stdout */
 fflush(stdout);					/* clear output buffer */
@@ -68,7 +80,10 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
       upserr_output(); upserr_clear();
       return (0);
       }
-   (*myfunc)(uc,stdout,calledby);
+   if (calledby == e_list)
+      (*myfunc)(uc,0);
+   else
+      (*myfunc)(uc,stdout,calledby);
    if (UPS_ERROR != estatus)                            
       {                                                 
       fprintf(stderr,"function: %s\n",funcname);       
@@ -77,9 +92,13 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
          g_error_ascii[estatus]);                       
       if (UPS_ERROR) upserr_output();                  
       }                                                
-   if (UPS_ERROR) { upserr_clear(); continue;}
+   if (UPS_ERROR) 
+      { 
+      upserr_clear(); 
+      continue;
+      }
    upserr_clear();                                   
-   upsfil_flush();
+   upsutl_finish_up(afd,uc->ugo_shell,calledby,FALSE);
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    }
 
@@ -91,10 +110,16 @@ dup2(stdout_dup,STDOUT_FILENO);                 /* reset stdout */
 close(stdout_dup);                              /* close files*/
 if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);
 
-if (difffile && outfile)
+if (f_stdout_diff && f_stdout)
    {
-   sprintf (diffcmd,"diff %s %s",difffile,outfile);
-   if (system(diffcmd)) printf("files %s %s differ\n",difffile,outfile);
+   sprintf (diffcmd,"diff %s %s",f_stdout_diff,f_stdout);
+   if (system(diffcmd)) printf("files %s %s differ\n",f_stdout_diff,f_stdout);
+   }
+
+if (f_action_diff && f_action)
+   {
+   sprintf (diffcmd,"diff %s %s",f_action_diff,f_action);
+   if (system(diffcmd)) printf("files %s %s differ\n",f_action_diff,f_action);
    }
 
 return (0);
@@ -155,3 +180,6 @@ int upstst_depend(int argc, char ** const argv)
 
 int upstst_touch(int argc, char ** const argv)
 { return(upstst_command(argc,argv,(void *)ups_touch,"ups_touch",e_touch)); }
+
+int upstst_list(int argc, char ** const argv)
+{ return(upstst_command(argc,argv,(void *)ups_list,"ups_list",e_list)); }
