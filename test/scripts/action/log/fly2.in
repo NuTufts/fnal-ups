@@ -19,7 +19,7 @@ fi
 export OPERA
 #
 upstmp="`dropit -p "$OPERA" -i' ' -d' ' FAUST`";
-if [ $? -eq 0 -a "$upstmp" != " " ]; then OPERA=$upstmp; fi
+if [ $? -eq 0 -a "$upstmp" != "" ]; then OPERA=$upstmp; fi
 unset upstmp;
 #
 unset OPERA
