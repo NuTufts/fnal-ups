@@ -330,8 +330,21 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       TRANSLATE_ENV(tmp_ud, a_upsdir);
       TRANSLATE_ENV(tmp_pd, a_productdir);
 
+      /* try db/prod_name/tablefile */
+      if ((a_db_info != NULL) && (a_prodname != NULL)) {
+	if ((total_chars = file_chars + (int )(strlen(a_prodname) +
+					       strlen(a_db_info->name)) + 1)
+	    <= FILENAME_MAX) {
+	  sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname,
+		  a_tablefile);
+	  LOOK_FOR_FILE();
+	} else {
+	  upserr_vplace();
+	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	}
+      }
       /* try ups_dir/tablefile */
-      if (tmp_ud != NULL) {
+      if ((found == 0) && (tmp_ud != NULL)) {
 	if ((total_chars = file_chars + (int )strlen(tmp_ud))
 	    <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s", tmp_ud, a_tablefile);
@@ -366,19 +379,6 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	    upserr_vplace();
 	    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
 	  }
-	}
-      }
-      /* try db/prod_name/tablefile */
-      if ((found == 0) && (a_db_info != NULL) && (a_prodname != NULL)) {
-	if ((total_chars = file_chars + (int )(strlen(a_prodname) +
-					       strlen(a_db_info->name)) + 1)
-	    <= FILENAME_MAX) {
-	  sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname,
-		  a_tablefile);
-	  LOOK_FOR_FILE();
-	} else {
-	  upserr_vplace();
-	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
 	}
       }
       /* try tablefile */
