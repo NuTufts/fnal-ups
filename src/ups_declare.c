@@ -140,10 +140,10 @@ void ups_declare( t_upsugo_command * const uc ,
 
  for (db_list = uc->ugo_db ; db_list ; db_list=db_list->next) 
  { db_info = (t_upstyp_db *)db_list->data;
-   uc->ugo_chain = upslst_new((void *)ANY_MATCH);
+   uc->ugo_chain = upslst_new(upsutl_str_create(ANY_MATCH,' '));
    uc->ugo_version=0;
-   uc->ugo_flavor = upslst_new((void *)ANY_MATCH);
-   uc->ugo_qualifiers = upslst_new((void *)ANY_MATCH);
+   uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
+   uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
    mproduct_list = upsmat_instance(uc, db_list , not_unique);
    if (mproduct_list)    /* the product does exist */ 
    { upsver_mes(1,"Product %s currently exist in database %s\n",
@@ -157,9 +157,12 @@ void ups_declare( t_upsugo_command * const uc ,
     db_info = (t_upstyp_db *)db_list->data;
   } 
 /* restore everything */
+  upslst_free(uc->ugo_chain,'d');
   uc->ugo_chain=save_chain;
   uc->ugo_version=save_version;
+  upslst_free(uc->ugo_flavor,'d');
   uc->ugo_flavor=save_flavor;
+  upslst_free(uc->ugo_qualifiers,'d');
   uc->ugo_qualifiers=save_qualifiers;
 /************************************************************************
  *
@@ -172,8 +175,8 @@ void ups_declare( t_upsugo_command * const uc ,
          chain_list = chain_list->next) 
        { the_chain = (char *)(chain_list->data);
          uc->ugo_version=0;
-         uc->ugo_flavor = upslst_new((void *)ANY_MATCH);
-         uc->ugo_qualifiers = upslst_new((void *)ANY_MATCH);
+         uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
+         uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
            save_next = chain_list->next;
            save_prev = chain_list->prev;
            chain_list->next=0;
@@ -245,7 +248,7 @@ void ups_declare( t_upsugo_command * const uc ,
                     new_cinst->version,
                     file);
          (void )upsfil_write_file(product, file,'d');  
-/*         product = (t_upstyp_product *)ups_free_product(product); */
+         /* product = (t_upstyp_product *)ups_free_product(product); */
         }
       }
 /************************************************************************
@@ -254,10 +257,13 @@ void ups_declare( t_upsugo_command * const uc ,
  *
  ***********************************************************************/
 /* We want NOTHING to do with chains at this point - it is out of sync */
+    if(uc->ugo_chain) { upslst_free(uc->ugo_chain,'d'); }
     uc->ugo_chain=0;
     uc->ugo_version=save_version;  /* we must match of version now */
-    uc->ugo_flavor = upslst_new((void *)ANY_MATCH);
-    uc->ugo_qualifiers = upslst_new((void *)ANY_MATCH);
+    if(uc->ugo_flavor) { upslst_free(uc->ugo_flavor,'d'); }
+    uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
+    if(uc->ugo_qualifiers) { upslst_free(uc->ugo_qualifiers,'d'); }
+    uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
     mproduct_list = upsmat_instance(uc, db_list , not_unique);
     if (mproduct_list) 
     {  uc->ugo_flavor=save_flavor;
