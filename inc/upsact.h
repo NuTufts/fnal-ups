@@ -58,7 +58,7 @@ typedef struct upsact_item {
  * Declaration of public functions.
  */
 
-t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
+t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product *mat_prod,
 			       const char * const act_name );
 t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str );
