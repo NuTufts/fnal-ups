@@ -117,7 +117,6 @@ enum {
   e_copynews,
   e_writecompilescript,
   e_dodefaults,
-  e_nodefaults,
   e_nosetupenv,
   e_noproddir
 };

@@ -479,7 +479,6 @@ static t_cmd_map g_cmd_maps[] = {
   { "copynews", e_copynews, f_copynews, 1, 1, e_invalid_cmd },
   { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd },
   { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults },
-  { "nodefaults", e_nodefaults, NULL, 0, 0, e_nodefaults },
   { "nosetupenv", e_nosetupenv, NULL, 0, 0, e_invalid_cmd },
   { "noproddir", e_noproddir, NULL, 0, 0, e_invalid_cmd },
   { 0,0,0,0,0 }
@@ -977,7 +976,6 @@ t_upslst_item *upsact_check_files(
 	case e_pathset:
 	case e_filetest:
 	case e_dodefaults:
-	case e_nodefaults:
 	case e_nosetupenv:
 	case e_noproddir:
 	case e_exeaccess:
