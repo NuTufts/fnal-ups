@@ -69,7 +69,7 @@ static int            put_key( const char * const key, const char * const val );
 /* Utils */
 static int            trim_qualifiers( char * const str );
 static int            cfilei( void );
-t_upslst_item         *copy_action_list( t_upslst_item *list_ptr );
+t_upslst_item         *copy_action_list( t_upslst_item * const list_ptr );
 
 /* Print stuff */
 static void           print_instance( t_ups_instance * const inst_ptr );
@@ -980,7 +980,7 @@ int trim_qualifiers( char * const str )
   return (int)strlen( str );
 }
 
-t_upslst_item *copy_action_list( t_upslst_item *list_ptr )
+t_upslst_item *copy_action_list( t_upslst_item * const list_ptr )
 {
   t_upslst_item *l_ptr1 = upslst_first( list_ptr );
   t_upslst_item *l_ptr2 = 0;
@@ -1094,7 +1094,7 @@ void g_print_product( t_ups_product * const prod_ptr )
   }     
 }
 
-int action_cmp ( const void *d1, const void *d2 )
+int action_cmp ( const void * const d1, const void * const d2 )
 {
   t_ups_action *a1 = (t_ups_action *)d1;
   t_ups_action *a2 = (t_ups_action *)d2;

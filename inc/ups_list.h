@@ -83,7 +83,7 @@ t_upslst_item *upslst_first( t_upslst_item * const list_ptr );
 t_upslst_item *upslst_last( t_upslst_item * const list_ptr );
 int           upslst_count( t_upslst_item * const list_ptr );
 t_upslst_item *upslst_sort0( t_upslst_item * const c,
-			     int (*cmp)(const void *, const void *) );
+			     int (* const cmp)(const void * const, const void * const) );
      
 /*
  * Declaration of private globals.
