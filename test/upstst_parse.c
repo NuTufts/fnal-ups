@@ -691,25 +691,29 @@ int upstst_split(char *input, int * const argc, char *** const argv)
 static char *tmp_argv[255];
 
 *argc = 0;
+#define getquote() {				\
+  input++;					\
+  tmp_argv[(*argc)++] = input;			\
+  while (*input && *input != '"') input++;	\
+  if (*input)					\
+     *input = 0;				\
+  else						\
+      return -1;				\
+  }
 	
 while( *input ) 
    {
    if (*input == '"') 
-      {
-      input++;					/* skip past leading " */
-      tmp_argv[(*argc)++] = input;		/* take full arg as is */
-      while (*input && *input != '"') input++;
-      if (*input) 				/* write over ending " */
-	 *input = 0;
-      else
-	 return -1;				/* no match to " */
-      
-      }
+      { getquote(); }
    else if (!(isspace((int)*input)))		/* start of word */
       {
       tmp_argv[(*argc)++] = input;		/* take full arg as is */
       while (*input && !(isspace((int)*input))) 
+         {
          *input++;				/* copy full word */
+	 if (*input == '"')
+            { *input = 0; getquote(); input++; }
+         }
       if (*input == 0) goto split_end;		/* all done */
       *input = 0;				/* null terminate */
       }
