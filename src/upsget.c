@@ -554,6 +554,7 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
   static char *prefix_string;
   static char buffer[1];
   static char *nostring=buffer;
+  static char *env_string;
   buffer[0]='\0';
   if (command_line && command_line->ugo_r)
   { string=command_line->ugo_productdir;
@@ -562,6 +563,10 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
   }
   if (!string)             /* The only why this could happen is if you */
   { string=buffer;         /* declare a product with no -r */
+  } else {
+    if((env_string=upsget_translation_env(string))!=0)
+    { string=env_string;
+    }
   }
   if (UPSRELATIVE(string))
   { if (db_info_ptr->config)

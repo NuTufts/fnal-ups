@@ -176,11 +176,15 @@
          case '3':      \
          uc->ugo_number = 4; \
          break;
-#define case_c \
-         case 'c':                                       \
-         uc->ugo_c = 1;                                  \
+#define add_chain(CHAIN) \
          addr=upsutl_str_create("current",' ');          \
          uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         uc->ugo_chain = upslst_first(uc->ugo_chain);
+
+#define case_c \
+         case 'c':             \
+         uc->ugo_c = 1;        \
+         add_chain("current"); \
          break;
 #define case_d \
          case 'd':                                       \

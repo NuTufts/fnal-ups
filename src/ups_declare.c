@@ -137,6 +137,8 @@ t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
      }
      if (upsutl_is_a_file(buf) == UPS_SUCCESS)
      { vinst->ups_dir=upsutl_str_create("ups",' ');
+       /* Make command think it had it too or upscpy will not find */
+       /* uc->ugo_upsdir=upsutl_str_create("ups",' '); */
      }
    }
 /* I'm going to create the save instance and just put everything in 
