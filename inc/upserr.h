@@ -59,7 +59,8 @@
 #define UPS_UNKNOWN_FILETYPE  16
 #define UPS_NOVALUE_ARGUMENT  17
 #define UPS_INVALID_ACTION    18
-#define UPS_NERR              19      /*  this one must always be last */
+#define UPS_NEED_UNIQUE       19
+#define UPS_NERR              20      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"

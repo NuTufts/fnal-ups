@@ -76,7 +76,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 16 */  "%s: Unknown file type \"%s\"\n",
 /* 17 */  "%s: Invalid value \"%s\" for argument \"%s\"\n",
 /* 18 */  "%s: Invalid action - %s\n",
-/* 19 this is the last */
+/* 19 */  "%s: Need unique instance but multiple \"%s\" found \n"
+/* 20 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -99,7 +100,8 @@ char *g_error_ascii[] = {
    /* UPS_UNKNOWN_FILETYPE  16 */ "UPS_UNKNOWN_FILETYPE",
    /* UPS_NOVALUE_ARGUMENT  17 */ "UPS_NOVALUE_ARGUMENT",
    /* UPS_INVALID_ACTION    18 */ "UPS_INVALID_ACTION",
-   /* UPS_NERR              19 */ "UPS_NERR",
+   /* UPS_NEED_UNIQUE       19 */ "UPS_NEED_UNIQUE",
+   /* UPS_NERR              20 */ "UPS_NERR",
    0 };
 
 /*
