@@ -17,12 +17,12 @@ rehash
 # if it does not already exist
 #
 if (! ${?PRODUCTS_SAVE}) then
-    setenv PRODUCTS_SAVE ${PRODUCTS}
+    setenv PRODUCTS_SAVE "${PRODUCTS}"
 endif
 
 # Define a new $PRODUCTS
 # 
-setenv PRODUCTS `cat ${ERUPT_DIR}/ups/new_database`
+setenv PRODUCTS "`cat ${ERUPT_DIR}/ups/new_database`"
 
 # Redefine 'setup', 'unsetup', and 'ups'
 #
