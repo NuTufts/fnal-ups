@@ -73,8 +73,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 13 */  "%s: File not found - %s\n",
 /* 14 */  "%s: Could not malloc %d bytes\n",
 /* 15 */  "%s: MAX_LINE_LEN exceeded in \"%s\"\n",
-/* 16 */  "%s: Unknown file type \"%s\"\n"
-/* 17 */  "%s: Invalid value \"%s\" for argument \"%s\"\n",
+/* 16 */  "%s: Unknown file type \"%s\"\n",
+/* 17 */  "%s: Invalid value \"%s\" for argument \"%s\"\n"
 /* 18 this is the last */
 };
 
