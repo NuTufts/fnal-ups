@@ -2174,6 +2174,7 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 {
   t_upsact_cmd lcl_cmd;
   static char buff[MAX_LINE_LEN];
+  char *tmp_prod_dir = NULL;
   char *uprod_name;
 
   /* only proceed if we have a stream to write the output to */
@@ -2185,12 +2186,20 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       lcl_cmd.argc = g_cmd_maps[e_envset].min_params;   /* # of args */
       lcl_cmd.icmd = e_envset;
       lcl_cmd.argv[0] = buff;
-      if (a_inst->version && a_inst->version->prod_dir
-	                  && a_inst->version->product) {
+
+      /* since the prod_dir may come from the command line we need to check
+	 if the user entered one that we have to use */
+      if (a_command_line->ugo_productdir) {
+	tmp_prod_dir = a_command_line->ugo_productdir;
+      } else if (a_inst->version && a_inst->version->prod_dir) {
+	tmp_prod_dir = a_inst->version->prod_dir;
+      }
+      if (a_inst->version && tmp_prod_dir && a_inst->version->product) {
 	uprod_name = upsutl_upcase(a_inst->version->product);
 	if (UPS_ERROR == UPS_SUCCESS) {
 	  sprintf(buff, "%s_DIR", uprod_name);
-	  lcl_cmd.argv[1] = a_inst->version->prod_dir;
+	  
+	  lcl_cmd.argv[1] = tmp_prod_dir;
 	  f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 	}
       }
