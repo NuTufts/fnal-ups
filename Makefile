@@ -23,7 +23,7 @@ DIR=$(DEFAULT_DIR)
 # Qualifiers, and customization information, which is also used for 
 # "cmd addproduct", and finally the distribution file name.
 # this section may change in later ups|addproduct incarnations
-            PROD=erupt
+            PROD=ups
      PRODUCT_DIR=UPS_DIR
             VERS=v4_3b
            CHAIN=development
@@ -34,9 +34,9 @@ DIR=$(DEFAULT_DIR)
  ADDPRODUCT_HOST=fnkits.fnal.gov
 OLD_ADDPRODUCT_HOST=`(domainname | grep dcdsv0 ||  echo fndaub)`
 DISTRIBUTIONFILE=$(DEFAULT_DISTRIBFILE)
-          FLAVOR=$(OS)$(CUST)$(QUALSEP)$(QUALS)
+          FLAVOR=$(OS)
               OS=`ups flavor -2`
-           QUALS=
+           QUALS=""
             CUST=$(DEFAULT_CUST)
           PREFIX=/dev/null
 
