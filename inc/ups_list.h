@@ -28,7 +28,7 @@
  *                        Note: all list data elements should be allocated
  *                        by upsmem_alloc.
  *                        Replaced upslst_add_list and upslst_insert_list
- *                        with upslst_merge
+ *                        with upslst_merge.
  *                        Added upslst_copy, which will create a new list
  *                        with data elements from passed list.
  *
@@ -65,8 +65,10 @@ t_upslst_item *upslst_add( t_upslst_item * list_ptr, void * const data_ptr );
 t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
 			      void * const data_ptr, const char copt );
 
-t_upslst_item *upslst_merge( t_upslst_item * const list_ptr_1,
-			     t_upslst_item * const list_ptr_2 );
+t_upslst_item *upslst_add_list( t_upslst_item * const list_ptr_1,
+				t_upslst_item * const list_ptr_2 );
+t_upslst_item *upslst_insert_list( t_upslst_item * const list_ptr_1,
+				   t_upslst_item * const list_ptr_2 );
 t_upslst_item *upslst_copy( t_upslst_item * const list_ptr );
 
 t_upslst_item *upslst_first( t_upslst_item * const list_ptr );

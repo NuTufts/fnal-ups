@@ -64,21 +64,21 @@
  *
  * Input : void *, a data element
  * Output: none
- * Return: t_upslst_item *, pointer to top of list or NULL
+ * Return: t_upslst_item *, pointer to top of list or 0
  */
 t_upslst_item *upslst_new( void * const data_ptr )
 {
-  t_upslst_item *l_first = NULL;
+  t_upslst_item *l_first = 0;
 
   l_first = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
-  if ( !l_first ) return NULL;
+  if ( !l_first ) return 0;
   
   l_first->data = data_ptr;
   upsmem_inc_refctr( data_ptr );
   
-  l_first->prev = NULL;
-  l_first->next = NULL;
+  l_first->prev = 0;
+  l_first->next = 0;
 
   return( l_first );
 }	
@@ -92,15 +92,15 @@ t_upslst_item *upslst_new( void * const data_ptr )
  * Input : t_upslst_item *, pointer to a list.
  *         char, copt = 'd', will also delete data elements.
  * Output: none
- * Return: t_upslst_item *, NULL
+ * Return: t_upslst_item *, 0
  */
 t_upslst_item *upslst_free( t_upslst_item * const list_ptr, const char copt )
 {
-  t_upslst_item *l_ptr = NULL;
-  t_upslst_item *l_tmp = NULL;
+  t_upslst_item *l_ptr = 0;
+  t_upslst_item *l_tmp = 0;
   t_upslst_item *l_first = upslst_first( list_ptr );
 
-  if ( !l_first ) return NULL;
+  if ( !l_first ) return 0;
 
   l_ptr = l_first;
   while( l_ptr ) {
@@ -110,11 +110,11 @@ t_upslst_item *upslst_free( t_upslst_item * const list_ptr, const char copt )
     }
     l_tmp = l_ptr;
     l_ptr = l_ptr->next;
-    if ( l_ptr ) l_ptr->prev = NULL;
+    if ( l_ptr ) l_ptr->prev = 0;
     free( l_tmp );
   }
 
-  return NULL;
+  return 0;
 }
 
 /*-----------------------------------------------------------------------
@@ -122,19 +122,19 @@ t_upslst_item *upslst_free( t_upslst_item * const list_ptr, const char copt )
  *
  * Will add an item as the first item to the list.
  *
- * Input : t_upslst_item *, pointer to a list, if NULL a new list will
+ * Input : t_upslst_item *, pointer to a list, if 0 a new list will
  *         be created.
  *         void *, data element for list.
  * Output: none
- * Return: t_upslst_item *, pointer to the first item of the list or NULL
+ * Return: t_upslst_item *, pointer to the first item of the list or 0
  *
  * NOTE: if passed list pointer, in successive calls, is the first item,
  * it should be pretty fast.
  */
 t_upslst_item *upslst_insert( t_upslst_item * list_ptr, void * const data_ptr )
 {
-  t_upslst_item *l_first = NULL;
-  t_upslst_item *l_new = NULL;
+  t_upslst_item *l_first = 0;
+  t_upslst_item *l_new = 0;
 
   if ( ! list_ptr ) {
     list_ptr = upslst_new( data_ptr );
@@ -145,14 +145,14 @@ t_upslst_item *upslst_insert( t_upslst_item * list_ptr, void * const data_ptr )
 
   l_new = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
-  if ( !l_new ) return NULL;
+  if ( !l_new ) return 0;
 
   l_new->data = data_ptr;
   upsmem_inc_refctr( data_ptr );  
   
   l_first->prev = l_new;
   l_new->next = l_first;
-  l_new->prev = NULL;
+  l_new->prev = 0;
 
   return l_new;
 }
@@ -162,19 +162,19 @@ t_upslst_item *upslst_insert( t_upslst_item * list_ptr, void * const data_ptr )
  *
  * Will add an item as the last item to the list.
  *
- * Input : t_upslst_item *, pointer to a list, if NULL a new list will
+ * Input : t_upslst_item *, pointer to a list, if 0 a new list will
  *         be created.
  *         void *, data element for list.
  * Output: none
- * Return: t_upslst_item *, pointer to the last item of the list or NULL
+ * Return: t_upslst_item *, pointer to the last item of the list or 0
  *
  * NOTE: if passed list pointer, in successive calls, is the last item,
  * it should be pretty fast.
  */
 t_upslst_item *upslst_add( t_upslst_item *list_ptr, void * const data_ptr )
 {
-  t_upslst_item *l_last = NULL;
-  t_upslst_item *l_new = NULL;
+  t_upslst_item *l_last = 0;
+  t_upslst_item *l_new = 0;
 
   if ( ! list_ptr ) {
     list_ptr = upslst_new( data_ptr );
@@ -185,14 +185,14 @@ t_upslst_item *upslst_add( t_upslst_item *list_ptr, void * const data_ptr )
 
   l_new = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
-  if ( !l_new ) return NULL;
+  if ( !l_new ) return 0;
 
   l_new->data = data_ptr;
   upsmem_inc_refctr( data_ptr );
   
   l_last->next = l_new;
   l_new->prev = l_last;
-  l_new->next = NULL;
+  l_new->next = 0;
 
   return l_new;
 }
@@ -212,9 +212,9 @@ t_upslst_item *upslst_add( t_upslst_item *list_ptr, void * const data_ptr )
 t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
 			      void * const data_ptr, const char copt )
 {
-  t_upslst_item *l_ptr = NULL;
-  t_upslst_item *l_prev = NULL;
-  t_upslst_item *l_first = NULL;
+  t_upslst_item *l_ptr = 0;
+  t_upslst_item *l_prev = 0;
+  t_upslst_item *l_first = 0;
 
   l_first = upslst_first( list_ptr );
   
@@ -227,7 +227,7 @@ t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
 	if ( l_prev ) l_prev->next = l_ptr->next;
       }
       else {
-	if ( l_prev ) l_prev->next = NULL;
+	if ( l_prev ) l_prev->next = 0;
       }
       upsmem_dec_refctr ( l_ptr->data );
       if ( copt == 'd' && l_ptr->data ) {
@@ -242,24 +242,24 @@ t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
   }
 
   /* item was not found */
-  return NULL;
+  return 0;
 }
 
 /*-----------------------------------------------------------------------
- * upslst_merge
+ * upslst_add_list
  *
- * Will merge two lists. 
+ * Will append second list to the end of first list.
  *
- * Input : t_upslst_item *, pointer to a list.
- *         t_upslst_item *, pointer to a list to be appended.
+ * Input : t_upslst_item *, pointer to first list.
+ *         t_upslst_item *, pointer to second list to be appended.
  * Output: none
- * Return: t_upslst_item *, pointer to the first item of the list or NULL
+ * Return: t_upslst_item *, pointer to the first item of first list or 0
  */
-t_upslst_item *upslst_merge( t_upslst_item * const list_ptr_1,
-			     t_upslst_item * const list_ptr_2 )
+t_upslst_item *upslst_add_list( t_upslst_item * const list_ptr_1,
+				t_upslst_item * const list_ptr_2 )
 {
-  t_upslst_item *l_last_1 = NULL;
-  t_upslst_item *l_first_2 = NULL;
+  t_upslst_item *l_last_1 = 0;
+  t_upslst_item *l_first_2 = 0;
 
   if ( list_ptr_1 && list_ptr_2 ) {
     l_last_1 = upslst_last( list_ptr_1 );
@@ -273,6 +273,38 @@ t_upslst_item *upslst_merge( t_upslst_item * const list_ptr_1,
 }
 
 /*-----------------------------------------------------------------------
+ * upslst_insert_list
+ *
+ * Will append second list to passed list element.
+ *
+ * Input : t_upslst_item *, pointer to item where second list will be appended.
+ *         t_upslst_item *, pointer to second list to be appended.
+ * Output: none
+ * Return: t_upslst_item *, pointer to last element of second list or 0.
+ */
+t_upslst_item *upslst_insert_list( t_upslst_item * const list_ptr_1,
+				   t_upslst_item * const list_ptr_2 )
+{
+  t_upslst_item *l_next_1 = 0;
+  t_upslst_item *l_first_2 = 0;
+  t_upslst_item *l_last_2 = 0;
+
+  if ( list_ptr_1 && list_ptr_2 ) {
+    l_next_1 = list_ptr_1->next;
+    l_first_2 = upslst_first( list_ptr_2 );
+    l_last_2 = upslst_last( list_ptr_2 );
+    
+    list_ptr_1->next = l_first_2;
+    l_first_2->prev = list_ptr_1;
+    
+    l_last_2->next = l_next_1;
+    if ( l_next_1 ) l_next_1->prev = l_last_2;
+  }
+  
+  return ( l_last_2 ? l_last_2 : list_ptr_1 );
+}
+
+/*-----------------------------------------------------------------------
  * upslst_copy
  *
  * Will create a new list, contaning data elements from the passed list.
@@ -280,15 +312,15 @@ t_upslst_item *upslst_merge( t_upslst_item * const list_ptr_1,
  *
  * Input : t_upslst_item *, pointer to a list.
  * Output: none
- * Return: t_upslst_item *, pointer to the first item of the list or NULL
+ * Return: t_upslst_item *, pointer to the first item of the list or 0
  */
 t_upslst_item *upslst_copy( t_upslst_item * const list_ptr )
 {
-  t_upslst_item *l_ptr = NULL;
-  t_upslst_item *l_new = NULL;
+  t_upslst_item *l_ptr = 0;
+  t_upslst_item *l_new = 0;
   
   if ( !list_ptr )
-    return NULL;
+    return 0;
   
   l_ptr = upslst_first( list_ptr );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
@@ -309,9 +341,9 @@ t_upslst_item *upslst_copy( t_upslst_item * const list_ptr )
  */
 t_upslst_item *upslst_first( t_upslst_item * const list_ptr )
 {
-  t_upslst_item *l_ptr = NULL;
+  t_upslst_item *l_ptr = 0;
   
-  if ( !list_ptr ) return NULL;
+  if ( !list_ptr ) return 0;
 
   for ( l_ptr = list_ptr; l_ptr->prev; l_ptr = l_ptr->prev ) {}
 
@@ -329,9 +361,9 @@ t_upslst_item *upslst_first( t_upslst_item * const list_ptr )
  */
 t_upslst_item *upslst_last( t_upslst_item * const list_ptr )
 {
-  t_upslst_item *l_ptr = NULL;
+  t_upslst_item *l_ptr = 0;
   
-  if ( !list_ptr ) return NULL;
+  if ( !list_ptr ) return 0;
 
   for ( l_ptr = list_ptr; l_ptr->next; l_ptr = l_ptr->next ) {}
 
