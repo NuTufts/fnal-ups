@@ -320,11 +320,11 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       int i;                                                               \
       /* we have more than the minimum number of params, must be flags */  \
       for (i = 1 ; i < a_cmd->argc ; ++i) {                                \
-	if (! strcmp(a_cmd->argv[i], EXIT)) {                              \
+	if (! upsutl_stricmp(a_cmd->argv[i], EXIT)) {                      \
 	  exit_flag = DO_EXIT;                                             \
 	  continue;                                                        \
 	}                                                                  \
-	if (! strcmp(a_cmd->argv[i], NO_UPS_ENV)) {                        \
+	if (! upsutl_stricmp(a_cmd->argv[i], NO_UPS_ENV)) {                \
 	  no_ups_env_flag = DO_NO_UPS_ENV;                                 \
 	}                                                                  \
       }                                                                    \
