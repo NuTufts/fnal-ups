@@ -336,24 +336,20 @@ void upsutl_statistics(t_ups_instance const * const a_instance,
       } else {
 	/* Error opening file */
 	upserr_add(UPS_OPEN_FILE, UPS_WARNING, stat_file);
-	return_status = UPS_OPEN_FILE;
       }
     } else {
       /* Error size of directory path to file is too long */
       upserr_add(UPS_NAME_TOO_LONG, UPS_WARNING, FILENAME_MAX);
-      return_status = UPS_NAME_TOO_LONG;
     }
   } else {
     /* Error no directry passed */
     upserr_add(UPS_NO_STAT_DIR, UPS_WARNING);
-    return_status = UPS_NO_STAT_DIR;
   }
 
   /* Close the file if it was opened */
   if (file_stream != NULL) {
     fclose(file_stream);
   }
-  return(return_status);
 }
 
 /*
