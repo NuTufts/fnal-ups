@@ -103,7 +103,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 42 */  "%s: Duplicate instance in %s file\n   %s \n   key = \"%s\" \"%s\" \"%s\" \"%s\" hash(%d)\n",
 /* 43 */  "%s: Specified %s file %s\n   does not exist in specified or default locations\n", /* file not found not good enough */
 /* 44 */  "%s: Missing match in %s file \n   File: %s\n",
-/* 45 */  "%s: Product \'%s\' has no %s %s\n"
+/* 45 */  "%s: Product \'%s\' has no %s %s\n",
+/* 46 */  "%s: Found no match for product \'%s\'\n"
 };
 
 char *g_error_ascii[] = {
@@ -153,7 +154,8 @@ char *g_error_ascii[] = {
    /* UPS_FILE_NOT_FOUND      43 */ "UPS_FILE_NOT_FOUND",
    /* UPS_MISSING_MATCH       44 */ "UPS_MISSING_MATCH",
    /* UPS_NO_INSTANCE         45 */ "UPS_NO_INSTANCE",
-   /* UPS_NERR                46 */ "UPS_NERR",
+   /* UPS_NO_MATCH            46 */ "UPS_NO_MATCH",
+   /* UPS_NERR                47 */ "UPS_NERR",
    0 };
 
 /*
