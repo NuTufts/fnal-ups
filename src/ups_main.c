@@ -65,32 +65,6 @@ extern int g_LOCAL_VARS_DEF;
 #define NULL 0
 #endif
 
-/* The enum is defined in ups_main.h */
-t_cmd_info g_cmd_info[] = {
-  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z"},
-  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z"},
-  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z"},
-  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
-  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:q:r:tT:U:vVWXz:Z"},
-  {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z"},
-  {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z"},
-  {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z"},
-  {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z"},
-  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z"},
-  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
-  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:tU:vVz:Z"},
-  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
-  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z"},
-  {e_create,      "create",      "?f:H:m:M:p:q:vZ"},
-  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z"},
-  {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z"},
-  {e_help,        "help",
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:U:vVwW:x:XyYz:Z"},
-  /* the following one must always be at the end and contains all options */
-  {e_unk,         NULL,
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:U:vVwW:x:XyYz:Z"}
-};
-
 /*
  * And now for something completely different
  */
@@ -99,7 +73,7 @@ int main(int argc, char *argv[])
   t_upsugo_command *command_line = NULL;
   FILE *temp_file = NULL;
   char *temp_file_name = NULL;
-  int i = 0, empty_temp_file = 0, keep_temp_file = 0;
+  int i = e_setup, empty_temp_file = 0, keep_temp_file = 0;
   int rstatus = 0;              /* assume success */
 
   if (argv[1]) {
