@@ -62,7 +62,7 @@ if (outfile) 					/* don't use stdout */
 else
    {ofd = stdout;}
 stdout_dup = dup(STDOUT_FILENO);                /* dup stdout */
-fflush(stdout);                                 /* clear output buffer */
+(void) fflush(stdout);                          /* clear output buffer */
 status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
  
 /* call the real routine
@@ -70,20 +70,20 @@ status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
 
 uc = upsugo_env(product,options);
 UPSTST_CHECK_CALL(UPSTST_NONZEROSUCCESS,uc,estatus);
-upsugo_dump(uc,FALSE);				/* display */
+(void) upsugo_dump(uc,FALSE);			/* display */
 
 /* dump the output to specified file and compare
    --------------------------------------------- */
 
-fflush(stdout);					/* flush buffer */
-dup2(stdout_dup,STDOUT_FILENO);			/* reset stdout */
-close(stdout_dup);				/* close files*/
-if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);	
+(void) fflush(stdout);				/* flush buffer */
+(void) dup2(stdout_dup,STDOUT_FILENO);		/* reset stdout */
+(void) close(stdout_dup);			/* close files*/
+if(fileno(ofd) != STDOUT_FILENO) (void) fclose(ofd);	
 
 if (difffile && outfile)
    {
-   sprintf (diffcmd,"diff %s %s",difffile,outfile);
-   if (system(diffcmd)) printf("files %s %s differ\n",difffile,outfile);
+   (void) sprintf (diffcmd,"diff %s %s",difffile,outfile);
+   if (system(diffcmd)) (void) printf("files %s %s differ\n",difffile,outfile);
    }
 return (0);
 }
@@ -137,7 +137,7 @@ if (outfile) 					/* don't use stdout */
 else
    {ofd = stdout;}
 stdout_dup = dup(STDOUT_FILENO);                /* dup stdout */
-fflush(stdout);                                 /* clear output buffer */
+(void) fflush(stdout);                          /* clear output buffer */
 status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
 
 
@@ -148,26 +148,26 @@ UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,options))	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
-   upsugo_dump(uc,FALSE);			/* display */
+   (void) upsugo_dump(uc,FALSE);		/* display */
    ncmds++;					/* increment ncommands */
    }
 
 if (ncmds != encmds)
-   fprintf(stderr,"%s: %d, %s: %d\n","actual ncmds",ncmds, 
+   (void) fprintf(stderr,"%s: %d, %s: %d\n","actual ncmds",ncmds, 
       "expected ncmds", encmds);    
 
 /* dump the output to specified file and compare
    --------------------------------------------- */
 
-fflush(stdout);					/* flush buffer */
-dup2(stdout_dup,STDOUT_FILENO);			/* reset stdout */
-close(stdout_dup);				/* close files*/
-if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);	
+(void) fflush(stdout);				/* flush buffer */
+(void) dup2(stdout_dup,STDOUT_FILENO);		/* reset stdout */
+(void) close(stdout_dup);			/* close files*/
+if(fileno(ofd) != STDOUT_FILENO) (void) fclose(ofd);	
 
 if (difffile && outfile)
    {
-   sprintf (diffcmd,"diff %s %s",difffile,outfile);
-   if (system(diffcmd)) printf("files %s %s differ\n",difffile,outfile);
+   (void) sprintf (diffcmd,"diff %s %s",difffile,outfile);
+   if (system(diffcmd)) (void) printf("files %s %s differ\n",difffile,outfile);
    }
 
 return (0);
@@ -221,7 +221,7 @@ if (outfile) 					/* don't use stdout */
 else
    {ofd = stdout;}
 stdout_dup = dup(STDOUT_FILENO);                /* dup stdout */
-fflush(stdout);                                 /* clear output buffer */
+(void) fflush(stdout);                          /* clear output buffer */
 status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
  
 /* call the real routine
@@ -229,20 +229,20 @@ status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
 
 uc = upsugo_bldcmd(command,options);
 UPSTST_CHECK_CALL(UPSTST_NONZEROSUCCESS,uc,estatus);
-upsugo_dump(uc,FALSE);				/* display */
+(void) upsugo_dump(uc,FALSE);			/* display */
 
 /* dump the output to specified file and compare
    --------------------------------------------- */
 
-fflush(stdout);					/* flush buffer */
-dup2(stdout_dup,STDOUT_FILENO);			/* reset stdout */
-close(stdout_dup);				/* close files*/
-if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);	
+(void) fflush(stdout);				/* flush buffer */
+(void) dup2(stdout_dup,STDOUT_FILENO);		/* reset stdout */
+(void) close(stdout_dup);			/* close files*/
+if(fileno(ofd) != STDOUT_FILENO) (void) fclose(ofd);	
 
 if (difffile && outfile)
    {
-   sprintf (diffcmd,"diff %s %s",difffile,outfile);
-   if (system(diffcmd)) printf("files %s %s differ\n",difffile,outfile);
+   (void) sprintf (diffcmd,"diff %s %s",difffile,outfile);
+   if (system(diffcmd)) (void) printf("files %s %s differ\n",difffile,outfile);
    }
 return (0);
 }
