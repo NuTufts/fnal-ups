@@ -36,6 +36,8 @@
 #include "ups_configure.h"
 #include "ups_unconfigure.h"
 #include "ups_list.h"
+#include "ups_create.h"
+#include "ups_tailor.h"
 #include "ups_unk.h"
 #include "upserr.h"
 #include "upsutl.h"
@@ -160,14 +162,14 @@ int main(int argc, char *argv[])
 	  break;
 	case e_stop: ups_stop(command_line, temp_file, e_stop);
 	  break;
-	case e_tailor: ups_unk(command_line, argv[1], e_tailor);
+	case e_tailor: ups_tailor(command_line, temp_file, e_tailor);
 	  break;
 	case e_unconfigure: ups_unconfigure(command_line, temp_file,
 					    e_unconfigure);
 	  break;
 	case e_undeclare: ups_unk(command_line, argv[1], e_undeclare);
 	  break;
-	case e_create: ups_unk(command_line, argv[1], e_create);
+	case e_create: ups_create(command_line, e_create);
 	  break;
 	case e_get: ups_unk(command_line, argv[1], e_get);
 	  break;
@@ -197,30 +199,30 @@ int main(int argc, char *argv[])
 
   /* close the temp file */
   if (temp_file) {
-    if (UPS_ERROR == UPS_SUCCESS ) {
-      /* look and see where we are */
-      if (ftell(temp_file) == 0L) {
-	/* we are at the beginning of the file, nothing was written to it */
-	empty_temp_file = 1;
-      } else {
-	/* write any closing info to the file */
-	if (g_LOCAL_VARS_DEF) {
-	  /* ??? call dave's routine to undefine the local env variables */
-	}
-	
-	/* we usually tell the file to delete itself.  however the user may
-	   override this */
-	if (! keep_temp_file) {
-	  fprintf(temp_file, "/bin/rm -f %s\n", temp_file_name);
-	}
+    /* look and see where we are */
+    if (ftell(temp_file) == 0L) {
+      /* we are at the beginning of the file, nothing was written to it */
+      empty_temp_file = 1;
+    } else {
+      /* write any closing info to the file */
+      if (g_LOCAL_VARS_DEF) {
+	/* ??? call dave's routine to undefine the local env variables */
       }
-      if (fclose(temp_file) == EOF) {
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
+      
+      /* we usually tell the file to delete itself.  however the user may
+	 override this */
+      if (! keep_temp_file) {
+	fprintf(temp_file, "/bin/rm -f %s\n", temp_file_name);
       }
-      /* if nothing was written to the file, delete it, */
-      if (empty_temp_file) {
-	(void )remove(temp_file_name);
-      } else {
+    }
+    if (fclose(temp_file) == EOF) {
+      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
+    }
+    /* if nothing was written to the file, delete it, */
+    if (empty_temp_file) {
+      (void )remove(temp_file_name);
+    } else {
+      if (UPS_ERROR == UPS_SUCCESS ) {
 	switch (g_cmd_info[i].cmd_index) {
 	case e_setup: 
 	case e_unsetup: 
@@ -238,28 +240,20 @@ int main(int argc, char *argv[])
 	  break;
 	default:
 	  /* source the file within the current process context */
-	  /*	if (system(temp_file_name) <= 0) {
-		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
-		strerror(errno));
-		}*/
-	  (void )printf("(usually sourced) %s\n", temp_file_name);  /* output it for now */
+	  (void )printf("(to be sourced) %s\n", temp_file_name); /* temp */
+	  /*if (system(temp_file_name) <= 0) {
+	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
+		       strerror(errno));
+	    }*/
 	  
 	}
-      }
-    } else {
-      /* An error occurred while doing what we had to do.  close the temp file.
-	 if it is not empty leave it and report it's name. except for setup or
-	 unsetup where it is always deleted */
-      if (fclose(temp_file) == EOF) {
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
-      }
-      /* if nothing was written to the file, delete it, */
-      if (empty_temp_file) {
-	(void )remove(temp_file_name);
-      } else {
+      } else {  /* there was an error while doing the command */
 	switch (g_cmd_info[i].cmd_index) {
 	case e_setup:
 	case e_unsetup:
+	  /* we must remove the file because otherwise the setup/unsetup 
+	     command will try and source it and only half change the user's
+	     environment */
 	  (void )remove(temp_file_name);
 	  break;
 	default:
