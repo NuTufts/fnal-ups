@@ -685,29 +685,81 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
   static char newstr[4096];
   static char *string = 0;
   static char *env_string;
+  static char *slash = "/";
+  static char *dot = ".";
+  char *divider = slash;
   *newstr='\0';
   if (!command_line->ugo_b) /* did they specify a compile file */
-  {  get_element(string,compile_dir);
-     if (string) 
-     { if((env_string=upsget_translation_env(string))!=0)
-       { string=env_string;
-       }
-       strcpy(newstr,string);
-       strcat(newstr,"/");
-     }
-     get_element(string,compile_file);
-     if (string) strcat(newstr,string);
-  } else {
-    if (command_line->ugo_u)
+  /* we do not have a compile_file on the command line */
+  { if (command_line->ugo_u)
+    /* we have a compile_dir on the command line */
     { string=command_line->ugo_compile_dir;
       if((env_string=upsget_translation_env(string))!=0)
       { string=env_string;
       }
       strcpy(newstr,string); 
-      strcpy(newstr,"/"); 
+    } else {
+      /* we do not have a compile_dir on the command line, check from file */
+      get_element(string,compile_dir);
+      if (string)
+      /* we found a compile_dir in the file */
+      { if((env_string=upsget_translation_env(string))!=0)
+	{ string=env_string;
+	}
+        strcpy(newstr,string);
+      } else {
+	/* no compile_dir in the file, we need to use the default */
+	string=upsget_product(db_info_ptr, instance, command_line);
+	sprintf(newstr,"%s/%s", db_info_ptr->name, string);
+      }
     }
-    if (command_line->ugo_b)
-    { strcpy(newstr,command_line->ugo_compile_file); 
+    get_element(string,compile_file);
+    if (string) 
+    /* there was a compile_file in the file */
+    { strcat(newstr,slash);
+      strcat(newstr,string);
+    } else {
+      /* there was no compile_file in the file, use the default */
+      get_element(string, version);
+      if (string)
+      { strcat(newstr,divider);
+        strcat(newstr,string);
+	divider = dot;
+      }
+      get_element(string, flavor);
+      if (string)
+      { strcat(newstr,divider);
+        strcat(newstr,string);
+        divider = dot;
+      }
+      sprintf(newstr, "%s%s%s", newstr, divider, "compile");
+    }
+  } else {
+    /* we have a compile_file specified on the command line */
+    if (command_line->ugo_u)
+    /* we have a compile_dir on the command line */
+    { string=command_line->ugo_compile_dir;
+      if((env_string=upsget_translation_env(string))!=0)
+      { string=env_string;
+      }
+      strcpy(newstr,string); 
+      strcpy(newstr,slash); 
+      strcpy(newstr,command_line->ugo_compile_file); 
+    } else {
+      /* we do not have a compile_dir on the command line, check from file */
+      get_element(string,compile_dir);
+      if (string)
+      /* we found a compile_dir in the file */
+      { if((env_string=upsget_translation_env(string))!=0)
+	{ string=env_string;
+	}
+        sprintf(newstr, "%s/%s", string, command_line->ugo_compile_file); 
+      } else {
+	/* no compile_dir in the file, we need to use the default */
+	string=upsget_product(db_info_ptr, instance, command_line);
+	sprintf(newstr,"%s/%s/%s", db_info_ptr->name, string, 
+		command_line->ugo_compile_file);
+      }
     }
   }
   return newstr;
