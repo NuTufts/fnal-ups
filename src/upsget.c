@@ -701,6 +701,9 @@ char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
    flavor = uname_flavor;                       /* init pointer */
    if (uname(&baseuname) == -1) return(0);     /* do uname */
    (void) strcpy (flavor,baseuname.sysname);    /* get sysname */
+   if (!strncmp(flavor,"IRIX",4))               /* Slam all IRIXanything */
+   { strcpy(flavor,"IRIX");
+   }
    (void) strcat (flavor,"+");                  /* add plus */
    if (strncmp(baseuname.sysname,"AIX",3) == 0) /* because AIX is different */
    { (void) strcat(flavor,baseuname.version);  /* add in version */
