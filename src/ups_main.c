@@ -296,12 +296,11 @@ int main(int argc, char *argv[])
 	    /* simulation only, print the file name */
 	    (void )printf("%s\n", g_temp_file_name);
 	  } else {	
-	    (void )printf("(to be sourced) %s\n", g_temp_file_name); /* temp */
-	    /*if (system(g_temp_file_name) <= 0) {
+	    if (system(g_temp_file_name) <= 0) {
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			 strerror(errno));
 	      KEEP_OR_REMOVE_FILE();
-	    }*/
+	    }
 	  }
 	  
 	}
