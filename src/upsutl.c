@@ -997,15 +997,15 @@ char *upsutl_user(void)
   char *username = NULL;
   struct passwd *pwd;
 
-  /* First try to get the username by calling getpwuid.  If this does not
-     work, translate the environmental variable USER.  If this does not
+  /* First try to get the username by looking at the environment variable
+     USER..  If this does not work, call getpwuid. If this does not
      work either, set the user to UNKNOWN. */
-  if ((pwd = getpwuid(getuid())) == NULL) {
-    if ((username = (char *)getenv("USER")) == NULL) {
+  if ((username = (char *)getenv("USER")) == NULL) {
+    if ((pwd = getpwuid(getuid())) == NULL) {
       username = g_unknown_user;
+    } else {
+      username = pwd->pw_name;
     }
-  } else {
-    username = pwd->pw_name;
   }
   return (username);
 }
