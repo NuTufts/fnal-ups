@@ -215,7 +215,7 @@ Setups_Dir_Resolve()
             break
         elif test -x /usr/bin/$shell
         then
-            Ash=/usr/bin/$shell
+            AsH=/usr/bin/$shell
             break
         fi
     done
