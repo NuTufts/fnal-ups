@@ -448,7 +448,7 @@ t_cmd_map g_func_info[] = {
   { "uncopycatman", e_uncopycatman, f_uncopycatman, 0, 0, e_copycatman, 0x00000000 },
   { "copynews", e_copynews, f_copynews, 0, 0, e_invalid_cmd, 0x00000000 },
   { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd, 0x00000001 },
-  { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults, 0x00000001 },
+  { "dodefaults", e_dodefaults, f_dodefaults, 0, 1, e_dodefaults, 0x00000001 },
   { "setupenv", e_setupenv, f_setupenv, 0, 0, e_unsetupenv, 0x00000001 },
   { "proddir", e_proddir, f_proddir, 0, 0, e_unproddir, 0x00000001 },
   { "unsetupenv", e_unsetupenv, f_unsetupenv, 0, 0, e_setupenv, 0x00000001 },
@@ -4080,16 +4080,26 @@ static void f_unproddir( ACTION_PARAMS)
 static void f_dodefaults( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
+  int the_cmd;
+
+  CHECK_NUM_PARAM("doDefaults");
 
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a stream to write the output to */
   if (a_stream) {
-    switch ( a_cmd->iact ) {
+    if (a_cmd->argc > g_func_info[a_cmd->icmd].min_params) {
+      the_cmd = upsact_action2enum(
+			 a_cmd->argv[g_func_info[a_cmd->icmd].max_params - 1]);
+    } else {
+      the_cmd = a_cmd->iact;
+    }
+
+    switch ( the_cmd ) {
     case e_setup:	/* Define <PROD>_DIR and SETUP_<PROD> */
       /* use our local copy since we have to change it - we will be calling
 	 the proddir action */
-      lcl_cmd.iact = a_cmd->iact;
+      lcl_cmd.iact = the_cmd;
       lcl_cmd.argc = g_func_info[e_proddir].min_params;   /* # of args */
       lcl_cmd.icmd = e_proddir;
       f_proddir(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
@@ -4104,13 +4114,7 @@ static void f_dodefaults( ACTION_PARAMS)
       break;
     case e_create:	/* None */
       break;
-    case e_current:     /* Copy man pages to man page area in dbconfig file */
-      /* use our local copy since we have to change it */
-      lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_func_info[e_copyman].min_params;   /* # of args */
-      f_copyman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
-      f_copycatman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
-      f_copyinfo(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
+    case e_current:     /* None */
       break;
     case e_declare:	/* None */
       break;
@@ -4142,12 +4146,7 @@ static void f_dodefaults( ACTION_PARAMS)
       break;
     case e_unconfigure:	/* None */
       break;
-    case e_uncurrent:   /* Remove the man pages from the man page area */
-      /* use our local copy since we have to change it */
-      lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_func_info[e_uncopyman].min_params;   /* # of args */
-      f_uncopyman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
-      f_uncopycatman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
+    case e_uncurrent:   /* None */
       break;
     case e_undeclare:	/* None */
       break;
@@ -4161,7 +4160,7 @@ static void f_dodefaults( ACTION_PARAMS)
       break;
     case e_unsetup:
       /* use our local copy since we have to change it */
-      lcl_cmd.iact = a_cmd->iact;
+      lcl_cmd.iact = the_cmd;
       lcl_cmd.argc = g_func_info[e_unproddir].min_params;   /* # of args */
       lcl_cmd.icmd = e_unproddir;
       f_unproddir(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
