@@ -786,8 +786,8 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 			     minst->version->qualifiers);
 	    } else if (minst->table) {
 	      (void )fprintf(file_stream, "\"\" \"%s\" \"%s\" \"\" ",
-			     minst->version->flavor,
-			     minst->version->qualifiers);
+			     minst->table->flavor,
+			     minst->table->qualifiers);
 	    }
 	    if (! fprintf(file_stream, "\"%s\" \"%s\" \"%s\"\n", user,
 			  time_date, a_command))
