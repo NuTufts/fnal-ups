@@ -119,8 +119,7 @@ static void test_match(int argc, char *argv[])
   t_upsugo_command *command_line = NULL;
   char *list_valid_opts = "a?cdDf:g:h:K:lm:M:noq:r:tU:vVz:Z";
   int need_unique = 0;
-  t_upslst_item *mproduct_list, *mproduct_item;
-  t_upstyp_matched_product *mproduct = NULL;
+  t_upslst_item *mproduct_list;
 
   /* avoid the need_unique flag */
   argc -= 2;
