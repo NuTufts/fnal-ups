@@ -47,7 +47,6 @@ extern t_cmd_info g_cmd_info[];
 
 #define CHAIN "chain"
 #define VERSION "version"
-#define UNDECLARE "undeclare"
 
 /*
  * Definition of public functions.
@@ -277,10 +276,22 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                       vinst->version);
         (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
         cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                   mproduct, UNDECLARE,ups_command);
+                                   mproduct,"unconfigure",
+                                   ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
-        { upsact_process_commands(cmd_list, tmpfile); 
-           upsact_cleanup(cmd_list); 
+        { upsact_process_commands(cmd_list, tmpfile);
+          upsact_cleanup(cmd_list);
+        } else {
+          upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0;
+        }
+        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                   mproduct,g_cmd_info[ups_command].cmd,
+                                   ups_command);
+        if (UPS_ERROR == UPS_SUCCESS) 
+        { upsact_process_commands(cmd_list, tmpfile);
+          upsact_cleanup(cmd_list);
         } else {
           upsfil_clear_journal_files();
           upserr_vplace();
