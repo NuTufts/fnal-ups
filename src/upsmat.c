@@ -150,14 +150,14 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	file_list = upsutl_get_files(location, suffix);              \
 	upsmem_free(location);
 
-#define CHECK_UNIQUE(a_list) \
+#define CHECK_UNIQUE(a_list, type) \
       if (a_list) {                                                    \
         a_list = upslst_first(a_list);                                 \
         if (a_need_unique) {                                           \
 	  /* we need a unique instance, make sure we only have one */  \
   	  if (a_list->next) {                                          \
 	    /* we have more than one, this is an error */              \
-	    upserr_add(UPS_NEED_UNIQUE);                               \
+	    upserr_add(UPS_NEED_UNIQUE, UPS_FATAL, type);              \
 	    break;                                                     \
 	  }                                                            \
 	}                                                              \
@@ -304,7 +304,7 @@ t_upslst_item *upsmat_match_instance(t_upsugo_command * const a_command_line,
 
 	if (all_products) {
 	  /* make sure if we need a unique instance that we only have one */
-	  CHECK_UNIQUE(all_products);
+	  CHECK_UNIQUE(all_products, "products");
 
 	  /* read in the config file associated with this database and
 	     save it */
@@ -347,7 +347,7 @@ t_upslst_item *upsmat_match_instance(t_upsugo_command * const a_command_line,
 		}
 	      }
 	      /* make sure if we need unique instance that we only have one */
-	      CHECK_UNIQUE(all_chains);
+	      CHECK_UNIQUE(all_chains, "chains");
 	    }
 
 	    /* Look to see if a version was specified. */
@@ -358,7 +358,7 @@ t_upslst_item *upsmat_match_instance(t_upsugo_command * const a_command_line,
 		any_version = 1;             /* originally version was *  */
 	      }
 	      /* make sure if need unique instance that we only have one */
-	      CHECK_UNIQUE(all_versions);
+	      CHECK_UNIQUE(all_versions, "versions");
 	    }
 	      
 	    /* now do the instance matching */
