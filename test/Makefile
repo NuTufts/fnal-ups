@@ -43,7 +43,7 @@ default:
 
 all : unit_tests integration_tests
 
-unit_tests : test_ups_error test_upslst test_ups_memory test_ups_utils test_ups_ugo test_ups_match
+unit_tests : test_upserr test_upslst test_ups_memory test_ups_utils test_ups_ugo test_ups_match
 
 integration_tests : ups_test
 
@@ -126,48 +126,38 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
-test_ups_error.o:	test_ups_error.c
-test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
+test_ups_help.o:	test_ups_help.c
+test_ups_ugo.o:	test_ups_ugo.c
+test_ups_utils.o:	test_ups_utils.c
+test_upserr.o:	test_upserr.c
+test_upserr.o:	$(ERUPT_DIR)/inc/upserr.h
 test_upsfil.o:	test_upsfil.c
-test_upsfil.o:	$(ERUPT_DIR)/inc/ups_error.h
+test_upsfil.o:	$(ERUPT_DIR)/inc/upserr.h
 test_upsfil.o:	$(ERUPT_DIR)/inc/upsfil.h
 test_upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
 test_upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
 test_upslst.o:	test_upslst.c
 test_upslst.o:	$(ERUPT_DIR)/inc/upslst.h
-test_upslst.o:	$(ERUPT_DIR)/inc/ups_memory.h
-test_ups_match.o:	test_ups_match.c
-test_ups_match.o:	$(ERUPT_DIR)/inc/ups_match.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/upstyp.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/upslst.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/ups_error.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/upslst.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/upstyp.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/upsfil.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/upstyp.h
-test_ups_match.o:	$(ERUPT_DIR)/inc/ups_memory.h
-test_ups_memory.o:	test_ups_memory.c
-test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
-test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_utils.h
-test_ups_memory.o:	$(ERUPT_DIR)/inc/upstyp.h
-test_ups_memory.o:	$(ERUPT_DIR)/inc/upslst.h
-test_ups_memory.o:	$(ERUPT_DIR)/inc/upslst.h
-test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_error.h
-test_ups_ugo.o:	test_ups_ugo.c
-test_ups_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
-test_ups_ugo.o:	$(ERUPT_DIR)/inc/upslst.h
-test_ups_utils.o:	test_ups_utils.c
-test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
-test_ups_utils.o:	$(ERUPT_DIR)/inc/upstyp.h
-test_ups_utils.o:	$(ERUPT_DIR)/inc/upslst.h
-test_ups_utils.o:	$(ERUPT_DIR)/inc/upslst.h
-test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
-test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_match.h
-test_ups_utils.o:	$(ERUPT_DIR)/inc/upstyp.h
+test_upslst.o:	$(ERUPT_DIR)/inc/upsmem.h
+test_upsmat.o:	test_upsmat.c
+test_upsmat.o:	$(ERUPT_DIR)/inc/upsmat.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upstyp.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upslst.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upserr.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upslst.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upstyp.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upsfil.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upstyp.h
+test_upsmat.o:	$(ERUPT_DIR)/inc/upsmem.h
+test_upsmem.o:	test_upsmem.c
+test_upsmem.o:	$(ERUPT_DIR)/inc/upsmem.h
+test_upsmem.o:	$(ERUPT_DIR)/inc/upsutl.h
+test_upsmem.o:	$(ERUPT_DIR)/inc/upstyp.h
+test_upsmem.o:	$(ERUPT_DIR)/inc/upslst.h
+test_upsmem.o:	$(ERUPT_DIR)/inc/upslst.h
+test_upsmem.o:	$(ERUPT_DIR)/inc/upserr.h
 ups_test.o:	ups_test.c
 ups_test.o:	./upstst_cmdtable.h
-ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
-ups_test.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_cmdline.o:	upstst_cmdline.c
 upstst_cmdline.o:	./upstst_cmdline.h
 upstst_cmdloop.o:	upstst_cmdloop.c
@@ -181,33 +171,17 @@ upstst_cmdproc.o:	./upstst_cmdtable.h
 upstst_error.o:	upstst_error.c
 upstst_error.o:	./upstst_parse.h
 upstst_error.o:	./upstst_macros.h
-upstst_error.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_files.o:	upstst_files.c
-upstst_files.o:	$(ERUPT_DIR)/inc/upsfil.h
-upstst_files.o:	$(ERUPT_DIR)/inc/upstyp.h
-upstst_files.o:	$(ERUPT_DIR)/inc/upslst.h
-upstst_files.o:	$(ERUPT_DIR)/inc/upstyp.h
-upstst_files.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_files.o:	./upstst_parse.h
 upstst_files.o:	./upstst_macros.h
-upstst_files.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_match.o:	upstst_match.c
-upstst_match.o:	$(ERUPT_DIR)/inc/upstyp.h
-upstst_match.o:	$(ERUPT_DIR)/inc/upslst.h
-upstst_match.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_match.o:	./upstst_parse.h
 upstst_match.o:	./upstst_macros.h
-upstst_match.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_misc.o:	upstst_misc.c
 upstst_misc.o:	./upstst_parse.h
 upstst_misc.o:	./upstst_macros.h
-upstst_misc.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_parse.o:	upstst_parse.c
 upstst_parse.o:	./upstst_parse.h
 upstst_ugo.o:	upstst_ugo.c
-upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
-upstst_ugo.o:	$(ERUPT_DIR)/inc/upslst.h
-upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_ugo.o:	./upstst_parse.h
 upstst_ugo.o:	./upstst_macros.h
-upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_error.h

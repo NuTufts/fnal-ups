@@ -14,9 +14,7 @@ Include files:-
 #include <string.h>
 
 /* ups specific include files */
-#include "ups_files.h"
-#include "ups_types.h"
-#include "ups_error.h"
+#include "ups.h"
 #include "upstst_parse.h"
 #include "upstst_macros.h"
 

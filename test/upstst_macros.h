@@ -11,7 +11,7 @@ Header file with useful things for wrapper routines
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "ups_error.h"
+#include "upserr.h"
 
 /* Global variables
    ================ */

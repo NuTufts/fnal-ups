@@ -8,7 +8,7 @@ Include files:-
 */
 #include "stdlib.h"
 #include "upstst_cmdtable.h"
-#include "ups_types.h"
+#include "ups.h"
 
 /* Globals:-
    ========= */
