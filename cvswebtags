@@ -25,10 +25,7 @@ fill_ugo_struct  628 src/ups_copy.c   static t_upsugo_command *fill_ugo_struct(
 free_new_dclr_instance 612 src/ups_copy.c   static t_upstyp_instance *free_new_dclr_instance(
 free_ugo_struct  695 src/ups_copy.c   static t_upsugo_command *free_ugo_struct( 
 ups_copy         163 src/ups_copy.c   t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
-ups_declare      172 src/ups_declare.c t_upslst_item *ups_declare( t_upsugo_command * const uc ,
-upsdcl_new_chain  78 src/ups_declare.c t_upstyp_instance *upsdcl_new_chain(t_upsugo_command * const uc)
-upsdcl_new_product  67 src/ups_declare.c t_upstyp_product *upsdcl_new_product(t_upsugo_command * const uc)
-upsdcl_new_version  93 src/ups_declare.c t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
+main              91 src/ups_main.c   int main(int argc, char *argv[])
 shutup            94 src/ups_depend.c static void shutup (const char * const s_cmd)
 ups_depend        66 src/ups_depend.c t_upslst_item *ups_depend( t_upsugo_command * const u_cmd, 
 ups_flavor        56 src/ups_flavor.c void ups_flavor( t_upsugo_command * const uc )
@@ -52,33 +49,20 @@ product_cmp      292 src/ups_list.c   int product_cmp ( const void * const d1, c
 product_name     299 src/ups_list.c   int product_name ( const void * const d1, const void * const d2 )
 ups_list         318 src/ups_list.c   t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
 ups_list_core    438 src/ups_list.c   t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
-main              91 src/ups_main.c   int main(int argc, char *argv[])
+ups_setup         63 src/ups_setup.c  t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 choose_file      123 src/ups_modify.c int choose_file( void )
 edit_file        232 src/ups_modify.c int edit_file( char * const file_name )
 make_file_list   166 src/ups_modify.c int make_file_list( void )
 shutup           406 src/ups_modify.c static void shutup(const FILE * const tmpfile, const int ups_command)
 ups_modify        82 src/ups_modify.c t_upslst_item *ups_modify( t_upsugo_command * const uc , 
 verify_file      356 src/ups_modify.c int verify_file( char * const file_name )
-ups_setup         63 src/ups_setup.c  t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 ups_start         61 src/ups_start.c  t_upslst_item *ups_start(const t_upsugo_command * const a_command_line,
 ups_stop          61 src/ups_stop.c   t_upslst_item *ups_stop(const t_upsugo_command * const a_command_line,
 ups_tailor        64 src/ups_tailor.c t_upslst_item *ups_tailor( const t_upsugo_command * const a_command_line,
 shutup           251 src/ups_touch.c  static void shutup(const FILE * const tmpfile, const int ups_command)
 ups_touch         73 src/ups_touch.c  t_upslst_item *ups_touch( t_upsugo_command * const uc,
 ups_unconfigure   61 src/ups_unconfigure.c t_upslst_item *ups_unconfigure( const t_upsugo_command * const a_command_line,
-ups_undeclare     65 src/ups_undeclare.c t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
 ups_unk           60 src/ups_unk.c    t_upslst_item *ups_unk(const t_upsugo_command * const a_command_line,
-ups_unsetup       61 src/ups_unsetup.c t_upslst_item *ups_unsetup( const t_upsugo_command * const a_command_line,
-CHECK_FOR_COMMA  106 src/ups_verify.c #define CHECK_FOR_COMMA(keyword)     \
-VERIFY_DIR_SPEC   71 src/ups_verify.c #define VERIFY_DIR_SPEC(dir, tran)   \
-VERIFY_FILE_SPEC  93 src/ups_verify.c #define VERIFY_FILE_SPEC(file)   \
-shutup           394 src/ups_verify.c static void shutup (VERIFY_INST_PARAMS)
-ups_verify_chain_instance 213 src/ups_verify.c static void ups_verify_chain_instance(VERIFY_INST_PARAMS)
-ups_verify_dbconfig 125 src/ups_verify.c void ups_verify_dbconfig(const t_upstyp_db * const a_db,
-ups_verify_generic_instance 369 src/ups_verify.c static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
-ups_verify_matched_instance 171 src/ups_verify.c void ups_verify_matched_instance(const t_upstyp_db * const a_db,
-ups_verify_table_instance 299 src/ups_verify.c static void ups_verify_table_instance(VERIFY_INST_PARAMS)
-ups_verify_version_instance 242 src/ups_verify.c static void ups_verify_version_instance(VERIFY_INST_PARAMS)
 CHECK_FOR_PATH   237 src/upsact.c     #define CHECK_FOR_PATH(thePath, theDelimiter)  \
 CHECK_NUM_PARAM  200 src/upsact.c     #define CHECK_NUM_PARAM(action) \
 CSH_OUTPUT_LAST_PART_OPT 288 src/upsact.c     #define CSH_OUTPUT_LAST_PART_OPT() \
@@ -99,64 +83,64 @@ SET_NO_ACTION_ERROR 310 src/upsact.c     #define SET_NO_ACTION_ERROR( str ) \
 SET_PARSE_ERROR  306 src/upsact.c     #define SET_PARSE_ERROR( str ) \
 SET_SETUP_PROD   293 src/upsact.c     #define SET_SETUP_PROD() \
 SH_OUTPUT_LAST_PART_OPT 283 src/upsact.c     #define SH_OUTPUT_LAST_PART_OPT() \
-actitem2str     2308 src/upsact.c     char *actitem2str( const t_upsact_item *const p_act_itm )
-cmp_ugo_db      1964 src/upsact.c     int cmp_ugo_db( const void * const d1, const void * const d2 )
-copy_act_item   2008 src/upsact.c     t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
-csh_output_first_check3289 src/upsact.c     static int csh_output_first_check(const FILE * const a_stream,
-csh_output_last_part_req3365 src/upsact.c     static int csh_output_last_part_req(const FILE * const a_stream,
-csh_output_next_part3301 src/upsact.c     static int csh_output_next_part(const FILE * const a_stream,
-do_exit_action  2268 src/upsact.c     int do_exit_action( const t_upsact_cmd * const a_cmd ) 
-f_addalias      3141 src/upsact.c     static void f_addalias( ACTION_PARAMS)
-f_copycatman    2412 src/upsact.c     static void f_copycatman( ACTION_PARAMS)
-f_copyhtml      2388 src/upsact.c     static void f_copyhtml( ACTION_PARAMS)
-f_copyinfo      2396 src/upsact.c     static void f_copyinfo( ACTION_PARAMS)
-f_copyman       2404 src/upsact.c     static void f_copyman( ACTION_PARAMS)
-f_copynews      2436 src/upsact.c     static void f_copynews( ACTION_PARAMS)
-f_dodefaults    4018 src/upsact.c     static void f_dodefaults( ACTION_PARAMS)
-f_envappend     2444 src/upsact.c     static void f_envappend( ACTION_PARAMS)
-f_envprepend    2501 src/upsact.c     static void f_envprepend( ACTION_PARAMS)
-f_envremove     2559 src/upsact.c     static void f_envremove( ACTION_PARAMS)
-f_envset        2642 src/upsact.c     static void f_envset( ACTION_PARAMS)
-f_envsetifnotset2680 src/upsact.c     static void f_envsetifnotset( ACTION_PARAMS)
-f_envunset      2720 src/upsact.c     static void f_envunset( ACTION_PARAMS)
-f_exeaccess     2756 src/upsact.c     static void f_exeaccess( ACTION_PARAMS)
-f_execute       2808 src/upsact.c     static void f_execute( ACTION_PARAMS)
-f_filetest      2869 src/upsact.c     static void f_filetest( ACTION_PARAMS)
-f_pathappend    2914 src/upsact.c     static void f_pathappend( ACTION_PARAMS)
-f_pathprepend   2970 src/upsact.c     static void f_pathprepend( ACTION_PARAMS)
-f_pathremove    3027 src/upsact.c     static void f_pathremove( ACTION_PARAMS)
-f_pathset       3093 src/upsact.c     static void f_pathset( ACTION_PARAMS)
-f_proddir       3918 src/upsact.c     static void f_proddir( ACTION_PARAMS)
-f_setupenv      3875 src/upsact.c     static void f_setupenv( ACTION_PARAMS)
-f_sourcecompileopt3436 src/upsact.c     static void f_sourcecompileopt( ACTION_PARAMS)
-f_sourcecompilereq3383 src/upsact.c     static void f_sourcecompilereq( ACTION_PARAMS)
-f_sourceoptcheck3664 src/upsact.c     static void f_sourceoptcheck( ACTION_PARAMS)
-f_sourceoptional3546 src/upsact.c     static void f_sourceoptional( ACTION_PARAMS)
-f_sourcereqcheck3603 src/upsact.c     static void f_sourcereqcheck( ACTION_PARAMS)
-f_sourcerequired3486 src/upsact.c     static void f_sourcerequired( ACTION_PARAMS)
-f_unalias       3195 src/upsact.c     static void f_unalias( ACTION_PARAMS)
-f_uncopycatman  2428 src/upsact.c     static void f_uncopycatman( ACTION_PARAMS)
-f_uncopyman     2420 src/upsact.c     static void f_uncopyman( ACTION_PARAMS)
-f_unproddir     3989 src/upsact.c     static void f_unproddir( ACTION_PARAMS)
-f_unsetupenv    3889 src/upsact.c     static void f_unsetupenv( ACTION_PARAMS)
-f_writecompilescript3720 src/upsact.c     static void f_writecompilescript(ACTION_PARAMS)
-find_prod_name  1949 src/upsact.c     t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
-get_SETUP_prod  1699 src/upsact.c     t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
-get_act         1759 src/upsact.c     t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
-get_top_item    1869 src/upsact.c     t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
-get_ugo         1796 src/upsact.c     t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
-is_prod_done    1938 src/upsact.c     int is_prod_done( const char *const prod_name )
-merge_ugo_db    1976 src/upsact.c     t_upslst_item* merge_ugo_db( t_upslst_item * const l_db1,
-new_act_item    2037 src/upsact.c     t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
-new_default_action2099 src/upsact.c     t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm, 
-next_cmd        1318 src/upsact.c     t_upslst_item *next_cmd( t_upslst_item * const top_list,
+actitem2str     2306 src/upsact.c     char *actitem2str( const t_upsact_item *const p_act_itm )
+cmp_ugo_db      1962 src/upsact.c     int cmp_ugo_db( const void * const d1, const void * const d2 )
+copy_act_item   2006 src/upsact.c     t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
+csh_output_first_check3287 src/upsact.c     static int csh_output_first_check(const FILE * const a_stream,
+csh_output_last_part_req3363 src/upsact.c     static int csh_output_last_part_req(const FILE * const a_stream,
+csh_output_next_part3299 src/upsact.c     static int csh_output_next_part(const FILE * const a_stream,
+do_exit_action  2266 src/upsact.c     int do_exit_action( const t_upsact_cmd * const a_cmd ) 
+f_addalias      3139 src/upsact.c     static void f_addalias( ACTION_PARAMS)
+f_copycatman    2410 src/upsact.c     static void f_copycatman( ACTION_PARAMS)
+f_copyhtml      2386 src/upsact.c     static void f_copyhtml( ACTION_PARAMS)
+f_copyinfo      2394 src/upsact.c     static void f_copyinfo( ACTION_PARAMS)
+f_copyman       2402 src/upsact.c     static void f_copyman( ACTION_PARAMS)
+f_copynews      2434 src/upsact.c     static void f_copynews( ACTION_PARAMS)
+f_dodefaults    4016 src/upsact.c     static void f_dodefaults( ACTION_PARAMS)
+f_envappend     2442 src/upsact.c     static void f_envappend( ACTION_PARAMS)
+f_envprepend    2499 src/upsact.c     static void f_envprepend( ACTION_PARAMS)
+f_envremove     2557 src/upsact.c     static void f_envremove( ACTION_PARAMS)
+f_envset        2640 src/upsact.c     static void f_envset( ACTION_PARAMS)
+f_envsetifnotset2678 src/upsact.c     static void f_envsetifnotset( ACTION_PARAMS)
+f_envunset      2718 src/upsact.c     static void f_envunset( ACTION_PARAMS)
+f_exeaccess     2754 src/upsact.c     static void f_exeaccess( ACTION_PARAMS)
+f_execute       2806 src/upsact.c     static void f_execute( ACTION_PARAMS)
+f_filetest      2867 src/upsact.c     static void f_filetest( ACTION_PARAMS)
+f_pathappend    2912 src/upsact.c     static void f_pathappend( ACTION_PARAMS)
+f_pathprepend   2968 src/upsact.c     static void f_pathprepend( ACTION_PARAMS)
+f_pathremove    3025 src/upsact.c     static void f_pathremove( ACTION_PARAMS)
+f_pathset       3091 src/upsact.c     static void f_pathset( ACTION_PARAMS)
+f_proddir       3916 src/upsact.c     static void f_proddir( ACTION_PARAMS)
+f_setupenv      3873 src/upsact.c     static void f_setupenv( ACTION_PARAMS)
+f_sourcecompileopt3434 src/upsact.c     static void f_sourcecompileopt( ACTION_PARAMS)
+f_sourcecompilereq3381 src/upsact.c     static void f_sourcecompilereq( ACTION_PARAMS)
+f_sourceoptcheck3662 src/upsact.c     static void f_sourceoptcheck( ACTION_PARAMS)
+f_sourceoptional3544 src/upsact.c     static void f_sourceoptional( ACTION_PARAMS)
+f_sourcereqcheck3601 src/upsact.c     static void f_sourcereqcheck( ACTION_PARAMS)
+f_sourcerequired3484 src/upsact.c     static void f_sourcerequired( ACTION_PARAMS)
+f_unalias       3193 src/upsact.c     static void f_unalias( ACTION_PARAMS)
+f_uncopycatman  2426 src/upsact.c     static void f_uncopycatman( ACTION_PARAMS)
+f_uncopyman     2418 src/upsact.c     static void f_uncopyman( ACTION_PARAMS)
+f_unproddir     3987 src/upsact.c     static void f_unproddir( ACTION_PARAMS)
+f_unsetupenv    3887 src/upsact.c     static void f_unsetupenv( ACTION_PARAMS)
+f_writecompilescript3718 src/upsact.c     static void f_writecompilescript(ACTION_PARAMS)
+find_prod_name  1947 src/upsact.c     t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
+get_SETUP_prod  1698 src/upsact.c     t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
+get_act         1758 src/upsact.c     t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
+get_top_item    1868 src/upsact.c     t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
+get_ugo         1795 src/upsact.c     t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
+is_prod_done    1936 src/upsact.c     int is_prod_done( const char *const prod_name )
+merge_ugo_db    1974 src/upsact.c     t_upslst_item* merge_ugo_db( t_upslst_item * const l_db1,
+new_act_item    2035 src/upsact.c     t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
+new_default_action2097 src/upsact.c     t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm, 
+next_cmd        1317 src/upsact.c     t_upslst_item *next_cmd( t_upslst_item * const top_list,
 next_top_prod   1174 src/upsact.c     t_upslst_item *next_top_prod( t_upslst_item * top_list,
-parse_params    1608 src/upsact.c     int parse_params( const char * const a_params, char **argv )
-reverse_command_list2135 src/upsact.c     t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm, 
-sh_output_first_check3231 src/upsact.c     static int sh_output_first_check(const FILE * const a_stream,
-sh_output_last_part_req3347 src/upsact.c     static int sh_output_last_part_req(const FILE * const a_stream,
-sh_output_next_part3243 src/upsact.c     static int sh_output_next_part(const FILE * const a_stream,
-shutup          4127 src/upsact.c     static void shutup( ACTION_PARAMS)
+parse_params    1607 src/upsact.c     int parse_params( const char * const a_params, char **argv )
+reverse_command_list2133 src/upsact.c     t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm, 
+sh_output_first_check3229 src/upsact.c     static int sh_output_first_check(const FILE * const a_stream,
+sh_output_last_part_req3345 src/upsact.c     static int sh_output_last_part_req(const FILE * const a_stream,
+sh_output_next_part3241 src/upsact.c     static int sh_output_next_part(const FILE * const a_stream,
+shutup          4125 src/upsact.c     static void shutup( ACTION_PARAMS)
 upsact_action2enum1030 src/upsact.c     int upsact_action2enum( const char * const act_name )
 upsact_check_files1058 src/upsact.c     t_upslst_item *upsact_check_files(
 upsact_cleanup   876 src/upsact.c     void upsact_cleanup( t_upslst_item *dep_list )
@@ -169,8 +153,18 @@ upsact_parse_cmd 779 src/upsact.c     t_upsact_cmd *upsact_parse_cmd( const char
 upsact_print     495 src/upsact.c     int upsact_print( t_upsugo_command * const ugo_cmd,
 upsact_print_cmd 936 src/upsact.c     void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
 upsact_print_item 906 src/upsact.c     void upsact_print_item( const t_upsact_item *const act_itm, 
-upsact_process_commands2361 src/upsact.c     void upsact_process_commands( const t_upslst_item * const a_cmd_list,
+upsact_process_commands2359 src/upsact.c     void upsact_process_commands( const t_upslst_item * const a_cmd_list,
 upsact_trim_unsetup 748 src/upsact.c     t_upslst_item *upsact_trim_unsetup( t_upslst_item * const act_list,
+CHECK_FOR_COMMA  106 src/ups_verify.c #define CHECK_FOR_COMMA(keyword)     \
+VERIFY_DIR_SPEC   71 src/ups_verify.c #define VERIFY_DIR_SPEC(dir, tran)   \
+VERIFY_FILE_SPEC  93 src/ups_verify.c #define VERIFY_FILE_SPEC(file)   \
+shutup           394 src/ups_verify.c static void shutup (VERIFY_INST_PARAMS)
+ups_verify_chain_instance 213 src/ups_verify.c static void ups_verify_chain_instance(VERIFY_INST_PARAMS)
+ups_verify_dbconfig 125 src/ups_verify.c void ups_verify_dbconfig(const t_upstyp_db * const a_db,
+ups_verify_generic_instance 369 src/ups_verify.c static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
+ups_verify_matched_instance 171 src/ups_verify.c void ups_verify_matched_instance(const t_upstyp_db * const a_db,
+ups_verify_table_instance 299 src/ups_verify.c static void ups_verify_table_instance(VERIFY_INST_PARAMS)
+ups_verify_version_instance 242 src/ups_verify.c static void ups_verify_version_instance(VERIFY_INST_PARAMS)
 COPY_FILES       166 src/upscpy.c     #define COPY_FILES(filename, dest_path, type)  \
 FPRINTF_ERROR     82 src/upscpy.c     #define FPRINTF_ERROR() \
 PROCESS_DIR      187 src/upscpy.c     #define PROCESS_DIR(dir_name, dir_size, type, keyword)   \
@@ -436,6 +430,12 @@ upsutl_unset_upsvars 266 src/upsutl.c     void upsutl_unset_upsvars( const FILE 
 upsutl_upcase    940 src/upsutl.c     char *upsutl_upcase(const char * const a_str)
 upsutl_user     1031 src/upsutl.c     char *upsutl_user(void)
 upsver_mes        56 src/upsver.c     void upsver_mes (const int vl, char * const format, ...)
+ups_unsetup       61 src/ups_unsetup.c t_upslst_item *ups_unsetup( const t_upsugo_command * const a_command_line,
+ups_undeclare     65 src/ups_undeclare.c t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
+ups_declare      172 src/ups_declare.c t_upslst_item *ups_declare( t_upsugo_command * const uc ,
+upsdcl_new_chain  78 src/ups_declare.c t_upstyp_instance *upsdcl_new_chain(t_upsugo_command * const uc)
+upsdcl_new_product  67 src/ups_declare.c t_upstyp_product *upsdcl_new_product(t_upsugo_command * const uc)
+upsdcl_new_version  93 src/ups_declare.c t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
 TOO_MUCH_FOR_UNSETUP  41 inc/upsact.h     #define TOO_MUCH_FOR_UNSETUP( ugo_cmd ) \
 UPSACT_CMD_NEEDS_DB 185 inc/upsact.h     #define UPSACT_CMD_NEEDS_DB( flag ) (flag&0x00000010 ? 1 : 0)
 UPSACT_FUNC_ISIN_TABLE 184 inc/upsact.h     #define UPSACT_FUNC_ISIN_TABLE( flag ) (flag&0x00000001 ? 1 : 0)
