@@ -94,8 +94,9 @@ static char *g_error_messages[UPS_NERR] = {
 /* 34 */  "%s: Cannot do unsetup, SETUP_%s is not defined\n",
 /* 35 */  "%s: Cannot do %s, no product specified on command line\n",
 /* 36 */  "%s: Action parsing failed on \"%s\"\n",
-/* 37 */  "%s: Mismatch in unsetup and SETUP_ env. variable for %s\n"
-/* 38 this is the last */
+/* 37 */  "%s: Mismatch in unsetup and SETUP_ env. variable for %s\n",
+/* 38 */  "%s: There is no ACTION=%s section in this table file.\n"
+/* 39 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -137,7 +138,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_PRODUCT          35 */ "UPS_NO_PRODUCT",
    /* UPS_ACTION_PARSE        36 */ "UPS_ACTION_PARSE",
    /* UPS_UNSETUP_CLASH       37 */ "UPS_UNSETUP_CLASH",		    
-   /* UPS_NERR                38 */ "UPS_NERR",
+   /* UPS_NO_ACTION           38 */ "UPS_NO_ACTION",
+   /* UPS_NERR                39 */ "UPS_NERR",
    0 };
 
 /*
