@@ -158,13 +158,14 @@ void ups_declare( t_upsugo_command * const uc ,
     db_info = (t_upstyp_db *)db_list->data;
   } 
 /* restore everything */
-  upslst_free(uc->ugo_chain,'d');
+  uc->ugo_chain=upslst_free(uc->ugo_chain,'d');
   uc->ugo_chain=save_chain;
   uc->ugo_version=save_version;
-  upslst_free(uc->ugo_flavor,'d');
+  uc->ugo_flavor=upslst_free(uc->ugo_flavor,'d');
   uc->ugo_flavor=save_flavor;
-  upslst_free(uc->ugo_qualifiers,'d');
+  uc->ugo_qualifiers=upslst_free(uc->ugo_qualifiers,'d');
   uc->ugo_qualifiers=save_qualifiers;
+  upsugo_dump(uc,1);
 /************************************************************************
  *
  * If there was any chain specified at all we need to look at chain files
@@ -268,12 +269,18 @@ void ups_declare( t_upsugo_command * const uc ,
  *
  ***********************************************************************/
 /* We want NOTHING to do with chains at this point - it is out of sync */
-    if(uc->ugo_chain) { upslst_free(uc->ugo_chain,'d'); }
+/*    if(uc->ugo_chain) 
+    { uc->ugo_chain=upslst_free(uc->ugo_chain,'d'); }
+*/
     uc->ugo_chain=0;
     uc->ugo_version=save_version;  /* we must match of version now */
-    if(uc->ugo_flavor) { upslst_free(uc->ugo_flavor,'d'); }
+/*    if(uc->ugo_flavor) 
+    { uc->ugo_flavor=upslst_free(uc->ugo_flavor,'d'); }
+*/
     uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
-    if(uc->ugo_qualifiers) { upslst_free(uc->ugo_qualifiers,'d'); }
+/*    if(uc->ugo_qualifiers) 
+    { uc->ugo_qualifiers=upslst_free(uc->ugo_qualifiers,'d'); }
+*/
     uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
     mproduct_list = upsmat_instance(uc, db_list , not_unique);
     if (mproduct_list) 
