@@ -10,7 +10,15 @@
 #    o Edit the updconfig file for your system
 #    o Edit the updusr.pm file for your system
 #
-################################################################################
+###############################################################################
+#
+# This script takes 1 parameter, a name of a file.  If the file does not exist,
+# it will prompt the user for all of the necessary information and then save
+# the answers in the file.  The next time the script is invoked with the
+# parameter as the file, it will not prompt the user, but will read the info
+# from the file.
+#
+###############################################################################
 #  This file will help you install ups/upd on your system.  This installation
 #  procedure is very interactive and will ask many questions.  It does the
 #  following based on the answers it receives.
