@@ -631,18 +631,16 @@ t_upstyp_instance *upsmat_version(t_upstyp_instance * const a_inst,
 {
   t_upslst_item *minst_list = NULL;
   t_upslst_item flavor_list = {NULL, NULL, NULL};
-/* DjF */
+  t_upslst_item *flavor_list_ptr = &flavor_list;
   t_upslst_item any_flavor_list = {NULL, ANY_FLAVOR, NULL};
-/* DjF */
   t_upslst_item quals_list = {NULL, NULL, NULL};
   t_upstyp_matched_instance *minst = NULL;
   t_upstyp_instance *tinst = NULL;
   int num_matches;
   int need_unique = 1;
-/* DjF */
-  any_flavor_list.prev = &flavor_list;
-  flavor_list.next = &any_flavor_list;
-/* DjF */
+
+  
+  flavor_list_ptr = upslst_add_list(flavor_list_ptr, &any_flavor_list);
   if (a_inst) {
     /* fill in the flavor list and the qualifer list */
     if (a_inst->flavor) {
