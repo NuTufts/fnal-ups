@@ -89,9 +89,15 @@ t_upstyp_product *upsutl_get_config( const char * const a_db)
   t_upstyp_product *read_product = NULL;
   char *buffer = NULL;
   
-  buffer = (char *)malloc(strlen(a_db) + (unsigned int )CONFIG_SIZE);
+  buffer = (char *)malloc(strlen(a_db) + (unsigned int )CONFIG_SIZE +
+			  (unsigned int ) 4);
   if (buffer) {
+    sprintf(buffer, "%s/../%s", a_db, CONFIG_FILE);
     read_product = upsfil_read_file(buffer);
+    if (UPS_ERROR == UPS_NO_FILE) {
+      upserr_backup();
+      upserr_backup();
+    }
   } else {
     upserr_add(UPS_NO_MEMORY, UPS_WARNING, strlen(buffer));
   }
