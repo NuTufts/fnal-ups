@@ -428,6 +428,7 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
   *newstr='\0';
   get_element(string,compile_dir);
   if (string) strcpy(newstr,string);
+  if (string) strcat(newstr,"/");
   get_element(string,compile_file);
   if (string) strcat(newstr,string);
   return newstr;

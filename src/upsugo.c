@@ -1027,6 +1027,14 @@ int upsugo_dump (struct ups_command * const uc,
          printf("Archivefile:      %s\n",uc->ugo_archivefile); 
       if ( uc->ugo_upsdir ) 
          printf("Upsdir:           %s\n",uc->ugo_upsdir); 
+      if ( uc->ugo_origin) 
+         printf("Origin:           %s\n",uc->ugo_origin); 
+      if ( uc->ugo_compile_dir) 
+         printf("Compile Dir:           %s\n",uc->ugo_compile_dir); 
+      if ( uc->ugo_compile_file) 
+         printf("Compile File:           %s\n",uc->ugo_compile_file); 
+      if ( uc->ugo_number) 
+         printf("UGO number[0-3]+1:           %d\n",uc->ugo_number); 
       if ( uc->ugo_db ) 
          upsugo_prtdb(uc->ugo_db,"DB:               ",prnt_ptr); 
       if ( uc->ugo_chain ) 

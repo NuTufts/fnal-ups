@@ -404,6 +404,17 @@ void list_output(const t_upslst_item * const a_mproduct_list,
             }
           }
           printf("%s\n", minst_ptr->version->prod_dir);
+          if (minst_ptr->version->compile_dir || 
+              minst_ptr->version->compile_file)
+          { printf("\t\tCompile=");
+            if (minst_ptr->version->compile_dir)
+            { printf("%s",minst_ptr->version->compile_dir); }
+            if (minst_ptr->version->compile_file)
+            { printf("/%s",minst_ptr->version->compile_file); }
+            printf("\n");
+          } else {
+            printf("\t\tNo Compile Directive\n"); /* ;) */
+          }
           if (upsutl_is_authorized( minst_ptr, mproduct->db_info,&nodes))
           { printf("\t\tAuthorized, Nodes=%s\n",nodes);
           } else {
@@ -480,6 +491,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(ups_dir)
     FromVersion(prod_dir)
     FromVersion(archive_file)
+    FromVersion(compile_file)
+    FromVersion(compile_dir)
     FromVersion(description)
     FromVersion(origin)
 /*    FromVersion(db_dir) */
