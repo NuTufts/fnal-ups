@@ -107,7 +107,6 @@ enum {
   e_cshexecute,
   e_shexecute,
   e_filetest,
-  e_makedir,
   e_copyhtml,
   e_copyinfo,
   e_copyman,
