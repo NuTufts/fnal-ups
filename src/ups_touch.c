@@ -55,9 +55,9 @@ extern t_cmd_info g_cmd_info[];
  */
 
 /*-----------------------------------------------------------------------
- * ups_declare
+ * ups_touch
  *
- * This is the main line for the 'ups declare' command.
+ * This is the main line for the 'ups touch' command.
  *
  * Input : 
  * Output: 

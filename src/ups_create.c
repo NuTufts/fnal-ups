@@ -39,7 +39,7 @@
 /*
  * Declaration of private functions.
  */
-
+# define COMMENT_LINES 17
 /*
  * Definition of global variables.
  */
@@ -67,6 +67,26 @@ t_upslst_item *ups_create(const t_upsugo_command * const a_command_line,
   t_upstyp_instance *instance;
   t_upslst_item *inst_list = NULL, *flavor_item, *quals_item;
   char *flavor, *quals;
+  int did_comments=0;          /* Add comments only once and only on new file */
+  static char *comment[COMMENT_LINES]={
+"# Several additional specifications examples and variables",
+"# MAN_SOURCE_DIR=ups/toman",
+"# INFO_SOURCE_DIR=ups/toinfo",
+"# HTML_SOURCE_DIR=\?\?\?",
+"# CATMAN_SOURCE_DIR=ups/toman",
+"# NEWS_SOURCE_DIR=\?\?\?",
+"# Action=setup",
+"# - Defines the environmental that allows product to unsetup",
+"#     setupEnv()",
+"# - Defines the PRODUCT_DIR environment",
+"#     prodDir()",
+"# - Put product in your path",
+"#     pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)",
+"# - or add an alias based on it's name",
+"#     addAlias(${UPS_PROD_NAME},${UPS_PROD_DIR}/bin/${UPS_PROD_NAME} %s)",
+"# - If you need a source alias/procedure with mine and users options",
+"#     addAlias(doit,'${UPS_SOURCE} `${UPS_PROD_DIR}/bin/exefile myopt %s`')"
+};
 
   /* make sure at least a name of a table file was passed */
   if (a_command_line->ugo_m) {
@@ -85,6 +105,12 @@ t_upslst_item *ups_create(const t_upsugo_command * const a_command_line,
 				       upsutl_str_create("",' '));
       }
       product = ups_new_product();
+      if(!did_comments)
+      { for ( did_comments=0; did_comments<=COMMENT_LINES; did_comments++)
+        product->comment_list = 
+              upslst_add(product->comment_list,
+                         upsutl_str_create(comment[did_comments],' '));
+      }
 
       /* no file - we can create it. first fill out the instances. if no
          particular list of flavors were entered, then just put flavor=any 
