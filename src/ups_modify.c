@@ -117,42 +117,41 @@ int choose_file( void )
      the user choose the file to be edited */
 
   int i;
-  int num = UNDEFINED;
+  int num;
   char str[80];
+
+  if ( g_file_count > 0 )
+  {
+
+    /* one file */
+
+    if ( g_file_count == 1 ) 
+      return 0;
+
+    /* more than one file */
+
+    (void) fprintf( stdout, "\n" );
+    for ( i=0; i<g_file_count; i++ )
+      (void) fprintf( stdout, "[%d] %s\n", i, g_file_list[i] );
+
+    for (;;) {
+      (void) fprintf( stdout,"Choose file to edit [%d-%d] or 'q' to quit: ", 
+	       0, g_file_count - 1 );
+      (void) fgets( str, 79, stdin );
+
+      if ( strchr( str, 'q' ) || strchr( str, 'Q' ) )
+        return QUIT;
+
+      (void) sscanf( str, "%d", &num );
+
+      if ( num >= 0 && num < g_file_count )
+        return num;
+    }
+  }
 
   /* no files */
 
-  if ( g_file_count <= 0 )
-    return UNDEFINED;
-
-  /* one file */
-
-  if ( g_file_count == 1 ) 
-    return 0;
-
-  /* more than one file */
-
-  (void) fprintf( stdout, "\n" );
-  for ( i=0; i<g_file_count; i++ )
-    (void) fprintf( stdout, "[%d] %s\n", i, g_file_list[i] );
-
-  for (;;) {
-    (void) fprintf( stdout,"Choose file to edit [%d-%d] or 'q' to quit: ", 
-	     0, g_file_count - 1 );
-    (void) fgets( str, 79, stdin );
-
-    if ( strchr( str, 'q' ) || strchr( str, 'Q' ) )
-      return QUIT;
-
-    (void) sscanf( str, "%d", &num );
-
-    if ( num >= 0 && num < g_file_count )
-      return num;
-  }
-
-  /* we should never come here
   return UNDEFINED;
-  */
 }
 
 int make_file_list( void )
