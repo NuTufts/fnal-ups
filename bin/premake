@@ -54,6 +54,16 @@ else
 fi
 
 #------------------------------------------------------------------------
+# look first to see if we should be using ERUPT_DIR or UPS_DIR
+#------------------------------------------------------------------------
+
+if [ "$ERUPT_DIR" = "" ]; then
+    the_real_dir=$UPS_DIR
+else
+    the_real_dir=$ERUPT_DIR
+fi
+
+#------------------------------------------------------------------------
 # PARSE SWITCHES
 #------------------------------------------------------------------------
 #
@@ -302,8 +312,8 @@ esac
 # NOW ADD IN INCLUDE DIRECTORIES AND LIBRARIES
 #------------------------------------------------------------------------------
 #
-llibs="-L${ERUPT_DIR}/lib -lups $llibs";
-incdirs="-I${ERUPT_DIR}/inc";
+llibs="-L${the_real_dir}/lib -lups $llibs";
+incdirs="-I${the_real_dir}/inc";
 
 #
 # We are ready to find out what our targets are
@@ -359,7 +369,7 @@ fi
 echo "make $flags $target\n"
 
 if [ "$filter" != "" ]; then
-	makeCmd="$makeCmd 2>&1 | filterWarn -filter $ERUPT_DIR/bin/filterWarn.dat"
+	makeCmd="$makeCmd 2>&1 | filterWarn -filter $the_real_dir/bin/filterWarn.dat"
 fi
 
 eval $makeCmd ${logPipe:-}
