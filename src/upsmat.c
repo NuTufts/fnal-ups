@@ -536,6 +536,48 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   return(mproduct_list);
 }
 
+/*-----------------------------------------------------------------------
+ * upsmat_match_with_instance
+ *
+ * Given an instance and a read in product structure, return a pointer
+ * to the instance (in the product structure) that matches (version, flavor
+ * and quals) the passed in instance.  This will be used for example. to pick
+ * out chains that point to already matched versions.
+ * 
+ *
+ * Input : instance, and a read in product structure
+ * Output: None
+ * Return: the instance list item pointer that matches.
+ *         if no match, then NULL.
+ */
+t_upslst_item *upsmat_match_with_instance(
+				    const t_upstyp_instance * const a_instance,
+				    const t_upstyp_product * const a_product)
+{
+  t_upslst_item *instance_list = NULL;
+  t_upstyp_instance *inst = NULL;
+
+  if (a_instance->version) {
+    for (instance_list = a_product->instance_list ; instance_list ;
+	 instance_list = instance_list->next) {
+      inst = (t_upstyp_instance *)instance_list->data;
+      if (inst->version) {       /* make sure we have one */
+	if (! strcmp(a_instance->version, inst->version)) {
+	  /* they are the same version */
+	  if (! strcmp(a_instance->flavor, inst->flavor)) {
+	    /* they have the same flavor */
+	    if (! strcmp(a_instance->qualifiers, inst->qualifiers)) {
+	      /* they have the same qualifiers, we found a match, return it */
+	      break;
+	    }
+	  }
+	}
+      }
+    }
+  }
+  return(instance_list);
+}
+
 /*
  * Definition of private globals.
  */
@@ -567,10 +609,9 @@ static t_upstyp_matched_product *match_instance_core(
 {
   t_upstyp_matched_product *mproduct = NULL;
   t_upslst_item *minst_list = NULL, *vminst_list = NULL;
-  t_upslst_item *pre_minst_list = NULL, *cinst_list = NULL;
+  t_upslst_item *pre_minst_list = NULL, *matched_item = NULL;
   t_upslst_item *chain_list = NULL, *version_list = NULL;
   t_upstyp_matched_instance *minst = NULL;
-  t_upstyp_instance *cinst = NULL;
   t_upstyp_product *read_product = NULL;
   int num_matches = 0, tmp_num_matches;
   char *chain, *version, *dummy;
@@ -632,38 +673,29 @@ static t_upstyp_matched_product *match_instance_core(
 	chain = (char *)chain_list->data;
 	read_product = upsget_chain_file(a_db_info->name, a_prod_name, chain, &dummy);
 	if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
-	  for (cinst_list = read_product->instance_list ; cinst_list ;
-	       cinst_list = cinst_list->next) {
-	    cinst = (t_upstyp_instance *)cinst_list->data;
-	    for (vminst_list = pre_minst_list ; vminst_list ; 
-		 vminst_list = vminst_list->next) {
-	      minst = (t_upstyp_matched_instance *)vminst_list->data;
-	      if (minst->version) {       /* make sure we have one */
-		if (! strcmp(cinst->version, minst->version->version)) {
-		  /* they are the same version */
-		  if (! strcmp(cinst->flavor, minst->version->flavor)) {
-		    /* they have the same flavor */
-		    if (! strcmp(cinst->qualifiers,
-				 minst->version->qualifiers)) {
-		      /* they have the same qualifiers - this is a match */
-		      if (UPS_VERBOSE) {
+	  for (vminst_list = pre_minst_list ; vminst_list ; 
+	       vminst_list = vminst_list->next) {
+	    minst = (t_upstyp_matched_instance *)vminst_list->data;
+	    if (minst->version) {       /* make sure we have one */
+	      if ((matched_item = 
+		   upsmat_match_with_instance(minst->version, read_product))) {
+		/* this is a match */
+		if (UPS_VERBOSE) {
 			printf("%sFound associated chain - %s\n", VPREFIX,
-			       cinst->chain);
-		      }
-		      if (! minst->chain ) {
-			/* no chain here yet, fill it in */
-			minst->chain = cinst;
-			upsmem_inc_refctr((void *)cinst);
-		      } else {
-			/* we need to add a list element to the list of extra
-			   chains */
-			minst->xtra_chains = upslst_add(minst->xtra_chains,
-							cinst);
-		      }
-		      break;           /* get next chain instance */
-		    }
-		  }
+			       chain);
 		}
+		if (! minst->chain ) {
+		  /* no chain here yet, fill it in */
+		  minst->chain = (t_upstyp_instance *)matched_item->data;
+		  upsmem_inc_refctr((void *)minst->chain);
+		} else {
+		  /* we need to add a list element to the list of extra
+		     chains */
+		  minst->xtra_chains = upslst_add(minst->xtra_chains,
+				      (t_upstyp_instance *)matched_item->data);
+		}
+		/* go get next chain */
+		break;
 	      }
 	    }
 	  }
