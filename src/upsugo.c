@@ -365,12 +365,12 @@
  */
 char * upsugo_getarg( const int , char **,char ** const );
 int upsugo_rearg(const int ,char **,int * const,char **);
-/* int upsugo_bldfvr(struct ups_command * const uc); */
 int upsugo_ifornota(struct ups_command * const uc);
 void upsugo_setfixed(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
 int upsugo_blddb(struct ups_command * const uc, char * inaddr);
-void upsugo_prtdb(t_upslst_item * const list_ptr,char * const title,const unsigned int);
+void upsugo_prtdb(t_upslst_item * const list_ptr,
+                  char * const title,const unsigned int);
 void upsugo_liststart(struct ups_command * const a_command_line);
 
 
@@ -459,9 +459,13 @@ void upsugo_setfixed(struct ups_command * const uc)
 /* ===========================================================================
 ** ROUTINE	upsugo_ifornota()
 **
-*/
-/* I could use the same address for the "*" string but I don't think the
+** This routine is called at the end of the command sequence to fill in
+** any defaults if not otherwise specified and sets the values appropriately
+** if a -a (all) is specified
+**
+** I could use the same address for the "*" string but I don't think the
 ** extra code would justify it.
+**
 */
 int upsugo_ifornota(struct ups_command * const uc)
 {
@@ -541,6 +545,10 @@ int upsugo_ifornota(struct ups_command * const uc)
 /* ===========================================================================
 ** ROUTINE	upsugo_blddb()
 **
+** The code to handle the NT environment is a bit of a hack, I convert
+** any :'s followed by a \ (drive specification) to a | (pipe) which
+** couldn't possibly get in there any other way and then modify them
+** back to : after the normal split.
 */
 int upsugo_blddb(struct ups_command * const uc, char * inaddr)
 {
@@ -579,7 +587,7 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  { loc=strchr(inaddr,'|');
    if (loc) { *loc=':'; }
  }
- /* db may not be free but it's pointed to by db config do NOT free */
+ /* db may not be free because it's pointed to by db config do NOT free */
  db=upsutl_str_create(inaddr,'p');
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
  memset (addr, 0, sizeof(struct upstyp_db));
@@ -718,7 +726,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
           naddr=addr;
         }
       } else { 
-/* if there is optionals with no required last one but be "" */
+/* if there is optionals with no required last one will be "" */
         if ( waddr != 0 ) 
         { naddr=waddr;
         } else { 
@@ -758,7 +766,7 @@ void upsugo_liststart(t_upsugo_command * const a_command_line)
 **	It does not modify either of its arguments.
 **
 ** Returns
-**	Ups_ugo_getarg returns either of the following:
+**	Upsugo_getarg returns either of the following:
 **
 **	The pointer to the next argument, or
 **	0 if no more arguments exist.
@@ -957,6 +965,12 @@ int upsugo_free (struct ups_command * const uc)
          upsmem_free(uc->ugo_tablefile); 
       if ( uc->ugo_anyfile ) 
          upsmem_free(uc->ugo_anyfile); 
+      if ( uc->ugo_origin ) 
+         upsmem_free(uc->ugo_origin); 
+      if ( uc->ugo_compile_dir) 
+         upsmem_free(uc->ugo_compile_dir); 
+      if ( uc->ugo_compile_file)
+         upsmem_free(uc->ugo_compile_file); 
       if ( uc->ugo_options ) 
          upsmem_free(uc->ugo_options); 
       if ( uc->ugo_description ) 
