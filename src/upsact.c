@@ -1739,6 +1739,11 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd )
     upserr_backup();
   }
 
+  /* ugo_command can be null for unsetup */
+  
+  if ( !a_ugo )
+    return 0;
+  
   /* if no database was specified by the action function (-z) then upsugo_bldcmd
      will have picked up $PRODUCTS. if databases (-z) was specified at the command 
      line that is not correct */
