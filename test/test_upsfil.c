@@ -19,7 +19,7 @@ int  main( const int argc, char * const argv[] )
 
     if ( prod_ptr ) {
       g_print_product( prod_ptr );
-      upsfil_write_file( prod_ptr, "ups.out" );
+      upsfil_write_file( prod_ptr, "ups.out",' ' );
       ups_free_product( prod_ptr );
     }
   }
