@@ -209,16 +209,16 @@ void list_K(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define defaults(INSTANCE) \
-{   printf("\tVERSION=%s", minst_ptr->INSTANCE->version);            \
-    printf("\tFLAVOR=%s\n", minst_ptr->INSTANCE->flavor);            \
+{   printf("\tVersion=%s", minst_ptr->INSTANCE->version);            \
+    printf("\tFlavor=%s\n", minst_ptr->INSTANCE->flavor);            \
     if (minst_ptr->INSTANCE->qualifiers)                             \
     { if(strlen(minst_ptr->INSTANCE->qualifiers))                    \
-      { printf("\t\tQUALIFIERS=%s", minst_ptr->INSTANCE->qualifiers);  \
+      { printf("\t\tQualifiers=%s", minst_ptr->INSTANCE->qualifiers);  \
       } else {      /* damn inconsistant if you ask me */              \
-        printf("\t\tQUALIFIERS=\"\"");                                 \
+        printf("\t\tQualifiers=\"\"");                                 \
       }                                                                \
     } else {                                                         \
-      printf("\t\tQUALIFIERS=\"\"");                                 \
+      printf("\t\tQualifiers=\"\"");                                 \
     }                                                                \
     if (minst_ptr->xtra_chains)                                      \
     { printf("\tChains=");                                           \
@@ -400,7 +400,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
     { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
 /* A as in a single product loop */
       if (!a_command_line->ugo_K)
-      { printf("\tPRODUCT=%s",mproduct->product);
+      { printf("\tProduct=%s",mproduct->product);
         if (minst_ptr->chain) 
         { defaults(chain)
         } else { 
@@ -437,19 +437,19 @@ void list_output(const t_upslst_item * const a_mproduct_list,
             printf("\t\tUPS=\"\"\n");
           }
           if (minst_ptr->version->table_dir)
-          { printf("\t\tTABLE_DIR=%s\n", minst_ptr->version->table_dir);
+          { printf("\t\tTable_Dir=%s\n", minst_ptr->version->table_dir);
           } else {
-            printf("\t\tTABLE_DIR=\"\"\n");
+            printf("\t\tTable_Dir=\"\"\n");
           }
           if (minst_ptr->version->table_file)
-          { printf("\t\tTABLE_FILE=%s\n", minst_ptr->version->table_file);
+          { printf("\t\tTable_File=%s\n", minst_ptr->version->table_file);
           } else {
-            printf("\t\tTABLE_FILE=\"\"\n");
+            printf("\t\tTable_File=\"\"\n");
           }
           if (minst_ptr->version->description)
-          { printf("\t\tDESCRIPTION=%s\n", minst_ptr->version->description);
+          { printf("\t\tDescription=%s\n", minst_ptr->version->description);
           } else {
-            printf("\t\tDESCRIPTION=\"\"\n");
+            printf("\t\tDescription=\"\"\n");
           }
           for ( ul_ptr = upslst_first( minst_ptr->version->user_list ); 
                 ul_ptr; ul_ptr = ul_ptr->next, count++ )
@@ -516,11 +516,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
       FromBoth(modified)
     }
 /* to HERE */
-    FromDatabase(name,"DATABASE")
-    FromConfig(ups_db_version,"DB_VERSION")
-    FromConfig(man_path,"MAN_PATH")
-    FromConfig(html_path,"HTML_PATH")
-    FromConfig(info_path,"INFO_PATH")
+    FromDatabase(name,"Database")
+    FromConfig(ups_db_version,"DB_Version")
+    FromConfig(man_path,"Man_Path")
+    FromConfig(html_path,"Html_Path")
+    FromConfig(info_path,"Info_Path")
     if (!strncmp(l_ptr->data,"USERKEY",7) || !strncmp(l_ptr->data,"userkey",7))
     { for ( ul_ptr = upslst_first( instance->version->user_list ); 
             ul_ptr; ul_ptr = ul_ptr->next, count++ )

@@ -160,6 +160,7 @@ void ups_undeclare( t_upsugo_command * const uc )
           save_prev = chain_list->prev;
           chain_list->next=0;
           chain_list->prev=0;
+          upsugo_dump(uc,0);
           mproduct_list = upsmat_instance(uc, db_list , need_unique);
           chain_list->next = save_next;
           chain_list->prev = save_prev;
