@@ -85,6 +85,7 @@ sub prompt {
   my $mustHave = shift(@_);
 
 TRY:
+  print STDOUT "\n";
   print STDOUT "Please enter $string (d: $default): ";
   chop($ans = <STDIN>);
   $ans =~ tr/\s//;      # remove whitespace
@@ -357,11 +358,11 @@ if ($error == 0) {
     if ((-e "$old_dir/$elem") && (! -e "$old_dir/$prefix$elem")) {
       if (-w $old_dir) {
 	`cp $old_dir/$elem $old_dir/$prefix$elem`;
-	print STDOUT "DONE: '$old_dir/$elem' copied to $old_dir/ups1.$elem\n";
+	print STDOUT "DONE: '$old_dir/$elem' copied to $old_dir/$prefix$elem\n";
       } else {
 	# The old directory is not writable.
         print STDOUT "WARNING: '$old_dir' is not writeable, $elem will not\n"; 
-	print STDOUT "         be copied to $old_dir/ups1.$elem\n";
+	print STDOUT "         be copied to $old_dir/$prefix$elem\n";
       }
     }
   }
@@ -510,13 +511,13 @@ if ($error == 0) {
   if (-w $userHash{$userArray[$UPD_USERCODE_DIR][0]}) {
     if (! -e "$userHash{$userArray[$UPD_USERCODE_DIR][0]}/updconfig") {
       # if we have a user edited one, copy it, else just use the template
-      if (($userHash{$userArray[$UPDCONFIG][0]} != "") &&
-	  (-e $userHash{$userArray[$UPDCONFIG][0]}/updconfig)) {
+      if (($userHash{$userArray[$UPDCONFIG][0]} ne "") &&
+	  (-e "$userHash{$userArray[$UPDCONFIG][0]}/updconfig")) {
 	`cp $userHash{$userArray[$UPDCONFIG][0]}/updconfig $userHash{$userArray[$UPD_USERCODE_DIR][0]}`;
 	print STDOUT "DONE: Copied $userHash{$userArray[$UPDCONFIG][0]}/updconfig to $userHash{$userArray[$UPD_USERCODE_DIR][0]}\n";
       } elsif ($upddir ne "") {
 	`cp $upddir/ups/updconfig.template $userHash{$userArray[$UPD_USERCODE_DIR][0]}/updconfig`;
-	print STDOUT "WARNING: Could not find edited updconfig file, copied the\n";
+	print STDOUT "WARNING: Do not have edited updconfig file, copied the\n";
 	print STDOUT "         template to $userHash{$userArray[$UPD_USERCODE_DIR][0]}\n";
       } else {
 	print STDOUT "WARNING: Could not locate a updconfig file.\n";
@@ -524,13 +525,13 @@ if ($error == 0) {
     }
     if (! -e "$userHash{$userArray[$UPD_USERCODE_DIR][0]}/updusr.pm") {
       # if we have a user edited one, copy it, else just use the template
-      if (($userHash{$userArray[$UPDCONFIG][0]} != "") &&
-	  (-e $userHash{$userArray[$UPDCONFIG][0]}/updusr.pm)) {
+      if (($userHash{$userArray[$UPDCONFIG][0]} ne "") &&
+	  (-e "$userHash{$userArray[$UPDCONFIG][0]}/updusr.pm")) {
 	`cp $userHash{$userArray[$UPDCONFIG][0]}/updusr.pm $userHash{$userArray[$UPD_USERCODE_DIR][0]}`;
 	print STDOUT "DONE: Copied $userHash{$userArray[$UPDCONFIG][0]}/updusr.pm to $userHash{$userArray[$UPD_USERCODE_DIR][0]}\n";
       } elsif ($upddir ne "") {
 	`cp $upddir/ups/updusr.pm.template $userHash{$userArray[$UPD_USERCODE_DIR][0]}/updusr.pm`;
-	print STDOUT "WARNING: Could not find edited updusr.pm file, copied the\n";
+	print STDOUT "WARNING: Do not have edited updusr.pm file, copied the\n";
 	print STDOUT "         template to $userHash{$userArray[$UPD_USERCODE_DIR][0]}\n";
       } else {
 	print STDOUT "WARNING: Could not locate a updusr.pm file.\n";
@@ -592,8 +593,13 @@ if ($error == 0) {
 
   $prod_dir = `$upsdir/bin/ups list -K PROD_DIR -z $userHash{$userArray[$UPS_DB][0]} -2 ups $userHash{$userArray[$UPS_VERSION][0]}`;
   if ($prod_dir eq "") {
-    `csh -fc "sh -c 'UPS_SHELL=sh;export UPS_SHELL;$upsdir/bin/ups declare -r $new_upsdir -2 -m ups.table ups $userHash{$userArray[$UPS_VERSION][0]} -z $userHash{$userArray[$UPS_DB][0]}'"`;
-    print STDOUT "DONE: Declared ups $userHash{$userArray[$UPS_VERSION][0]} to $userHash{$userArray[$UPS_DB][0]}.\n";
+    if (-e $upsdb_list) {
+      `csh -fc "sh -c 'UPS_SHELL=sh;export UPS_SHELL;$upsdir/bin/ups declare -r $new_upsdir -2 -m ups.table ups $userHash{$userArray[$UPS_VERSION][0]} -z $userHash{$userArray[$UPS_DB][0]}'"`;
+      print STDOUT "DONE: Declared ups $userHash{$userArray[$UPS_VERSION][0]} to $userHash{$userArray[$UPS_DB][0]}.\n";
+    } else {
+      print STDOUT "WARNING: Not declaring ups, $upsdb_list does not exist,\n";
+      print STDOUT "         this is needed for the configure.\n";
+    }
   }
 
   if (($userHash{$userArray[$UPD_VERSION][0]} ne "") && ($upddir ne "")) {
