@@ -161,7 +161,7 @@ typedef struct upstyp_product
 /* check if the first character matches ANY_MATCH. NOTE: the value of ANY_MATCH
    and the value subtracted in NOT_EQUAL_ANY_MATCH must be the same */
 #define ANY_MATCH "*"
-#define NOT_EQUAL_ANY_MATCH(string) (*(string) - '\*')
+#define NOT_EQUAL_ANY_MATCH(string) (*(string) - '*')
 
 #define ANY_FLAVOR "ANY"
 #define MAX_LINE_LEN 1024
