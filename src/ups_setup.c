@@ -114,14 +114,10 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 
 	    /* free allocated memory */
 	    (void )upsugo_free(new_command_line);
-	  }
-	  /* now clean up the memory that we used */
-	  if (cmd_list) {
-	    upsact_cleanup(cmd_list);
-	  }
-	  if (new_mproduct_list) {
-	    new_mproduct_list = upsutl_free_matched_product_list(
+	    if (new_mproduct_list) {
+	      new_mproduct_list = upsutl_free_matched_product_list(
 							   &new_mproduct_list);
+	    }
 	  }
 	}
 
