@@ -30,6 +30,7 @@
 /*
  * Definition of public variables.
  */
+extern int UPS_VERBOSE;
 
 /*
  * Declaration of private functions.
@@ -56,6 +57,9 @@ int main(int argc, char *argv[])
 
   /* get the options for each iteration of the command and do it */
   while (command_line = upsugo_next(argc, &argv[1], (char *)list_valid_opts)) {
+    if (command_line->ugo_v) {
+      UPS_VERBOSE = 1;
+    }
     ups_c_list(command_line);
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_output();
