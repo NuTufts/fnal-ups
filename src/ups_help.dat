@@ -26,9 +26,6 @@
 #Information about command presented EXACTLY as typed line for
 #line until OPTIONS or a : not found 
 COMMANDS    :
-compile     :?bBcdefgHjkmMnoOqrtUvVzZ: Ignored stuf
-: The compile command creates a "snapshot" of environment 
-: and blaa blaa 
 configure   :?cdfgHmMnoOqrtUvVzZ: 
 : The configure command 
 copy        :?AcCdfgHmMnoOpPqrtTUvVWXzZ:
@@ -37,7 +34,7 @@ create      :?fHmMpqvZ:
 : The Create command blaa blaa
 declare     :?AcCdfgHmMnoOpqrtTUvVzZ:
 : The Declare command blaa blaa
-depend      :?fHKmMqrUvVzZ:
+depend      :?cdotgfHKmMqrUvVzZ:
 : The Depend command blaa blaa
 exist       :?BcdefgHjkmMoOqrtUvVzZ:
 : The Exist command blaa blaa
@@ -45,7 +42,7 @@ get         :?cdfFgHmMnoqrtUvVzZ:
 : The Get command blaa blaa
 help        :?:This is sort of a special case since it will accept commands
 : The Help command blaa blaa
-list        :a?cdDfghHKlmMnoqrtUvVzZ:
+list        :a?cdfghHKlmMnoqrtUvVzZ:
 : The List command blaa blaa
 modify      :?AEfHmMopqrTUvVxzZ:
 : The Modify command blaa blaa
@@ -76,7 +73,6 @@ OPTIONS     :
 -c :current chain 
 -C :don't do configure 
 -d :development chain 
--D :list all versions in the database with an archive file 
 -e :define $UPS_EXTENDED 
 -E :run the editor in $EDITOR on the requested file (the default) 
 -f :flavor : flavor to use (operating system[+release]) 
@@ -89,8 +85,8 @@ OPTIONS     :
 -k :do not execute unsetup files first 
 -K :"keywords" : return information from these keywords only 
 -l :produce a long listing 
--m :tableFileDir : table file directory 
--M :tableFile : table file name 
+-m :tableFile : table file name
+-M :tableFileDir : table file directory 
 -n :new chain 
 -N :any file parsable by UPS 
 -o :old chain 
@@ -103,9 +99,8 @@ OPTIONS     :
 -S :check syntax only 
 -t :test chain 
 -T :archivefile : archive file 
--u :uncompile first 
 -U :upsDir : ups directory location 
--v :print out extra 'debugging' info (only if keyword is present) 
+-v :print out extra 'debugging' info
 -V :do not delete the temp file 
 -w :stop first then start 
 -W :use environment variables to determine instances of UPS 
