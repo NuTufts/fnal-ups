@@ -554,7 +554,7 @@ int upsugo_ifornota(struct ups_command * const uc)
         strcpy(addr,PRODUCTS);
         loc=addr;
         while ( loc && *loc ) 
-        { if (isspace( *(loc) ) ) { *loc=' '; }
+        { if (isspace( (unsigned long )(*(loc)) ) ) { *loc=' '; }
           ++loc; 
         }
         while ((loc=strchr(addr,' '))!=0) {
