@@ -35,4 +35,5 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 9. Expand the functionality of the fileTest action.
 
+10. Full support for environment variables in table files.
 
