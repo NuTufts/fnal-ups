@@ -29,7 +29,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "upstyp.h"
+#include "ups.h"
  
 void print_list( t_upslst_item *list_ptr );
 /* ==========================================================================
@@ -50,6 +50,8 @@ int main (argc,argv)
 
 	int 	status = 0;
 	struct ups_command * uc;
+        char    * cmdline = "-f FlAVoR pRoDa V2";
+
 
 /*
 	signal(SIGSEGV, ups_signal_handler);
@@ -75,6 +77,12 @@ while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
 /*
 	if (status != UPS_SUCCESS) fprintf(stderr," %s \n", UPS_ERRTXT[status]);
 */
+        uc=upsugo_bldcmd(cmdline,"AacCdfghKtmMNoOPqrTuU");
+        if (uc) 
+	{ upsugo_dump(uc);
+          upsugo_free(uc);
+        }
+        uc=0;
 	exit(status);
 
 }
