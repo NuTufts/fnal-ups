@@ -141,57 +141,17 @@ if [ -s optcheck ]; then
 fi
 #
 if [ -s reqcheck2 ]; then
-  UPS_PROD_NAME=fly;export UPS_PROD_NAME
-  UPS_PROD_VERSION="v1_0";export UPS_PROD_VERSION
-  UPS_PROD_DIR="/NULL/fly";export UPS_PROD_DIR
-  unset UPS_VERBOSE
-  unset UPS_EXTENDED
-  UPS_THIS_DB=../db1;export UPS_THIS_DB
-  UPS_OS_FLAVOR=IRIX+6.2;export UPS_OS_FLAVOR
-  UPS_PROD_FLAVOR=NULL;export UPS_PROD_FLAVOR
-  UPS_PROD_QUALIFIERS=;export UPS_PROD_QUALIFIERS
-  UPS_OPTIONS="";export UPS_OPTIONS
   . reqcheck2
   UPS_STATUS=$?
   if [ "$UPS_STATUS" != "0" ]; then
     echo "Error $UPS_STATUS while sourcing reqcheck2"
     unset UPS_STATUS
-    unset UPS_PROD_NAME
-    unset UPS_PROD_VERSION
-    unset UPS_PROD_DIR
-    unset UPS_VERBOSE
-    unset UPS_EXTENDED
-    unset UPS_THIS_DB
-    unset UPS_OS_FLAVOR
-    unset UPS_PROD_FLAVOR
-    unset UPS_PROD_QUALIFIERS
-    unset UPS_OPTIONS
     return 1
   fi
   unset UPS_STATUS
-  unset UPS_PROD_NAME
-  unset UPS_PROD_VERSION
-  unset UPS_PROD_DIR
-  unset UPS_VERBOSE
-  unset UPS_EXTENDED
-  unset UPS_THIS_DB
-  unset UPS_OS_FLAVOR
-  unset UPS_PROD_FLAVOR
-  unset UPS_PROD_QUALIFIERS
-  unset UPS_OPTIONS
   return
 else
   echo "File (reqcheck2)  not found"
-  unset UPS_PROD_NAME
-  unset UPS_PROD_VERSION
-  unset UPS_PROD_DIR
-  unset UPS_VERBOSE
-  unset UPS_EXTENDED
-  unset UPS_THIS_DB
-  unset UPS_OS_FLAVOR
-  unset UPS_PROD_FLAVOR
-  unset UPS_PROD_QUALIFIERS
-  unset UPS_OPTIONS
   return 1
 fi
 #

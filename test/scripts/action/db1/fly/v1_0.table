@@ -63,7 +63,7 @@ ACTION = SETUP
    sourceOptCheck(optcheck,NO_UPS_ENV,CONTINUE)
    sourceOptional(optfile,NO_UPS_ENV,EXIT)
    sourceOptCheck(optcheck,NO_UPS_ENV,EXIT)
-   sourceReqCheck(reqcheck2,ups_env,EXIT)
+   sourceReqCheck(reqcheck2,NO_UPS_ENV,EXIT)
    envset (OPERA,"")
 # compile tests
 #   sourceCompileReq(requiredScript)

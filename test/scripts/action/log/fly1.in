@@ -144,57 +144,17 @@ if (-e optcheck) then
 endif
 #
 if (-e reqcheck2) then
-  setenv UPS_PROD_NAME fly
-  setenv UPS_PROD_VERSION "v1_0"
-  setenv UPS_PROD_DIR "/NULL/fly"
-  unsetenv UPS_VERBOSE
-  unsetenv UPS_EXTENDED
-  setenv UPS_THIS_DB ../db1
-  setenv UPS_OS_FLAVOR IRIX+6.2
-  setenv UPS_PROD_FLAVOR NULL
-  setenv UPS_PROD_QUALIFIERS 
-  setenv UPS_OPTIONS ""
   source reqcheck2
   setenv UPS_STATUS "$status"
   if ("$UPS_STATUS" != "0") then
     echo "Error $UPS_STATUS while sourcing reqcheck2
     unsetenv UPS_STATUS
-    unsetenv UPS_PROD_NAME
-    unsetenv UPS_PROD_VERSION
-    unsetenv UPS_PROD_DIR
-    unsetenv UPS_VERBOSE
-    unsetenv UPS_EXTENDED
-    unsetenv UPS_THIS_DB
-    unsetenv UPS_OS_FLAVOR
-    unsetenv UPS_PROD_FLAVOR
-    unsetenv UPS_PROD_QUALIFIERS
-    unsetenv UPS_OPTIONS
     exit 1
   endif
   unsetenv UPS_STATUS
-  unsetenv UPS_PROD_NAME
-  unsetenv UPS_PROD_VERSION
-  unsetenv UPS_PROD_DIR
-  unsetenv UPS_VERBOSE
-  unsetenv UPS_EXTENDED
-  unsetenv UPS_THIS_DB
-  unsetenv UPS_OS_FLAVOR
-  unsetenv UPS_PROD_FLAVOR
-  unsetenv UPS_PROD_QUALIFIERS
-  unsetenv UPS_OPTIONS
   exit
 else
   echo "File (reqcheck2)  not found"
-  unsetenv UPS_PROD_NAME
-  unsetenv UPS_PROD_VERSION
-  unsetenv UPS_PROD_DIR
-  unsetenv UPS_VERBOSE
-  unsetenv UPS_EXTENDED
-  unsetenv UPS_THIS_DB
-  unsetenv UPS_OS_FLAVOR
-  unsetenv UPS_PROD_FLAVOR
-  unsetenv UPS_PROD_QUALIFIERS
-  unsetenv UPS_OPTIONS
   exit 1
 endif
 #
