@@ -50,9 +50,10 @@ typedef struct upsact_cmd {
 } t_upsact_cmd;
 
 typedef struct upsact_item {
-  int                        indent;
+  int                        level;
   t_upsugo_command           *ugo;
   t_upstyp_matched_product   *mat;
+  t_upstyp_action            *act;
   t_upsact_cmd               *cmd;
 } t_upsact_item;
 

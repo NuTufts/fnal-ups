@@ -73,7 +73,6 @@ typedef struct s_cmd_map {
   int  max_params;
 } t_cmd_map;
 
-/*typedef int (*tpf_cmd)( const t_upsact_cmd * const cmd_ptr, const char copt );*/
 /*
  * Declaration of private functions.
  */
@@ -81,15 +80,22 @@ typedef struct s_cmd_map {
 int parse_params( const char * const a_params,
 		   char *argv[] );
 
-t_upslst_item *next_cmd( t_upslst_item *dep_list,
-			 t_upstyp_action * const action,
+t_upslst_item *next_cmd( t_upslst_item *top_list,
+			 t_upslst_item *dep_list,
 			 t_upsact_item * const p_cur,
-			 const char * const act_name );
+			 const char * const act_name, 
+			 const char copt );
+t_upslst_item *get_top_prod( t_upsact_item *const p_cur, 
+			     const char *const act_name );
 t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 			  t_upstyp_matched_product * mat_prod,
 			  const char * const act_name );
 t_upsact_item *find_product( const t_upslst_item *const dep_list,
 			     const char *const prod_name );
+t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
+			     t_upstyp_matched_product *mat_prod,
+			     const int level,
+			     const char * const act_name );
 
 /* functions to handle specific action commands */
 
@@ -350,32 +356,15 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       const char * const act_name )
 {
   t_upsact_item *new_cur;
-  t_upstyp_action *p_act;
+  t_upslst_item *top_list = 0;
   t_upslst_item *dep_list = 0;
-
-
-  t_upslst_item *l_mproduct;
 
   if ( !ugo_cmd || !act_name )
     return 0;
 
-  if ( !mat_prod ) {
-    l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
-    if ( !l_mproduct || !l_mproduct->data )
-      return 0;
-    mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
-  }
-
-  new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
-  new_cur->indent = 0;
-  new_cur->ugo = ugo_cmd;
-  new_cur->mat = mat_prod;
-  new_cur->cmd = 0;
-  p_act = get_act( ugo_cmd, mat_prod, act_name );
-
-  /* get setup for top level product */
-
-  dep_list = next_cmd( dep_list, p_act, new_cur, act_name );
+  new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name );
+  top_list = get_top_prod( new_cur, act_name );
+  dep_list = next_cmd( top_list, dep_list, new_cur, act_name, ' ' );
 
   return upslst_first( dep_list );
 }
@@ -478,8 +467,8 @@ void upsact_print_item( const t_upsact_item *const p_cur )
     return;
   }
 
-  for ( i=0; i<p_cur->indent; i++ ) { printf( "\t" ); }
-  printf( "%d:( %s, %s, %s, \"%s\" ):", p_cur->indent, inst->product,
+  for ( i=0; i<p_cur->level; i++ ) { printf( "\t" ); }
+  printf( "%d:( %s, %s, %s, \"%s\" ):", p_cur->level, inst->product,
 	  inst->flavor, inst->version, inst->qualifiers );
   upsact_print_cmd( p_cur->cmd );  
 }
@@ -539,74 +528,107 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 }
 
 /*-----------------------------------------------------------------------
+ * get_top_prod
+ *
+ * Input : t_upsact_tree *,
+ * Output: none
+ * Return: t_upsact_cmd *,
+ */
+t_upslst_item *get_top_prod( t_upsact_item *const p_cur, 
+			     const char *const act_name )
+{
+  static char *valid_switch = "AacCdfghKtmMNoOPqrTuUv";
+  t_upslst_item *l_cmd = p_cur->act ? p_cur->act->command_list : 0;
+  t_upsact_cmd *p_cmd = 0;
+  char *p_line = 0;
+  t_upslst_item *top_list = 0;
+
+  for ( ; l_cmd; l_cmd = l_cmd->next ) {
+    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
+				 (char *)l_cmd->data );
+    p_cmd = upsact_parse_cmd( p_line );
+
+    if ( p_cmd && p_cmd->icmd >= 0 ) {
+      if ( p_cmd->icmd <= e_unsetuprequired ) {
+	t_upsact_item *new_cur = 0;
+	t_upsugo_command *new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+	new_cur = new_act_item( new_ugo, 0, 0, act_name );
+	top_list = upslst_add( top_list, new_cur );
+      }
+    }
+  }
+
+  return upslst_first( top_list );
+}
+
+/*-----------------------------------------------------------------------
  * next_cmd
  *
  * Input : t_upsact_tree *,
  * Output: none
  * Return: t_upsact_cmd *,
  */
-t_upslst_item *next_cmd( t_upslst_item *dep_list,
-			 t_upstyp_action *const action,			 
+t_upslst_item *next_cmd( t_upslst_item *top_list,
+			 t_upslst_item *dep_list,
 			 t_upsact_item *const p_cur,
-			 const char *const act_name )
+			 const char *const act_name,
+			 const char copt )
 {
   static char *valid_switch = "AacCdfghKtmMNoOPqrTuUv";
-  t_upslst_item *l_cmd = action->command_list;
+  t_upslst_item *l_cmd = p_cur->act ? p_cur->act->command_list : 0;
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
 
-  for ( ; l_cmd; l_cmd = l_cmd->next ) {    
+  for ( ; l_cmd; l_cmd = l_cmd->next ) {
+
     /* translate and parse command */    
     p_line = upsget_translation( p_cur->mat, p_cur->ugo,
 				 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
-    if ( p_cmd ) {
+
+    if ( p_cmd && p_cmd->icmd >= 0 ) {
       if ( p_cmd->icmd > e_unsetuprequired ) {
 	t_upsact_item *new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
-	new_cur->indent = p_cur->indent;
+	new_cur->level = p_cur->level;
 	new_cur->ugo = p_cur->ugo;
 	new_cur->mat = p_cur->mat;
+	new_cur->act = p_cur->act;
 	new_cur->cmd = p_cmd;
 	dep_list = upslst_add( dep_list, new_cur );
 	continue;
       }
-      else if ( p_cmd->icmd >= 0 ) { /* here we go again */
-	t_upstyp_action *new_act = 0;
+      else if ( copt != 't' ) { /* here we go again */
 	t_upstyp_matched_product *new_mat = 0;
-	t_upslst_item *l_mproduct = 0;
 	t_upsact_item *new_cur = 0;
 	t_upsugo_command *new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+
 	if ( !new_ugo ) {
 	  printf( "???? no new ugo on %s\n", p_line );
 	  continue;
 	}
 
-	/* check if product is already at first level */
+	/* check if product is already at top level */
 
-	/* check if product is already in list */
+	if ( p_cur->level > 0 ) {
+	  new_cur = find_product( top_list, new_ugo->ugo_product );
+	}
+
+	/* check if product is already setup */
 	
 	if ( find_product( dep_list, new_ugo->ugo_product ) ) {
 	  /* ??? free stuff */
 	  continue;
 	}
 	
-	l_mproduct = upsmat_instance( new_ugo, NULL, 1 );
-	if ( !l_mproduct || !l_mproduct->data ) {
-	  printf( "???? no product on %s\n", p_line );
-	  continue;
+	if ( !new_cur ) {
+	  new_cur = new_act_item( new_ugo, 0, 0, act_name );
+	  if ( !new_cur ) {
+	    printf( "???? no action_item for %s\n", p_line );
+	    continue;
+	  }
 	}
-	new_mat = (t_upstyp_matched_product *)l_mproduct->data;
-	new_act = get_act( new_ugo, new_mat, act_name );
-	if ( !new_act ) {
-	  printf( "???? no new act on %s\n", p_line );
-	  continue;
-	}
-	new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
-	new_cur->indent = p_cur->indent + 1;
-	new_cur->ugo = new_ugo;
-	new_cur->mat = new_mat;
-	new_cur->cmd = 0;
-	dep_list = next_cmd( dep_list, new_act, new_cur, act_name );
+	new_cur->level = p_cur->level + 1;
+	dep_list = next_cmd( top_list, dep_list, new_cur, act_name, copt );
 	continue;
       }
     }
@@ -725,6 +747,30 @@ int parse_params( const char * const a_params, char **argv )
   return count;
 }
 
+
+t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
+			     t_upstyp_matched_product *mat_prod,
+			     const int level,
+			     const char * const act_name )
+{		       
+  t_upsact_item *act_item = 0;
+
+  if ( !mat_prod ) {
+    t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
+    if ( !l_mproduct || !l_mproduct->data )
+      return 0;
+    mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
+  }
+
+  act_item = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
+  act_item->level = level;
+  act_item->ugo = ugo_cmd;
+  act_item->mat = mat_prod;
+  act_item->act = get_act( ugo_cmd, mat_prod, act_name );
+  act_item->cmd = 0;
+
+  return act_item;
+}
 
 /*-----------------------------------------------------------------------
  * upsact_process_commands
