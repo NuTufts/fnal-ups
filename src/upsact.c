@@ -2993,7 +2993,7 @@ static void f_exeaccess( ACTION_PARAMS)
 
 static void f_execute( ACTION_PARAMS)
 {
-  int ups_env_flag = DO_NO_UPS_ENV;
+  int no_ups_env_flag = DO_NO_UPS_ENV;
 
   CHECK_NUM_PARAM("execute");
 
@@ -3002,9 +3002,11 @@ static void f_execute( ACTION_PARAMS)
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    /* Determine which flags (if any) were entered */
+    GET_UPS_ENV();
   
   /* define all of the UPS local variables that the user may need. */
-  if (ups_env_flag == DO_UPS_ENV) {
+  if (no_ups_env_flag == DO_UPS_ENV) {
     upsget_allout(a_stream, a_db_info, a_minst, a_command_line, "  ");
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
   }
