@@ -510,7 +510,7 @@ sub AddChainRec {
        print ChainFile "# \n";
     }
     $who="$flvrchnHash{$flvr}{$chainKey}[$#WHO]";
-    $when="$flvrchnHash{$flvr}{$chainKey}[$#WHEN]";
+    $when=&convert_to_gmt($flvrchnHash{$flvr}{$chainKey}[$#WHEN]);
     ( $sos, $qual ) = &split_os ( $flvr );
     print ChainFile "Flavor=$sos\n";
     print ChainFile "Qualifiers=\"$qual\"\n";
@@ -582,13 +582,16 @@ sub WriteVersionRecs {
        print VersionFile "# \n";
     }
     ( $sos, $qual ) = &split_os ( $flvr );
+    $DaTe=&convert_to_gmt($instanceHash{$flvr}{$version}[$#WHEN]);
     print VersionFile "#*************************************************\n";
     print VersionFile "# Starting group definition\n";
     print VersionFile "Group:\n";
     print VersionFile "   FLAVOR=$sos\n";
     print VersionFile "   QUALIFIERS=\"$qual\"\n";
-    print VersionFile "   DECLARED=$instanceHash{$flvr}{$version}[$#WHEN]\n";
+    print VersionFile "   DECLARED=$DaTe\n";
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
+    print VersionFile "   MODIFIED=$DaTe\n";
+    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
     if ( &upsdir ) {
      print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
@@ -625,8 +628,11 @@ sub WriteVersionRecs {
     } else { 
        print VersionFile "   QUALIFIERS=\"build\"\n";
     }
-    print VersionFile "   DECLARED=$instanceHash{$flvr}{$version}[$#WHEN]\n";
+    $DaTe=&convert_to_gmt($instanceHash{$flvr}{$version}[$#WHEN]);
+    print VersionFile "   DECLARED=$DaTe\n";
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
+    print VersionFile "   MODIFIED=$DaTe\n";
+    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
     if ( &upsdir ) {
      print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
@@ -701,6 +707,10 @@ sub use_flavor { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAVOR] }
 sub build_flags { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#FLAGS] }
 sub use_flags { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAGS] }
 
+sub convert_to_gmt
+{ @D = split ( '\-' , $_[0]);
+  return sprintf("19%s-%02d-%02d 00.00.00 GMT",$D[2],$D[0],$D[1]);
+}
 sub table_file { 
     my $type = $_[0];
     return $flvrverHash{$flvr}{$version}{$type} 
