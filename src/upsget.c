@@ -226,7 +226,7 @@ void upsget_allout(const FILE * const stream,
                     const t_upstyp_matched_instance * const instance,
                     const t_upsugo_command * const command_line,
 		    const char * const prefix )
-{ char *addr;
+{ 
   char *name;
   char *pdefault;
   int idx;
@@ -844,8 +844,8 @@ char *upsget_product(const t_upstyp_db * const db_info_ptr,
 char *upsget_version(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
-{ static char *string;
-  static char *nostring="";
+{
+  static char *string="";
   get_element(string,version);
   SHUTUP;
   return string;
