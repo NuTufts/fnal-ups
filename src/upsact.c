@@ -407,7 +407,7 @@ t_cmd_info g_cmd_info[] = {
   {e_verify,      "verify",      "?acdf:g:H:m:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_help,        "help",        "?v", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
-  {e_unk,         NULL,          "?aA:b:cCdD:eE:f:Fg:G:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:XyYz:Z0123",
+  {e_unk,         NULL,          "?aA:b:B:cCdD:eE:f:Fg:G:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:XyYz:Z0123",
                                   0x00000010, e_invalid_action}
 };
 
