@@ -53,6 +53,7 @@ typedef struct upstyp_config {
   char             *authorized_nodes;
   char             *statistics;
   char             *man_path;
+  char             *catman_path;
   char             *info_path;
   char             *html_path;
   char             *news_path;

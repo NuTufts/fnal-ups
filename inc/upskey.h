@@ -67,6 +67,7 @@ enum e_upskey_key {
 
   e_key_prod_dir_prefix,
   e_key_man_path,
+  e_key_catman_path,
   e_key_info_path,
   e_key_news_path,
   e_key_html_path,
