@@ -64,6 +64,7 @@ int upshlp_command(const char * const what)
     int     count=0;
     char    * option;
     char    * last ;
+    int     found=0;			/* did I find the command? */
 
 /* test
     char    *what = "compile";
@@ -133,30 +134,35 @@ int upshlp_command(const char * const what)
           l_ptr; l_ptr = l_ptr->next, count++ )
     { if (!strncmp(l_ptr->data,what,strlen(what))) {
          fprintf(stdout,"          %s",(char *)l_ptr->data+13 );
+         found=1;
       }
     }
-    fprintf(stdout,"\n     Valid Options:\n");
-    for ( l_ptr = upslst_first(command_options); 
-          l_ptr; l_ptr = l_ptr->next, count++ )
-    { if (!strncmp(l_ptr->data,what,strlen(what))) {
-/*         fprintf(stdout,"          %s",(char *)l_ptr->data+13 ); */
-         addr=l_ptr->data;
-         option=addr+13;
-      }
-    }
-    for ( l_ptr = upslst_first(option_list); 
-          l_ptr; l_ptr = l_ptr->next, count++ )
-    { addr=l_ptr->data;  
-      *(addr+2)=' ';
-        if (strchr(option,(int)*(addr+1))) {
-           if (*(addr+1)==*last) { 
-              *addr=' ';
-              *(addr+1)=' ';
-           } else { 
-             *last=*(addr+1);
+    if (found) {
+       fprintf(stdout,"\n     Valid Options:\n");
+       for ( l_ptr = upslst_first(command_options); 
+             l_ptr; l_ptr = l_ptr->next, count++ )
+       { if (!strncmp(l_ptr->data,what,strlen(what))) {
+/*            fprintf(stdout,"          %s",(char *)l_ptr->data+13 ); */
+            addr=l_ptr->data;
+            option=addr+12;
+         }
+       }
+       for ( l_ptr = upslst_first(option_list); 
+             l_ptr; l_ptr = l_ptr->next, count++ )
+       { addr=l_ptr->data;  
+         *(addr+2)=' ';
+           if (strchr(option,(int)*(addr+1))) {
+              if (*(addr+1)==*last) { 
+                 *addr=' ';
+                 *(addr+1)=' ';
+              } else { 
+                *last=*(addr+1);
+              }
+              fprintf(stdout,"          %s",(char *)l_ptr->data);
            }
-           fprintf(stdout,"          %s",(char *)l_ptr->data);
-        }
+       }
+    } else {
+      fprintf(stdout,"No help information available\n");
     }
   }
 /* test dump...
