@@ -366,29 +366,29 @@ t_cmd_info g_cmd_info[] = {
   {e_unold,         "unold", 0, 0x00000000, e_invalid_action},
   {e_untest,        "untest", 0, 0x00000000, e_invalid_action},
   {e_unchain,       "unchain", 0, 0x00000000, e_invalid_action},
-  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z", 0x00000001, e_invalid_action},
-  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z", 0x00000001, e_setup},
+  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:stU:vVz:Z", 0x00000001, e_invalid_action},
+  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:stU:vVz:Z", 0x00000001, e_setup},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
-  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVWXz:Z", 0x00000000, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_depend,      "depend",      "?cdotg:f:H:K:lm:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
-  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z", 0x00000000, e_invalid_action},
-  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
+  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000000, e_invalid_action},
   {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:l0123", 0x00000000, e_invalid_action},
   {e_help,        "help",
-            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
+            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
+            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
 };
 
 /* These action commands are listed in order of use.  Hopefully the more
@@ -2287,7 +2287,7 @@ static void f_filetest( const t_upstyp_matched_instance * const a_inst,
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "if ( ! %s %s ) then\necho %s\nreturn 1\nendif\n#\n", 
+		  "if ( ! %s %s ) then\necho \"%s\"\nreturn 1\nendif\n#\n", 
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
 	FPRINTF_ERROR();
       }
@@ -2533,7 +2533,7 @@ static int sh_output_first_check(const FILE * const a_stream,
   int status;
 
   if ((status = fprintf((FILE *)a_stream,
-	      "if [ -s %s ]; then\n  if [ ! -r %s -o ! -x %s ]; then\n    echo File to source (%s) is not readable or not executable\n", a_data,
+	      "if [ -s %s ]; then\n  if [ ! -r %s -o ! -x %s ]; then\n    echo \"File to source (%s) is not readable or not executable\"\n", a_data,
 			a_data, a_data, a_data)) < 0) {
     FPRINTF_ERROR();
   } else {
@@ -2575,7 +2575,7 @@ static int sh_output_next_part(const FILE * const a_stream,
     } else {
       if (a_check_flag == DO_CHECK) {
 	if ((status = fprintf((FILE *)a_stream,
-	      "    UPS_STATUS=$?\n    if [ \"$UPS_STATUS\" != \"0\" ]; then\n      echo Error $UPS_STATUS while sourcing %s\n      unset UPS_STATUS\n",
+	      "    UPS_STATUS=$?\n    if [ \"$UPS_STATUS\" != \"0\" ]; then\n      echo \"Error $UPS_STATUS while sourcing %s\"\n      unset UPS_STATUS\n",
 		    a_data)) < 0) {
 	  FPRINTF_ERROR();
 	} else {
@@ -2610,7 +2610,7 @@ static int csh_output_first_check(const FILE * const a_stream,
   int status;
 
   if ((status = fprintf((FILE *)a_stream,
-	      "if (-e %s) then\n  if (! -r %s || ! -x %s) then\n    echo File to source (%s) is not readable or not executable\n", a_data,
+	      "if (-e %s) then\n  if (! -r %s || ! -x %s) then\n    echo \"File to source (%s) is not readable or not executable\"\n", a_data,
 			a_data, a_data, a_data)) < 0) {
     FPRINTF_ERROR();
   } else {
@@ -2686,7 +2686,7 @@ static int sh_output_last_part_req(const FILE * const a_stream,
   int status;
 
   if ((status = fprintf((FILE *)a_stream,
-	      "else\n  echo File (%s)  not found\n", a_data) < 0)) {
+	      "else\n  echo \"File (%s)  not found\"\n", a_data) < 0)) {
     FPRINTF_ERROR();
   } else {
     upsutl_finish_temp_file(a_stream, a_command_line);
@@ -2704,7 +2704,7 @@ static int csh_output_last_part_req(const FILE * const a_stream,
   int status;
 
   if ((status = fprintf((FILE *)a_stream,
-	      "else\n  echo File (%s)  not found\n", a_data) < 0)) {
+	      "else\n  echo \"File (%s)  not found\"\n", a_data) < 0)) {
     FPRINTF_ERROR();
   } else {
     upsutl_finish_temp_file(a_stream, a_command_line);
