@@ -344,7 +344,7 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
     /* point back to the beginning of the list */
     file_list = upslst_first(file_list);
   } else {
-    upserr_add(UPS_OPEN_FILE, UPS_ERROR, a_dir);
+    upserr_add(UPS_OPEN_FILE, UPS_WARNING, a_dir);
   }
   return (file_list);
 }
