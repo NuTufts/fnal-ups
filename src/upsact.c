@@ -215,9 +215,23 @@ static void f_dodefaults( ACTION_PARAMS);
 	(a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);            \
       /* trim delimiter for quotes */                                   \
       upsutl_str_remove_end_quotes( delimiter, "\"\'", 0 );             \
+      /* if the delimiter is 0 length, then use a space */              \
+      if (*delimiter == '\0') {                                         \
+	delimiter = g_space_delimiter;                                  \
+      }                                                                 \
     } else {                                                            \
       /* use the default, nothing was entered */                        \
       delimiter = g_default_delimiter;                                  \
+    }
+
+#define GET_WHATS_LEFT()   \
+    /* we must set the value of the string expected when dropit removes the \
+       last item from the variable.  it is usually the delimiter except in  \
+       the case where the delimiter is a space. */                          \
+    if (*delimiter == *g_space_delimiter) {                                 \
+      whats_left = g_whats_left;                                            \
+    } else {                                                                \
+      whats_left = delimiter;                                               \
     }
 
 #define CHECK_FOR_PATH(thePath, theDelimiter)  \
@@ -322,6 +336,8 @@ static void f_dodefaults( ACTION_PARAMS);
  */
 
 static char *g_default_delimiter = ":";
+static char *g_space_delimiter = " ";
+static char *g_whats_left = "";
 static int g_ups_cmd = e_invalid_action;
 static char g_buff[MAX_LINE_LEN];
 static char *g_shPath = "PATH";
@@ -2179,18 +2195,18 @@ static void f_copyinfo( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to and a source. */
-    if (a_db_info->config && a_db_info->config->info_path &&
-	a_minst->table && a_minst->table->info_files) {
+    if (a_db_info->config && a_db_info->config->info_target_dir &&
+	a_minst->table && a_minst->table->info_source_dir) {
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
 	/* first check to see if the directory where the info files are
 	   located exists and is a directory */
-	if (! stat(a_minst->table->info_files, &file_stat)) {
+	if (! stat(a_minst->table->info_source_dir, &file_stat)) {
 	  if (S_ISDIR(file_stat.st_mode)) {
 	    if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-			a_minst->table->info_files,
-			a_db_info->config->info_path) < 0) {
+			a_minst->table->info_source_dir,
+			a_db_info->config->info_target_dir) < 0) {
 	      FPRINTF_ERROR();
 	    }
 	  }
@@ -2206,7 +2222,7 @@ static void f_copyinfo( ACTION_PARAMS)
 		   g_cmd_maps[a_cmd->icmd].cmd);
       }
     } else {
-      if (a_minst->table && a_minst->table->info_files) {
+      if (a_minst->table && a_minst->table->info_source_dir) {
 	/* there was a source but no destination.  if we have no source then
 	   there are no info files and that is not an error */
 	upsver_mes(1, "%sNo destination in dbconfig file for info files\n",
@@ -2238,7 +2254,7 @@ static void f_copyinfo( ACTION_PARAMS)
     if (!a_minst->table || !a_minst->table->keyword) {                     \
       source = upsutl_find_manpages(a_minst, a_db_info);                   \
     } else {                                                               \
-      /* the *MAN_FILES keyword must have been specified, use it but we    \
+      /* the *MAN_SOURCE_DIR keyword must have been specified, use it but we \
 	 must translate any local ups environment variables in it. */      \
       if (a_minst->version) {                                              \
         source = upsget_translation(a_minst, a_db_info, a_command_line,    \
@@ -2293,10 +2309,10 @@ static void f_copyman( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to and a source. */
-    if (a_db_info->config && a_db_info->config->man_path) {
+    if (a_db_info->config && a_db_info->config->man_target_dir) {
       /* ok we have a destination, now see if we have a source, if not
 	 assume the default */
-      GET_SOURCE(man_source, man_files);
+      GET_SOURCE(man_source, man_source_dir);
 
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
@@ -2311,14 +2327,14 @@ static void f_copyman( ACTION_PARAMS)
 		if (S_ISDIR(file_stat.st_mode)) {
 		  /* this is a directory.  so we need to process the files in
 		     it */
-		  PROCESS_DIR("man", man_size, "man", man_path);
+		  PROCESS_DIR("man", man_size, "man", man_target_dir);
 		} else {
 		  /* this is a file, if it is a man file, copy it to the man
 		     area */
 		  if ((file = fopen(filename, "r"))) {
 		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
 		    if (c == FIRST_MAN_CHAR) {
-		      COPY_FILES(filename, a_db_info->config->man_path, "man");
+		      COPY_FILES(filename, a_db_info->config->man_target_dir, "man");
 		    }
 		    fclose(file);
 		  }
@@ -2366,10 +2382,10 @@ static void f_copycatman( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to and a source. */
-    if (a_db_info->config && a_db_info->config->catman_path) {
+    if (a_db_info->config && a_db_info->config->catman_target_dir) {
       /* ok we have a destination, now see if we have a source, if not
 	 assume the default */
-      GET_SOURCE(catman_source, catman_files);
+      GET_SOURCE(catman_source, catman_source_dir);
 
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
@@ -2384,15 +2400,15 @@ static void f_copycatman( ACTION_PARAMS)
 		if (S_ISDIR(file_stat.st_mode)) {
 		  /* this is a directory.  so we need to process the files in
 		     it */
-		  PROCESS_DIR("catman", cat_size, "cat", catman_path);
+		  PROCESS_DIR("catman", cat_size, "cat", catman_target_dir);
 		} else {
 		  /* this is a file, if it is a catman file, copy it to the man
 		     area */
 		  if ((file = fopen(filename, "r"))) {
 		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
 		    if (c != FIRST_MAN_CHAR) {
-		      COPY_FILES(filename, a_db_info->config->catman_path,
-				 "cat");
+		      COPY_FILES(filename,
+				 a_db_info->config->catman_target_dir, "cat");
 		    }
 		    fclose(file);
 		  }
@@ -2463,10 +2479,10 @@ static void f_uncopyman( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to remove the files from. */
-    if (a_db_info->config && a_db_info->config->man_path) {
+    if (a_db_info->config && a_db_info->config->man_target_dir) {
       /* ok we have a destination, now see if we have a source, if not
 	 assume the default */
-      GET_SOURCE(man_source, man_files);
+      GET_SOURCE(man_source, man_source_dir);
 
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
@@ -2481,7 +2497,7 @@ static void f_uncopyman( ACTION_PARAMS)
 		if (S_ISDIR(file_stat.st_mode)) {
 		  /* this is a directory.  so we need to process the files in
 		     it */
-		  UNPROCESS_DIR("man", man_size, "man", man_path);
+		  UNPROCESS_DIR("man", man_size, "man", man_target_dir);
 		} else {
 		  /* this is a file, if it is a man file, remove it from the
 		     man area */
@@ -2489,7 +2505,7 @@ static void f_uncopyman( ACTION_PARAMS)
 		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
 		    if (c == FIRST_MAN_CHAR) {
 		      REMOVE_FILES(dir_line->d_name, 
-				   a_db_info->config->man_path, "man");
+				   a_db_info->config->man_target_dir, "man");
 		    }
 		    fclose(file);
 		  }
@@ -2535,10 +2551,10 @@ static void f_uncopycatman( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
     /* Make sure we have somewhere to copy the files to. */
-    if (a_db_info->config && a_db_info->config->catman_path) {
+    if (a_db_info->config && a_db_info->config->catman_target_dir) {
       /* ok we have a destination, now see if we have a source, if not
 	 assume the default */
-      GET_SOURCE(catman_source, man_files);
+      GET_SOURCE(catman_source, man_source_dir);
 
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
@@ -2553,7 +2569,7 @@ static void f_uncopycatman( ACTION_PARAMS)
 		if (S_ISDIR(file_stat.st_mode)) {
 		  /* this is a directory.  so we need to process the files in
 		     it */
-		  UNPROCESS_DIR("cat", cat_size, "cat", catman_path);
+		  UNPROCESS_DIR("cat", cat_size, "cat", catman_target_dir);
 		} else {
 		  /* this is a file, if it is a man file, remove it from the
 		     man area */
@@ -2561,7 +2577,8 @@ static void f_uncopycatman( ACTION_PARAMS)
 		    while( isspace(c=fgetc(file))) ;   /* skip empty spaces */
 		    if (c != FIRST_MAN_CHAR) {
 		      REMOVE_FILES(dir_line->d_name, 
-				   a_db_info->config->catman_path, "cat");
+				   a_db_info->config->catman_target_dir,
+				   "cat");
 		    }
 		    fclose(file);
 		  }
@@ -2709,7 +2726,7 @@ static void f_envprepend( ACTION_PARAMS)
 
 static void f_envremove( ACTION_PARAMS)
 {
-  char *delimiter;
+  char *delimiter, *whats_left;
   
   CHECK_NUM_PARAM("envRemove");
 
@@ -2721,13 +2738,14 @@ static void f_envremove( ACTION_PARAMS)
   
     /* get the correct delimiter */
     GET_DELIMITER();
+    GET_WHATS_LEFT();
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
 		"upstmp=\"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
-		  delimiter, a_cmd->argv[0]) < 0) {
+		  whats_left, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -2735,7 +2753,7 @@ static void f_envremove( ACTION_PARAMS)
       if (fprintf((FILE *)a_stream,
 	     "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s \"$upstmp\"\nunsetenv upstmp\n#\n",
 		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
-		  delimiter, a_cmd->argv[0]) < 0) {
+		  whats_left, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -3093,7 +3111,7 @@ static void f_pathprepend( ACTION_PARAMS)
 
 static void f_pathremove( ACTION_PARAMS)
 {
-  char *delimiter;
+  char *delimiter, *whats_left;
   char *pathPtr;
   
   CHECK_NUM_PARAM("pathRemove");
@@ -3110,18 +3128,21 @@ static void f_pathremove( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       CHECK_FOR_PATH(g_shPath, g_shDelimiter);
+      GET_WHATS_LEFT();
+
       if (fprintf((FILE *)a_stream,
 	        "upstmp=\"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
-		  pathPtr, delimiter, delimiter, a_cmd->argv[1], delimiter, 
+		  pathPtr, delimiter, delimiter, a_cmd->argv[1], whats_left, 
 		  pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
       CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
+      GET_WHATS_LEFT()
       if (fprintf((FILE *)a_stream,
           "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
-		  pathPtr, delimiter, delimiter, a_cmd->argv[1], delimiter,
+		  pathPtr, delimiter, delimiter, a_cmd->argv[1], whats_left,
 		  pathPtr) < 0) {
 	FPRINTF_ERROR();
       }

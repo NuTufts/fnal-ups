@@ -553,11 +553,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(compile_file)
     FromVersion(compile_dir)
     FromAny(description)
-    FromTable(man_files)
-    FromTable(catman_files)
-    FromTable(html_files)
-    FromTable(news_files)
-    FromTable(info_files)
+    FromTable(man_source_dir)
+    FromTable(catman_source_dir)
+    FromTable(html_source_dir)
+    FromTable(news_source_dir)
+    FromTable(info_source_dir)
     FromVersion(origin)
     /* FromChain(chain) */
     FromBoth(declarer)
@@ -586,12 +586,13 @@ void list_K(const t_upstyp_matched_instance * const instance,
       valid=1;
     }
     FromDatabase(name,"Database")
-    FromConfig(upd_usercode,"UPD_UserCode")
+    FromConfig(upd_usercode_dir,"UPD_UserCode_Dir")
+    FromConfig(setups_dir,"Setups_Dir")
     FromConfig(ups_db_version,"DB_Version")
     FromConfig(prod_dir_prefix,"Prod_dir_prefix")
-    FromConfig(man_path,"Man_Path")
-    FromConfig(html_path,"Html_Path")
-    FromConfig(info_path,"Info_Path")
+    FromConfig(man_target_dir,"Man_Target_dir")
+    FromConfig(html_target_dir,"Html_Target_dir")
+    FromConfig(info_target_dir,"Info_Target_dir")
     if (!strcmp(l_ptr->data,"key"))
     { valid=1; 
       printf("\"%d\"",upsget_key(instance->version)); /* test */ 

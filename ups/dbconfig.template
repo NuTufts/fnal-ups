@@ -10,17 +10,17 @@ PROD_DIR_PREFIX = /usr/products
 STATISTICS = edt,tpu,tkreq
 
 # manpages, info files, etc. go here:
-MAN_PATH = /usr/products/man
-CATMAN_PATH = /usr/products/catman
-INFO_PATH = /usr/products/Info
-HTML_PATH = /usr/products/SunOS/html/www-oss/docs
-NEWS_PATH = /dev/null
+MAN_SOURCE_DIR = /usr/products/man
+CATMAN_SOURCE_DIR = /usr/products/catman
+INFO_SOURCE_DIR = /usr/products/Info
+HTML_SOURCE_DIR = /usr/products/SunOS/html/www-oss/docs
+NEWS_SOURCE_DIR = /dev/null
 
 # this db contains the ups product; copy the setups.[c]sh
 #  and cached files to this directory
-SETUPS_PATH = /usr/local/etc
+SETUPS_DIR = /usr/local/etc
 
 # this db contains the upd product; look for the upd
 #  user callouts here:
-UPD_USERCODE = /usr/products/ups_database/upd/usercode
+UPD_USERCODE_DIR = /usr/products/ups_database/upd/usercode
                 

@@ -330,11 +330,11 @@ int ups_free_instance( t_upstyp_instance * const inst_ptr )
     if ( inst_ptr->compile_dir ) { upsmem_free( inst_ptr->compile_dir ); }    
     if ( inst_ptr->compile_file ) { upsmem_free( inst_ptr->compile_file ); }
 
-    if ( inst_ptr->catman_files ) { upsmem_free( inst_ptr->catman_files ); }
-    if ( inst_ptr->html_files ) { upsmem_free( inst_ptr->html_files ); }
-    if ( inst_ptr->info_files ) { upsmem_free( inst_ptr->info_files ); }
-    if ( inst_ptr->man_files ) { upsmem_free( inst_ptr->man_files ); }
-    if ( inst_ptr->news_files ) { upsmem_free( inst_ptr->news_files ); }
+    if ( inst_ptr->catman_source_dir ) { upsmem_free( inst_ptr->catman_source_dir ); }
+    if ( inst_ptr->html_source_dir ) { upsmem_free( inst_ptr->html_source_dir ); }
+    if ( inst_ptr->info_source_dir ) { upsmem_free( inst_ptr->info_source_dir ); }
+    if ( inst_ptr->man_source_dir ) { upsmem_free( inst_ptr->man_source_dir ); }
+    if ( inst_ptr->news_source_dir ) { upsmem_free( inst_ptr->news_source_dir ); }
     
     if ( inst_ptr->db_dir ) { upsmem_free( inst_ptr->db_dir ); }
   
@@ -434,11 +434,11 @@ int ups_free_config( t_upstyp_config * const conf_ptr )
     if ( conf_ptr->prod_dir_prefix ) { upsmem_free( conf_ptr->prod_dir_prefix ); }
     if ( conf_ptr->authorized_nodes ) { upsmem_free( conf_ptr->authorized_nodes ); }
     if ( conf_ptr->statistics ) { upsmem_free( conf_ptr->statistics ); }
-    if ( conf_ptr->man_path ) { upsmem_free( conf_ptr->man_path ); }
-    if ( conf_ptr->catman_path ) { upsmem_free( conf_ptr->catman_path ); }
-    if ( conf_ptr->info_path ) { upsmem_free( conf_ptr->info_path ); }
-    if ( conf_ptr->html_path ) { upsmem_free( conf_ptr->html_path ); }
-    if ( conf_ptr->news_path ) { upsmem_free( conf_ptr->news_path ); }
+    if ( conf_ptr->man_target_dir ) { upsmem_free( conf_ptr->man_target_dir ); }
+    if ( conf_ptr->catman_target_dir ) { upsmem_free( conf_ptr->catman_target_dir ); }
+    if ( conf_ptr->info_target_dir ) { upsmem_free( conf_ptr->info_target_dir ); }
+    if ( conf_ptr->html_target_dir ) { upsmem_free( conf_ptr->html_target_dir ); }
+    if ( conf_ptr->news_target_dir ) { upsmem_free( conf_ptr->news_target_dir ); }
 
     upsmem_free( conf_ptr );
   }

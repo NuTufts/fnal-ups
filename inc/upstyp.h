@@ -52,12 +52,13 @@ typedef struct upstyp_config {
   char             *prod_dir_prefix;
   char             *authorized_nodes;
   char             *statistics;
-  char             *man_path;
-  char             *catman_path;
-  char             *info_path;
-  char             *html_path;
-  char             *news_path;
-  char             *upd_usercode;
+  char             *man_target_dir;
+  char             *catman_target_dir;
+  char             *info_target_dir;
+  char             *html_target_dir;
+  char             *news_target_dir;
+  char             *upd_usercode_dir;
+  char             *setups_dir;
 } t_upstyp_config;
 
 /* database information.  this includes the name (location) of the database
@@ -103,11 +104,11 @@ typedef struct upstyp_instance
   char             *statistics;
   char             *compile_dir;
   char             *compile_file;
-  char             *catman_files;
-  char             *html_files;
-  char             *info_files;
-  char             *man_files;
-  char             *news_files;
+  char             *catman_source_dir;
+  char             *html_source_dir;
+  char             *info_source_dir;
+  char             *man_source_dir;
+  char             *news_source_dir;
   
   char             *db_dir;  
   
