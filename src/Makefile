@@ -40,14 +40,15 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 	  upsver.o upsact.o upsget.o
 
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
-	          ups_configure.o ups_unconfigure.o \
+	          ups_configure.o ups_unconfigure.o ups_unsetup.o \
 	          ups_unk.o
 
 CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsfil.A upsugo.A upsmat.A ups_list.A  \
 	     upskey.A upshlp.A ups_unk.A ups_setup.A \
 	     upsver.A upsact.A upsget.A ups_start.A \
-	     ups_stop.A ups_configure.A ups_unconfigure.A
+	     ups_stop.A ups_configure.A ups_unconfigure.A \
+	     ups_unsetup.A
 
 LDFLAGS = $(LLIBS)
 
@@ -123,23 +124,6 @@ ups_configure.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_configure.o:	$(ERUPT_DIR)/inc/ups_main.h
-ups_exist.o:	ups_exist.c
-ups_exist.o:	$(ERUPT_DIR)/inc/upserr.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upsugo.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upsutl.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upstyp.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upsmat.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upsugo.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upstyp.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upsact.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upstyp.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upsugo.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upsmat.h
-ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
-ups_exist.o:	$(ERUPT_DIR)/inc/ups_main.h
 ups_list.o:	ups_list.c
 ups_list.o:	$(ERUPT_DIR)/inc/ups.h
 ups_list.o:	$(ERUPT_DIR)/inc/upserr.h
@@ -170,6 +154,8 @@ ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_setup.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_unsetup.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_start.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_stop.h
@@ -263,6 +249,19 @@ ups_unsetup.o:	ups_unsetup.c
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upserr.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/ups_main.h
 upsact.o:	upsact.c
 upsact.o:	$(ERUPT_DIR)/inc/upsact.h
 upsact.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -309,6 +308,8 @@ upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_main.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upslst.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_setup.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_unsetup.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_start.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
