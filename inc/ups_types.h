@@ -93,8 +93,7 @@ typedef struct ups_command
     char    *ugo_version;     
     int     ugo_a;           /* All include                          */
     int     ugo_A;           /* Authorized Host(s)                   */
-    t_upslst_item *ugo_auth_first;
-    t_upslst_item *ugo_auth_last;
+    t_upslst_item *ugo_auth;
 /*  int     ugo_b;           UNDEFINED                               */
     int     ugo_B;           /* CODE INCOMPLETE                      */
     int     ugo_c;           /* current specified                    */
@@ -104,21 +103,18 @@ typedef struct ups_command
     int     ugo_e;           /* Define ups_extended                  */
     int     ugo_E;           /* Run Editor                           */
     int     ugo_f;           /* Flavor(s) specified                  */
-    t_upslst_item *ugo_flavor_first;
-    t_upslst_item *ugo_flavor_last;
+    t_upslst_item *ugo_flavor;
     int     ugo_F;           /* Return list of files not in product  */
 /*  int     ugo_G;           UNDEFINED                               */
     int     ugo_g;           /* Did they request a "special" chain?  */
     int     ugo_h;           /* Host(s) specified                    */
-    t_upslst_item *ugo_host_first;
-    t_upslst_item *ugo_host_last;
+    t_upslst_item *ugo_host;
 /*  int     ugo_H;           UNDEFINED                               */
     int     ugo_j;           /* applies to top level product         */
 /*  int     ugo_J;           UNDEFINED                               */
     int     ugo_k;           /* Don't do unsetup first               */
     int     ugo_K;           /* Keywords                             */
-    t_upslst_item *ugo_key_first;
-    t_upslst_item *ugo_key_last;
+    t_upslst_item *ugo_key;
     int     ugo_l;           /* long (listing)                       */
 /*  int     ugo_L;           UNDEFINED                               */
     int     ugo_m;           /* Table file directory                 */
@@ -156,12 +152,10 @@ typedef struct ups_command
     int     ugo_y;           /* delete home dir, no query            */
     int     ugo_Y;           /* delete home dir, query               */
     int     ugo_z;           /* Database(s) were specified           */
-    t_upslst_item *ugo_db_first;
-    t_upslst_item *ugo_db_last;
+    t_upslst_item *ugo_db;
     int     ugo_Z;           /* Time this command                    */
 /* these are associated with n,o,d,c,t,and g chains                  */
-    t_upslst_item *ugo_chain_first;
-    t_upslst_item *ugo_chain_last;
+    t_upslst_item *ugo_chain;
 } t_ups_command;
 
 /*
