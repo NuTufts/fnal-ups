@@ -19,6 +19,9 @@
 
 #ifndef _UPSGET_H_
 #define _UPSGET_H_
+
+#define UPSSHELL "UPS_SHELL"
+
 char *upsget_translation( const t_upstyp_matched_instance * const minstance,
 			  const t_upstyp_db * const db_info_ptr,
 			  const t_upsugo_command * const command_line,
