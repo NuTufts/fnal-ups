@@ -265,6 +265,7 @@ case $ccenv in
 			fi
 		fi
 		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -migrate -check\""
+		llibs="-lots"
 		;;
 
 	*)
@@ -277,7 +278,7 @@ esac
 # NOW ADD IN INCLUDE DIRECTORIES AND LIBRARIES
 #------------------------------------------------------------------------------
 #
-llibs="-L${ERUPT_DIR}/lib -lups";
+llibs="-L${ERUPT_DIR}/lib -lups $llibs";
 incdirs="-I${ERUPT_DIR}/inc";
 
 #
