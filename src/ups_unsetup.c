@@ -107,38 +107,64 @@ static t_upslst_item *unsetup_core(
   t_upstyp_matched_product *mproduct = NULL;
   t_upstyp_matched_instance *minst = NULL;
   t_upslst_item *cmd_list;
+  t_upsugo_command *new_command_line;
   char *dummy = NULL;
   int need_unique = 1;
 
-  /* get all the requested instances */
-  mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
-				  NULL, need_unique);
-  if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
-    /* get the product to be set up */
-    mproduct = (t_upstyp_matched_product *)mproduct_list->data;
+  /* if no product name was given, this is an error */
+  if (a_command_line->ugo_product) {
 
-    /* make sure an instance was matched before proceeding */
-    if (mproduct->minst_list) {
-      minst = (t_upstyp_matched_instance *)(mproduct->minst_list->data);
-
-      /* check if this product is authorized to be unsetup on this node */
-      if (upsutl_is_authorized(minst, mproduct->db_info, &dummy)) {
-	if (UPS_ERROR == UPS_SUCCESS) {	  
-	  /* Now process the unsetup actions */
-	  cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
-				    mproduct, g_cmd_info[a_ups_command].cmd);
-	  if (UPS_ERROR == UPS_SUCCESS) {
-	    upsact_process_commands(cmd_list, a_temp_file);
-	  }
-	  /* now clean up the memory that we used */
-	  upsact_cleanup(cmd_list);
-	}
-      } else {
-	upserr_add(UPS_NOT_AUTH, UPS_FATAL, mproduct->product);
-      }
+    /* If enough information was passed on the command line that allows us to
+       identify an instance then use that information.  otherwise, try to get
+       the SETUP_<prod> environment variable and get the information from
+       that. */
+    if (a_command_line->ugo_version || a_command_line->ugo_chain ||
+	a_command_line->ugo_qualifiers || a_command_line->ugo_f ||
+	a_command_line->ugo_H) {
+      new_command_line = (t_upsugo_command *)a_command_line;
+    } else {
+      /* translate SETUP_<prodname> to get instance information */
+      new_command_line = upsugo_env(a_command_line->ugo_product,
+				    g_cmd_info[e_unsetup].valid_opts);
     }
-  } 
 
+    if (new_command_line) {
+      /* get all the requested instances */
+      mproduct_list = upsmat_instance((t_upsugo_command *)new_command_line,
+				      NULL, need_unique);
+
+      if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
+	/* get the product to be set up */
+	mproduct = (t_upstyp_matched_product *)mproduct_list->data;
+      
+	/* make sure an instance was matched before proceeding */
+	if (mproduct->minst_list) {
+	  minst = (t_upstyp_matched_instance *)(mproduct->minst_list->data);
+	
+	  /* check if this product is authorized to be unsetup on this node */
+	  if (upsutl_is_authorized(minst, mproduct->db_info, &dummy)) {
+	    if (UPS_ERROR == UPS_SUCCESS) {	  
+	      /* Now process the unsetup actions */
+	      cmd_list = upsact_get_cmd((t_upsugo_command *)new_command_line,
+					mproduct, 
+					g_cmd_info[a_ups_command].cmd);
+	      if (UPS_ERROR == UPS_SUCCESS) {
+		upsact_process_commands(cmd_list, a_temp_file);
+	      }
+	      /* now clean up the memory that we used */
+	      upsact_cleanup(cmd_list);
+	    }
+	  } else {
+	    upserr_add(UPS_NOT_AUTH, UPS_FATAL, mproduct->product);
+	  }
+	}
+      }
+    } else {
+      upserr_add(UPS_NO_SETUP_ENV, UPS_FATAL, a_command_line->ugo_product);
+    }
+  } else {
+    upserr_add(UPS_NO_PRODUCT, UPS_FATAL, g_cmd_info[a_ups_command].cmd);
+  }
   return(mproduct_list);
 
 }

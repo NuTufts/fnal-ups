@@ -41,8 +41,6 @@
 static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 				 const FILE * const a_temp_file,
 				 const int a_ups_command);
-static void check_for_unsetup ( const t_upslst_item * const a_cmd_list,
-				const FILE * const a_stream);
 
 /*
  * Definition of global variables.
@@ -130,10 +128,7 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 	  /* the command line says it is ok to do the unsetup.  we must
 	     get the value of the env variable SETUP_<prodname> and use
 	     it to locate the instance that was previously set up.  if
-	     this variable does not exist, we cannot do the unsetup.  then
-	     we must walk through the cmd_list for the current instances'
-	     unsetup actions and check each UPS product dependency to see
-	     if a SETUP_<dep> exists and then do the unsetup */
+	     this variable does not exist, we cannot do the unsetup. */
 	  if (new_command_line = upsugo_env(mproduct->product,
 					   g_cmd_info[e_unsetup].valid_opts)) {
 	    /* we found the SETUP_<PROD> so get a new instance based on the
@@ -149,23 +144,21 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 		cmd_list = upsact_get_cmd(new_command_line, new_mproduct,
 					  g_cmd_info[e_unsetup].cmd);
 	      }
+	      if (UPS_ERROR == UPS_SUCCESS) {
+		upsact_process_commands(cmd_list, a_temp_file);
+	      }
+	      /* now clean up the memory that we used */
+	      upsact_cleanup(cmd_list);
 	    }
-	  } else {
-	    /* There was no env variable.  so use the current instance to
-	       locate the unsetup actions. */
-	    cmd_list = upsact_get_cmd((t_upsugo_command * )a_command_line, 
-				      mproduct, g_cmd_info[e_unsetup].cmd);
-	  }
-	  if (cmd_list && (UPS_ERROR == UPS_SUCCESS)) {
-	    /* Now walk thru all the actions.  for each UPS product
-	       encountered, check if a SETUP_<product> exists.  if it does
-	       output all the unsetup actions to the file. */
-	    check_for_unsetup(cmd_list, a_temp_file);
 	  }
 	  /* now clean up the memory that we used */
-	  upsact_cleanup(cmd_list);
-	  new_mproduct_list = upsutl_free_matched_product_list(
+	  if (cmd_list) {
+	    upsact_cleanup(cmd_list);
+	  }
+	  if (new_mproduct_list) {
+	    new_mproduct_list = upsutl_free_matched_product_list(
 							   &new_mproduct_list);
+	  }
 	}
 
 	if (UPS_ERROR != UPS_SUCCESS) {	  
@@ -190,21 +183,3 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 
 }
 
-/*-----------------------------------------------------------------------
- * check_for_unsetup
- *
- * Walk through the list of commands.  for each new product that is
- * encountered, see if the environment variable SETUP_<product> exists.  if
- * it does, , translate the variable, find the appropriate instance and
- * write the unsetup commands to the stream.
- *
- * Input : a list of commands(t_upsact_item), an output stream
- * Output: none
- * Return: none
- */
-static void check_for_unsetup ( const t_upslst_item * const a_cmd_list,
-				const FILE * const a_stream)
-{
-
-
-}
