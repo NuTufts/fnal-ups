@@ -194,7 +194,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upstyp_instance *cinst;                 /* chain instance      */
   t_upstyp_instance *new_cinst;             /* new chain instance  */
   t_upstyp_instance *tinst;                 /*   table instance      */
-  t_upstyp_instance *new_vinst;             /* new version instance  */
+  t_upstyp_instance *new_vinst=0;           /* new version instance  */
   char *unchain;
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
