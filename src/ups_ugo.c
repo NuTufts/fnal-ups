@@ -57,6 +57,14 @@
    t_upslst_item *ugo_commands = 0;
    t_upslst_item *last_command = 0;
    int argindx;
+/* flag to know if I added current because no chain was specified 
+** when this is done the version is not yet know to exist yet so
+** I can't check and I have to remove if version is then specified 
+** kind of ugly, but otherwise the ifornota would have to be called
+** after checking if last command existed or the version was previously
+** parsed etc and would add a lot of code.
+*/
+   int added_current=0;	
 
 /* ===========================================================================
  * Private function declarations
@@ -203,6 +211,7 @@ int upsugo_bldfvr(struct ups_command * const uc)
 int upsugo_ifornota(struct ups_command * const uc)
 {
    char   * addr;
+   added_current=0;
    if (uc->ugo_a)                           /* did the user specify -a */
    { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
      { addr=upsutl_str_create("*",' ');
@@ -217,9 +226,13 @@ int upsugo_ifornota(struct ups_command * const uc)
        uc->ugo_version = addr;      /* at this point I may not know... */
      }
    } else {                         /* not -a but give defaults */
-     if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain current      */
+/* oops... This is called before version may be set!!! */
+/*     if (!uc->ugo_chain || !uc->ugo_version) */ /* If no chain current      */
+     if (!uc->ugo_chain )
      { addr=upsutl_str_create("current",' ');
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
+/* ug */
+       added_current=1;
      }
      if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
      { addr=upsutl_str_create("",' ');
@@ -690,6 +703,7 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
 				/* to 0 before recalling getarg */
 /* Initialize those pesky variables
     -------------------------------- */
+   struct upslst_item * temp;   /* hold clean current chain if version */
    struct ups_command * uc;
    struct ups_command * luc=0;
    uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
@@ -1194,6 +1208,15 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          if (add_ver) 
          { if(luc->ugo_version) upsmem_free(luc->ugo_version); /* -a put * */
            luc->ugo_version=addr;
+/* may have added the current chain if no chain specified if have version
+** remove that current chain I added */
+           if (added_current)
+           { temp = luc->ugo_chain; 
+/*             upsugo_prtlst(temp,"the current chain"); */
+             upslst_delete( temp, temp->data, 'd');
+             luc->ugo_chain=0;
+             added_current=0;
+           }
            add_ver=0;
          } else { 
            uc->ugo_product = addr;
@@ -1224,6 +1247,15 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
            }
            if (add_ver) 
            { luc->ugo_version=addr;
+/* may have added the current chain if no chain specified if have version
+** remove that current chain I added */
+           if (added_current)
+           { temp = luc->ugo_chain; 
+/*             upsugo_prtlst(temp,"the current chain"); */
+             upslst_delete( temp, temp->data, 'd');
+             luc->ugo_chain=0;
+             added_current=0;
+           }
              add_ver=0;
            } else { 
              uc->ugo_product = addr;
