@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* ups specific include files */
 #include "upsact.h"
@@ -32,6 +33,7 @@
 #include "upsutl.h"
 #include "upsmem.h"
 #include "upskey.h"
+#include "upsugo.h"
 
 /*
  * Definition of public variables.
@@ -60,7 +62,6 @@ enum {
   e_envprepend,
   e_envset,
   e_envunset,
-  e_noproddir,
   e_sourcerequired,
   e_sourceoptional,
   e_sourcereqcheck,
@@ -74,7 +75,10 @@ enum {
   e_copynews,
   e_dodefaults,
   e_nodefaults,
-  e_nosetupenv
+  e_nosetupenv,
+  e_noproddir,
+  e_forkactions,
+  e_sourceactions
 };
 
 /*
@@ -91,7 +95,13 @@ typedef struct s_cmd_cur {
 } t_cmd_cur;
 
 /* this one is the type of a action command handler */
-typedef int (*tpf_cmd)( const t_cmd_cur * const cmd_ptr, const char copt );
+typedef void (*tpf_cmd)( const t_upstyp_matched_instance * const a_inst,
+			 const t_upstyp_db * const a_db_info,
+			 const t_upsugo_command * const a_command_line,
+			 const FILE * const a_stream,
+			 const struct s_cmd_map * const a_cmd_map,
+			 const int a_argc,
+			 const char ** const a_argv);
 
 /* this one is the type for a single action command */
 typedef struct s_cmd_map {
@@ -109,34 +119,154 @@ int upsact_parse( const char * const a_action_line, t_cmd_cur * const cmd_cur );
 
 /* functions to handle specific action commands */
 
-int f_setupoptional( const t_cmd_cur * const, const char );
-int f_setuprequired( const t_cmd_cur * const, const char );
-int f_unsetupoptional( const t_cmd_cur * const, const char );
-int f_unsetuprequired( const t_cmd_cur * const, const char );
-int f_envappend( const t_cmd_cur * const, const char );
-int f_envremove( const t_cmd_cur * const, const char );
-int f_envprepend( const t_cmd_cur * const, const char );
-int f_envset( const t_cmd_cur * const, const char );
-int f_envunset( const t_cmd_cur * const, const char );
-int f_noproddir( const t_cmd_cur * const, const char );
-int f_sourcerequired( const t_cmd_cur * const, const char );
-int f_sourceoptional( const t_cmd_cur * const, const char );
-int f_sourcereqcheck( const t_cmd_cur * const, const char );
-int f_sourceoptcheck( const t_cmd_cur * const, const char );
-int f_exeaccess( const t_cmd_cur * const, const char );
-int f_execute( const t_cmd_cur * const, const char );
-int f_filetest( const t_cmd_cur * const, const char );
-int f_copyhtml( const t_cmd_cur * const, const char );
-int f_copyinfo( const t_cmd_cur * const, const char );
-int f_copyman( const t_cmd_cur * const, const char );
-int f_copynews( const t_cmd_cur * const, const char );
-int f_dodefaults( const t_cmd_cur * const, const char );
-int f_nodefaults( const t_cmd_cur * const, const char );
-int f_nosetupenv( const t_cmd_cur * const, const char );
+void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv);
+void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv);
+void f_copyman( const t_upstyp_matched_instance * const a_inst,
+		const t_upstyp_db * const a_db_info,
+		const t_upsugo_command * const a_command_line,
+		const FILE * const a_stream,
+		const struct s_cmd_map * const a_cmd_map,
+		const int a_argc,
+		const char ** const a_argv);
+void f_copynews( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv);
+void f_envappend( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc,
+		  const char ** const a_argv);
+void f_envprepend( const t_upstyp_matched_instance * const a_inst,
+		   const t_upstyp_db * const a_db_info,
+		   const t_upsugo_command * const a_command_line,
+		   const FILE * const a_stream,
+		   const struct s_cmd_map * const a_cmd_map,
+		   const int a_argc,
+		   const char ** const a_argv);
+void f_envremove( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc,
+		  const char ** const a_argv);
+void f_envset( const t_upstyp_matched_instance * const a_inst,
+	       const t_upstyp_db * const a_db_info,
+	       const t_upsugo_command * const a_command_line,
+	       const FILE * const a_stream,
+	       const struct s_cmd_map * const a_cmd_map,
+	       const int a_argc,
+	       const char ** const a_argv);
+void f_envunset( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv);
+void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc,
+		  const char ** const a_argv);
+void f_execute( const t_upstyp_matched_instance * const a_inst,
+		const t_upstyp_db * const a_db_info,
+		const t_upsugo_command * const a_command_line,
+		const FILE * const a_stream,
+		const struct s_cmd_map * const a_cmd_map,
+		const int a_argc,
+		const char ** const a_argv);
+void f_filetest( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv);
+void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv);
+void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv);
+void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv);
+void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv);
+void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
+		   const t_upstyp_db * const a_db_info,
+		   const t_upsugo_command * const a_command_line,
+		   const FILE * const a_stream,
+		   const struct s_cmd_map * const a_cmd_map,
+		   const int a_argc,
+		   const char ** const a_argv);
+
+#define CHECK_NUM_PARAM(action) \
+    if ((a_argc < min_num_params) || (a_argc > max_num_params)) {   \
+      upserr_add(UPS_INVALID_ACTION_PARAMS, UPS_FATAL, action,      \
+                 min_num_params, max_num_params, a_argc);           \
+    }
+
+#define GET_DELIMITER() \
+    if (a_argc == max_num_params) {                               \
+      /* remember arrays start at 0, so subtract one here */      \
+      delimiter = (char *)&a_argv[max_num_params-1];              \
+    } else {                                                      \
+      /* use the default, nothing was entered */                  \
+      delimiter = &g_default_delimiter[0];                        \
+    }
+
+#define GET_ERR_MESSAGE(msg_ptr) \
+    if (msg_ptr) {                                 \
+      err_message = msg_ptr;                       \
+    } else {                                       \
+      err_message = "";                            \
+    }
+
 
 /*
  * Definition of global variables.
  */
+
+static char g_default_delimiter[2] = ":";
 
 static char *g_local_vars[] = {
   /* 0 */     "$UPS_PROD_NAME",
@@ -160,16 +290,15 @@ static char *g_local_vars[] = {
    array MUST appear in the same order in the following enumeration */
 
 static t_cmd_map g_cmd_maps[] = {
-  { "setupoptional", e_setupoptional, f_setupoptional },
-  { "setuprequired", e_setuprequired, f_setuprequired },
-  { "unsetupoptional", e_unsetupoptional, f_unsetupoptional },
-  { "unsetuprequired", e_unsetuprequired, f_unsetuprequired },
+  { "setupoptional", e_setupoptional, NULL },
+  { "setuprequired", e_setuprequired, NULL },
+  { "unsetupoptional", e_unsetupoptional, NULL },
+  { "unsetuprequired", e_unsetuprequired, NULL },
   { "envappend", e_envappend, f_envappend },
   { "envremove", e_envremove, f_envremove },
   { "envprepend", e_envprepend, f_envprepend },
   { "envset", e_envset, f_envset },
   { "envunset", e_envunset, f_envunset },
-  { "noproddir", e_noproddir, f_noproddir },
   { "sourcerequired", e_sourcerequired, f_sourcerequired },
   { "sourceoptional", e_sourceoptional, f_sourceoptional },
   { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck },
@@ -182,8 +311,11 @@ static t_cmd_map g_cmd_maps[] = {
   { "copyman", e_copyman, f_copyman },
   { "copynews", e_copynews, f_copynews },
   { "dodefaults", e_dodefaults, f_dodefaults },
-  { "nodefaults", e_nodefaults, f_nodefaults },
-  { "nosetupenv", e_nosetupenv, f_nosetupenv },
+  { "nodefaults", e_nodefaults, NULL },
+  { "nosetupenv", e_nosetupenv, NULL },
+  { "noproddir", e_noproddir, NULL},
+  { "forkactions", e_forkactions, NULL},
+  { "sourceactions", e_sourceactions, NULL},
   { 0,0,0 }
 };
 
@@ -193,60 +325,33 @@ static t_cmd_map g_cmd_maps[] = {
  */
 
 /*-----------------------------------------------------------------------
- * upsact_translate
+ * upsact_get_shell_code
  *
- * Given an action, it's parameters and a stream pointer, write the shell 
- * or cshell code corresponding to the passed action to the stream.
+ * Write the actions' equivalent shell specific code to the stream.
+ * We assume the following has been done already -
+ *        the action has been parsed and verified
+ *        all supported local UPS environment variables in the action have
+ *            been replaced with their value.
  *
- * Input : action line, pointer to db config info
+ * Input : instance information, command line information and the
+ *         parsed action information.
  * Output: none
  * Return: pointer to string of translated action
  */
-int upsact_translate( t_upstyp_instance * const inst_ptr,
-		      const char * const action_name )
+void upsact_get_shell_code( const t_upstyp_matched_instance * const a_inst,
+			    const t_upstyp_db * const a_db_info,
+			    const t_upsugo_command * const a_command_line,
+			    const FILE * const a_stream,
+			    const t_cmd_cur * const a_actcmd)
 {
-  t_upstyp_action *act_ptr = NULL;
-  t_upslst_item *cmd_list = NULL;
-  int ierr = UPS_SUCCESS;  
-  t_cmd_cur cmd_cur;
 
-  cmd_cur.inst = inst_ptr;
-  cmd_cur.action_name = action_name;
-  cmd_cur.map = NULL;
-  cmd_cur.argc = 0;
-  
-  /* get action */
-  
-  if ( !(act_ptr = upskey_inst_getaction( inst_ptr, action_name )) ) {
-    return f_dodefaults( &cmd_cur, 's' );
+  /* Call the function associated with the action command */
+  if (g_cmd_maps[a_actcmd->map->icmd].func) {
+    g_cmd_maps[a_actcmd->map->icmd].func( a_inst, a_db_info, a_command_line,
+					a_stream, a_actcmd->map,
+					a_actcmd->argc,
+					(const char ** const)(&(a_actcmd->argv[0])));
   }
-  
-  /* parse each command line for action */
-
-  cmd_list = upslst_first( act_ptr->command_list );
-  for ( ; cmd_list; cmd_list = cmd_list->next ) {
-    
-    char *cmd_str = (char *)cmd_list->data;      
-  
-    if ( upsact_parse( cmd_str, &cmd_cur ) != e_invalid_action ) { 
-    
-      /* Replace all ups pre-set local variables with their actual values in
-	 the parameters before they are split up. */
-      /* new_params = upsact_local_vars(params, a_local_vars); */
-
-      /* handle action */
-    
-      ierr = g_cmd_maps[cmd_cur.map->icmd].func( &cmd_cur, 's' );
-    }
-    else {
-      /* invalid action */
-      upserr_add( UPS_INVALID_ACTION, UPS_WARNING, cmd_str );
-      ierr = UPS_INVALID_ACTION;
-      continue;
-    }
-  }
-
-  return ierr;
 }
 
 /*-----------------------------------------------------------------------
@@ -274,7 +379,6 @@ int upsact_translate_cmd( const char * const cmd_str )
 
     /* handle action */
     
-    ierr = g_cmd_maps[cmd_cur.map->icmd].func( &cmd_cur, 's' );
   }
   else {
     /* invalid action */
@@ -346,7 +450,7 @@ int upsact_params( char * const a_params, char **argv )
   while ( ptr && *ptr ) {
 
     if ( count >= MAX_ARGC ) {
-      upserr_add( UPS_TO_MANY_ACTION_ARG, UPS_FATAL, a_params );
+      upserr_add( UPS_TOO_MANY_ACTION_ARG, UPS_FATAL, a_params );
       return 0;
     }
     
@@ -444,7 +548,7 @@ int upsact_parse( const char * const a_action_line, t_cmd_cur * const cmd_cur )
 
   /* get rid of leading spaces */
   
-  while ( act_s && *act_s && isspace( *(act_s) ) ){ ++act_s; };
+  while ( act_s && *act_s && isspace( (int )*(act_s) ) ){ ++act_s; };
 
   if ( !act_s || !*act_s )
     return e_invalid_action;
@@ -487,441 +591,848 @@ int upsact_parse( const char * const a_action_line, t_cmd_cur * const cmd_cur )
 
 /* Action handling */
 
-int check_argc( const int argc[] )
+void f_copyHtml( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv)
 {
-  return 1;
-}
-
-void print_act( const t_cmd_cur * const cmd_cur )
-{
-  int i;
-  int icmd;
+  int min_num_params = 1;
+  int max_num_params = 1;
   
-  if ( !cmd_cur || !cmd_cur->map )
-    return;
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
 
-  icmd = cmd_cur->map->icmd;
-  
-  printf( "%s( ", g_cmd_maps[icmd].cmd );
-  for ( i = 0; i < cmd_cur->argc; i++ ) {
-    if ( i == cmd_cur->argc - 1 ) 
-      printf( "%s", cmd_cur->argv[i] );
-    else
-      printf( "%s, ", cmd_cur->argv[i] );
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+
+    /* Make sure we have somewhere to copy the files to. */
+    if (!a_db_info->config->html_path) {
+      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "html");
+    } else {  
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+      case e_CSHELL:
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+		    a_argv[0], a_db_info->config->html_path) != EOF) {
+	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	}
+	break;
+      default:
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      }
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      }
+    }
   }
-  printf( " )\n" ); 
 }
 
-int f_setupoptional( const t_cmd_cur * const cmd_cur, const char shell )
+void f_copyInfo( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv)
 {
-  return f_setuprequired( cmd_cur, shell );
-}
-
-int f_setuprequired( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
-
-  /* check number of arguments */
+  int min_num_params = 1;
+  int max_num_params = 1;
   
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
 
-  switch ( shell ) {
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
 
-  case 's':
-
-    /*
-      call upsugo_bldcmd( char * const cmdstr, char * const validopts );
-    */
-
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+    /* Make sure we have somewhere to copy the files to. */
+    if (!a_db_info->config->info_path) {
+      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "info");
+    } else {  
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+      case e_CSHELL:
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+		    a_argv[0], a_db_info->config->info_path) != EOF) {
+	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	}
+	break;
+      default:
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      }
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      }
+    }
   }
+}
+
+void f_copyMan( const t_upstyp_matched_instance * const a_inst,
+		const t_upstyp_db * const a_db_info,
+		const t_upsugo_command * const a_command_line,
+		const FILE * const a_stream,
+		const struct s_cmd_map * const a_cmd_map,
+		const int a_argc,
+		const char ** const a_argv)
+{
+  int min_num_params = 1;
+  int max_num_params = 1;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+
+    /* Make sure we have somewhere to copy the files to. */
+    if (!a_db_info->config->man_path) {
+      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "man");
+    } else {  
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+      case e_CSHELL:
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+		    a_argv[0], a_db_info->config->man_path) != EOF) {
+	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	}
+	break;
+      default:
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      }
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      }
+    }
+  }
+}
+
+void f_copyNews( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv)
+{
+  int min_num_params = 1;
+  int max_num_params = 1;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+
+    /* Make sure we have somewhere to copy the files to. */
+    if (!a_db_info->config->news_path) {
+      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "news");
+    } else {  
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+      case e_CSHELL:
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+		    a_argv[0], a_db_info->config->news_path) != EOF) {
+	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	}
+	break;
+      default:
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      }
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      }
+    }
+  }
+}
+
+void f_envappend( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc,
+		  const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 3;
+  char *delimiter;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    /* get the correct delimiter */
+    GET_DELIMITER();
+
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s=\${%s-}%s%s;export %s\n", a_argv[0], a_argv[0],
+		  delimiter, a_argv[1], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "setenv %s \${%s}%s%s\n", a_argv[0], a_argv[0],
+		  delimiter, a_argv[1]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_envprepend( const t_upstyp_matched_instance * const a_inst,
+		   const t_upstyp_db * const a_db_info,
+		   const t_upsugo_command * const a_command_line,
+		   const FILE * const a_stream,
+		   const struct s_cmd_map * const a_cmd_map,
+		   const int a_argc,
+		   const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 3;
+  char *delimiter;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    /* get the correct delimiter */
+    GET_DELIMITER();
+
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n", a_argv[0], a_argv[1],
+		  delimiter, a_argv[0], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "setenv %s %s%s\${%s}\n", a_argv[0], a_argv[1],
+		  delimiter, a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_envremove( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc,
+		  const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 3;
+  char *delimiter;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    /* get the correct delimiter */
+    GET_DELIMITER();
+
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n",
+		  a_argv[0], a_argv[1], delimiter, a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) setenv %s $upstmp\nunsetenv upstmp\n",
+		  a_argv[0], a_argv[0], delimiter, a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     
-  return UPS_SUCCESS;
-}
-
-int f_unsetupoptional( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  return f_unsetuprequired( cmd_cur, shell );
-}
-
-int f_unsetuprequired( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
-  
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
-  case 's':
-    /*
-    printf( "#\n#The following are wrong:\n" );
-    printf( "#it should be about g_argv[0]\n" );
-    printf( "unset %s_DIR\n", cmd_cur->inst->product );
-    printf( "unset SETUP_%s\n", cmd_cur->inst->product );
-    */
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      }
+    }
   }
+}
+
+void f_envset( const t_upstyp_matched_instance * const a_inst,
+	       const t_upstyp_db * const a_db_info,
+	       const t_upsugo_command * const a_command_line,
+	       const FILE * const a_stream,
+	       const struct s_cmd_map * const a_cmd_map,
+	       const int a_argc,
+	       const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 2;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_argv[0], a_argv[1],
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "setenv %s %s\n", a_argv[0], a_argv[1]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_envunset( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv)
+{
+  int min_num_params = 1;
+  int max_num_params = 1;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "unset %s\n", a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "unsetenv %s\n", a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
+		  const t_upstyp_db * const a_db_info,
+		  const t_upsugo_command * const a_command_line,
+		  const FILE * const a_stream,
+		  const struct s_cmd_map * const a_cmd_map,
+		  const int a_argc,
+		  const char ** const a_argv)
+{
+  int min_num_params = 1;
+  int max_num_params = 1;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "hash %s;\nif [ $? -eq 1 ]; then return 1; fi\n",
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "whereis %s\nif ($status == 1) return 1\n",
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_execute( const t_upstyp_matched_instance * const a_inst,
+		const t_upstyp_db * const a_db_info,
+		const t_upsugo_command * const a_command_line,
+		const FILE * const a_stream,
+		const struct s_cmd_map * const a_cmd_map,
+		const int a_argc,
+		const char ** const a_argv)
+{
+  int min_num_params = 1;
+  int max_num_params = 2;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n", a_argv[1], a_argv[0],
+		  a_argv[1]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n", a_argv[1], a_argv[0])
+	  != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_filetest( const t_upstyp_matched_instance * const a_inst,
+		 const t_upstyp_db * const a_db_info,
+		 const t_upsugo_command * const a_command_line,
+		 const FILE * const a_stream,
+		 const struct s_cmd_map * const a_cmd_map,
+		 const int a_argc,
+		 const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 3;
+  char *err_message;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    /* get the correct error message */
+    GET_ERR_MESSAGE((char *)a_argv[max_num_params-1]);
+
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "if [ ! %s %s ]; then\necho %s;\nreturn 1;\nfi;\n",
+		  a_argv[1], a_argv[0], err_message) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "if ( ! %s %s ) return 1\n", 
+		  a_argv[1], a_argv[0], err_message) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_pathappend( const t_upstyp_matched_instance * const a_inst,
+		   const t_upstyp_db * const a_db_info,
+		   const t_upsugo_command * const a_command_line,
+		   const FILE * const a_stream,
+		   const struct s_cmd_map * const a_cmd_map,
+		   const int a_argc,
+		   const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 3;
+  char *delimiter;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    /* get the correct delimiter */
+    GET_DELIMITER();
+
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s=${%s-}%s%s;export %s\n", a_argv[0], a_argv[0],
+		  delimiter, a_argv[1], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n", a_argv[0], a_argv[0],
+		  a_argv[1]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
+		    const t_upstyp_db * const a_db_info,
+		    const t_upsugo_command * const a_command_line,
+		    const FILE * const a_stream,
+		    const struct s_cmd_map * const a_cmd_map,
+		    const int a_argc,
+		    const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 3;
+  char *delimiter;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    /* get the correct delimiter */
+    GET_DELIMITER();
+
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n", a_argv[0], a_argv[1],
+		  delimiter, a_argv[0], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n", a_argv[0], a_argv[1],
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
+  }
+}
+
+void f_pathremove( const t_upstyp_matched_instance * const a_inst,
+		   const t_upstyp_db * const a_db_info,
+		   const t_upsugo_command * const a_command_line,
+		   const FILE * const a_stream,
+		   const struct s_cmd_map * const a_cmd_map,
+		   const int a_argc,
+		   const char ** const a_argv)
+{
+  int min_num_params = 2;
+  int max_num_params = 3;
+  char *delimiter;
+  
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    /* get the correct delimiter */
+    GET_DELIMITER();
+
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n",
+		  a_argv[0], a_argv[1], delimiter, a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) set %s=$upstmp\nrehash\nunsetenv upstmp\n",
+		  a_argv[0], a_argv[0], delimiter, a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     
-  return UPS_SUCCESS;
-}
-
-int f_envappend( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {2,3};
-  
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-
-  switch ( shell ) {
-
-  case 's':
-    if ( cmd_cur->argc > 2 ) 
-      printf( "%s=${%s}%s%s; export %s\n",
-	       cmd_cur->argv[0], cmd_cur->argv[0], cmd_cur->argv[1], cmd_cur->argv[2], cmd_cur->argv[0] );
-    else
-      printf( "%s=${%s}:%s; export %s\n",
-	       cmd_cur->argv[0], cmd_cur->argv[0], cmd_cur->argv[1], cmd_cur->argv[0] );	      
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+      }
+    }
   }
-
-  return UPS_SUCCESS;
 }
 
-int f_envremove( const t_cmd_cur * const cmd_cur, const char shell )
+void f_pathset( const t_upstyp_matched_instance * const a_inst,
+		const t_upstyp_db * const a_db_info,
+		const t_upsugo_command * const a_command_line,
+		const FILE * const a_stream,
+		const struct s_cmd_map * const a_cmd_map,
+		const int a_argc,
+		const char ** const a_argv)
 {
-  static int argc[2] = {2,3};
+  int min_num_params = 2;
+  int max_num_params = 2;
   
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
-  print_act( cmd_cur );
-
-  switch ( shell ) {
-
-  case 's':
-    if ( cmd_cur->argc > 2 )      
-      printf( "upstmp1=`dropit.pl %s %s %s`\n",
-	       cmd_cur->argv[0], cmd_cur->argv[1], cmd_cur->argv[2] );
-    else
-      printf( "upstmp1=`dropit.pl %s %s :`\n",
-	       cmd_cur->argv[0], cmd_cur->argv[1] );
-    printf( "upstmp2=$?\n" );
-    printf( "if [ $upstmp2 -eq 0 ]\n" );
-    printf( "then\n" );
-    printf( "  %s=$upstmp1; export %s\n", cmd_cur->argv[0], cmd_cur->argv[0] );
-    printf( "fi\n" );
-    printf( "unset upstmp1\n" );
-    printf( "unset upstmp2\n" );
-    
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_argv[0], a_argv[1],
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n", a_argv[0], a_argv[1]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
   }
-  
-  return UPS_SUCCESS;
 }
 
-int f_envprepend( const t_cmd_cur * const cmd_cur, const char shell )
+void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv)
 {
-  static int argc[2] = {2,3};
+  int min_num_params = 1;
+  int max_num_params = 1;
   
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
 
-  case 's':
-    if ( cmd_cur->argc > 2 ) 
-      printf( "%s=%s%s${%s}; export %s\n",
-	       cmd_cur->argv[0], cmd_cur->argv[1], cmd_cur->argv[2], cmd_cur->argv[0], cmd_cur->argv[0] );
-    else
-      printf( "%s=%s:${%s}; export %s\n",
-	       cmd_cur->argv[0], cmd_cur->argv[1], cmd_cur->argv[0], cmd_cur->argv[0] );	      
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, ". %s;\n", a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "source %s\n", a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
   }
-  
-  return UPS_SUCCESS;
 }
 
-int f_envset( const t_cmd_cur * const cmd_cur, const char shell )
+void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv)
 {
-  static int argc[2] = {2,2};
+  int min_num_params = 1;
+  int max_num_params = 1;
   
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
 
-  case 's':
-      printf( "%s=%s; export %s\n",
-	       cmd_cur->argv[0], cmd_cur->argv[1], cmd_cur->argv[0] );
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "if [ -r %s ]; then . %s; fi\n", a_argv[0],
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "if (-r %s) source %s\n", a_argv[0], a_argv[0])
+	  != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
   }
-  
-  return UPS_SUCCESS;
 }
 
-int f_envunset( const t_cmd_cur * const cmd_cur, const char shell )
+void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv)
 {
-  static int argc[2] = {1,1};
-
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
+  int min_num_params = 1;
+  int max_num_params = 1;
   
-  print_act( cmd_cur );
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
-  switch ( shell ) {
-
-  case 's':
-      printf( "unset %s\n", cmd_cur->argv[0] );
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, ". %s;\nif [ $? -eq 1 ]; then return 1; fi;\n",
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "source %s\nif ($status == 1) return 1/n",
+		  a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
   }
-  
-  return UPS_SUCCESS;
 }
 
-/* ??? */
-int f_noproddir( const t_cmd_cur * const cmd_cur, const char shell )
+void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
+		       const t_upstyp_db * const a_db_info,
+		       const t_upsugo_command * const a_command_line,
+		       const FILE * const a_stream,
+		       const struct s_cmd_map * const a_cmd_map,
+		       const int a_argc,
+		       const char ** const a_argv)
 {
-  static int argc[2] = {1,1};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
-
-int f_sourcerequired( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
+  int min_num_params = 1;
+  int max_num_params = 1;
   
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
 
-  case 's':
-      printf( ". ${%s}.sh\n", cmd_cur->argv[0] );
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "if [ -r %s ]; then\n  . %s;\n  if [ $? -eq 1 ]; then return 1; fi;\nfi;\n", 
+		  a_argv[0], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "if (-r %s) then\n  source %s\n  if ($status == 1) return 1/nendif\n", 
+		  a_argv[0], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
   }
-  
-  return UPS_SUCCESS;
 }
 
-int f_sourceoptional( const t_cmd_cur * const cmd_cur, const char shell )
+void f_doDefaults( const t_upstyp_matched_instance * const a_inst,
+		   const t_upstyp_db * const a_db_info,
+		   const t_upsugo_command * const a_command_line,
+		   const FILE * const a_stream,
+		   const struct s_cmd_map * const a_cmd_map,
+		   const int a_argc,
+		   const char ** const a_argv)
 {
-  return f_sourcerequired( cmd_cur, shell );
-}
-
-int f_sourcereqcheck( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
+  int min_num_params = 0;
+  int max_num_params = 0;
   
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
+  CHECK_NUM_PARAM(a_cmd_map->cmd);
 
-  case 's':
-    printf( ". ${%s}.sh\n", cmd_cur->argv[0] );
-    printf( "upstmp=$?\n" );
-    printf( "if [ $upstmp -eq 1 ]\n" );
-    printf( "then\n" );
-    printf( "  unset upstmp\n" );
-    printf( "  return 1\n" );
-    printf( "fi\n" );
-    printf( "unset upstmp\n" );
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "if [ -r %s ]; then\n  . %s;\n  if [ $? -eq 1 ]; then return 1; fi;\nfi;\n", 
+		  a_argv[0], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "if (-r %s) then\n  source %s\n  if ($status == 1) return 1/nendif\n", 
+		  a_argv[0], a_argv[0]) != EOF) {
+	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      }
+      break;
+    default:
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL, a_cmd_map->cmd);
+    }
   }
-  
-  return UPS_SUCCESS;
 }
 
-int f_sourceoptcheck( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  return f_sourcereqcheck( cmd_cur, shell );
-}
-
-int f_exeaccess( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
-  
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
-
-  case 's':
-    printf( "hash %s\n", cmd_cur->argv[0] );
-    printf( "upstmp=$?\n" );
-    printf( "if [ $upstmp -eq 1 ]\n" );
-    printf( "then\n" );
-    printf( "  unset upstmp\n" );
-    printf( "  return 1\n" );
-    printf( "fi\n" );
-    printf( "unset upstmp\n" );
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
-  }
-  
-  return UPS_SUCCESS;
-}
-
-int f_execute( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,2};
-  
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
-
-  case 's':
-    if ( cmd_cur->argc == 2 )
-      printf( "%s = `%s`; export %s\n",
-	       cmd_cur->argv[1], cmd_cur->argv[0], cmd_cur->argv[1] );
-    else
-      printf( "`%s`\n",cmd_cur->argv[0] );
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
-  }
-  
-  return UPS_SUCCESS;
-}
-
-int f_filetest( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {2,3};
-  
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  
-  print_act( cmd_cur );
-  
-  switch ( shell ) {
-
-  case 's':
-    printf( "if [ ! %s %s ]\n", cmd_cur->argv[1], cmd_cur->argv[0] );
-    printf( "then\n" );
-    if ( cmd_cur->argc == 3 )
-      printf( "  echo %s\n", cmd_cur->argv[2] );
-    printf( "  return 1\n" );
-    printf( "fi\n" );
-    break;
-
-  default:
-    return UPS_INVALID_SHELL;
-  }
-
-  return UPS_SUCCESS;
-}
-
-int f_copyhtml( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
-
-int f_copyinfo( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
-
-int f_copyman( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
-
-int f_copynews( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {1,1};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
-
-int f_dodefaults( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {0,0};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
-
-int f_nodefaults( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {0,0};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
-
-int f_nosetupenv( const t_cmd_cur * const cmd_cur, const char shell )
-{
-  static int argc[2] = {0,0};
-  if ( !check_argc( argc ) )
-    return UPS_INVALID_ACTION_ARG;
-  print_act( cmd_cur );	  
-  return UPS_SUCCESS;
-}
