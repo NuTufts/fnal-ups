@@ -17,7 +17,7 @@ ccenv=""		# CCENV		Compilation environment
 cc=""			# CC		Compiler name
 cflags=""		# UPS_CFLAGS	C compiler flags
 dbg=""			# compile with debugger
-filter=""                # flag as to whether to use filterWarn
+filter=""               # flag as to whether to use filterWarn
 mflags=""		# flags for the makefile
 opt=""			# compile with optimiser
 fullopt=""		# compile with all optimisations (may be undebuggable)
@@ -27,7 +27,6 @@ needEmacs=""            # used to check for EMACS_DIR if target is tag_file
 logFile=""		# Log make output?
 defs="$defs SHELL=/bin/sh"	# misc. definitions to pass to make
 insight=""              # compile with Insure (only on IRIX)
-
 
 #------------------------------------------------------------------------
 #  MAKE SURE WE ARE BUILDING ON A SUPPORTED ARCHITECTURE
@@ -47,6 +46,8 @@ elif [ $arch = Linux -o $arch = linux ]; then
 	ccenv="Linux"
 elif [ $arch = AIX ]; then
         ccenv="AIX"
+elif [ $arch = CYGWIN32/NT ]; then
+        ccenv="CYGWIN32/NT"
 else
 	echo "Unknown architecture \`$arch'" >&2
 	ccenv=notvalid
@@ -187,6 +188,19 @@ case $ccenv in
 		defs="$defs CCCHK=\"-Wall\""
 		;;
 
+	CYGWIN32/NT)			# Running cygwin32 under Windows NT
+		defs="$defs AR=ar ARFLAGS=r RANLIB=/usr/bin/ranlib"
+		cc="gcc"
+		if [ "$opt" != "" ]; then
+			cflags="$cflags -O" 
+		fi
+		if [ "$dbg" != "" ]; then 
+			cflags="$cflags -g" 
+		fi
+		defs="$defs CCCHK=\"-Wall\""
+                llibs="-lcygwin"
+		;;
+
 	irix*|IRIX*)
 		os_version=`uname -r | sed -e 's/\(.\).*/\1/'`
 
@@ -287,7 +301,6 @@ case $ccenv in
 	"Please supply one of ACC IRIX GCC OSF1 instead of $ccenv" >&2
 		exit 1;;
 esac
-
 #------------------------------------------------------------------------------
 # NOW ADD IN INCLUDE DIRECTORIES AND LIBRARIES
 #------------------------------------------------------------------------------
@@ -330,7 +343,7 @@ if [ \( "$needEmacs" = "yes" \) -a "$EMACS_DIR" = ""  ]; then
 	exit 1
 fi
 
-trap "/bin/rm -f .status.$$" 0; echo 0 > .status.$$
+trap "rm -f .status.$$" 0; echo 0 > .status.$$
 makeCmd="if make $flags PMFLAGS='$flags' $target; then :; else echo 1 > .status.$$; fi"
 
 if [ "${logFile}" != "" ]; then
