@@ -638,7 +638,7 @@ void upsfil_stat( const int iopt )
 
   printf( "total calls = %d, cache calls = %d (%.1f%%)\n", 
 	  g_call_count, g_call_cache_count, 
-	  g_call_count ? 100.0*(double)(g_call_cache_count)/g_call_count : 0 );
+	  g_call_count ? 100.0*(double)(g_call_cache_count)/(double)g_call_count : (double)0 );
 
   upstbl_dump( g_ft, iopt );
 }
@@ -1606,7 +1606,7 @@ int get_key( void )
 
   else {
     count = 0;
-    while ( cp && *cp && !isspace( *cp ) && *cp != '=' ) {
+    while ( cp && *cp && !isspace( (unsigned long )*cp ) && *cp != '=' ) {
       g_key[count] = *cp;
       count++; cp++;
     }
