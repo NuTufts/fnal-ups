@@ -47,28 +47,28 @@
 #   for the last product defined and base all defintions of the other
 #   actions base on that version and the last flavor.
 
-use Getopt::Std;
+
+# use Getopt::Std;
 
 #  Define valid options (only the option 'f' takes an argument)
-$validOptions = "vf:";
+# $validOptions = "vf:";
 
-$errorMsg = "Error:";
-$usage = "USAGE:\ups_convert [-v -f <flavor>] <releaseName> [releaseVersion]\n";
+# $errorMsg = "Error:";
+# $usage = "USAGE:\ups_convert [-v -f <flavor>] <releaseName> [releaseVersion]\n";
 
 # Get the UPS database we will be using
-$dbs = $ENV{'PRODUCTS'};
+$dbs = $ENV{'OLD_PRODUCTS'};
 if (! "$dbs") {
   print  "$errorMsg A UPS database must be specified in the environmental \n";
-  print  "       variable \$PRODUCTS.\n";
+  print  "       variable \$OLD_PRODUCTS.\n";
   exit 1;
 }
 
-$ndbs = $ENV{'NPRODUCTS'};
+$ndbs = $ENV{'PRODUCTS'};
 if (! "$ndbs") {
   $ndbs = "$dbs/ndbs";
-  print "The NPRODUCTS environment was not set, the new ups database will\n";
-  print "be built at $ndbs\n";
-  exit 1;			# not yet!!
+  print "The PRODUCTS environment was not set, the new ups database will\n";
+  exit 1;
 }
 
 # Separate out all individual databases.
@@ -76,13 +76,13 @@ if (! "$ndbs") {
 
 # Parse through any command line parameters.  Invalid syntax if user specified
 #  an invlid parameter or did not specify a releaseName.
-if (! getopts("$validOptions")) {
-  print "$errorMsg Invalid syntax. $usage";
-  exit 1;
-}
-$GetoptName = $ARGV[0];
-if (! "$ARGV[0]") { $GetoptName = "*"; }
-$releaseVersion = $ARGV[1];
+#if (! getopts("$validOptions")) {
+#  print "$errorMsg Invalid syntax. $usage";
+#  exit 1;
+#}
+#$GetoptName = $ARGV[0];
+#if (! "$ARGV[0]") { $GetoptName = "*"; }
+#$releaseVersion = $ARGV[1];
 
 #**********************************************************************
 #* 
