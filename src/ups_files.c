@@ -1246,11 +1246,9 @@ t_upslst_item *find_group( t_upslst_item * const list_ptr, const char copt )
     inst = (t_ups_instance *)l_itm->data;
     l_itm = l_itm->next;
     
-    printf( "prope (%s, %s)\n", inst->flavor, inst->qualifiers );
     while ( l_itm ) {
       t_ups_instance *is = (t_ups_instance *)l_itm->data;
       if ( !cmp_actions( inst->action_list, is->action_list ) ) {
-	printf( "adding (%s, %s)\n", is->flavor, is->qualifiers );
 	l_grp = upslst_add( l_grp, is );
 	l_itm = upslst_delete_safe( l_itm, is, ' ' );
       }
@@ -1267,9 +1265,6 @@ t_upslst_item *find_group( t_upslst_item * const list_ptr, const char copt )
     l_grp = upslst_insert( l_grp, inst );
     l_orig = upslst_delete( l_orig, inst, ' ' );
   }
-
-  printf( "group count = %d\n", upslst_count( l_grp ) );
-  printf( "list count = %d\n", upslst_count( l_itm ) );
 
   return l_grp;    
 }
