@@ -63,7 +63,7 @@ fi
 
 if test x${UPS_PROD_VERSION:-} = x
 then
-    echo UPS_PROD_VERION not set.  Configure exiting.
+    echo UPS_PROD_VERSION not set.  Configure exiting.
     error=1
 fi
 
@@ -112,9 +112,17 @@ Configure_Date=`date`
 if test ! -d $BootStrap_Dir
 then
     mkdir -p $BootStrap_Dir
+    if test ! -d $BootStrap_Dir
+    then
+	echo '****' Unable to create $BootStrap_Dir
+	echo '****'
+	echo '****' $Name_Of_Ups configure failure
+	exit 1
+    fi
 fi
 
-if test !  -w $BootStrap_Dir
+cp $UPS_PROD_DIR/ups/configure $BootStrap_Dir/.Write_Test
+if test ! -f $BootStrap_Dir/.Write_Test
 then
     echo '****' Unable to write to $BootStrap_Dir
     echo '****'
@@ -122,17 +130,40 @@ then
     exit 1
 fi
 rm -f $BootStrap_Dir/*
-if test -x /usr/local/bin/funame 
+if test -f $BootStrap_Dir/.write_Test
 then
-    echo '**' WARNING: /usr/local/bin/funame exists.
-    echo '**           Please remove this file before declaring ups current'
-    echo '**           It has the same name as a file in ups.'
+    echo ''
+    echo '****' WARNING:  Cannot remove files from $BootStrap_Dir
+    echo '****'           Configure may fail.  Continuing .......
+    echo ''
 fi
-if test -x /usr/local/bin/dropit
+type_test=x`ls -l /usr/local/bin/funame|cut -c1-10|sed 's% %%g'|cut -c1`
+if test $type_test = 'xl'
 then
-    echo '**' WARNING: /usr/local/bin/dropit exists.
-    echo '**           Please remove this file before declaring ups current'
-    echo '**           It has the same name as a file in ups.'
+    echo ''
+    echo '**' WARNING: Please ensure that /usr/local/bin/funame is linked
+    echo '**           to' $UPS_PROD_DIR/bin/funame
+    echo ''
+elif test $type_test != 'x'
+then
+    echo ''
+    echo '**' WARNING: Please convert /usr/local/bin/funame to become a symbolic link
+    echo '**           to' $UPS_PROD_DIR/bin/funame
+    echo ''
+fi
+type_Test=x`ls -l /usr/local/bin/dropit|cut -c1-10|sed 's% %%g'|cut -c1`
+if test $type_test = 'xl'
+then
+    echo ''
+    echo '**' WARNING: Please ensure that /usr/local/bin/dropit is linked
+    echo '**           to' $UPS_PROD_DIR/bin/dropit
+    echo ''
+elif test $type_test != 'x'
+then
+    echo ''
+    echo '**' WARNING: Please convert /usr/local/bin/dropit to become a symbolic link
+    echo '**           to' $UPS_PROD_DIR/bin/dropit
+    echo ''
 fi
 #
 #
@@ -142,6 +173,13 @@ fi
 if test -f $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 then
     rm -f $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
+    if test -f $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
+    then
+	echo '****' Unable to replace cache file in $BootStrap_Dir.
+	echo '****' Existing copy could not be removed.
+	echo '****' $Name_Of_Ups configure failure.
+	exit 1
+    fi
 fi
 cat <<XEoF >$BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 #
@@ -270,31 +308,29 @@ fi
 prod_set=no
 for Prod in \${Products_String}
 do
-#    eval "Prod=\$Prod"
-
-if test \`echo \$Prod|cut -c1\` != '/'
-then
-    for sh in $Setups_Advanced_Sh_Str
-    do
-	if test -x /usr/bin/\${sh}
-	then
-	    Name_Of_Sh=/usr/bin/\${sh}
-	    break
-	elif test -x /bin/\${sh}
-	then
-	    Name_Of_Sh=/bin/\${sh}
-	    break
-	fi
-    done
-    cat <<XxEoF >/tmp/Ash_\$$
+    if test \`echo \$Prod|cut -c1\` != '/'
+    then
+    	for sh in $Setups_Advanced_Sh_Str
+    	do
+	    if test -x /usr/bin/\${sh}
+	    then
+	    	Name_Of_Sh=/usr/bin/\${sh}
+	    	break
+	    elif test -x /bin/\${sh}
+	    then
+	    	Name_Of_Sh=/bin/\${sh}
+	    	break
+	    fi
+        done
+        cat <<XxEoF >/tmp/Ash_\$$
 #!\${Name_Of_Sh}
 eval dir=${b_slash}\$1
 \$ECHO ${b_slash}\$dir
 XxEoF
-    chmod +x /tmp/Ash_\$$
-    Prod=\`(unset ENV; /tmp/Ash_\$$ \$Prod )\`
-    rm -f /tmp/Ash_\$$ 
-fi
+        chmod +x /tmp/Ash_\$$
+        Prod=\`(unset ENV; /tmp/Ash_\$$ \$Prod )\`
+        rm -f /tmp/Ash_\$$ 
+    fi
     if test -d \$Prod
     then
 	if test \$prod_set = no
@@ -459,8 +495,6 @@ endif
 if ( ! \$?UPS_DIR ) then
     if ( -x \$Setups_Home/${Script_Prefix}.common ) then
 	eval \`\$Setups_Home/${Script_Prefix}.common\`
-#    else if ( -x /usr/local/etc/${Script_Prefix}.common ) then
-#	eval \`/usr/local/etc/${Script_Prefix}.common\`
     endif
 endif
 #
@@ -484,8 +518,6 @@ else
 # setup script may set aliases which are NOT inherited by sub-shells.
 #
 #
-#    source \$UPS_DIR/ups/setup.csh
-#    setup \$Name_Of_Ups
     source \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
 endif
 #
@@ -705,9 +737,6 @@ then
     if test -x \$Setups_Home/${Script_Prefix}.common
     then
         eval \`(unset ENV;\$Setups_Home/${Script_Prefix}.common sh)\`
-#    elif test -x /usr/local/etc/${Script_Prefix}.common
-#   then
-#       eval \`(unset ENV;/usr/local/etc/${Script_Prefix}.common sh)\`
     fi
 fi
 if test x\${UPS_DIR:-} != x
@@ -722,8 +751,6 @@ then
 # when PRODUCTS and UPS_DIR are known at entry.  The $Name_Of_Ups setup script
 # may define functions which are NOT inherited by sub-shells.
 #
-#	. \$UPS_DIR/ups/setup.sh
-#	setup \$Name_Of_Ups
 	. \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
 else
 #
@@ -851,12 +878,6 @@ fi
 # 
 # set the appropriate environmental variables for root 
 # 
-#if test ! -f /usr/local/etc/setpath.sh
-#then
-#    PATH=\${PATH}:/usr/local/bin; export PATH 
-#else 
-#    . /usr/local/etc/setpath.sh 
-#fi 
 if test x\${PATH:-} != x
 then
     PATH=\$PATH:/bin:/usr/bin
@@ -950,9 +971,7 @@ fi
 #
 if test ! -r $BootStrap_Dir/${Script_Prefix}.common
 then
-#    echo '**'
     echo '**' Creating $BootStrap_Dir/${Script_Prefix}.common
-#    echo '**'
     cat <<XEoF > $BootStrap_Dir/${Script_Prefix}.common 
 #!/bin/sh 
 # Copyright (c) 1998 Universities Research Association, Inc.
@@ -1033,9 +1052,6 @@ Node=\`uname -n|cut -f1 -d'.'\`
 if test -r \$Setups_Home_Dir/\$Setups_Product_Init_File
 then
 	Product_String=\`cat \$Setups_Home_Dir/\$Setups_Product_Init_File|grep -v '^#'\`
-#elif test -r /usr/local/etc/\$Setups_Product_Init_File
-#then
-#	Product_String=\`cat /usr/local/etc/\$Setups_Product_Init_File|grep -v '^#'\`
 fi
 #
 # Determine a likely flavor to search for.  The actual search 
@@ -1151,7 +1167,6 @@ then
 				    fi
                     		    UPS_DIR=\$PROD_DIR;export UPS_DIR
 				    export PRODUCTS
-#				    . \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
     				    if test \$Shell = 'sh'
     				    then
         				cat <<EoF
@@ -1327,17 +1342,20 @@ fi
 # A better one is in the works
 # However, this should work most of the time at Fermilab
 #
-if test ! -w \$Setups_Home
+cp $UPS_PROD_DIR/ups/configure \$Setups_Home/.Write_Test
+if test ! -f \$Setups_Home/.Write_Test
 then
     Setups_Home=\`echo \$Setups_Home|sed 's%/afs/fnal/products%/afs/.fnal.gov/products%'\`
     Setups_Home=\`echo \$Setups_Home|sed 's%/afs/fnal.gov/products%/afs/.fnal.gov/products%'\`
 fi
-if test ! -w \$Setups_Home
+cp $UPS_PROD_DIR/ups/configure \$Setups_Home/.Write_Test
+if test ! -f \$Setups_Home/.Write_Test
 then
     echo '****' Unable to write to \$Setups_Home
     echo '****' \$Name_Of_Ups current script failure
     exit 1
 else
+    rm -f \$Setups_Dir/.Write_Test
     chmod +rx \$Setups_Home
 fi
 #
@@ -1351,16 +1369,6 @@ do
     cp /tmp/ups_cur_\$$ \$filex
     rm /tmp/ups_cur_\$$
 done
-#
-# Don't forget to copy the ${Script_Prefix}.common script to
-# /usr/local/etc.  Just in case everything else
-# fails
-#
-#if test -w /usr/local/etc
-#then
-#    echo '**' Copying ${Script_Prefix}.common to /usr/local/etc
-#    cp \$BootStrap_Dir/${Script_Prefix}.common /usr/local/etc
-#fi
 #
 # Move all the files from the bootstrap directory to 
 # $Setups_Home
@@ -1395,7 +1403,6 @@ done
 	    chmod +x \$Setups_Home/\$file
 	else
 	    echo '**' \$file identical to \$Setups_Home/\$file - not copied.
-#	    touch \$Setups_Home/\$file
         fi
     done
 
@@ -1451,10 +1458,7 @@ chmod +x $BootStrap_Dir/current
 #
 # Create the uncurrent script
 #
-if test -w $BootStrap_Dir/uncurrent
-then
     rm -f $BootStrap_Dir/uncurrent
-fi
 echo '**' Creating $BootStrap_Dir/uncurrent
 cat <<XEoF >$BootStrap_Dir/uncurrent
 #!/bin/sh
@@ -1551,10 +1555,9 @@ fi
 #Remove the setups.cache file from 
 # $Setups_Home
 #
-if test -w \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
-then
     rm -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
-else
+if test -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
+then
 #
 # If we can't remove the file, print error message and fail.
 #
@@ -1612,12 +1615,6 @@ cat <<XEoF >$BootStrap_Dir/unconfigure
 # The real code ( 1 line - This could be incorporated in the table file )
 if test -d $BootStrap_Dir
 then
-    if test ! -w $BootStrap_Dir
-    then
-	echo '****' Unconfigure cannot remove $BootStrap_Dir
-	echo '****' Insufficient privilege
-	exit 1
-    else
 	echo '**' Removing the $BootStrap_Dir directory
 	rm -rf $BootStrap_Dir
 	if test -d $BootStrap_Dir
@@ -1626,7 +1623,6 @@ then
 	    echo '****' Please remove this directory manually.
 	    echo ' '
 	fi
-    fi
 fi
 XEoF
 #
