@@ -58,17 +58,19 @@ typedef struct upslst_item
 /*
  * Declaration of public functions.
  */
-t_upslst_item *upslst_new( void *data_ptr );
-t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt );
-t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr );
-t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr );
-t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt );
+t_upslst_item *upslst_new( void * const data_ptr );
+t_upslst_item *upslst_free( t_upslst_item * const list_ptr, const char copt );
+t_upslst_item *upslst_insert( t_upslst_item * list_ptr, void * const data_ptr );
+t_upslst_item *upslst_add( t_upslst_item * list_ptr, void * const data_ptr );
+t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
+			      void * const data_ptr, const char copt );
 
-t_upslst_item *upslst_merge( t_upslst_item *list_ptr_1, t_upslst_item *list_ptr_2 );
-t_upslst_item *upslst_copy( t_upslst_item *list_ptr );
+t_upslst_item *upslst_merge( t_upslst_item * const list_ptr_1,
+			     t_upslst_item * const list_ptr_2 );
+t_upslst_item *upslst_copy( t_upslst_item * const list_ptr );
 
-t_upslst_item *upslst_first( t_upslst_item *list_ptr );
-t_upslst_item *upslst_last( t_upslst_item *list_ptr );
+t_upslst_item *upslst_first( t_upslst_item * const list_ptr );
+t_upslst_item *upslst_last( t_upslst_item * const list_ptr );
 
 /*
  * Declaration of private globals.

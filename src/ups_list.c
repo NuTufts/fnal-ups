@@ -66,7 +66,7 @@
  * Output: none
  * Return: t_upslst_item *, pointer to top of list or NULL
  */
-t_upslst_item *upslst_new( void *data_ptr )
+t_upslst_item *upslst_new( void * const data_ptr )
 {
   t_upslst_item *l_first = NULL;
 
@@ -94,7 +94,7 @@ t_upslst_item *upslst_new( void *data_ptr )
  * Output: none
  * Return: t_upslst_item *, NULL
  */
-t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt )
+t_upslst_item *upslst_free( t_upslst_item * const list_ptr, const char copt )
 {
   t_upslst_item *l_ptr = NULL;
   t_upslst_item *l_tmp = NULL;
@@ -131,7 +131,7 @@ t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt )
  * NOTE: if passed list pointer, in successive calls, is the first item,
  * it should be pretty fast.
  */
-t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr )
+t_upslst_item *upslst_insert( t_upslst_item * list_ptr, void * const data_ptr )
 {
   t_upslst_item *l_first = NULL;
   t_upslst_item *l_new = NULL;
@@ -171,7 +171,7 @@ t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr )
  * NOTE: if passed list pointer, in successive calls, is the last item,
  * it should be pretty fast.
  */
-t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr )
+t_upslst_item *upslst_add( t_upslst_item *list_ptr, void * const data_ptr )
 {
   t_upslst_item *l_last = NULL;
   t_upslst_item *l_new = NULL;
@@ -209,7 +209,8 @@ t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr )
  * Output: none
  * Return: t_upslst_item *, pointer to top of list
  */
-t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt )
+t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
+			      void * const data_ptr, const char copt )
 {
   t_upslst_item *l_ptr = NULL;
   t_upslst_item *l_prev = NULL;
@@ -254,7 +255,8 @@ t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt
  * Output: none
  * Return: t_upslst_item *, pointer to the first item of the list or NULL
  */
-t_upslst_item *upslst_merge( t_upslst_item *list_ptr_1, t_upslst_item *list_ptr_2 )
+t_upslst_item *upslst_merge( t_upslst_item * const list_ptr_1,
+			     t_upslst_item * const list_ptr_2 )
 {
   t_upslst_item *l_last_1 = NULL;
   t_upslst_item *l_first_2 = NULL;
@@ -280,7 +282,7 @@ t_upslst_item *upslst_merge( t_upslst_item *list_ptr_1, t_upslst_item *list_ptr_
  * Output: none
  * Return: t_upslst_item *, pointer to the first item of the list or NULL
  */
-t_upslst_item *upslst_copy( t_upslst_item *list_ptr )
+t_upslst_item *upslst_copy( t_upslst_item * const list_ptr )
 {
   t_upslst_item *l_ptr = NULL;
   t_upslst_item *l_new = NULL;
@@ -305,7 +307,7 @@ t_upslst_item *upslst_copy( t_upslst_item *list_ptr )
  * Output: none
  * Return: t_upslst_item *, pointer to first item of list
  */
-t_upslst_item *upslst_first( t_upslst_item *list_ptr )
+t_upslst_item *upslst_first( t_upslst_item * const list_ptr )
 {
   t_upslst_item *l_ptr = NULL;
   
@@ -325,7 +327,7 @@ t_upslst_item *upslst_first( t_upslst_item *list_ptr )
  * Output: none
  * Return: t_upslst_item *, pointer to last item of list
  */
-t_upslst_item *upslst_last( t_upslst_item *list_ptr )
+t_upslst_item *upslst_last( t_upslst_item * const list_ptr )
 {
   t_upslst_item *l_ptr = NULL;
   
