@@ -1037,10 +1037,10 @@ int upsugo_dump (struct ups_command * const uc,
          printf("Description:      %s\n",uc->ugo_description); 
 /*      if ( uc->ugo_override ) 
          printf("Override:         %s\n",uc->ugo_override); */
-      if ( uc->ugo_P) 
+      if ( uc->ugo_L) 
          printf("LongListing\n"); 
       if ( uc->ugo_P) 
-         printf("OutputActOnly\n"); 
+         printf("Product not in a database (-P)\n"); 
       if ( uc->ugo_qualifiers ) 
          upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers:       ",prnt_ptr); 
       if ( uc->ugo_productdir ) 

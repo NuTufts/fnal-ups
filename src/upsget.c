@@ -170,6 +170,12 @@ void upsget_envout(const FILE * const stream,
                     const t_upsugo_command * const command_line )
 { char *name;
   get_element(name,product);
+  if (!name)
+  { name = command_line->ugo_product;
+    upserr_add(UPS_NO_KEYWORD, UPS_INFORMATIONAL, "for this version", 
+               "PRODUCT", name );
+   /* put out info here !!! */
+  }
   name = upsutl_upcase( name );
   if (command_line->ugo_shell == e_BOURNE )
   { fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n#\n",
@@ -200,7 +206,11 @@ void upsget_allout(const FILE * const stream,
   } else {
     get_element(name,product);
     if (!name)
-    { name = " ";      /* no name in file, set to space */      
+/*    { name = " ";      no name in file, set to space */      
+    { name = command_line->ugo_product;
+      upserr_add(UPS_NO_KEYWORD, UPS_INFORMATIONAL, "for this version", 
+               "PRODUCT", name );
+      /* put out info here !!! */
     }
     if (command_line->ugo_shell == e_BOURNE )
     { fprintf((FILE *)stream,"%sUPS_PROD_NAME=%s;export UPS_PROD_NAME\n",
@@ -517,6 +527,12 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
   static char newstr[4096];
   static char *string = 0;
   get_element(string,product);
+  if (!string)
+  { string=command_line->ugo_product;
+    upserr_add(UPS_NO_KEYWORD, UPS_INFORMATIONAL, "for this version", 
+               "PRODUCT", string );
+   /* put out info here !!! */
+  }
   strcpy(newstr,string);
   strcat(newstr," ");
   get_element(string,version);
