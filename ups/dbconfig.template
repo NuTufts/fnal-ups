@@ -6,8 +6,8 @@ AUTHORIZED_NODES = *
 # all product roots are under /usr/products:
 PROD_DIR_PREFIX = /usr/products
 
-# keep statistics about the following products:
-STATISTICS = edt,tpu,tkreq
+# keep statistics about the following products (uncomment this to get it):
+#STATISTICS = edt,tpu,tkreq
 
 # manpages, info files, etc. go here:
 MAN_SOURCE_DIR = /usr/products/man
