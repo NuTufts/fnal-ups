@@ -14,8 +14,7 @@ Tablefile:        titan
 Anyfile:          sam:shameful
 Options:          -power_steering -ac -abs
 Description:      It was a dark and stormy night.
-LongListing
-OutputActOnly
+Product not in a database (-P)
 Qualifiers:       *
 Productdir:       /myprod:/yourprod
 Archivefile:      a.tar:b.tar
