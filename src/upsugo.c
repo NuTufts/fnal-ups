@@ -450,7 +450,7 @@ void upsugo_setfixed(struct ups_command * const uc)
    static int shell=e_INVALID_SHELL;
    if (shell==e_INVALID_SHELL)
    { if((SHELL = (char *)getenv("SHELL")) == 0)
-     { upserr_add(UPS_NOSHELL);
+     { upserr_add(UPS_NOSHELL, UPS_WARNING);
      } else { 
        if (strstr(SHELL,"csh"))
        { shell=e_CSHELL;

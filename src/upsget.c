@@ -131,7 +131,7 @@ void upsget_remall(const FILE * const stream,
                     const t_upsugo_command * const command_line )
 {
   if (command_line->ugo_shell == e_INVALID_SHELL)
-  { upserr_add(UPS_NOSHELL);
+  { upserr_add(UPS_NOSHELL, UPS_WARNING);
   } else {
     if (command_line->ugo_shell == e_BOURNE )
     { fprintf((FILE *)stream,"unset UPS_PROD_NAME\n");
@@ -184,7 +184,7 @@ void upsget_allout(const FILE * const stream,
 { char *addr;
   char *name;
   if (command_line->ugo_shell == e_INVALID_SHELL)
-  { upserr_add(UPS_NOSHELL);
+  { upserr_add(UPS_NOSHELL, UPS_WARNING);
   } else {
     get_element(name,product);
     if (!name)
