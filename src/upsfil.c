@@ -183,7 +183,8 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
     if ( g_pd ) {
       g_call_cache_count++;
-      P_VERB_s( 1, "Reading from cache" );
+      P_VERB_s_i_s( 1, "Read from cache", 
+		    upslst_count( g_pd->instance_list), "item(s)" );
       return g_pd;
     }
   }
@@ -376,6 +377,21 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   g_filename = 0;
 
   return UPS_SUCCESS;
+}
+
+int upsfil_exist( const char * const ups_file )
+{
+  /* will just check if a file exist,
+    the main purpose is not to log/report any errors */
+
+  FILE *fh = fopen ( ups_file, "r" );
+  if ( fh ) {
+    fclose( fh );
+    return 1;
+  }
+  else {
+    return 0;
+  }
 }
 
 void free_product( const void *key, void ** prod, void *cl ) 
