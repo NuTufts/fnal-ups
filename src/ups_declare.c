@@ -129,11 +129,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                "Exact product definition exists");
     return 0;
   }
-  if (!uc->ugo_r )
-  { upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL, 
-               uc->ugo_product, "product home", 
-               "\nSpecification did not include a -r for product directory");
-  }
   save_chain=uc->ugo_chain;
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
@@ -286,6 +281,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          new_cinst->qualifiers=the_qualifiers;
          new_cinst->declarer=username;
          new_cinst->declared=declared_date;
+         new_cinst->modifier=username;
+         new_cinst->modified=declared_date;
          product->instance_list = 
             upslst_add(product->instance_list,new_cinst);
          upsver_mes(1,"Adding %s chain version %s to %s\n",
@@ -346,6 +343,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       new_vinst->qualifiers=the_qualifiers;
       new_vinst->declarer=username;
       new_vinst->declared=declared_date;
+      new_vinst->modifier=username;
+      new_vinst->modified=declared_date;
       new_vinst->prod_dir=uc->ugo_productdir;
 /*      new_vinst->table_dir=uc->ugo_tablefiledir;
         new_vinst->table_file=uc->ugo_tablefile;   */
@@ -355,6 +354,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       new_vinst->origin=uc->ugo_origin;
       new_vinst->compile_file=uc->ugo_compile_file;
       new_vinst->compile_dir=uc->ugo_compile_dir;
+      if (!uc->ugo_r )
+      { upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL, 
+               uc->ugo_product, "product home", 
+               "\nSpecification did not include a -r for product directory");
+      }
       if (uc->ugo_O)
       { if ( strchr(uc->ugo_options,':') == 0)
         { new_vinst->user_list = 
