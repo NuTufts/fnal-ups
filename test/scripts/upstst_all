@@ -50,5 +50,6 @@ upstst_start
 echo "======================================================================"
 echo "Testing stop routines"
 upstst_stop
-
-
+echo "======================================================================"
+echo "Testing exist command"
+upstst_exist
