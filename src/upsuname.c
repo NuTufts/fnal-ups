@@ -23,7 +23,7 @@ ups_have_flavor_override() {
 
 	res = parts;
 
-	scan = parts[0] = override;
+	scan = parts[0] = strdup(override);
 	while( isspace(*scan) && *scan ) {
 	    scan++;
 	}
