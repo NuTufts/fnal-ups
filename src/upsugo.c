@@ -953,7 +953,7 @@ int upsugo_dump (struct ups_command * const uc,
       if ( uc->ugo_version ) 
          fprintf(fd,"Version:          %s\n",uc->ugo_version); 
       if ( uc->ugo_auth ) 
-         upsugo_prtlst(uc->ugo_auth,  "Auth:             ",prnt_ptr,fd); 
+         upsugo_prtlst(uc->ugo_auth,  "Authorized Nodes: ",prnt_ptr,fd); 
       if ( uc->ugo_flavor ) 
          upsugo_prtlst(uc->ugo_flavor,"Flavor:           ",prnt_ptr,fd); 
       if ( uc->ugo_host ) 
@@ -961,25 +961,25 @@ int upsugo_dump (struct ups_command * const uc,
       if ( uc->ugo_key ) 
          upsugo_prtlst(uc->ugo_key,   "Key:              ",prnt_ptr,fd); 
       if ( uc->ugo_tablefiledir ) 
-         fprintf(fd,"Tablefiledir: %s\n",uc->ugo_tablefiledir); 
+         fprintf(fd,"Tablefiledir:     %s\n",uc->ugo_tablefiledir); 
       if ( uc->ugo_tablefile ) 
-         fprintf(fd,"Tablefile: %s\n",uc->ugo_tablefile); 
+         fprintf(fd,"Tablefile:        %s\n",uc->ugo_tablefile); 
       if ( uc->ugo_anyfile ) 
-         fprintf(fd,"Anyfile: %s\n",uc->ugo_anyfile); 
+         fprintf(fd,"Anyfile:          %s\n",uc->ugo_anyfile); 
       if ( uc->ugo_options ) 
-         fprintf(fd,"Options: %s\n",uc->ugo_options); 
+         fprintf(fd,"Options:          %s\n",uc->ugo_options); 
       if ( uc->ugo_description ) 
-         fprintf(fd,"Description: %s\n",uc->ugo_description); 
+         fprintf(fd,"Description:      %s\n",uc->ugo_description); 
       if ( uc->ugo_override ) 
-         fprintf(fd,"Override: %s\n",uc->ugo_override); 
+         fprintf(fd,"Override:         %s\n",uc->ugo_override); 
       if ( uc->ugo_qualifiers ) 
          upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers:       ",prnt_ptr,fd); 
       if ( uc->ugo_productdir ) 
-         fprintf(fd,"Productdir: %s\n",uc->ugo_productdir); 
+         fprintf(fd,"Productdir:       %s\n",uc->ugo_productdir); 
       if ( uc->ugo_archivefile ) 
-         fprintf(fd,"Archivefile: %s\n",uc->ugo_archivefile); 
+         fprintf(fd,"Archivefile:      %s\n",uc->ugo_archivefile); 
       if ( uc->ugo_upsdir ) 
-         fprintf(fd,"Upsdir: %s\n",uc->ugo_upsdir); 
+         fprintf(fd,"Upsdir:           %s\n",uc->ugo_upsdir); 
       if ( uc->ugo_db ) 
          upsugo_prtdb(uc->ugo_db,"DB:               ",prnt_ptr,fd); 
       if ( uc->ugo_chain ) 
