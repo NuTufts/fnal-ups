@@ -345,7 +345,8 @@
 #define case_P \
          case 'P':       \
          uc->ugo_P = 1;  \
-         set_value (uc->ugo_override , "P")
+         break;
+/*         set_value (uc->ugo_override , "P") */
 #define case_r           \
          case 'r':       \
          uc->ugo_r = 1;  \
@@ -991,8 +992,8 @@ int upsugo_free (struct ups_command * const uc)
          upsmem_free(uc->ugo_options); 
       if ( uc->ugo_description ) 
          upsmem_free(uc->ugo_description); 
-      if ( uc->ugo_override ) 
-         upsmem_free(uc->ugo_override); 
+/*      if ( uc->ugo_override ) 
+         upsmem_free(uc->ugo_override);  */
       if ( uc->ugo_qualifiers ) 
          upslst_free(uc->ugo_qualifiers,'d'); 
       if ( uc->ugo_productdir ) 
@@ -1047,8 +1048,8 @@ int upsugo_dump (struct ups_command * const uc,
          printf("Options:          %s\n",uc->ugo_options); 
       if ( uc->ugo_description ) 
          printf("Description:      %s\n",uc->ugo_description); 
-      if ( uc->ugo_override ) 
-         printf("Override:         %s\n",uc->ugo_override); 
+/*      if ( uc->ugo_override ) 
+         printf("Override:         %s\n",uc->ugo_override); */
       if ( uc->ugo_qualifiers ) 
          upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers:       ",prnt_ptr); 
       if ( uc->ugo_productdir ) 
@@ -1348,7 +1349,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        switch(*(arg_str+1))      /* which flag was specified */
        { /* Single flag cases */
          case_a case_C case_e case_E case_F 
-         case_j case_k case_l case_L case_s case_S
+         case_j case_k case_l case_L case_P case_s case_S
          case_v case_V case_w case_W case_x case_X
          case_y case_Y case_Z case_help
          /* Chain cases */ 
@@ -1358,7 +1359,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          case_f case_K case_A case_h case_H
          /* single values */ 
          case_b case_D case_m case_M case_N 
-         case_O case_p case_P case_r case_T 
+         case_O case_p case_r case_T 
          case_u case_U 
          /* number sets */
          case_0 case_1 case_2 case_3

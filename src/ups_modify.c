@@ -97,6 +97,7 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
 /*  t_upstyp_instance *vinst;                  version instance      */
   t_upstyp_instance *new_vinst;             /* new version instance  */
   char *username;
+  char *loc;
   struct tm *mytime;
   char *declared_date;
   char *unchain;
@@ -126,12 +127,17 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
   username=upsutl_user();
-  seconds=time(0);
+/*  seconds=time(0);
   mytime = localtime(&seconds);
-  mytime->tm_mon++; /* correct jan=0 */
-  declared_date = (char *) malloc((size_t)(9));
+  mytime->tm_mon++;  correct jan=0 */
+  declared_date = upsutl_time_date();
+  while((loc=strchr(declared_date,' '))!=0)
+  { *loc='_';
+  }
+/* (char *) malloc((size_t)(9));
   sprintf(declared_date,"%d-%d-%d",
           mytime->tm_mon,mytime->tm_mday,mytime->tm_year);
+*/
 
 /************************************************************************
  *

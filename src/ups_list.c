@@ -486,6 +486,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
+  char *nodes=0;
   char *str_val;
   char *addr;
   int count=0;
@@ -522,7 +523,32 @@ void list_K(const t_upstyp_matched_instance * const instance,
       FromBoth(modified)
     }
 /* to HERE */
+    if (!upsutl_stricmp(l_ptr->data,"authorized_nodes")) 
+    { if (upsutl_is_authorized(instance, product->db_info,&nodes))
+      { printf("\"%s\" ",nodes);
+      } else { 
+        printf("\"\" ");
+      }
+      valid=1;
+    }
+    if (!upsutl_stricmp(l_ptr->data,"statistics")) 
+    { if (config_ptr)
+      { if (config_ptr->statistics)
+        { if (strstr(config_ptr->statistics,product->product))
+          { printf("\"statistics\" ");
+          } else { 
+            printf("\"\" ");
+          }
+        } else {
+          printf("\"\" ");
+        }
+      } else {
+        printf("\"\" ");
+      }
+      valid=1;
+    }
     FromDatabase(name,"Database")
+    FromConfig(upd_usercode,"UPD_UserCode")
     FromConfig(ups_db_version,"DB_Version")
     FromConfig(prod_dir_prefix,"Prod_dir_prefix")
     FromConfig(man_path,"Man_Path")

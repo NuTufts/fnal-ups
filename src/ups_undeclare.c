@@ -80,6 +80,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
   char buffer[FILENAME_MAX+1];
   char *file=buffer;
   char *the_chain;
+  char *product_home;            /* product home to be deleted (-y or -Y) */
+  char *input = "   ";           /* yes or no */
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
   t_upslst_item *vinst_list;                /* version instance list */
@@ -207,7 +209,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
  ***********************************************************************/
 /* If they specified the version all chains were removed by this point */
 /* If they didn't specify a version we Don't continue...               */
-    if (!uc->ugo_version) { exit(0); }
+    if (!uc->ugo_version) { return(0); }
 
 /* We want NOTHING to do with chains at this point - it is out of sync */
     uc->ugo_chain=0;
@@ -225,6 +227,32 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
       if ((UPS_ERROR == UPS_SUCCESS) && product )
       { vinst_list=upsmat_match_with_instance( vinst, product );
         vinst=vinst_list->data;
+        if (uc->ugo_y || uc->ugo_Y )
+        { if(db_info->config)
+          { if (db_info->config->prod_dir_prefix)
+            { product_home =
+                   upsutl_str_create(db_info->config->prod_dir_prefix,' ');
+              product_home =
+                   upsutl_str_crecat(product_home,"/");
+              product_home =
+                   upsutl_str_crecat(product_home,vinst->prod_dir);
+            } else {
+              product_home =
+                   upsutl_str_create(vinst->prod_dir,' ');
+            }
+          } else { 
+            product_home =
+                 upsutl_str_create(vinst->prod_dir,' ');
+          }
+          if (uc->ugo_y)
+          { fprintf(stdout,"Product home directory - \n\t%s\n",product_home);
+            fprintf(stdout,"Delete this directory?");
+            (void)fgets(input,3,stdin);
+            if(!upsutl_strincmp(input,"y",1))
+            { uc->ugo_Y=1;         /* set and leave for last thing... */
+            }
+          }
+        }
         product->instance_list = 
            upslst_delete(product->instance_list,vinst,'d');
         upsver_mes(1,"Deleting version %s\n",
@@ -235,6 +263,9 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         if (UPS_ERROR == UPS_SUCCESS) 
         { upsact_process_commands(cmd_list, tmpfile); }
         upsact_cleanup(cmd_list); */
+        if (uc->ugo_Y) 
+        { fprintf((FILE *)tmpfile,"rm -rf %s\n",product_home);
+        }
       }
     }
     return 0;
