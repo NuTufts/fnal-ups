@@ -295,7 +295,8 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
 
   /* we usually tell the file to delete itself.  however the user may
      override this */
-  if (g_temp_file_name && ! g_COMPILE_FLAG && ! g_keep_temp_file) {
+  if (g_temp_file_name && ! g_COMPILE_FLAG && ! g_keep_temp_file &&
+      (strcmp (g_temp_file_name, "/dev/null") != 0)) {
     (void) fprintf((FILE *)a_stream, "%s/bin/rm -f %s\n", a_prefix, g_temp_file_name);
   }
 }
