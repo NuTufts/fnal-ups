@@ -144,23 +144,36 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
       inst = (t_upstyp_matched_instance *) inst_ptr->data;
       if (inst->chain)
          {
-         printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", inst->chain->product,
-             inst->chain->chain, inst->chain->version);
-         printf("FLAVOR=%s, QUALIFIERS=%s\n", inst->chain->flavor,
-             inst->chain->qualifiers);
+         printf("C:PRODUCT=%15s, VERSION=%10s, ", inst->chain->product,
+             inst->chain->version);
+         printf("FLAVOR=%12s, QUALIFIERS=%s, CHAIN=%s\n", inst->chain->flavor,
+             inst->chain->qualifiers, inst->chain->chain);
+         if (inst->xtra_chains)
+	    {
+	    t_upstyp_instance 	*cinst;
+	    t_upslst_item 	*clist;
+ 	    for (clist = inst->xtra_chains; clist; clist=clist->next)
+		{
+		cinst = (t_upstyp_instance *)clist->data; 
+                printf("C:PRODUCT=%15s, VERSION=%10s, ", cinst->product,
+                    cinst->version);
+                printf("FLAVOR=%12s, QUALIFIERS=%s, CHAIN=%s\n", 
+		    cinst->flavor, cinst->qualifiers, cinst->chain);
+		}
+	    }
          }
       if (inst->version)
          {
-         printf("V:PRODUCT=%s, VERSION=%s, ", inst->version->product,
+         printf("V:PRODUCT=%15s, VERSION=%10s, ", inst->version->product,
              inst->version->version);
-         printf("FLAVOR=%s, QUALIFIERS=%s\n", inst->version->flavor,
+         printf("FLAVOR=%12s, QUALIFIERS=%s\n", inst->version->flavor,
              inst->version->qualifiers);
          }
       if (inst->table)
          {
-         printf("T:PRODUCT=%s, VERSION=%s, ", inst->table->product,
+         printf("T:PRODUCT=%15s, VERSION=%10s, ", inst->table->product,
              inst->table->version);
-         printf("FLAVOR=%s, QUALIFIERS=%s\n", inst->table->flavor,
+         printf("FLAVOR=%12s, QUALIFIERS=%s\n", inst->table->flavor,
              inst->table->qualifiers);
          }
       }

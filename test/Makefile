@@ -36,7 +36,7 @@ UNIT_TESTS = test_upserr test_upslst test_upsmem test_upsutl test_upsugo \
 
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
 	upstst_misc.o upstst_parse.o upstst_err.o upstst_fil.o	\
-	upstst_ugo.o upstst_mat.o upstst_get.o upstst_list.o
+	upstst_ugo.o upstst_mat.o upstst_get.o upstst_list.o upstst_act.o
 #=============================================================================
 # TARGETS
 #=============================================================================
@@ -142,6 +142,11 @@ test_ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
 test_ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
 test_ups_list.o:	$(ERUPT_DIR)/inc/upsver.h
 test_ups_list.o:	$(ERUPT_DIR)/inc/upsget.h
+test_ups_list.o:	$(ERUPT_DIR)/inc/upsact.h
+test_ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+test_ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
+test_ups_list.o:	$(ERUPT_DIR)/inc/upsmat.h
+test_ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
 test_ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 test_upsact.o:	test_upsact.c
@@ -215,6 +220,11 @@ test_upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
 test_upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
 test_upsugo.o:	$(ERUPT_DIR)/inc/upsver.h
 test_upsugo.o:	$(ERUPT_DIR)/inc/upsget.h
+test_upsugo.o:	$(ERUPT_DIR)/inc/upsact.h
+test_upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+test_upsugo.o:	$(ERUPT_DIR)/inc/upsugo.h
+test_upsugo.o:	$(ERUPT_DIR)/inc/upsmat.h
+test_upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
 test_upsugo.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_upsugo.o:	$(ERUPT_DIR)/inc/upsugo.h
 test_upsutl.o:	test_upsutl.c
@@ -249,8 +259,43 @@ ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_test.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_test.o:	$(ERUPT_DIR)/inc/upsver.h
 ups_test.o:	$(ERUPT_DIR)/inc/upsget.h
+ups_test.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_test.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_test.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_test.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_test.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_test.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_test.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_act.o:	upstst_act.c
+upstst_act.o:	$(ERUPT_DIR)/inc/ups.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upserr.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsfil.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upskey.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsmem.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsutl.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsver.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsget.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsact.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upslst.h
+upstst_act.o:	$(ERUPT_DIR)/inc/ups_list.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_act.o:	./upstst_parse.h
+upstst_act.o:	./upstst_macros.h
+upstst_act.o:	$(ERUPT_DIR)/inc/upserr.h
 upstst_cmdline.o:	upstst_cmdline.c
 upstst_cmdline.o:	./upstst_cmdline.h
 upstst_cmdloop.o:	upstst_cmdloop.c
@@ -285,6 +330,11 @@ upstst_fil.o:	$(ERUPT_DIR)/inc/upstyp.h
 upstst_fil.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_fil.o:	$(ERUPT_DIR)/inc/upsver.h
 upstst_fil.o:	$(ERUPT_DIR)/inc/upsget.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upsact.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_fil.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_fil.o:	$(ERUPT_DIR)/inc/ups_list.h
 upstst_fil.o:	$(ERUPT_DIR)/inc/upsugo.h
 upstst_fil.o:	./upstst_parse.h
@@ -310,6 +360,11 @@ upstst_get.o:	$(ERUPT_DIR)/inc/upstyp.h
 upstst_get.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_get.o:	$(ERUPT_DIR)/inc/upsver.h
 upstst_get.o:	$(ERUPT_DIR)/inc/upsget.h
+upstst_get.o:	$(ERUPT_DIR)/inc/upsact.h
+upstst_get.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_get.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_get.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_get.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_get.o:	$(ERUPT_DIR)/inc/ups_list.h
 upstst_get.o:	$(ERUPT_DIR)/inc/upsugo.h
 upstst_get.o:	./upstst_parse.h
@@ -335,6 +390,11 @@ upstst_list.o:	$(ERUPT_DIR)/inc/upstyp.h
 upstst_list.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_list.o:	$(ERUPT_DIR)/inc/upsver.h
 upstst_list.o:	$(ERUPT_DIR)/inc/upsget.h
+upstst_list.o:	$(ERUPT_DIR)/inc/upsact.h
+upstst_list.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_list.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_list.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_list.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 upstst_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 upstst_list.o:	./upstst_parse.h
@@ -360,6 +420,11 @@ upstst_mat.o:	$(ERUPT_DIR)/inc/upstyp.h
 upstst_mat.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_mat.o:	$(ERUPT_DIR)/inc/upsver.h
 upstst_mat.o:	$(ERUPT_DIR)/inc/upsget.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upsact.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_mat.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_mat.o:	$(ERUPT_DIR)/inc/ups_list.h
 upstst_mat.o:	$(ERUPT_DIR)/inc/upsugo.h
 upstst_mat.o:	./upstst_parse.h
@@ -391,6 +456,11 @@ upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
 upstst_ugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_ugo.o:	$(ERUPT_DIR)/inc/upsver.h
 upstst_ugo.o:	$(ERUPT_DIR)/inc/upsget.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upsact.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upstyp.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upsugo.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upsmat.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/upslst.h
 upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_list.h
 upstst_ugo.o:	$(ERUPT_DIR)/inc/upsugo.h
 upstst_ugo.o:	./upstst_parse.h

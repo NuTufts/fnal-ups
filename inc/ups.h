@@ -34,6 +34,7 @@
 #include "upsutl.h"
 #include "upsver.h"
 #include "upsget.h"
+#include "upsact.h"
 #include "ups_list.h"
 
 #endif /* _UPS_H_ */

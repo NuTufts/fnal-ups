@@ -28,11 +28,18 @@ int             estatus = UPS_SUCCESS;          /* expected status */
 static char     *estatus_str;                   /* expected status string */
 static char     *product;			/* product name */
 static char     *options;			/* options */
+static char	*outfile;			/* filename to output */
+static char     *difffile;			/* file to diff */
+FILE		*ofd;				/* outfile file descriptor */
+int		stdout_dup;			/* dup of stdout */
 upstst_argt     argt[] = {{"<product>", UPSTST_ARGV_STRING,NULL,&product},
 			  {"-options",  UPSTST_ARGV_STRING,NULL,&options},
                           {"-status",   UPSTST_ARGV_STRING,NULL,&estatus_str},
+                          {"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
+                          {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
                           {NULL,        UPSTST_ARGV_END,   NULL,NULL}};
-t_upsugo_command	*uc;				/* ups command */
+t_upsugo_command *uc;				/* ups command */
+char            diffcmd[132];                   /* diff command */
 
 
 /* parse command line
@@ -44,11 +51,40 @@ UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 if (!options) options = UPSTST_ALLOPTS;
 
+/* let's get our output file descriptor setup
+   ------------------------------------------ */
+
+if (outfile) 					/* don't use stdout */
+   {
+   if (!(ofd = fopen(outfile,"w")))
+      { perror(outfile); return (1); }
+   }
+else
+   {ofd = stdout;}
+stdout_dup = dup(STDOUT_FILENO);                /* dup stdout */
+fflush(stdout);                                 /* clear output buffer */
+status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
+ 
 /* call the real routine
    --------------------- */
 
 uc = upsugo_env(product,options);
 UPSTST_CHECK_CALL(UPSTST_NONZEROSUCCESS,uc,estatus);
+upsugo_dump(uc,FALSE);				/* display */
+
+/* dump the output to specified file and compare
+   --------------------------------------------- */
+
+fflush(stdout);					/* flush buffer */
+dup2(stdout_dup,STDOUT_FILENO);			/* reset stdout */
+close(stdout_dup);				/* close files*/
+if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);	
+
+if (difffile && outfile)
+   {
+   sprintf (diffcmd,"diff %s %s",difffile,outfile);
+   system(diffcmd);
+   }
 return (0);
 }
 
@@ -75,10 +111,9 @@ upstst_argt     argt[] = {{"-options",UPSTST_ARGV_STRING,NULL,&options},
                           {"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
                           {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
                           {NULL,      UPSTST_ARGV_END,   NULL,NULL}};
-t_upsugo_command	*uc =0;				/* ups command */
+t_upsugo_command *uc =0;			/* ups command */
 int		ncmds = 0;
 char            diffcmd[132];                   /* diff command */
-
 
 
 /* parse command line
@@ -138,3 +173,76 @@ if (difffile && outfile)
 return (0);
 }
 
+/* ==========================================================================
+
+    upstst_ugo_bldcmd - tests upsugo_bldcmd
+
+   ==========================================================================*/
+
+int upstst_ugo_bldcmd (int argc, char ** const argv)
+{
+static char     *myfunc = "upsugo_bldcmd";
+int             status;                         /* status of parse */
+int             estatus = UPS_SUCCESS;          /* expected status */
+static char     *estatus_str;                   /* expected status string */
+static char     *command;			/* command string name */
+static char     *options;			/* options */
+static char	*outfile;			/* filename to output */
+static char     *difffile;			/* file to diff */
+FILE		*ofd;				/* outfile file descriptor */
+int		stdout_dup;			/* dup of stdout */
+upstst_argt     argt[] = {{"<command>", UPSTST_ARGV_STRING,NULL,&command},
+			  {"-options",  UPSTST_ARGV_STRING,NULL,&options},
+                          {"-status",   UPSTST_ARGV_STRING,NULL,&estatus_str},
+                          {"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
+                          {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
+                          {NULL,        UPSTST_ARGV_END,   NULL,NULL}};
+t_upsugo_command *uc;				/* ups command */
+char            diffcmd[132];                   /* diff command */
+
+
+/* parse command line
+   ------------------ */
+
+estatus_str = NULL; options = NULL;
+status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
+UPSTST_CHECK_PARSE(status,argt,argv[0]);
+UPSTST_CHECK_ESTATUS (estatus_str, estatus);
+if (!options) options = UPSTST_ALLOPTS;
+
+/* let's get our output file descriptor setup
+   ------------------------------------------ */
+
+if (outfile) 					/* don't use stdout */
+   {
+   if (!(ofd = fopen(outfile,"w")))
+      { perror(outfile); return (1); }
+   }
+else
+   {ofd = stdout;}
+stdout_dup = dup(STDOUT_FILENO);                /* dup stdout */
+fflush(stdout);                                 /* clear output buffer */
+status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
+ 
+/* call the real routine
+   --------------------- */
+
+uc = upsugo_bldcmd(command,options);
+UPSTST_CHECK_CALL(UPSTST_NONZEROSUCCESS,uc,estatus);
+upsugo_dump(uc,FALSE);				/* display */
+
+/* dump the output to specified file and compare
+   --------------------------------------------- */
+
+fflush(stdout);					/* flush buffer */
+dup2(stdout_dup,STDOUT_FILENO);			/* reset stdout */
+close(stdout_dup);				/* close files*/
+if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);	
+
+if (difffile && outfile)
+   {
+   sprintf (diffcmd,"diff %s %s",difffile,outfile);
+   system(diffcmd);
+   }
+return (0);
+}

@@ -23,13 +23,11 @@ Include files:-
 int upstst_list (int argc, char ** const argv)
 {
 static char     *myfunc = "upsugo_list";
-static char     *options;			/* options */
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
 int		status;				/* function status */
 FILE		*ofd;				/* outfile file descriptor */
-upstst_argt     argt[] = {{"-options",UPSTST_ARGV_STRING,NULL,&options},
-                          {"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
+upstst_argt     argt[] = {{"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
                           {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
                           {NULL,      UPSTST_ARGV_END,   NULL,NULL}};
 t_upsugo_command	*uc =0;			/* ups command */
@@ -39,10 +37,9 @@ int		stdout_dup;			/* dup of stdout */
 /* parse command line
    ------------------ */
 
-outfile = NULL; difffile = NULL; options = NULL;
+outfile = NULL; difffile = NULL; 
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
-if (!options) options = UPSTST_ALLOPTS;
 if (outfile) 					/* don't use stdout */
    {
    if (!(ofd = fopen(outfile,"w")))		/* open file */
@@ -59,7 +56,7 @@ dup2(fileno(ofd),STDOUT_FILENO);		/* reset it to output file */
    --------------------- */
 
 UPS_ERROR = UPS_SUCCESS;
-while (uc = upsugo_next(argc,argv,options))	/* for all commands */
+while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    ups_list(uc);

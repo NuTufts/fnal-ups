@@ -1,6 +1,6 @@
 #!/bin/sh
 # ============================================================================
-# test the file routines
+# test the match routines
 # ============================================================================
 unset PRODUCTS
 cd $ERUPT_DIR/test/scripts/match/log
