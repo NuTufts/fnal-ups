@@ -34,9 +34,9 @@ CFLAGScia = $(INCDIRS)
 
 #
 #
-OBJECTS = ups_error.o
+OBJECTS = ups_error.o ups_list.o
 
-CIAOBJECTS = ups_error.a
+CIAOBJECTS = ups_error.a  ups_list.a
 
 LDFLAGS = $(LLIBS)
 
@@ -110,5 +110,12 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
-ups_error.o:	ups_error.c
-ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_error.o: ups_error.c $(ERUPT_DIR)/inc/ups_error.h
+ups_list.o: ups_list.c $(ERUPT_DIR)/inc/ups_list.h
+
+
+
+
+
+
+
