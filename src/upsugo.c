@@ -111,10 +111,6 @@
          case 'S':      \
          uc->ugo_S = 1; \
          break;
-#define case_u \
-         case 'u':      \
-         uc->ugo_u = 1; \
-         break;
 #define case_v \
          case 'v':      \
          uc->ugo_v +=1; \
@@ -310,6 +306,10 @@
          case 'A':       \
          uc->ugo_A = 1;  \
          build_list (uc->ugo_auth , "A") 
+#define case_b \
+         case 'b':       \
+         uc->ugo_b = 1;  \
+         set_value (uc->ugo_compile_file, "b") 
 #define case_D \
          case 'D':       \
          uc->ugo_D = 1;  \
@@ -346,6 +346,10 @@
          case 'T':       \
          uc->ugo_T = 1;  \
          set_value (uc->ugo_archivefile , "T")
+#define case_u           \
+         case 'u':       \
+         uc->ugo_u = 1;  \
+         set_value (uc->ugo_compile_file_dir, "u")
 #define case_U           \
          case 'U':       \
          uc->ugo_U = 1;  \
@@ -1279,16 +1283,18 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        { /* Single flag cases */
          case_a case_C case_e case_E case_F 
          case_j case_k case_l case_L case_S
-         case_u case_v case_V case_w case_W
-         case_x case_y case_Y case_Z case_help
+         case_v case_V case_w case_W case_x 
+         case_y case_Y case_Z case_help
          /* Chain cases */ 
          case_c case_d case_n case_t case_o
          /* List elements */
          case_g            /* also a chain */
          case_f case_K case_A case_h case_H
          /* single values */ 
-         case_D case_m case_M case_N case_O 
-         case_p case_P case_r case_T case_U
+         case_b case_D case_m case_M case_N 
+         case_O case_p case_P case_r case_T 
+         case_u case_U 
+         /* number sets */
          case_0 case_1 case_2 case_3
          case 'q':
               uc->ugo_q = 1;
