@@ -5,6 +5,11 @@
 #include <ctype.h>
 #include "upsuname.h"
 
+#ifdef _sgi
+extern char *strdup();
+exterh char *getenv();
+#endif
+
 #define HOST_BUF_SIZE 1024
 
 char **
