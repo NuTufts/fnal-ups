@@ -100,7 +100,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 39 */  "%s: No instance to copy to specified on command line.\n",
 /* 40 */  "%s: Invalid Specification for %s -\n\t%s\n",
 /* 41 */  "%s: No instance found for product: \'%s\'\n",
-/* 42 */  "%s: Duplicate instance in %s file\n   %s \n   key = \"%s\" \"%s\" \"%s\" \"%s\" hash(%d)\n" 
+/* 42 */  "%s: Duplicate instance in %s file\n   %s \n   key = \"%s\" \"%s\" \"%s\" \"%s\" hash(%d)\n",
+/* 43 */  "%s: Specified %s file %s\n   does not exist in specified or default locations\n" /* file not found not good enough */
 };
 
 char *g_error_ascii[] = {
@@ -147,7 +148,8 @@ char *g_error_ascii[] = {
    /* UPS_INVALID_SPECIFICATION 40 */ "UPS_INVALID_SPECIFICATION",
    /* UPS_NO_PRODUCT_FOUND    41 */ "UPS_NO_PRODUCT_FOUND",
    /* UPS_DUPLICATE_INSTANCE  42 */ "UPS_DUPLICATE_INSTANCE",
-   /* UPS_NERR                43 */ "UPS_NERR",
+   /* UPS_FILE_NOT_FOUND      43 */ "UPS_FILE_NOT_FOUND",
+   /* UPS_NERR                44 */ "UPS_NERR",
    0 };
 
 /*

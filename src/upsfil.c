@@ -774,10 +774,10 @@ void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
     t_upslst_item *vl_ptr = 0;
     t_upstyp_instance *vinst_ptr = 0;
     static char file[10];
+    verify_key=upsget_key(inst_ptr); 
     vl_ptr = upslst_first(l_ptr);
     for ( ; vl_ptr; vl_ptr = vl_ptr->next ) 
-    {   verify_key=upsget_key(inst_ptr); 
-        vinst_ptr = (t_upstyp_instance *)vl_ptr->data;
+    {   vinst_ptr = (t_upstyp_instance *)vl_ptr->data;
         if ( verify_key == upsget_key(vinst_ptr) )
         { switch ( g_ifile )  
           { case e_file_version: strcpy(file,"VERSION"); break;

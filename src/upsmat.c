@@ -1131,7 +1131,12 @@ static int match_from_table( const char * const a_product,
       /* free the table_file_path */
       upsmem_free(full_table_file);
     }
-  }    
+  } else { 
+    if (UPS_VERIFY) 
+    { upserr_add(UPS_FILE_NOT_FOUND, UPS_WARNING, "CHAIN", a_tablefile );
+      upserr_output(); /* THIS SHOULD NOT BE !!! , BUT IT'S LOST DJF */
+    }
+  }
     return num_matches;
 }
 
