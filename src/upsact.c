@@ -775,7 +775,7 @@ t_upslst_item *upsact_trim_unsetup( t_upslst_item * const act_list,
  */
 t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 {
-  static char trim_chars[] = " \t\n\r\f);";
+  static char trim_chars[] = " \t\n\r\f)";
   t_upsact_cmd *pcmd;
   char *act_s = (char *)cmd_str, *act_e = NULL, *act_p = NULL;
   int icmd = e_invalid_action;
@@ -831,6 +831,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 	/* trim off whitespace & the ending ")", we will also get rid
            of ending ';' */
 
+	upsutl_str_remove_edges( act_s, " ;" );
 	upsutl_str_remove_edges( act_s, trim_chars );
 
         /* save the location in the array */
