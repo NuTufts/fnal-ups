@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <sys/utsname.h>
 #include <pwd.h>
 
@@ -674,11 +676,10 @@ char *upsget_tilde_dir(char * addr)
 char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
-{ t_upslst_item *db_list;
-  static char NOT[]="";
+{ static char NOT[]="";
   static char *string;
 /*  if (command_line->ugo_z) 
-  { db_list=upslst_first(command_line->ugo_db);
+  { t_upslst_item *db_list=upslst_first(command_line->ugo_db);
     string=db_list->data-;
   } else {
 */
