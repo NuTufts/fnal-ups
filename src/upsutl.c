@@ -145,7 +145,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
       }
       /* flush the journaling cache of files so the changes made internally are
 	 actually written out to disk. only do this when command succeeds  */
-      if (UPS_ERROR == UPS_SUCCESS) {
+      if (UPS_ERROR == UPS_SUCCESS && !a_simulate_flag) {
 	upsfil_flush();
       }
     } else {
@@ -218,7 +218,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
   } else {
     /* flush the journaling cache of files so the changes made internally are
        actually written out to disk. only do this when command succeeds  */
-    if (UPS_ERROR == UPS_SUCCESS) {
+    if (UPS_ERROR == UPS_SUCCESS && !a_simulate_flag) {
       upsfil_flush();
     }
   }
