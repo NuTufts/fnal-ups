@@ -107,7 +107,7 @@ $#VERSION=0;   # Version specification            - reqHash,flvrchnHash
 $#FLAVOR=1;    # Flavor                           - reqHash
 $#FLAGS=2;     # flags                            - reqHash
 
-$opt_v=1;
+#$opt_v=1;
 NEXTDB:
 
 foreach $db (@dbs) {
