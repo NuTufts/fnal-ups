@@ -62,18 +62,21 @@ int main (void)
   instance.qualifiers = "debug, build";
   instance.flavor = "global";
 
-  if (upsutl_statistics(&instance, db, command) != UPS_SUCCESS) {
+  upsutl_statistics(&instance, db, command);
+  if (UPS_ERROR != UPS_SUCCESS) {
     upserr_output();
   }
 
   /* Now append to the file */
-  if (upsutl_statistics(&instance, db, command) != UPS_SUCCESS) {
+  upsutl_statistics(&instance, db, command);
+  if (UPS_ERROR != UPS_SUCCESS) {
     upserr_output();
   }
 
   /* Now write a new file */
   instance.product = "WarGames";
-  if (upsutl_statistics(&instance, db, command) != UPS_SUCCESS) {
+  upsutl_statistics(&instance, db, command);
+  if (UPS_ERROR != UPS_SUCCESS) {
     upserr_output();
   }
 
