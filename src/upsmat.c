@@ -232,7 +232,7 @@ static int g_ups_error;
       }
 
 #define MATCH_TABLE_ONLY() \
-    mproduct = match_instance_core(a_command_line, NULL,               \
+    mproduct = match_instance_core(a_command_line, db_info,            \
 				   a_command_line->ugo_product,        \
 				   NULL, NULL, a_need_unique,          \
                                    any_version, any_chain);            \
@@ -321,7 +321,13 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	printf("%sOnly using Table File - %s\n", VPREFIX,
 	       (char *)a_command_line->ugo_tablefile);
       }
-      MATCH_TABLE_ONLY();
+      for (db_item = db_list ; db_item ; db_item = db_item->next) {
+	db_info = (t_upstyp_db *)db_item->data;
+	if (UPS_VERBOSE) {
+	  printf("%sSearching UPS database - %s\n", VPREFIX, db_info->name);
+	}
+	MATCH_TABLE_ONLY();
+      }
     } else {
       /* we have at least one db */
       for (db_item = db_list ; db_item ; db_item = db_item->next) {
@@ -605,9 +611,6 @@ static t_upstyp_matched_product *match_instance_core(
 	     generate an error */
 	  CHECK_NO_FILE(chain);
 	}
-      /* we do not need the info read from the file.  we have taken what we
-	 want and put it on the a_minst_list */
-	/* ups_free_product(read_product); ??? for table */
       }
 
       /* return the xtra chain lists to the first list element */
@@ -711,10 +714,6 @@ static int match_from_chain( const char * const a_product,
       printf("%sFound %d instances in %s\n", VPREFIX, tmp_num_matches,
 	     buffer);
     }
-
-    /* we do not need the info read from the file.  we have taken what we
-       want and put it on the a_cinst_list */
-    /* ups_free_product(read_product); ??? for table */
 
     if (tmp_num_matches > 0) {
       /* for each instance that was matched, open the version file, and only
@@ -853,10 +852,6 @@ static int match_from_version( const char * const a_product,
 	       buffer);
       }
 
-      /* we do not need the info read from the file.  we have taken what we
-	 want and put it on the a_minst_list */
-      /* ups_free_product(read_product); ??? for table */
-
       if (tmp_num_matches > 0) {
 	/* for each instance that was matched, open the table file, and only
 	   look for the instance that matches the instance found in the version
@@ -979,10 +974,6 @@ static int match_from_table( const char * const a_product,
 	 printf("%sFound %d instances in %s\n", VPREFIX, num_matches,
 		full_table_file);
        }
-
-      /* we do not need the info read from the file.  we have taken what we
-	 want */
-       /* ups_free_product(read_product); ??? for table */
 
       /* free the table_file_path */
       upsmem_free(full_table_file);
