@@ -345,48 +345,50 @@ static t_upsugo_command *g_ugo_cmd = 0;
  * ups_main is not part of the ups library, it's here.
  *
  * The enum is defined in ups_main.h
- * where flag:
+ * where flags:
  * <byte>: <description>
  *   0   : specify if that action has a default set of commands
+ *   1   : specify if the associated command needs a db entered from the
+ *              command line (or a table file)
  */
 
 t_cmd_info g_cmd_info[] = {
-  {e_current,       "current", 0, 0x00000001, e_invalid_action},
-  {e_development,   "development", 0, 0x00000000, e_invalid_action},
-  {e_new,           "new", 0, 0x00000000, e_invalid_action},
-  {e_old,           "old", 0, 0x00000000, e_invalid_action},
-  {e_test,          "test", 0, 0x00000000, e_invalid_action},
-  {e_chain,         "chain", 0, 0x00000000, e_invalid_action},
-  {e_uncurrent,     "uncurrent", 0, 0x00000001, e_current},
-  {e_undevelopment, "undevelopment", 0, 0x00000000, e_development},
-  {e_unnew,         "unnew", 0, 0x00000000, e_new},
-  {e_unold,         "unold", 0, 0x00000000, e_old},
-  {e_untest,        "untest", 0, 0x00000000, e_test},
-  {e_unchain,       "unchain", 0, 0x00000000, e_chain},
-  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:stU:vVz:Z0123", 0x00000001, e_invalid_action},
-  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:stU:vVz:Z0123", 0x00000001, e_setup},
-  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
-  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000000, e_invalid_action},
-  {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:p:q:r:stT:u:U:vVz:Z0123", 0x00000000, e_declare},
-  {e_depend,      "depend",      "?cdnotg:f:H:jK:lm:M:q:r:RU:vVz:Z0123", 0x00000000, e_invalid_action},
-  {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
-  {e_modify,      "modify",      "a?A:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
-  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
-  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_touch,       "touch",       "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_invalid_action},
-  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_configure},
-  {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:stU:vVyYz:Z0123", 0x00000000, e_undeclare},
+  {e_current,       "current", 0, 0x00000011, e_invalid_action},
+  {e_development,   "development", 0, 0x00000010, e_invalid_action},
+  {e_new,           "new", 0, 0x00000010, e_invalid_action},
+  {e_old,           "old", 0, 0x00000010, e_invalid_action},
+  {e_test,          "test", 0, 0x00000010, e_invalid_action},
+  {e_chain,         "chain", 0, 0x00000010, e_invalid_action},
+  {e_uncurrent,     "uncurrent", 0, 0x00000011, e_current},
+  {e_undevelopment, "undevelopment", 0, 0x00000010, e_development},
+  {e_unnew,         "unnew", 0, 0x00000010, e_new},
+  {e_unold,         "unold", 0, 0x00000010, e_old},
+  {e_untest,        "untest", 0, 0x00000010, e_test},
+  {e_unchain,       "unchain", 0, 0x00000010, e_chain},
+  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:stU:vVz:Z0123", 0x00000011, e_invalid_action},
+  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:stU:vVz:Z0123", 0x00000011, e_setup},
+  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000010, e_invalid_action},
+  {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000010, e_invalid_action},
+  {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:p:q:r:stT:u:U:vVz:Z0123", 0x00000010, e_declare},
+  {e_depend,      "depend",      "?cdnotg:f:H:jK:lm:M:q:r:RU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_modify,      "modify",      "a?A:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000010, e_invalid_action},
+  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000010, e_invalid_action},
+  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000010, e_invalid_action},
+  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:stU:vVz:Z", 0x00000010, e_invalid_action},
+  {e_touch,       "touch",       "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000010, e_configure},
+  {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:stU:vVyYz:Z0123", 0x00000010, e_undeclare},
   {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
-  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000010, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:lZ0123", 0x00000000, e_invalid_action},
-  {e_verify,      "verify",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
+  {e_verify,      "verify",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_help,        "help",
             "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStRT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
+            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:sStRT:u:U:vVwW:x:XyYz:Z", 0x00000010, e_invalid_action}
 };
 
 /* These action commands are listed in order of use.  Hopefully the more

@@ -175,6 +175,7 @@ typedef struct s_cmd_map {
 } t_cmd_map;
 
 #define UPSACT_FUNC_ISIN_TABLE( flag ) (flag&0x00000001 ? 1 : 0)
+#define UPSACT_CMD_NEEDS_DB( flag ) (flag&0x00000010 ? 1 : 0)
 
 /*
  * Declaration of public functions.

@@ -66,6 +66,7 @@ extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
 int g_simulate;
 static mode_t g_umask = 0;
+extern int UPS_NEED_DB;
 
 /*
  * Declaration of private functions.
@@ -100,6 +101,7 @@ int main(int argc, char *argv[])
     /* Figure out which command was entered */
     while (g_cmd_info[i].cmd) {
       if (! strcmp(g_cmd_info[i].cmd, argv[1])) {
+	UPS_NEED_DB = UPSACT_CMD_NEEDS_DB(g_cmd_info[i].flags);
 	break;
       }
       ++i;
