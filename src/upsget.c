@@ -310,7 +310,6 @@ char *upsget_translation_env( char * const oldstr )
   { if ( s_loc )
     { strcat( buf, s_loc ); /* Something left after translation tack on */
     }
-    strcpy(buf2,buf);
     if ((buf2=upsget_translation_tilde(buf))==0)
     { return buf;
     } else {
