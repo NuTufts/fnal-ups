@@ -426,7 +426,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
             }
           }
           printf("%s\n", minst_ptr->version->prod_dir);
-          if (upsutl_is_authorized( minst_ptr, mproduct->db_info,nodes))
+          if (upsutl_is_authorized( minst_ptr, mproduct->db_info,&nodes))
           { printf("\t\tAuthorized, Nodes=%s\n",nodes);
           } else {
             printf("\t\tNOT Authorized, Nodes=%s\n",nodes);

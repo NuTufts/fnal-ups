@@ -122,7 +122,7 @@ static t_upslst_item *unsetup_core(
       minst = (t_upstyp_matched_instance *)(mproduct->minst_list->data);
 
       /* check if this product is authorized to be unsetup on this node */
-      if (upsutl_is_authorized(minst, mproduct->db_info, dummy)) {
+      if (upsutl_is_authorized(minst, mproduct->db_info, &dummy)) {
 	if (UPS_ERROR == UPS_SUCCESS) {	  
 	  /* Now process the unsetup actions */
 	  cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,

@@ -184,7 +184,7 @@ char *upsutl_get_hostname( void )
  */
 int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
 			  const t_upstyp_db * const a_db_info, 
-			  const char **a_nodes)
+			  char ** const a_nodes)
 {
   int is_auth = 1;
   char *nodename = NULL;
