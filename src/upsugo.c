@@ -184,6 +184,26 @@
          errflg = 1;                                                       \
          break;                                                            \
 } 
+#define set_value_nop( ELEMENT , ARG )                                         \
+{                                                                          \
+         if ( *argbuf )                                                    \
+         { addr=upsutl_str_create(*argbuf,' ');                            \
+           ELEMENT = addr;                                                 \
+           *argbuf = 0;                                                    \
+           break;                                                          \
+         }                                                                 \
+         if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
+         { if(*arg_str == '-')                                             \
+           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
+             break;                                                        \
+           }                                                               \
+           addr=upsutl_str_create(arg_str,' ');                            \
+           ELEMENT = addr;                                                 \
+           break;                                                          \
+         }                                                                 \
+         errflg = 1;                                                       \
+         break;                                                            \
+} 
 #define build_list( LIST_ELEMENT , ARG )                                   \
 {                                                                          \
          if ( *argbuf )                                                    \
@@ -263,7 +283,7 @@
 #define case_p \
          case 'p':       \
          uc->ugo_p = 1;  \
-         set_value (uc->ugo_description , "p")
+         set_value_nop (uc->ugo_description , "p")
 #define case_P \
          case 'P':       \
          uc->ugo_P = 1;  \
