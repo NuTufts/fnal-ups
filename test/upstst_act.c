@@ -112,7 +112,6 @@ t_upsugo_command *uc =0;			/* ups command */
 char            diffcmd[132];                   /* diff command */
 int		stdout_dup;			/* dup of stdout */
 t_upslst_item  *cmd_list;			/* list of commands */
-extern t_cmd_info g_cmd_info[];
 
 
 /* parse command line
