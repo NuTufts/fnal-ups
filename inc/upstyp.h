@@ -101,6 +101,7 @@ typedef struct upstyp_matched_instance
   t_upstyp_instance *version;
   t_upstyp_instance *table;
 
+  t_upslst_item *xtra_chains;
 } t_upstyp_matched_instance;
 
 /* an action */
@@ -137,6 +138,8 @@ typedef struct upstyp_product
 t_upstyp_matched_product *ups_new_matched_product(const char * const a_db,
 			  	     const char * const a_prod_name,
 			             const t_upslst_item * const a_minst_list);
+t_upstyp_matched_product *ups_free_matched_product(
+				 t_upstyp_matched_product * const a_mproduct);
 t_upstyp_matched_instance *ups_new_matched_instance( void );
 t_upstyp_matched_instance *ups_free_matched_instance(
                                  t_upstyp_matched_instance * const minst_ptr);
