@@ -106,6 +106,9 @@ int upsget_key(const t_upstyp_instance * const);
 char *upsget_man_source_dir( const t_upstyp_matched_instance * const ,
                              const t_upstyp_db * const ,
                              const t_upsugo_command * const );
+char *upsget_catman_source_dir( const t_upstyp_matched_instance * const ,
+                                const t_upstyp_db * const ,
+                                const t_upsugo_command * const );
 char *upsget_info_source_dir( const t_upstyp_matched_instance * const ,
                               const t_upstyp_db * const ,
                               const t_upsugo_command * const );
