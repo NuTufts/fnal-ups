@@ -89,6 +89,7 @@
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
 #define UPS_INFORMATIONAL   "INFORMATIONAL"
+#define UPS_INFORMATIONAL_LEN 13
 
 /*
  * Types.
