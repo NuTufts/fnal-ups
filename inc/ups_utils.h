@@ -22,6 +22,8 @@
  *                        added function str_crecat.
  *       11-Sep-1997, LR, added function str_stricmp, case insensitive
  *                        string comparison. It's a copy of strcasecmp.
+ *       24-Sep-1997, LR, added function str_strincmp, like str_stricmp,
+ *                        except it will compare most n characters.
  *
  ***********************************************************************/
 
@@ -66,6 +68,7 @@ char *upsutl_time_date(void);
 char *upsutl_user(void);
 
 int   upsutl_stricmp( const char *s1, const char *s2 );
+int   upsutl_strincmp( const char *s1, const char *s2, size_t n );
 char  *upsutl_strstr( const char * const a_str, const char * const a_pattern);
 char  *upsutl_str_create( char * const str, const char copt );
 char  *upsutl_str_crecat( char * const str1, char * const str2 );
