@@ -47,7 +47,7 @@
 static int g_ikeys[ e_key_count+1 ];
 
 /*
- * g_key_map.
+ * g_key_info.
  *
  * It goes like: 'enum key', 'string key', 'index to product structure',
  *               'index to instance structure', 'index into config structure',
@@ -78,7 +78,7 @@ static int g_ikeys[ e_key_count+1 ];
  *       is kind of importend for the reading and writing functions.
  *
  */
-t_upskey_map g_key_map[] =
+t_upskey_map g_key_info[] =
 {
   { e_key_file,             "FILE",             0,    NO,   NO, 0x00001111 },
   { e_key_product,          "PRODUCT",          1,     0,   NO, 0x00000111 },
@@ -149,7 +149,7 @@ t_upskey_map *upskey_get_map( const char * const str )
 
   /* for now, just a linear search */
   
-  for ( keys = g_key_map; keys->key; keys++ ) {
+  for ( keys = g_key_info; keys->key; keys++ ) {
     if ( !upsutl_stricmp( keys->key, str ) )
       return keys;
   }
@@ -281,7 +281,7 @@ void upskey_inst_print( const t_upstyp_instance * const inst )
   
   if ( !inst ) return;
   
-  for ( keys = g_key_map; keys->key; keys++ ) {
+  for ( keys = g_key_info; keys->key; keys++ ) {
     if ( (ix = keys->i_index) != NO && UPSKEY_INST2ARR( inst )[ix] )
       printf( "%s = %s\n", keys->key, UPSKEY_INST2ARR( inst )[ix] );    
   }
@@ -338,7 +338,7 @@ char *upskey_prod_setval( t_upstyp_product * const prod,
 
 int *upskey_prod_arr(void)
 {
-  t_upskey_map *keys = &g_key_map[ 0 ];
+  t_upskey_map *keys = &g_key_info[ 0 ];
   int i = 0;
 
   for ( ; keys->key; keys++ )
@@ -352,7 +352,7 @@ int *upskey_prod_arr(void)
 
 int *upskey_inst_arr(void)
 {
-  t_upskey_map *keys = &g_key_map[ 0 ];
+  t_upskey_map *keys = &g_key_info[ 0 ];
   int i = 0;
 
   for ( ; keys->key; keys++ )
@@ -382,7 +382,7 @@ int *upskey_verhead_arr(void)
 
 int *upskey_verinst_arr(void)
 {
-  t_upskey_map *keys = &g_key_map[ e_key_flavor ];
+  t_upskey_map *keys = &g_key_info[ e_key_flavor ];
   int i = 0;
 
   for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
@@ -412,7 +412,7 @@ int *upskey_tblhead_arr(void)
 
 int *upskey_tblinst_arr(void)
 {
-  t_upskey_map *keys = &g_key_map[ e_key_flavor ];
+  t_upskey_map *keys = &g_key_info[ e_key_flavor ];
   int i = 0;
 
   for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
@@ -442,7 +442,7 @@ int *upskey_chnhead_arr(void)
 
 int *upskey_chninst_arr(void)
 {
-  t_upskey_map *keys = &g_key_map[ e_key_flavor + 1];
+  t_upskey_map *keys = &g_key_info[ e_key_flavor + 1];
   int i = 0;
 
   g_ikeys[i++] = e_key_flavor;
@@ -469,7 +469,7 @@ void upskey_prod_print( const t_upstyp_product * const prod )
    
   if ( !prod ) return;
   
-  for ( (keys = g_key_map); keys->key; keys++ ) {
+  for ( (keys = g_key_info); keys->key; keys++ ) {
     if ( (ix = keys->p_index) != NO && UPSKEY_PROD2ARR( prod )[ix] ) 
       printf( "%s = %s\n", keys->key, UPSKEY_PROD2ARR( prod )[ix] );
   }
@@ -482,7 +482,7 @@ void upskey_conf_print( const t_upstyp_config * const conf )
   
   if ( !conf ) return;
   
-  for ( keys = g_key_map; keys->key; keys++ ) {
+  for ( keys = g_key_info; keys->key; keys++ ) {
     if ( (ix = keys->c_index) != NO && UPSKEY_CONF2ARR( conf )[ix] )
       printf( "%s = %s\n", keys->key, UPSKEY_CONF2ARR( conf )[ix] );    
   }

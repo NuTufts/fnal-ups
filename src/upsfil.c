@@ -42,7 +42,7 @@
 #include "upsver.h"
 #include "upsget.h"
 
-extern t_upskey_map g_key_map[];
+extern t_upskey_map g_key_info[];
 
 /*
  * Definition of public variables
@@ -1721,7 +1721,7 @@ int put_head_keys( int * ikeys )
       continue;
     }
 
-    map = &g_key_map[ *ikeys ];
+    map = &g_key_info[ *ikeys ];
     put_key( map->key, 
 	     UPSKEY_PROD2ARR( g_pd )[ map->p_index ] );
   }
@@ -1774,7 +1774,7 @@ int put_inst_keys( int * ikeys,
       continue;
     }
 
-    map = &g_key_map[ *ikeys ];
+    map = &g_key_info[ *ikeys ];
     if ( !sav_inst ||  !(val = UPSKEY_INST2ARR( sav_inst )[ map->i_index ]) )
       val = UPSKEY_INST2ARR( inst )[ map->i_index ];
 
@@ -1859,7 +1859,7 @@ int put_inst_keys_mask( int * ikeys,
       continue;
     }
 
-    map = &g_key_map[ *ikeys ];
+    map = &g_key_info[ *ikeys ];
     if ( !sav_inst ||  !(val = UPSKEY_INST2ARR( sav_inst )[ map->i_index ]) )
       val = UPSKEY_INST2ARR( inst )[ map->i_index ];
 
@@ -2038,7 +2038,7 @@ int add_to_instance( t_upstyp_instance * const inst,
 
   for ( ; *ikeys != -1; ikeys++ ) {
     
-    index = g_key_map[*ikeys].i_index;
+    index = g_key_info[*ikeys].i_index;
 
     if ( (val_add = UPSKEY_INST2ARR( inst_add )[ index ] ) ) {
 
@@ -2155,10 +2155,10 @@ int *find_common_mask( t_upstyp_instance * const inst1,
 
     if ( *ikeys <= e_key_qualifiers || 
 	 *ikeys == e_key_action ||
-	 g_key_map[ *ikeys ].i_index == INVALID_INDEX )
+	 g_key_info[ *ikeys ].i_index == INVALID_INDEX )
       continue;
 
-    map = &g_key_map[ *ikeys ];
+    map = &g_key_info[ *ikeys ];
 	
     if ( !map )
       continue;
@@ -2295,7 +2295,7 @@ t_upslst_item *find_group( t_upslst_item * const list_ptr,
 
 	/* compare strings ... we hope */
 
-	else if ( (map = &g_key_map[ *ikeys ]) ) {
+	else if ( (map = &g_key_info[ *ikeys ]) ) {
 
 	  char *val1, *val2;
 	  goon = 
