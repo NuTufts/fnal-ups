@@ -84,7 +84,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 24 */  "%s: \"%s\" is not authorized for use on this node\n",
 /* 25 */  "%s: No destination was specified in the UPS Database Configuration file for where to copy the %s files\n",
 /* 26 */  "%s: Error when writing to temp file while processing %s action\n",
-/* 27 */  "%s: Invalid number of parameters for action %s, must be between %d and %d (found %d)\n"
+/* 27 */  "%s: Invalid number of parameters for action %s, must be between %i and %i (found %i)\n"
 /* 28 */  "%s: Unable to determine user shell, value = %s\n",
 /* 29 this is the last */
 };
