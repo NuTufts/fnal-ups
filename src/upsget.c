@@ -136,30 +136,30 @@ void upsget_remall(const FILE * const stream,
 
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    fprintf((FILE *)stream,"%sunset UPS_PROD_NAME\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_PROD_VERSION\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_PROD_DIR\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_THIS_DB\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_OS_FLAVOR\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_PROD_FLAVOR\n", pdefault);
-    fprintf((FILE *)stream,"%sunset UPS_PROD_QUALIFIERS\n", pdefault);
-/*    fprintf((FILE *)stream,"%sunset UPS_SHELL\n", pdefault); */
-    fprintf((FILE *)stream,"%sunset UPS_OPTIONS\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_NAME\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_VERSION\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_DIR\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_THIS_DB\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_OS_FLAVOR\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_FLAVOR\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_QUALIFIERS\n", pdefault);
+/*    (void) fprintf((FILE *)stream,"%sunset UPS_SHELL\n", pdefault); */
+    (void) fprintf((FILE *)stream,"%sunset UPS_OPTIONS\n", pdefault);
     break;
   case e_CSHELL:
-    fprintf((FILE *)stream,"%sunsetenv UPS_PROD_NAME\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_PROD_VERSION\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_PROD_DIR\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_THIS_DB\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_OS_FLAVOR\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_PROD_FLAVOR\n", pdefault);
-    fprintf((FILE *)stream,"%sunsetenv UPS_PROD_QUALIFIERS\n", pdefault);
-/*    fprintf((FILE *)stream,"%sunsetenv UPS_SHELL\n", pdefault); */
-    fprintf((FILE *)stream,"%sunsetenv UPS_OPTIONS\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_NAME\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_VERSION\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_DIR\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_THIS_DB\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_OS_FLAVOR\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_FLAVOR\n", pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_QUALIFIERS\n", pdefault);
+/*    (void) fprintf((FILE *)stream,"%sunsetenv UPS_SHELL\n", pdefault); */
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_OPTIONS\n", pdefault);
     break;
   default:
     upserr_add(UPS_NOSHELL, UPS_WARNING, UPS_UNKNOWN_TEXT);
@@ -182,11 +182,11 @@ void upsget_envout(const FILE * const stream,
   name = upsutl_upcase( name );
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n#\n",
+    (void) fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n#\n",
       name,upsget_envstr(db,instance,command_line),name);
     break;
   case e_CSHELL:
-    fprintf((FILE *)stream,"setenv SETUP_%s \"%s\"\n#\n",
+    (void) fprintf((FILE *)stream,"setenv SETUP_%s \"%s\"\n#\n",
     name,upsget_envstr(db,instance,command_line));
     break;
   default:
@@ -220,73 +220,73 @@ void upsget_allout(const FILE * const stream,
   }
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    fprintf((FILE *)stream,"%sUPS_PROD_NAME=%s;export UPS_PROD_NAME\n",
+    (void) fprintf((FILE *)stream,"%sUPS_PROD_NAME=%s;export UPS_PROD_NAME\n",
 	       pdefault, name);
-    fprintf((FILE *)stream,"%sUPS_PROD_VERSION=\"%s\";export UPS_PROD_VERSION\n",
+    (void) fprintf((FILE *)stream,"%sUPS_PROD_VERSION=\"%s\";export UPS_PROD_VERSION\n",
                pdefault, upsget_version(db,instance,command_line));
-    fprintf((FILE *)stream,"%sUPS_PROD_DIR=\"%s\";export UPS_PROD_DIR\n",
+    (void) fprintf((FILE *)stream,"%sUPS_PROD_DIR=\"%s\";export UPS_PROD_DIR\n",
                pdefault, upsget_prod_dir(db,instance,command_line));
     addr=upsget_verbose(db,instance,command_line);
     if (strlen(addr)) 
-    { fprintf((FILE *)stream,"%sUPS_VERBOSE=%s;export UPS_VERBOSE\n",
+    { (void) fprintf((FILE *)stream,"%sUPS_VERBOSE=%s;export UPS_VERBOSE\n",
 		 pdefault, addr);
     } else { 
-      fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
+      (void) fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
     }
     addr=upsget_extended(db,instance,command_line);
     if (strlen(addr))
-    { fprintf((FILE *)stream,"%sUPS_EXTENDED=%s;export UPS_EXTENDED\n",
+    { (void) fprintf((FILE *)stream,"%sUPS_EXTENDED=%s;export UPS_EXTENDED\n",
 		 pdefault, addr); 
     } else { 
-      fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
+      (void) fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
     } 
-    fprintf((FILE *)stream,"%sUPS_THIS_DB=%s;export UPS_THIS_DB\n",pdefault,
+    (void) fprintf((FILE *)stream,"%sUPS_THIS_DB=%s;export UPS_THIS_DB\n",pdefault,
                upsget_this_db(db,instance,command_line));
-    fprintf((FILE *)stream,"%sUPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
+    (void) fprintf((FILE *)stream,"%sUPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
 	       pdefault, upsget_OS_flavor(db,instance,command_line));
-    fprintf((FILE *)stream,"%sUPS_PROD_FLAVOR=%s;export UPS_PROD_FLAVOR\n",
+    (void) fprintf((FILE *)stream,"%sUPS_PROD_FLAVOR=%s;export UPS_PROD_FLAVOR\n",
                pdefault, upsget_flavor(db,instance,command_line));
-    fprintf((FILE *)stream,"%sUPS_PROD_QUALIFIERS=%s;export UPS_PROD_QUALIFIERS\n",
+    (void) fprintf((FILE *)stream,"%sUPS_PROD_QUALIFIERS=%s;export UPS_PROD_QUALIFIERS\n",
                pdefault,upsget_qualifiers(db,instance,command_line));
-/*    fprintf((FILE *)stream,"%sUPS_SHELL=%s;export UPS_SHELL\n",
+/*    (void) fprintf((FILE *)stream,"%sUPS_SHELL=%s;export UPS_SHELL\n",
                pdefault,upsget_shell(db,instance,command_line)); */
     addr=upsget_options(db,instance,command_line);
     if (addr) 
-    { fprintf((FILE *)stream,"%sUPS_OPTIONS=\"%s\";export UPS_OPTIONS\n",
+    { (void) fprintf((FILE *)stream,"%sUPS_OPTIONS=\"%s\";export UPS_OPTIONS\n",
 		 pdefault,addr); } 
     break;
 
   case e_CSHELL:
-    fprintf((FILE *)stream,"%ssetenv UPS_PROD_NAME %s\n",pdefault,name);
-    fprintf((FILE *)stream,"%ssetenv UPS_PROD_VERSION \"%s\"\n",pdefault,
+    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_NAME %s\n",pdefault,name);
+    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_VERSION \"%s\"\n",pdefault,
                upsget_version(db,instance,command_line));
-    fprintf((FILE *)stream,"%ssetenv UPS_PROD_DIR \"%s\"\n",pdefault,
+    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_DIR \"%s\"\n",pdefault,
                upsget_prod_dir(db,instance,command_line));
     addr=upsget_verbose(db,instance,command_line);
     if (strlen(addr))
-    { fprintf((FILE *)stream,"%ssetenv UPS_VERBOSE %s\n",pdefault,addr);
+    { (void) fprintf((FILE *)stream,"%ssetenv UPS_VERBOSE %s\n",pdefault,addr);
     } else { 
-    fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n",pdefault);
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n",pdefault);
     }
     addr=upsget_extended(db,instance,command_line);
     if (strlen(addr))
-    { fprintf((FILE *)stream,"%ssetenv UPS_EXTENDED %s\n",pdefault,addr); 
+    { (void) fprintf((FILE *)stream,"%ssetenv UPS_EXTENDED %s\n",pdefault,addr); 
     } else { 
-      fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n",pdefault);
+      (void) fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n",pdefault);
     }
-    fprintf((FILE *)stream,"%ssetenv UPS_THIS_DB %s\n",pdefault,
+    (void) fprintf((FILE *)stream,"%ssetenv UPS_THIS_DB %s\n",pdefault,
                upsget_this_db(db,instance,command_line));
-    fprintf((FILE *)stream,"%ssetenv UPS_OS_FLAVOR %s\n",pdefault,
+    (void) fprintf((FILE *)stream,"%ssetenv UPS_OS_FLAVOR %s\n",pdefault,
                upsget_OS_flavor(db,instance,command_line));
-    fprintf((FILE *)stream,"%ssetenv UPS_PROD_FLAVOR %s\n",pdefault,
+    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_FLAVOR %s\n",pdefault,
                upsget_flavor(db,instance,command_line));
-    fprintf((FILE *)stream,"%ssetenv UPS_PROD_QUALIFIERS %s\n",pdefault,
+    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_QUALIFIERS %s\n",pdefault,
                upsget_qualifiers(db,instance,command_line));
-/*    fprintf((FILE *)stream,"%ssetenv UPS_SHELL %s\n",pdefault,
+/*    (void) fprintf((FILE *)stream,"%ssetenv UPS_SHELL %s\n",pdefault,
                upsget_shell(db,instance,command_line)); */
     addr=upsget_options(db,instance,command_line);
     if (addr) 
-    { fprintf((FILE *)stream,"%ssetenv UPS_OPTIONS \"%s\"\n",pdefault,
+    { (void) fprintf((FILE *)stream,"%ssetenv UPS_OPTIONS \"%s\"\n",pdefault,
 		 addr); }
     break;
 
@@ -321,33 +321,33 @@ char *upsget_translation_env( char * const oldstr )
 
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) 
   { if(!clear_flag)                   
-    { memset( buf, 0, sizeof( buf ) );        /* clear ONLY if I need too... */
+    { (void) memset( buf, 0, sizeof( buf ) ); /* clear ONLY if I need too... */
       clear_flag++;
     }
-    memset( env, 0, sizeof( env ) );          /* copy everything upto ${     */
-    strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );  
+    (void) memset( env, 0, sizeof( env ) );   /* copy everything upto ${     */
+    (void) strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );  
     if (!(s_loc = strstr( e_loc, e_tok )))    /* set s_loc to end (finding })*/
     { upserr_add(UPS_NO_TRANSLATION, UPS_FATAL, e_loc);
       return 0;                               /* NO matching }               */
     }
     e_loc += 2;  /* Skip over the ${ */       /* copy from there to } in env */
-    strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );    
+    (void) strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );    
     if ( (tr_env = (char *)getenv( env )) )
-    { strcat( buf, tr_env );
+    { (void) strcat( buf, tr_env );
     } else {
       if (!strcmp(env,"UPS_THIS_DB"))                        /* will MODIFY */
       { tr_env = upsutl_str_create((char *)upsfil_last_file(),' ');
         if ((e_loc = strstr(tr_env,"/.upsfiles/dbconfig"))!=0) /* mustcreate */
         { *e_loc='\0';                         /* end before .upsfile */
-          strcat( buf, tr_env );               /* put in buffer */
+          (void) strcat( buf, tr_env );               /* put in buffer */
           *e_loc='/';                          /* restore */
           upsmem_free(tr_env);                 /* free whole thing */
         } else { 
-          sprintf(error,"${%s}",env);
+          (void) sprintf(error,"${%s}",env);
           upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
         }
       } else {
-        sprintf(error,"${%s}",env);
+        (void) sprintf(error,"${%s}",env);
         upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
       }
     }
@@ -356,7 +356,7 @@ char *upsget_translation_env( char * const oldstr )
   }
   if ( buf[0] ) 
   { if ( s_loc )
-    { strcat( buf, s_loc ); /* Something left after translation tack on */
+    { (void) strcat( buf, s_loc ); /* Something left after translation tack on */
     }
     if ((buf2=upsget_translation_tilde(buf))==0)
     { return buf;
@@ -386,30 +386,30 @@ char *upsget_translation_tilde( char * const oldstr )
 
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, TILDE)) != 0 ) 
   { if(!clear_flag)                   
-    { memset( buf, 0, sizeof( buf ) );  /* clear ONLY if I need too... */
+    { (void) memset( buf, 0, sizeof( buf ) ); /* clear ONLY if I need too... */
       clear_flag++;
     }
-    memset( env, 0, sizeof( env ) );
-    strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );    /* copy everything upto ~      */
+    (void) memset( env, 0, sizeof( env ) );
+    (void) strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );    /* copy everything upto ~      */
     if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding /)*/
     { s_loc = strstr( e_loc, " ");           /* set s_loc to end space */
     }
 /*    e_loc++;  oops tilde_dir does that... Skip over the ~             */
     if (s_loc)
-    { strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );  /* copy from there to / in env */
+    { (void) strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );  /* copy from there to / in env */
     } else {
-      strcpy(env,e_loc);
+      (void) strcpy(env,e_loc);
     }
     if ( (tr_env = (char *)upsget_tilde_dir( env )) )
-    { strcat( buf, tr_env );
+    { (void) strcat( buf, tr_env );
     } else {
-      sprintf(error,"~%s",env);
+      (void) sprintf(error,"~%s",env);
       upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
     }
   }
   if ( buf[0] ) 
   { if ( s_loc )
-    { strcat( buf, s_loc ); /* Something left after translation tack on */
+    { (void) strcat( buf, s_loc ); /* Something left after translation tack on */
     }
     return buf;
   } else {
@@ -437,11 +437,11 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
   if (!minstance) { return(oldstr); }
   /* work = (char *) malloc((size_t)(strlen(oldstr) +1)); */
   work=holdstr;
-  strcpy(work,oldstr);
+  (void) strcpy(work,oldstr);
   upto = work;
   while ((loc = strstr(upto,UPSPRE))!= 0 ) 
   { count = ( loc - upto );
-    strncat(newstr,upto,(unsigned int )count);
+    (void) strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr =strchr(upto,'}');
     if ( !eaddr ) {
@@ -455,31 +455,31 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
     { if (!strcmp(g_var_subs[idx].string,upto)) 
       { if (g_var_subs[idx].func)
         {  value=g_var_subs[idx].func(db_info_ptr,minstance,command_line);
-           if(value) { strcat(newstr,value); }
+           if(value) { (void) strcat(newstr,value); }
         }
         found=1;
         any++;
       }
     }
-    if (!found) { strcat(newstr,upto); strcat(newstr,"}"); } 
+    if (!found) { (void) strcat(newstr,upto); (void) strcat(newstr,"}"); } 
     *eaddr = '}';
     upto =strchr(upto,'}') + 1;
   }
   if (any)
-  { strcat(newstr,upto);
+  { (void) strcat(newstr,upto);
   } else {
-    strcpy(newstr,work);
+    (void) strcpy(newstr,work);
     /* free(work); now static */
   }
 /* Support added 08/27/1998 DjF for _variable translation within table files */ 
   work=holdstr;
-  strcpy(work,newstr);
+  (void) strcpy(work,newstr);
   upto = work;
   newstr[0] = '\0';
   any=0;
   while ((loc = strstr(upto,USERKEY))!= 0 ) 
   { count = ( loc - upto );
-    strncat(newstr,upto,(unsigned int )count);
+    (void) strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr =strchr(upto,'}');
     if ( !eaddr ) {
@@ -504,60 +504,60 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
        found=1;
     }
     if(value) 
-    { strcat(newstr,value);
+    { (void) strcat(newstr,value);
       any++;
     }
-    if (!found) { strcat(newstr,upto); strcat(newstr,"}"); } 
+    if (!found) { (void) strcat(newstr,upto); (void) strcat(newstr,"}"); } 
     *eaddr = '}';
     upto =strchr(upto,'}') + 1;
   }
   if (any)
-  { strcat(newstr,upto);
+  { (void) strcat(newstr,upto);
   } else {
-    strcpy(newstr,work);
+    (void) strcpy(newstr,work);
     /* free(work); now static */
   }
 /* End Modifications 08/27/1998 */
   /* work = (char *) malloc((size_t)(strlen(newstr) +1)); */
   work=holdstr;
-  strcpy(work,newstr);
+  (void) strcpy(work,newstr);
   upto = work;
   newstr[0] = '\0';
   any=0;
   while ((loc = strstr(upto,"${PRODUCTS}"))!=0) 
   { count = ( loc - upto );
-    strncat(newstr,upto,(unsigned int )count);
+    (void) strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr =strchr(upto,'}');
     *eaddr = '\0';
     found=0;
     if (!strcmp("${PRODUCTS",upto)) 
     { value=upsget_database(db_info_ptr,minstance,command_line);
-      if(value) { strcat(newstr,value); }
+      if(value) { (void) strcat(newstr,value); }
       found=1;
       any++;
     } else { 
-      strcat(newstr,upto); 
-      strcat(newstr,"}");
+      (void) strcat(newstr,upto); 
+      (void) strcat(newstr,"}");
     } 
     *eaddr = '}';
     upto = strchr(upto,'}') + 1;
   }
   if (any)
-  { strcat(newstr,upto);
+  { (void) strcat(newstr,upto);
   } else {
-    strcpy(newstr,work);
+    (void) strcpy(newstr,work);
     /* free(work); no static */
   }
   /* work = (char *) malloc((size_t)(strlen(newstr) +1)); */
   work=holdstr;
-  strcpy(work,newstr);
+  (void) strcpy(work,newstr);
   upto = work;
   newstr[0] = '\0';
   any=0;
   while ((loc = strstr(upto,TILDE))!=0) 
   { count = ( loc - upto );
-    strncat(newstr,upto,(unsigned int )count);
+    (void) strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr = strchr(upto,'/'); 
     *eaddr = '\0';
@@ -565,23 +565,23 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
     if (strchr(upto,'~')) 
     { value=upsget_tilde_dir(upto);
       if(value) 
-      { strcat(newstr,value); 
-        strcat(newstr,"/");
+      { (void) strcat(newstr,value); 
+        (void) strcat(newstr,"/");
       }
       found=1;
       any++;
     } else { 
-      strcat(newstr,upto); 
-      strcat(newstr,"/");
+      (void) strcat(newstr,upto); 
+      (void) strcat(newstr,"/");
     } 
     *eaddr = '/';
     upto=eaddr+1;
     /* upto = strchr(upto,'/') + 1; */
   }
   if (any)
-  { strcat(newstr,upto);
+  { (void) strcat(newstr,upto);
   } else {
-    strcpy(newstr,work);
+    (void) strcpy(newstr,work);
   }
   return newstr;
 }
@@ -599,47 +599,47 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
                "PRODUCT", string );
    /* put out info here !!! */
   }
-  strcpy(newstr,string);
-  strcat(newstr," ");
+  (void) strcpy(newstr,string);
+  (void) strcat(newstr," ");
   get_element(string,version);
   if (string) 
-  { strcat(newstr,string);
+  { (void) strcat(newstr,string);
   }
-  strcat(newstr," -f ");
+  (void) strcat(newstr," -f ");
   get_element(string,flavor);
-  strcat(newstr,string);
+  (void) strcat(newstr,string);
   if ( db_info_ptr )
-  { strcat(newstr," -z ");
-    strcat(newstr,db_info_ptr->name);
+  { (void) strcat(newstr," -z ");
+    (void) strcat(newstr,db_info_ptr->name);
   }
   get_element(string,qualifiers);
   if (string && *string != '\0')
-  { strcat(newstr," -q ");
-    strcat(newstr,string);
+  { (void) strcat(newstr," -q ");
+    (void) strcat(newstr,string);
   }
   if ( command_line->ugo_v)
-  { strcat(newstr," -v "); }
+  { (void) strcat(newstr," -v "); }
   if ( command_line->ugo_j)
-  { strcat(newstr," -j "); }
+  { (void) strcat(newstr," -j "); }
   if ( command_line->ugo_r)
-  { strcat(newstr," -r ");
-    strcat(newstr,command_line->ugo_productdir);
+  { (void) strcat(newstr," -r ");
+    (void) strcat(newstr,command_line->ugo_productdir);
   }
   if ( command_line->ugo_m)
-  { strcat(newstr," -m ");
-    strcat(newstr,command_line->ugo_tablefile);
+  { (void) strcat(newstr," -m ");
+    (void) strcat(newstr,command_line->ugo_tablefile);
   }
   if ( command_line->ugo_M)
-  { strcat(newstr," -M ");
-    strcat(newstr,command_line->ugo_tablefiledir);
+  { (void) strcat(newstr," -M ");
+    (void) strcat(newstr,command_line->ugo_tablefiledir);
   }
   if ( command_line->ugo_O)
-  { strcat(newstr," -O \"");
-    strcat(newstr,command_line->ugo_options);
-    strcat(newstr,"\"");
+  { (void) strcat(newstr," -O \"");
+    (void) strcat(newstr,command_line->ugo_options);
+    (void) strcat(newstr,"\"");
   }
   if ( command_line->ugo_e)
-  { strcat(newstr," -e "); }
+  { (void) strcat(newstr," -e "); }
   return newstr;
 }
 
@@ -665,7 +665,7 @@ char *upsget_archive_file(const t_upstyp_db * const db_info_ptr,
     }
     if (strip)
     { if (!upsutl_strincmp(string,"ftp://",6))
-      { strncpy(string,"123456",6); /* space ftp:// */
+      { (void) strncpy(string,"123456",6); /* space ftp:// */
         if (strchr(string,'/'))
         { string=upsutl_str_create(strchr(string,'/'),'p');
         } else { 
@@ -758,7 +758,7 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
       if((env_string=upsget_translation_env(string))!=0)
       { string=env_string;
       }
-      strcpy(newstr,string); 
+      (void) strcpy(newstr,string); 
     } else {
       /* we do not have a compile_dir on the command line, check from file */
       get_element(string,compile_dir);
@@ -767,33 +767,33 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
       { if((env_string=upsget_translation_env(string))!=0)
 	{ string=env_string;
 	}
-        strcpy(newstr,string);
+        (void) strcpy(newstr,string);
       } else {
 	/* no compile_dir in the file, we need to use the default */
 	string=upsget_product(db_info_ptr, instance, command_line);
-	sprintf(newstr,"%s/%s", db_info_ptr->name, string);
+	(void) sprintf(newstr,"%s/%s", db_info_ptr->name, string);
       }
     }
     get_element(string,compile_file);
     if (string) 
     /* there was a compile_file in the file */
-    { strcat(newstr,slash);
-      strcat(newstr,string);
+    { (void) strcat(newstr,slash);
+      (void) strcat(newstr,string);
     } else {
       /* there was no compile_file in the file, use the default */
       get_element(string, version);
       if (string)
-      { strcat(newstr,divider);
-        strcat(newstr,string);
+      { (void) strcat(newstr,divider);
+        (void) strcat(newstr,string);
 	divider = dot;
       }
       get_element(string, flavor);
       if (string)
-      { strcat(newstr,divider);
-        strcat(newstr,string);
+      { (void) strcat(newstr,divider);
+        (void) strcat(newstr,string);
         divider = dot;
       }
-      sprintf(newstr, "%s%s%s", newstr, divider, "compile");
+      (void) sprintf(newstr, "%s%s%s", newstr, divider, "compile");
     }
   } else {
     /* we have a compile_file specified on the command line */
@@ -803,9 +803,9 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
       if((env_string=upsget_translation_env(string))!=0)
       { string=env_string;
       }
-      strcpy(newstr,string); 
-      strcpy(newstr,slash); 
-      strcpy(newstr,command_line->ugo_compile_file); 
+      (void) strcpy(newstr,string); 
+      (void) strcpy(newstr,slash); 
+      (void) strcpy(newstr,command_line->ugo_compile_file); 
     } else {
       /* we do not have a compile_dir on the command line, check from file */
       get_element(string,compile_dir);
@@ -814,11 +814,11 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
       { if((env_string=upsget_translation_env(string))!=0)
 	{ string=env_string;
 	}
-        sprintf(newstr, "%s/%s", string, command_line->ugo_compile_file); 
+        (void) sprintf(newstr, "%s/%s", string, command_line->ugo_compile_file); 
       } else {
 	/* no compile_dir in the file, we need to use the default */
 	string=upsget_product(db_info_ptr, instance, command_line);
-	sprintf(newstr,"%s/%s/%s", db_info_ptr->name, string, 
+	(void) sprintf(newstr,"%s/%s/%s", db_info_ptr->name, string, 
 		command_line->ugo_compile_file);
       }
     }
@@ -899,7 +899,7 @@ char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
 { static char string[2];
   static char NOT[]="";
   if (command_line->ugo_v)
-  { sprintf(string,"%.1d",command_line->ugo_v);
+  { (void) sprintf(string,"%.1d",command_line->ugo_v);
     return (string);
   } else {
     return(NOT);
@@ -939,8 +939,8 @@ char *upsget_database(const t_upstyp_db * const db_info_ptr,
   for ( db_list=command_line->ugo_db; db_list; 
         db_list = db_list->next, count++ )
   { db=db_list->data;
-    if(count) strcpy(string,":");
-    strcpy(string,db->name);
+    if(count) (void) strcpy(string,":");
+    (void) strcpy(string,db->name);
   } return(string);     
 } 
 char *upsget_tilde_dir(char * const addr)
@@ -951,12 +951,12 @@ char *upsget_tilde_dir(char * const addr)
   buffer[0]='\0';
   if(strlen(addr)==1)
   { pdp = getpwuid(getuid());
-    strcpy(buffer,pdp->pw_dir);
+    (void) strcpy(buffer,pdp->pw_dir);
   } else { 
     name=addr+1;
     pdp = getpwnam(name);
     if (pdp)
-    { strcpy(buffer,pdp->pw_dir);
+    { (void) strcpy(buffer,pdp->pw_dir);
     }
   }
   return(buffer);
@@ -992,7 +992,7 @@ char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
    if (uname(&baseuname) == -1) return(0);     /* do uname */
    (void) strcpy (flavor,baseuname.sysname);    /* get sysname */
    if (!strncmp(flavor,"IRIX",4))               /* Slam all IRIXanything */
-   { strcpy(flavor,"IRIX");
+   { (void) strcpy(flavor,"IRIX");
    }
    (void) strcat (flavor,"+");                  /* add plus */
    if (strncmp(baseuname.sysname,"AIX",3) == 0) /* because AIX is different */
@@ -1025,7 +1025,7 @@ t_upstyp_product *upsget_chain_file(const char * const a_db,
   file_chars = (int )(strlen(a_chain) + strlen(a_prod) + strlen(a_db) + 
                sizeof(CHAIN_SUFFIX) + 4);
   if (file_chars <= FILENAME_MAX) {
-    sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_chain, CHAIN_SUFFIX);
+    (void) sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_chain, CHAIN_SUFFIX);
     read_product = upsfil_read_file(&buffer[0]);
     *a_buffer = buffer;
   } else {
@@ -1058,7 +1058,7 @@ t_upstyp_product *upsget_version_file(const char * const a_db,
   file_chars = (int )(strlen(a_version) + strlen(a_prod) + strlen(a_db) + 
                sizeof(VERSION_SUFFIX) + 4);
   if (file_chars <= FILENAME_MAX) {
-    sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_version, VERSION_SUFFIX);
+    (void) sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_version, VERSION_SUFFIX);
     read_product = upsfil_read_file(&buffer[0]);
     *a_buffer = buffer;
   } else {
@@ -1079,7 +1079,7 @@ int upsget_key(const t_upstyp_instance * const instance)
   char *skey=buffer;
   int i;
   static char *nostring = "";
-  sprintf(skey,"%s%s%s%s",(instance->product ? instance->product : nostring),
+  (void) sprintf(skey,"%s%s%s%s",(instance->product ? instance->product : nostring),
                           (instance->version ? instance->version : nostring),
                           instance->flavor,
                           instance->qualifiers);
@@ -1117,11 +1117,11 @@ char *upsget_man_source_dir( const t_upstyp_matched_instance * const a_inst,
                             0, tinst->man_source_dir);
       if (UPSRELATIVE(man_source))         /* Is it a relative path?         */
       { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc);   
-	strcat(g_buffer, prod_dir);
-	strcat(g_buffer, "/");
+	(void) strcat(g_buffer, prod_dir);
+	(void) strcat(g_buffer, "/");
       } 
-      strcat(g_buffer,man_source);
-      strcat(g_buffer, "/");               /* safe then sorry...             */
+      (void) strcat(g_buffer,man_source);
+      (void) strcat(g_buffer, "/");               /* safe then sorry...             */
       return ((char *)(&g_buffer[0]));     /* Bail out path from table       */
     }
   }
@@ -1131,17 +1131,17 @@ char *upsget_man_source_dir( const t_upstyp_matched_instance * const a_inst,
   { if (vinst->ups_dir)                    /* Do we have a ups dir           */
     { if (UPSRELATIVE(vinst->ups_dir))     /* is ups_dir a relative path     */
       { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
-        strcat(g_buffer, prod_dir);        /* full path to product           */
-        strcat(g_buffer, "/");             /* add the /                      */
-        strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
+        (void) strcat(g_buffer, prod_dir);        /* full path to product           */
+        (void) strcat(g_buffer, "/");             /* add the /                      */
+        (void) strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
       } else { 
-        strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
+        (void) strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
       }
-      strcat(g_buffer, "/toman/");         /* Add the default location       */
+      (void) strcat(g_buffer, "/toman/");         /* Add the default location       */
     } else {                               /* no UPS dir, PROD_DIR/ups/toman */
       prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
-      strcat(g_buffer, prod_dir);          /* full path to product           */
-      strcat(g_buffer, "/ups/toman/");     /* add the /ups/toman default     */
+      (void) strcat(g_buffer, prod_dir);          /* full path to product           */
+      (void) strcat(g_buffer, "/ups/toman/");     /* add the /ups/toman default     */
     }
   }
   
@@ -1174,11 +1174,11 @@ char *upsget_catman_source_dir( const t_upstyp_matched_instance * const a_inst,
                             0, tinst->catman_source_dir);
       if (UPSRELATIVE(catman_source))      /* Is it a relative path?         */
       { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc);   
-	strcat(g_buffer, prod_dir);
-	strcat(g_buffer, "/");
+	(void) strcat(g_buffer, prod_dir);
+	(void) strcat(g_buffer, "/");
       } 
-      strcat(g_buffer,catman_source);
-      strcat(g_buffer, "/");               /* safe then sorry...             */
+      (void) strcat(g_buffer,catman_source);
+      (void) strcat(g_buffer, "/");               /* safe then sorry...             */
       return ((char *)(&g_buffer[0]));     /* Bail out path from table       */
     }
   }
@@ -1188,17 +1188,17 @@ char *upsget_catman_source_dir( const t_upstyp_matched_instance * const a_inst,
   { if (vinst->ups_dir)                    /* Do we have a ups dir           */
     { if (UPSRELATIVE(vinst->ups_dir))     /* is ups_dir a relative path     */
       { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
-        strcat(g_buffer, prod_dir);        /* full path to product           */
-        strcat(g_buffer, "/");             /* add the /                      */
-        strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
+        (void) strcat(g_buffer, prod_dir);        /* full path to product           */
+        (void) strcat(g_buffer, "/");             /* add the /                      */
+        (void) strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
       } else { 
-        strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
+        (void) strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
       }
-      strcat(g_buffer, "/toman/");         /* Add the default location       */
+      (void) strcat(g_buffer, "/toman/");         /* Add the default location       */
     } else {                               /* no UPS dir, PROD_DIR/ups/toman */
       prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
-      strcat(g_buffer, prod_dir);          /* full path to product           */
-      strcat(g_buffer, "/ups/toman/");     /* add the /ups/toman default     */
+      (void) strcat(g_buffer, prod_dir);          /* full path to product           */
+      (void) strcat(g_buffer, "/ups/toman/");     /* add the /ups/toman default     */
     }
   }
   
@@ -1222,11 +1222,11 @@ char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
                             0, tinst->info_source_dir);
       if (UPSRELATIVE(info_source))        /* Is it a relative path?         */
       { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
-	strcat(g_buffer, prod_dir);
-        strcat(g_buffer, "/");
+	(void) strcat(g_buffer, prod_dir);
+        (void) strcat(g_buffer, "/");
       } 
-      strcat(g_buffer,info_source);
-      strcat(g_buffer, "/");               /* safe then sorry...             */
+      (void) strcat(g_buffer,info_source);
+      (void) strcat(g_buffer, "/");               /* safe then sorry...             */
       return ((char *)(&g_buffer[0]));     /* Bail out path from table       */
     }
   }
@@ -1236,17 +1236,17 @@ char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
   { if (vinst->ups_dir)                    /* Do we have a ups dir           */
     { if (UPSRELATIVE(vinst->ups_dir))     /* is ups_dir a relative path     */
       { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
-        strcat(g_buffer, prod_dir);        /* full path to product           */
-        strcat(g_buffer, "/");             /* add the /                      */
-        strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
+        (void) strcat(g_buffer, prod_dir);        /* full path to product           */
+        (void) strcat(g_buffer, "/");             /* add the /                      */
+        (void) strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
       } else { 
-        strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
+        (void) strcat(g_buffer,vinst->ups_dir);   /* this is the whole path         */
       }
-      strcat(g_buffer, "/toinfo/");        /* Add the default location       */
+      (void) strcat(g_buffer, "/toinfo/");        /* Add the default location       */
     } else {                               /* no UPS dir, PROD_DIR/ups/toman */
       prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
-      strcat(g_buffer, prod_dir);          /* full path to product           */
-      strcat(g_buffer, "/ups/toinfo/");    /* add the /ups/toinfo default    */
+      (void) strcat(g_buffer, prod_dir);          /* full path to product           */
+      (void) strcat(g_buffer, "/ups/toinfo/");    /* add the /ups/toinfo default    */
     }
   }
   
@@ -1326,7 +1326,7 @@ char *upsget_table_file( const char * const a_prodname,
       if (!UPSRELATIVE(tmp_tfd)) {
 	if ((total_chars = file_chars + (int )strlen(tmp_tfd))
 	    <= FILENAME_MAX) {
-	  sprintf(buffer, "%s/%s", tmp_tfd, a_tablefile);
+	  (void) sprintf(buffer, "%s/%s", tmp_tfd, a_tablefile);
 	  LOOK_FOR_FILE();
 	} else {
 	  upserr_vplace();
@@ -1343,7 +1343,7 @@ char *upsget_table_file( const char * const a_prodname,
 	  if ((total_chars += (int )strlen(tmp_pd) + 
 	       (int )strlen(a_db_info->config->prod_dir_prefix) +
 	       1) <= FILENAME_MAX) {
-	    sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
+	    (void) sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
 		    tmp_pd, tmp_tfd, a_tablefile);
 	    LOOK_FOR_FILE();
 	  } else {
@@ -1353,7 +1353,7 @@ char *upsget_table_file( const char * const a_prodname,
 	} else {
 	  if ((total_chars += (int )strlen(tmp_pd) + 1)
 	      <= FILENAME_MAX) {
-	    sprintf(buffer, "%s/%s/%s", tmp_pd, tmp_tfd, a_tablefile);
+	    (void) sprintf(buffer, "%s/%s/%s", tmp_pd, tmp_tfd, a_tablefile);
 	    LOOK_FOR_FILE();
 	  } else {
 	    upserr_vplace();
@@ -1371,7 +1371,7 @@ char *upsget_table_file( const char * const a_prodname,
 	if ((total_chars = file_chars + (int )(strlen(a_prodname) +
 					       strlen(a_db_info->name)) + 1)
 	    <= FILENAME_MAX) {
-	  sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname,
+	  (void) sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname,
 		  a_tablefile);
 	  LOOK_FOR_FILE();
 	} else {
@@ -1383,7 +1383,7 @@ char *upsget_table_file( const char * const a_prodname,
       if ((found == 0) && (tmp_ud != NULL) && (!UPSRELATIVE(tmp_ud))) {
 	if ((total_chars = file_chars + (int )strlen(tmp_ud))
 	    <= FILENAME_MAX) {
-	  sprintf(buffer, "%s/%s", tmp_ud, a_tablefile);
+	  (void) sprintf(buffer, "%s/%s", tmp_ud, a_tablefile);
 	  LOOK_FOR_FILE();
 	} else {
 	  upserr_vplace();
@@ -1399,7 +1399,7 @@ char *upsget_table_file( const char * const a_prodname,
 	       (int )strlen(tmp_pd) + 
 	       (int )strlen(a_db_info->config->prod_dir_prefix) +
 	       3) <= FILENAME_MAX) {
-	    sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
+	    (void) sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
 		    tmp_pd, tmp_ud, a_tablefile);
 	    LOOK_FOR_FILE();
 	  } else {
@@ -1409,7 +1409,7 @@ char *upsget_table_file( const char * const a_prodname,
 	} else {
 	  if ((total_chars = file_chars + (int )strlen(tmp_ud) +
 	       (int )strlen(tmp_pd) + 2) <= FILENAME_MAX) {
-	    sprintf(buffer, "%s/%s/%s", tmp_pd, tmp_ud, a_tablefile);
+	    (void) sprintf(buffer, "%s/%s/%s", tmp_pd, tmp_ud, a_tablefile);
 	    LOOK_FOR_FILE();
 	  } else {
 	    upserr_vplace();
@@ -1420,7 +1420,7 @@ char *upsget_table_file( const char * const a_prodname,
       /* try tablefile */
       if (found == 0) {
         if ((total_chars = file_chars) <= FILENAME_MAX) {
-          sprintf(buffer, "%s", a_tablefile);
+          (void) sprintf(buffer, "%s", a_tablefile);
           LOOK_FOR_FILE();
         } else {
           upserr_vplace();
