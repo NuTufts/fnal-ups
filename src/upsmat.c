@@ -338,67 +338,62 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
     }
     
     if (db_list) {
-      if (a_command_line->ugo_m && a_command_line->ugo_product) {
-	/* since a specific table file was entered, we need to check if a
-	   version or chain was also specified.  if yes then is an error */
-	if (!a_command_line->ugo_version &&
-	    (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
-	  /* We have a table file  and we have a product name, we do not need a
-	     db. */
-	  upsver_mes(MATVLEVEL, "%sUsing Table File - %s\n", VPREFIX,
+      if (a_command_line->ugo_m && a_command_line->ugo_product &&
+	  !a_command_line->ugo_version &&
+	  (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
+	/* We have a table file  and we have a product name, we do not need a
+	   db. */
+	upsver_mes(MATVLEVEL, "%sUsing Table File - %s\n", VPREFIX,
 		   (char *)a_command_line->ugo_tablefile);
-	  for (db_item = db_list ; db_item ; db_item = db_item->next) {
-	    db_info = (t_upstyp_db *)db_item->data;
- 
-	    /* first check to see that the specified database exists. */
-	    if (upsutl_is_a_file(db_info->name) == UPS_SUCCESS) {
-	      upsver_mes(MATVLEVEL, "%sSearching UPS database - %s\n", VPREFIX,
-			 db_info->name);
-	      /* If the user did not enter a product name, get all the product
-		 names in the current db. */
-	      if (! got_all_products) {
-		upsutl_get_files(db_info->name, (char *)ANY_MATCH,
-				 &all_products);
-	      }
-	    
-	      if (all_products) {
-		/* make sure if we need unique instance that we only have 1 */
-		CHECK_UNIQUE(all_products, "products");
-
-		/* read in the config file associated with this database and
-		   save it */
-		GET_CONFIG_FILE();
-	      
-		/* for each product, get all the requested instances */
-		for (product_item = all_products ; product_item ;
-		     product_item = product_item->next) {
-		  prod_name = (char *)product_item->data;
-		
-		  upsver_mes(MATVLEVEL, "%sLooking for Product = %s\n",
-			     VPREFIX, prod_name);
-		  mproduct = match_instance_core(a_command_line, db_info, 
-						 prod_name, NULL, NULL,
-						 a_need_unique, any_version,
-						 any_chain);
-		  /* update the mproduct_list structure with the new info */
-		  ADD_TO_MPRODUCT_LIST();
-		}
-		/* may no longer need product list - free it */
-		if (! got_all_products) {
-		  all_products = upslst_free(all_products, do_delete);
-		}
-	      }
-	      /* if we have a match and are asking for a unique one, we do not
-		 need to go to the next db */
-	      if (a_need_unique && mproduct) {
-		break;
-	      }
-	    } else {
-	      upserr_add(UPS_NOT_A_DIR, UPS_WARNING, db_info->name);
+	for (db_item = db_list ; db_item ; db_item = db_item->next) {
+	  db_info = (t_upstyp_db *)db_item->data;
+	  
+	  /* first check to see that the specified database exists. */
+	  if (upsutl_is_a_file(db_info->name) == UPS_SUCCESS) {
+	    upsver_mes(MATVLEVEL, "%sSearching UPS database - %s\n", VPREFIX,
+		       db_info->name);
+	    /* If the user did not enter a product name, get all the product
+	       names in the current db. */
+	    if (! got_all_products) {
+	      upsutl_get_files(db_info->name, (char *)ANY_MATCH,
+			       &all_products);
 	    }
+	    
+	    if (all_products) {
+	      /* make sure if we need unique instance that we only have 1 */
+	      CHECK_UNIQUE(all_products, "products");
+	      
+	      /* read in the config file associated with this database and
+		 save it */
+	      GET_CONFIG_FILE();
+	      
+	      /* for each product, get all the requested instances */
+	      for (product_item = all_products ; product_item ;
+		   product_item = product_item->next) {
+		prod_name = (char *)product_item->data;
+		
+		upsver_mes(MATVLEVEL, "%sLooking for Product = %s\n",
+			   VPREFIX, prod_name);
+		mproduct = match_instance_core(a_command_line, db_info, 
+					       prod_name, NULL, NULL,
+					       a_need_unique, any_version,
+					       any_chain);
+		/* update the mproduct_list structure with the new info */
+		ADD_TO_MPRODUCT_LIST();
+	      }
+	      /* may no longer need product list - free it */
+	      if (! got_all_products) {
+		all_products = upslst_free(all_products, do_delete);
+	      }
+	    }
+	    /* if we have a match and are asking for a unique one, we do not
+	       need to go to the next db */
+	    if (a_need_unique && mproduct) {
+	      break;
+	    }
+	  } else {
+	    upserr_add(UPS_NOT_A_DIR, UPS_WARNING, db_info->name);
 	  }
-	} else {
-	  upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
 	}
       } else {
 	/* we have at least one db */
@@ -742,7 +737,8 @@ static t_upstyp_matched_product *match_instance_core(
 
   /* see if we were passed a table file. if so, don't worry about
      version and chain files, just read the table file */
-  if (a_command_line->ugo_m) {
+  if (a_command_line->ugo_m  && (! a_command_line->ugo_version)	&&
+      (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
     upsver_mes(MATVLEVEL, "%sMatching with Table file  - %s\n", VPREFIX,
 	     a_command_line->ugo_tablefile);
     num_matches = match_from_table(a_prod_name,
@@ -1041,7 +1037,7 @@ static int match_from_version( const char * const a_product,
   t_upslst_item tmp_quals_list = {NULL, NULL, NULL};
   t_upstyp_instance *inst;
   t_upstyp_matched_instance *tmp_minst_ptr = NULL, *minst;
-  char *tmp_upsdir, *tmp_productdir, *tmp_tabledir;
+  char *tmp_upsdir, *tmp_productdir, *tmp_tabledir, *tmp_tablefile;
   int do_need_unique = 1;
 
   tmp_any_flavor_list.prev = &tmp_flavor_list;
@@ -1110,6 +1106,11 @@ static int match_from_version( const char * const a_product,
 	      } else {
 		tmp_productdir = inst->prod_dir;
 	      }
+	      if (a_command_line->ugo_m) {
+		tmp_tablefile = (char *)a_command_line->ugo_tablefile;
+	      } else {
+		tmp_tablefile = inst->table_file;
+	      }
 
 	      upsver_mes(MATVLEVEL, 
 			 "%sMatching with Version %s in Product %s using Table file %s\n",
@@ -1117,8 +1118,7 @@ static int match_from_version( const char * const a_product,
 	      upsver_mes(MATVLEVEL, "%sUsing Flavor %s and Qualifiers %s\n",
 			 VPREFIX, (char *)(tmp_flavor_list.data),
 			 (char *)(tmp_quals_list.data));
-	      tmp_num_matches = match_from_table(a_product,
-						 inst->table_file,
+	      tmp_num_matches = match_from_table(a_product, tmp_tablefile,
 						 tmp_tabledir, tmp_upsdir,
 						 tmp_productdir, a_db_info,
 						 do_need_unique,
