@@ -210,7 +210,7 @@
            break;                                                          \
          }                                                                 \
          if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
-         { if(*arg_str == '-')                                             \
+         { if(*arg_str == '-' || *arg_str == ',' )                         \
            { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
              break;                                                        \
            }                                                               \
@@ -230,7 +230,7 @@
            break;                                                          \
          }                                                                 \
          if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
-         { if(*arg_str == '-')                                             \
+         { if(*arg_str == '-' || *arg_str == ',' )                         \
            { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
              break;                                                        \
            }                                                               \
@@ -272,8 +272,8 @@
            break;                                                          \
          }                                                                 \
          if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)      \
-         { if(*arg_str == '-')                                             \
-           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG ); \
+         { if(*arg_str == '-' || *arg_str == ',' )                         \
+           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
              break;                                                        \
            }                                                               \
            while((loc=strchr(arg_str,':'))!=0) {                           \
