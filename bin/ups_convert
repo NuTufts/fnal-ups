@@ -427,7 +427,7 @@ sub WriteTableFile {
 # back to the OLD way AGAIN...
 #       print TableFile "     doDefaults()\n";
        if (checkfor("${basedir}/ups/setup.sh")) {
-          $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
+          $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL},UPS_ENV)\n/;
        } else { 
           $key=~s/DaSeTuP/      doDefaults()\n/;
        }
@@ -743,14 +743,28 @@ sub add_misactions {
     if (checkfor("${basedir}/ups/tailor")) {
        $value.="   Action=Tailor\n";
        $value.="      proddir()\n";
-       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/tailor)\n";
+       $value.="      execute(\${UPS_PROD_DIR}/ups/tailor,UPS_ENV)\n";
+       $value.="      doDefaults()\n";
+       $value.="      unproddir()\n"
+    }
+    if (checkfor("${basedir}/ups/tailor.sh}")) {
+       $value.="   Action=Tailor\n";
+       $value.="      proddir()\n";
+       $value.="      execute(\${UPS_PROD_DIR}/ups/tailor.\${UPS_SHELL},UPS_ENV)\n";
        $value.="      doDefaults()\n";
        $value.="      unproddir()\n"
     }
     if (checkfor("${basedir}/ups/configure")) {
        $value.="   Action=Configure\n";
        $value.="      proddir()\n";
-       $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/configure)\n";
+       $value.="      execute(\${UPS_PROD_DIR}/ups/configure,UPS_ENV)\n";
+       $value.="      doDefaults()\n";
+       $value.="      unproddir()\n"
+    }
+    if (checkfor("${basedir}/ups/configure.sh")) {
+       $value.="   Action=Configure\n";
+       $value.="      proddir()\n";
+       $value.="      execute(\${UPS_PROD_DIR}/ups/configure.\${UPS_SHELL},UPS_ENV)\n";
        $value.="      doDefaults()\n";
        $value.="      unproddir()\n"
     }
