@@ -208,7 +208,7 @@ int product_cmp ( const void * const d1, const void * const d2 )
   t_upstyp_product *a1 = (t_upstyp_product *)d1;
   t_upstyp_product *a2 = (t_upstyp_product *)d2;
 
-  return upsutl_stricmp( a1->product, a2->product );
+    return upsutl_stricmp( a1->product, a2->product );
 }
 /*
  * Definition of public functions.
@@ -323,7 +323,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         } else {
           printf("\"\" ");
         } printf("\n");
-        printf("\t%s",mproduct->product);
+        printf("\tPRODUCT=%s",mproduct->product);
         if (minst_ptr->chain) 
         { defaults(chain)
         } else { 
