@@ -37,6 +37,7 @@
 #include "upserr.h"
 #include "upskey.h"
 #include "upsfil.h"
+#include "upsver.h"
 
 /*
  * Definition of public variables
@@ -120,11 +121,25 @@ static int               g_call_cache_count = 0;     /* # times cache is used */
 static int               g_call_count = 0;           /* # times read_file is called */
 
 
-#define P_VERB_s( str ) \
-  if ( UPS_VERBOSE ) printf("UPSFIL: %s - %s\n", g_filename, (str))
+#define P_VERB_s( iver, str ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s\n", \
+			       g_filename, (str))
   
-#define P_VERB_s_i_s( str1, num, str2 ) \
-  if ( UPS_VERBOSE ) printf("UPSFIL: %s - %s %d %s\n", g_filename, (str1), (num), (str2))
+#define P_VERB_s_i( iver, str1, num ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s %d\n", \
+			       g_filename, (str1), (num) )
+
+#define P_VERB_s_i_s( iver, str1, num, str2 ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s %d %s\n", \
+			       g_filename, (str1), (num), (str2))
+
+#define P_VERB_s_i_s_nn( iver, str1, num, str2 ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s %d %s", \
+			       g_filename, (str1), (num), (str2))
+
+#define P_VERB_s_i_s_s_s( iver, str1, num, str2, str3, str4 ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s %d %s\n", \
+			       g_filename, (str1), (num), (str2), (str3), (str4))
 
 /*
  * Definition of public functions
@@ -166,7 +181,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
     if ( g_pd ) {
       g_call_cache_count++;
-      P_VERB_s( "Reading from cache" );
+      P_VERB_s( 1, "Reading from cache" );
       return g_pd;
     }
   }
@@ -175,7 +190,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
   g_fh = fopen ( ups_file, "r" );
   if ( ! g_fh ) {
-    P_VERB_s( "Open file for read ERROR" );
+    P_VERB_s( 1, "Open file for read ERROR" );
     upserr_vplace();
     upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
     if (errno == ENOENT)
@@ -184,7 +199,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
       upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return 0;
   }
-  P_VERB_s( "Open file for read" );
+  P_VERB_s( 1, "Open file for read" );
   
   g_pd = ups_new_product();
   if ( g_pd ) {       
@@ -207,7 +222,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   if ( g_ft && g_pd )
     upstbl_put( g_ft, key, g_pd );
 
-  P_VERB_s_i_s( "Read", g_item_count, "item(s)" );
+  P_VERB_s_i_s( 1, "Read", g_item_count, "item(s)" );
 
   g_fh = 0;
   g_filename = 0;
@@ -247,12 +262,12 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   
   g_fh = fopen ( ups_file, "w" );
   if ( ! g_fh ) {
-    P_VERB_s( "Open file for write ERROR" );
+    P_VERB_s( 1, "Open file for write ERROR" );
     upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return UPS_OPEN_FILE;
   }    
-  P_VERB_s( "Open file for write" );
+  P_VERB_s( 1, "Open file for write" );
 
   g_imargin = 0;
   
@@ -271,7 +286,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   cfilei();
 
   if ( g_ifile == e_file_unknown ) {
-    P_VERB_s( "Unknown file type for writing" );
+    P_VERB_s( 1, "Unknown file type for writing" );
     upserr_vplace();
     upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, g_pd->file ? g_pd->file : "(null)" );
     return UPS_UNKNOWN_FILETYPE;
@@ -282,17 +297,17 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   switch ( g_ifile ) {
 
   case e_file_version:
-    P_VERB_s( "Writing version file" );
+    P_VERB_s( 1, "Writing version file" );
     write_version_file();
     break;
 	
   case e_file_table:
-    P_VERB_s( "Writing table file" );
+    P_VERB_s( 1, "Writing table file" );
     write_table_file();
     break;
 	
   case e_file_chain:
-    P_VERB_s( "Writing chain file" );
+    P_VERB_s( 1, "Writing chain file" );
     write_chain_file();
     break;
   }
@@ -300,7 +315,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   
   fclose( g_fh );
 
-  P_VERB_s_i_s( "Write", g_item_count, "item(s)" );
+  P_VERB_s_i_s( 1, "Write", g_item_count, "item(s)" );
 
   g_fh = 0;
   g_filename = 0;
@@ -314,12 +329,12 @@ void free_product( const void *key, void **prod, void *cl )
 }     
 void upsfil_flush( void )
 {
-  upsfil_stat( 1 );
+  /* upsfil_stat( 1 ); */
 
   /* clean up cache */
 
   if ( g_ft ) {
-    P_VERB_s( "Flushing cache" );
+    P_VERB_s( 1, "Flushing cache" );
     upstbl_map( g_ft, free_product, NULL );
     upstbl_free( &g_ft );
     g_ft = 0;
@@ -371,6 +386,8 @@ int write_version_file( void )
     g_imargin += 2;    
     put_key( "DECLARED", inst_ptr->declared );
     put_key( "DECLARER", inst_ptr->declarer );
+    put_key( "MODIFIED", inst_ptr->modified );
+    put_key( "MODIFIER", inst_ptr->modifier );
     put_key( "PROD_DIR", inst_ptr->prod_dir );
     put_key( "UPS_DIR", inst_ptr->ups_dir );
     put_key( "TABLE_DIR", inst_ptr->table_dir );
@@ -979,10 +996,7 @@ int next_key( void )
     if ( strlen( g_line ) < 1 ) continue;
     if ( g_line[0] == '#' ) continue;
 
-    if ( UPS_VERBOSE > 2 ) {
-      /* you asked for it */
-      printf( "UPSFIL: %s - reading line %d: %s", g_filename, g_line_count, g_line );
-    }    
+    P_VERB_s_i_s_nn( 3, "reading line :", g_line_count, g_line );
   
     if ( !upsutl_str_remove_edges( g_line, CHAR_REMOVE ) ) continue;
 
@@ -1013,10 +1027,7 @@ int get_key( void )
   /* check if line is not empty (again) */
   
   if ( strlen( g_line ) < 1 || g_line[0] == '#' ) {
-    if ( UPS_VERBOSE > 2 ) {
-      /* you asked for it */
-      printf( "UPSFIL: %s - parsed line  %d: \n", g_filename, g_line_count );
-    }
+    P_VERB_s_i( 3, "parsed line  :", g_line_count );
     return e_key_eol;
   }
     
@@ -1037,10 +1048,7 @@ int get_key( void )
     }
     g_key[count] = 0;
     if ( strlen( g_key ) <= 0 ) {
-      if ( UPS_VERBOSE > 2 ) {
-	/* you asked for it */
-	printf( "UPSFIL: %s - parsed line  %d: \n", g_filename, g_line_count );
-      }
+      P_VERB_s_i( 3, "parsed line  :", g_line_count );
       return e_key_eol;
     }
   
@@ -1061,15 +1069,10 @@ int get_key( void )
   else
     g_ikey = e_key_unknown;
 
-  if ( UPS_VERBOSE > 2 ) {
-    /* you asked for it */
-    if ( has_val )
-      printf( "UPSFIL: %s - parsed line  %d: %s=%s\n", 
-	      g_filename, g_line_count, g_key, g_val );
-    else 
-      printf( "UPSFIL: %s - parsed line  %d: %s\n", 
-	      g_filename, g_line_count, g_key );
-  }
+  if ( has_val )
+    P_VERB_s_i_s_s_s( 3, "parsed line  :", g_line_count, g_key, "=", g_val );
+  else 
+    P_VERB_s_i_s( 3, "parsed line  :", g_line_count, g_key );
 
   return g_ikey;
 }
@@ -1227,6 +1230,9 @@ void print_instance( t_upstyp_instance * const inst_ptr )
   
   printf( "chain = %s\ndeclarer = %s\ndeclared = %s\n",
 	  inst_ptr->chain, inst_ptr->declarer, inst_ptr->declared );
+  
+  printf( "modifier = %s\nmodified= %s\n",
+	  inst_ptr->modifier, inst_ptr->modified );
   
   printf( "prod_dir = %s\nups_dir = %s\n",
 	  inst_ptr->prod_dir, inst_ptr->ups_dir );

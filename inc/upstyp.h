@@ -88,6 +88,8 @@ typedef struct upstyp_instance
   char             *chain;
   char             *declarer;
   char             *declared;
+  char             *modifier;
+  char             *modified;
   char             *prod_dir;
   char             *ups_dir;
   char             *table_dir;

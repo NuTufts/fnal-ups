@@ -90,7 +90,8 @@ t_upstyp_matched_product *ups_free_matched_product(
     if (all_gone(a_mproduct)) {
       upsmem_free(a_mproduct->db_info);
       upsmem_free(a_mproduct->product);
-      upsutl_free_matched_instance_list(&(a_mproduct->minst_list));
+      /* ??? test */
+      /* upsutl_free_matched_instance_list(&(a_mproduct->minst_list)); */
     }
     upsmem_free((void *)a_mproduct);
   }
@@ -265,6 +266,8 @@ int ups_free_instance( t_upstyp_instance * const inst_ptr )
     if ( inst_ptr->chain ) { upsmem_free( inst_ptr->chain ); }
     if ( inst_ptr->declarer ) { upsmem_free( inst_ptr->declarer ); }
     if ( inst_ptr->declared ) { upsmem_free( inst_ptr->declared ); }
+    if ( inst_ptr->modifier ) { upsmem_free( inst_ptr->modifier ); }
+    if ( inst_ptr->modified ) { upsmem_free( inst_ptr->modified ); }
     if ( inst_ptr->prod_dir ) { upsmem_free( inst_ptr->prod_dir ); }
     if ( inst_ptr->ups_dir ) { upsmem_free( inst_ptr->ups_dir ); }
     if ( inst_ptr->table_dir ) { upsmem_free( inst_ptr->table_dir ); }

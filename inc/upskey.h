@@ -47,6 +47,8 @@ enum e_upskey_key {
   e_key_qualifiers,
   e_key_declarer,
   e_key_declared,
+  e_key_modifier,
+  e_key_modified,
   e_key_prod_dir,
   e_key_ups_dir,
   e_key_table_dir,
