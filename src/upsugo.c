@@ -147,6 +147,26 @@
          case 'Z':      \
          uc->ugo_Z = 1; \
          break;
+/* -0 exact match */
+/* -1 machine major version */
+/* -2 machine only */
+/* -3 generic unix machine */
+#define case_0 \
+         case '0':      \
+         uc->ugo_number = 1; \
+         break;
+#define case_1 \
+         case '1':      \
+         uc->ugo_number = 2; \
+         break;
+#define case_2 \
+         case '2':      \
+         uc->ugo_number = 3; \
+         break;
+#define case_3 \
+         case '3':      \
+         uc->ugo_number = 4; \
+         break;
 #define case_c \
          case 'c':                                       \
          uc->ugo_c = 1;                                  \
@@ -290,12 +310,6 @@
          case 'A':       \
          uc->ugo_A = 1;  \
          build_list (uc->ugo_auth , "A") 
-/* make database a list of database default structures */
-/* #define case_z \
-         case 'z':       \
-         uc->ugo_z = 1;  \
-         build_list (uc->ugo_db , "z") 
-*/
 #define case_m \
          case 'm':       \
          uc->ugo_m = 1;  \
@@ -387,6 +401,16 @@ if (!uc->ugo_H)
    addr=upsutl_str_create(flavor,' ');		/* first add full */
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
    flavor_sub()
+upsugo_dump(uc,1);
+   if (uc->ugo_number)
+   { for ( l_ptr=upslst_first(uc->ugo_flavor);
+       l_ptr; l_ptr = l_ptr->next, count++ )
+     { if(uc->ugo_number!=count)
+       {  l_ptr = upslst_delete_safe(l_ptr,l_ptr->data,'d'); 
+printf("count = %d\n",count); 
+     } } 
+exit(0);
+   } 
  } else { 
    for ( l_ptr = upslst_first(uc->ugo_osname); 
        l_ptr; l_ptr = l_ptr->next, count++ )
@@ -1075,6 +1099,7 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      int argc=0;
      int    count=0;
      int    length=0;
+     int    verbose=0;
      char ** argv;
      t_upslst_item *hold = 0;
      
@@ -1110,8 +1135,10 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
            }
      hold=ugo_commands;
      ugo_commands=0;
+     verbose=UPS_VERBOSE;
      uc=upsugo_next(argc,argv,validopts);
      ugo_commands=hold;
+     UPS_VERBOSE=verbose;
      return(uc);
      }
 }
@@ -1132,9 +1159,10 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
 {
      char * waddr;                               /* work address */
      struct ups_command * uc=0;
-     int argc=0;
+     int    argc=0;
      int    count=0;
      int    length=0;
+     int    verbose=0;
      char ** argv;
      t_upslst_item *hold = 0;
      
@@ -1161,8 +1189,10 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
            }
      hold=ugo_commands;
      ugo_commands=0;
+     verbose=UPS_VERBOSE;
      uc=upsugo_next(argc,argv,validopts);
      ugo_commands=hold;
+     UPS_VERBOSE=verbose;
      return(uc);
 }
 
@@ -1240,6 +1270,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          /* single values */ 
          case_m case_M case_N case_O case_p
          case_P case_r case_T case_U
+         case_0 case_1 case_2 case_3
          case 'q':
               uc->ugo_q = 1;
               if ( *argbuf ) 
