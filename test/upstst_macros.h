@@ -13,6 +13,10 @@ Header file with useful things for wrapper routines
 #include <stdio.h>
 #include "upserr.h"
 
+#ifdef __sun
+extern int fileno(FILE *);
+#endif
+
 /* Global variables
    ================ */
 
