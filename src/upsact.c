@@ -391,7 +391,7 @@ t_cmd_info g_cmd_info[] = {
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z", 0x00000000, e_invalid_action},
+  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000000, e_invalid_action},
   {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000, e_invalid_action},

@@ -97,7 +97,7 @@ void ups_undeclare( t_upsugo_command * const uc ,
     printf("\tspecify a version, which will remove ALL chains, OR chain(s) \n");
     exit(1);
   }
-  if (!uc->ugo_f || (int)(upslst_count(uc->ugo_flavor) > 1) )
+  if ((int)(upslst_count(uc->ugo_flavor) ==0 ) )
   { printf("To undeclare a product you must specify A flavor \n");
     exit(1);
   }
