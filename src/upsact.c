@@ -1783,22 +1783,20 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_setup:	/* Define <PROD>_DIR and SETUP_<PROD> */
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = 2;              /* # of args for both function calls */
+      lcl_cmd.argc = g_cmd_maps[e_envset].min_params;   /* # of args */
+      lcl_cmd.icmd = e_envset;
+      lcl_cmd.argv[0] = buff;
       uprod_name = upsutl_upcase(a_inst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
 	if (a_inst->version->prod_dir) {
 	  strcpy(buff, uprod_name);
 	  strcat(buff, "_DIR");
-	  lcl_cmd.argv[0] = buff;
 	  lcl_cmd.argv[1] = a_inst->version->prod_dir;
-	  lcl_cmd.icmd = e_pathset;
 	  f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 	}
 	strcpy(buff, SETUPENV);
 	strcat(buff, uprod_name);
-	lcl_cmd.argv[0] = buff;
 	lcl_cmd.argv[1] = "\"-f flavor -c dum dum\"";  /* ????? temp */
-	lcl_cmd.icmd = e_envset;
 	f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
       break;
@@ -1811,6 +1809,9 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_create:	/* None */
       break;
     case e_current:     /* Copy man pages to man page area in dbconfig file */
+      /* use our local copy since we have to change it */
+      lcl_cmd.iact = a_cmd->iact;
+      lcl_cmd.argc = g_cmd_maps[e_copyman].min_params;   /* # of args */
       f_copyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_declare:	/* None */
@@ -1844,6 +1845,9 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_unconfigure:	/* None */
       break;
     case e_uncurrent:   /* Remove the man pages from the man page area */
+      /* use our local copy since we have to change it */
+      lcl_cmd.iact = a_cmd->iact;
+      lcl_cmd.argc = g_cmd_maps[e_uncopyman].min_params;   /* # of args */
       f_uncopyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_undeclare:	/* None */
@@ -1857,6 +1861,20 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_unold:	/* None */
       break;
     case e_unsetup:
+      /* use our local copy since we have to change it */
+      lcl_cmd.iact = a_cmd->iact;
+      lcl_cmd.argc = g_cmd_maps[e_envunset].min_params;   /* # of args */
+      lcl_cmd.icmd = e_envunset;
+      lcl_cmd.argv[0] = buff;
+      uprod_name = upsutl_upcase(a_inst->version->product);
+      if (UPS_ERROR == UPS_SUCCESS) {
+	strcpy(buff, uprod_name);
+	strcat(buff, "_DIR");
+	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+	strcpy(buff, SETUPENV);
+	strcat(buff, uprod_name);
+	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      }
       break;
     case e_untest:	/* None */
       break;
