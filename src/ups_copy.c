@@ -56,7 +56,8 @@ static t_upstyp_instance *fill_new_dclr_instance(
 				      char * const a_prod_dir,
 				      char * const a_ups_dir,
 				      char * const a_table_dir,
-				      char * const a_table_file);
+				      char * const a_table_file,
+				      t_upstyp_db * const a_db);
 static t_upstyp_instance *free_new_dclr_instance(
 					t_upstyp_instance * const a_instance);
 static t_upsugo_command *fill_ugo_struct( 
@@ -179,7 +180,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
   t_upsugo_command *dclr_command_line;
   t_upstyp_product *write_product_ptr = NULL;
   t_upstyp_product *dum_product;
-  t_upstyp_db new_db_info, *new_db_info_ptr;
+  t_upstyp_db *new_db_info_ptr = NULL;
 
   /* get the requested instance */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
@@ -235,10 +236,11 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	  new_db_info_ptr = mproduct->db_info;
 	} else {
 	  /* read in the new databases configuration file */
-	  dum_product = upsutl_get_config(mproduct->db_info->name);
-	  if (dum_product->config) {
-	    new_db_info_ptr = &new_db_info;
-	    new_db_info.config = dum_product->config;
+	  new_db_info_ptr = (t_upstyp_db *)new_command_line->ugo_db->data;
+	  upsmem_inc_refctr(new_db_info_ptr);
+	  dum_product = upsutl_get_config(new_db_info_ptr->name);
+	  if (dum_product && dum_product->config) {
+	    new_db_info_ptr->config = dum_product->config;
 	  }
 	}
       }
@@ -372,7 +374,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	    tmp_buf2 = tmp_buf;
 	    
 	    /* tell user the name of the temporary file */
-	    printf("%s\n", tmp_buf);
+	    printf("UPS_COPY: Temporary table file is \'%s\'\n", tmp_buf);
 	  } else {
 	    tmp_buf2 = NULL;
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam",
@@ -441,7 +443,8 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 						   new_command_line,
 						   new_prod_dir, new_ups_dir,
 						   new_table_dir,
-						   new_table_file);
+						   new_table_file,
+						   new_db_info_ptr);
 	if (! a_command_line->ugo_X) {
 	  /*    do not execute, just echo the command line */
 	  sprintf(tmp_buf,
@@ -541,7 +544,8 @@ static t_upstyp_instance *fill_new_dclr_instance(
 				     char * const a_prod_dir,
 				     char * const a_ups_dir,
 				     char * const a_table_dir,
-				     char * const a_table_file)		 
+				     char * const a_table_file,
+				     t_upstyp_db * const a_db)
 {
   t_upslst_item *tmp_item = NULL;
   t_upstyp_instance *ninst = ups_new_instance();
@@ -588,9 +592,10 @@ static t_upstyp_instance *fill_new_dclr_instance(
   }
   COPY_TO_INSTANCE(ninst, ugo_compile_file, a_old_vinst, compile_file);
   COPY_TO_INSTANCE(ninst, ugo_compile_dir, a_old_vinst, compile_dir);
+
   /* only copy the first db as we set this up above to only have one db
      in it */
-  COPY_TO_INSTANCE(ninst, ugo_db->data, a_old_vinst, db_dir);
+  ninst->db_dir = a_db->name;
 	
   return ninst;
 }
