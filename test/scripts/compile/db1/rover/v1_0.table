@@ -33,5 +33,5 @@ ACTION = SETUP
    sourceRequired(reqfile1,NO_UPS_ENV, continue)
 
 action = configure
-   writeCompileReq("$UPS_DIR/test/scripts/compile/log/rover.out")
+   writeCompileScript("$UPS_DIR/test/scripts/compile/log/rover.out")
 
