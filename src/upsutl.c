@@ -561,6 +561,11 @@ t_upstyp_product *upsutl_get_config( const char * const a_db)
     if (UPS_ERROR == UPS_NO_FILE) {
       upserr_backup();
       upserr_backup();
+    } else {
+      if (UPS_VERIFY && upsutl_stricmp(CONFIG_FILE, read_product->file)) {
+	upserr_add(UPS_NO_KEYWORD, UPS_INFORMATIONAL, buffer, "FILE",
+		   CONFIG_FILE);
+      }
     }
   } else {
     upserr_add(UPS_NAME_TOO_LONG, UPS_WARNING, MAX_LINE_LEN);
