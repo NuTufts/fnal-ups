@@ -79,9 +79,10 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
   t_upstyp_product *product;
   char buffer[FILENAME_MAX+1];
   char *file=buffer;
-  char *the_chain;
-  char *product_home;            /* product home to be deleted (-y or -Y) */
+  char *the_chain=0;
+  char *product_home=0;          /* product home to be deleted (-y or -Y) */
   char *input = "   ";           /* yes or no */
+  char *archive=0;
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
   t_upslst_item *vinst_list;                /* version instance list */
@@ -257,6 +258,9 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         vinst=vinst_list->data;
         if (uc->ugo_y || uc->ugo_Y )
         { product_home=upsget_prod_dir(db_info,minst,uc);
+          if (vinst->archive_file)
+          { archive=upsutl_str_create(vinst->archive_file,' ');
+          }
           if (uc->ugo_y && product_home)
           { fprintf(stdout,"Product home directory - \n\t%s\n",product_home);
             fprintf(stdout,"Delete this directory?");
@@ -298,6 +302,9 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         }
         if (uc->ugo_Y && product_home) 
         { fprintf((FILE *)tmpfile,"rm -rf %s\n",product_home);
+          if (archive)
+          { fprintf((FILE *)tmpfile,"rm %s\n",archive);
+          }
         }
       } else {
         if (UPS_ERROR != UPS_SUCCESS) /* just an error */
