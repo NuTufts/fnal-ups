@@ -83,7 +83,12 @@ BootStrap_Dir=$Ups_DB_Path/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FL
 # Make an advanced shell for the products initialization script,
 # if we can.
 #
-for sh in ash bash ksh
+cygsh=''
+if test x`echo $UPS_PROD_FLAVOR|grep CYG` != x
+then
+    cygsh=ash
+fi
+for sh in ${cygsh} bash ksh
 do
     if test -x /usr/bin/${sh}
     then
@@ -174,6 +179,9 @@ chmod +rx $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 cat <<XEoF >$BootStrap_Dir/setups_find_home
 #!${Name_Of_Sh}
 #
+# $Name_Of_Sh was determined to be an appropriate shell when $Name_Of_Ups
+# was configured for $UPS_PROD_FLAVOR on $Node
+#
 # This script will return, on stdout, the resolved directory
 # associated with the only argument
 #
@@ -197,6 +205,10 @@ echo '**' Creating $BootStrap_Dir/$Setups_Products_Script
 #
 cat <<XEoF >$BootStrap_Dir/$Setups_Products_Script 
 #!${Name_Of_Sh}
+#
+# $Name_Of_Sh was determined to be an appropriate shell when $Name_Of_Ups
+# was configured for $UPS_PROD_FLAVOR on $Node
+#
 #
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
