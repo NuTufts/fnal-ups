@@ -71,7 +71,7 @@ t_cmd_info g_cmd_info[] = {
   {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z"},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z"},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
-  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z"},
+  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:q:r:tT:U:vVWXz:Z"},
   {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z"},
   {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z"},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z"},
@@ -85,10 +85,10 @@ t_cmd_info g_cmd_info[] = {
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z"},
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z"},
   {e_help,        "help",
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z"},
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:U:vVwW:x:XyYz:Z"},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z"}
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:U:vVwW:x:XyYz:Z"}
 };
 
 /*
