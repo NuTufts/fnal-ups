@@ -189,7 +189,7 @@ then
 # are likely to be less than desired.
 #
 cat <<XEoF >$Ups_Dir/bootstrap/$Setups_Products_Script 
-#! $Name_Of_Sh
+#!$Name_Of_Sh
 #
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
