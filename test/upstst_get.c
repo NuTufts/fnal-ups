@@ -217,7 +217,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    UPSTST_CHECK_UPS_ERROR(estatus);
    prod = (t_upstyp_matched_product *) mp->data;
    inst = (t_upstyp_matched_instance *)prod->minst_list->data;
-   upsget_allout(stdout, prod->db_info, inst, uc);
+   upsget_allout(stdout, prod->db_info, inst, uc, "");
    }
 
 /* dump the output to specified file and compare
