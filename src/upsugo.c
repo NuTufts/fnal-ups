@@ -1083,8 +1083,8 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
              }
        count++;  /* add one more for the program who called */
        argv = (char **) malloc((size_t)count*sizeof(char *));
-       argv[1] = (char *) malloc((size_t)(strlen("upsugo_env") +1));
-       (void) strcpy(argv[1],"upsugo_env");
+       argv[0] = (char *) malloc((size_t)(strlen("upsugo_env") +1));
+       (void) strcpy(argv[0],"upsugo_env");
        waddr=setup_env;
        for (argc = 1;argc < count;argc++)
            { length = (int)strcspn(waddr," ");
@@ -1134,8 +1134,8 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
              }
        count++;  /* add one more for the program who called */
        argv = (char **) malloc((size_t)count*sizeof(char *));
-       argv[1] = (char *) malloc((size_t)(strlen("upsugo_env") +1));
-       (void) strcpy(argv[1],"upsugo_bldcmd");
+       argv[0] = (char *) malloc((size_t)(strlen("upsugo_bldcmd") +1));
+       (void) strcpy(argv[0],"upsugo_bldcmd");
        waddr=cmdstr;
        for (argc = 1;argc < count;argc++)
            { length = (int)strcspn(waddr," ");
