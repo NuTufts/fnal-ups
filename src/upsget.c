@@ -264,10 +264,66 @@ void upsget_allout(const FILE * const stream,
   } 
 }
 
+char *upsget_translation_env( char * const oldstr )
+{
+  /* it will translate env.var in the passed string. if any translation
+     is done, it will return a pointer to a static string containing the 
+     translated string. if no translation is done, it will return (null).
+
+     Note: right now it quit dum, it will only recognize ${var},
+     but should probaly also recognize ${ var }, $var, maybe even
+     ${var1_${var2}} ... */
+
+  static char buf[MAX_LINE_LEN];
+  static char env[48];
+  static char *s_tok = "${";
+  static char *e_tok = "}";  
+  char *s_loc = oldstr;
+  char *e_loc = 0;
+  char *tr_env = 0;
+  
+  memset( buf, 0, sizeof( buf ) );
+
+  while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) {
+
+    memset( env, 0, sizeof( env ) );
+
+    /* copy up to env.var */
+    strncat( buf, s_loc, e_loc - s_loc );
+
+    /* move s_loc up to end of env.var */
+    if ( ! (s_loc = strstr( e_loc, e_tok )) ) {
+
+      /* error case */
+      return 0;
+    }
+
+    /* copy, translate and append env var */
+    e_loc += 2;
+    strncpy( env, e_loc, s_loc - e_loc );
+    if ( (tr_env = (char *)getenv( env )) )
+      strcat( buf, tr_env );
+
+    /* move pass the '}' */
+    ++s_loc;    
+  }
+
+  if ( buf[0] ) {
+
+    /* append the rest */
+    if ( s_loc )
+      strcat( buf, s_loc );
+    return buf;
+  }
+  else {
+    return 0;
+  }
+}
+
 char *upsget_translation( const t_upstyp_matched_instance * const minstance,
 			  const t_upstyp_db *db_info_ptr,
-                  const t_upsugo_command * const command_line,
-                  char * const oldstr )
+			  const t_upsugo_command * const command_line,
+			  char * const oldstr )
 {
   static char newstr[4096];
   static char holdstr[4096];
