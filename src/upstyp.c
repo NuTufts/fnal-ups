@@ -60,6 +60,7 @@ t_upstyp_matched_product *ups_new_matched_product(
 				      const char * const a_prod_name,
 				      const t_upslst_item * const a_minst_list)
 {
+  t_upslst_item *minst_item;
   t_upstyp_matched_product *mprod_ptr =
    (t_upstyp_matched_product *)upsmem_malloc(sizeof(t_upstyp_matched_product));
 
@@ -68,6 +69,10 @@ t_upstyp_matched_product *ups_new_matched_product(
   mprod_ptr->product = (char *)a_prod_name;
   upsmem_inc_refctr((void *)a_prod_name);
   mprod_ptr->minst_list = (t_upslst_item *)a_minst_list;
+
+  /* do not increment the reference counter for the matched instance list as
+     the list pointer we were given was only a temporary storage for the
+     list */
 
   return mprod_ptr;
 }
@@ -88,10 +93,12 @@ t_upstyp_matched_product *ups_free_matched_product(
     /* we incremented the ref counter in the ups_new_matched_product function,
        doing a free here will decrement it or free it */
     if (all_gone(a_mproduct)) {
-      upsmem_free(a_mproduct->db_info);
+      upsmem_free(a_mproduct->db_info->name);
+      upsmem_free(a_mproduct->db_info->config);
       upsmem_free(a_mproduct->product);
-      /* ??? test */
-      /* upsutl_free_matched_instance_list(&(a_mproduct->minst_list)); */
+      /* we do not free the matched instance list as it was not malloced when
+	 we created the new mproduct. nor was the reference counter
+	 incremented */
     }
     upsmem_free((void *)a_mproduct);
   }

@@ -3537,9 +3537,8 @@ static void f_sourceoptcheck( ACTION_PARAMS)
 
 static void f_writecompilescript(ACTION_PARAMS)
 {
-  t_upstyp_matched_product mproduct = {NULL, NULL, NULL};
+  t_upstyp_matched_product *mproduct;
   t_upslst_item *cmd_list = NULL;
-  char time_buff[MAX_LINE_LEN];
   char *time_ptr;
   int moved_to_old = 0, moved_to_timedate = 0;
   FILE *compile_file;
@@ -3566,11 +3565,15 @@ static void f_writecompilescript(ACTION_PARAMS)
 	 5. process actions and write them to the compile file.
 	 6. close compile file */
       /* 1     first, setup the matched product */
-      mproduct.db_info = (t_upstyp_db *)a_db_info;
-      mproduct.minst_list = upslst_new((void *)a_inst);
+      mproduct = (t_upstyp_matched_product *)upsmem_malloc(
+					    sizeof(t_upstyp_matched_product));
+      
+      mproduct->db_info = (t_upstyp_db *)a_db_info;
+      upsmem_inc_refctr(a_db_info);
+      mproduct->minst_list = upslst_new((void *)a_inst);
     
       /*       get the action command list */
-      cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, &mproduct,
+      cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, mproduct,
 				a_cmd->argv[1], a_cmd->icmd );
       if (UPS_ERROR == UPS_SUCCESS) {
 	/* 2      now that we have the list, locate the current compile file
@@ -3588,13 +3591,9 @@ static void f_writecompilescript(ACTION_PARAMS)
 	      DO_SYSTEM_MOVE(moved_to_old);
 	    } else if (! strcmp(a_cmd->argv[a_cmd->argc - 1], DATE_FLAG)) {
 	      /* append a timedate stamp to the file name */
-	      time_ptr = upsutl_time_date();
-	      strcpy(time_buff, time_ptr);
-
-	      /* remove any whitespace */
-	      (void )upsutl_str_remove(time_buff, WSPACE);
+	      time_ptr = upsutl_time_date(STR_TRIM_PACK);
 	      sprintf(g_buff, "mv %s %s.%s\n", a_cmd->argv[0], a_cmd->argv[0],
-		      time_buff);
+		      time_ptr);
 	      DO_SYSTEM_MOVE(moved_to_timedate);
 	    }
 	  }
@@ -3641,7 +3640,7 @@ static void f_writecompilescript(ACTION_PARAMS)
 	sprintf(g_buff, "mv %s.%s %s\n", a_cmd->argv[0], OLD_FLAG,
 		a_cmd->argv[0]);
       } else {
-	sprintf(g_buff, "mv %s.%s %s\n", a_cmd->argv[0], time_buff,
+	sprintf(g_buff, "mv %s.%s %s\n", a_cmd->argv[0], time_ptr,
 		a_cmd->argv[0]);
       }
       /* since we are at the end, it does not matter which flag we use here */
@@ -3649,8 +3648,10 @@ static void f_writecompilescript(ACTION_PARAMS)
     }
 
     /* release any memory we acquired */
-    if (mproduct.minst_list) {
-      (void )upslst_free(mproduct.minst_list, ' ');
+    if (mproduct->minst_list) {
+      (void )upslst_free(mproduct->minst_list, ' ');
+      upsmem_free(mproduct);
+      upsmem_dec_refctr(a_db_info);
     }
     if (cmd_list) {
       upsact_cleanup(cmd_list);
