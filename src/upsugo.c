@@ -73,10 +73,6 @@ static char             *str_create( char *str );
 ** ==========================================================================
 */                                                                           
 struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
-/*   int   ups_argc;
-   char   *ups_argv[];
-   char   *validopts;
-*/
 {
 
    char   *arg_str;
@@ -91,13 +87,13 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 				/* returned by upsugo_getarg */
 				/* if contents are used is reset to */
 				/* to 0 before recalling getarg */
-/* struct stat statbuf; */
-
 
 /* Initialize those pesky variables
     -------------------------------- */
    struct ups_command * uc;
+   t_upslst_item *my_qualifiers;
    uc=(struct ups_command *)malloc( sizeof(struct ups_command));
+   my_qualifiers=0;
    uc->ugo_product = 0;
    uc->ugo_version = 0;
 /* Chain flags, still setting them in addition to chain list 
@@ -461,6 +457,28 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
               }
               errflg = 1;
               break;
+         case 'q':
+              uc->ugo_q = 1;
+              if ( *argbuf ) 
+              { addr=str_create(*argbuf);
+                my_qualifiers = upslst_add(my_qualifiers,addr);
+/* return something for now */
+                uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
+                *argbuf = 0;
+                break;
+               }
+               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
+               { if(*arg_str == '-')
+                 { errflg = 1;
+                   break;
+                 }
+                 my_qualifiers = upslst_add(my_qualifiers,arg_str);
+/* return something for now */
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,arg_str);
+                 break;
+               }
+               errflg = 1;
+               break;
          case 'r':
               uc->ugo_r = 1;
               if ( *argbuf ) 
