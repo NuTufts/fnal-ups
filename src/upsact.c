@@ -1740,7 +1740,8 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
        that instance, except if the instance is created from a setup action */
 
     if ( !i_build )
-      use_cmd = TOO_MUCH_FOR_UNSETUP( a_cmd_ugo );
+      use_cmd = 0;
+    /*      use_cmd = TOO_MUCH_FOR_UNSETUP( a_cmd_ugo ); */
 
   }
 
@@ -1912,7 +1913,9 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
      defined in $SETUP_prod */
 
   if ( i_act == e_unsetup ) {
-    if ( ! TOO_MUCH_FOR_UNSETUP( the_ugo_cmd ) ) {
+
+    if ( 1 ) {
+      /*     if ( ! TOO_MUCH_FOR_UNSETUP( the_ugo_cmd ) ) { */
 
       strcpy( s_pname, the_ugo_cmd->ugo_product );
       pname = upsutl_upcase( s_pname );
