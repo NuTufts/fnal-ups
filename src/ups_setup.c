@@ -91,7 +91,7 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	     it to locate the instance that was previously set up.  if
 	     this variable does not exist, we cannot do the unsetup. */
 	  if (new_command_line = upsugo_env(mproduct->product,
-					   g_cmd_info[e_unsetup].valid_opts)) {
+					   g_cmd_info[e_setup].valid_opts)) {
 	    /* we found the SETUP_<PROD> so get a new instance based on the
 	       env variable. */
 	    new_mproduct_list = upsmat_instance(new_command_line, NULL,

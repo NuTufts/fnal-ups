@@ -77,14 +77,17 @@ t_upslst_item *ups_unsetup( const t_upsugo_command * const a_command_line,
        identify an instance then use that information.  otherwise, try to get
        the SETUP_<prod> environment variable and get the information from
        that. */
-    if (a_command_line->ugo_version || a_command_line->ugo_chain ||
-	a_command_line->ugo_qualifiers || a_command_line->ugo_f ||
-	a_command_line->ugo_H) {
+    if (a_command_line->ugo_version || a_command_line->ugo_c ||
+	a_command_line->ugo_d || a_command_line->ugo_o ||
+	a_command_line->ugo_n || a_command_line->ugo_t ||
+	a_command_line->ugo_g || a_command_line->ugo_z ||
+	a_command_line->ugo_q || a_command_line->ugo_f ||
+	a_command_line->ugo_M || a_command_line->ugo_m) {
       new_command_line = (t_upsugo_command *)a_command_line;
     } else {
       /* translate SETUP_<prodname> to get instance information */
       new_command_line = upsugo_env(a_command_line->ugo_product,
-				    g_cmd_info[e_unsetup].valid_opts);
+				    g_cmd_info[e_setup].valid_opts);
       got_new_cmd_line = 1;
     }
 
