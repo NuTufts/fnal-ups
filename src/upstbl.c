@@ -145,7 +145,7 @@ const char *upstbl_atom_new( const char * const str,
   p->len = len;
   p->str = (char *)( p + 1 );
   if ( len > 0 )
-    memcpy(p->str, str, (size_t)len);
+    (void) memcpy(p->str, str, (size_t)len);
   p->str[len] = '\0';
   p->link = buckets[h];
   buckets[h] = p;
@@ -363,7 +363,7 @@ void upstbl_trim( t_upstbl * const table )
   }
   
   for ( i=0; i<nkeys; i++ ) {
-    upstbl_remove( table, keys[i] );
+    (void) upstbl_remove( table, keys[i] );
   }
 
 }
@@ -376,27 +376,27 @@ void upstbl_dump( t_upstbl * const table, const int iopt )
 
   /* just print number of items */
 
-  printf( "total number of items in table = %d\n", table ? table->length : 0 );
+  (void) printf( "total number of items in table = %d\n", table ? table->length : 0 );
 
   if ( iopt <= 0 )
     return;
 
   /* dump all elements in table */
 
-  printf( "\ndumping table:\n" );
+  (void) printf( "\ndumping table:\n" );
   for ( i = 0; i < table->size; i++ )
     for ( bp = table->buckets[i]; bp; bp = bp->link )
-      printf( "%x, table bucket %d, %s\n", (unsigned int)bp->key, i, (char *)bp->key );
+      (void) printf( "%x, table bucket %d, %s\n", (unsigned int)bp->key, i, (char *)bp->key );
 
   if ( iopt <= 5 )
     return;
 
   /* dump keys */
 
-  printf( "\ndumping atoms:\n" );
+  (void) printf( "\ndumping atoms:\n" );
   for ( i = 0; i < (int)NELEMS(buckets); i++ )
     for ( ap = buckets[i]; ap; ap = ap->link ) 
-      printf( "%x, key bucket %d, %s\n", (unsigned int)ap->str, i, (char *)ap->str );
+      (void) printf( "%x, key bucket %d, %s\n", (unsigned int)ap->str, i, (char *)ap->str );
 
   return;
 }
