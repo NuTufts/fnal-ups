@@ -2,23 +2,25 @@ FILE = VERSION
 PRODUCT = spot
 VERSION = v2_0
 
+#*************************************************
+#
 FLAVOR = NULL
 QUALIFIERS = ""
-  DECLARED = 1-1-98
   DECLARER = jetson
+  DECLARED = 1-1-98
   PROD_DIR = /NULL/spot
   UPS_DIR = ups
   TABLE_FILE = spot.table
 
+#*************************************************
+#
 FLAVOR = NULL
 QUALIFIERS = "long"
-  DECLARED = 1-1-98
   DECLARER = jetson
+  DECLARED = 1-1-98
   PROD_DIR = /NULL/spot
   UPS_DIR = ups
-  TABLE_FILE = spot.table
   TABLE_DIR = .
-  AUTHORIZED_NODES = backyard
-  DESCRIPTION = "spot is a good dog who loves me the best."
+  TABLE_FILE = spot.table
   ARCHIVE_FILE = akc.tar.z
-  DUMMY = "this should not be recognized"
+  AUTHORIZED_NODES = "backyard"

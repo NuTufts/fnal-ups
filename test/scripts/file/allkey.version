@@ -2,26 +2,29 @@ FILE = VERSION
 PRODUCT = spot
 VERSION = v2_0
 
+#*************************************************
+#
 FLAVOR = NULL
 QUALIFIERS = ""
-  DECLARED = 1-1-98
   DECLARER = jetson
+  DECLARED = 1-1-98
   PROD_DIR = /NULL/spot
   UPS_DIR = ups
   TABLE_FILE = spot.table
 
+#*************************************************
+#
 FLAVOR = NULL
 QUALIFIERS = "long"
-  DECLARED = 1-1-98
   DECLARER = jetson
+  DECLARED = 1-1-98
+  MODIFIER = elroy
+  MODIFIED = 1-12-98
+  ORIGIN = /mycvsrepository
   PROD_DIR = /NULL/allkey
   UPS_DIR = ups
-  TABLE_FILE = astro.table
   TABLE_DIR = .
-  AUTHORIZED_NODES = backyard
-  MODIFIED = 1-12-98
-  MODIFIER = elroy
-  DESCRIPTION = "spot is a good dog who loves me the best."
+  TABLE_FILE = astro.table
   ARCHIVE_FILE = akc.tar.z
-  _DUMMY = "this should be recognized"
-  ORIGIN = /mycvsrepository
+  AUTHORIZED_NODES = "backyard"
+  _DUMMY=this should be recognized
