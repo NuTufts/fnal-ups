@@ -22,6 +22,6 @@ Extended     = 1
 Flags        = 	
 Flags Depend = 	
 This Db      = 	
-Setup        = lassie v2_0 -f NULL -z ../list/db1 -q nodbg:opt -v 	
+Setup        = lassie v2_0 -f NULL -z ../list/db1 -q nodbg:opt -v  -O "-blah" -e 	
 Origin       = roddy@village.england	
 Junk         = ${JUNK}	
