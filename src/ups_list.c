@@ -302,6 +302,7 @@ void ups_list( t_upsugo_command * const a_command_line , int verify )
       } printf("\n");
     }
     list_output(mproduct_list, a_command_line);
+    if (UPS_ERROR!=UPS_SUCCESS) { upserr_output(); upserr_clear(); return; }
   }
     /* free the matched products */
     for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
@@ -339,7 +340,7 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
 
   /* Get all the instances that the user requested */
   mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
-  if (UPS_ERROR != UPS_SUCCESS) upserr_output();
+  if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); upserr_clear(); }
 
   return(mproduct_list);
 }
@@ -462,6 +463,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         printf("\n");
       } else { 
           list_K(minst_ptr,a_command_line,mproduct);
+          if (UPS_ERROR!=UPS_SUCCESS) { upserr_output(); upserr_clear(); return; }
       }
     }
 /* end product loop */
