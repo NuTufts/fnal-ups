@@ -533,17 +533,38 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
 {
  char * loc;
  char * db;
+ char * saddr=inaddr;
+ int nt=0;
  struct upstyp_db * addr;
-/* quick NT fix on \ is this good enough ??? */
- while((loc=strchr(inaddr,':'))!=0 && strchr(inaddr,'\\')==0)
+/* All NT database paths must have \ following : if not a seperator */
+/* PRODUCTS or -z "C:\/local/products:GROUP:\/usr/products"         */
+ while((loc=strchr(inaddr,':'))!=0)
+ { inaddr=loc+1;
+   if(*inaddr=='\\') 
+   { *loc = '|'; 
+     nt++;			/* Do not endure pain if not necessary */
+   }
+ }
+ inaddr=saddr;
+ while((loc=strchr(inaddr,':'))!=0)
  {  db=inaddr;
    inaddr=loc+1;
    *loc = 0;
+   if(nt) 
+   { loc=strchr(db,'|');
+     if (loc) 
+     { *loc=':'; 
+     }
+   }
    db=upsutl_str_create(db,'p');
    addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
    memset (addr,0,sizeof(struct upstyp_db));
    addr->name = db;
    uc->ugo_db = upslst_add(uc->ugo_db,addr);
+ }
+ if(nt) 
+ { loc=strchr(inaddr,'|');
+   if (loc) { *loc=':'; }
  }
  db=upsutl_str_create(inaddr,'p');
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
@@ -606,9 +627,6 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   waddr=upsutl_str_create(addr,'p');   /* new list trimed */
   upsmem_free(addr);                   /* disgard work string */
   addr=waddr;                          /* required string in addr */
-/* give it for the moment */
-/*  uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr); */
-/* remove all required from the optional string */
   oaddr=upsutl_str_create(inaddr,'p');
   onc=1;                               /* must assume first no spec is , */
   waddr=oaddr;				/* work address */
@@ -651,40 +669,33 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   }
 /* changed to reverse count, this will allow it to build and return the
 ** highest number of matches AND in alphabetical significance (since they
-** are sorted as well) to least for atleast up to 2 optional qualifiers
-** without resorting the list based on number of elements. upslst_insert 
-** instead of add MAY have worked as well?  Beyond optional elements it
-** will require a bubble sort based ONLY on the number of elements.
+** are sorted as well) for atleast up to 2 optional qualifiers without
+** resorting the list based on number of elements. upslst_insert 
 */
     for ( i=(1<<(qcount))-1; i >=0; --i) 
     { opinit=0;
       waddr=0;
       for ( j=0; j < qcount; ++j)
-         {  if ( i & (1<<(qcount-j-1)) )
-          { 
-             if(!opinit)
-            { waddr=upsutl_str_create(optionals[j],' '); 
-              opinit=1;
-            } else { 
-              waddr=upsutl_str_crecat(waddr,":"); 
-              waddr=upsutl_str_crecat(waddr,optionals[j]); 
-            }
+      { if ( i & (1<<(qcount-j-1)) )
+        { if(!opinit)
+          { waddr=upsutl_str_create(optionals[j],' '); 
+            opinit=1;
+          } else { 
+            waddr=upsutl_str_crecat(waddr,":"); 
+            waddr=upsutl_str_crecat(waddr,optionals[j]); 
           }
+        }
       }
       if ( *addr != 0 ) /* required as well as optional */
       { naddr=upsutl_str_crecat(addr,":");
         naddr=upsutl_str_crecat(naddr,waddr);
       } else { 
-/*        naddr=waddr; 
-      }
-*/
 /* if there is optionals with no required last one but be "" */
         if ( waddr != 0 ) 
-          { naddr=waddr;
-          } else { 
-/*            naddr=upsutl_str_create(" ",'p'); */
-            naddr=addr; /* should be a null string yes? */
-          }
+        { naddr=waddr;
+        } else { 
+          naddr=addr; /* should be a null string yes? */
+        }
       }
       upsutl_str_sort(naddr,':'); 
       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
