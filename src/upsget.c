@@ -416,3 +416,70 @@ char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
    (void) strcat(flavor,baseuname.release);     /* add in release */
    return flavor;
 }
+
+/*  upsget_chain_file
+ *
+ * Read the specified chain file.
+ *
+ * Input : a database
+ *         a product name
+ *         a chain name
+ * Output: pointer to the buffer with the file path in it
+ * Return: a product structure read from the file
+ */
+t_upstyp_product *upsget_chain_file(const char * const a_db,
+                                    const char * const a_prod,
+                                    const char * const a_chain,
+                                    char ** const a_buffer)
+{
+  int file_chars = 0;
+  char buffer[FILENAME_MAX+1];
+  t_upstyp_product *read_product = NULL;
+
+  file_chars = (int )(strlen(a_chain) + strlen(a_prod) + strlen(a_db) + 
+               sizeof(CHAIN_SUFFIX) + 4);
+  if (file_chars <= FILENAME_MAX) {
+    sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_chain, CHAIN_SUFFIX);
+    read_product = upsfil_read_file(&buffer[0]);
+    *a_buffer = buffer;
+  } else {
+    upserr_vplace();
+    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
+    *a_buffer = 0;
+  }
+
+  return(read_product);
+}
+/*  upsget_version_file
+ *
+ * Read the specified version file.
+ *
+ * Input : a database
+ *         a product name
+ *         a version 
+ * Output: pointer to the buffer with the file path in it
+ * Return: a product structure read from the file
+ */
+t_upstyp_product *upsget_version_file(const char * const a_db,
+                                      const char * const a_prod,
+                                      const char * const a_version,
+                                      char ** const a_buffer)
+{
+  int file_chars = 0;
+  char buffer[FILENAME_MAX+1];
+  t_upstyp_product *read_product = NULL;
+
+  file_chars = (int )(strlen(a_version) + strlen(a_prod) + strlen(a_db) + 
+               sizeof(VERSION_SUFFIX) + 4);
+  if (file_chars <= FILENAME_MAX) {
+    sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_version, VERSION_SUFFIX);
+    read_product = upsfil_read_file(&buffer[0]);
+    *a_buffer = buffer;
+  } else {
+    upserr_vplace();
+    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
+    *a_buffer = 0;
+  }
+
+  return(read_product);
+}

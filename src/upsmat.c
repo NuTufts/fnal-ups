@@ -32,6 +32,7 @@
 #include "upsmem.h"
 #include "upsfil.h"
 #include "upsutl.h"
+#include "upsget.h"
 
 /*
  * Definition of public variables.
@@ -86,10 +87,6 @@ static char *get_table_file_path( const char * const a_prodname,
 				  const char * const a_upsdir,
 				  const char * const a_productdir,
 				  const t_upstyp_db * const a_db_info);
-static t_upstyp_product *read_chain(const char * const a_db,
-				    const char * const a_prod,
-				    const char * const a_chain,
-				    char ** const a_buffer);
 static int get_instance(const t_upslst_item * const a_read_instances,
 			const t_upslst_item * const a_flavor_list,
 			const t_upslst_item * const a_quals_list,
@@ -633,7 +630,7 @@ static t_upstyp_matched_product *match_instance_core(
 	   chain_list = chain_list->next) {
 	/* get the chain name */
 	chain = (char *)chain_list->data;
-	read_product = read_chain(a_db_info->name, a_prod_name, chain, &dummy);
+	read_product = upsget_chain_file(a_db_info->name, a_prod_name, chain, &dummy);
 	if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
 	  for (cinst_list = read_product->instance_list ; cinst_list ;
 	       cinst_list = cinst_list->next) {
@@ -769,7 +766,7 @@ static int match_from_chain( const char * const a_product,
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
 
-  read_product = read_chain(a_db_info->name, a_product, a_chain, &buffer);
+  read_product = upsget_chain_file(a_db_info->name, a_product, a_chain, &buffer);
   if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
     /* get all the instances that match command line input */
     tmp_num_matches = get_instance(read_product->instance_list,
@@ -1177,42 +1174,6 @@ static char *get_table_file_path( const char * const a_prodname,
   }
 
 return path_ptr;
-}
-
-
-/*-----------------------------------------------------------------------
- * read_chain
- *
- * Read the specified chain file.
- *
- * Input : a database
- *         a product name
- *         a chain name
- * Output: pointer to the buffer with the file path in it
- * Return: a product structure read from the file
- */
-t_upstyp_product *read_chain(const char * const a_db,
-			     const char * const a_prod,
-			     const char * const a_chain,
-			     char ** const a_buffer)
-{
-  int file_chars = 0;
-  char buffer[FILENAME_MAX+1];
-  t_upstyp_product *read_product = NULL;
-
-  file_chars = (int )(strlen(a_chain) + strlen(a_prod) + strlen(a_db) + 
-               sizeof(CHAIN_SUFFIX) + 4);
-  if (file_chars <= FILENAME_MAX) {
-    sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_chain, CHAIN_SUFFIX);
-    read_product = upsfil_read_file(&buffer[0]);
-    *a_buffer = buffer;
-  } else {
-    upserr_vplace();
-    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
-    *a_buffer = 0;
-  }
-
-  return(read_product);
 }
 
 /*-----------------------------------------------------------------------
