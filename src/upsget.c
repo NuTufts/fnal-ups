@@ -591,10 +591,16 @@ char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   static char *prefix_string;
+  static char *env_string;
   if (command_line && command_line->ugo_U)
   { string=command_line->ugo_upsdir;
   } else { 
     get_element(string,ups_dir);
+  }
+  if (string)            
+  { if((env_string=upsget_translation_env(string))!=0)
+    { string=env_string;
+    }
   }
   if (UPSRELATIVE(string))
   { prefix_string = upsget_prod_dir(db_info_ptr, instance, command_line );
@@ -612,16 +618,26 @@ char *upsget_compile(const t_upstyp_db * const db_info_ptr,
 { 
   static char newstr[4096];
   static char *string = 0;
+  static char *env_string;
   *newstr='\0';
   if (!command_line->ugo_b) /* did they specify a compile file */
   {  get_element(string,compile_dir);
-     if (string) strcpy(newstr,string);
-     if (string) strcat(newstr,"/");
+     if (string) 
+     { if((env_string=upsget_translation_env(string))!=0)
+       { string=env_string;
+       }
+       strcpy(newstr,string);
+       strcat(newstr,"/");
+     }
      get_element(string,compile_file);
      if (string) strcat(newstr,string);
   } else {
     if (command_line->ugo_u)
-    { strcpy(newstr,command_line->ugo_compile_dir); 
+    { string=command_line->ugo_compile_dir;
+      if((env_string=upsget_translation_env(string))!=0)
+      { string=env_string;
+      }
+      strcpy(newstr,string); 
       strcpy(newstr,"/"); 
     }
     if (command_line->ugo_b)
