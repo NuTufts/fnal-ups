@@ -219,12 +219,18 @@ void ups_declare( t_upsugo_command * const uc ,
                { upsact_process_commands(cmd_list, tmpfile); }
                upsact_cleanup(cmd_list);
              }
-           } /* Get chain file (again) */
-           product = upsget_chain_file(db_info->name,
+           } /* Get chain file (maybe again) */
+           sprintf(file,"%s/%s/%s%s",
+                   db_info->name,
+                   uc->ugo_product,
+                   the_chain,CHAIN_SUFFIX);
+           if (upsfil_exist(file))
+           { product = upsget_chain_file(db_info->name,
                                        uc->ugo_product,
                                        the_chain, &file);
-           if(!product) /* Chain deleted was all only one */ 
-           { product = ups_new_product();
+           /* if(!product) Chain deleted was all only one */ 
+           } else { 
+             product = ups_new_product();
              sprintf(file,"%s/%s/%s%s",
                      db_info->name,
                      uc->ugo_product,
