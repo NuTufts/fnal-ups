@@ -35,7 +35,7 @@ if ($debug) {
 for $prod (@printlist) {
     print "\n";
     %visited = ();
-    recurse_tree($trees{$prod}, $prod, '');
+    recurse_tree($trees{$prod}, $prod, '', '');
 }
 
 #--------------------------------------------------
@@ -135,28 +135,29 @@ sub parseargs {
 # do it's kids again...
 #
 sub recurse_tree {
-    my ($tree, $node, $prefix) = @_;
+    my ($tree, $node, $prefix, $how) = @_;
     my ($n, @kids, $pre, $k, $i);
 
     ($pre = $prefix) =~ s/.  $/|__/;
      
     if ( !defined($visited{$node}) ) {
 	@kids = sort(keys(%{$tree->{$node}}));
-	print $pre, $node, "\n";
+	print $pre, $node, $how, "\n";
 	$visited{$node} = 1;
 	$k = $#kids;
 	$i = 0;
 	foreach $n (@kids) {
 	    # visit it..
+            $how = $tree->{$node}->{$n};
 	    if ( $i == $k ) {
-		recurse_tree( $tree, $n, $prefix . "   " );
+		recurse_tree( $tree, $n, $prefix . "   ", $how );
 	    } else {
-		recurse_tree( $tree, $n, $prefix . "|  " );
+		recurse_tree( $tree, $n, $prefix . "|  ", $how );
 	    }
 	    $i++;
 	}
     } else {
-	print $pre, "(", $node, ")\n";
+	print $pre, "(", $node, $how, ")\n";
     }
 }
 
@@ -267,11 +268,15 @@ sub dodeps {
 
  	       if ( m/\A\|__/o ) {
                   $direct = 1;
+               } else {
+	          $direct = 0;
                }
 
 	       s/\A[|_ ]*//o;
-	       s/ -g .*//o;
+
 	       push(@addto, $_);
+
+	       s/ -g .*//o;
 
                if ($direct) {
 		  print "first level...\n" if $debug;
@@ -281,10 +286,16 @@ sub dodeps {
 	   close(DEPEND);
 	 
 	   print "from depend on $parent:\n" if $debug;
+
            for $root (@addto) {
+	        if ($root =~ s/ -g .*//o ) {
+		    $how = " [via $&]";
+                } else {
+		    $how = " ";
+                }
 	        print "entries for $root:\n" if $debug;
 		for $child (@direct) {
-	            addedge($root, $parent, $child);
+	            addedge($root, $parent, $child, $how);
                 }
            }
        }
@@ -292,7 +303,7 @@ sub dodeps {
 }
 
 sub addedge {
-    my ($root, $parent, $child) = @_;
+    my ($root, $parent, $child, $how) = @_;
     if (! defined($trees{$root}) ) {
        $trees{$root} = {};
     }
@@ -302,7 +313,7 @@ sub addedge {
     if (!defined $tree->{$child}) {
        $tree->{$child} = {};
     }
-    $tree->{$child}->{$parent} = 1;
+    $tree->{$child}->{$parent} = $how;
 }
 
 sub makenode {
