@@ -549,14 +549,16 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   static char *prefix_string;
-  static char *nostring = '\0';
+  static char buffer[1];
+  static char *nostring=buffer;
+  buffer[0]='\0';
   if (command_line && command_line->ugo_r)
   { string=command_line->ugo_productdir;
   } else { 
     get_element(string,prod_dir);
   }
   if (!string)             /* The only why this could happen is if you */
-  { string=nostring;       /* declare a product with no -r */
+  { string=buffer;         /* declare a product with no -r */
   }
   if (UPSRELATIVE(string))
   { if (db_info_ptr->config)
@@ -923,7 +925,7 @@ char *upsget_man_source_dir( const t_upstyp_matched_instance * const a_inst,
   if ((vinst = a_inst->version))           /* Verify our version is there    */
   { if (vinst->ups_dir)                    /* Do we have a ups dir           */
     { if (UPSRELATIVE(vinst->ups_dir))     /* is ups_dir a relative path     */
-      { prod_dir=upsget_prod_dir(a_db_info, a_inst, 0);   /* no command line */
+      { prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
         strcat(g_buffer, prod_dir);        /* full path to product           */
         strcat(g_buffer, "/");             /* add the /                      */
         strcat(g_buffer, vinst->ups_dir);  /* tack on the ups_dir specified  */
@@ -980,7 +982,7 @@ char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
       }
       strcat(g_buffer, "/toinfo/");        /* Add the default location       */
     } else {                               /* no UPS dir, PROD_DIR/ups/toman */
-      prod_dir=upsget_prod_dir(a_db_info, a_inst, 0);     /* no command line */
+      prod_dir=upsget_prod_dir(a_db_info, a_inst, uc); 
       strcat(g_buffer, prod_dir);          /* full path to product           */
       strcat(g_buffer, "/ups/toinfo/");    /* add the /ups/toinfo default    */
     }

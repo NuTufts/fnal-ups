@@ -612,16 +612,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
             { upsver_mes(0,"A UPS start/stop exists for this product\n");
               upsact_cleanup(cmd_list);
             } 
-/* upscpy_info takes care of the checking... 
-            if (minst->table && minst->table->info_source_dir)
-            {  minst->table->info_source_dir =
-               upsget_translation( minst, db_info, 
-                                   uc, minst->table->info_source_dir);
-            }
-*/
-/*            upsutl_copy_info( minst, tmpfile, db_info);
-              upsutl_copy_man( minst, tmpfile, db_info);
-*/
               upscpy_man(minst,db_info,uc,tmpfile);
               upscpy_catman(minst,db_info,uc,tmpfile);
               upscpy_info(minst,db_info,uc,tmpfile);
