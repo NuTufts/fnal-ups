@@ -23,3 +23,6 @@ Things to remember to verify when reading a ups file.
 - Check for dublicate instances in ups files.
   e.g (FLAVOR=IRIX, QUALIFIERS=a:b) and (FLAVOR=IRIX, QUALIFIERS=b:a)
   is a dublicate.
+
+- Check that a chain file name (<name>.chain) is the same as specifyed
+  by chain key (CHAIN=<name>) in the file.
