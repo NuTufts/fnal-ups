@@ -24,7 +24,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/utsname.h>
-/*#include <malloc.h>*/
 #include <pwd.h>
 
 /* ups specific include files */
@@ -252,6 +251,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   t_upstyp_matched_instance *instance;
   t_upstyp_db *db_info_ptr;
   static char newstr[4096];
+  static char holdstr[4096];
   char * loc;
   char * upto;
   char * eaddr;             /* end addr of } */
@@ -265,7 +265,8 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   inst_list = product->minst_list;
   db_info_ptr = product->db_info;
   instance = (t_upstyp_matched_instance *)(inst_list->data);
-  work = (char *) malloc((size_t)(strlen(oldstr) +1));
+  /* work = (char *) malloc((size_t)(strlen(oldstr) +1)); */
+  work=holdstr;
   strcpy(work,oldstr);
   upto = work;
   while ((loc = strstr(upto,UPSPRE))!= 0 ) 
@@ -293,9 +294,10 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   { strcat(newstr,upto);
   } else {
     strcpy(newstr,work);
-    free(work);
+    /* free(work); now static */
   }
-  work = (char *) malloc((size_t)(strlen(newstr) +1));
+  /* work = (char *) malloc((size_t)(strlen(newstr) +1)); */
+  work=holdstr;
   strcpy(work,newstr);
   upto = work;
   newstr[0] = '\0';
@@ -323,14 +325,14 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   { strcat(newstr,upto);
   } else {
     strcpy(newstr,work);
-    free(work);
+    /* free(work); no static */
   }
-  work = (char *) malloc((size_t)(strlen(newstr) +1));
+  /* work = (char *) malloc((size_t)(strlen(newstr) +1)); */
+  work=holdstr;
   strcpy(work,newstr);
   upto = work;
   newstr[0] = '\0';
   any=0;
-/* not working */
   while ((loc = strstr(upto,TILDE))!=0) 
   { count = ( loc - upto );
     strncat(newstr,upto,(unsigned int )count);

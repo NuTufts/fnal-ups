@@ -417,6 +417,7 @@ if (!uc->ugo_H)
        strcpy(flavor,l_ptr->data);
        flavor_sub()
    }
+   upslst_free(uc->ugo_osname,'d');
    uc->ugo_osname=0;
  } 
  if (uc->ugo_number)
@@ -467,6 +468,7 @@ int upsugo_ifornota(struct ups_command * const uc)
    char   * addr;
    char   * PRODUCTS;                           /* PRODUCTS value */
    char   * loc;
+   static char temp[1024];
 
    if (!uc->ugo_product) 
    { addr=upsutl_str_create("*",' ');
@@ -507,7 +509,8 @@ int upsugo_ifornota(struct ups_command * const uc)
        { upserr_add(UPS_NO_DATABASE, UPS_FATAL); 
        }
      } else {
-        addr = (char *) malloc((size_t)(strlen(PRODUCTS) +1));
+        /* addr = (char *) malloc((size_t)(strlen(PRODUCTS) +1)); */
+        addr=temp; /* use static instead of alloc space */
         strcpy(addr,PRODUCTS);
         loc=addr;
         while ( loc && *loc ) 
@@ -518,13 +521,13 @@ int upsugo_ifornota(struct ups_command * const uc)
                 *loc = 0;
                 PRODUCTS = upsutl_str_create(addr,' ');
                 upsugo_blddb(uc,PRODUCTS);
+                upsmem_free(PRODUCTS);
                 addr=loc+1; 
                 while(*addr==' ') { addr=addr+1; }
-/*              uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS); */
         }
         PRODUCTS = upsutl_str_create(addr,' ');
-/*      uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS); */
         upsugo_blddb(uc,PRODUCTS);
+        upsmem_free(PRODUCTS);
      }
    } 
    return(0);
@@ -570,7 +573,8 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  { loc=strchr(inaddr,'|');
    if (loc) { *loc=':'; }
  }
- db=upsutl_str_create(inaddr,'p');  /* fix this leak!!! */
+ /* db may not be free but it's pointed to by db config do NOT free */
+ db=upsutl_str_create(inaddr,'p');
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
  memset (addr, 0, sizeof(struct upstyp_db));
  addr->name = db;
@@ -683,11 +687,17 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
       for ( j=0; j < qcount; ++j)
       { if ( i & (1<<(qcount-j-1)) )
         { if(!opinit)
-          { waddr=upsutl_str_create(optionals[j],' '); 
+          { if (waddr) upsmem_free(waddr); /* lint said so, I don't believe */
+            waddr=upsutl_str_create(optionals[j],' '); 
             opinit=1;
           } else { 
-            waddr=upsutl_str_crecat(waddr,":"); 
-            waddr=upsutl_str_crecat(waddr,optionals[j]); 
+            /* this one I did believe... */
+            taddr=upsutl_str_crecat(waddr,":"); 
+            upsmem_free(waddr);
+            waddr=taddr;
+            taddr=upsutl_str_crecat(waddr,optionals[j]); 
+            upsmem_free(waddr);
+            waddr=taddr;
           }
         }
       }
@@ -1169,6 +1179,7 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      ugo_commands=0;
      verbose=UPS_VERBOSE;
      uc=upsugo_next(argc,argv,validopts);
+     upslst_free(ugo_commands,' '); /* do NOT delete data */
      ugo_commands=hold;
      UPS_VERBOSE=verbose;
      return(uc);
@@ -1223,6 +1234,7 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
      ugo_commands=0;
      verbose=UPS_VERBOSE;
      uc=upsugo_next(argc,argv,validopts);
+     upslst_free(ugo_commands,' '); /* do NOT free data!!! */
      ugo_commands=hold;
      UPS_VERBOSE=verbose;
      return(uc);
@@ -1261,6 +1273,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
   if ( ugo_commands ) { /* subsequent call */ 
      /* dealloc your brain out */ 
      upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
+/* lint says it wasn't free, but there is NOTHING you can do about it*/
      last_command=ugo_commands;      /* need pointer to drop & remove struct */
      if (( ugo_commands=ugo_commands->next )!=0) {
         upslst_delete( last_command, last_command->data, 'd');

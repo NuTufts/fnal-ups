@@ -519,6 +519,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
 /* to HERE */
     FromDatabase(name,"Database")
     FromConfig(ups_db_version,"DB_Version")
+    FromConfig(prod_dir_prefix,"Prod_dir_prefix")
     FromConfig(man_path,"Man_Path")
     FromConfig(html_path,"Html_Path")
     FromConfig(info_path,"Info_Path")
