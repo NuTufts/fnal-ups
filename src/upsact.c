@@ -1796,13 +1796,11 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       uprod_name = upsutl_upcase(a_inst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
 	if (a_inst->version->prod_dir) {
-	  strcpy(buff, uprod_name);
-	  strcat(buff, "_DIR");
+	  sprintf(buff, "%s_DIR", uprod_name);
 	  lcl_cmd.argv[1] = a_inst->version->prod_dir;
 	  f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 	}
-	strcpy(buff, SETUPENV);
-	strcat(buff, uprod_name);
+	sprintf(buff, "%s%s", SETUPENV, uprod_name);
 	lcl_cmd.argv[1] = "\"-f flavor -c dum dum\"";  /* ????? temp */
 	f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
@@ -1875,11 +1873,9 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       lcl_cmd.argv[0] = buff;
       uprod_name = upsutl_upcase(a_inst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
-	strcpy(buff, uprod_name);
-	strcat(buff, "_DIR");
+	sprintf(buff, "%s_DIR", uprod_name);
 	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
-	strcpy(buff, SETUPENV);
-	strcat(buff, uprod_name);
+	sprintf(buff, "%s%s", SETUPENV, uprod_name);
 	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
       break;
