@@ -638,7 +638,7 @@ int write_chain_file( void )
   
   /* write instances */
   
-  ikeys = upskey_verinst_arr();
+  ikeys = upskey_chninst_arr();
   l_ptr = upslst_first( g_pd->instance_list );
   for( ; l_ptr; l_ptr = l_ptr->next ) {
 

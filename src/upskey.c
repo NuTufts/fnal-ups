@@ -422,9 +422,13 @@ int *upskey_chnhead_arr()
 
 int *upskey_chninst_arr()
 {
-  t_upskey_map *keys = &g_key_map[ e_key_flavor ];
+  t_upskey_map *keys = &g_key_map[ e_key_flavor + 1];
   int i = 0;
 
+  g_ikeys[i++] = e_key_flavor;
+  g_ikeys[i++] = e_key_version;
+
+  
   for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
     if ( UPSKEY_ISIN_CHAIN( keys->flag ) && keys->ikey != e_key_unknown )
       g_ikeys[i++] = keys->ikey;
