@@ -1,5 +1,5 @@
 Name         = jessie	
-Tilde        = /dir/filename	
+Tilde        = //dir/filename	
 Version      = v2_0	
 Flavor       = NULL	
 Qualifiers   = red	
