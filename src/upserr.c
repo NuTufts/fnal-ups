@@ -83,8 +83,9 @@ static char *g_error_messages[UPS_NERR] = {
 /* 23 */  "%s: Error in call to %s: %s\n",
 /* 24 */  "%s: \"%s\" is not authorized for use on this node\n",
 /* 25 */  "%s: No destination was specified in the UPS Database Configuration file for where to copy the %s files\n",
-/* 26 */  "%s: Error when writing to temp file while processing %s action\n"
-/* 27 this is the last */
+/* 26 */  "%s: Error when writing to temp file while processing %s action\n",
+/* 27 */  "%s: Invalid number of parameters for action %s, must be between %d and %d (found %d)\n"
+/* 28 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -108,13 +109,14 @@ char *g_error_ascii[] = {
    /* UPS_NOVALUE_ARGUMENT    17 */ "UPS_NOVALUE_ARGUMENT",
    /* UPS_INVALID_ACTION      18 */ "UPS_INVALID_ACTION",
    /* UPS_INVALID_ACTION_ARG  19 */ "UPS_INVALID_ACTION_ARG",
-   /* UPS_TO_MANY_ACTION_ARG  20 */ "UPS_TO_MANY_ACTION_ARG",
+   /* UPS_TOO_MANY_ACTION_ARG 20 */ "UPS_TOO_MANY_ACTION_ARG",
    /* UPS_INVALID_SHELL       21 */ "UPS_INVALID_SHELL",
    /* UPS_NEED_UNIQUE         22 */ "UPS_NEED_UNIQUE",
    /* UPS_SYSTEM_ERROR        23 */ "UPS_SYSTEM_ERROR",
    /* UPS_NOT_AUTH            24 */ "UPS_NOT_AUTH",
    /* UPS_NO_DESTINATION      25 */ "UPS_NO_DESTINATION",		    
    /* UPS_ACTION_WRITE_ERROR  26 */ "UPS_ACTION_WRITE_ERROR",
+   /* UPS_INVALID_ACTION_PARAMS 27 */ "UPS_INVALID_ACTION_PARAMS",
    /* UPS_NERR                27 */ "UPS_NERR",
    0 };
 
