@@ -48,13 +48,13 @@
 #   actions base on that version and the last flavor.
 
 
-# use Getopt::Std;
+use Getopt::Std;
 
 #  Define valid options (only the option 'f' takes an argument)
-# $validOptions = "vf:";
+$validOptions = "vf:";
 
-# $errorMsg = "Error:";
-# $usage = "USAGE:\ups_convert [-v -f <flavor>] <releaseName> [releaseVersion]\n";
+$errorMsg = "Error:";
+$usage = "USAGE:\ups_convert [-v -f <flavor>] <releaseName> [releaseVersion]\n";
 
 # Get the UPS database we will be using
 $dbs = $ENV{'OLD_PRODUCTS'};
@@ -76,13 +76,14 @@ if (! "$ndbs") {
 
 # Parse through any command line parameters.  Invalid syntax if user specified
 #  an invlid parameter or did not specify a releaseName.
-#if (! getopts("$validOptions")) {
-#  print "$errorMsg Invalid syntax. $usage";
-#  exit 1;
-#}
-#$GetoptName = $ARGV[0];
-#if (! "$ARGV[0]") { $GetoptName = "*"; }
-#$releaseVersion = $ARGV[1];
+if (! getopts("$validOptions")) {
+  print "$errorMsg Invalid syntax. $usage";
+  exit 1;
+}
+print $opt_f;
+$GetoptName = $ARGV[0];
+if (! "$ARGV[0]") { $GetoptName = "*"; }
+$releaseVersion = $ARGV[1];
 
 #**********************************************************************
 #* 
@@ -114,7 +115,7 @@ foreach $db (@dbs) {
 #   @files = <$db/$GetoptName>;
 # this didn't work either!!!
 # glob just sucks...
-   if ( "$GetoptName" != "*" ) {
+   if ( "$GetoptName" ne "*" ) {
       @files = glob ( "$db/$GetoptName" );
    } else {
       opendir DBDIR , "$db";
@@ -122,7 +123,7 @@ foreach $db (@dbs) {
       closedir DBDIR;
    }
    foreach $releaseName ( @files ) { 
-      if ("$GetoptName" == "*" ) {
+      if ("$GetoptName" eq "*" ) {
          if (!open(DBFILE, "$db/$releaseName")) {
             print STDERR "Can't open $db/$releaseName\n";
             NEXTDB;
@@ -374,17 +375,16 @@ sub WriteTableFile {
            open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
            $ReqHash{$flvr} = &table_file ("$reqType");
            delete $flvrverHash{$flvr}{$version}{"$reqType"};
-        } 
-# else {
+        } else {
 # Need for force table files even if there is no requirements - Sep 11
-#          if ("$reqType" == "USE") { 
-#             if ("$opt_v") { 
-#                print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
-#                }
-#             open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
-#                $ReqHash{$flvr} = &add_setup;
-#             }
-#        }
+          if ("$reqType" eq "USE") { 
+             if ("$opt_v") { 
+                print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
+                }
+             open( TableFile, ">>$ndbs/$PRODUCT/$version.table" );
+                $ReqHash{$flvr} = &add_setup;
+             }
+        }
     }
     if ( ! $TableFileInfo ) { 
        print TableFile "File=Table\n";
