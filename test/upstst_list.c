@@ -59,7 +59,7 @@ UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
-   ups_list(uc);
+   ups_list(uc,0);
    }
 
 /* dump the output to specified file and compare

@@ -49,6 +49,7 @@
  * Definition of public variables.
  */
 extern int UPS_VERBOSE;
+extern int UPS_VERIFY;
 
 /*
  * Declaration of private functions
@@ -82,6 +83,8 @@ static int               put_key( const char * const key, const char * const val
 static int               trim_qualifiers( char * const str );
 static int               cfilei( void );
 t_upslst_item            *copy_action_list( t_upslst_item * const list_ptr );
+static void verify_keys(t_upslst_item * l_ptr, t_upstyp_instance * inst_ptr);
+static void verify_groups(t_upslst_item * l_ptr,t_upslst_item * n_ptr);
 
 /* Print stuff */
 static void              print_instance( t_upstyp_instance * const inst_ptr );
@@ -761,7 +764,70 @@ int read_file_desc( void )
 
   return 1;
 }
-
+/* The verify's a set of "keys" product,flavor,version,qualifiers WITHIN
+** a group or file with no groups.  The verify groups has to be used to
+** verify the keys within the sets of groups.  
+*/
+void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
+{
+    int verify_key=0;
+    t_upslst_item *vl_ptr = 0;
+    t_upstyp_instance *vinst_ptr = 0;
+    static char file[10];
+    vl_ptr = upslst_first(l_ptr);
+    for ( ; vl_ptr; vl_ptr = vl_ptr->next ) 
+    {   verify_key=upsget_key(inst_ptr); 
+        vinst_ptr = (t_upstyp_instance *)vl_ptr->data;
+        if ( verify_key == upsget_key(vinst_ptr) )
+        { switch ( g_ifile )  
+          { case e_file_version: strcpy(file,"VERSION"); break;
+            case e_file_table: strcpy(file,"TABLE"); break;
+            case e_file_chain: strcpy(file,"CHAIN"); break;
+          }
+          upserr_add(UPS_DUPLICATE_INSTANCE, UPS_WARNING, 
+                     file , g_filename, 
+                     vinst_ptr->product,vinst_ptr->version, 
+                     vinst_ptr->flavor,vinst_ptr->qualifiers,
+                     verify_key);
+        }
+    }
+}
+/* The l_ptr is the existing list of instances the n_ptr is the list
+** that's going to be added to the existing list.  I check the instances
+** in the new list, which MAY ALLREADY have a duplicate and be previously
+** reported, against the existing list.  If I took the final list and
+** compaired it against itself it would report duplicates within groups
+** twice
+**/
+void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
+{
+    int verify_key=0;
+    t_upslst_item *myl_ptr = 0;
+    t_upslst_item *myn_ptr = 0;
+    t_upstyp_instance *vinst_ptr = 0;
+    static char file[10];
+    myn_ptr = upslst_first(n_ptr);
+    for ( ; myn_ptr; myn_ptr = myn_ptr->next ) 
+    { vinst_ptr = (t_upstyp_instance *)myn_ptr->data;
+      verify_key = upsget_key(vinst_ptr);
+      myl_ptr = upslst_first(l_ptr);
+      for ( ; myl_ptr; myl_ptr = myl_ptr->next ) 
+      { vinst_ptr = (t_upstyp_instance *)myl_ptr->data;
+        if ( verify_key == upsget_key(vinst_ptr) )
+        { switch ( g_ifile )  
+          { case e_file_version: strcpy(file,"VERSION"); break;
+            case e_file_table: strcpy(file,"TABLE"); break;
+            case e_file_chain: strcpy(file,"CHAIN"); break;
+          }
+          upserr_add(UPS_DUPLICATE_INSTANCE, UPS_WARNING, 
+                     file , g_filename, 
+                     vinst_ptr->product,vinst_ptr->version, 
+                     vinst_ptr->flavor,vinst_ptr->qualifiers,
+                     verify_key);
+        }
+      }
+    }
+}
 /*-----------------------------------------------------------------------
  * read_instances
  *
@@ -781,9 +847,11 @@ t_upslst_item *read_instances( void )
 	inst_ptr = read_instance();
 	
 	if ( inst_ptr )
+        { if (UPS_VERIFY) { verify_keys(l_ptr,inst_ptr); }
 	  l_ptr = upslst_add( l_ptr, inst_ptr );
-	else
+	} else {
 	  break;
+        }
     }
     
     return upslst_first( l_ptr );
@@ -818,7 +886,7 @@ t_upstyp_instance *read_instance( void )
   /* fill information from file */
   
   inst_ptr->flavor = upsutl_str_create( g_val, ' ' );
-    
+
   while ( next_key() != e_key_eof ) {
 
     /* the world are full of special cases */
@@ -851,7 +919,17 @@ t_upstyp_instance *read_instance( void )
       
     default:
       if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) 
-	UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = upsutl_str_create( g_val, ' ' );
+      { if (UPS_VERIFY) 
+        { if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0)
+          { printf("duplicate key in file %s line %d\n", 
+                    g_filename, g_line_count); 
+            printf("key %s value %s \n", 
+                    g_key, g_val); 
+          } 
+        }
+	UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = 
+                      upsutl_str_create( g_val, ' ' );
+      }
       break;    
 
     }
@@ -982,7 +1060,8 @@ t_upslst_item *read_groups( void )
     while  ( g_ikey == e_key_group ) {
 	l_tmp_ptr = read_group();
 
-	if ( l_tmp_ptr ) {
+	if ( l_tmp_ptr )
+        { if (UPS_VERIFY) { verify_groups(l_ptr,l_tmp_ptr); }
 	  l_ptr = upslst_add_list( l_ptr, l_tmp_ptr );
 	}
 	else {

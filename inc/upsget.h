@@ -87,4 +87,5 @@ char *upsget_database(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
 char *upsget_tilde_dir(char *);
+int upsget_key(const t_upstyp_instance * const);
 #endif /* _UPSGET_H_ */

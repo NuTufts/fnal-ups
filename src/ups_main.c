@@ -143,7 +143,9 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_unsetup: ups_unsetup(command_line, temp_file, e_unsetup);
 	    break;
-	  case e_list: ups_list(command_line);
+	  case e_list: ups_list(command_line,0);
+	    break;
+	  case e_verify: ups_list(command_line,1); /* verify IS list !! */
 	    break;
 	  case e_configure: ups_configure(command_line, temp_file,
 					  e_configure);

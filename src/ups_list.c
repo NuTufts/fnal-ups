@@ -57,7 +57,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 
 #define FromVersion(ELEMENT) \
 { if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if(instance->version)                               \
+  { valid=1; \
+    if(instance->version)                               \
     { if (instance->version->ELEMENT)                   \
       { printf("\"%s\" ",instance->version->ELEMENT);   \
       } else {                                          \
@@ -70,7 +71,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 }
 #define FromDatabase(ELEMENT,STRING) \
 { if (!upsutl_stricmp((l_ptr->data),STRING))            \
-  { if(product->db_info)                                \
+  { valid=1; \
+    if(product->db_info)                                \
     { if (product->db_info->ELEMENT)                    \
       { printf("\"%s\" ",product->db_info->ELEMENT);    \
       } else {                                          \
@@ -83,7 +85,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 }
 #define FromConfig(ELEMENT,STRING) \
 { if (!upsutl_stricmp((l_ptr->data),STRING))            \
-  { if(config_ptr)                                      \
+  { valid=1; \
+    if(config_ptr)                                      \
     { if (config_ptr->ELEMENT)                          \
       { printf("\"%s\" ",config_ptr->ELEMENT);          \
       } else {                                          \
@@ -97,7 +100,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 #define FromAny(ELEMENT) \
 { if (!upsutl_stricmp(l_ptr->data,"" #ELEMENT "") ||    \
       !upsutl_stricmp(l_ptr->data,"+"))                 \
-  { if(instance->chain)                                 \
+  { valid=1; \
+    if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
       { printf("\"%s\" ",instance->chain->ELEMENT);         \
       } else {                                          \
@@ -159,7 +163,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 #define FromBoth(ELEMENT) \
 { if (!upsutl_stricmp(l_ptr->data,"" #ELEMENT "") ||    \
       !upsutl_stricmp(l_ptr->data,"+"))                 \
-  { printf("\"");                                       \
+  { valid=1; \
+    printf("\"");                                       \
     if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
       { printf("%s:",instance->chain->ELEMENT);         \
@@ -265,16 +270,15 @@ int product_cmp ( const void * const d1, const void * const d2 )
  * Output: 
  * Return: 
  */
-void ups_list( t_upsugo_command * const a_command_line )
+void ups_list( t_upsugo_command * const a_command_line , int verify )
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *tmp_mprod_list = NULL;
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
-
   /* Get all the requested instances */
- 
+  UPS_VERIFY=verify;		/* this is REALLY the ups verify command */ 
   for (db_list = a_command_line->ugo_db ; db_list ; db_list=db_list->next) 
   { db_info = (t_upstyp_db *)db_list->data;
     mproduct_list = ups_list_core(a_command_line,db_list);
@@ -285,7 +289,8 @@ void ups_list( t_upsugo_command * const a_command_line )
     mproduct_list = upslst_sort0( mproduct_list , product_cmp );
     upsver_mes(2,"Ending sort of product list\n");
     mproduct_list = upslst_first(mproduct_list);  /* point to the start */
-
+  if(!verify)  /* verify is list with NO output */
+  {
     /* Output the requested information from the instances */
     /*  upsugo_dump(a_command_line);*/
     if (!a_command_line->ugo_K)
@@ -297,7 +302,7 @@ void ups_list( t_upsugo_command * const a_command_line )
       } printf("\n");
     }
     list_output(mproduct_list, a_command_line);
-  
+  }
     /* free the matched products */
     for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
          tmp_mprod_list = tmp_mprod_list->next) {
@@ -328,17 +333,11 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
 
   /* if no chains were entered, ask for them all */
   if (! a_command_line->ugo_chain) { 
-/* The following won't work, a list item will be eventually managed
-   with our memory routines and since this in not allocated with
-   the ups_malloc the extra stuff won't be there... DjF
-    a_command_line->ugo_chain = upslst_new((void *)ANY_MATCH);
-*/
     addr=upsutl_str_create(ANY_MATCH,' ');
     a_command_line->ugo_chain = upslst_new(addr);
   }
 
   /* Get all the instances that the user requested */
-/*  mproduct_list = upsmat_instance(a_command_line, NULL, need_unique); */
   mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
   if (UPS_ERROR != UPS_SUCCESS) upserr_output();
 
@@ -482,12 +481,14 @@ void list_K(const t_upstyp_matched_instance * const instance,
   char *str_val;
   int count=0;
   int exists=1;
+  int valid=0;
   if (product->db_info) 
   { config_ptr = product->db_info->config;
   }
   for ( l_ptr = upslst_first( command->ugo_key ); 
         l_ptr; l_ptr = l_ptr->next, count++ )
-  { FromVersion(table_file)
+  { valid=0;
+    FromVersion(table_file)
     FromVersion(table_dir)
     FromVersion(ups_dir)
     FromVersion(prod_dir)
@@ -503,6 +504,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromAny(flavor) 
     FromAny(qualifiers)
     /* FromChain(chain) */
+    if (!upsutl_stricmp(l_ptr->data,"chain")) { valid=1; }
     print_chain(instance,l_ptr->data);
     if(upsutl_stricmp(l_ptr->data,"+"))
     { FromBoth(declarer)
@@ -517,6 +519,10 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromConfig(man_path,"Man_Path")
     FromConfig(html_path,"Html_Path")
     FromConfig(info_path,"Info_Path")
+    if (!strcmp(l_ptr->data,"key"))
+    { valid=1; 
+      printf("\"%d\"",upsget_key(instance->version)); /* test */ 
+    }
     if (!strncmp(l_ptr->data,"_",1))
     { str_val=0;
       if (instance->chain) 
@@ -526,8 +532,9 @@ void list_K(const t_upstyp_matched_instance * const instance,
       if (instance->table && !str_val )
          str_val = upskey_inst_getuserval( instance->table,l_ptr->data);
       if (!str_val) 
-      { printf("\"\" ");
+      { printf("\"\" ");  /* this gives them "" for a invalid _key */
       } else {
+        valid=1;
         if (strlen(str_val))
         { printf("\"%s\" ",str_val);
         } else { 
@@ -538,7 +545,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
 /* look for "processed values" spam? */
     if (!strncmp(l_ptr->data,"@",1))
     { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
-      { if (instance->version)
+      { valid=1;
+        if (instance->version)
         { printf("\"%s\" ",upsutl_get_table_file_path(command->ugo_product,
                                                  instance->version->table_file,
                                                  instance->version->table_dir,
@@ -551,7 +559,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
         }
       } else {
         if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
-        { printf("\"");
+        { valid=1;
+          printf("\"");
           if (product->db_info) 
           { config_ptr = product->db_info->config;
             if (config_ptr) 
@@ -560,8 +569,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
             }
           }
           printf("%s\" ", instance->version->prod_dir);
-        }
+        } 
       }
+    }
+    if (!valid) 
+    { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
     }
   }
   printf("\n");

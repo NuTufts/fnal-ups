@@ -35,6 +35,7 @@
 
 int UPS_ERROR = UPS_SUCCESS;    /* start out with no errors */
 int UPS_VERBOSE = 0;            /* start out not verbose */
+int UPS_VERIFY = 0;
 int g_ups_line = 0;
 char *g_ups_file = '\0';
 
@@ -60,7 +61,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 00 */  "%s: Success.\n",
 /* 01 */  "%s: Unable to open file %s.\n",
 /* 02 */  "%s: Unable to read file %s.\n",
-/* 03 */  "%s: Invalid keyword - %s, in %s found.\n",
+/* 03 */  "%s: Invalid keyword - %s\n   in %s found.\n",
 /* 04 */  "%s: No database specified on command line or in $PRODUCTS.\n",
 /* 05 */  "%s: CPU time used - %f, Wall clock time used %f.\n",
 /* 06 */  "%s: File name and path too long, must be less than %d bytes.\n",
@@ -98,7 +99,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 38 */  "%s: There is no ACTION=%s section in this table file.\n",
 /* 39 */  "%s: No instance to copy to specified on command line.\n",
 /* 40 */  "%s: Invalid Specification for %s -\n\t%s\n",
-/* 41 */  "%s: No instance found for product: \'%s\'\n"
+/* 41 */  "%s: No instance found for product: \'%s\'\n",
+/* 42 */  "%s: Duplicate instance in %s file\n   %s \n   key = \"%s\" \"%s\" \"%s\" \"%s\" hash(%d)\n" 
 };
 
 char *g_error_ascii[] = {
@@ -144,7 +146,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_NEW_INSTANCE     39 */ "UPS_NO_NEW_INSTANCE",
    /* UPS_INVALID_SPECIFICATION 40 */ "UPS_INVALID_SPECIFICATION",
    /* UPS_NO_PRODUCT_FOUND    41 */ "UPS_NO_PRODUCT_FOUND",
-   /* UPS_NERR                42 */ "UPS_NERR",
+   /* UPS_DUPLICATE_INSTANCE  42 */ "UPS_DUPLICATE_INSTANCE",
+   /* UPS_NERR                43 */ "UPS_NERR",
    0 };
 
 /*
