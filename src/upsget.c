@@ -287,14 +287,18 @@ char *upsget_translation_env( char * const oldstr )
   static char error[51];
   static char *s_tok = "${";
   static char *e_tok = "}";  
+  int clear_flag=0;                     /* This makes Eli happy... */
   char *s_loc = oldstr;
   char *e_loc = 0;
   char *tr_env = 0;
   
-  memset( buf, 0, sizeof( buf ) );
 
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) 
-  { memset( env, 0, sizeof( env ) );
+  { if(!clear_flag)                   
+    { memset( buf, 0, sizeof( buf ) );  /* clear ONLY if I need too... */
+      clear_flag++;
+    }
+    memset( env, 0, sizeof( env ) );
     strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );  /* copy everything upto ${     */
     if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding })*/
     { upserr_add(UPS_NO_TRANSLATION, UPS_FATAL, e_loc);
@@ -334,14 +338,17 @@ char *upsget_translation_tilde( char * const oldstr )
   static char env[48];
   static char error[49];
   static char *e_tok = "/";  
+  int clear_flag=0;                     /* This makes Eli happy... */
   char *s_loc = oldstr;
   char *e_loc = 0;
   char *tr_env = 0;
   
-  memset( buf, 0, sizeof( buf ) );
-
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, TILDE)) != 0 ) 
-  { memset( env, 0, sizeof( env ) );
+  { if(!clear_flag)                   
+    { memset( buf, 0, sizeof( buf ) );  /* clear ONLY if I need too... */
+      clear_flag++;
+    }
+    memset( env, 0, sizeof( env ) );
     strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );    /* copy everything upto ~      */
     if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding /)*/
     { s_loc = strstr( e_loc, " ");           /* set s_loc to end space */
