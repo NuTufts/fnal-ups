@@ -22,7 +22,7 @@
 #**      Sep 17 1997, DjF, First
 #**      Jan 6  1998, EB, Added some text for command help
 # 
-# File definition is extreamly rigid for speed  
+# File definition is extremely rigid for speed  
 # "#"'s are start of lines are comments NO MATTER WHAT.
 #Information about command presented EXACTLY as typed line for
 #line until OPTIONS or a : not found 
