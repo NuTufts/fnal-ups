@@ -35,43 +35,43 @@ Setups_Products_Init_Default="\${Node}/products/ups_database \
 
 # ===  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE ===
 
-if [ x${Test_Prod_Dir:-} != x ]
+if test x${Test_Prod_Dir:-} != x
 then
     Ups_Dir=$Test_Prod_Dir
 fi
 
 error=0
-if [ x${Ups_Dir:-} = x ]
+if test x${Ups_Dir:-} = x
 then
     echo UPS_PROD_DIR not set.  Configure exiting.
     error=1
 fi
 
-if [ x${Name_Of_Ups:-} = x ]
+if test x${Name_Of_Ups:-} = x
 then
     echo UPS_PROD_NAME not set. Configure exiting.
     error=1
 fi
 
-if [ x${UPS_PROD_FLAVOR:-} = x ]
+if test x${UPS_PROD_FLAVOR:-} = x
 then
     echo UPS_PROD_FLAVOR not set. Configure exiting.
     error=1
 fi
 
-if [ x${UPS_PROD_VERSION:-} = x ]
+if test x${UPS_PROD_VERSION:-} = x
 then
     echo UPS_PROD_VERION not set.  Configure exiting.
     error=1
 fi
 
-if [ x${Ups_DB_Path:-} = x ]
+if test x${Ups_DB_Path:-} = x
 then
     echo Ups_DB_Path not set. Configure exiting.
     error=1
 fi
 
-if [ $error = 1 ]
+if test $error = 1
 then
     exit 1
 fi
@@ -83,29 +83,30 @@ BootStrap_Dir=$Ups_DB_Path/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FL
 # Make an advanced shell for the products initialization script,
 # if we can.
 #
-if [ -x /usr/bin/bash ]
+for sh in ash bash ksh
+do
+    if test -x /usr/bin/${sh}
+    then
+        Name_Of_Sh=/usr/bin/${sh}
+        break
+    elif test -x /bin/${sh}
+    then
+        Name_Of_Sh=/bin/${sh}
+        break
+    fi
+done
+if test x${Name_Of_Sh:-} = x
 then
-    Name_Of_Sh=/usr/bin/bash
-elif [ -x /bin/bash ]
-then
-    Name_Of_Sh=/bin/bash
-elif [ -x /usr/bin/ksh ]
-then
-    Name_Of_Sh=/usr/bin/ksh
-elif [ -x /bin/ksh ]
-then
-    Name_Of_Sh=/bin/ksh
-else
     Name_Of_Sh=/bin/sh
 fi
 #
 # Parse the SETUPS_PATH from the dbconfig file
 #
-if [ -f $Ups_DB_Path/.upsfiles/dbconfig ]
+if test -f $Ups_DB_Path/.upsfiles/dbconfig
 then
     Setups_Home=`grep -i $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '#'|cut -f2 -d'='|sed 's% %%g'`
 fi
-if [ x${Setups_Home:-} = x ]
+if test x${Setups_Home:-} = x
 then
     echo '**' $Setups_Flag not defined in $Ups_DB_Path/.upsfiles/dbconfig
     echo '**' Using /usr/local/etc
@@ -125,12 +126,12 @@ Startup_Home=${Ups_DB_Path}/.upsfiles
 
 Configure_Date=`date`
 
-if [ ! -d $BootStrap_Dir ]
+if test ! -d $BootStrap_Dir
 then
     mkdir -p $BootStrap_Dir
 fi
 
-if [ ! -w $BootStrap_Dir ]
+if test !  -w $BootStrap_Dir
 then
     echo '****' Unable to write to $BootStrap_Dir
     echo '****'
@@ -138,13 +139,13 @@ then
     exit 1
 fi
 rm -f $BootStrap_Dir/*
-if [ -x /usr/local/bin/funame ] 
+if test -x /usr/local/bin/funame 
 then
     echo '**' WARNING: /usr/local/bin/funame exists.
     echo '**           Please remove this file before declaring ups current'
     echo '**           It has the same name as a file in ups.'
 fi
-if [ -x /usr/local/bin/dropit ]
+if test -x /usr/local/bin/dropit
 then
     echo '**' WARNING: /usr/local/bin/dropit exists.
     echo '**           Please remove this file before declaring ups current'
@@ -155,7 +156,7 @@ fi
 # Create the local copy of the cache file.
 # This file MUST be a fresh copy to avoid complications.
 #
-if [ -f $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR} ]
+if test -f $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 then
     rm -f $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 fi
@@ -167,6 +168,8 @@ cat <<XEoF >$BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 #
 $UPS_PROD_DIR
 XEoF
+
+chmod +rx $BootStrap_Dir/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
 
 cat <<XEoF >$BootStrap_Dir/setups_find_home
 #!${Name_Of_Sh}
@@ -182,7 +185,7 @@ XEoF
 
 chmod +x $BootStrap_Dir/setups_find_home
 #
-if [ ! -x $BootStrap_Dir/$Setups_Products_Script ]
+if test ! -x $BootStrap_Dir/$Setups_Products_Script
 then
 echo '**' Creating $BootStrap_Dir/$Setups_Products_Script
 #
@@ -234,7 +237,7 @@ Setups_Products_Init_Default="$Setups_Products_Init_Default"
 
 Setups_Current=0
 
-if [ \$Setups_Current = 0 ]
+if test \$Setups_Current = 0
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -249,11 +252,11 @@ node=\$Node; NODE=\$Node
 # the one in $Setups_Home is preferred.
 # Other wise use the default created at configure time.
 #
-if [ -r \$Products_List_Home/\$Products_String_File ]
+if test -r \$Products_List_Home/\$Products_String_File
 then
     Products_String=\`cat \$Products_List_Home/\$Products_String_File|grep -v '^#'\`
     Products_String="\${UPS_EXTRA_DIR} \${Products_String}"
-#elif [ -r \$BootStrap_Dir/\$Products_String_File ]
+#elif test -r \$BootStrap_Dir/\$Products_String_File
 #then
 #    Products_String=\`cat \$BootStrap_Dir/\$Products_String_File|grep -v '^#'\`
 #    Products_String="\${UPS_EXTRA_DIR} \${Products_String}"
@@ -270,14 +273,14 @@ prod_set=no
 for Prod in \${Products_String}
 do
     eval "Prod=\$Prod"
-    if [ -d \$Prod ]
+    if test -d \$Prod
     then
-	if [ \$prod_set = no ]
+	if test \$prod_set = no
         then
 	    PRODUCTS=\$Prod
 	    prod_set=yes
 
-        elif [ \`echo \$PRODUCTS|grep -c \$Prod\` = "0" ]
+        elif test \`echo \$PRODUCTS|grep -c \$Prod\` = "0"
         then
 	    PRODUCTS=\${PRODUCTS}:\${Prod}
 	fi
@@ -287,14 +290,14 @@ done
 # output the result as an eval string which will set the PRODUCTS environment
 # variable in the invoking shell.  NOTE: this is shell family sensitive.
 #
-if [ x\`echo \${PRODUCTS:-}|cut -c1\` = x/ ]
+if test x\`echo \${PRODUCTS:-}|cut -c1\` = x/
 then
-    if [ \$UPS_SHELL = sh ]
+    if test \$UPS_SHELL = sh
     then
         cat <<EoF
         PRODUCTS=\$PRODUCTS; export PRODUCTS;
 EoF
-    elif [ \$UPS_SHELL = csh ]
+    elif test \$UPS_SHELL = csh
     then
         cat <<EoF
         setenv PRODUCTS "\$PRODUCTS";
@@ -313,7 +316,7 @@ fi
 #
 # Create the setups.csh file in the bootstrap directory.
 #
-if [ ! -f $BootStrap_Dir/${Script_Prefix}.csh ]
+if test ! -f $BootStrap_Dir/${Script_Prefix}.csh
 then
 echo '**' Creating $BootStrap_Dir/${Script_Prefix}.csh
 cat <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
@@ -482,7 +485,7 @@ fi
 #
 # Create, if necessary, the setups.sh script
 #
-if [ ! -f $BootStrap_Dir/${Script_Prefix}.sh ]
+if test ! -f $BootStrap_Dir/${Script_Prefix}.sh
 then
 echo '**' Creating $BootStrap_Dir/${Script_Prefix}.sh
 cat <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
@@ -556,7 +559,7 @@ BootStrap_Dir=$BootStrap_Dir
   
 # === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
 
-if [ "\`echo \$Setups_Home|cut -c1\`" = "~" ]
+if test "\`echo \$Setups_Home|cut -c1\`" = "~"
 then
     Setups_Home=\`(unset ENV;\$BootStrap_Dir/setups_find_home \$Setups_Home)\`
 fi
@@ -565,7 +568,7 @@ export Setups_Home
 
 Setups_Current=0
 
-if [ \$Setups_Current = 0 ]
+if test \$Setups_Current = 0
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -581,7 +584,7 @@ UPS_SHELL=sh; export UPS_SHELL
 # Some versions of $Name_Of_Ups use this to determine the instructions
 # to be generated for execution.
 #
-if [ \`echo x\${SHELL:-}|grep -c csh\` != '0' ]
+if test \`echo x\${SHELL:-}|grep -c csh\` != '0'
 then
     SHELL=/bin/sh;export SHELL
 fi
@@ -591,23 +594,23 @@ fi
 #
 Node=\`uname -n|cut -f1 -d'.'\`
 MACH_OS=\`uname -s\`
-if [ \`echo \$MACH_OS|cut -c1-4\` = IRIX ]
+if test \`echo \$MACH_OS|cut -c1-4\` = IRIX
 then
     MACH_OS=IRIX
 fi
 export MACH_OS
 Flavor=\$MACH_OS'+'\`uname -r|cut -f1 -d'.'\`
-if [ \$MACH_OS = AIX ]
+if test \$MACH_OS = AIX
 then
     Flavor=\$MACH_OS'+'\`uname -v\`
 fi
-if [ \$MACH_OS = HP-UX ]
+if test \$MACH_OS = HP-UX
 then
     Flavor=\$MACH_OS'+'\`uname -r|cut -f2 -d'.'\`
 fi
-if [ x\`echo \${UPS_DIR:-}|cut -c1\` = x/ ]
+if test x\`echo \${UPS_DIR:-}|cut -c1\` = x/
 then
-    if [ ! -d \$UPS_DIR ]
+    if test ! -d \$UPS_DIR
     then
 	unset UPS_DIR
     fi
@@ -617,9 +620,9 @@ fi
 #
 # Attempt to define the PRODUCTS variable.
 #
-if [ x\`echo \${PRODUCTS:-}|cut -c1\` != x/ ]
+if test x\`echo \${PRODUCTS:-}|cut -c1\` != x/
 then
-    if [ -x \${Setups_Home}/$Setups_Products_Script ] 
+    if test -x \${Setups_Home}/$Setups_Products_Script 
     then
         eval \`(unset ENV;\${Setups_Home}/$Setups_Products_Script)\`
     fi   
@@ -630,17 +633,17 @@ fi
 # on the platform executing this script.  If found, utilize it to define
 # a UPS_DIR.
 #
-if [ x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a x\$UPS_DIR = x ]
+if test x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a x\$UPS_DIR = x
 then
     for fl in \$Node \$Flavor \$MACH_OS NULL
     do
-        if [ -r \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl} ]
+        if test -r \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}
         then
             UPS_DIR=\`cat \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}|grep -v '^#'\`
         fi
-        if [ x\${UPS_DIR:-} != x ]
+        if test x\${UPS_DIR:-} != x
         then
-            if [ -d \$UPS_DIR ]
+            if test -d \$UPS_DIR
             then
                 break
             else
@@ -655,17 +658,17 @@ fi
 #
 # This process, although thorough, is very time consuming.
 #
-if [ x\${UPS_DIR:-} = x ]
+if test x\${UPS_DIR:-} = x
 then
-    if [ -x \$Setups_Home/${Script_Prefix}.common ]
+    if test -x \$Setups_Home/${Script_Prefix}.common
     then
         eval \`(unset ENV;\$Setups_Home/${Script_Prefix}.common sh)\`
-#    elif [ -x /usr/local/etc/${Script_Prefix}.common ]
+#    elif test -x /usr/local/etc/${Script_Prefix}.common
 #   then
 #       eval \`(unset ENV;/usr/local/etc/${Script_Prefix}.common sh)\`
     fi
 fi
-if [ x\${UPS_DIR:-} != x ]
+if test x\${UPS_DIR:-} != x
 then
 #
 # If we have successfully managed to find a usable version of $Name_Of_Ups,
@@ -714,7 +717,7 @@ fi
  
 Boot_Start='yes'
 #Boot_Start=`grep -i $StartUp_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%g'|tr 'A-Z' 'a-z'` 
-if [ x${Boot_Start:-} = xyes ]
+if test x${Boot_Start:-} = xyes
 then
 
 for Start_Or_Stop in startup shutdown
@@ -764,7 +767,7 @@ Setup_List=${Ups_DB_Path}/.upsfiles/${Start_Or_Stop}
 
 Setups_Current=0
 
-if [ \$Setups_Current = 0 ]
+if test \$Setups_Current = 0
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -772,19 +775,19 @@ fi
 # 
 # set the appropriate environmental variables for root 
 # 
-#if [ ! -f /usr/local/etc/setpath.sh ]
+#if test ! -f /usr/local/etc/setpath.sh
 #then
 #    PATH=\${PATH}:/usr/local/bin; export PATH 
 #else 
 #    . /usr/local/etc/setpath.sh 
 #fi 
-if [ x\${PATH:-} != x ]
+if test x\${PATH:-} != x
 then
     PATH=\$PATH:/bin:/usr/bin
 else
     PATH=/bin:/usr/bin
 fi
-if [ ! -f \$Setups_Home/\${Script_Prefix}.sh ]
+if test ! -f \$Setups_Home/\${Script_Prefix}.sh
 then
     echo '****' \$Name_Of_Ups initialization file 
     echo '****' \$Setups_Home/\${Script_Prefix}.sh not found
@@ -796,31 +799,31 @@ fi
 Node=\`uname -n|cut -f1 -d'.'\`               
                                               
 MACH_OS=\`uname -s\`                          
-if [ \`echo \$MACH_OS|cut -c1-4\` = IRIX ]    
+if test \`echo \$MACH_OS|cut -c1-4\` = IRIX    
 then                                          
     MACH_OS=IRIX                              
 fi                                            
 
 Boot_Start='yes'
 #Boot_Start=\`grep -i $StartUp_Flag \$Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%g'|tr 'A-Z' 'a-z'\`
-if [ x\${Boot_Start:-} = xyes ]
+if test x\${Boot_Start:-} = xyes
 then
                                               
 #for starts in \$Startup_Home
 for starts in \`echo \${PRODUCTS}|tr ':' ' '\`
 do
     starts_dir=\$starts
-    if [ ! -d \$starts_dir ]
+    if test ! -d \$starts_dir
     then
 	continue
     fi
-    if [ -d \$starts/.upsfiles/$Start_Or_Stop ]
+    if test -d \$starts/.upsfiles/$Start_Or_Stop
     then
 	starts_dir=\$starts/.upsfiles/$Start_Or_Stop
-    elif [ -d \$starts/$Start_Or_Stop ]
+    elif test -d \$starts/$Start_Or_Stop
     then
         starts_dir=\$starts/$Start_Or_Stop
-    elif [ -d \$starts/../$Start_Or_Stop ]
+    elif test -d \$starts/../$Start_Or_Stop
     then
         starts_dir=\$starts/../$Start_Or_Stop
     fi
@@ -828,19 +831,19 @@ do
 #
 # execute the appropriate node.products file
 #
-    if [ -f \$starts_dir/\$Node.products ]
+    if test -f \$starts_dir/\$Node.products
     then 
 	. \$starts_dir/\$Node.products
 	started='1'
 #
 # execute the appropriate flavor.products file
 # 
-    elif [ -f \$starts_dir/\$MACH_OS.products ]
+    elif test -f \$starts_dir/\$MACH_OS.products
     then
 	. \$starts_dir/\$MACH_OS.products
 	started='1'
     fi 
-    if [ \$started = '1' ]
+    if test \$started = '1'
     then
 	break
     fi
@@ -849,7 +852,7 @@ done
 # If we made it this far, we found nothing to start
 # Report the fact.
 #
-if [ \$started = '0' ]
+if test \$started = '0'
 then
     cat <<EoF
     '****'
@@ -869,7 +872,7 @@ fi
 #
 # IT IS  V E R  Y    S   L    O     W
 #
-if [ ! -r $BootStrap_Dir/${Script_Prefix}.common ]
+if test ! -r $BootStrap_Dir/${Script_Prefix}.common
 then
 #    echo '**'
     echo '**' Creating $BootStrap_Dir/${Script_Prefix}.common
@@ -942,7 +945,7 @@ Product_String="$Setups_Products_Init_Default $Ups_DB_Path"
 
 Setups_Current=0
 
-if [ \$Setups_Current = 0 ]
+if test \$Setups_Current = 0
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -951,10 +954,10 @@ Shell=\$UPS_SHELL
 
 Node=\`uname -n|cut -f1 -d'.'\`
 
-if [ -r \$Setups_Home_Dir/\$Setups_Product_Init_File ]
+if test -r \$Setups_Home_Dir/\$Setups_Product_Init_File
 then
 	Product_String=\`cat \$Setups_Home_Dir/\$Setups_Product_Init_File|grep -v '^#'\`
-#elif [ -r /usr/local/etc/\$Setups_Product_Init_File ]
+#elif test -r /usr/local/etc/\$Setups_Product_Init_File
 #then
 #	Product_String=\`cat /usr/local/etc/\$Setups_Product_Init_File|grep -v '^#'\`
 fi
@@ -963,17 +966,17 @@ fi
 # should find something useful on this platform.
 #
 MACH_OS=\`uname -s\`
-if [ \`echo \$MACH_OS|cut -c1-4\` = IRIX ]
+if test \`echo \$MACH_OS|cut -c1-4\` = IRIX
 then
     MACH_OS=IRIX
 fi
 export MACH_OS
 r=\`uname -r|cut -f1 -d'.'\`
-if [ \$MACH_OS = AIX ]
+if test \$MACH_OS = AIX
 then
     r=\`uname -v\`
 fi
-if [ \$MACH_OS = HP-UX ]
+if test \$MACH_OS = HP-UX
 then
     r=\`uname -v|cut -f2 -d'.'\`
 fi
@@ -984,18 +987,18 @@ Flavor_Wanted=\${MACH_OS}+\${r}
 #
 # Find the PRODUCTS databases.
 #
-if [ "x\`echo \${PRODUCTS:-}|cut -c1\`" != "x/" ]
+if test "x\`echo \${PRODUCTS:-}|cut -c1\`" != "x/"
 then
     prodset=no
     for Prod in \$Product_String
     do
-        if [ -d \$Prod ]
+        if test -d \$Prod
         then
-	    if [ \$prodset = no ]
+	    if test \$prodset = no
             then
 		PRODUCTS=\$Prod
 		prodset=yes
-            elif [ \`echo \$PRODUCTS|grep -c \$Prod\` = "0" ]
+            elif test \`echo \$PRODUCTS|grep -c \$Prod\` = "0"
             then
                 PRODUCTS="\$PRODUCTS' '\${Prod}"
             fi
@@ -1006,31 +1009,40 @@ fi
 # Now for the time consuming search of the PRODUCTS for an 
 # appropriate 'current' version of $Name_Of_Ups.
 #
-if [ "x\`echo \${PRODUCTS:-}|cut -c1\`" = "x/" ]
+if test "x\`echo \${PRODUCTS:-}|cut -c1\`" = "x/"
 then
     PRODUCTS=\`echo \$PRODUCTS|tr ':' ' '\`
     for Prod in \${PRODUCTS}
     do
-	if [ -r \$Prod/\${Name_Of_Ups}/current.chain ]
+#
+# It is legal to declare ups to its database with a relative chain
+# On the off chance that this was done, parse out the PROD_DIR_PREFIX
+# from the dbconfig file.
+#
+	if test -r \$Prod/.upsfiles/dbconfig
+	then
+	    Ups_Pre=\`grep -i PROD_DIR_PREFIX  \$Prod/.upsfiles/dbconfig|grep -v '#'|cut -f2 -d'='|sed 's% %%g'\`
+	fi
+	if test -r \$Prod/\${Name_Of_Ups}/current.chain
 	then
 	    Parse_curr=\$Prod/\${Name_Of_Ups}/current.chain
 	    while read string
 	    do	
 		key=\`echo \$string|cut -f1 -d'=' -s|tr 'a-z' 'A-Z'|sed 's% %%g'\`
 		val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'|sed 's% %%g'\`
-		if [ x\${val} != x ]
+		if test x\${val} != x
 		then
-		    if [ "\$key" = "FLAVOR" ]
+		    if test "\$key" = "FLAVOR"
 		    then
 			FLAVOR=\$val
-		    elif [ "\$key" = "VERSION" ]
+		    elif test "\$key" = "VERSION"
 		    then
 			VERSION=\$val
 		    fi
 		fi
-		if [ x\${VERSION} != x -a x\${FLAVOR} != x ]
+		if test x\${VERSION} != x -a x\${FLAVOR} != x
 		then
-		    if [ \$FLAVOR = \$Flavor_Wanted -o \$FLAVOR = \$MACH_OS ]
+		    if test \$FLAVOR = \$Flavor_Wanted -o \$FLAVOR = \$MACH_OS
 		    then
 			Ups_Version_File=\${VERSION}.version
 			Ups_Flavor=\$FLAVOR
@@ -1040,28 +1052,37 @@ then
         		do
             		    key=\`echo \$string|cut -f1 -d'='|tr 'a-z' 'A-Z'|sed 's% %%g'\`
             		    val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'|sed 's% %%g'\`
-            		    if [ "x\${key}" = xFLAVOR ]
+            		    if test "x\${key}" = xFLAVOR
             		    then
                 		FLAVOR=\$val
             		    fi
-            		    if [ "x\${key}" = xPROD_DIR ]
+            		    if test "x\${key}" = xPROD_DIR
             		    then
                 		PROD_DIR=\$val
             		    fi
-            		    if [ x\${FLAVOR} != x -a x\${PROD_DIR} != x ]
+            		    if test x\${FLAVOR} != x -a x\${PROD_DIR} != x
             		    then
-                		if [ \$FLAVOR = \$Ups_Flavor ]
+                		if test \$FLAVOR = \$Ups_Flavor
                 		then
+				    First_C=\`echo \$PROD_DIR|cut -c1\`
+				    if test x\${First_C} != "x/"
+				    then
+					PROD_DIR=\${Ups_Pre}/\${PROD_DIR}
+				    fi
+				    if test ! -d \$PROD_DIR
+				    then
+					continue
+				    fi
                     		    UPS_DIR=\$PROD_DIR;export UPS_DIR
 				    export PRODUCTS
 #				    . \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
-    				    if [ \$Shell = 'sh' ]
+    				    if test \$Shell = 'sh'
     				    then
         				cat <<EoF
         				PRODUCTS="\${PRODUCTS}"; export PRODUCTS;
         				UPS_DIR=\$UPS_DIR; export UPS_DIR;
 EoF
-    				    elif [ \$Shell = 'csh' ]
+    				    elif test \$Shell = 'csh'
     				    then
         				cat <<EoF
         				setenv PRODUCTS "\${PRODUCTS}";
@@ -1082,7 +1103,7 @@ EoF
             		    fi
         		done < \$Parse_ver
 			rm -f /tmp/VSeTuPs.\$$
-			if [ -r /tmp/.__SeTuPs_.\$$ ]
+			if test -r /tmp/.__SeTuPs_.\$$
 			then
 			    break	# exit while read current.chain
 			fi
@@ -1092,7 +1113,7 @@ EoF
 		fi
 	    done < \$Parse_curr
 	    rm -f /tmp/.SeTuPs.\$$
-	    if [ -r /tmp/.__SeTuPs_.\$$ ]
+	    if test -r /tmp/.__SeTuPs_.\$$
 	    then
 		break	# Exit for Prod
 	    fi
@@ -1116,7 +1137,7 @@ chmod +x $BootStrap_Dir/${Script_Prefix}.common
 #
 # Create the current script
 #
-if [ -r $BootStrap_Dir/current ]
+if test -r $BootStrap_Dir/current
 then
     rm -f $BootStrap_Dir/current
 fi
@@ -1163,13 +1184,13 @@ BootStrap_Dir=$BootStrap_Dir
 
 Ups_Dir=$UPS_PROD_DIR
 
-if [ x\${Test_Prod_Dir} != x ]
+if test x\${Test_Prod_Dir} != x
 then
     Ups_Dir=\$Test_Prod_Dir
 fi
 
 error='0'
-if [ ! -f \$BootStrap_Dir/${Script_Prefix}.common ]
+if test ! -f \$BootStrap_Dir/${Script_Prefix}.common
 then
     echo '****' Configure script has failed or was not executed.
     echo '****' \$Name_Of_Ups current script cannot execute.
@@ -1183,12 +1204,12 @@ fi
 # A better one is in the works
 # However, this should work most of the time at Fermilab
 #
-if [ ! -w \$Setups_Home ]
+if test ! -w \$Setups_Home
 then
     Setups_Home=\`echo \$Setups_Home|sed 's%/afs/fnal/products%/afs/.fnal.gov/products%'\`
     Setups_Home=\`echo \$Setups_Home|sed 's%/afs/fnal.gov/products%/afs/.fnal.gov/products%'\`
 fi
-if [ ! -w \$Setups_Home ]
+if test ! -w \$Setups_Home
 then
     echo '****' Unable to write to \$Setups_Home
     echo '****' \$Name_Of_Ups current script failure
@@ -1210,7 +1231,7 @@ done
 # /usr/local/etc.  Just in case everything else
 # fails
 #
-#if [ -w /usr/local/etc ]
+#if test -w /usr/local/etc
 #then
 #    echo '**' Copying ${Script_Prefix}.common to /usr/local/etc
 #    cp \$BootStrap_Dir/${Script_Prefix}.common /usr/local/etc
@@ -1224,22 +1245,22 @@ done
     do
         Diff_rc='0'
 	file=\`echo \$filex|sed "s%\$BootStrap_Dir/%%"\`
-        if [ ! -f \$Setups_Home/\$file ]
+        if test ! -f \$Setups_Home/\$file
         then
             Diff_rc='1'
         else
             diff -b \$BootStrap_Dir/\$file \$Setups_Home/\$file >/dev/null
             Diff_rc=\$?
         fi
-        if [ \$Diff_rc != '0' ]
+        if test \$Diff_rc != '0'
         then
 	    echo '**' Copying \$file to \$Setups_Home
-	    if [ -f \$Setups_Home/\$file ]
+	    if test -f \$Setups_Home/\$file
 	    then
-		cp \$Setups_Home/\$file \$Setups_Home/\${file}.BAK
+		cp  \$Setups_Home/\$file \$Setups_Home/\${file}.BAK
 	    fi
             cp \$BootStrap_Dir/\$file \$Setups_Home
-	    if [ \$? != '0' ]
+	    if test \$? != '0'
 	    then
 		error='1'
 		echo '****' An error has prevented the copy of
@@ -1249,10 +1270,11 @@ done
 	    chmod +x \$Setups_Home/\$file
 	else
 	    echo '**' \$file identical to \$Setups_Home/\$file - not copied.
+#	    touch \$Setups_Home/\$file
         fi
     done
 
-if [ \$error = '1' ]
+if test \$error = '1'
 then
     echo '**** Error(s) have caused the current script to fail'
     exit 1
@@ -1265,11 +1287,11 @@ fi
 #
 for Start_Or_Stop in startup shutdown
 do
-    if [ -f \$BootStrap_Dir/ups_\${Start_Or_Stop} ]
+    if test -f \$BootStrap_Dir/ups_\${Start_Or_Stop}
     then
-	if [ \`echo \$Startup_Home|grep -c '.upsfiles'\` != 0 ]
+	if test \`echo \$Startup_Home|grep -c '.upsfiles'\` != 0
 	then
- 	    if [ ! -d \$Startup_Home/\$Start_Or_Stop ]
+ 	    if test ! -d \$Startup_Home/\$Start_Or_Stop
 	    then
 	        mkdir \$Startup_Home/\$Start_Or_Stop
 	    fi
@@ -1304,7 +1326,7 @@ chmod +x $BootStrap_Dir/current
 #
 # Create the uncurrent script
 #
-if [ -w $BootStrap_Dir/uncurrent ]
+if test -w $BootStrap_Dir/uncurrent
 then
     rm -f $BootStrap_Dir/uncurrent
 fi
@@ -1351,7 +1373,7 @@ Setups_Home=$Setups_Home
 
 Setups_Current=0
 
-if [ \$Setups_Current = 0 ]
+if test \$Setups_Current = 0
 then
     echo '****' \$Name_Of_Ups \$UPS_PROD_VERSION \$UPS_PROD_FLAVOR
     echo '****' is not current.
@@ -1361,7 +1383,7 @@ fi
 #
 # Don't  try to remove a non-existant file
 #
-if [ ! -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR} ]
+if test ! -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
 then
     exit 0
 fi
@@ -1370,7 +1392,7 @@ fi
 #Remove the setups.cache file from 
 # $Setups_Home
 #
-if [ -w \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR} ]
+if test -w \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
 then
     rm -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
 else
@@ -1429,9 +1451,9 @@ cat <<XEoF >$BootStrap_Dir/unconfigure
 # ==== DO NOT EDIT BELOW THIS LINE ===== DO NOT REMOVE THIS LINE ===
 #
 # The real code ( 1 line - This could be incorporated in the table file )
-if [ -d $BootStrap_Dir ]
+if test -d $BootStrap_Dir
 then
-    if [ ! -w $BootStrap_Dir ]
+    if test ! -w $BootStrap_Dir
     then
 	echo '****' Unconfigure cannot remove $BootStrap_Dir
 	echo '****' Insufficient privilege
@@ -1439,7 +1461,7 @@ then
     else
 	echo '**' Removing the $BootStrap_Dir directory
 	rm -rf $BootStrap_Dir
-	if [ -d $BootStrap_Dir ]
+	if test -d $BootStrap_Dir
 	then
 	    echo '****' Unconfigure failed to remove $BootStrap_Dir
 	    echo '****' Please remove this directory manually.
