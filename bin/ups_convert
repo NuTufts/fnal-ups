@@ -429,7 +429,11 @@ sub WriteTableFile {
        if (checkfor("${basedir}/ups/setup.sh")) {
           $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL},UPS_ENV)\n/;
        } else { 
-          $key=~s/DaSeTuP/      doDefaults()\n/;
+         if (checkfor("${basedir}/ups/setup")) {
+            $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup,UPS_ENV)\n/;
+         } else {
+           $key=~s/DaSeTuP/      doDefaults()\n/;
+         }
        }
        print TableFile "$key";
 # remove unsetup all together...
