@@ -8,6 +8,7 @@ Include files:-
 */
 
 #include <unistd.h>
+char *g_temp_file_name;
 
 /* ups specific include files */
 #include "ups.h"
@@ -33,14 +34,15 @@ int		status;				/* function status */
 FILE		*ofd;				/* f_stdout file descriptor */
 FILE		*afd;				/* f_stdout file descriptor */
 upstst_argt     argt[] = {{"-out",     UPSTST_ARGV_STRING,NULL,&f_stdout},
-                          {"-actout",  UPSTST_ARGV_STRING,NULL,&f_action_diff},
                           {"-diff",    UPSTST_ARGV_STRING,NULL,&f_stdout_diff},
+                          {"-actout",  UPSTST_ARGV_STRING,NULL,&f_action},
                           {"-actdiff", UPSTST_ARGV_STRING,NULL,&f_action_diff},
                           {"-status",  UPSTST_ARGV_STRING,NULL,&estatus_str},
                           {NULL,       UPSTST_ARGV_END,   NULL,NULL}};
 t_upsugo_command	*uc =0;			/* ups command */
 char            diffcmd[132];                   /* diff command */
 int		stdout_dup;			/* dup of stdout */
+int		had_error;
 
 /* parse command line
    ------------------ */
@@ -62,6 +64,7 @@ if (!f_action)
 
 if (!(afd = fopen(f_action,"w")))
       { perror("f_action"); return (1); }
+g_temp_file_name = f_action; 
 
 
 stdout_dup = dup(STDOUT_FILENO);		/* dup stdout */
@@ -83,8 +86,9 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
    if (calledby == e_list)
       (*myfunc)(uc,0);
    else
-      (*myfunc)(uc,stdout,calledby);
-   if (UPS_ERROR != estatus)                            
+      (*myfunc)(uc,afd,calledby);
+   had_error = UPS_ERROR;
+   if (UPS_ERROR != estatus)
       {                                                 
       fprintf(stderr,"function: %s\n",funcname);       
       fprintf(stderr,"%s: %s, %s: %s\n","actual status",
@@ -92,12 +96,8 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
          g_error_ascii[estatus]);                       
       if (UPS_ERROR) upserr_output();                  
       }                                                
-   if (UPS_ERROR) 
-      { 
-      upserr_clear(); 
-      continue;
-      }
-   upserr_clear();                                   
+   upserr_clear();
+   if (had_error) continue;
    upsutl_finish_up(afd,uc->ugo_shell,calledby,FALSE);
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    }
@@ -121,7 +121,6 @@ if (f_action_diff && f_action)
    sprintf (diffcmd,"diff %s %s",f_action_diff,f_action);
    if (system(diffcmd)) printf("files %s %s differ\n",f_action_diff,f_action);
    }
-
 return (0);
 }
 

@@ -1,16 +1,8 @@
-echo declare
-#
-echo configure
-#
-echo current
-#
-echo development
-#
-echo old
-#
-echo test
-#
-echo new
-#
-echo leash
-#
+declare
+configure
+current
+development
+old
+test
+new
+leash

@@ -45,6 +45,11 @@ upsmat_instance -out snoopy3.out -diff snoopy3.in -z ../db1 -H IRIX+5 snoopy v1_
 upsmat_instance -out snoopy4.out -diff snoopy4.in -z ../db1 -H IRIX+5 snoopy v1_0 -q ?pigpen -unique
 upsmat_instance -out snoopy5.out -diff snoopy5.in -z ../db1 -H IRIX+5 snoopy v1_0 -q lucy:linus:pigpen:violet 
 #
+# flavor = ANY tests with 
+#
+upsmat_instance -z ../db1 -f YAHOO  -unique benji v1_0 -out benji1.out -diff benji1.in
+upsmat_instance -z ../db1 -f IRIX+5 -unique benji v1_0 -out benji2.out -diff benji2.in
+#
 # multiple db tests
 #
 upsmat_instance -out lassie6.out -diff lassie6.in -z ../db1:../db2 -f NULL -a lassie v2_0
