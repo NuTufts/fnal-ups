@@ -108,6 +108,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   time_t seconds=0;
   char * save_table_dir;		/* match won't work "how I want" */
   char * save_table_file;		/* with table specifications     */
+  char * tmp_ptr;
   int save_m=uc->ugo_m;
   int save_M=uc->ugo_M;
   uc->ugo_m=0;
@@ -408,12 +409,18 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       /* if no ups dir was entered on the command line, then check if 
 	 PROD_DIR/ups exists. if it does, then set this = to ups. EFB */
       if ((! new_vinst->ups_dir) && new_vinst->prod_dir) {
+	/* we must pass prod_dir through the env variable translator first */
+	if (!(tmp_ptr = upsget_translation_env(new_vinst->prod_dir))) {
+	  /* there was nothing to translate, use the original */
+	  tmp_ptr = new_vinst->prod_dir;
+	}
 	if (db_info && db_info->config && db_info->config->prod_dir_prefix
-	    && UPSRELATIVE(new_vinst->prod_dir)) {
-	  sprintf(buf,"%s/%s/ups", db_info->config->prod_dir_prefix,
-		  new_vinst->prod_dir);
+	    && UPSRELATIVE(tmp_ptr)) {
+	  /* we don't have to translate prod_dir_prefix, it is done when it
+	     is read in */
+	  sprintf(buf,"%s/%s/ups", db_info->config->prod_dir_prefix, tmp_ptr);
         } else {
-	  sprintf(buf,"%s/ups", new_vinst->prod_dir);
+	  sprintf(buf,"%s/ups", tmp_ptr);
         }
 	if (upsutl_is_a_file(buf) == UPS_SUCCESS) {
 	  /* the file existed */
