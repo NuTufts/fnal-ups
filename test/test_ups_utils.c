@@ -24,6 +24,7 @@
 /* ups specific include files */
 #include "ups_utils.h"
 #include "ups_error.h"
+#include "ups_match.h"
 
 /*
  * Definition of public variables.
@@ -76,7 +77,8 @@ int main (void)
   }
 
   /* Now test the function upsutl_get_files */
-  list_ptr = upsutl_get_files("/usrdevel/s1/berman/upsdb/tigger");
+  list_ptr = upsutl_get_files("/usrdevel/s1/berman/upsdb/tigger", 
+			      (char *)ANY_MATCH);
 
   return 0;
 }

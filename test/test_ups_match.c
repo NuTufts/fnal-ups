@@ -148,7 +148,7 @@ static void test_match(const int argc, char *argv[])
   new_string = get_ups_string(argv[2]);
   command_line.ugo_chain = upslst_new(new_string);
 
-  mproduct = upsmat_match_instance(&command_line, need_unique);
+  mproduct = upsmat_match_instance(&command_line, (char *)NULL, need_unique);
   printf("\nChain Instances:\n");
   print_inst(mproduct->chain_list);
   printf("\nVersion Instances:\n");
