@@ -34,10 +34,12 @@ DIR=$(DEFAULT_DIR)
  ADDPRODUCT_HOST=fnkits.fnal.gov
 OLD_ADDPRODUCT_HOST=`(domainname | grep dcdsv0 ||  echo fndaub)`
 DISTRIBUTIONFILE=$(DEFAULT_DISTRIBFILE)
-          FLAVOR=$(OS)
-              OS=`ups flavor -2`
+          FLAVOR=$(OS)$(CUST)
+# can't use ups flavor in the ups makefile, 'cause ups may not be built yet...
+              OS=`uname -s | sed -e 's/IRIX64/IRIX/'`
+            CUST=+`((uname -s | grep AIX >/dev/null && uname -v) || uname -r) | \
+                sed -e 's|\..*||'`
            QUALS=""
-            CUST=$(DEFAULT_CUST)
           PREFIX=/dev/null
 
 #------------------------------------------------------------------
@@ -81,7 +83,7 @@ all: 	proddir_is_set
 	cd man; ../bin/upspremake $(UPSDBG) $(INSURE)
 
 test: FORCE
-	cd test/scripts; upstst_all
+	cd test/scripts; PATH=.:$$PATH; export PATH; upstst_all
 
 debug: 	
 	make UPSDBG="-debug -filter" all
@@ -210,7 +212,7 @@ new_delproduct:
 # make clean (see above).
 # 
 SETUP_BUILD= echo $(SETUP_BUILD1); $(SETUP_BUILD1)
-SETUP_BUILD1=setup -P -q build?:$(QUALS) -f $(FLAVOR) $(PROD) 	\
+SETUP_BUILD1=setup -P -q ?build:$(QUALS) -f $(FLAVOR) $(PROD) 	\
 		-r $(DIR) -M $(TABLE_FILE_DIR) -m $(TABLE_FILE)	
 
 SETUP_PLAIN= echo $(SETUP_PLAIN1); $(SETUP_PLAIN1)
@@ -221,7 +223,7 @@ build_n_test:
 	$(SETUP_BUILD)					;\
 	echo make all; make all 			;\
 	$(SETUP_PLAIN)					;\
-	echo make regression; make regression
+	echo make test; make test
 
 #
 #---------------------------------------------------------------------------
