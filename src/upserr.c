@@ -174,13 +174,18 @@ void upserr_add (const int a_error_index, ...)
 
   /* Initialize */
   buf[0] = '\0';
-  UPS_ERROR = a_error_index;
 
   if ( (a_error_index < UPS_NERR) && (a_error_index > UPS_INVALID)) {
     /* format the error and put it in the error buf */
     va_start(args, a_error_index);
     vsprintf(buf, g_error_messages[a_error_index], args);
     va_end(args);
+
+    /* figure out if it was an informational message or not.  if so, do
+       not reset UPS_ERROR */
+    if (strncmp(buf, UPS_INFORMATIONAL, UPS_INFORMATIONAL_LEN)) {
+      UPS_ERROR = a_error_index;
+    }
   }
   else {
     /* This was an invalid error message request */
