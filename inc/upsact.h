@@ -132,7 +132,9 @@ enum {
   e_unproddir,
   e_if,
   e_endif,
-  e_else
+  e_else,
+  e_unless,
+  e_endunless
 };
 
 /*

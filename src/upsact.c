@@ -186,6 +186,7 @@ static void f_dodefaults( ACTION_PARAMS);
 static void f_if( ACTION_PARAMS);
 static void f_endif( ACTION_PARAMS);
 static void f_else( ACTION_PARAMS);
+static void f_unless( ACTION_PARAMS);
 
 static void shutup( ACTION_PARAMS);
 /* pretend to use all of the parameters we've defined */
@@ -477,7 +478,8 @@ t_cmd_map g_func_info[] = {
   { "unsetupenv", e_unsetupenv, f_unsetupenv, 0, 0, e_setupenv, 0x00000001 },
   { "unproddir", e_unproddir, f_unproddir, 0, 0, e_proddir, 0x00000001 },
   { "if", e_if, f_if, 1, 1, e_endif, 0x00000001},
-  { "endif", e_endif, f_endif, 1, 1, e_if, 0x00000001 },
+  { "endif", e_endif, f_endif, 1, 1, e_unless, 0x00000001 },
+  { "endunless", e_endunless, f_endif, 1, 1, e_if, 0x00000001 },
   { "else", e_else, f_else, 0, 0, e_else, 0x00000001 },
   { 0,0,0,0,0, 0x00000000 }
 };
@@ -3935,6 +3937,44 @@ static void f_if( ACTION_PARAMS)
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream, "%s\nif ($status == 0) then\n", a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
+      }
+      break;
+    default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+      upserr_vplace();
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_func_info[a_cmd->icmd].cmd);
+    }
+  }
+  SHUTUP;
+}
+
+static void f_unless( ACTION_PARAMS)
+{
+  CHECK_NUM_PARAM("Unless");
+
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
+
+  ifstack[ifcount++] = a_cmd->argv[0];
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "%s; if [ $? != 0 ] \nthen\n", a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "%s\nif ($status != 0) then\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
