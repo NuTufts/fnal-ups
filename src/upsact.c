@@ -185,14 +185,23 @@ static void f_unsetupenv( ACTION_PARAMS);
 static void f_unproddir( ACTION_PARAMS);
 static void f_dodefaults( ACTION_PARAMS);
 
+#define OUTPUT_ACTION_INFO(severity, minst) \
+    if (minst->version && minst->version->product &&                  \
+        minst->version->version) {                                    \
+      upserr_add(UPS_PRODUCT_INFO, severity, ACT_PREFIX,              \
+                 minst->version->product, minst->version->version,    \
+                 minst->version->flavor, minst->version->qualifiers); \
+    }
+
 #define CHECK_NUM_PARAM(action) \
     if ((a_cmd->argc < g_func_info[a_cmd->icmd].min_params) ||   \
         (a_cmd->argc > g_func_info[a_cmd->icmd].max_params)) {   \
-      upserr_vplace();                                          \
-      upserr_add(UPS_INVALID_ACTION_PARAMS, UPS_FATAL,          \
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);                    \
+      upserr_vplace();                                           \
+      upserr_add(UPS_INVALID_ACTION_PARAMS, UPS_FATAL,           \
                  action, g_func_info[a_cmd->icmd].min_params,    \
                  g_func_info[a_cmd->icmd].max_params,            \
-		 a_cmd->argc);                                  \
+		 a_cmd->argc);                                   \
     }
 
 #define ACT_PREFIX "UPSACT: "
@@ -262,6 +271,8 @@ static void f_dodefaults( ACTION_PARAMS);
       no_ups_env_flag = DO_UPS_ENV;                                       \
     } else if (upsutl_stricmp(a_cmd->argv[1], NO_UPS_ENV)) {              \
       /* the second parameter was not UPS_ENV or NO_UPS_ENV, an error */  \
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);                             \
+      upserr_vplace();                                                    \
       upserr_add(UPS_EXECUTE_ARG2, UPS_FATAL, a_cmd->argv[1]);            \
     }
 
@@ -279,8 +290,10 @@ static void f_dodefaults( ACTION_PARAMS);
    upsget_envout(a_stream, a_db_info, a_minst, a_command_line);
 
 #define DO_SYSTEM_MOVE(move_flag)  \
-   if (system(g_buff) != 0) {                                               \
+   if (system(g_buff) != 0) {                                             \
+     OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);                              \
      /* error from system call */                                         \
+     upserr_vplace();                                                     \
      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system", strerror(errno));  \
    } else {                                                               \
      move_flag = 1;                                                       \
@@ -2473,10 +2486,12 @@ static void f_envappend( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2527,11 +2542,13 @@ static void f_envprepend( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2572,14 +2589,15 @@ static void f_envremove( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-    
-      if (UPS_ERROR != UPS_SUCCESS) {
-	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_func_info[a_cmd->icmd].cmd);
-      }
+    }    
+    if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -2608,10 +2626,12 @@ static void f_envset( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2645,10 +2665,12 @@ static void f_envsetifnotset( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2678,10 +2700,12 @@ static void f_envunset( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2715,10 +2739,12 @@ static void f_exeaccess( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2772,10 +2798,12 @@ static void f_execute( ACTION_PARAMS)
 	}
 	break;
       default:
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_func_info[a_cmd->icmd].cmd);
@@ -2815,10 +2843,12 @@ static void f_filetest( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2868,10 +2898,12 @@ static void f_pathappend( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2921,11 +2953,13 @@ static void f_pathprepend( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -2970,14 +3004,15 @@ static void f_pathremove( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-    
-      if (UPS_ERROR != UPS_SUCCESS) {
-	upserr_vplace();
-	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_func_info[a_cmd->icmd].cmd);
-      }
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3011,10 +3046,12 @@ static void f_pathset( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -3066,10 +3103,12 @@ static void f_addalias( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -3099,10 +3138,12 @@ static void f_unalias( ACTION_PARAMS)
       }
       break;
     default:
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -3295,11 +3336,13 @@ static void f_sourcecompilereq( ACTION_PARAMS)
 	}
 	break;
       default:
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
 
       if (UPS_ERROR != UPS_SUCCESS) {
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_func_info[a_cmd->icmd].cmd);
@@ -3343,10 +3386,12 @@ static void f_sourcecompileopt( ACTION_PARAMS)
 	}
 	break;
       default:
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_func_info[a_cmd->icmd].cmd);
@@ -3398,6 +3443,7 @@ static void f_sourcerequired( ACTION_PARAMS)
 	}
 	break;
       default:
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
@@ -3405,6 +3451,7 @@ static void f_sourcerequired( ACTION_PARAMS)
       FPRINTF_ERROR();
     }
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -3454,10 +3501,12 @@ static void f_sourceoptional( ACTION_PARAMS)
 	}
 	break;
       default:
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_func_info[a_cmd->icmd].cmd);
@@ -3509,6 +3558,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
 	}
 	break;
       default:
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
@@ -3517,6 +3567,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
@@ -3565,10 +3616,12 @@ static void f_sourceoptcheck( ACTION_PARAMS)
 	}
 	break;
       default:
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
+        OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		   g_func_info[a_cmd->icmd].cmd);
@@ -3668,6 +3721,8 @@ static void f_writecompilescript(ACTION_PARAMS)
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    /* 4    open file that we will write compiled commands out to */
 	    if ((compile_file = fopen(buf, "w")) == NULL) {
+	      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+	      upserr_vplace();
 	      upserr_add(UPS_OPEN_FILE, UPS_FATAL, buf);
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
 			 strerror(errno));
@@ -3680,6 +3735,8 @@ static void f_writecompilescript(ACTION_PARAMS)
 	      /* 6   close the compile file */
 	      upsutl_unset_upsvars(compile_file, a_command_line, "");
 	      if (fclose(compile_file) == EOF) {
+		OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+		upserr_vplace();
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose",
 			   strerror(errno));
 	      }
@@ -3688,6 +3745,8 @@ static void f_writecompilescript(ACTION_PARAMS)
 	} else {
 	  /* could not get the list of commands, there must not be an
 	     action=argv[1] line in the file */
+	  OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+	  upserr_vplace();
 	  upserr_add(UPS_NO_ACTION, UPS_WARNING, a_cmd->argv[1]);
 	}
       }
@@ -3827,6 +3886,8 @@ static void f_proddir( ACTION_PARAMS)
       /* we could not find a value to set PROD_DIR to.  this smells like an
 	 error so let the user know about it */
       if (a_minst->version && a_minst->version->product) {
+	OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
+	upserr_vplace();
 	upserr_add(UPS_NO_PROD_DIR, UPS_INFORMATIONAL,
 		   a_minst->version->product);
       }
@@ -3962,6 +4023,7 @@ static void f_dodefaults( ACTION_PARAMS)
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
+      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
 		 g_func_info[a_cmd->icmd].cmd);
