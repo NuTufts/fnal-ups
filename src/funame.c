@@ -115,7 +115,7 @@ char *ipaddress;
 			(void) strcat(thostname,DOMAIN);
 			hostentry = gethostbyname(thostname);
 		}
-		ipaddress[0] = NULL;
+		ipaddress[0] = 0;
 		if ( hostentry != (struct hostent *) 0 )
 		{	/*Entry found*/
 			for(i=0;i<hostentry->h_length;i++)
@@ -124,7 +124,7 @@ char *ipaddress;
 			        ((short)hostentry->h_addr_list[0][i] & 0xff));
 			}
 			length=strlen(ipaddress);
-			ipaddress[length-1] = NULL;
+			ipaddress[length-1] = 0;
 		}
 return(0);
 }
