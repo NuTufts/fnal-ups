@@ -12,7 +12,7 @@ default:
 	@exit 1
 
 all :
-	@rm catman/*.1
+	-rm catman/*.1
 	@../bin/ups -? > catman/ups.1
 	@../bin/ups configure -? > catman/ups_configure.1
 	@../bin/ups copy -? > catman/ups_copy.1
