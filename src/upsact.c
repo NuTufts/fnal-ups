@@ -2633,7 +2633,7 @@ static void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "whereis %s\nif ($status == 1) exit 1\n#\n",
+		  "which %s\nif ($status == 1) exit 1\n#\n",
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
