@@ -503,8 +503,38 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    }
 	    
 	    /* get out of the loop if we got an error */
-	    CHECK_SOFT_ERR();
-	  
+	    if (UPS_ERROR != UPS_SUCCESS) {
+	      if (!a_need_unique) {
+		/* we are looking for possibly many instances.  skip the error
+		   if the current instance could not be found */
+		if (UPS_ERROR == UPS_NO_FILE ||
+		     UPS_ERROR == UPS_NO_TABLE_MATCH ||
+		     UPS_ERROR == UPS_NO_VERSION_MATCH) {
+		  g_ups_error = UPS_ERROR;
+		  upserr_backup();
+		  upserr_backup();
+		}
+		else {
+		  /* it was another error so pay attention to it. */
+		  break;
+		}
+	      } else {
+		/* we are only looking for one instance. if we are looking thru
+		   multiple databases, and have not reached the last one, then
+		   ignore the error and continue on to the next prod or db. */
+		if (db_item->next) {
+		  /* there are more databases to look thru. erase the error
+		     and continue */
+		  upserr_backup();
+		  upserr_backup();
+		} else {
+		  /* this was the last db on the list so we need to handle the
+		     error */
+		  break;
+		}
+	      }
+	    }
+
 	    /* update the mproduct_list structure with the new info */
 	    ADD_TO_MPRODUCT_LIST();
 	  }
