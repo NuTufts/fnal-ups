@@ -28,8 +28,12 @@
 #include <signal.h>
 #include <time.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "ups.h"
+#ifndef TRUE
+#define TRUE 1
+#endif
  
 void print_list( t_upslst_item *list_ptr );
 /* ==========================================================================
@@ -58,12 +62,12 @@ int main (argc,argv)
 */
         uc=upsugo_env("TEST","AacCdfghKtmMNoOPqrTuU");
         if (uc) 
-	{ upsugo_dump(uc);
+	{ upsugo_dump(uc,TRUE,stdout);
           upsugo_free(uc);
         }
         uc=0;
 while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuUv?")) != 0 )
-      { upsugo_dump(uc); 
+      { upsugo_dump(uc,TRUE,stdout); 
         upserr_output();
         fprintf(stderr, "-------------------------------------------------\n");
         upserr_clear();
@@ -77,13 +81,13 @@ while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuUv?")) != 0 )
       argv[2]="adprod";
       argv[3]="ver";
 while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
-      { upsugo_dump(uc); }
+      { upsugo_dump(uc,TRUE,stdout); }
 /*
 	if (status != UPS_SUCCESS) fprintf(stderr," %s \n", UPS_ERRTXT[status]);
 */
         uc=upsugo_bldcmd(cmdline,"AacCdfghKtmMNoOPqrTuU");
         if (uc) 
-	{ upsugo_dump(uc);
+	{ upsugo_dump(uc,TRUE,stdout);
           upsugo_free(uc); 
         }
         uc=0;

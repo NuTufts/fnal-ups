@@ -4,7 +4,7 @@
  *       upsugo.h
  * 
  * DESCRIPTION: 
- *       Common types for ups
+ *       Prototypes for upsugo
  *
  * AUTHORS:
  *       Eileen Berman
@@ -125,7 +125,11 @@ t_upsugo_command     *upsugo_env(char * const product,
 t_upsugo_command     *upsugo_bldcmd(char * const cmdstr,
 			       char * const validopts);
 int         upsugo_free(struct ups_command * const uc);
-void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title );
-int         upsugo_dump (struct ups_command * const uc);
+void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title ,
+		           const unsigned int prnt_ptr,
+			   FILE * const fd);
+int         upsugo_dump (struct ups_command * const uc, 
+			 const unsigned int prnt_ptr,
+			 FILE * const fd);
 #endif /* _UPSUGO_H_ */
 

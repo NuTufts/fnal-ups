@@ -315,8 +315,7 @@ int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
 int upsugo_blddb(struct ups_command * const uc, char * inaddr);
-int upsugo_dump (struct ups_command * const uc);
-void upsugo_prtdb( t_upslst_item * const list_ptr, char * const title );
+void upsugo_prtdb(t_upslst_item * const list_ptr,char * const title,const unsigned int,FILE * const fd);
 void upsugo_liststart(struct ups_command * const a_command_line);
 
 
@@ -944,48 +943,50 @@ int upsugo_free (struct ups_command * const uc)
 **                                                                           
 ** ==========================================================================
 */                                                                           
-int upsugo_dump (struct ups_command * const uc)
+int upsugo_dump (struct ups_command * const uc,
+		 const unsigned int prnt_ptr,
+	   	 FILE * const fd)
 {
     if(uc)
     { if ( uc->ugo_product ) 
-         fprintf(stdout,"Product: %s\n",uc->ugo_product); 
+         fprintf(fd,"Product:          %s\n",uc->ugo_product); 
       if ( uc->ugo_version ) 
-         fprintf(stdout,"Version: %s\n",uc->ugo_version); 
+         fprintf(fd,"Version:          %s\n",uc->ugo_version); 
       if ( uc->ugo_auth ) 
-         upsugo_prtlst(uc->ugo_auth,"Auth"); 
+         upsugo_prtlst(uc->ugo_auth,  "Auth:             ",prnt_ptr,fd); 
       if ( uc->ugo_flavor ) 
-         upsugo_prtlst(uc->ugo_flavor,"Flavor"); 
+         upsugo_prtlst(uc->ugo_flavor,"Flavor:           ",prnt_ptr,fd); 
       if ( uc->ugo_host ) 
-         upsugo_prtlst(uc->ugo_host,"Host"); 
+         upsugo_prtlst(uc->ugo_host,  "Host:             ",prnt_ptr,fd); 
       if ( uc->ugo_key ) 
-         upsugo_prtlst(uc->ugo_key,"Key"); 
+         upsugo_prtlst(uc->ugo_key,   "Key:              ",prnt_ptr,fd); 
       if ( uc->ugo_tablefiledir ) 
-         fprintf(stdout,"Tablefiledir: %s\n",uc->ugo_tablefiledir); 
+         fprintf(fd,"Tablefiledir: %s\n",uc->ugo_tablefiledir); 
       if ( uc->ugo_tablefile ) 
-         fprintf(stdout,"Tablefile: %s\n",uc->ugo_tablefile); 
+         fprintf(fd,"Tablefile: %s\n",uc->ugo_tablefile); 
       if ( uc->ugo_anyfile ) 
-         fprintf(stdout,"Anyfile: %s\n",uc->ugo_anyfile); 
+         fprintf(fd,"Anyfile: %s\n",uc->ugo_anyfile); 
       if ( uc->ugo_options ) 
-         fprintf(stdout,"Options: %s\n",uc->ugo_options); 
+         fprintf(fd,"Options: %s\n",uc->ugo_options); 
       if ( uc->ugo_description ) 
-         fprintf(stdout,"Description: %s\n",uc->ugo_description); 
+         fprintf(fd,"Description: %s\n",uc->ugo_description); 
       if ( uc->ugo_override ) 
-         fprintf(stdout,"Override: %s\n",uc->ugo_override); 
+         fprintf(fd,"Override: %s\n",uc->ugo_override); 
       if ( uc->ugo_qualifiers ) 
-         upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers"); 
+         upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers:       ",prnt_ptr,fd); 
       if ( uc->ugo_productdir ) 
-         fprintf(stdout,"Productdir: %s\n",uc->ugo_productdir); 
+         fprintf(fd,"Productdir: %s\n",uc->ugo_productdir); 
       if ( uc->ugo_archivefile ) 
-         fprintf(stdout,"Archivefile: %s\n",uc->ugo_archivefile); 
+         fprintf(fd,"Archivefile: %s\n",uc->ugo_archivefile); 
       if ( uc->ugo_upsdir ) 
-         fprintf(stdout,"Upsdir: %s\n",uc->ugo_upsdir); 
+         fprintf(fd,"Upsdir: %s\n",uc->ugo_upsdir); 
       if ( uc->ugo_db ) 
-         upsugo_prtdb(uc->ugo_db,"DB"); 
+         upsugo_prtdb(uc->ugo_db,"DB:               ",prnt_ptr,fd); 
       if ( uc->ugo_chain ) 
-         upsugo_prtlst(uc->ugo_chain,"Chains"); 
+         upsugo_prtlst(uc->ugo_chain,"Chains:           ",prnt_ptr,fd); 
       if ( uc->ugo_help )
-         fprintf(stdout,"--- HELP !!! ---\n",uc->ugo_help); 
-      fprintf(stdout,"ugo_v %d and UPS_VERBOSE %d\n",uc->ugo_v,UPS_VERBOSE); 
+         fprintf(fd,"--- HELP !!! ---\n",uc->ugo_help); 
+      fprintf(fd,"ugo_v %d and UPS_VERBOSE %d\n",uc->ugo_v,UPS_VERBOSE); 
     } return (0);
 }
 
@@ -1001,7 +1002,8 @@ int upsugo_dump (struct ups_command * const uc)
 **                                                                           
 ** ==========================================================================
 */
-void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title )
+void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title ,
+   const unsigned int prnt_ptr, FILE * const fd)
 {
   t_upslst_item *l_ptr;
   int count = 0;
@@ -1009,12 +1011,24 @@ void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title )
   /*
    * Note use of upslst_first(), to be sure to start from first item
    */
-  fprintf(stdout,"%s\n",title);
+  if (prnt_ptr)
+     fprintf(fd,"%s\n",title);
+  else
+     fprintf(fd,"%s",title);
   for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ )
-  { fprintf(stdout,"ref count %d\n",upsmem_get_refctr(l_ptr->data));
-    fprintf(stdout, "%03d: p=%08x, i=%08x, n=%08x, data=%s\n",
+  { if(prnt_ptr)
+      {fprintf(fd,"ref count %d\n",upsmem_get_refctr(l_ptr->data));
+       fprintf(fd, "%03d: p=%08x, i=%08x, n=%08x, data=%s\n",
             count, (int)l_ptr->prev, (int)l_ptr,
             (int)l_ptr->next, (char *)l_ptr->data );
+      }
+   else
+      {
+      if (l_ptr == upslst_first(list_ptr))                           
+         fprintf (fd,"%s\n", (char *)l_ptr->data);              
+      else                                                      
+         fprintf (fd,"                  %s\n",  (char *)l_ptr->data); 
+      }
   }
 }
 /* ==========================================================================
@@ -1029,7 +1043,8 @@ void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title )
 **                                                                           
 ** ==========================================================================
 */
-void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title )
+void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title ,
+   const unsigned int prnt_ptr, FILE * const fd)
 {
   t_upslst_item *l_ptr;
   struct upstyp_db *addr;
@@ -1038,13 +1053,27 @@ void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title )
   /*
    * Note use of upslst_first(), to be sure to start from first item
    */
-  fprintf(stdout,"%s\n",title);
+  if (prnt_ptr)
+     fprintf(fd,"%s\n",title);
+  else
+     fprintf(fd,"%s",title);
   for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ )
-  { fprintf(stdout,"ref count %d\n",upsmem_get_refctr(l_ptr->data));
-    fprintf(stdout, "%03d: p=%08x, i=%08x, n=%08x, ",
-            count, (int)l_ptr->prev, (int)l_ptr, (int)l_ptr->next);
-    addr=l_ptr->data;
-    fprintf(stdout, "data=%s\n", (char *)addr->name);
+  {addr=l_ptr->data;
+   if(prnt_ptr)
+      {
+      fprintf(fd,"ref count %d\n",upsmem_get_refctr(l_ptr->data));
+      fprintf(fd, "%03d: p=%08x, i=%08x, n=%08x, ",
+           count, (int)l_ptr->prev, (int)l_ptr, (int)l_ptr->next);
+      addr=l_ptr->data;
+      fprintf(fd, "data=%s\n", (char *)addr->name);
+      }
+   else
+      {
+      if (l_ptr == upslst_first(list_ptr))
+         fprintf (fd,"%s\n", (char *)addr->name);
+      else
+         fprintf (fd,"                  %s\n",  (char *)addr->name);
+      }
   }
 }
 

@@ -110,7 +110,7 @@ while (uc = upsugo_next(argc,argv,options))	/* for all commands */
        if (UPS_ERROR)                                       
             { upserr_output(); upserr_clear(); }
         }
-   upstst_ugo_dump(uc,ofd);			/* display */
+   upsugo_dump(uc,FALSE,ofd);		/* display */
    ncmds++;					/* increment ncommands */
    }
 

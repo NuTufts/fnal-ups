@@ -12,11 +12,9 @@ upsfil_read_file dog_v2_0_1.table
 upsfil_write_file dog_v2_0_1.table.out
 upsfil_write_file -status UPS_OPEN_FILE /junk/junk/junk
 upserr_clear
-upsfil_write_file -status UPS_UNKNOWN_FILETYPE /junk/junk/junk
-upserr_clear
 upsfil_read_file -status UPS_NO_FILE blah
 upserr_clear
-upsfil_read_file -status UPS_READ_FILE dummy.file
+upsfil_read_file -status UPS_UNKNOWN_FILETYPE dummy.file
 upserr_clear
 quit
 EOD

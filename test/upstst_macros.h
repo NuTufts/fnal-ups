@@ -43,21 +43,21 @@ extern int              upstst_debug;            /* debug flag */
    }
 
 #define UPSTST_CHECK_CALL(type,returnval,estatus) {	\
-   int status = 0;				\
+   int macstatus = 0;				\
    if (type == UPSTST_ZEROSUCCESS) 		\
-      status = (int)(returnval);		\
+      macstatus = (int)(returnval);		\
    else if (type == UPSTST_NONZEROSUCCESS)	\
       {						\
-      if (returnval) status = UPS_SUCCESS;	\
-      else status = UPS_ERROR;			\
+      if (returnval) macstatus = UPS_SUCCESS;	\
+      else macstatus = UPS_ERROR;		\
       }						\
-   if (status != estatus)			\
+   if (macstatus != estatus)			\
       {						\
       fprintf (stderr, "function: %s\n",myfunc);\
       fprintf (stderr, "%s: %s, %s: %s\n",	\
-         "actual status",g_error_ascii[status],	\
-	 "expected status", g_error_ascii[estatus]); 	\
-      if (status)				\
+         "actual status",g_error_ascii[macstatus],\
+	 "expected status", g_error_ascii[estatus]);\
+      if (macstatus)				\
          {					\
          upserr_output();			\
          upserr_clear();			\
