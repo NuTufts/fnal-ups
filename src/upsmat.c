@@ -840,6 +840,10 @@ static int match_from_version( const char * const a_product,
 
 	      /* keep a running total of the matches we found */
 	      ++num_matches;
+	    } else {
+	      /* this one did not have a table file so we just record the
+		 match from the version file */
+	      ++num_matches;
 	    }
 	  } else {
 	    /* There are no more version matched instances filled out here */
