@@ -368,7 +368,7 @@ t_cmd_info g_cmd_info[] = {
   {e_untest,        "untest", 0, 0x00000010, e_test},
   {e_unchain,       "unchain", 0, 0x00000010, e_chain},
   {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:Pq:r:stU:vVz:Z0123", 0x00000011, e_invalid_action},
-  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:Pq:stU:vVz:Z0123", 0x00000011, e_setup},
+  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:Pq:r:stU:vVz:Z0123", 0x00000011, e_setup},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z", 0x00000010, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000010, e_invalid_action},
