@@ -364,7 +364,7 @@ char *upsutl_get_hostname( void )
 #define CMP_AUTH_NODES(struct) \
     if (struct && struct->authorized_nodes) {                   \
       *a_nodes = struct->authorized_nodes;                      \
-      if (strcmp(struct->authorized_nodes, ANY_MATCH) &&        \
+      if (NOT_EQUAL_ANY_MATCH(struct->authorized_nodes) &&      \
 	  !strstr(struct->authorized_nodes, nodename)) {        \
 	is_auth = 0;                                            \
       }                                                         \
@@ -575,7 +575,7 @@ void upsutl_get_files(const char * const a_dir,
   int plen;
 
   if ((dir = opendir(a_dir))) {
-    if (! strcmp(a_pattern, ANY_MATCH)) {
+    if (! NOT_EQUAL_ANY_MATCH(a_pattern)) {
       /* read each directory item and add it to the list */
       while ((dir_line = readdir(dir)) != NULL) {
 	if (strncmp(dir_line->d_name, ".", 1)) {
@@ -739,7 +739,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
     mproduct = (t_upstyp_matched_product *)mproduct_item->data;
     if ((mproduct->db_info) && (mproduct->db_info->config) && 
 	(tmp_stat = mproduct->db_info->config->statistics)) {
-      if ((! strcmp(tmp_stat, ANY_MATCH)) ||
+      if ((! NOT_EQUAL_ANY_MATCH(tmp_stat)) ||
 	  (strstr(tmp_stat, mproduct->product))) {
 	global_yes = 1;      /* write statistics for everything in this db */
       }

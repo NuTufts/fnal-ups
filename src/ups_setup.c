@@ -183,7 +183,7 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
     }
   } else {
     if (a_command_line->ugo_version && 
-	(strcmp(a_command_line->ugo_version, ANY_MATCH))) {
+	(NOT_EQUAL_ANY_MATCH(a_command_line->ugo_version))) {
       upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
 		 a_command_line->ugo_product,
 		 a_command_line->ugo_version, "version");
