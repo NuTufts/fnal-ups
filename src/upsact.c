@@ -565,15 +565,22 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
  * Output: none
  * Return: pointer to a list of file names
  */
-t_upslst_item *upsact_check_files( const char * const a_cmd)
+t_upslst_item *upsact_check_files(
+			    const t_upstyp_matched_product * const a_mproduct,
+			    const t_upsugo_command * const a_command_line,
+			    char *const a_cmd)
 {
   t_upsact_cmd *parsed_cmd = NULL;
   t_upslst_item *file_list = NULL;
   char *new_string = NULL;
+  char *trans_cmd = NULL;
   
   if (a_cmd) {
-    /* first parse the command */
-    parsed_cmd = upsact_parse_cmd(a_cmd);
+    /* translate any ${UPS...} variables */
+    trans_cmd = upsget_translation(a_mproduct, a_command_line, a_cmd);
+
+    /* parse the command */
+    parsed_cmd = upsact_parse_cmd(trans_cmd);
     if (parsed_cmd) {
       /* command was successfully parsed.  if there were no arguments, none 
 	 of them can be files (;-) */
