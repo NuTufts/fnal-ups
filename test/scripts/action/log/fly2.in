@@ -81,7 +81,7 @@ ups_this_db="../db1";export ups_this_db
 #
 products="../db1";export products
 #
-ups_compile="";export ups_compile
+ups_compile="../db1/fly/v1_0.NULL.compile";export ups_compile
 #
 rambo () { SlyStalone "$@" ;}
 #

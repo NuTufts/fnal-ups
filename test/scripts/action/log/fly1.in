@@ -84,7 +84,7 @@ setenv ups_this_db "../db1"
 #
 setenv products "../db1"
 #
-setenv ups_compile ""
+setenv ups_compile "../db1/fly/v1_0.NULL.compile"
 #
 alias rambo 'SlyStalone \!*'
 #
