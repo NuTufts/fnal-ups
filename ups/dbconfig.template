@@ -6,22 +6,25 @@ AUTHORIZED_NODES = *
 # all product roots are under /usr/products:
 PROD_DIR_PREFIX = /usr/products
 
-# keep statistics about the following products (uncomment this to get it):
-#STATISTICS = edt,tpu,tkreq
+# keep statistics about the following products:
+#   (uncomment to get stats!)
+# STATISTICS = ups, upd, perl
 
-# manpages, info files, etc. go here: (html and news filesare not automatically
-#    supported in this version of ups.
+#
+# manpages, info files, get copied here:
 MAN_TARGET_DIR = /usr/products/man
 CATMAN_TARGET_DIR = /usr/products/catman
 INFO_TARGET_DIR = /usr/products/Info
-#HTML_TARGET_DIR = /usr/products/SunOS/html/www-oss/docs
-#NEWS_TARGET_DIR = /dev/null
 
-# this db contains the ups product; copy the setups.[c]sh
-#  and cached files to this directory
+#
+#  automatic html and news processing not yet supported
+HTML_TARGET_DIR = /dev/null
+NEWS_TARGET_DIR = /dev/null
+
+# this db contains the ups product; 
+#   copy the setups.[c]sh and cached files to this directory:
 SETUPS_DIR = /usr/local/etc
 
-# this db contains the upd product; look for the upd
-#  user callouts here:
+# this db contains the upd product; 
+#   look for the upd configuration and user callouts here:
 UPD_USERCODE_DIR = /usr/products/ups_database/.updfiles
-                
