@@ -167,7 +167,6 @@
          case 'c':                                       \
          uc->ugo_c = 1;                                  \
          addr=upsutl_str_create("current",' ');          \
-         printf("current chain value before add = %d",uc->ugo_chain); \
          uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
          break;
 #define case_d \

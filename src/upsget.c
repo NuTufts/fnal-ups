@@ -24,7 +24,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/utsname.h>
-#include <malloc.h>
+/*#include <malloc.h>*/
 #include <pwd.h>
 
 /* ups specific include files */
