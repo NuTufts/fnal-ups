@@ -277,7 +277,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 
 	/*       fill in the instance fields that are maintained by UPS */
 	new_instance->modifier = upsutl_str_create( upsutl_user(), ' ');
-	new_instance->modified = upsutl_time_date(STR_TRIM_DEFAULT);
+	new_instance->modified = upsutl_str_create( upsutl_time_date(STR_TRIM_DEFAULT), ' ' );
 
 	/*       if we are merging with the environment, walk through all the
 		 actions.  if we encounter a setupRequired, setupOptional,
