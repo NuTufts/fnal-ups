@@ -216,10 +216,10 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	 from the -O options string which contains information that changes
 	 from the old instance to the new.  this information can contain
 	 a new flavor, qualifiers, product name, product home directory etc.
-	 we need to parse the -O string to get the info. */
+	 we need to parse the -G string to get the info. */
 
-      /* STEP 1: translate the -O string into a ugo_command structure */
-      if (a_command_line->ugo_O) {
+      /* STEP 1: translate the -G string into a ugo_command structure */
+      if (a_command_line->ugo_G) {
 	new_command_line = upsugo_bldcmd(a_command_line->ugo_options,
 				     g_cmd_info[a_ups_command].valid_opts);
 	/* if the -O string did not contain a -z part to specify the ups
