@@ -557,7 +557,7 @@ size_t trim_line( void )
   char *cp = g_line;
   char *cstart = NULL;
   char *cend = NULL;
-  int count = 0;
+  unsigned int count = 0;
   
   while ( cp && is_space( *cp ) ){ cp++; }
   cstart = cp;
