@@ -42,7 +42,8 @@ typedef struct ups_command
     int     ugo_a;           /* All include                          */
     int     ugo_A;           /* Authorized Host(s)                   */
     t_upslst_item *ugo_auth;
-/*  int     ugo_b;           UNDEFINED                               */
+    int     ugo_b;           /* Compile_file name                    */
+    char    *ugo_compile_file;
     int     ugo_B;           /* CODE INCOMPLETE                      */
     int     ugo_c;           /* current specified                    */
     int     ugo_C;           /* Don't do Configure                   */
@@ -94,7 +95,8 @@ typedef struct ups_command
     int     ugo_t;           /* test chain                           */
     int     ugo_T;           /* archive file name                    */
     char    *ugo_archivefile; 
-    int     ugo_u;           /* uncompile first                      */
+    int     ugo_u;           /* compile file dir                     */
+    char    *ugo_compile_file_dir;
     int     ugo_U;           /* ups directory location               */
     char    *ugo_upsdir; 
     int     ugo_v;           /* verbose                              */
