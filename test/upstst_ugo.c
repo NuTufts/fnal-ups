@@ -22,7 +22,7 @@ static void upstst_ugo_dump (const t_upsugo_command * const uc, FILE * const fd)
 
 int upstst_ugo_env (int argc, char ** const argv)
 {
-
+static char     *myfunc = "upsugo_env";
 int             status;                         /* status of parse */
 int             estatus = UPS_SUCCESS;          /* expected status */
 static char     *estatus_str;                   /* expected status string */
@@ -59,7 +59,7 @@ return (0);
    ==========================================================================*/
 int upstst_ugo_next (int argc, char ** const argv)
 {
-
+static char     *myfunc = "upsugo_next";
 int             status;                         /* status of parse */
 int             estatus = UPS_SUCCESS;          /* expected status */
 static char     *estatus_str;                   /* expected status string */

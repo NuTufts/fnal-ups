@@ -26,7 +26,7 @@ t_upstyp_product *upstst_file = NULL;
 
 int upstst_fil_read_file (int argc, char ** const argv)
 {
-
+static char     *myfunc = "upsfil_read_file";
 int             status;				/* status of parse */
 int             estatus = UPS_SUCCESS; 		/* expected status */
 static char     *estatus_str;			/* expected status string */
@@ -50,7 +50,7 @@ return (0);
 
 int upstst_fil_write_file (int argc, char ** const argv)
 {
-
+static char     *myfunc = "upsfil_write_file";
 int             status;				/* status of parse */
 int             estatus = UPS_SUCCESS; 		/* expected status */
 static char     *estatus_str;			/* expected status string */

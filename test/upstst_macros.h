@@ -53,6 +53,7 @@ extern int              upstst_debug;            /* debug flag */
       }						\
    if (status != estatus)			\
       {						\
+      fprintf (stderr, "function: %s\n",myfunc);\
       fprintf (stderr, "%s: %s, %s: %s\n",	\
          "actual status",g_error_ascii[status],	\
 	 "expected status", g_error_ascii[estatus]); 	\
@@ -77,6 +78,7 @@ extern int              upstst_debug;            /* debug flag */
 	    }						\
       if (!g_error_ascii[i])				\
          {						\
+         fprintf (stderr, "function: %s\n",myfunc);	\
          fprintf (stderr,				\
             "Invalid error code specified: %s\n",	\
             estring);					\
