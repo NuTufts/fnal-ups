@@ -58,9 +58,9 @@ int main(void)
   upserr_clear();
 
   UPS_VERBOSE = 1;
-  upserr_place();
+  upserr_vplace();
   upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING, "BORING", "FILE1");
-  upserr_place();
+  upserr_vplace();
   upserr_add(UPS_NO_DATABASE, UPS_INFORMATIONAL);
   UPS_VERBOSE = 0;
 
@@ -68,6 +68,7 @@ int main(void)
   upserr_output();
   fprintf(stderr, "-------------------------------------------------\n");
 
+  upserr_vplace();
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE1");
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE2");
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE3");
@@ -81,6 +82,7 @@ int main(void)
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE11");
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE12");
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE13");
+  upserr_vplace();
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE14");
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE15");
   upserr_add(UPS_OPEN_FILE, UPS_FATAL, "FILE16");
@@ -97,6 +99,7 @@ int main(void)
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD7", "FILE27");
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD8", "FILE28");
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD9", "FILE29");
+  upserr_vplace();
   upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD10", "FILE30");
 
   fprintf(stderr, "\nOutputing 30 messages.\n");
