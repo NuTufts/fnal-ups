@@ -76,23 +76,29 @@ static char get_man_subdir(char * const a_man_file);
     upserr_vplace(); \
     upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 
+#define SYSTEM_ERROR() \
+    upserr_vplace(); \
+    upserr_add(UPS_SYSTEM_ERROR, UPS_INFORMATIONAL, "system", strerror(errno));
 
 /*
  * Definition of global variables.
  */
 
-static char *g_default_delimiter = ":";
+static char g_buff[MAX_LINE_LEN];
+/* static char *g_default_delimiter = ":";
 static char *g_space_delimiter = " ";
 static char *g_whats_left = "";
 static int g_ups_cmd = e_invalid_action;
-static char g_buff[MAX_LINE_LEN];
 static char *g_shPath = "PATH";
 static char *g_cshPath = "path";
 static char *g_shDelimiter = ":";
 static char *g_cshDelimiter = " ";
+*/
 
 /* this one, is a pointer to the ugo_command from the command line */
+/*
 static t_upsugo_command *g_ugo_cmd = 0;
+*/
 
 
 /*=======================================================================
@@ -117,6 +123,7 @@ void upscpy_info(UPSCPY_PARAMS)
 {
   struct stat file_stat;
   char *info_source;
+  char buffer[ FILENAME_MAX+1 ];
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -128,15 +135,16 @@ void upscpy_info(UPSCPY_PARAMS)
       { if (S_ISDIR(file_stat.st_mode))
         { if (stat(a_db_info->config->info_target_dir, &file_stat) 
               == (int )-1)  /* target not there make it */
-          { if (fprintf((FILE *)a_stream, "/bin/mkdir -p %s\n", 
-                a_db_info->config->info_target_dir) < 0)
-            { FPRINTF_ERROR();
+          { sprintf(buffer, "/bin/mkdir -p %s\n", 
+                    a_db_info->config->info_target_dir);
+            if (system(buffer))
+            { SYSTEM_ERROR();
             }
           }
-          if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-              info_source,
-              a_db_info->config->info_target_dir) < 0)
-          { FPRINTF_ERROR();
+          sprintf(buffer,"cp %s/* %s\n#\n", info_source,
+                  a_db_info->config->info_target_dir);
+          if (system(buffer))
+          { SYSTEM_ERROR();
           }
         }
       }
@@ -159,13 +167,15 @@ void upscpy_info(UPSCPY_PARAMS)
         /* make sure we have not created it before */                  \
         if (not_yet_created(subdirs_made, subdirs_index, subdir)) {    \
           /* we must create the directory first */                     \
-          fprintf((FILE *)a_stream, "/bin/mkdir -p %s\n", dest);       \
+          sprintf(buffer,"/bin/mkdir -p %s\n", dest);                  \
+          if (system(buffer)) { SYSTEM_ERROR(); }                      \
           /* now keep a record so we only create it once */            \
           subdirs_made[subdirs_index++] = (int )subdir;                \
         }                                                              \
       }                                                                \
       /* now add the copy line to the temp file */                     \
-      fprintf((FILE *)a_stream, "cp %s %s\n", filename, dest);         \
+      sprintf(buffer, "cp %s %s\n", filename, dest);                   \
+      if (system(buffer)) { SYSTEM_ERROR(); }                          \
     }
 
 #define PROCESS_DIR(dir_name, dir_size, type, keyword)   \
@@ -186,8 +196,9 @@ void upscpy_info(UPSCPY_PARAMS)
         /* the directory is XXX#, where # is the subdir spec.            \
            we just need to copy the entire contents of this dir          \
            (of the form *.*) to the appropriate destination */           \
-        fprintf((FILE *)a_stream, "cp %s/*.* %s/%s/ \n", filename,       \
+        sprintf(buffer, "cp %s/*.* %s/%s/ \n", filename,                 \
                 a_db_info->config->keyword, dir_line->d_name);           \
+        if (system(buffer)) { SYSTEM_ERROR(); }                          \
       }                                                                  \
     }
 
@@ -205,6 +216,7 @@ void upscpy_man(UPSCPY_PARAMS)
   int subdirs_index = (int )0;
   int man_size = 3;           /* size of the string "man" */
   FILE *file = NULL;
+  char buffer[ FILENAME_MAX+1 ];
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -265,6 +277,7 @@ void upscpy_catman(UPSCPY_PARAMS)
   int subdirs_index = (int )0;
   int cat_size = 6;           /* size of the string "catman" */
   FILE *file = NULL;
+  char buffer[ FILENAME_MAX+1 ];
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -320,7 +333,8 @@ void upscpy_catman(UPSCPY_PARAMS)
       /* see if the sectional subdir exists.  if not, ignore this. */  \
       if (stat(dest, &file_stat) != (int )-1) {                        \
         /* now add the remove line to the temp file */                 \
-        fprintf((FILE *)a_stream, "rm -f %s/%s\n", dest, filename);    \
+        sprintf(buffer, "rm -f %s/%s\n", dest, filename);              \
+        if (system(buffer)) { SYSTEM_ERROR(); }                        \
       }                                                                \
     }
 
@@ -348,6 +362,7 @@ void upscpy_rmman(UPSCPY_PARAMS)
   struct stat file_stat;
   int man_size = 3;           /* size of the string "man" */
   FILE *file = NULL;
+  char buffer[ FILENAME_MAX+1 ];
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -406,6 +421,7 @@ void upscpy_rmcatman(UPSCPY_PARAMS)
   struct stat file_stat;
   int cat_size = 3;           /* size of the string "cat" */
   FILE *file = NULL;
+  char buffer[ FILENAME_MAX+1 ];
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */

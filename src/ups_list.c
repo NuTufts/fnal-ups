@@ -49,7 +49,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 /*
  * Definition of global variables.
  */
-static int g_MATCH_DONE = 1;
+static int g_MATCH_DONE = 0;
 
 #define VPREFIX "UPSLIST: "
 
@@ -422,7 +422,9 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
   for (key = (t_upslst_item *)a_command_line->ugo_key ; key ;
 	 key = key->next) {
     keymap = upskey_get_info((char *)key->data);
-    if (((int )(((char *)key->data)[0]) == '+') || (keymap && 
+    if ((((int )(((char *)key->data)[0]) == '+') ||
+         ((int )(((char *)key->data)[0]) == '@'))
+        || (keymap && 
 	(UPSKEY_ISIN_VERSION(keymap->flag) ||
 	 UPSKEY_ISIN_TABLE(keymap->flag) ||
 	 UPSKEY_ISIN_CHAIN(keymap->flag)))) {
@@ -729,58 +731,40 @@ void list_K(const t_upstyp_matched_instance * const instance,
 /* look for "processed values" spam? */
       if (!strncmp(l_ptr->data,"@",1))
       { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
-	{ valid=1;
+        { valid=1;
           if (instance->version)
-	  { addr=upsget_table_file(product->product,
-				   instance->version->table_file,
-				   instance->version->table_dir,
-				   instance->version->ups_dir,
-				   instance->version->prod_dir,
-				   product->db_info,
-				   exists);
+          { addr=upsget_table_file(product->product,
+                                   instance->version->table_file,
+                                   instance->version->table_dir,
+                                   instance->version->ups_dir,
+                                   instance->version->prod_dir,
+                                   product->db_info,
+                                   exists);
             if(addr)
-	    { printf("\"%s\" ",addr);
-	    } else { 
-	      printf("\"\" "); 
-	    }
-	  } else {
-	    printf("\"\" "); 
-	  }
-	} else {
-	  if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
-	  { valid=1;
-            printf("\"");
-	    if (UPSRELATIVE(instance->version->prod_dir))
-	    { if (product->db_info) 
-	      { config_ptr = product->db_info->config;
-                if (config_ptr) 
-                { if (config_ptr->prod_dir_prefix) 
-		  { printf("%s/",config_ptr->prod_dir_prefix); }
-		}
-	      }
-	    }
-	    printf("%s\" ", instance->version->prod_dir);
-	  } 
-	  if(!upsutl_stricmp(l_ptr->data,"@ups_dir"))
-	  { valid=1;
-            printf("\"");
-	    if (UPSRELATIVE(instance->version->ups_dir))
-	    { if (product->db_info) 
-	      { config_ptr = product->db_info->config;
-                if (config_ptr) 
-		{ if (config_ptr->prod_dir_prefix) 
-		  { printf("%s/",config_ptr->prod_dir_prefix); }
-		}
-	      }
-	    }
-	    printf("%s\" ", instance->version->ups_dir);
-	  } 
-	}
+            { printf("\"%s\" ",addr);
+            } else { 
+              printf("\"\" "); 
+            }
+          } else {
+            printf("\"\" "); 
+          }
+        }
+        if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
+        { valid=1;
+          printf("\"%s\" ", 
+                 upsget_prod_dir(product->db_info,instance,command));
+        } 
+        if(!upsutl_stricmp(l_ptr->data,"@ups_dir"))
+        { valid=1;
+          printf("\"");
+          if (UPSRELATIVE(instance->version->ups_dir))
+          { printf("%s/", upsget_prod_dir(product->db_info,instance,command));
+          } 
+          printf("%s\" ", instance->version->ups_dir);
+        } 
       }
       if (!valid) 
       { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
-/*        if (list_error!=UPS_SUCCESS) */
-/*        list_error=UPS_INVALID_KEYWORD;  */
       }
     }
   } else {
