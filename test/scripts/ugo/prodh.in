@@ -11,5 +11,7 @@ Qualifiers:       comma,here,no
                   here
                   no
                   
-DB:               /home/t2/fagan/ups_database
+DB:               /thunder
+                  	
+                  /lightening
 Chains:           current

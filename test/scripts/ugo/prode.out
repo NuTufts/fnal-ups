@@ -5,5 +5,7 @@ Flavor:           IRIX+5.3
                   NULL
 Qualifiers:       cat
                   
-DB:               /home/t2/fagan/ups_database
+DB:               /thunder
+                  	
+                  /lightening
 Chains:           current

@@ -4,5 +4,7 @@ Flavor:           IRIX+5.3
                   IRIX
                   NULL
 Qualifiers:       Butcaption,youhavespaces
-DB:               /home/t2/fagan/ups_database
+DB:               /thunder
+                  	
+                  /lightening
 Chains:           current

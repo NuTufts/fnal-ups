@@ -7,5 +7,7 @@ Qualifiers:       cat,dog,mouse
                   cat,dog
                   dog,mouse
                   dog
-DB:               /home/t2/fagan/ups_database
+DB:               /thunder
+                  	
+                  /lightening
 Chains:           current

@@ -5,5 +5,7 @@ Flavor:           IRIX+5.3
                   NULL
 Description:      EEK, I haven't a clue scooby doo
 Qualifiers:       
-DB:               /home/t2/fagan/ups_database
+DB:               /thunder
+                  	
+                  /lightening
 Chains:           current
