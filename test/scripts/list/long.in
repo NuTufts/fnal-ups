@@ -12,7 +12,7 @@ DATABASE=db1
 		Table_Dir="" 
 		Table_File="spot.table" 
 		Archive_File="" 
-		Description="" 
+		Description="spot is a good dog who loves me the best." 
 		Action=SETUP
 			ya hey der
 		Action=CONFIGURE
@@ -34,7 +34,7 @@ DATABASE=db1
 		Table_File="spot.table" 
 		Archive_File="akc.tar.z" 
 		Description="spot is a good dog who loves me the best." 
-		_DUMMY=this should be recognized 
+		_DUMMY = this should be recognized 
 		Action=SETUP
 			ya hey der
 		Action=CONFIGURE

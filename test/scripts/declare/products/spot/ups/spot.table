@@ -1,0 +1,33 @@
+FILE = table
+
+FLAVOR = NULL
+QUALIFIERS = ""
+
+ACTION = current
+   exeExcute("echo current")
+ACTION = uncurrent
+   exeExcute("echo uncurrent")
+ACTION = new
+   exeExcute("echo new")
+ACTION = unnew
+   exeExcute("echo unnew")
+ACTION = test
+   exeExcute("echo test")
+ACTION = untest
+   exeExcute("echo untest")
+ACTION = old
+   exeExcute("echo old")
+ACTION = unold
+   exeExcute("echo unold")
+ACTION = development
+   exeExcute("echo development")
+ACTION = undevelopment
+   exeExcute("echo undevelopment")
+ACTION = current
+   exeExcute("echo current")
+ACTION = uncurrent
+   exeExcute("echo uncurrent")
+ACTION = configure
+   exeExcute("echo configure")
+ACTION = unconfigure
+   exeExcute("echo unconfigure")
