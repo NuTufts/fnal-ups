@@ -1,37 +1,45 @@
 FILE = TABLE
+PRODUCT = rover
+
 FLAVOR = ANY
 QUALIFIERS = ""
 
 ACTION = SETUP
-   sourceCompileReq("$UPS_DIR/test/scripts/compile/log/rover.out")
-   doDefaults()
+   envset(ROVER_1,"ROCK AND ROLL 1")
+   envset(ROVER_2,"ROCK AND ROLL 2")
+   envset(ROVER_3,"ROCK AND ROLL 3")
+   sourceCompileReq("${UPS_PROD_DIR}/rover")
+   envset(ROVER,"OPERA")
+   setupRequired( "bambi v1_0" )
+
+#   doDefaults()
 # do environment variable tests
-   envset(OPERA,"AIDA FAUST")
-   envappend(OPERA,"MADAM_BUTTERFLY CARMEN"," ")
-   envprepend(OPERA,FIDELIO,' ')
-   envremove(OPERA,FAUST,' ')
-   envunset(OPERA)
-   envsetifnotset(TMPDIR,/tmp)
+#   envset(OPERA,"AIDA FAUST")
+#   envappend(OPERA,"MADAM_BUTTERFLY CARMEN"," ")
+#   envprepend(OPERA,FIDELIO,' ')
+#   envremove(OPERA,FAUST,' ')
+#   envunset(OPERA)
+#   envsetifnotset(TMPDIR,/tmp)
 # do path tests
-   pathset(path,/bin:/usr/local/bin:/local/etc:/mybin)
-   pathAppend(path,emacs/bin,emacs/etc)
-   pathprepend(path,emacs/test)
-   pathremove(path,emacs)
-   pathremove(path,bin)
+#   pathset(path,/bin:/usr/local/bin:/local/etc:/mybin)
+#   pathAppend(path,emacs/bin,emacs/etc)
+#   pathprepend(path,emacs/test)
+#   pathremove(path,emacs)
+#   pathremove(path,bin)
 # do file tests
-   filetest(blah,r,"can't read file")
+#   filetest(blah,r,"can't read file")
 # setup tests
 # this is already done by earlier action tests?
 #   setupOptional(blah)
 #   setupRequired(blah)
 # execute tests
-   exeAccess(ls)
+#   exeAccess(ls)
 #aliases
-   addalias (rambo,"SlyStalone %s")
-   unalias  (rambo)
+#   addalias (rambo,"SlyStalone %s")
+#   unalias  (rambo)
 # source tests
-   sourceRequired(reqfile1,NO_UPS_ENV, continue)
+#   sourceRequired(reqfile1,NO_UPS_ENV, continue)
 
-action = configure
-   writeCompileScript("$UPS_DIR/test/scripts/compile/log/rover.out")
+ACTION = CONFIGURE
+   writeCompileScript("${UPS_PROD_DIR}/rover", SETUP)
 

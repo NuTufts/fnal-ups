@@ -1,5 +1,5 @@
 FILE = VERSION
-PRODUCT = rover
+PRODUCT = rabbit
 VERSION = v1_0
 
 FLAVOR = NULL
