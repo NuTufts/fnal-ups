@@ -6,7 +6,7 @@ cd $UPS_DIR/test/scripts/depend/log
 $UPS_DIR/test/ups_test << EOD 
 
 ups_echo "===Test 1"
-depend bee3 v2_0 -f NULL -z ../db1 -K DECLARER -out bee1.out -diff bee1.in
+depend bee3 v2_0 -f NULL -z ../db1 -K DECLARER:VERSION:PRODUCT -out bee1.out -diff bee1.in
 ups_echo "===Test 2"
 depend bee3 v2_0 -f NULL -z ../db1 -K ACTION -status UPS_INVALID_KEYWORD
 ups_echo "===Test 3" 

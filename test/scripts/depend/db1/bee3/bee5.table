@@ -10,7 +10,7 @@ COMMON:
 
 ACTION=SETUP
 
-setupRequired("bee5 v1_0", no_ups_env)
+setupRequired("bee5 v4_0", no_ups_env)
 
 
 ACTION=SETUP
