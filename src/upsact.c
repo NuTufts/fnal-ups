@@ -2347,15 +2347,27 @@ static void f_execute( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n", a_cmd->argv[1],
-		  a_cmd->argv[0], a_cmd->argv[1]) < 0) {
-	FPRINTF_ERROR();
+      if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].min_params) {
+	if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0]) < 0) {
+	  FPRINTF_ERROR();
+	}
+      } else {
+	if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n", a_cmd->argv[1],
+		    a_cmd->argv[0], a_cmd->argv[1]) < 0) {
+	  FPRINTF_ERROR();
+	}
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n#\n", a_cmd->argv[1],
-		  a_cmd->argv[0])< 0) {
-	FPRINTF_ERROR();
+      if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].min_params) {
+	if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0])< 0) {
+	  FPRINTF_ERROR();
+	}
+      } else {
+	if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n#\n",
+		    a_cmd->argv[1], a_cmd->argv[0])< 0) {
+	  FPRINTF_ERROR();
+	}
       }
       break;
     default:
