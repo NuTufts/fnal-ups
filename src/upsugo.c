@@ -61,6 +61,7 @@ int UPS_NEED_DB=1;
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
         n = strlen(addr)-1;\
 	while(addr[n] > '0' && addr[n] <= '9') { \
+	     addr=upsutl_str_create(addr,' '); \
 	     addr[n]--; \
              upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
              uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \

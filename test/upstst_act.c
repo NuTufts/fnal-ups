@@ -142,7 +142,8 @@ while ((uc = upsugo_next(argc,argv,UPSTST_ALLOPTS)) != 0)	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    cmd_list = upsact_get_cmd(uc,NULL,action,upsact_action2enum(action));
-   UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
+   if (UPS_ERROR != UPS_SUCCESS)		/* second one could be the error */
+      UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    if (estatus != UPS_SUCCESS) continue;
    upsact_process_commands(cmd_list, ofd);
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */

@@ -114,7 +114,8 @@
 #define UPS_NO_VERSION          71
 #define UPS_DANGLING_CHAIN      72
 #define UPS_REMOVE_FILE         73
-#define UPS_NERR                74      /*  this one must always be last */
+#define UPS_MISMATCHED_ENDIF	74
+#define UPS_NERR                75      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"

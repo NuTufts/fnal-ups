@@ -25,11 +25,22 @@ upsact_process_commands unsetup     fly v4_0 -out fly4.out -diff fly4.in
 upsact_process_commands unconfigure fly v4_0 -out fly5.out -diff fly5.in 
 upsact_process_commands uncurrent   fly v4_0 -out fly6.out -diff fly6.in 
 #
+# if then else tests
+#
+upsact_process_commands -out ite1.out -diff ite1.in setup ite v1_0 
+ upsact_process_commands -out ite3.out -diff ite3.in setup ite v2_0 -status UPS_MISMATCHED_ENDIF
+#
 #  check for a bug involving a setupRequired(product version)
 #  where there is no current chain for product for the 
 #  unsetup before setting up product.
 # 
 setup oregano v1_0 -out oregano.out -diff oregano.in
+quit
+EOD
+FOO=a
+export FOO
+env PRODUCTS=../db1 $UPS_DIR/test/ups_test << EOD
+upsact_process_commands -out ite2.out -diff ite2.in setup ite v1_0 
 quit
 EOD
 SHELL=/bin/sh;export SHELL;

@@ -110,9 +110,9 @@ f_copyhtml       2444 src/upsact.c     static void f_copyhtml(
 f_copyinfo       2452 src/upsact.c     static void f_copyinfo(
 f_copyman        2460 src/upsact.c     static void f_copyman(
 f_copynews       2492 src/upsact.c     static void f_copynews(
-f_dodefaults     4010 src/upsact.c     static void f_dodefaults(
-f_else           3987 src/upsact.c     static void f_else(
-f_endif          3951 src/upsact.c     static void f_endif(
+f_dodefaults     4027 src/upsact.c     static void f_dodefaults(
+f_else           4004 src/upsact.c     static void f_else(
+f_endif          3956 src/upsact.c     static void f_endif(
 f_envappend      2500 src/upsact.c     static void f_envappend(
 f_envprepend     2557 src/upsact.c     static void f_envprepend(
 f_envremove      2615 src/upsact.c     static void f_envremove(
@@ -122,7 +122,7 @@ f_envunset       2776 src/upsact.c     static void f_envunset(
 f_exeaccess      2812 src/upsact.c     static void f_exeaccess(
 f_execute        2864 src/upsact.c     static void f_execute(
 f_filetest       2925 src/upsact.c     static void f_filetest(
-f_if             3915 src/upsact.c     static void f_if(
+f_if             3918 src/upsact.c     static void f_if(
 f_pathappend     2970 src/upsact.c     static void f_pathappend(
 f_pathprepend    2986 src/upsact.c     static void f_pathprepend(
 f_pathremove     3002 src/upsact.c     static void f_pathremove(
@@ -157,7 +157,7 @@ reverse_command_list 2191 src/upsact.c     t_upslst_item *reverse_command_list(
 sh_output_first_check 3128 src/upsact.c     static int sh_output_first_check(
 sh_output_last_part_req 3244 src/upsact.c     static int sh_output_last_part_req(
 sh_output_next_part 3140 src/upsact.c     static int sh_output_next_part(
-shutup           4119 src/upsact.c     static void shutup(
+shutup           4136 src/upsact.c     static void shutup(
 upsact_action2enum 1043 src/upsact.c     int upsact_action2enum(
 upsact_check_files 1071 src/upsact.c     t_upslst_item *upsact_check_files(
 upsact_cleanup   889 src/upsact.c     void upsact_cleanup(
@@ -189,10 +189,10 @@ upscpy_man       215 src/upscpy.c     void upscpy_man(
 upscpy_news      501 src/upscpy.c     void upscpy_news(
 upscpy_rmcatman  436 src/upscpy.c     void upscpy_rmcatman(
 upscpy_rmman     373 src/upscpy.c     void upscpy_rmman(
-upserr_add       229 src/upserr.c     void upserr_add 
-upserr_backup    301 src/upserr.c     void upserr_backup 
-upserr_clear     335 src/upserr.c     void upserr_clear 
-upserr_output    372 src/upserr.c     void upserr_output 
+upserr_add       231 src/upserr.c     void upserr_add 
+upserr_backup    304 src/upserr.c     void upserr_backup 
+upserr_clear     338 src/upserr.c     void upserr_clear 
+upserr_output    375 src/upserr.c     void upserr_output 
 P_VERB           208 src/upsfil.c     #define P_VERB(
 P_VERB_s         212 src/upsfil.c     #define P_VERB_s(
 P_VERB_s_i       216 src/upsfil.c     #define P_VERB_s_i(
@@ -382,29 +382,29 @@ ups_new_matched_instance 136 src/upstyp.c     t_upstyp_matched_instance *ups_new
 ups_new_matched_product  58 src/upstyp.c     t_upstyp_matched_product *ups_new_matched_product(
 ups_new_product  216 src/upstyp.c     t_upstyp_product *ups_new_product(
 FREE              53 src/upsugo.c     #define FREE(
-add_chain        104 src/upsugo.c     #define add_chain(
-build_list       190 src/upsugo.c     #define build_list(
+add_chain        112 src/upsugo.c     #define add_chain(
+build_list       198 src/upsugo.c     #define build_list(
 flavor_sub        55 src/upsugo.c     #define flavor_sub(
-set_O_value      165 src/upsugo.c     #define set_O_value(
-set_value        121 src/upsugo.c     #define set_value(
-set_value_nop    141 src/upsugo.c     #define set_value_nop(
-upsugo_bldcmd    1275 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(
-upsugo_blddb     508 src/upsugo.c     int upsugo_blddb(
-upsugo_bldfvr    311 src/upsugo.c     int upsugo_bldfvr(
-upsugo_bldqual   570 src/upsugo.c     int upsugo_bldqual(
-upsugo_dump      1009 src/upsugo.c     int upsugo_dump 
-upsugo_env       1198 src/upsugo.c     t_upsugo_command *upsugo_env(
-upsugo_free      916 src/upsugo.c     int upsugo_free 
-upsugo_free_ugo_db 979 src/upsugo.c     void upsugo_free_ugo_db(
-upsugo_getarg    745 src/upsugo.c     char * upsugo_getarg(
-upsugo_getenv    1172 src/upsugo.c     char *upsugo_getenv(
-upsugo_ifornota  410 src/upsugo.c     int upsugo_ifornota(
-upsugo_liststart 713 src/upsugo.c     void upsugo_liststart(
-upsugo_next      1329 src/upsugo.c     t_upsugo_command *upsugo_next(
-upsugo_prtdb     1124 src/upsugo.c     void upsugo_prtdb(
-upsugo_prtlst    1083 src/upsugo.c     void upsugo_prtlst(
-upsugo_rearg     837 src/upsugo.c     int upsugo_rearg(
-upsugo_setshell  373 src/upsugo.c     void upsugo_setshell(
+set_O_value      173 src/upsugo.c     #define set_O_value(
+set_value        129 src/upsugo.c     #define set_value(
+set_value_nop    149 src/upsugo.c     #define set_value_nop(
+upsugo_bldcmd    1283 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(
+upsugo_blddb     516 src/upsugo.c     int upsugo_blddb(
+upsugo_bldfvr    319 src/upsugo.c     int upsugo_bldfvr(
+upsugo_bldqual   578 src/upsugo.c     int upsugo_bldqual(
+upsugo_dump      1017 src/upsugo.c     int upsugo_dump 
+upsugo_env       1206 src/upsugo.c     t_upsugo_command *upsugo_env(
+upsugo_free      924 src/upsugo.c     int upsugo_free 
+upsugo_free_ugo_db 987 src/upsugo.c     void upsugo_free_ugo_db(
+upsugo_getarg    753 src/upsugo.c     char * upsugo_getarg(
+upsugo_getenv    1180 src/upsugo.c     char *upsugo_getenv(
+upsugo_ifornota  418 src/upsugo.c     int upsugo_ifornota(
+upsugo_liststart 721 src/upsugo.c     void upsugo_liststart(
+upsugo_next      1337 src/upsugo.c     t_upsugo_command *upsugo_next(
+upsugo_prtdb     1132 src/upsugo.c     void upsugo_prtdb(
+upsugo_prtlst    1091 src/upsugo.c     void upsugo_prtlst(
+upsugo_rearg     845 src/upsugo.c     int upsugo_rearg(
+upsugo_setshell  381 src/upsugo.c     void upsugo_setshell(
 ups_append_OS     84 src/upsuname.c   ups_append_OS(
 ups_append_default_quals 148 src/upsuname.c   ups_append_default_quals(
 ups_append_release 110 src/upsuname.c   ups_append_release(
@@ -453,8 +453,8 @@ t_upsact_item    159 inc/upsact.h     } t_upsact_item;
 tpf_cmd          171 inc/upsact.h     typedef void (*tpf_cmd)
 upsact_cmd       142 inc/upsact.h     typedef struct upsact_cmd 
 upsact_item      150 inc/upsact.h     typedef struct upsact_item 
-upserr_place     157 inc/upserr.h     #define upserr_place(
-upserr_vplace    158 inc/upserr.h     #define upserr_vplace(
+upserr_place     158 inc/upserr.h     #define upserr_place(
+upserr_vplace    159 inc/upserr.h     #define upserr_vplace(
 UPSKEY_CONF2ARR  134 inc/upskey.h     #define UPSKEY_CONF2ARR(
 UPSKEY_INST2ARR  133 inc/upskey.h     #define UPSKEY_INST2ARR(
 UPSKEY_ISIN_CHAIN 138 inc/upskey.h     #define UPSKEY_ISIN_CHAIN(

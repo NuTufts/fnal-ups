@@ -3912,11 +3912,16 @@ static void f_unproddir( ACTION_PARAMS)
   SHUTUP;
 }
 
+static char *ifstack[256] = {""};
+static int   ifcount = 0;
+
 static void f_if( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("If");
 
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
+
+  ifstack[ifcount++] = a_cmd->argv[0];
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3953,6 +3958,18 @@ static void f_endif( ACTION_PARAMS)
   CHECK_NUM_PARAM("EndIf");
 
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
+
+  ifcount--;
+
+  if ( ifcount < 0 || 0 != strcmp(ifstack[ifcount], a_cmd->argv[0]) ) {
+
+      if (ifcount < 0) 
+	ifcount = 0;
+
+      upserr_vplace();
+      upserr_add(UPS_MISMATCHED_ENDIF, UPS_FATAL, ifstack[ifcount], a_cmd->argv[0]);
+      return;
+  }
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
