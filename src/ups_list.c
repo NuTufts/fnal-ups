@@ -49,7 +49,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 /*
  * Definition of global variables.
  */
-static int g_MATCH_DONE = 0;
+static int g_MATCH_DONE = 1;
 
 #define VPREFIX "UPSLIST: "
 
