@@ -418,8 +418,9 @@ sub WriteTableFile {
        }
        print TableFile "Common:\n";
        print TableFile "   Action=setup\n";
-       print TableFile "     doDefaults()\n";
-       $key=~s/DaSeTuP/      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
+# back to the OLD way AGAIN...
+#       print TableFile "     doDefaults()\n";
+       $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
        $key=~s/DaSeTuP//g;
        if (open(TMPFILE,"${basedir}/ups/setup.sh")) {
           close TMPFILE;
@@ -431,7 +432,7 @@ sub WriteTableFile {
           close TMPFILE;
           print TableFile "$key";
        }
-       print TableFile "     doDefaults()\n";
+#       print TableFile "     doDefaults()\n";
        $baseactions=&add_misactions;
        print TableFile "${baseactions}";
        print TableFile "End:\n";
