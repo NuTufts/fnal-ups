@@ -155,13 +155,15 @@ t_ups_product *upsfil_read_file( const char * const ups_file )
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
     return 0;
   }
-       
+
   g_fh = fopen ( ups_file, "r" );
   if ( ! g_fh ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
     return 0;
   }
   
+  /* check if file is empty ??? */
+    
   g_pd = ups_new_product();
   if ( !g_pd ) return 0;
        
@@ -179,26 +181,28 @@ t_ups_product *upsfil_read_file( const char * const ups_file )
  * Input : t_ups_product *, a pointer to a product
  *         char *, path to a ups file
  * Output: none
- * Return: int, 1 just fine, 0 somthing went wrong
+ * Return: int, UPS_SUCCESS just fine, else UPS_<error> number.
  */
 int upsfil_write_file( t_ups_product * const prod_ptr,
 		       const char * const ups_file )
 {
   t_upslst_item *l_ptr = 0;
   
-  if ( ! prod_ptr )
-    return 0;
+  if ( ! prod_ptr ) {
+    upserr_vplace(); upserr_add( UPS_NOVALUE_ARGUMENT, UPS_FATAL, "0", "product pointer" );
+    return UPS_NOVALUE_ARGUMENT;
+  }
   g_pd = prod_ptr;
 
   if ( !ups_file || strlen( ups_file ) <= 0 ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
-    return 0;
+    return UPS_OPEN_FILE;
   }
   
   g_fh = fopen ( ups_file, "w" );
   if ( ! g_fh ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
-    return 0;
+    return UPS_OPEN_FILE;
   }    
 
   g_imargin = 0;
@@ -220,7 +224,7 @@ int upsfil_write_file( t_ups_product * const prod_ptr,
   if ( g_ifile == e_file_unknown ) {
     upserr_vplace();
     upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, g_pd->file ? g_pd->file : "(null)" );
-    return 0;
+    return UPS_UNKNOWN_FILETYPE;
   }
     
   /* make groups !!! */
@@ -245,7 +249,7 @@ int upsfil_write_file( t_ups_product * const prod_ptr,
   
   fclose( g_fh );
 
-  return 1;
+  return UPS_SUCCESS;
 }
      
 /*
