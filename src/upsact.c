@@ -473,6 +473,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
     t_upstyp_matched_product *mat_prod;
     t_upstyp_matched_instance *mat_inst;
     t_upslst_item *l_mproduct;
+    t_upslst_item *old_ugo_key;
     t_upsact_item dep_act_itm; 
 
     /* list dependencies in reverse order */
@@ -491,14 +492,18 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 
       if ( strchr( sopt, 'K' ) ) {
 
-	dep_ugo->ugo_key = ugo_cmd->ugo_key;      
+	old_ugo_key = dep_ugo->ugo_key;
+	dep_ugo->ugo_key = ugo_cmd->ugo_key;
+
 	list_K( mat_inst, dep_ugo, mat_prod );
-	dep_ugo->ugo_key = 0;
+
+	dep_ugo->ugo_key = old_ugo_key;
       }
       else {
 
 	dep_act_itm.ugo = dep_ugo;
 	dep_act_itm.mat = mat_prod;
+
 	printf( "%s\n", actitem2str( &dep_act_itm) );
       }
 
