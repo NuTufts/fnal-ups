@@ -284,11 +284,13 @@ int product_cmp ( const void * const d1, const void * const d2 )
  */
 t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
 {
-  t_upslst_item *mproduct_list = NULL;
+  t_upslst_item *mproduct_list = NULL, *mproduct_item = NULL;
+  t_upslst_item *minst_item = NULL;
   t_upslst_item *tmp_mprod_list = NULL;
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
+  t_upstyp_matched_instance *minst = NULL;
   /* Get all the requested instances */
   UPS_VERIFY=verify;		/* this is REALLY the ups verify command */ 
   for (db_list = a_command_line->ugo_db ; db_list ; db_list=db_list->next) 
@@ -323,6 +325,28 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
       upserr_clear(); 
       return 0; 
     }
+  } else {
+    /* now we must do the extra verify things - 
+	    o verify the info in the dbconfig file
+            o verify the information in the instances
+     */
+    for (mproduct_item = mproduct_list ; mproduct_item ; 
+	 mproduct_item = mproduct_item->next) 
+    { mproduct = (t_upstyp_matched_product *)mproduct_item->data;
+      ups_verify_dbconfig(mproduct->db_info, 
+			  (t_upstyp_matched_instance *)minst_item->data,
+			  a_command_line);
+      for (minst_item = mproduct->minst_list ; minst_item ;
+	   minst_item = minst_item->next)
+      { upserr_add(UPS_VERIFY_PRODUCT, UPS_INFORMATIONAL, mproduct->product);
+	ups_verify_matched_instance(mproduct->db_info,
+			       (t_upstyp_matched_instance *)minst_item->data,
+			       a_command_line, mproduct->product);
+      }
+      /* there may be lots of messages so output them on a per product basis */
+      upserr_output();
+      upserr_clear();
+    }    
   }
     /* free the matched products */
     tmp_mprod_list = upsutl_free_matched_product_list(&mproduct_list);

@@ -921,9 +921,9 @@ static int match_from_chain( const char * const a_product,
 {
   int num_matches = 0, tmp_num_matches = 0;
   t_upstyp_product *read_product;
-  t_upslst_item *cinst;
+  t_upslst_item *cinst, *minst_item;
   t_upstyp_instance *inst = NULL;
-  t_upstyp_matched_instance *tmp_minst_ptr = NULL;
+  t_upstyp_matched_instance *tmp_minst_ptr = NULL, *minst;
   char *buffer = NULL;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
@@ -940,11 +940,19 @@ static int match_from_chain( const char * const a_product,
 				   a_minst_list);
     upsver_mes(MATVLEVEL, "%sFound %d instances in %s\n", VPREFIX,
 	       tmp_num_matches, buffer);
-    if (UPS_VERIFY && !tmp_num_matches)
-    { upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "VERSION", buffer); 
-      /* upserr_output(); maybe lost don't think so here but ...*/
+    if (UPS_VERIFY && tmp_num_matches) {
+      /* verify that if there was a chain keyword in the file, that it
+	 matches the filename */
+      for (minst_item = *a_minst_list ; minst_item ; 
+	   minst_item = minst_item->next) {
+	minst = (t_upstyp_matched_instance *)minst_item->data;
+	if (minst->chain && minst->chain->chain &&
+	    strcmp(minst->chain->chain, a_chain)) {
+	  upserr_add(UPS_MISMATCH_CHAIN, minst->chain->chain, a_chain);
+	}
+      }
     }
-
+    
     /* for each instance that was matched, open the version file, and only
        look for the instance that matches the instance found in the chain
        file.  this insures that an instance in a chain file is
@@ -1046,12 +1054,12 @@ static int match_from_version( const char * const a_product,
   int file_chars, num_matches = 0, tmp_num_matches = 0;
   char buffer[FILENAME_MAX+1];
   t_upstyp_product *read_product;
-  t_upslst_item *vinst;
+  t_upslst_item *vinst, *minst_item;
   t_upslst_item tmp_any_flavor_list = {NULL, ANY_FLAVOR, NULL};
   t_upslst_item tmp_flavor_list = {NULL, NULL, NULL};
   t_upslst_item tmp_quals_list = {NULL, NULL, NULL};
   t_upstyp_instance *inst;
-  t_upstyp_matched_instance *tmp_minst_ptr = NULL;
+  t_upstyp_matched_instance *tmp_minst_ptr = NULL, *minst;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
 
@@ -1074,9 +1082,18 @@ static int match_from_version( const char * const a_product,
 				     a_minst_list);
       upsver_mes(MATVLEVEL, "%sFound %d instances in %s\n", VPREFIX,
                  tmp_num_matches, buffer);
-      if (UPS_VERIFY && !tmp_num_matches)
-      { upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "VERSION", buffer); 
-        /* upserr_output(); WHY WHY WHY ??? or it's lost !!! */
+      if (UPS_VERIFY && tmp_num_matches) {
+	/* verify that if there was a version keyword in the file, that it
+	   matches the filename */
+	for (minst_item = *a_minst_list ; minst_item ; 
+	     minst_item = minst_item->next) {
+	  minst = (t_upstyp_matched_instance *)minst_item->data;
+	  if (minst->version && minst->version->version &&
+	      strcmp(minst->version->version, a_version)) {
+	    upserr_add(UPS_MISMATCH_VERSION, minst->version->version,
+		       a_version);
+	  }
+	}
       }
 
       /* for each instance that was matched, open the table file, and only
@@ -1194,10 +1211,6 @@ static int match_from_table( const char * const a_product,
 				 a_minst_list);
       upsver_mes(MATVLEVEL, "%sFound %d instances in %s\n", VPREFIX,
 		 num_matches, full_table_file);
-      if (UPS_VERIFY && !num_matches) {
-	upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "TABLE",
-		   full_table_file);
-      }
     }
   }
   
@@ -1298,5 +1311,3 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 
   return num_matches;
 }
-
-
