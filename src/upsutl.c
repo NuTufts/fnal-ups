@@ -91,7 +91,7 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 
 static clock_t g_start_cpu, g_finish_cpu;
 static time_t g_start_w, g_finish_w;
-static char g_stat_dir[] = "/statistics/";
+static char g_stat_dir[] = "statistics/";
 static char g_unknown_user[] = "UNKNOWN";
 static char g_buffer[FILENAME_MAX+1];
 /*
@@ -401,9 +401,9 @@ t_upstyp_product *upsutl_get_config( const char * const a_db)
   t_upstyp_product *read_product = NULL;
   static char buffer[MAX_LINE_LEN];
   
-  if ((strlen(a_db) + (unsigned int )CONFIG_SIZE + (unsigned int ) 5) <=
+  if ((strlen(a_db) + (unsigned int )CONFIG_SIZE + (unsigned int ) 2) <=
       MAX_LINE_LEN) {
-    sprintf(&buffer[0], "%s/../%s", a_db, CONFIG_FILE);
+    sprintf(&buffer[0], "%s/%s/%s", a_db, UPS_FILES, CONFIG_FILE);
     read_product = upsfil_read_file(buffer);
     if (UPS_ERROR == UPS_NO_FILE) {
       upserr_backup();
@@ -555,7 +555,7 @@ void upsutl_get_files(const char * const a_dir,
     if (! strcmp(a_pattern, ANY_MATCH)) {
       /* read each directory item and add it to the list */
       while ((dir_line = readdir(dir)) != NULL) {
-	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
+	if (strncmp(dir_line->d_name, ".", 1)) {
 	  if ((new_string = upsutl_str_create(dir_line->d_name, ' '))) {
 	    *a_file_list = upslst_add((t_upslst_item *)*a_file_list,
 				      (void *)new_string);
@@ -568,7 +568,7 @@ void upsutl_get_files(const char * const a_dir,
 	 the list */
       plen = (int )strlen (a_pattern);
       while ((dir_line = readdir(dir)) != NULL) {
-	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
+	if (strncmp(dir_line->d_name, ".", 1)) {
 	  /* if the pattern is there, make sure it is at the end of the
 	     string before removing it */
 	  if (substr = strstr(dir_line->d_name, a_pattern)) {
@@ -728,18 +728,16 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	  dir_s = (int )strlen(mproduct->db_info->name);
 	  stat_s = (int )strlen(g_stat_dir);
 	  file_s = (int )strlen(mproduct->product);
-	  if ( (dir_s + stat_s + file_s + 3) < FILENAME_MAX) {
+	  if ( (dir_s + UPS_FILES_LEN + stat_s + file_s + 4) < FILENAME_MAX) {
 	    /* Construct the filename where the statistics are to be stored. */
-	    strcpy(stat_file, mproduct->db_info->name);   /* directory */
-	    strcat(stat_file, "/..");                     /* move up 1 level */
-	    strcat(stat_file, g_stat_dir);                /* stats sub-dir */
+	    sprintf(stat_file, "%s/%s/%s", mproduct->db_info->name,
+		    UPS_FILES, g_stat_dir);
 
 	    /* check to make sure the statistics directory exists first */
 	    if (upsutl_is_a_file(stat_file) == UPS_NO_FILE) {
 	      /* no statistics directory, this is a warning error */
 	      upserr_add(UPS_NO_FILE, UPS_WARNING, stat_file);
 	    } else {
-
 	      strcat(stat_file, mproduct->product);         /* filename */
 
 	      /* See if we can open the file we are supposed to write to. */
