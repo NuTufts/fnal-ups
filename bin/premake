@@ -27,6 +27,7 @@ needEmacs=""            # used to check for EMACS_DIR if target is tag_file
 logFile=""		# Log make output?
 defs="$defs SHELL=/bin/sh"	# misc. definitions to pass to make
 insure=""              # compile with Insure (only on IRIX)
+old_libs=""             # Libs need for old compatability programs
 
 #------------------------------------------------------------------------
 #  MAKE SURE WE ARE BUILDING ON A SUPPORTED ARCHITECTURE
@@ -303,6 +304,14 @@ defs="$defs CCCHK=\"-D_POSIX_SOURCE -D_NETINET_IN_H_ -D_H_NETDB\""
 		exit 1;;
 esac
 #------------------------------------------------------------------------------
+#  Quick fix for old compatability programs
+#------------------------------------------------------------------------------
+#
+if [ -f /usr/lib/libnsl.a ]
+then
+    old_libs='-lnsl'; export old_libs
+fi
+#------------------------------------------------------------------------------
 # NOW ADD IN INCLUDE DIRECTORIES AND LIBRARIES
 #------------------------------------------------------------------------------
 #
@@ -329,10 +338,11 @@ cflags="UPS_CFLAGS=\"$cflags\""		# UPS_CFLAGS
 llibs="LLIBS=\"$llibs\""		# LLIBS
 mflags="$mflags CCENV=$ccenv"		# CCENV
 incdirs="INCDIRS=\"$incdirs\""		# INCDIRS
+old_libs="OLD_LIBS=\"$old_libs\""       # OLD_LIBS
 
 
 # all flags passed to make
-flags="$mflags $cc $cflags $llibs $incdirs $defs"
+flags="$mflags $cc $cflags $llibs $incdirs $defs $old_libs"
  
 # Check to see if emacs is setup, if the etags file will be changed.
 #
