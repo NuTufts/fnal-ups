@@ -278,7 +278,7 @@ t_ups_match_product *ups_new_mp(const char * const a_db,
  * Output: none
  * Return: NULL
  */
-t_ups_match_product *ups_free_mp(t_ups_match_product *a_mproduct)
+t_ups_match_product *ups_free_mp(t_ups_match_product * const a_mproduct)
 {
   if (! a_mproduct) {
     /* we incremented the ref counter in the ups_new_mp function, doing a
