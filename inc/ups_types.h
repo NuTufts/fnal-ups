@@ -20,6 +20,7 @@
  *       29-jul-1997, LR, New 'unified' t_ups_instance structure.
  *                        Added function declarations for creating
  *                        and destroying common types.
+ *       30-jul-1997, LR, Added 'char *db_dir' to instance structure.
  *
  ***********************************************************************/
 
@@ -71,9 +72,11 @@ typedef struct ups_instance
   char             *authorized_nodes;
   char             *description;  
   t_upslst_item    *unknown_list;
-  
+
   t_upslst_item    *action_list;
 
+  char             *db_dir;
+  
 } t_ups_instance;
 
 /* an action */
