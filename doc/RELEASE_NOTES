@@ -30,4 +30,12 @@ Added a specific database check in declare, ugo can't determine that
 <li>
 Added more error messages to the action processing code. Errors on actions 
 should now output more info as to the instance involved.
+<li>
+Fixed Makefiles so no longer need ups bin directory in your path to build.
+Now the steps are:
+<ul>
+<li>export UPS_DIR=<new-location>
+<li>cd $UPS_DIR
+<li>make all
+</ul>
 </ul>
