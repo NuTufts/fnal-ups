@@ -91,7 +91,7 @@ sub use_prod {
     }
     if ( ! defined($::ENV{$var}) || $::ENV{$var} !~ m/$p $vm / ) {
 	setup("$p $v");
-	exec "$::ENV{PERL_DIR}/bin/perl", "-wS", $::0, @::ARGV;
+	exec "$::ENV{PERL_DIR}/bin/perl", "-S", $::0, @::ARGV;
 	die( "cannot exec $::ENV{PERL_DIR}/bin/perl" );
     }
 }

@@ -637,6 +637,7 @@ chmod +x $BootStrap_Dir/$Setups_Products_Script
 # replaced, and use setups.sh...
 sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/${Script_Prefix}.pl > ${BootStrap_Dir}/${Script_Prefix}.pl
 sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/ups.pm > ${BootStrap_Dir}/ups.pm
+sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/ups.py > ${BootStrap_Dir}/ups.py
 sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/${Script_Prefix}.py > ${BootStrap_Dir}/${Script_Prefix}.py
 
 #
