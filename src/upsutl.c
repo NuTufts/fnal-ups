@@ -84,7 +84,10 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
       }                                                         \
     }
 
-#define G_SAVE_PATH(s) path_ptr = (char *)upsmem_malloc(s); strcpy(path_ptr, buffer)
+#define G_SAVE_PATH(s) \
+  path_ptr = (char *)upsmem_malloc(s);   \
+  strcpy(path_ptr, buffer);              \
+  found = 1;      
 
 static clock_t g_start_cpu, g_finish_cpu;
 static time_t g_start_w, g_finish_w;
@@ -121,6 +124,8 @@ static char g_buffer[FILENAME_MAX+1];
  *         ups directory information
  *         product dir
  *         ups database directory
+ *         a flag stating if the directory returned must already contain the
+ *             table file
  * Output: none
  * Return: table file location
  */
@@ -129,7 +134,8 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 				  const char * const a_tablefiledir,
 				  const char * const a_upsdir,
 				  const char * const a_productdir,
-				  const t_upstyp_db * const a_db_info)
+				  const t_upstyp_db * const a_db_info,
+				  const int a_exist_flag)
 {
   char buffer[FILENAME_MAX+1];   /* max size of file name and path on system */
   char *path_ptr = NULL;
@@ -144,9 +150,8 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       if ((total_chars = file_chars + (int )strlen(a_tablefiledir))
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s", a_tablefiledir, a_tablefile);
-	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	if ((! a_exist_flag) || (upsutl_is_a_file(buffer) == UPS_SUCCESS)) {
 	  G_SAVE_PATH(total_chars);      /* found it - save it */
-	  found = 1;
 	}
       } else {
 	upserr_vplace();
@@ -158,9 +163,8 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       if ((total_chars = file_chars + (int )strlen(a_upsdir))
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s", a_upsdir, a_tablefile);
-	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
 	  G_SAVE_PATH(total_chars);         /* found it */
-	  found = 1;
 	}
       } else {
 	upserr_vplace();
@@ -175,9 +179,8 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	                    1) <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
 		                         a_productdir, a_upsdir, a_tablefile);
-	  if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	  if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
 	    G_SAVE_PATH(total_chars);        /* found it */
-	    found = 1;
 	  }
 	} else {
 	  upserr_vplace();
@@ -186,9 +189,8 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       } else {
 	if ((total_chars += (int )strlen(a_productdir) + 1) <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s/%s", a_productdir, a_upsdir, a_tablefile);
-	  if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	  if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
 	    G_SAVE_PATH(total_chars);        /* found it */
-	    found = 1;
 	  }
 	} else {
 	  upserr_vplace();
@@ -202,7 +204,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 					     strlen(a_db_info->name)) + 1)
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname, a_tablefile);
-	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
 	  G_SAVE_PATH(total_chars);        /* found it */
 	}
       } else {
@@ -211,15 +213,17 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       }
     }
     /* try ./tablefile */
-    if ((found == 0) && ((total_chars = file_chars) <= FILENAME_MAX)) {
-      sprintf(buffer, "%s", a_tablefile);
-      if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
-	G_SAVE_PATH(file_chars);            /* found it */
-	found = 1;
+    if (found == 0) {
+      if ((total_chars = file_chars) <= FILENAME_MAX) {
+	sprintf(buffer, "%s", a_tablefile);
+	if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
+	  G_SAVE_PATH(file_chars);            /* found it */
+	  found = 1;
+	}
+      } else {
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
-    } else {
-      upserr_vplace();
-      upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
     }
   }
 

@@ -1126,7 +1126,8 @@ static int match_from_table( const char * const a_product,
 
   full_table_file = upsutl_get_table_file_path(a_product, a_tablefile,
 					       a_tablefiledir, a_upsdir,
-					       a_productdir, a_db_info);
+					       a_productdir, a_db_info,
+					       MUST_EXIST);
 
   if (full_table_file != NULL) {
     if ((read_product = upsfil_read_file(full_table_file)) != NULL) {
