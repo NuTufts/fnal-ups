@@ -49,28 +49,244 @@
 #ifdef UPS_ID
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	1.00";
 #endif
+#define MAX_ARGS 1000
 #define FREE( X )	{			\
 			free( X );		\
 			X = 0;		\
 			}
+#define case_a \
+         case 'a':      \
+         uc->ugo_a = 1; \
+         break;
+#define case_C \
+         case 'C':      \
+         uc->ugo_C = 1; \
+         break;
+#define case_D \
+         case 'D':      \
+         uc->ugo_D = 1; \
+         break;
+#define case_e \
+         case 'e':      \
+         uc->ugo_e = 1; \
+         break;
+#define case_E \
+         case 'E':      \
+         uc->ugo_E = 1; \
+         break;
+#define case_F \
+         case 'F':      \
+         uc->ugo_F = 1; \
+         break;
+#define case_j \
+         case 'j':      \
+         uc->ugo_j = 1; \
+         break;
+#define case_k \
+         case 'k':      \
+         uc->ugo_k = 1; \
+         break;
+#define case_l \
+         case 'l':      \
+         uc->ugo_l = 1; \
+         break;
+#define case_S \
+         case 'S':      \
+         uc->ugo_S = 1; \
+         break;
+#define case_u \
+         case 'u':      \
+         uc->ugo_u = 1; \
+         break;
+#define case_v \
+         case 'v':      \
+         uc->ugo_v +=1; \
+         break;
+#define case_V \
+         case 'V':      \
+         uc->ugo_V = 1; \
+         break;
+#define case_w \
+         case 'w':      \
+         uc->ugo_w = 1; \
+         break;
+#define case_W \
+         case 'W':      \
+         uc->ugo_W = 1; \
+         break;
+#define case_x \
+         case 'x':      \
+         uc->ugo_x = 1; \
+         break;
+#define case_y \
+         case 'y':      \
+         uc->ugo_y = 1; \
+         break;
+#define case_Y \
+         case 'Y':      \
+         uc->ugo_Y = 1; \
+         break;
+#define case_Z \
+         case 'Z':      \
+         uc->ugo_Z = 1; \
+         break;
+#define case_c \
+         case 'c':                                       \
+         uc->ugo_c = 1;                                  \
+         addr=upsutl_str_create("current",' ');          \
+         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         break;
+#define case_d \
+         case 'd':                                       \
+         uc->ugo_d = 1;                                  \
+         addr=upsutl_str_create("development",' ');      \
+         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         break;
+#define case_n \
+         case 'n':                                       \
+         uc->ugo_n = 1;                                  \
+         addr=upsutl_str_create("new",' ');              \
+         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         break;
+#define case_t \
+         case 't':                                       \
+         uc->ugo_t = 1;                                  \
+         addr=upsutl_str_create("test",' ');             \
+         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         break;
+#define case_o \
+         case 'o':                                       \
+         uc->ugo_o = 1;                                  \
+         addr=upsutl_str_create("old",' ');              \
+         uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
+         break;
+#define set_value( ELEMENT , ARG )                                         \
+{                                                                          \
+         if ( *argbuf )                                                    \
+         { addr=upsutl_str_create(*argbuf,'p');                            \
+           ELEMENT = addr;                                                 \
+           *argbuf = 0;                                                    \
+           break;                                                          \
+         }                                                                 \
+         if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
+         { if(*arg_str == '-')                                             \
+           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
+             break;                                                        \
+           }                                                               \
+           addr=upsutl_str_create(arg_str,'p');                            \
+           ELEMENT = addr;                                                 \
+           break;                                                          \
+         }                                                                 \
+} 
+#define build_list( LIST_ELEMENT , ARG )                                   \
+{                                                                          \
+         if ( *argbuf )                                                    \
+         { while((loc=strchr(*argbuf,':'))!=0) {                           \
+             addr=*argbuf;                                                 \
+             *argbuf=loc+1;                                                \
+             *loc = 0;                                                     \
+             addr=upsutl_str_create(addr,'p');                             \
+             LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                 \
+           }                                                               \
+           addr=upsutl_str_create(*argbuf,'p');                            \
+           LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                   \
+           *argbuf = 0;                                                    \
+           break;                                                          \
+         }                                                                 \
+         if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)      \
+         { if(*arg_str == '-')                                             \
+           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG ); \
+             break;                                                        \
+           }                                                               \
+           while((loc=strchr(arg_str,':'))!=0) {                           \
+             addr=arg_str;                                                 \
+             arg_str=loc+1;                                                \
+             *loc = 0;                                                     \
+             addr=upsutl_str_create(addr,'p');                             \
+             LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                 \
+           }                                                               \
+           addr=upsutl_str_create(arg_str,'p');                            \
+           LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                   \
+           break;                                                          \
+         }                                                                 \
+}
+#define case_g \
+         case 'g':                        \
+         uc->ugo_g = 1;                   \
+         build_list (uc->ugo_chain , "g") \
+         errflg = 1;                      \
+         break; 
+#define case_f \
+         case 'f':                         \
+         uc->ugo_f = 1;                    \
+         build_list (uc->ugo_flavor , "f") \
+         errflg = 1;                       \
+         break; 
+#define case_h \
+         case 'h':                       \
+         uc->ugo_h = 1;                  \
+         build_list (uc->ugo_host , "h") \
+         errflg = 1;                     \
+         break; 
+#define case_K \
+         case 'K':                      \
+         uc->ugo_K = 1;                 \
+         build_list (uc->ugo_key , "K") \
+         errflg = 1;                    \
+         break; 
+#define case_A \
+         case 'A':                       \
+         uc->ugo_A = 1;                  \
+         build_list (uc->ugo_auth , "A") \
+         errflg = 1;                     \
+         break; 
+#define case_z \
+         case 'z':                     \
+         uc->ugo_z = 1;                \
+         build_list (uc->ugo_db , "z") \
+         errflg = 1;                   \
+         break; 
+#define case_m \
+         case 'm':                              \
+         uc->ugo_m = 1;                         \
+         set_value (uc->ugo_tablefiledir , "m") \
+         errflg = 1;                            \
+         break; 
+#define case_M \
+         case 'M':                              \
+         uc->ugo_M = 1;                         \
+         set_value (uc->ugo_tablefile , "M")    \
+         errflg = 1;                            \
+         break; 
+#define case_N \
+         case 'N':                            \
+         uc->ugo_N = 1;                       \
+         set_value (uc->ugo_anyfile , "N")    \
+         errflg = 1;                          \
+         break; 
+#define case_O \
+         case 'O':                            \
+         uc->ugo_O = 1;                       \
+         set_value (uc->ugo_options , "O")    \
+         errflg = 1;                          \
+         break; 
+#define case_p \
+         case 'p':                                \
+         uc->ugo_p = 1;                           \
+         set_value (uc->ugo_description , "p")    \
+         errflg = 1;                              \
+         break; 
 
    int	errflg = 0;
    t_upslst_item *ugo_commands = 0;
    t_upslst_item *last_command = 0;
    int argindx;
-/* flag to know if I added current because no chain was specified 
-** when this is done the version is not yet know to exist yet so
-** I can't check and I have to remove if version is then specified 
-** kind of ugly, but otherwise the ifornota would have to be called
-** after checking if last command existed or the version was previously
-** parsed etc and would add a lot of code.
-*/
-   int added_current=0;	
 
 /* ===========================================================================
  * Private function declarations
  */
-char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf);
+char * upsugo_getarg( const int , char **,char ** const );
+int upsugo_rearg(const int ,char **,int * const,char **);
 int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
@@ -215,8 +431,11 @@ int upsugo_ifornota(struct ups_command * const uc)
    char   * addr;
    char   * PRODUCTS;                           /* PRODUCTS value */
    char   * loc;
- 
-   added_current=0;
+
+   if (!uc->ugo_product) 
+   { addr=upsutl_str_create("*",' ');
+     uc->ugo_product = addr;
+   }
    if (uc->ugo_a)                           /* did the user specify -a */
    { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
      { addr=upsutl_str_create("*",' ');
@@ -235,13 +454,9 @@ int upsugo_ifornota(struct ups_command * const uc)
        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      }
    } else {                         /* not -a but give defaults */
-/* oops... This is called before version may be set!!! */
-/*     if (!uc->ugo_chain || !uc->ugo_version) */ /* If no chain current      */
      if (!uc->ugo_chain )
      { addr=upsutl_str_create("current",' ');
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-/* ug */
-       added_current=1;
      }
      if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
      { addr=upsutl_str_create("",' ');
@@ -291,14 +506,14 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
 
  if ( strchr(inaddr,'?') == 0) {       /* no optional qualifiers */
   addr=upsutl_str_create(inaddr,'p');
-  test=upsutl_str_sort(addr,',');
+  test=upsutl_str_sort(addr,':');
   uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
  } else {
   addr=upsutl_str_create(inaddr,'p');
 /* remove all ?qualifiers from required string */
   waddr=addr;				/* work address */
   while (*waddr)   
-  { if (*waddr==',')
+  { if (*waddr==':')
     { onq=0;
     } else {
       if (*waddr=='?'||onq)
@@ -310,10 +525,10 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   }
   waddr=addr;
   while (*waddr&&!done) 
-  { if (*waddr!=' '&&*waddr!=',')
+  { if (*waddr!=' '&&*waddr!=':')
     { done=1;
     } else { 
-      if (*waddr==',') 
+      if (*waddr==':') 
       { *waddr=' ';
         done=1;
       }
@@ -333,7 +548,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   { if (*waddr=='?')
     { onc=0;
     } else {
-      if (*waddr==','||onc)
+      if (*waddr==':'||onc)
       { onc=1;
         *waddr=' ';
       }
@@ -383,13 +598,13 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
             { waddr=upsutl_str_create(optionals[j],' '); 
               opinit=1;
             } else { 
-              waddr=upsutl_str_crecat(waddr,","); 
+              waddr=upsutl_str_crecat(waddr,":"); 
               waddr=upsutl_str_crecat(waddr,optionals[j]); 
             }
           }
       }
       if ( *addr != 0 ) /* required as well as optional */
-      { naddr=upsutl_str_crecat(addr,",");
+      { naddr=upsutl_str_crecat(addr,":");
         naddr=upsutl_str_crecat(naddr,waddr);
       } else { 
 /*        naddr=waddr; 
@@ -403,7 +618,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
             naddr=addr; /* should be a null string yes? */
           }
       }
-      test=upsutl_str_sort(naddr,','); 
+      test=upsutl_str_sort(naddr,':'); 
       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
     }
  }
@@ -515,6 +730,92 @@ char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
 	    }
 	return &d[0];
 
+}
+
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_rearg
+**                                                                           
+** DESCRIPTION                                                               
+** 
+** rearg copies argv/c argv/c_new, except that commas will be treated
+** as if they had whitespace around them -- they will appear in their own
+** argv_new[i].
+**                                                                           
+** VALUES RETURNED                                                           
+**
+** UPS_ERROR : if there is going to be a buffer overflow
+** UPS_SUCCESS : if everything was okay
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/                                                                           
+int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *argv_new[])
+/*	int	argc_old,	
+		*argc_new;
+	char	*argv_old[],
+		*argv_new[]; */
+{
+
+	int 		lcv_old,
+			lcv_new;
+	size_t		str_length = 0;
+	char		*temp;
+	unsigned char	*string;
+
+        string = (char *) malloc(sizeof(char *));
+        string = ",";
+
+	lcv_old = lcv_new = 0;
+
+	while (lcv_old < argc_old)
+
+	   {
+
+	   if (lcv_new >= MAX_ARGS - 1)   { /* Make sure no buffer overflow */
+	       fprintf(stderr, 
+	         "ups: Error - maximum command line buffer limit exceeded\n");
+	       return (1);
+	   }
+
+	   if ( strcmp(argv_old[lcv_old],string) == 0)
+		argv_new[lcv_new++] = argv_old[lcv_old++];
+	   else
+		/* we know argv_old[lcv_old] isn't a comma or a space*/
+	   	{
+		temp = argv_old[lcv_old++];
+			/* temp points to beginning of next argument */
+
+		if ( strchr(temp,(int)string[0]) != NULL )
+		   while ( (temp != NULL) && (strlen(temp) != 0)  )
+			{
+			str_length = strcspn(temp,string);
+			if (str_length)
+			     {
+			     argv_new[lcv_new] = (char *) malloc(str_length+1);
+			     strncpy(argv_new[lcv_new],temp,str_length);
+			     argv_new[lcv_new++][str_length] = '\0';
+			     }
+			temp = strchr(temp,(int) string[0]);
+			if (temp != NULL)
+			     {
+			     argv_new[lcv_new++] = string;
+			     temp++; /* skip comma or space*/
+			     }
+
+			}
+
+	 	else
+		    /* there is no comma in temp */
+			argv_new[lcv_new++] = temp;
+
+	       }
+	   }
+
+        argv_new[lcv_new++] = string;
+	*argc_new = lcv_new;
+
+	return(0);
 }
 
 /* ==========================================================================
@@ -784,15 +1085,16 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
 **                                                                           
 ** ==========================================================================
 */                                                                           
-t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const validopts)
+t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const validopts)
 {
    char   *arg_str;
 
    char   * addr;
    char   * loc;
-   int add_ver=0;
-   int my_argc=0;
    int test=0;
+   int				ups_argc;	/* argv and argc with white 
+							space and commas    */
+   char				*ups_argv[MAX_ARGS]; /* reformatted */
    
    char   **argbuf;		/* String to hold residual argv stuff*/
 				/* returned by upsugo_getarg */
@@ -800,7 +1102,6 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
 				/* to 0 before recalling getarg */
 /* Initialize those pesky variables
     -------------------------------- */
-   struct upslst_item * temp;   /* hold clean current chain if version */
    struct ups_command * uc;
    struct ups_command * luc=0;
    uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
@@ -826,324 +1127,32 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
    argindx=0;
    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
-   while ((arg_str= upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)
-   { my_argc+=1; 
-     if(*arg_str == '-')      /* is it an option */
+   test = upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
+   while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
+   { if(*arg_str == '-')      /* is it an option */
      { if (!strchr(validopts,(int)*(arg_str+1))) { 
           upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, arg_str+1);
-/*          errflg=1; */
        }
-       add_ver=0;
        switch(*(arg_str+1))      /* which flag was specified */
-       { case 'a':
-              uc->ugo_a = 1;
-              break;
-         case 'C':
-              uc->ugo_C = 1;
-              break;
-         case 'D':
-              uc->ugo_D = 1;
-              break;
-         case 'e':
-              uc->ugo_e = 1;
-              break;
-         case 'E':
-              uc->ugo_E = 1;
-              break;
-         case 'F':
-              uc->ugo_F = 1;
-              break;
-         case 'j':
-              uc->ugo_j = 1;
-              break;
-         case 'k':
-              uc->ugo_k = 1;
-              break;
-         case 'l':
-              uc->ugo_l = 1;
-              break;
-         case 'S':
-              uc->ugo_S = 1;
-              break;
-         case 'u':
-              uc->ugo_u = 1;
-              break;
-         case 'v':
-              uc->ugo_v +=1;
-              break;
-         case 'V':
-              uc->ugo_V = 1;
-              break;
-         case 'w':
-              uc->ugo_w = 1;
-              break;
-         case 'W':
-              uc->ugo_W = 1;
-              break;
-         case 'x':		/* This command is incomplete */
-              uc->ugo_x = 1;
-              break;
-         case 'y':
-              uc->ugo_y = 1;
-              break;
-         case 'Y':
-              uc->ugo_Y = 1;
-              break;
-         case 'Z':
-              uc->ugo_Z = 1;
-              break;
-         case 'c':
-              uc->ugo_c = 1;
-              addr=upsutl_str_create("current",' ');
-              uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-              break;
-         case 'n':
-              uc->ugo_n = 1;
-              addr=upsutl_str_create("new",' ');
-              uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-              break;
-         case 'd':
-              uc->ugo_d = 1;
-              addr=upsutl_str_create("development",' ');
-              uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-              break;
-         case 't':
-              uc->ugo_t = 1;
-              addr=upsutl_str_create("test",' ');
-              uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-              break;
-         case 'o':
-              uc->ugo_o = 1;
-              addr=upsutl_str_create("old",' ');
-              uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-              break;
-         case 'g':
-              uc->ugo_g = 1;
-              if ( *argbuf ) 
-              { while((loc=strchr(*argbuf,','))!=0) {
-                  addr=*argbuf; 
-                  *argbuf=loc+1;
-                  *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'p');
-                  uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-                }
-                addr=upsutl_str_create(*argbuf,'p');
-                uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-                *argbuf = 0;
-                break;
-               }
-               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-               { if(*arg_str == '-')
-                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "g" );
-                   break;
-                 }
-                 while((loc=strchr(arg_str,','))!=0) {
-                    addr=arg_str;
-                    arg_str=loc+1;
-                    *loc = 0;
-                    addr=upsutl_str_create(addr,'p');
-		    uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-                 }
-                 addr=upsutl_str_create(arg_str,'p');
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
-                 break;
-               }
-               errflg = 1;
-               break;
-         case 'f':
-              uc->ugo_f = 1;
-              if ( *argbuf ) 
-              { while((loc=strchr(*argbuf,','))!=0) {
-                  addr=*argbuf; 
-                  *argbuf=loc+1;
-                  *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'p');
-                  uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-                }
-                addr=upsutl_str_create(*argbuf,'p');
-                uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-                *argbuf = 0;
-                break;
-               }
-               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-               { if(*arg_str == '-')
-                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "f" );
-                   break;
-                 }
-                 while((loc=strchr(arg_str,','))!=0) {
-                    addr=arg_str;
-                    arg_str=loc+1;
-                    *loc = 0;
-                    addr=upsutl_str_create(addr,'p');
-		    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-                 }
-                    addr=upsutl_str_create(arg_str,'p');
-                 uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-                 break;
-               }
-               errflg = 1;
-               break;
-         case 'h':
-              uc->ugo_h = 1;
-              if ( *argbuf ) 
-              { while((loc=strchr(*argbuf,','))!=0) {
-                  addr=*argbuf; 
-                  *argbuf=loc+1;
-                  *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'p');
-                  uc->ugo_host = upslst_add(uc->ugo_host,addr);
-                }
-                addr=upsutl_str_create(*argbuf,'p');
-                uc->ugo_host = upslst_add(uc->ugo_host,addr);
-                *argbuf = 0;
-                break;
-               }
-               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-               { if(*arg_str == '-')
-                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "h" );
-                   break;
-                 }
-                 while((loc=strchr(arg_str,','))!=0) {
-                    addr=arg_str;
-                    arg_str=loc+1;
-                    *loc = 0;
-                    addr=upsutl_str_create(addr,'p');
-		    uc->ugo_host = upslst_add(uc->ugo_host,addr);
-                 }
-                 addr=upsutl_str_create(arg_str,'p');
-                 uc->ugo_host = upslst_add(uc->ugo_host,addr);
-                 break;
-               }
-               errflg = 1;
-               break;
-         case 'K':
-              uc->ugo_K = 1;
-              if ( *argbuf ) 
-              { while((loc=strchr(*argbuf,','))!=0) {
-                  addr=*argbuf; 
-                  *argbuf=loc+1;
-                  *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'p');
-                  uc->ugo_key = upslst_add(uc->ugo_key,addr);
-                }
-                addr=upsutl_str_create(*argbuf,'p');
-                uc->ugo_key = upslst_add(uc->ugo_key,addr);
-                *argbuf = 0;
-                break;
-               }
-               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-               { if(*arg_str == '-')
-                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "K" );
-                   break;
-                 }
-                 while((loc=strchr(arg_str,','))!=0) {
-                    addr=arg_str;
-                    arg_str=loc+1;
-                    *loc = 0;
-                    addr=upsutl_str_create(addr,'p');
-		    uc->ugo_key = upslst_add(uc->ugo_key,addr);
-                 }
-                    addr=upsutl_str_create(arg_str,'p');
-                 uc->ugo_key = upslst_add(uc->ugo_key,addr);
-                 break;
-               }
-               errflg = 1;
-               break;
-         case 'm':
-              uc->ugo_m = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_tablefiledir = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "m" );
-                  break;
-                }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_tablefiledir = addr;
-                break;
-              }
-              errflg = 1;
-              break;
-         case 'M':
-              uc->ugo_M = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_tablefile = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "M" );
-                  break;
-                }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_tablefile = addr;
-                break;
-              }
-              errflg = 1;
-              break;
-         case 'N':
-              uc->ugo_N = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_anyfile = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "N" );
-                  break;
-                }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_anyfile = addr;
-                break;
-              }
-              errflg = 1;
-              break;
-         case 'O':
-              uc->ugo_O = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'p');
-                 uc->ugo_options = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "O" );
-                  break;
-                }
-                addr=upsutl_str_create(arg_str,'p');
-		uc->ugo_options = addr;
-                break;
-              }
-              errflg = 1;
-              break;
-         case 'p':
-              uc->ugo_p = 1;
-              if ( *argbuf ) 
-              {  addr=upsutl_str_create(*argbuf,'t');
-                 uc->ugo_description = addr;
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "p" );
-                  break;
-                }
-                addr=upsutl_str_create(arg_str,'t');
-		uc->ugo_description = addr;
-                break;
-              }
-              errflg = 1;
-              break;
+       { /* Single flag cases */
+         case_a case_C case_D case_e case_E
+         case_F case_j case_k case_l case_S
+         case_u case_v case_V case_w case_W
+         case_x case_y case_Y case_Z
+         /* Chain cases */ 
+         case_c case_d case_n case_t case_o
+         /* List elements */
+         case_g            /* also a chain */
+         case_f
+         case_K
+         case_A
+         case_z
+         /* single values */ 
+         case_m
+         case_M
+         case_N
+         case_O
+         case_p
          case 'P':
               uc->ugo_P = 1;
               if ( *argbuf ) 
@@ -1233,145 +1242,21 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
               }
               errflg = 1;
               break;
-         case 'A':
-              uc->ugo_A = 1;
-              if ( *argbuf ) 
-              { while((loc=strchr(*argbuf,','))!=0) {
-                  addr=*argbuf; 
-                  *argbuf=loc+1;
-                  *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'p');
-                  uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
-                }
-                addr=upsutl_str_create(*argbuf,'p');
-                uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
-                *argbuf = 0;
-                break;
-               }
-               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-               { if(*arg_str == '-')
-                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "A" );
-                   break;
-                 }
-                 while((loc=strchr(arg_str,','))!=0) {
-                    addr=arg_str;
-                    arg_str=loc+1;
-                    *loc = 0;
-                    addr=upsutl_str_create(addr,'p');
-		    uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
-                 }
-                    addr=upsutl_str_create(arg_str,'p');
-                 uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
-                 break;
-               }
-               errflg = 1;
-               break;
-         case 'z':
-              uc->ugo_z = 1;
-              if ( *argbuf ) 
-              { while((loc=strchr(*argbuf,','))!=0) {
-                  addr=*argbuf; 
-                  *argbuf=loc+1;
-                  *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'p');
-                  uc->ugo_db = upslst_add(uc->ugo_db,addr);
-                }
-                addr=upsutl_str_create(*argbuf,'p');
-                uc->ugo_db = upslst_add(uc->ugo_db,addr);
-                *argbuf = 0;
-                break;
-               }
-               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-               { if(*arg_str == '-')
-                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "z" );
-                   break;
-                 }
-                 while((loc=strchr(arg_str,','))!=0) {
-                    addr=arg_str;
-                    arg_str=loc+1;
-                    *loc = 0;
-                    addr=upsutl_str_create(addr,'p');
-		    uc->ugo_db = upslst_add(uc->ugo_db,addr);
-                 }
-                    addr=upsutl_str_create(arg_str,'p');
-                 uc->ugo_db = upslst_add(uc->ugo_db,addr);
-                 break;
-               }
-               errflg = 1;
-               break;
          default:
             errflg = 1;
        }
      } else {
-       if ( strchr(arg_str,',') == 0 )
-       { addr=upsutl_str_create(arg_str,' ');
-         if (add_ver) 
-         { if(luc->ugo_version) upsmem_free(luc->ugo_version); /* -a put * */
-           luc->ugo_version=addr;
-/* may have added the current chain if no chain specified if have version
-** remove that current chain I added */
-           if (added_current)
-           { temp = luc->ugo_chain; 
-/*             upsugo_prtlst(temp,"the current chain"); */
-             upslst_delete( temp, temp->data, 'd');
-             luc->ugo_chain=0;
-             added_current=0;
-           }
-           add_ver=0;
-         } else { 
-           uc->ugo_product = addr;
-/*           if (!uc->ugo_flavor) test=upsugo_bldfvr(uc); */
-           test = upsugo_ifornota(uc);
-           luc=uc;
-           add_ver=1;
-           ugo_commands = upslst_add(ugo_commands,uc);
-           uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-         } 
+       if ( strchr(arg_str,',') != 0 )
+       { test = upsugo_ifornota(uc);
+         ugo_commands = upslst_add(ugo_commands,uc);
+         uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
        } else { 
-/* was it just a , or a ,something? */
-         if(strlen(arg_str)==1 || *arg_str==',' )  /* just a comma all alone */
-         { add_ver=0;                              /* just in case... */
-           if ( strlen(arg_str)!=1 )               /* a ,something not just , */
-           { ups_argv[argindx]=arg_str+1;
-             argindx=argindx-1;
-             my_argc=my_argc-1;
-           }
+         addr=upsutl_str_create(arg_str,' ');
+         if ( !uc->ugo_product ) 
+         { uc->ugo_product = addr;
          } else { 
-           loc=strchr(arg_str,',');
-           if(loc==arg_str)
-           { addr=upsutl_str_create(arg_str+1,' ');
-           } else {
-             *loc=0;
-             addr=upsutl_str_create(arg_str,' ');
-            *loc=' '; 
-           }
-           if (add_ver) 
-           { luc->ugo_version=addr;
-/* may have added the current chain if no chain specified if have version
-** remove that current chain I added */
-           if (added_current)
-           { temp = luc->ugo_chain; 
-/*             upsugo_prtlst(temp,"the current chain"); */
-             upslst_delete( temp, temp->data, 'd');
-             luc->ugo_chain=0;
-             added_current=0;
-           }
-             add_ver=0;
-           } else { 
-             uc->ugo_product = addr;
-/*             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc); */
-             test = upsugo_ifornota(uc);
-             ugo_commands = upslst_add(ugo_commands,uc);
-             uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-             luc=uc;
-           }
-/* prod/version, (space) */
-           if (strlen(arg_str) != (strlen(addr)+1))
-           { ups_argv[argindx]=loc+1;
-             argindx=argindx-1;
-             my_argc=my_argc-1;
-           }
-         }
+           uc->ugo_version = addr ;
+         } 
        }
      }
    }
