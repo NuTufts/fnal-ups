@@ -283,21 +283,22 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
  uc->ugo_version=0;
  uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
  uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
- for (db_list = uc->ugo_db ; db_list ; db_list=db_list->next) 
- { db_info = (t_upstyp_db *)db_list->data;
-   mproduct_list = upsmat_instance(uc, db_list , not_unique);
-   if (UPS_ERROR != UPS_SUCCESS) 
-   { return 0; 
+ if (!uc->ugo_z)         /* didn't specify a database(s) specifically */
+ { for (db_list = uc->ugo_db ; db_list ; db_list=db_list->next) 
+   { db_info = (t_upstyp_db *)db_list->data;
+     mproduct_list = upsmat_instance(uc, db_list , not_unique);
+     if (UPS_ERROR != UPS_SUCCESS) 
+     { return 0; 
+     } 
+     if (mproduct_list)    /* the product does exist */ 
+     { upsver_mes(1,"%sProduct %s currently exist in database %s\n",
+                  UPS_DECLARE,
+                  uc->ugo_product,
+                  db_info->name);
+       break; 
+     } db_info=0;
    } 
-/*   if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); }  */
-   if (mproduct_list)    /* the product does exist */ 
-   { upsver_mes(1,"%sProduct %s currently exist in database %s\n",
-                UPS_DECLARE,
-                uc->ugo_product,
-                db_info->name);
-     break; 
-   } db_info=0;
-  } 
+ }
   if (!db_info) 
   { db_list = upslst_first(uc->ugo_db);
     db_info = (t_upstyp_db *)db_list->data;
