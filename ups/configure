@@ -577,18 +577,6 @@ SETUPS_DIR=\$Setups_Home; export SETUPS_DIR
 
 UPS_SHELL=sh; export UPS_SHELL
 #
-# The following kludge fixes the problem caused by switching shell
-# families.  Many members of the bourne shell family do not set the
-# SHELL environment variable, thus leaving it at its previous value.
-#
-# Some versions of $Name_Of_Ups use this to determine the instructions
-# to be generated for execution.
-#
-if test \`echo x\${SHELL:-}|grep -c csh\` != '0'
-then
-    SHELL=/bin/sh;export SHELL
-fi
-#
 # Determine probable flavor names for the version of $Name_Of_Ups
 # which would execute on this platform.
 #
