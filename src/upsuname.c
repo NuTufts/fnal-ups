@@ -6,8 +6,8 @@
 #include "upsuname.h"
 
 #ifdef __sgi
-extern char *strdup();
-extern char *getenv();
+extern char *strdup(const char *);
+extern char *getenv(const char *);
 #endif
 
 #define HOST_BUF_SIZE 1024
