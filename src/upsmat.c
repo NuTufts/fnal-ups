@@ -703,6 +703,10 @@ static t_upstyp_matched_product *match_instance_core(
 
       num_matches += tmp_num_matches;
     }
+    if (num_matches > 0) {
+      /* clean out any invalid instances */
+      FREE_INVALID_INSTANCES();
+    }
     if (a_chain_list && (num_matches > 0)) {
       /* Now we need to go thru the list of chains that were passed us, read in
 	 each file, and associate any chains with the matched version
@@ -759,9 +763,6 @@ static t_upstyp_matched_product *match_instance_core(
     /* We went thru the list of versions, get a matched product
        structure if we got no errors */
     if (num_matches > 0) {
-      /* clean out any invalid instances */
-      FREE_INVALID_INSTANCES();
-
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
     }
