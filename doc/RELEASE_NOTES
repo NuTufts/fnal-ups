@@ -11,4 +11,6 @@ upcased product name in error message
 fix problem with 'setup -r ...' giving an error the second time it is done
 <li>
 minor documentation fixes
+<li>
+ups current action will now also do a configure
 </ul>
