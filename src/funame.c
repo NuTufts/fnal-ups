@@ -32,7 +32,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#ifdef USE_GETOPT_H
 #include <getopt.h>
+#else
+#include <stdlib.h>
+#endif
 #include "upsuname.h"
 
 #ifdef VMS
