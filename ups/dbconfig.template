@@ -23,5 +23,5 @@ SETUPS_DIR = /usr/local/etc
 
 # this db contains the upd product; look for the upd
 #  user callouts here:
-UPD_USERCODE_DIR = ../.updfiles
+UPD_USERCODE_DIR = /usr/products/ups_database/.updfiles
                 
