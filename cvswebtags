@@ -384,31 +384,31 @@ ups_new_matched_instance 136 src/upstyp.c     t_upstyp_matched_instance *ups_new
 ups_new_matched_product  58 src/upstyp.c     t_upstyp_matched_product *ups_new_matched_product(
 ups_new_product  216 src/upstyp.c     t_upstyp_product *ups_new_product(
 FREE              56 src/upsugo.c     #define FREE(
-add_chain        147 src/upsugo.c     #define add_chain(
-build_list       233 src/upsugo.c     #define build_list(
+add_chain        153 src/upsugo.c     #define add_chain(
+build_list       239 src/upsugo.c     #define build_list(
 expand_flavorlist  59 src/upsugo.c     expand_flavorlist(
 flavor_sub        92 src/upsugo.c     flavor_sub(
-set_O_value      208 src/upsugo.c     #define set_O_value(
-set_value        164 src/upsugo.c     #define set_value(
-set_value_nop    184 src/upsugo.c     #define set_value_nop(
-ugo_old2newquals 615 src/upsugo.c     ugo_old2newquals(
-upsugo_bldcmd    1389 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(
-upsugo_blddb     552 src/upsugo.c     int upsugo_blddb(
-upsugo_bldfvr    354 src/upsugo.c     int upsugo_bldfvr(
-upsugo_bldqual   675 src/upsugo.c     int upsugo_bldqual(
-upsugo_dump      1123 src/upsugo.c     int upsugo_dump 
-upsugo_env       1312 src/upsugo.c     t_upsugo_command *upsugo_env(
-upsugo_free      1030 src/upsugo.c     int upsugo_free 
-upsugo_free_ugo_db 1093 src/upsugo.c     void upsugo_free_ugo_db(
-upsugo_getarg    859 src/upsugo.c     char * upsugo_getarg(
-upsugo_getenv    1286 src/upsugo.c     char *upsugo_getenv(
-upsugo_ifornota  454 src/upsugo.c     int upsugo_ifornota(
-upsugo_liststart 827 src/upsugo.c     void upsugo_liststart(
-upsugo_next      1443 src/upsugo.c     t_upsugo_command *upsugo_next(
-upsugo_prtdb     1238 src/upsugo.c     void upsugo_prtdb(
-upsugo_prtlst    1197 src/upsugo.c     void upsugo_prtlst(
-upsugo_rearg     951 src/upsugo.c     int upsugo_rearg(
-upsugo_setshell  417 src/upsugo.c     void upsugo_setshell(
+set_O_value      214 src/upsugo.c     #define set_O_value(
+set_value        170 src/upsugo.c     #define set_value(
+set_value_nop    190 src/upsugo.c     #define set_value_nop(
+ugo_old2newquals 621 src/upsugo.c     ugo_old2newquals(
+upsugo_bldcmd    1395 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(
+upsugo_blddb     558 src/upsugo.c     int upsugo_blddb(
+upsugo_bldfvr    360 src/upsugo.c     int upsugo_bldfvr(
+upsugo_bldqual   681 src/upsugo.c     int upsugo_bldqual(
+upsugo_dump      1129 src/upsugo.c     int upsugo_dump 
+upsugo_env       1318 src/upsugo.c     t_upsugo_command *upsugo_env(
+upsugo_free      1036 src/upsugo.c     int upsugo_free 
+upsugo_free_ugo_db 1099 src/upsugo.c     void upsugo_free_ugo_db(
+upsugo_getarg    865 src/upsugo.c     char * upsugo_getarg(
+upsugo_getenv    1292 src/upsugo.c     char *upsugo_getenv(
+upsugo_ifornota  460 src/upsugo.c     int upsugo_ifornota(
+upsugo_liststart 833 src/upsugo.c     void upsugo_liststart(
+upsugo_next      1449 src/upsugo.c     t_upsugo_command *upsugo_next(
+upsugo_prtdb     1244 src/upsugo.c     void upsugo_prtdb(
+upsugo_prtlst    1203 src/upsugo.c     void upsugo_prtlst(
+upsugo_rearg     957 src/upsugo.c     int upsugo_rearg(
+upsugo_setshell  423 src/upsugo.c     void upsugo_setshell(
 ups_append_OS     84 src/upsuname.c   ups_append_OS(
 ups_append_default_quals 148 src/upsuname.c   ups_append_default_quals(
 ups_append_release 110 src/upsuname.c   ups_append_release(

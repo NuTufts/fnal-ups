@@ -94,6 +94,12 @@ flavor_sub(char *flavor, struct ups_command * uc)
    char *addr;
    char *loc;
   
+   if ((loc = strrchr(flavor,'-')))
+      { *loc = 0;
+        addr=upsutl_str_create(flavor,' ');
+        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+      }
    while ((loc = strrchr(flavor,'.')))
       { *loc = 0;
         addr=upsutl_str_create(flavor,' ');
@@ -1505,7 +1511,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
           case_b case_D case_G case_m 
           case_M case_N case_O case_p 
           case_r case_T case_u case_U 
-          case_0 case_1 case_2 case_3 case_4/* number sets */
+          case_0 case_1 case_2 case_3 case_4 /* number sets */
           case_q case_z               /* special cases */
           default:
              errflg = 1;
