@@ -63,6 +63,7 @@ extern int UPS_VERBOSE;
 extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
+extern int g_UPS_SHELL; /* Ugliness!!! */
 int g_simulate = 0;
 static mode_t g_umask = 0;
 extern int UPS_NEED_DB;
@@ -169,6 +170,7 @@ int main(int argc, char *argv[])
 	       everything in shell.  so change whatever we have here to be
 	       bourne shell */
 	    command_line->ugo_shell = e_BOURNE;
+            g_UPS_SHELL = e_BOURNE;
 
 	    switch (g_cmd_info[i].cmd_index) {
 	    case e_list: mproduct_list = ups_list(command_line,0);
