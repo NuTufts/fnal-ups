@@ -66,7 +66,9 @@ static char *g_dollarsign = "$";
     if (dir && (dir[0] != '\0')) {                                          \
       char *trans_dir;                                                      \
       struct stat file_stat;                                                \
-      if ( tran )                                                           \
+      t_upstyp_matched_instance *tran_tmp;                                  \
+      tran_tmp = (t_upstyp_matched_instance *) tran;                        \
+      if ( tran_tmp )                                                       \
 	trans_dir = upsget_translation(a_minst, a_db, a_command_line, dir); \
       else                                                                  \
 	trans_dir = dir;                                                    \
