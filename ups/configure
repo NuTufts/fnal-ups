@@ -1197,6 +1197,16 @@ then
     echo '****' \$Name_Of_Ups current script cannot execute.
     exit 1
 fi
+if test ! -d \$Setups_Home
+then
+    mkdir \$setups_Home
+fi
+
+if test ! -d \$Setups_Home
+then
+    echo '****' Unable to create \$Setups_Home
+    exit 1
+fi
 #
 # If the $Setups_Home
 # is in AFS space, 
@@ -1216,6 +1226,8 @@ then
     echo '****' Unable to write to \$Setups_Home
     echo '****' \$Name_Of_Ups current script failure
     exit 1
+else
+    chmod +rx $Setups_Home
 fi
 #
 # Mark ALL BootStrap files current.
