@@ -34,9 +34,9 @@ CFLAGScia = $(INCDIRS)
 
 #
 #
-OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o
+OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.c
 
-CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a
+CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a ups_types.a
 
 LDFLAGS = $(LLIBS)
 
@@ -123,6 +123,9 @@ ups_memory.o:	ups_memory.c
 ups_memory.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_memory.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
+ups_types.o:    $(ERUPT_DIR)/inc/ups_types.h
+ups_types.o:    $(ERUPT_DIR)/inc/ups_list.h
+ups_types.o:    $(ERUPT_DIR)/inc/ups_memory.h
 ups_utils.o:	ups_utils.c
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
