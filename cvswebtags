@@ -98,9 +98,9 @@ SH_OUTPUT_LAST_PART_OPT 280 src/upsact.c     #define SH_OUTPUT_LAST_PART_OPT() \
 actitem2str     2359 src/upsact.c     char *actitem2str( const t_upsact_item *const p_act_itm )
 cmp_ugo_db      1983 src/upsact.c     int cmp_ugo_db( const void * const d1, const void * const d2 )
 copy_act_item   2059 src/upsact.c     t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
-csh_output_first_check3315 src/upsact.c     static int csh_output_first_check(const FILE * const a_stream,
-csh_output_last_part_req3389 src/upsact.c     static int csh_output_last_part_req(const FILE * const a_stream,
-csh_output_next_part3327 src/upsact.c     static int csh_output_next_part(const FILE * const a_stream,
+csh_output_first_check3316 src/upsact.c     static int csh_output_first_check(const FILE * const a_stream,
+csh_output_last_part_req3391 src/upsact.c     static int csh_output_last_part_req(const FILE * const a_stream,
+csh_output_next_part3328 src/upsact.c     static int csh_output_next_part(const FILE * const a_stream,
 do_exit_action  2319 src/upsact.c     int do_exit_action( const t_upsact_cmd * const a_cmd ) 
 f_addalias      3171 src/upsact.c     static void f_addalias( ACTION_PARAMS)
 f_copycatman    2460 src/upsact.c     static void f_copycatman( ACTION_PARAMS)
@@ -108,7 +108,7 @@ f_copyhtml      2439 src/upsact.c     static void f_copyhtml( ACTION_PARAMS)
 f_copyinfo      2446 src/upsact.c     static void f_copyinfo( ACTION_PARAMS)
 f_copyman       2453 src/upsact.c     static void f_copyman( ACTION_PARAMS)
 f_copynews      2481 src/upsact.c     static void f_copynews( ACTION_PARAMS)
-f_dodefaults    4031 src/upsact.c     static void f_dodefaults( ACTION_PARAMS)
+f_dodefaults    4033 src/upsact.c     static void f_dodefaults( ACTION_PARAMS)
 f_envappend     2488 src/upsact.c     static void f_envappend( ACTION_PARAMS)
 f_envprepend    2544 src/upsact.c     static void f_envprepend( ACTION_PARAMS)
 f_envremove     2601 src/upsact.c     static void f_envremove( ACTION_PARAMS)
@@ -122,20 +122,20 @@ f_pathappend    2949 src/upsact.c     static void f_pathappend( ACTION_PARAMS)
 f_pathprepend   3004 src/upsact.c     static void f_pathprepend( ACTION_PARAMS)
 f_pathremove    3060 src/upsact.c     static void f_pathremove( ACTION_PARAMS)
 f_pathset       3125 src/upsact.c     static void f_pathset( ACTION_PARAMS)
-f_proddir       3933 src/upsact.c     static void f_proddir( ACTION_PARAMS)
-f_setupenv      3892 src/upsact.c     static void f_setupenv( ACTION_PARAMS)
-f_sourcecompileopt3459 src/upsact.c     static void f_sourcecompileopt( ACTION_PARAMS)
-f_sourcecompilereq3407 src/upsact.c     static void f_sourcecompilereq( ACTION_PARAMS)
-f_sourceoptcheck3683 src/upsact.c     static void f_sourceoptcheck( ACTION_PARAMS)
-f_sourceoptional3567 src/upsact.c     static void f_sourceoptional( ACTION_PARAMS)
-f_sourcereqcheck3623 src/upsact.c     static void f_sourcereqcheck( ACTION_PARAMS)
-f_sourcerequired3508 src/upsact.c     static void f_sourcerequired( ACTION_PARAMS)
+f_proddir       3935 src/upsact.c     static void f_proddir( ACTION_PARAMS)
+f_setupenv      3894 src/upsact.c     static void f_setupenv( ACTION_PARAMS)
+f_sourcecompileopt3461 src/upsact.c     static void f_sourcecompileopt( ACTION_PARAMS)
+f_sourcecompilereq3409 src/upsact.c     static void f_sourcecompilereq( ACTION_PARAMS)
+f_sourceoptcheck3685 src/upsact.c     static void f_sourceoptcheck( ACTION_PARAMS)
+f_sourceoptional3569 src/upsact.c     static void f_sourceoptional( ACTION_PARAMS)
+f_sourcereqcheck3625 src/upsact.c     static void f_sourcereqcheck( ACTION_PARAMS)
+f_sourcerequired3510 src/upsact.c     static void f_sourcerequired( ACTION_PARAMS)
 f_unalias       3224 src/upsact.c     static void f_unalias( ACTION_PARAMS)
 f_uncopycatman  2474 src/upsact.c     static void f_uncopycatman( ACTION_PARAMS)
 f_uncopyman     2467 src/upsact.c     static void f_uncopyman( ACTION_PARAMS)
-f_unproddir     4003 src/upsact.c     static void f_unproddir( ACTION_PARAMS)
-f_unsetupenv    3905 src/upsact.c     static void f_unsetupenv( ACTION_PARAMS)
-f_writecompilescript3738 src/upsact.c     static void f_writecompilescript(ACTION_PARAMS)
+f_unproddir     4005 src/upsact.c     static void f_unproddir( ACTION_PARAMS)
+f_unsetupenv    3907 src/upsact.c     static void f_unsetupenv( ACTION_PARAMS)
+f_writecompilescript3740 src/upsact.c     static void f_writecompilescript(ACTION_PARAMS)
 find_prod_name  1968 src/upsact.c     t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
 get_SETUP_prod  1713 src/upsact.c     t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
 get_act         1777 src/upsact.c     t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
@@ -151,7 +151,7 @@ parse_params    1622 src/upsact.c     int parse_params( const char * const a_par
 prepend_ugo_db  1996 src/upsact.c     t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
 reverse_command_list2186 src/upsact.c     t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm, 
 sh_output_first_check3259 src/upsact.c     static int sh_output_first_check(const FILE * const a_stream,
-sh_output_last_part_req3371 src/upsact.c     static int sh_output_last_part_req(const FILE * const a_stream,
+sh_output_last_part_req3373 src/upsact.c     static int sh_output_last_part_req(const FILE * const a_stream,
 sh_output_next_part3271 src/upsact.c     static int sh_output_next_part(const FILE * const a_stream,
 upsact_action2enum1027 src/upsact.c     int upsact_action2enum( const char * const act_name )
 upsact_check_files1055 src/upsact.c     t_upslst_item *upsact_check_files(
@@ -398,37 +398,37 @@ upsugo_prtdb    1131 src/upsugo.c     void upsugo_prtdb( t_upslst_item * const l
 upsugo_prtlst   1090 src/upsugo.c     void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title ,
 upsugo_rearg     844 src/upsugo.c     int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *argv_new[])
 upsugo_setshell  380 src/upsugo.c     void upsugo_setshell(struct ups_command * const uc)
-CMP_AUTH_NODES   335 src/upsutl.c     #define CMP_AUTH_NODES(struct) \
-KEEP_OR_REMOVE_FILE  83 src/upsutl.c     #define KEEP_OR_REMOVE_FILE()   \
-qsort_cmp_string1311 src/upsutl.c     int qsort_cmp_string( const void * c1, const void * c2 )
-upsutl_finish_temp_file 271 src/upsutl.c     void upsutl_finish_temp_file( const FILE * const a_stream,
-upsutl_finish_up 110 src/upsutl.c     void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
-upsutl_free_config 426 src/upsutl.c     t_upstyp_config *upsutl_free_config( const t_upstyp_config * const a_db_config)
-upsutl_free_inst_list 501 src/upsutl.c     t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
-upsutl_free_matched_instance_list 472 src/upsutl.c     t_upslst_item *upsutl_free_matched_instance_list(
-upsutl_free_matched_product_list 442 src/upsutl.c     t_upslst_item *upsutl_free_matched_product_list(
-upsutl_get_config 393 src/upsutl.c     t_upstyp_product *upsutl_get_config( const char * const a_db)
-upsutl_get_files 531 src/upsutl.c     void upsutl_get_files(const char * const a_dir,
-upsutl_get_hostname 300 src/upsutl.c     char *upsutl_get_hostname( void )
-upsutl_get_prod_dir 601 src/upsutl.c     char *upsutl_get_prod_dir(const char * const a_db,
-upsutl_is_a_file1293 src/upsutl.c     int upsutl_is_a_file(const char * const a_filename)
-upsutl_is_authorized 344 src/upsutl.c     int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
-upsutl_start_timing 636 src/upsutl.c     void upsutl_start_timing(void)
-upsutl_statistics 683 src/upsutl.c     void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
-upsutl_stop_timing 652 src/upsutl.c     void upsutl_stop_timing(void)
-upsutl_str_create1048 src/upsutl.c     char *upsutl_str_create( char * const str, const char copt )
-upsutl_str_crecat1091 src/upsutl.c     char *upsutl_str_crecat( char * const str1, char * const str2 )
-upsutl_str_remove1187 src/upsutl.c     size_t upsutl_str_remove( char * const str, const char * const str_remove )
-upsutl_str_remove_edges1216 src/upsutl.c     size_t upsutl_str_remove_edges( char * const str, const char * const str_remove )
-upsutl_str_remove_end_quotes1256 src/upsutl.c     size_t upsutl_str_remove_end_quotes( char * str, 
-upsutl_str_sort 1121 src/upsutl.c     int upsutl_str_sort( char * const str, const char c )
-upsutl_stricmp   870 src/upsutl.c     int upsutl_stricmp( const char *s1, const char *s2 )
-upsutl_strincmp  899 src/upsutl.c     int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
-upsutl_strstr    953 src/upsutl.c     char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
-upsutl_time_date 986 src/upsutl.c     char *upsutl_time_date(const int a_flag)
-upsutl_unset_upsvars 253 src/upsutl.c     void upsutl_unset_upsvars( const FILE * const a_stream,
-upsutl_upcase    927 src/upsutl.c     char *upsutl_upcase(const char * const a_str)
-upsutl_user     1018 src/upsutl.c     char *upsutl_user(void)
+CMP_AUTH_NODES   341 src/upsutl.c     #define CMP_AUTH_NODES(struct) \
+KEEP_OR_REMOVE_FILE  84 src/upsutl.c     #define KEEP_OR_REMOVE_FILE()   \
+qsort_cmp_string1317 src/upsutl.c     int qsort_cmp_string( const void * c1, const void * c2 )
+upsutl_finish_temp_file 277 src/upsutl.c     void upsutl_finish_temp_file( const FILE * const a_stream,
+upsutl_finish_up 111 src/upsutl.c     int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
+upsutl_free_config 432 src/upsutl.c     t_upstyp_config *upsutl_free_config( const t_upstyp_config * const a_db_config)
+upsutl_free_inst_list 507 src/upsutl.c     t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
+upsutl_free_matched_instance_list 478 src/upsutl.c     t_upslst_item *upsutl_free_matched_instance_list(
+upsutl_free_matched_product_list 448 src/upsutl.c     t_upslst_item *upsutl_free_matched_product_list(
+upsutl_get_config 399 src/upsutl.c     t_upstyp_product *upsutl_get_config( const char * const a_db)
+upsutl_get_files 537 src/upsutl.c     void upsutl_get_files(const char * const a_dir,
+upsutl_get_hostname 306 src/upsutl.c     char *upsutl_get_hostname( void )
+upsutl_get_prod_dir 607 src/upsutl.c     char *upsutl_get_prod_dir(const char * const a_db,
+upsutl_is_a_file1299 src/upsutl.c     int upsutl_is_a_file(const char * const a_filename)
+upsutl_is_authorized 350 src/upsutl.c     int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
+upsutl_start_timing 642 src/upsutl.c     void upsutl_start_timing(void)
+upsutl_statistics 689 src/upsutl.c     void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
+upsutl_stop_timing 658 src/upsutl.c     void upsutl_stop_timing(void)
+upsutl_str_create1054 src/upsutl.c     char *upsutl_str_create( char * const str, const char copt )
+upsutl_str_crecat1097 src/upsutl.c     char *upsutl_str_crecat( char * const str1, char * const str2 )
+upsutl_str_remove1193 src/upsutl.c     size_t upsutl_str_remove( char * const str, const char * const str_remove )
+upsutl_str_remove_edges1222 src/upsutl.c     size_t upsutl_str_remove_edges( char * const str, const char * const str_remove )
+upsutl_str_remove_end_quotes1262 src/upsutl.c     size_t upsutl_str_remove_end_quotes( char * str, 
+upsutl_str_sort 1127 src/upsutl.c     int upsutl_str_sort( char * const str, const char c )
+upsutl_stricmp   876 src/upsutl.c     int upsutl_stricmp( const char *s1, const char *s2 )
+upsutl_strincmp  905 src/upsutl.c     int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
+upsutl_strstr    959 src/upsutl.c     char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
+upsutl_time_date 992 src/upsutl.c     char *upsutl_time_date(const int a_flag)
+upsutl_unset_upsvars 259 src/upsutl.c     void upsutl_unset_upsvars( const FILE * const a_stream,
+upsutl_upcase    933 src/upsutl.c     char *upsutl_upcase(const char * const a_str)
+upsutl_user     1024 src/upsutl.c     char *upsutl_user(void)
 upsver_mes        56 src/upsver.c     void upsver_mes (const int vl, char * const format, ...)
 TOO_MUCH_FOR_UNSETUP  41 inc/upsact.h     #define TOO_MUCH_FOR_UNSETUP( ugo_cmd ) \
 UPSACT_CMD_NEEDS_DB 185 inc/upsact.h     #define UPSACT_CMD_NEEDS_DB( flag ) (flag&0x00000010 ? 1 : 0)

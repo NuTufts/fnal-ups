@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
 
   /* finish writing stuff to the temp file, close it and execute it or output
      it's name if necessary.  also flush the journal files. */
-  upsutl_finish_up(temp_file, temp_shell, i, g_simulate);
+  rstatus = upsutl_finish_up(temp_file, temp_shell, i, g_simulate);
 
   /* output any help that was asked for */
   if (need_help) {

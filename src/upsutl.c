@@ -40,6 +40,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <netdb.h>        /* needed on SunOS to get MAXHOSTNAMELEN */
 /* #ifdef _SYSTYPE_SVR4 */
@@ -107,7 +108,7 @@ static mode_t g_umask = 0;
  * Output: none
  * Return: none
  */
-void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
+int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 		      const int a_command_index, const int a_simulate_flag)
 {
   int empty_stream = 0;
@@ -191,16 +192,19 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
               char sourced_temp_file[L_tmpnam+3] = ". ";
               strcat(sourced_temp_file, g_temp_file_name);
 	      upsver_mes(1,"%sExecuting file %s\n",VPREFIX,g_temp_file_name);
-	      if (system(sourced_temp_file) < 0) {
+              errno = system (sourced_temp_file);
+              errno = WEXITSTATUS (errno);
+	      if (errno == 0) {
+                /* flush the journaling cache of files so the changes made
+                   internally are actually written out to disk */
+                upsfil_flush();
+              } else {
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			   strerror(errno));
 		upserr_add(UPS_COMMAND_FAILED, UPS_FATAL,
 			  g_cmd_info[a_command_index].cmd);
 		KEEP_OR_REMOVE_FILE();
-	      } else {
-		/* flush the journaling cache of files so the changes made
-		   internally are actually written out to disk */
-		upsfil_flush();
+                return (errno);
 	      }
 	    } else {
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "chmod",
@@ -241,6 +245,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
       break;
     }
   }
+  return 0;
 }
 
 /*-----------------------------------------------------------------------
