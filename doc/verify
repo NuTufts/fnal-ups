@@ -14,3 +14,8 @@ Things to remember to verify when reading a ups file.
 - Check that each FLAVOR is followed by a QUALIFIERS.
 
 - Check that no VERSION is specified in a TABLE file.
+
+- Check that all support UPS_ environmentals are actually in
+  the file as ${UPS_blaablaa} and not just $UPS_blaablaa.
+  This decision to force this was based on time constraints
+  of setup.  DjF
