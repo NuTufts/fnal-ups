@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     if (command_line->ugo_v) {
       UPS_VERBOSE = 1;
     }
-    ups_c_list(command_line);
+    ups_list(command_line);
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_output();
       break;
