@@ -109,7 +109,7 @@ static t_upslst_item *unsetup_core(
   t_upslst_item *cmd_list;
   t_upsugo_command *new_command_line;
   char *dummy = NULL;
-  int need_unique = 1;
+  int need_unique = 1, got_new_cmd_line = 0;
 
   /* if no product name was given, this is an error */
   if (a_command_line->ugo_product) {
@@ -126,6 +126,7 @@ static t_upslst_item *unsetup_core(
       /* translate SETUP_<prodname> to get instance information */
       new_command_line = upsugo_env(a_command_line->ugo_product,
 				    g_cmd_info[e_unsetup].valid_opts);
+      got_new_cmd_line = 1;
     }
 
     if (new_command_line) {
@@ -159,12 +160,17 @@ static t_upslst_item *unsetup_core(
 	  }
 	}
       }
+      /* free this if we got a new one */
+      if (got_new_cmd_line) {
+	(void )upsugo_free(new_command_line);
+      }
     } else {
       upserr_add(UPS_NO_SETUP_ENV, UPS_FATAL, a_command_line->ugo_product);
     }
   } else {
     upserr_add(UPS_NO_PRODUCT, UPS_FATAL, g_cmd_info[a_ups_command].cmd);
   }
+
   return(mproduct_list);
 
 }

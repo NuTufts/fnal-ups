@@ -150,6 +150,9 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 	      /* now clean up the memory that we used */
 	      upsact_cleanup(cmd_list);
 	    }
+
+	    /* free allocated memory */
+	    (void )upsugo_free(new_command_line);
 	  }
 	  /* now clean up the memory that we used */
 	  if (cmd_list) {
