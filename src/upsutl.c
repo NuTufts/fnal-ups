@@ -545,7 +545,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   for (mproduct_item = (t_upslst_item *)a_mproduct_list ;
        mproduct_item ; mproduct_item = mproduct_item->next) {
     mproduct = (t_upstyp_matched_product *)mproduct_item->data;
-    if ((mproduct->db_info->config) && 
+    if ((mproduct->db_info) && (mproduct->db_info->config) && 
 	(tmp_stat = mproduct->db_info->config->statistics)) {
       if ((! strcmp(tmp_stat, ANY_MATCH)) ||
 	  (strstr(tmp_stat, mproduct->product))) {
