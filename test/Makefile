@@ -32,7 +32,7 @@ OBJECTS =
 LDFLAGS = $(LLIBS)
 
 UNIT_TESTS = test_upserr test_upslst test_upsmem test_upsutl test_upsugo \
-	test_upsmat
+	test_upsmat test_upsact
 
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
 	upstst_misc.o upstst_parse.o upstst_err.o upstst_fil.o	\
@@ -56,6 +56,9 @@ integration_tests : ups_test
 #
 
 test_ups_list : test_ups_list.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+
+test_upsact : test_upsact.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
 
 test_upserr : test_upserr.o $(LIB)/libups.a
@@ -83,10 +86,10 @@ ups_test : ups_test.o $(UPS_TEST_OBJECTS)
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(UPS_TEST_OBJECTS) $(LDFLAGS)
 
 upstst_cmdline.o : upstst_cmdline.c $(LIB)/libups.a
-	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
+	$(CC) -c -o $@   $< 
 
 upstst_cmdloop.o : upstst_cmdloop.c $(LIB)/libups.a
-	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
+	$(CC) -c -o $@   $< 
 
 upstst_error.o : upstst_error.c $(LIB)/libups.a
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
@@ -131,6 +134,10 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
+test_upsact.o:	test_upsact.c
+test_upsact.o:	$(ERUPT_DIR)/inc/upsact.h
+test_upsact.o:	$(ERUPT_DIR)/inc/upserr.h
+test_upsact.o:	$(ERUPT_DIR)/inc/upslst.h
 test_upserr.o:	test_upserr.c
 test_upserr.o:	$(ERUPT_DIR)/inc/upserr.h
 test_upsfil.o:	test_upsfil.c
