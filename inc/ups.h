@@ -46,6 +46,7 @@
 #include "ups_get.h"
 #include "ups_list.h"
 #include "ups_main.h"
+#include "ups_modify.h"
 #include "ups_setup.h"
 #include "ups_start.h"
 #include "ups_stop.h"
