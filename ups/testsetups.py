@@ -1,5 +1,6 @@
 
-sys.path.insert(0,"/tmp")
+import sys
+sys.path.insert(0,"/usr/local/etc")
 import setups
 import os
  

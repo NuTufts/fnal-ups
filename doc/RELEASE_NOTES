@@ -1,3 +1,104 @@
+Changes made in the v4_7_1 release of ups:
+
+    * adds setups.py
+    * return code of ups matches return code from actions
+	(i.e. if ups some_action product has an action of "false"
+	ups exits with an exit code of 1...)
+    * UPS_REQ_CHAIN -- requested chain
+
+Changes made in the v4_7 release of ups:
+
+    * ups flavor -4
+    * finalizes extended flavor matching
+    * finalizes improved qualifier matching
+    * adds setups.pl
+    * UPS_REQ_QUALIFIER -- requested qualifier
+
+    Extended Flavor Matching
+
+      This new flavor matching extension assumes backwards compatability for
+      operating systems, and also adds "ups flavor -4".  If a component of a 
+      flavor is numeric, it is counted down numerically to find compatable 
+      packages, so under the old scheme you would use for a Linux system we 
+      would try flavors:
+	Linux+2.4.9-2
+	Linux+2.4
+	Linux+2
+	Linux
+	NULL
+      In the new scheme we would try:
+	Linux+2.4.9-2
+	Linux+2.4.9-1
+	Linux+2.4.9-0
+	Linux+2.4.9
+	Linux+2.4.8
+	Linux+2.4.7
+	Linux+2.4.6
+	Linux+2.4.5
+	Linux+2.4.4
+	Linux+2.4.3
+	Linux+2.4.2
+	Linux+2.4.1
+	Linux+2.4.0
+	Linux+2.4
+	Linux+2.3
+	Linux+2.2
+	Linux+2.1
+	Linux+2.0
+	Linux+2
+	Linux+1
+	Linux+0
+
+    Improved Qualifier Matching
+
+       Under the new system qualifiers default to being optional (and can
+       be made mandatory with a '+' sign.)  Also, a new variable for table
+       files has been provided ${UPS_REQ_QUALIFIERS}, which is the list of
+       requested qualifiers, as distinct from those that matched.   This
+       allows you to pass requested qualifiers down to dependant products
+       in table files -- so if your table file for product "foo" looks like:
+
+       Action=setup
+	 SetupRequired(bar -q "${UPS_REQ_QUALIFIERS}")
+	 SetupRequired(baz -q "${UPS_REQ_QUALIFIERS}")
+
+      and you do a "ups depend foo -q apple:orange", and bar has an "apple"
+      qualifier, and baz has an "orange" qualifier, and foo has none, you
+      will get a depenency like:
+
+	   foo v1_0 -f NULL -g current
+	   |__bar v1_0 -f NULL -q apple -g current
+	   |__baz v1_0 -f NULL -q orange -g current
+
+      This sort of arrangement makes dealing with various qualifiers of 
+      dependency hierarchies much easier to manage.
+
+    setups.pl
+
+      This is perhaps best described with an example:
+
+	#!/usr/bin/env perl
+	require "/usr/local/etc/setups.pl";
+
+	# make sure we're using the right ups version of perl
+	ups::use_perl("v5_005a");
+
+	print @INC;
+
+	# make sure we have dependant products available before using
+	# them
+	ups::setup("pgp");
+	ups::setup("xemacs v20_4");
+
+	print "PGP_DIR is ", $::ENV{PGP_DIR}, "\n";
+	    print "XEMACS_DIR is ", $::ENV{XEMACS_DIR}, "\n";
+
+	    ups::setup("xemacs v21_1");
+
+	    print "XEMACS_DIR is ", $::ENV{XEMACS_DIR}, "\n";
+
+
+
 Changes made in the v4_6 release of ups (2001-08-26): 
 
   * ups table file actions extended -- added:

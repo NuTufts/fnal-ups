@@ -4,6 +4,9 @@ upsdb=/local/ups/db
 state=$1
 case $state in
   'start')
+      exec > /tmp/ups.out 2>&1
+      # uncomment the following if debugging
+      # set -x
       start=$upsdb/.upsfiles/startup/ups_startup
       (while [ ! -f $start ]; do sleep 5; done; $start) &
       ;;

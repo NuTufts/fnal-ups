@@ -95,5 +95,8 @@ sub use_prod {
 	die( "cannot exec $::ENV{PERL_DIR}/bin/perl" );
     }
 }
- 
+
+sub ups {
+   return `$::ENV{UPS_DIR}/bin/ups @_`;
+}
 1;

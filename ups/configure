@@ -631,11 +631,12 @@ XEoF
 chmod +x $BootStrap_Dir/$Setups_Products_Script
 #
 #======================================================================
-# Create the setups.pl, setups.py files in the bootstrap directory.
+# Create the setups.pl, ups.pm, setups.py files in the bootstrap directory.
 #======================================================================
 # These are done differently, since they only needs ${Setups_Home} 
 # replaced, and use setups.sh...
 sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/${Script_Prefix}.pl > ${BootStrap_Dir}/${Script_Prefix}.pl
+sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/ups.pm > ${BootStrap_Dir}/ups.pm
 sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/${Script_Prefix}.py > ${BootStrap_Dir}/${Script_Prefix}.py
 
 #
@@ -1711,7 +1712,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/current
 	# Move all the files from the bootstrap directory to 
 	# $Setups_Home
 	#======================================================================
-	    for filex in \$BootStrap_Dir/set*
+	    for filex in \$BootStrap_Dir/set* \$BootStrap_Dir/ups.pm
 	    do
 #	        Diff_rc='0'
 		file=\`echo \$filex|\$sed "s%\$BootStrap_Dir/%%"\`
