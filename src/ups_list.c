@@ -47,6 +47,8 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line);
 void list_output(const t_upslst_item * const a_mproduct_list,
 		 const t_upsugo_command * const a_command_line);
 
+void list_K(const t_upstyp_matched_instance * const instance,
+            const t_upsugo_command * const a_command_line);
 /*
  * Definition of global variables.
  */
@@ -55,6 +57,78 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 #ifndef NULL
 #define NULL 0
 #endif
+
+#define FromVersion(ELEMENT) \
+{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
+  { if(instance->version)                               \
+    { if (instance->version->ELEMENT)                   \
+      { printf("%s ",instance->version->ELEMENT);       \
+      } else {                                          \
+        printf("\"\" ");                                \
+      }                                                 \
+    } else {                                            \
+      printf("\"\" ");                                  \
+    }                                                   \
+  }                                                     \
+}
+#define FromEither(ELEMENT) \
+{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
+  { if(instance->chain)                                 \
+    { if (instance->chain->ELEMENT)                     \
+      { printf("%s ",instance->chain->ELEMENT);         \
+      } else {                                          \
+        if(instance->version)                           \
+        { if (instance->version->ELEMENT)               \
+          { printf("%s ",instance->version->ELEMENT);   \
+          } else {                                      \
+            printf("\"\" ");                            \
+          }                                             \
+        } else {                                        \
+          printf("\"\" ");                              \
+        }                                               \
+      }                                                 \
+    } else {                                            \
+      if(instance->version)                             \
+      { if (instance->version->ELEMENT)                 \
+        { printf("%s ",instance->version->ELEMENT);     \
+        } else {                                        \
+          printf("\"\" ");                              \
+        }                                               \
+      } else {                                          \
+        printf("\"\" ");                                \
+      }                                                 \
+    }                                                   \
+  }                                                     \
+}
+#define FromBoth(ELEMENT) \
+{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
+  { if(instance->chain)                                 \
+    { if (instance->chain->ELEMENT)                     \
+      { printf("%s:",instance->chain->ELEMENT);         \
+      } else {                                          \
+        printf(":");                                    \
+      }                                                 \
+    } else {                                            \
+      printf(":");                                      \
+    }                                                   \
+    if (instance->xtra_chains)                          \
+    { for (clist = instance->xtra_chains ;              \
+           clist ; clist = clist->next)                 \
+      { cinst_ptr = (t_upstyp_instance *)clist->data;   \
+        printf("%s:", cinst_ptr->ELEMENT);              \
+      }                                                 \
+    }                                                   \
+    if(instance->version)                               \
+    { if (instance->version->ELEMENT)                   \
+      { printf("%s ",instance->version->ELEMENT);       \
+      } else {                                          \
+        printf(" ");                                    \
+      }                                                 \
+    } else {                                            \
+      printf(" ");                                      \
+    }                                                   \
+  }                                                     \
+}
 
 /*
  * Definition of public functions.
@@ -108,11 +182,17 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line)
 {
   t_upslst_item *mproduct_list = NULL;
   int need_unique = 0;
-
+  char * addr;
 
   /* if no chains were entered, ask for them all */
   if (! a_command_line->ugo_chain) { 
+/* The following won't work, a list item will be eventually managed
+   with our memory routines and since this in not allocated with
+   the ups_malloc the extra stuff won't be there... DjF
     a_command_line->ugo_chain = upslst_new((void *)ANY_MATCH);
+*/
+    addr=upsutl_str_create("*",' ');
+    a_command_line->ugo_chain = upslst_new(addr);
   }
 
   /* Get all the instances that the user requested */
@@ -180,7 +260,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         }
         printf("\n\n");
       } else { 
-        printf(" NO K support yet\n");
+          list_K(minst_ptr,a_command_line);
       }
     }
 /* end product loop */
@@ -194,3 +274,29 @@ void list_output(const t_upslst_item * const a_mproduct_list,
       }
 */
 
+void list_K(const t_upstyp_matched_instance * const instance, 
+            const t_upsugo_command * const command)
+{
+  t_upslst_item *l_ptr = 0;
+  t_upstyp_instance *cinst_ptr = 0;
+  t_upslst_item *clist = 0;
+  int count=0;
+  for ( l_ptr = upslst_first( command->ugo_key ); 
+        l_ptr; l_ptr = l_ptr->next, count++ )
+  { FromBoth(declarer)
+    FromBoth(declared)
+    FromBoth(chain)
+    FromVersion(table_file)
+    FromVersion(table_dir)
+    FromVersion(ups_dir)
+    FromVersion(prod_dir)
+    FromVersion(archive_file)
+    FromVersion(description)
+    FromVersion(db_dir)
+    FromEither(flavor)
+    FromEither(product)
+    FromEither(version)
+    FromEither(qualifiers)
+  }
+  printf("\n");
+}
