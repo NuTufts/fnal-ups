@@ -96,105 +96,114 @@ int main(int argc, char *argv[])
   int i = 0, empty_temp_file = 0, keep_temp_file = 0;
   int rstatus = 0;              /* assume success */
 
-  /* Figure out which command was entered */
-  while (g_cmd_info[i].cmd) {
-    if (! strcmp(g_cmd_info[i].cmd, argv[1])) {
-      break;
-    }
-    ++i;
-  }
-
-  /* skip the command name */
-  --argc;
-
-  /* get the options for each iteration of the command and do it */
-  while ((command_line = upsugo_next(argc, &argv[1],
-				    g_cmd_info[i].valid_opts))) {
-
-    if (command_line->ugo_Z) {
-      upsutl_start_timing();
-    }
-
-    /* we will need this later after command_line goes away, so keep track
-       of it here. only attempt to save it if it has not already been saved */
-    if (! keep_temp_file ) {
-      keep_temp_file = command_line->ugo_V;
-    }
-
-    if (!command_line->ugo_help) {
-      /* no help requested - do the command */
-
-      /* open the temp file. this is where shell specific action code will\
-         be put */
-      if (! temp_file ) {                /* only open it once. */
-	/* let the system get me a buffer */
-	if ((temp_file_name = tmpnam(NULL)) != NULL) {
-	  if ((temp_file = fopen(temp_file_name,"w")) == NULL) {
-	    /* error in open */
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
-	  }
-	} else {
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam", strerror(errno));
-	}
-      }
-
-      if (UPS_ERROR == UPS_SUCCESS) {
-	switch (g_cmd_info[i].cmd_index) {
-	case e_setup: ups_setup(command_line, temp_file, e_setup);
-	  break;
-	case e_unsetup: ups_unsetup(command_line, temp_file, e_unsetup);
-	  break;
-	case e_list: ups_list(command_line);
-	  break;
-	case e_configure: ups_configure(command_line, temp_file, e_configure);
-	  break;
-	case e_copy: ups_unk(command_line, argv[1], e_copy);
-	  break;
-	case e_declare: ups_unk(command_line, argv[1], e_declare);
-	  break;
-	case e_depend: ups_unk(command_line, argv[1], e_depend);
-	  break;
-	case e_exist: ups_setup(command_line, temp_file, e_exist);
-	  break;
-	case e_modify: ups_unk(command_line, argv[1], e_modify);
-	  break;
-	case e_start: ups_start(command_line, temp_file, e_start);
-	  break;
-	case e_stop: ups_stop(command_line, temp_file, e_stop);
-	  break;
-	case e_tailor: ups_tailor(command_line, temp_file, e_tailor);
-	  break;
-	case e_unconfigure: ups_unconfigure(command_line, temp_file,
-					    e_unconfigure);
-	  break;
-	case e_undeclare: ups_unk(command_line, argv[1], e_undeclare);
-	  break;
-	case e_create: ups_create(command_line, e_create);
-	  break;
-	case e_get: ups_unk(command_line, argv[1], e_get);
-	  break;
-	case e_validate: ups_unk(command_line, argv[1], e_validate);
-	  break;
-	case e_unk: ups_unk(command_line, argv[1], e_unk);
-	  break;
-	}
-      }
-    } else {
-      /* output help */
-      switch (g_cmd_info[i].cmd_index) {
-      case e_unk: (void )upshlp_command(NULL);         /* print out all help */
+  if (argv[1]) {
+    /* Figure out which command was entered */
+    while (g_cmd_info[i].cmd) {
+      if (! strcmp(g_cmd_info[i].cmd, argv[1])) {
 	break;
-      default:    (void )upshlp_command(g_cmd_info[i].cmd); /* specific help */
       }
-    }
-    if (command_line->ugo_Z) {
-      upsutl_stop_timing();
+      ++i;
     }
 
-    if (UPS_ERROR != UPS_SUCCESS) {
-      rstatus = 1;                   /* return an error to the user */
-      break;
+    /* skip the command name */
+    --argc;
+
+    /* get the options for each iteration of the command and do it */
+    while ((command_line = upsugo_next(argc, &argv[1],
+				       g_cmd_info[i].valid_opts))) {
+
+      if (command_line->ugo_Z) {
+	upsutl_start_timing();
+      }
+
+      /* we will need this later after command_line goes away, so keep track
+	 of it here. only attempt to save it if it has not already been
+	 saved */
+      if (! keep_temp_file ) {
+	keep_temp_file = command_line->ugo_V;
+      }
+
+      if (!command_line->ugo_help) {
+	/* no help requested - do the command */
+
+	/* open the temp file. this is where shell specific action code will\
+	   be put */
+	if (! temp_file ) {                /* only open it once. */
+	  /* let the system get me a buffer */
+	  if ((temp_file_name = tmpnam(NULL)) != NULL) {
+	    if ((temp_file = fopen(temp_file_name,"w")) == NULL) {
+	      /* error in open */
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
+			 strerror(errno));
+	    }
+	  } else {
+	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam", strerror(errno));
+	  }
+	}
+
+	if (UPS_ERROR == UPS_SUCCESS) {
+	  switch (g_cmd_info[i].cmd_index) {
+	  case e_setup: ups_setup(command_line, temp_file, e_setup);
+	    break;
+	  case e_unsetup: ups_unsetup(command_line, temp_file, e_unsetup);
+	    break;
+	  case e_list: ups_list(command_line);
+	    break;
+	  case e_configure: ups_configure(command_line, temp_file,
+					  e_configure);
+	    break;
+	  case e_copy: ups_unk(command_line, argv[1], e_copy);
+	    break;
+	  case e_declare: ups_unk(command_line, argv[1], e_declare);
+	    break;
+	  case e_depend: ups_unk(command_line, argv[1], e_depend);
+	    break;
+	  case e_exist: ups_setup(command_line, temp_file, e_exist);
+	    break;
+	  case e_modify: ups_unk(command_line, argv[1], e_modify);
+	    break;
+	  case e_start: ups_start(command_line, temp_file, e_start);
+	    break;
+	  case e_stop: ups_stop(command_line, temp_file, e_stop);
+	    break;
+	  case e_tailor: ups_tailor(command_line, temp_file, e_tailor);
+	    break;
+	  case e_unconfigure: ups_unconfigure(command_line, temp_file,
+					      e_unconfigure);
+	    break;
+	  case e_undeclare: ups_unk(command_line, argv[1], e_undeclare);
+	    break;
+	  case e_create: ups_create(command_line, e_create);
+	    break;
+	  case e_get: ups_unk(command_line, argv[1], e_get);
+	    break;
+	  case e_validate: ups_unk(command_line, argv[1], e_validate);
+	    break;
+	  case e_unk: ups_unk(command_line, argv[1], e_unk);
+	    break;
+	  }
+	}
+      } else {
+	/* output help */
+	switch (g_cmd_info[i].cmd_index) {
+	case e_unk: (void )upshlp_command(NULL);       /* print out all help */
+	  break;
+	  /* specific help */
+	default:    (void )upshlp_command(g_cmd_info[i].cmd);
+	}
+      }
+      if (command_line->ugo_Z) {
+	upsutl_stop_timing();
+      }
+
+      if (UPS_ERROR != UPS_SUCCESS) {
+	rstatus = 1;                   /* return an error to the user */
+	break;
+      }
     }
+  } else {
+    /* no parameters were entered - give help */
+    (void )upshlp_command(NULL);       /* print out all help */
   }
 
   /* close the temp file */
