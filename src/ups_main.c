@@ -57,7 +57,6 @@ extern int g_LOCAL_VARS_DEF;
 extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 
-
 /*
  * Declaration of private functions.
  */
@@ -65,16 +64,15 @@ extern char *g_temp_file_name;
 /*
  * Definition of global variables.
  */
-
 #ifndef NULL
 #define NULL 0
 #endif
 
 #define KEEP_OR_REMOVE_FILE()   \
-   if (! keep_temp_file) {                  \
-     (void )remove(temp_file_name);         \
+   if (! g_keep_temp_file) {                  \
+     (void )remove(g_temp_file_name);         \
    } else {                                 \
-     (void )printf("%s\n", temp_file_name); \
+     (void )printf("%s\n", g_temp_file_name); \
    }
 
 /*
@@ -82,10 +80,9 @@ extern char *g_temp_file_name;
  */
 int main(int argc, char *argv[])
 {
-  t_upsugo_command *command_line = NULL;
+  t_upsugo_command *command_line = NULL, temp_command_line;
   FILE *temp_file = NULL;
-  char *temp_file_name = NULL;
-  int i = e_setup, empty_temp_file = 0, keep_temp_file = 0;
+  int i = e_setup, empty_temp_file = 0;
   int rstatus = 0;              /* assume success */
 
   if (argv[1]) {
@@ -111,8 +108,8 @@ int main(int argc, char *argv[])
       /* we will need this later after command_line goes away, so keep track
 	 of it here. only attempt to save it if it has not already been
 	 saved */
-      if (! keep_temp_file ) {
-	keep_temp_file = command_line->ugo_V;
+      if (! g_keep_temp_file ) {
+	g_keep_temp_file = command_line->ugo_V;
       }
 
       if (!command_line->ugo_help && (g_cmd_info[i].cmd_index != e_help)) {
@@ -122,8 +119,8 @@ int main(int argc, char *argv[])
 	   be put */
 	if (! temp_file ) {                /* only open it once. */
 	  /* let the system get me a buffer */
-	  if ((temp_file_name = tmpnam(NULL)) != NULL) {
-	    if ((temp_file = fopen(temp_file_name,"w")) == NULL) {
+	  if ((g_temp_file_name = tmpnam(NULL)) != NULL) {
+	    if ((temp_file = fopen(g_temp_file_name,"w")) == NULL) {
 	      /* error in open */
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
 			 strerror(errno));
@@ -192,16 +189,15 @@ int main(int argc, char *argv[])
 	upsutl_stop_timing();
       }
 
-      /* write any closing info to the file */
-      if (g_LOCAL_VARS_DEF) {
-	/* undefine the local env variables */
-	(void )upsget_remall(temp_file, command_line);
-      }
-
       if (UPS_ERROR != UPS_SUCCESS) {
 	rstatus = 1;                   /* return an error to the user */
 	break;
       }
+
+      /* we need to save the shell info here as the next call to upsugo_next
+	 will free the structure we have now.  and we will need the shell info
+	 later */
+      temp_command_line.ugo_shell = command_line->ugo_shell;
     }
   } else {
     /* no parameters were entered - give help */
@@ -215,18 +211,15 @@ int main(int argc, char *argv[])
       /* we are at the beginning of the file, nothing was written to it */
       empty_temp_file = 1;
     } else {      
-      /* we usually tell the file to delete itself.  however the user may
-	 override this */
-      if (! keep_temp_file) {
-	fprintf(temp_file, "/bin/rm -f %s\n", temp_file_name);
-      }
+      /* write any closing info to the file */
+      (void )upsutl_finish_temp_file(temp_file, &temp_command_line);
     }
     if (fclose(temp_file) == EOF) {
       upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
     }
     /* if nothing was written to the file, delete it, */
     if (empty_temp_file) {
-      (void )remove(temp_file_name);
+      (void )remove(g_temp_file_name);
       switch (g_cmd_info[i].cmd_index) {
       case e_setup: 
       case e_unsetup: 
@@ -241,7 +234,7 @@ int main(int argc, char *argv[])
 	case e_setup: 
 	case e_unsetup: 
 	  /* output the name of the temp file that was created */
-	  (void )printf("%s\n", temp_file_name);
+	  (void )printf("%s\n", g_temp_file_name);
 	  break;
 	case e_exist:
 	  /* just get rid of the file. (unless asked not to) we do not need it,
@@ -250,8 +243,8 @@ int main(int argc, char *argv[])
 	  break;
 	default:
 	  /* source the file within the current process context */
-	  (void )printf("(to be sourced) %s\n", temp_file_name); /* temp */
-	  /*if (system(temp_file_name) <= 0) {
+	  (void )printf("(to be sourced) %s\n", g_temp_file_name); /* temp */
+	  /*if (system(g_temp_file_name) <= 0) {
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 		       strerror(errno));
 	    KEEP_OR_REMOVE_FILE();
@@ -265,7 +258,7 @@ int main(int argc, char *argv[])
 	  /* we must remove the file because otherwise the setup/unsetup 
 	     command will try and source it and only half change the user's
 	     environment */
-	  (void )remove(temp_file_name);
+	  (void )remove(g_temp_file_name);
 	  /* print the following so automatic sourcing does'nt give an error */
 	  printf("/dev/null\n");
 	  break;
