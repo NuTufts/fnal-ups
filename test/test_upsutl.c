@@ -35,6 +35,8 @@
  * Declaration of private functions.
  */
 
+static void test_find_manpages(void);
+
 /*
  * Definition of global variables.
  */
@@ -45,18 +47,86 @@
 
 int main (void)
 {
-  /* *************************************************************************
-     test the writing of the statistics file
-     ************************************************************************/
 
-  /* First set up the stuff we need - an instance, a database and a command.
-     The database, product combination better be someplace writeable */
-
-    t_upslst_item *list_ptr;
-
-   /* Now test the function upsutl_get_files */
-  list_ptr = upsutl_get_files("/usrdevel/s1/berman/upsdb/tigger", 
-			      (char *)ANY_MATCH);
+  test_find_manpages();
 
   return 0;
+}
+
+
+/* test upsutl_find_manpages */
+static void test_find_manpages(void)
+{
+
+  /* Information needed  -
+           from the instance:  prod_dir
+	                       ups_dir
+
+	   from the db config: prod_dir_prefix */
+  t_upstyp_db db;
+  t_upstyp_config config;
+  t_upstyp_matched_instance inst;
+  t_upstyp_instance vinst;
+  char *buf = NULL;
+
+  db.config = &config;
+  inst.version = &vinst;
+
+  /* Test 1 : with no prod_dir_prefix */
+  db.config->prod_dir_prefix = NULL;
+  printf("Test with NO prod_dir_prefix\n");
+
+  /* Test 1a: with both prod_dir and ups_dir */
+  vinst.prod_dir = "prodDir";
+  vinst.ups_dir = "upsDir";
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
+
+  /* Test 1b: with neither prod_dir or ups_dir */
+  vinst.prod_dir = NULL;
+  vinst.ups_dir = NULL;
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
+
+  /* Test 1c: with a prod_dir and no ups_dir */
+  vinst.prod_dir = "prodDir";
+  vinst.ups_dir = NULL;
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
+
+  /* Test 1d: with no prod_dir and a ups_dir */
+  vinst.prod_dir = NULL;
+  vinst.ups_dir = "upsDir";
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
+
+
+  /* Test 2 : with prod_dir_prefix */
+  db.config->prod_dir_prefix = "prodDirPrefix";
+  printf("Test with prod_dir_prefix = %s\n", db.config->prod_dir_prefix);
+
+  /* Test 2a: with both prod_dir and ups_dir */
+  vinst.prod_dir = "prodDir";
+  vinst.ups_dir = "upsDir";
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, vinst.ups_dir, buf);
+
+  /* Test 2b: with neither prod_dir or ups_dir */
+  vinst.prod_dir = NULL;
+  vinst.ups_dir = NULL;
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n", " ", " ", buf);
+
+  /* Test 2c: with a prod_dir and no ups_dir */
+  vinst.prod_dir = "prodDir";
+  vinst.ups_dir = NULL;
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n", vinst.prod_dir, " ", buf);
+
+  /* Test 2d: with no prod_dir and a ups_dir */
+  vinst.prod_dir = NULL;
+  vinst.ups_dir = "upsDir";
+  buf = upsutl_find_manpages(&inst, &db);
+  printf("PD=%s, UD=%s, ManPages=%s\n\n", " ", vinst.ups_dir, buf);
+
 }
