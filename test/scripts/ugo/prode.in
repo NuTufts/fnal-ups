@@ -1,0 +1,9 @@
+Product:          ProdE
+Flavor:           IRIX+5.3
+                  IRIX+5
+                  IRIX
+                  NULL
+Qualifiers:       cat
+                  
+DB:               /home/t2/fagan/ups_database
+Chains:           current

@@ -1,0 +1,6 @@
+Product:          ProdC
+Flavor:           IRIX
+                  AIX
+Qualifiers:       
+DB:               /home/t2/fagan/ups_database
+Chains:           current
