@@ -1,6 +1,8 @@
 FILE = VERSION
 PRODUCT = spot
 VERSION = v2_0
+DESCRIPTION = "description in header"
+_MY_KEY = my_data
 
 #*************************************************
 #
@@ -11,6 +13,7 @@ QUALIFIERS = ""
   PROD_DIR = /NULL/spot
   UPS_DIR = ups
   TABLE_FILE = spot.table
+  DESCRIPTION = "description in instance"
 
 #*************************************************
 #
@@ -27,4 +30,4 @@ QUALIFIERS = "long"
   TABLE_FILE = astro.table
   ARCHIVE_FILE = akc.tar.z
   AUTHORIZED_NODES = "backyard"
-  _DUMMY=this should be recognized
+  _DUMMY = this should be recognized

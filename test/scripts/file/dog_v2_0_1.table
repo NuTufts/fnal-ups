@@ -1,17 +1,21 @@
 FILE = TABLE
 PRODUCT = tiny
 VERSION = v2_0
+DESCRIPTION = "whatta you wanna know ?"
+_USER1 = uuuu1
 
 #*************************************************
 #
 GROUP:
   FLAVOR = IRIX+6.2
   QUALIFIERS = ""
-  
+    
   FLAVOR = IRIX
   QUALIFIERS = "nodebug:superoptimized"
-  
+    
 COMMON:
+  DESCRIPTION = "This is some version"
+  HTML_SOURCE_DIR = /usr/local/html
   ACTION = CONFIGURE
     setupRequired("dog v2_4")
     envSet(${PROD_NAME}_LIB, ${PROD_DIR}/lib)
@@ -29,6 +33,7 @@ END:
 #
 FLAVOR = IRIX
 QUALIFIERS = "nodebug"
+  _USER2 = uuuu2
   ACTION = CONFIGURE
     setupRequired("dog v2_4")
     envSet(${PROD_NAME}_LIB, ${PROD_DIR}/lib)
