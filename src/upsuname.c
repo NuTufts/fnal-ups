@@ -6,13 +6,14 @@
 #include "upsuname.h"
 
 #define HOST_BUF_SIZE 1024
+
 char **
 ups_have_flavor_override(char *hostname) {
     static char **res = 0;
-    static char *parts[2];
+    static char *parts[3];
     static char filename[HOST_BUF_SIZE];
     static char buffer[HOST_BUF_SIZE];
-    char *setups_dir;
+    char *override;
     char *scan;
     extern char *getenv();
     int fd;
@@ -21,29 +22,57 @@ ups_have_flavor_override(char *hostname) {
 	/* we've been here before... */
         return res;
     }
-    if ( 0 != (setups_dir = getenv("SETUPS_DIR")) && 
-		strlen(setups_dir) + strlen(hostname) + 8 < HOST_BUF_SIZE ) {
+    if ( 0 != (override = getenv("UPS_OVERRIDE")) ) {
 
-	(void)strcpy(filename, setups_dir);
-        (void)strcat(filename, "/flavor.");
-        (void)strcat(filename, hostname);
-        if ( -1 != (fd = open(filename, O_RDONLY))) {
-	    read(fd, buffer, HOST_BUF_SIZE);
-	    scan = parts[0] = buffer;
-            while( !isspace(*scan) && scan < buffer+HOST_BUF_SIZE) {
+	res = parts;
+
+	scan = parts[0] = override;
+	while( isspace(*scan) && *scan ) {
+	    scan++;
+	}
+        while( *scan ) {
+	    if (0 == strncmp("-H ", scan, 3)) {
+                scan += 3;
+		while( isspace(*scan) && *scan ) {
+		    scan++;
+		}
+		parts[0] = scan;
+		while( !isspace(*scan) && '+' != *scan && *scan) {
+		    scan++;
+		}
+		if ( '+' == *scan ) {
+		    *scan = 0;
+		    scan++;
+		    parts[1] = scan;
+		    while( !isspace(*scan) && *scan) {
+			scan++;
+		    }
+		}
+		if (*scan) {
+		   *scan = 0;
+		    scan++;
+		}
+	    } else if (0 == strncmp("-q ", scan, 3)) {
+                scan += 3;
+		while( isspace(*scan) && *scan ) {
+		    scan++;
+		}
+		parts[2] = scan;
+		while( !isspace(*scan) && *scan ) {
+		    scan++;
+		}
+		if (*scan) {
+		   *scan = 0;
+		    scan++;
+		}
+            } else {
+		while( !isspace(*scan) && *scan ) {
+		    scan++;
+		}
+            }
+	    while( isspace(*scan) && *scan ) {
 		scan++;
 	    }
-            *scan = 0;
-            scan++;
-            while( isspace(*scan) && scan < buffer+HOST_BUF_SIZE) {
-		scan++;
-	    }
-	    parts[1] = scan;
-            while( !isspace(*scan) && scan < buffer+HOST_BUF_SIZE) {
-		scan++;
-	    }
-            *scan = 0;
-            res = parts;
         }
     }
     return res;
