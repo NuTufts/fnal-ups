@@ -197,7 +197,7 @@
          errflg = 1;                                                       \
          break;                                                            \
 } 
-#define set_value_nop( ELEMENT , ARG )                                         \
+#define set_value_nop( ELEMENT , ARG )                                     \
 {                                                                          \
          if ( *argbuf )                                                    \
          { addr=upsutl_str_create(*argbuf,' ');                            \
@@ -217,6 +217,21 @@
          errflg = 1;                                                       \
          break;                                                            \
 } 
+#define set_O_value( ELEMENT , ARG )                                       \
+{        if ( *argbuf )                                                    \
+         { addr=upsutl_str_create(*argbuf,' ');                            \
+           ELEMENT = addr;                                                 \
+           *argbuf = 0;                                                    \
+           break;                                                          \
+         }                                                                 \
+         if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
+         { addr=upsutl_str_create(arg_str,' ');                            \
+           ELEMENT = addr;                                                 \
+           break;                                                          \
+         }                                                                 \
+         errflg = 1;                                                       \
+         break;                                                            \
+}
 #define build_list( LIST_ELEMENT , ARG )                                   \
 {                                                                          \
          if ( *argbuf )                                                    \
@@ -296,7 +311,7 @@
 #define case_O \
          case 'O':       \
          uc->ugo_O = 1;  \
-         set_value (uc->ugo_options , "O") 
+         set_O_value (uc->ugo_options , "O") 
 #define case_p \
          case 'p':       \
          uc->ugo_p = 1;  \
@@ -772,10 +787,6 @@ char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
 ** ==========================================================================
 */                                                                           
 int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *argv_new[])
-/*	int	argc_old,	
-		*argc_new;
-	char	*argv_old[],
-		*argv_new[]; */
 {
 
 	int 		lcv_old,
