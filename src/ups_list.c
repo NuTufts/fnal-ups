@@ -673,14 +673,30 @@ void list_K(const t_upstyp_matched_instance * const instance,
         if(!upsutl_stricmp(l_ptr->data,"@prod_dir"))
         { valid=1;
           printf("\"");
-          if (product->db_info) 
-          { config_ptr = product->db_info->config;
-            if (config_ptr) 
-            { if (config_ptr->prod_dir_prefix) 
-              { printf("%s",config_ptr->prod_dir_prefix); }
+          if (UPSRELATIVE(instance->version->prod_dir))
+          { if (product->db_info) 
+            { config_ptr = product->db_info->config;
+              if (config_ptr) 
+              { if (config_ptr->prod_dir_prefix) 
+                { printf("%s/",config_ptr->prod_dir_prefix); }
+              }
             }
           }
           printf("%s\" ", instance->version->prod_dir);
+        } 
+        if(!upsutl_stricmp(l_ptr->data,"@ups_dir"))
+        { valid=1;
+          printf("\"");
+          if (UPSRELATIVE(instance->version->ups_dir))
+          { if (product->db_info) 
+            { config_ptr = product->db_info->config;
+              if (config_ptr) 
+              { if (config_ptr->prod_dir_prefix) 
+                { printf("%s/",config_ptr->prod_dir_prefix); }
+              }
+            }
+          }
+          printf("%s\" ", instance->version->ups_dir);
         } 
       }
     }
