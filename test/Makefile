@@ -40,7 +40,11 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : test_ups_error test_ups_list test_ups_memory test_ups_utils ups_test test_upsugo
+all : unit_tests integration_tests
+
+unit_tests : test_ups_error test_ups_list test_ups_memory test_ups_utils test_upsugo
+
+integration_tests : ups_test
 
 #
 # Main programs.
@@ -61,6 +65,9 @@ test_ups_memory : test_ups_memory.o $(LIB)/libups.a
 test_ups_utils : test_ups_utils.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
+test_upsugo: test_upsugo.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
+
 ups_test : ups_test.o $(UPS_TEST_OBJECTS)
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(UPS_TEST_OBJECTS) $(LDFLAGS)
 
@@ -70,8 +77,6 @@ ups_t_cmdline.o : ups_t_cmdline.c
 ups_t_cmdloop.o : ups_t_cmdloop.c
 	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
 
-test_upsugo: test_upsugo.o $(LIB)/libups.a
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 #
 # Now standard targets
 #
