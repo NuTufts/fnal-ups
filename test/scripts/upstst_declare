@@ -13,7 +13,6 @@ declare rover -status UPS_INVALID_SPECIFICATION
 declare rover v1_0 -f NULL -r /tmp
 declare rover v1_0 -f NULL -r /tmp -status UPS_INVALID_SPECIFICATION
 declare rover v1_0 -f IRIX -g leash -r /tmp
-declare rover v1_0 -f IRIX -g leash
 upserr_clear
 #
 # test most switches
@@ -22,10 +21,9 @@ declare rover v2_0 -f NULL -A backyard -b mycompile -D akc@kennel -g leash -L -m
 #
 # make sure actions are executed
 #
-declare spot v1_0 -f NULL -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table -c -d -o -t -n -g leash 
-#declare spot v1_0 -f NULL -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table -c -d -o -t -n -g leash -out log/spot1.out -diff log/spot1.in
-#declare spot v1_0 -f NULL -c -d -o -t -n -g leash  
-#declare spot v2_0 -C -c -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table
+declare spot v1_0 -f NULL -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table -c -d -o -t -n -g leash -out log/spot1.out -diff log/spot1.in
+declare spot v1_0 -f NULL -c -d -o -t -n -g leash -out log/spot2.out -diff log/spot2.in 
+declare spot v2_0 -f IRIX -C -c -r $UPS_DIR/test/scripts/declare/products/spot -M ups -m spot.table
 quit
 EOD
 diff dbclean/rover/leash.chain dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 

@@ -3,6 +3,10 @@ FILE = table
 FLAVOR = NULL
 QUALIFIERS = ""
 
+ACTION = declare
+   Execute("echo declare",NO_UPS_ENV)
+ACTION = undeclare
+   Execute("echo undeclare",NO_UPS_ENV)
 ACTION = current
    Execute("echo current",NO_UPS_ENV)
 ACTION = uncurrent
