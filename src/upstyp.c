@@ -347,6 +347,8 @@ int ups_free_instance( t_upstyp_instance * const inst_ptr )
       ups_free_action( act_ptr );
     }
 
+    ups_free_instance( inst_ptr->sav_inst );
+
     upsmem_free ( inst_ptr );
   }
 

@@ -43,6 +43,9 @@ enum e_upskey_key {
   e_key_chain,
   e_key_ups_db_version,
 
+  /* it's importend that the above keys are all part of a 
+     file descriptor, and the keys below are not */
+
   e_key_flavor,
   e_key_qualifiers,
   e_key_declarer,
@@ -79,6 +82,9 @@ enum e_upskey_key {
   e_key_upd_usercode_dir,
   e_key_setups_dir,
   
+  /* it's importend that the keys below are not part of
+     any ups product or instance or like */
+
   e_key_group,
   e_key_common,
   e_key_end,
@@ -124,11 +130,13 @@ typedef union upskey_config_u {
 #define UPSKEY_ISIN_TABLE( flag )   (flag&0x0010 ? 1 : 0)
 #define UPSKEY_ISIN_CHAIN( flag )   (flag&0x0100 ? 1 : 0)
 #define UPSKEY_ISIN_CONFIG( flag )  (flag&0x1000 ? 1 : 0)
+#define UPSKEY_TRY_TRANSLATE( flag )  (flag&0x10000 ? 1 : 0)
 
 /*
  * Declaration of public functions.
  */
 t_upskey_map *upskey_get_map( const char * const skey );
+t_upskey_map *upskey_get_map_i( int ikey );
 char         *upskey_inst_getval( t_upstyp_instance * const inst,
 				  const char * const skey );
 char         *upskey_inst_setval( t_upstyp_instance * const inst,
@@ -137,7 +145,13 @@ char         *upskey_inst_setval( t_upstyp_instance * const inst,
 t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
 				     const char * const action_name );
 char         *upskey_inst_getuserval(t_upstyp_instance * const inst,
-				  const char * const skey ); 
+				  const char * const skey );
+int          *upskey_verhead_arr();
+int          *upskey_verinst_arr();
+int          *upskey_tabhead_arr();
+int          *upskey_tabinst_arr();
+int          *upskey_chnhead_arr();
+int          *upskey_chninst_arr();
 void         upskey_inst_print( const t_upstyp_instance * const prod );
 
 char         *upskey_prod_getval( t_upstyp_product * const prod,

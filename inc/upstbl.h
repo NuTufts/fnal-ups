@@ -48,6 +48,7 @@ extern void      *upstbl_remove( t_upstbl * const table,
 extern void      upstbl_map( t_upstbl * const table,
 			     void apply(const void *, void **, void *),
 			     void * const cl );
+extern void     upstbl_trim( t_upstbl * const table );
 extern void     **upstbl_to_array( t_upstbl * const table, 
 				   void * const end );
 extern void     upstbl_dump( t_upstbl * const table, const int iopt );

@@ -184,12 +184,15 @@ t_upstbl *upstbl_new( int hint )
   int i;
   static unsigned int primes[] = { 509, 509, 1021, 2053, 4093,
 				   8191, 16381, 32771, 65521, INT_MAX };
+  unsigned int size;
 
   if ( hint <= 0 ) 
     hint = 0;
   for ( i = 1; primes[i] < (unsigned int)hint; i++ );
-  table = malloc( sizeof( *table ) + (size_t)(primes[i-1]*sizeof( table->buckets[0] )) );
-  table->size = (int)primes[i-1];
+  size = primes[i-1];
+  
+  table = malloc( sizeof( *table ) + (size_t)(size*sizeof( table->buckets[0] )) );
+  table->size = (int)size;
   table->buckets = (struct binding **)(table + 1);
   for (i = 0; i < table->size; i++)
     table->buckets[i] = NULL;
@@ -332,6 +335,37 @@ void upstbl_free( t_upstbl ** const table )
       }
   }
   free( *table );
+}
+
+void upstbl_trim( t_upstbl * const table ) 
+{
+
+  /* when we have a little more time ... this should be
+     done a lot better */
+  
+  static char *keys[1024];
+  static int nkeys;
+  int i;
+
+  if ( !table )
+    return;
+
+  if ( table->length > 0 ) {
+    struct binding *p;
+    for ( i = 0; i < table->size; i++ ) {
+      for ( p = table->buckets[i]; p; p = p->link ) {
+	if ( ! p->value ) {
+	  keys[ nkeys ] = p->key;
+	  nkeys++;
+	}
+      }
+    }
+  }
+  
+  for ( i=0; i<nkeys; i++ ) {
+    upstbl_remove( table, keys[i] );
+  }
+
 }
 
 void upstbl_dump( t_upstbl * const table, const int iopt )

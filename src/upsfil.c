@@ -40,6 +40,9 @@
 #include "upskey.h"
 #include "upsfil.h"
 #include "upsver.h"
+#include "upsget.h"
+
+extern t_upskey_map g_key_map[];
 
 /*
  * Definition of public variables
@@ -70,7 +73,8 @@ static int               write_version_file( void );
 static int               write_chain_file( void );
 static int               write_table_file( void );
 static int               write_action( t_upstyp_action * const act );
-t_upslst_item            *find_group( t_upslst_item * const list_ptr, const char copt );
+t_upslst_item            *find_group( t_upslst_item * const list_ptr, 
+				      const char copt );
 
 /* Line parsing */
 static int               find_start_key( void );
@@ -78,9 +82,13 @@ static int               get_key( void );
 static int               next_key( void );
 static int               is_stop_key( void );
 static int               is_start_key( void );
+int                      put_inst_keys( int * keys,
+					t_upstyp_instance * const inst );
+int                      put_head_keys( int * keys );
 static int               put_key( const char * const key, const char * const val );
 
 /* Utils */
+void                     trim_cache( void );
 static int               trim_qualifiers( char * const str );
 static int               cfilei( void );
 t_upslst_item            *copy_action_list( t_upslst_item * const list_ptr );
@@ -127,7 +135,6 @@ static int               g_use_cache = 1;            /* turn on/off use of cache
 static t_upstbl          *g_ft = 0;                  /* pointer to file cache */
 static int               g_call_cache_count = 0;     /* # times cache is used */
 static int               g_call_count = 0;           /* # times read_file is called */
-
 
 #define P_VERB( iver, str ) \
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s\n", \
@@ -252,10 +259,33 @@ void write_journal_file( const void *key, void ** prod, void *cl )
      upstbl_map will produce a fatal error if table is been modified
      during a traverse */
 
+  char *old_filename = (char *)g_filename;
   t_upstyp_product *p = (t_upstyp_product *)*prod;
-  if ( p->journal == JOURNAL && upslst_count( p->instance_list ) > 0 )
-    upsfil_write_file( p, key, 'd', NOJOURNAL );
+
+  g_filename = key;
+
+  if ( p->journal == JOURNAL ) {
+    if ( upslst_count( p->instance_list ) <= 0 ) {
+      P_VERB_s( 1, "Removing empty journal file" );
+
+      /* remove file */
+
+      remove( key );
+
+      /* free product, and set prod pointer to zero for later removal 
+         from cache (by a call to trim_cache) */
+
+      ups_free_product( *prod );
+      *prod = 0;
+    }
+    else {
+      upsfil_write_file( p, key, 'd', NOJOURNAL );
+    }
+  }
+
+  g_filename = old_filename;
 }
+
 /*-----------------------------------------------------------------------
  * upsfil_write_journal_files
  *
@@ -272,6 +302,7 @@ int upsfil_write_journal_files( void )
     P_VERB( 1, "Writing ALL journal files" );
     upstbl_map( g_ft, write_journal_file, NULL );
   }
+  trim_cache();
 
   return UPS_SUCCESS;
 }
@@ -293,7 +324,6 @@ void clear_journal_file( const void *key, void ** prod, void *cl )
  */
 int upsfil_clear_journal_files( void )
 {
-
   if ( g_ft ) {
     P_VERB( 1, "Clearing journal files" );
     upstbl_map( g_ft, clear_journal_file, NULL );
@@ -417,12 +447,6 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     fprintf( g_fh, "%s\n", (char *)l_ptr->data );
   }    
 
-  /* write file type */
-  
-  if ( g_pd->file ) {
-    put_key( "FILE", g_pd->file );
-  }
-
   /* set file type (g_ifile) */
 
   cfilei();
@@ -474,6 +498,12 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   return UPS_SUCCESS;
 }
 
+void trim_cache( void )
+{
+  if ( g_use_cache && g_ft )
+    upstbl_trim( g_ft );
+}
+
 t_upstyp_product  *upsfil_is_in_cache( const char * const ups_file )
 {
   /* will just check if a given file is in cache,
@@ -493,9 +523,8 @@ t_upstyp_product  *upsfil_is_in_cache( const char * const ups_file )
 
 int upsfil_exist( const char * const ups_file )
 {
-  /* will return true if:
-     1) file is in cache
-     2) file is on disk */
+  /* will return true if file is in cache or on disk,
+     else false */
 
   if ( upsfil_is_in_cache( ups_file ) )
     return 1;
@@ -512,19 +541,14 @@ void flush_product( const void *key, void ** prod, void *cl )
 
   /* write the file to disk, if journal flag set */
 
-  /* we will check that the product list is not empty before writing
-     the file. the reason is that upsfil_write_file will, for an empty
-     product, remove existing files and remove the product from the cache,
-     upstbl_map will produce a fatal error if table is been modified
-     during a traverse */
-
-  t_upstyp_product *p = (t_upstyp_product *)*prod;
-  if ( p->journal == JOURNAL && upslst_count( p->instance_list ) > 0 )
-    upsfil_write_file( p, key, 'd', NOJOURNAL );
+  write_journal_file( key, prod, cl );
 
   /* free product */
 
-  ups_free_product( *prod );
+  if ( *prod ) {
+    ups_free_product( *prod );
+    *prod = 0;
+  }
 }     
 void upsfil_flush( void )
 {
@@ -559,52 +583,43 @@ int write_version_file( void )
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *inst_ptr = 0;
+  int *ikeys=0;
+  int o_imargin = g_imargin;
 
   /* write file descriptor */
   
-  put_key( "PRODUCT", g_pd->product );
-  put_key( "VERSION", g_pd->version );
-  put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
-
+  put_head_keys( upskey_verhead_arr() );
+  
   /* write instances */
   
+  ikeys = upskey_verinst_arr();
   l_ptr = upslst_first( g_pd->instance_list );
+
   for( ; l_ptr; l_ptr = l_ptr->next ) {
+
     inst_ptr = (t_upstyp_instance *)l_ptr->data;
+
     if ( !inst_ptr || !inst_ptr->flavor ) {
       /* handle error !!! */
       return 0;
     }
 
+    g_imargin = o_imargin;
+
     g_item_count++;
     put_key( 0, "" );
     put_key( 0, SEPARATION_LINE );
-    put_key( "FLAVOR", inst_ptr->flavor );    
-    put_key( "QUALIFIERS", inst_ptr->qualifiers );
-    
-    g_imargin += 2;    
-    put_key( "DECLARED", inst_ptr->declared );
-    put_key( "DECLARER", inst_ptr->declarer );
-    put_key( "MODIFIED", inst_ptr->modified );
-    put_key( "MODIFIER", inst_ptr->modifier );
-    put_key( "ORIGIN", inst_ptr->origin );
-    put_key( "PROD_DIR", inst_ptr->prod_dir );
-    put_key( "UPS_DIR", inst_ptr->ups_dir );
-    put_key( "TABLE_DIR", inst_ptr->table_dir );
-    put_key( "TABLE_FILE", inst_ptr->table_file );
-    put_key( "COMPILE_DIR", inst_ptr->compile_dir );
-    put_key( "COMPILE_FILE", inst_ptr->compile_file );
-    put_key( "ARCHIVE_FILE", inst_ptr->archive_file );
-    put_key( "AUTHORIZED_NODES", inst_ptr->authorized_nodes );
-    if ( inst_ptr->statistics )
-      put_key( 0, "STATISTICS" );
+
+    put_inst_keys( ikeys, inst_ptr );
+
+    /* write user defined key words */
+
     if ( inst_ptr->user_list ) {
       t_upslst_item *l_ptr = upslst_first( inst_ptr->user_list );
       for ( ; l_ptr; l_ptr = l_ptr->next ) {
 	put_key( 0, l_ptr->data );
       }
     }
-    g_imargin -= 2;
   }  
 
   return 1;
@@ -614,36 +629,33 @@ int write_chain_file( void )
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *inst_ptr = 0;
+  int *ikeys;
+  int o_imargin = g_imargin;
 
   /* write file descriptor */
   
-  put_key( "PRODUCT", g_pd->product );
-  put_key( "CHAIN", g_pd->chain );
-  put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
-
+  put_head_keys( upskey_chnhead_arr() );
+  
   /* write instances */
   
+  ikeys = upskey_verinst_arr();
   l_ptr = upslst_first( g_pd->instance_list );
   for( ; l_ptr; l_ptr = l_ptr->next ) {
+
     inst_ptr = (t_upstyp_instance *)l_ptr->data;
+
     if ( !inst_ptr || !inst_ptr->flavor ) {
       /* handle error !!! */
       return 0;
     }
 
+    g_imargin = o_imargin;
+
     g_item_count++;
     put_key( 0, "" );
     put_key( 0, SEPARATION_LINE );
-    put_key( "FLAVOR", inst_ptr->flavor );
-    put_key( "QUALIFIERS", inst_ptr->qualifiers );
-    
-    g_imargin += 2;
-    put_key( "VERSION", inst_ptr->version );
-    put_key( "DECLARED", inst_ptr->declared );
-    put_key( "DECLARER", inst_ptr->declarer );
-    put_key( "MODIFIED", inst_ptr->modified);
-    put_key( "MODIFIER", inst_ptr->modifier);
-    g_imargin -= 2;
+
+    put_inst_keys( ikeys, inst_ptr );
   }  
 
   return 1;
@@ -660,6 +672,7 @@ int write_table_file( void )
 
   /* write file descriptor */
   
+  put_key( "FILE", g_pd->file );
   put_key( "PRODUCT", g_pd->product );
   put_key( "VERSION", g_pd->version );
   put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
@@ -1062,16 +1075,36 @@ t_upstyp_instance *read_instance( void )
       
     default:
       if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) { 
-	if (UPS_VERIFY) 
-        { if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0)
-          { printf("duplicate key in file %s line %d\n", 
-                    g_filename, g_line_count); 
+
+	char *sval = g_val;
+
+	if (UPS_VERIFY) { 
+	  if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0) { 
+	    printf("duplicate key in file %s line %d\n", 
+		   g_filename, g_line_count); 
             printf("key %s value %s \n", 
-                    g_key, g_val); 
-          } 
+		   g_key, g_val); 
+          }
         }
+
+	/* if key is allowed to contain env.var, we will translate.
+           the original string has to be saved (in inst_ptr->sav_inst)
+	   if written out to file */
+
+	if ( UPSKEY_TRY_TRANSLATE( g_mkey->flag ) ) {
+	  char *tran_val = upsget_translation_env( sval ); 
+	  if ( tran_val ) {
+	    if ( ! inst_ptr->sav_inst )
+	      inst_ptr->sav_inst = ups_new_instance();
+
+	    UPSKEY_INST2ARR( inst_ptr->sav_inst )[g_mkey->i_index] = 
+	      upsutl_str_create( sval, ' ' );
+	    sval = tran_val;
+	  }
+	}
+
 	UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = 
-                      upsutl_str_create( g_val, ' ' );
+	  upsutl_str_create( sval, ' ' );
       }
       else if ( UPS_VERIFY ) {
 	upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
@@ -1091,7 +1124,6 @@ t_upstyp_instance *read_instance( void )
       if ( UPS_VERIFY )
 	printf( "no qualifiers found in file %s line %d\n", 
 		g_filename, g_line_count );
-      
 
       inst_ptr->qualifiers = upsutl_str_create( "", ' ' );
     }
@@ -1430,6 +1462,65 @@ int get_key( void )
   }
 
   return g_ikey;
+}
+
+/*-----------------------------------------------------------------------
+ * put_head_keys
+ *
+ * Will print and format passed key and val for a ups file header.
+ * It will not print anything if val is empty.
+ *
+ * Input : char *, arrays of indexes to print
+ * Output: none
+ * Return: int, 1 fine, 0 not fine
+ */
+int put_head_keys( int * ikeys ) 
+{
+  t_upskey_map *map =  0;
+  for ( ; ikeys && *ikeys != -1; ikeys++ ) {
+    map = &g_key_map[ *ikeys ];
+    put_key( map->key, 
+	     UPSKEY_PROD2ARR( g_pd )[ map->p_index ] );
+  }
+
+  return 1;
+}
+
+/*-----------------------------------------------------------------------
+ * put_inst_keys
+ *
+ * Will print and format passed key and val for a ups file instance.
+ * It will not print anything if val is empty.
+ *
+ * Input : char *, arrays of indexes to print
+ * Output: none
+ * Return: int, 1 fine, 0 not fine
+ */
+int put_inst_keys( int * ikeys, t_upstyp_instance * const inst ) 
+{
+  t_upskey_map *map =  0;
+  t_upstyp_instance *sav_inst = inst->sav_inst;
+  char *val = 0;
+  
+  for ( ; ikeys && *ikeys != -1; ikeys++ ) {
+    map = &g_key_map[ *ikeys ];
+    if ( !sav_inst ||  !(val = UPSKEY_INST2ARR( sav_inst )[ map->i_index ]) )
+      val = UPSKEY_INST2ARR( inst )[ map->i_index ];
+
+    /* statistics is the only ups key we know there has no value */
+
+    if ( map->ikey == e_key_statistics && val )
+      put_key( 0, "STATISTICS" );
+    else
+      put_key( map->key, val );
+
+    /* cosmetic */
+
+    if ( map->ikey == e_key_qualifiers )
+      g_imargin += 2;
+  }
+
+  return 1;
 }
 
 /*-----------------------------------------------------------------------

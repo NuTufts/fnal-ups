@@ -43,6 +43,9 @@
  */
 #define NO INVALID_INDEX
 
+/* this array is used for returning a valid list of key enums */
+static int g_ikeys[ e_key_count+1 ];
+
 /*
  * g_key_map.
  *
@@ -55,12 +58,23 @@
  *   1   : key can be in a table file
  *   2   : key can be in a chain file
  *   3   : key can be in a config file
- *   4   : upsfil will translate env. variables in the corresponding value
+ *   4   : upsfil will translate env. variables in the key value
  *   5   : spare
  *   6   : spare
  *   7   : spare
+ *
+ *
+ * How to add a new keyword/field:
+ *   1) add the new keyword to the enums in upskey.h
+ *   2) add a corresponding line to the map below.
+ *   3) add the new field to t_upstyp_product, _instance ... in upstyp.h
+ *   4) free the field in ups_free_product, _instance ...
+ *   5) only if the new keyword affect the file description (the head of a ups 
+ *      file, like FILE and PRODUCT) be sure the file header writing control 
+ *      routines are doing the right thing: upskey_*head_arr.
+ *
  */
-static t_upskey_map g_key_map[] =
+t_upskey_map g_key_map[] =
 {
   { e_key_file,             "FILE",             0,    NO,   NO, 0x00001111 },
   { e_key_product,          "PRODUCT",          1,     0,   NO, 0x00000111 },
@@ -92,7 +106,7 @@ static t_upskey_map g_key_map[] =
 
   { e_key_db_dir,           "DB_DIR",           NO,   25,   NO, 0x00000000 },
   { e_key_action,           "ACTION",           NO,   26,   NO, 0x00000010 },
-  { e_key_unknown,          "USER",             NO,   27,   NO, 0x00000011 },
+  { e_key_unknown,          "USER",             NO,   27,   NO, 0x00000001 },
 
   { e_key_prod_dir_prefix,  "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00011000 },
   { e_key_man_target_dir,   "MAN_TARGET_DIR",   NO,   NO,    4, 0x00001000 },
@@ -101,7 +115,7 @@ static t_upskey_map g_key_map[] =
   { e_key_html_target_dir,  "HTML_TARGET_DIR",  NO,   NO,    7, 0x00001000 },
   { e_key_news_target_dir,  "NEWS_TARGET_DIR",  NO,   NO,    8, 0x00001000 },
   { e_key_upd_usercode_dir, "UPD_USERCODE_DIR", NO,   NO,    9, 0x00001000 },
-  { e_key_setups_dir,       "SETUPS_DIR",       NO,   NO,    10, 0x00001000 },
+  { e_key_setups_dir,       "SETUPS_DIR",       NO,   NO,   10, 0x00001000 },
 
   { e_key_group,            "GROUP:",           NO,   NO,   NO, 0x00000010 },
   { e_key_common,           "COMMON:",          NO,   NO,   NO, 0x00000010 },
@@ -134,6 +148,26 @@ t_upskey_map *upskey_get_map( const char * const str )
       return keys;
   }
 
+  return 0;
+}
+
+/*-----------------------------------------------------------------------
+ * upskey_get_map_i
+ *
+ * Will return a map (t_upskey_map) for passed enum key.
+ *
+ * Input : int, enum of key.
+ * Output: none.
+ * Return: t_upskey_map *, corresponding map, or 0.
+ */
+t_upskey_map *upskey_get_map_i( int ikey )
+{
+  /*
+  if ( ikey >= 0 && ikey < e_key_count )
+    return &g_ikey_map[ ikey ];
+  else
+    return 0;
+  */
   return 0;
 }
 
@@ -309,6 +343,100 @@ char *upskey_prod_setval( t_upstyp_product * const prod,
   else
     return 0;  
 }
+
+/*
+ * The following six routines will return an array of key enums for
+ * valid keys as a file descriptor (head) or as an instance in ups files 
+ * (version, table, chain). Mainly used by the upsfil writing routines.
+ */
+
+int *upskey_verhead_arr()
+{
+  
+  /* tsk, tsk */
+
+  g_ikeys[0] = e_key_file;
+  g_ikeys[1] = e_key_product;
+  g_ikeys[2] = e_key_version;
+  g_ikeys[3] = e_key_ups_db_version;
+  g_ikeys[4] = -1;
+
+  return g_ikeys;
+}
+
+int *upskey_verinst_arr()
+{
+  t_upskey_map *keys = &g_key_map[ e_key_flavor ];
+  int i = 0;
+
+  for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
+    if ( UPSKEY_ISIN_VERSION( keys->flag ) && keys->ikey != e_key_unknown )
+      g_ikeys[i++] = keys->ikey;
+  }
+  g_ikeys[i] = -1;
+
+  return g_ikeys;
+}
+
+int *upskey_tabhead_arr()
+{
+
+  /* tsk, tsk */
+
+  g_ikeys[0] = e_key_file;
+  g_ikeys[1] = e_key_product;
+  g_ikeys[2] = e_key_version;
+  g_ikeys[3] = e_key_ups_db_version;
+  g_ikeys[4] = -1;
+
+  return g_ikeys;
+}
+
+int *upskey_tabinst_arr()
+{
+  t_upskey_map *keys = &g_key_map[ e_key_flavor ];
+  int i = 0;
+
+  for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
+    if ( UPSKEY_ISIN_TABLE( keys->flag ) && keys->ikey != e_key_unknown )
+      g_ikeys[i++] = keys->ikey;
+  }
+  g_ikeys[i] = -1;
+
+  return g_ikeys;
+}
+
+int *upskey_chnhead_arr()
+{
+
+  /* tsk, tsk */
+
+  g_ikeys[0] = e_key_file;
+  g_ikeys[1] = e_key_product;
+  g_ikeys[2] = e_key_chain;
+  g_ikeys[3] = e_key_ups_db_version;
+  g_ikeys[4] = -1;
+
+  return g_ikeys;
+}
+
+int *upskey_chninst_arr()
+{
+  t_upskey_map *keys = &g_key_map[ e_key_flavor ];
+  int i = 0;
+
+  for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
+    if ( UPSKEY_ISIN_CHAIN( keys->flag ) && keys->ikey != e_key_unknown )
+      g_ikeys[i++] = keys->ikey;
+  }
+  g_ikeys[i] = -1;
+
+  return g_ikeys;
+}
+
+/*
+ * Some print routines
+ */
 
 void upskey_prod_print( const t_upstyp_product * const prod )
 {

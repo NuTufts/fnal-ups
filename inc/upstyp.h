@@ -116,6 +116,8 @@ typedef struct upstyp_instance
 
   t_upslst_item    *user_list;
 
+  struct upstyp_instance *sav_inst;
+
 } t_upstyp_instance;
 
 /* a matched instance */
@@ -182,13 +184,13 @@ t_upstyp_matched_instance *ups_free_matched_instance(
                                  t_upstyp_matched_instance * const minst_ptr);
 t_upstyp_matched_instance *ups_free_matched_instance_structure(
                                  t_upstyp_matched_instance * const minst_ptr);
-t_upstyp_product     *ups_new_product( void );
+t_upstyp_product  *ups_new_product( void );
 int               ups_free_product( t_upstyp_product * const prod_ptr );
-t_upstyp_instance    *ups_new_instance( void );
+t_upstyp_instance *ups_new_instance( void );
 int               ups_free_instance( t_upstyp_instance * const inst_ptr );
-t_upstyp_action      *ups_new_action( void );
+t_upstyp_action   *ups_new_action( void );
 int               ups_free_action( t_upstyp_action * const act_ptr );
-t_upstyp_config      *ups_new_config( void );
+t_upstyp_config   *ups_new_config( void );
 int               ups_free_config( t_upstyp_config * const conf_ptr );
 
 
