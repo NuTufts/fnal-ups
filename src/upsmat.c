@@ -517,7 +517,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		      /* we are looking for possibly many instances.  skip the
 			 error if current instance could not be found and look
 			 for the next one. error message is in error buffer. */
-		      if (UPS_ERROR == UPS_NO_TABLE_MATCH) {
+		      if (UPS_ERROR == UPS_DB_CORRUPTION) {
 			  g_ups_error = UPS_ERROR;
 		      } else {
 			/* it was another error so pay attention to it. */
