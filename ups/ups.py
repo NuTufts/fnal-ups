@@ -47,15 +47,25 @@ def use_python(pythonVersion=DEFAULT_PYTHON_VERSION):
 
     obj = getUps()
 
+    # did we setup python at all?  Or are we getting it by default from the path?
+    alreadySetup = ( os.environ.has_key('SETUP_PYTHON') and
+                     os.environ['SETUP_PYTHON'] != '' )
+    print("did we setup any python? %s" % alreadySetup)
+
     # are we already using the requested version?
     alreadyUsing = ( os.environ.has_key('SETUP_PYTHON') and
                      re.search('python ' + pythonVersion, os.environ['SETUP_PYTHON']) != None )
+    print("are we alreadyUsing pythonVersion? %s" % alreadyUsing)
 
-    if ( not alreadyUsing ):
-        if os.environ.has_key('SETUP_PYTHON'):
-            obj._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups unsetup python')
-        obj._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups setup python ' + pythonVersion)
+    if ( alreadyUsing ):
+        # already using the requested version, no-op.
+        pass
+    else:
+        if ( alreadySetup ):
+            obj._inhaleresults(os.environ['UPS_DIR'] + '/bin/ups unsetup python')
+        obj._inhaleresults(os.environ['UPS_DIR'] + '/bin/ups setup python ' + pythonVersion)
 
+        # now exec into the context of the requested version of python:
         # were we running the python interpreter itself?  Special handling required!
         if ( sys.argv == [''] ):
             sys.argv = [ os.environ['PYTHON_DIR'] + '/bin/python' ]
