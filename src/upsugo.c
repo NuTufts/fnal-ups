@@ -55,12 +55,12 @@
 			X = 0;		\
 			}
 #define flavor_sub() \
-{  while (loc = strrchr(flavor,'.')) \
+{  while ((loc = strrchr(flavor,'.'))) \
       { *loc = 0; \
         addr=upsutl_str_create(flavor,' '); \
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
       } \
-   if (loc = strrchr(flavor,'+')) \
+   if ((loc = strrchr(flavor,'+'))) \
       { *loc = 0; \
         addr=upsutl_str_create(flavor,' '); \
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
@@ -1191,7 +1191,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
      /* dealloc your brain out */ 
      upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
      last_command=ugo_commands;      /* need pointer to drop & remove struct */
-     if ( ugo_commands=ugo_commands->next ) {
+     if (( ugo_commands=ugo_commands->next )) {
         upslst_delete( last_command, last_command->data, 'd');
         luc = ugo_commands->data;
         upsugo_setfixed(luc);
