@@ -33,8 +33,6 @@ configure   :this_part_should_be_created_by_build_help_file:
 copy        ::
 : Allow one instance of a product to be declared 
 : "like" another.
-create      ::
-: Create a template UPS table file.
 declare     ::
 : Add a product instance or a chain to a UPS Database.
 depend      ::

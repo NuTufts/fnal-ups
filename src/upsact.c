@@ -395,7 +395,6 @@ t_cmd_info g_cmd_info[] = {
   {e_touch,       "touch",       "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z", 0x00000010, e_configure},
   {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000010, e_undeclare},
-  {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000010, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:lvZ0123", 0x00000000, e_invalid_action},
   {e_verify,      "verify",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
