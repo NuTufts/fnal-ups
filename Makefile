@@ -25,7 +25,7 @@ DIR=$(DEFAULT_DIR)
 # this section may change in later ups|addproduct incarnations
             PROD=erupt
      PRODUCT_DIR=UPS_DIR
-            VERS=v4_0
+            VERS=b4_11
            CHAIN=development
       UPS_SUBDIR=ups
        UPS_STYLE=new
