@@ -66,7 +66,7 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
   t_upstyp_matched_product *mproduct = NULL;
   t_upstyp_matched_instance *minst = NULL;
   t_upslst_item *cmd_list = NULL, *mproduct_list = NULL;
-  static t_upsugo_command prod_only_ugo;
+  t_upsugo_command* prod_only_ugo;
   char *dummy = NULL;
   int need_unique = 1, top_unsetup = 0;
 
@@ -89,16 +89,17 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	     that only has a product name in it.  then upsact will look for
 	     the appropriate setup_prod environment variables to do the
 	     unsetup. Remember to add the j and the database options  */
-	  memset(&prod_only_ugo, 0, sizeof(t_upsugo_command));
-	  prod_only_ugo.ugo_product = a_command_line->ugo_product;
+	  prod_only_ugo = upsmem_malloc( sizeof( t_upsugo_command ) );
+	  memset(prod_only_ugo, 0, sizeof(t_upsugo_command));
+	  prod_only_ugo->ugo_product = a_command_line->ugo_product;
 	  if (a_command_line->ugo_j) {
-	    prod_only_ugo.ugo_j = a_command_line->ugo_j;
+	    prod_only_ugo->ugo_j = a_command_line->ugo_j;
 	  }
 	  if ( a_command_line->ugo_z ) {
-	    prod_only_ugo.ugo_z = a_command_line->ugo_z;
-	    prod_only_ugo.ugo_db = a_command_line->ugo_db;
+	    prod_only_ugo->ugo_z = a_command_line->ugo_z;
+	    prod_only_ugo->ugo_db = a_command_line->ugo_db;
 	  }
-	  cmd_list = upsact_get_cmd(&prod_only_ugo, mproduct,
+	  cmd_list = upsact_get_cmd(prod_only_ugo, mproduct,
 				    g_cmd_info[e_unsetup].cmd, e_unsetup);
 	  /* the above routine will return all of the commands associated with
 	     the matched instance.  including commands associated with
@@ -121,6 +122,7 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	  if (UPS_ERROR != UPS_SUCCESS) {	  
 	    upserr_add(UPS_UNSETUP_FAILED, UPS_WARNING, mproduct->product);
 	  }
+	  upsmem_free( prod_only_ugo );
 	}
 	/* Now process the setup actions */
 	cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
