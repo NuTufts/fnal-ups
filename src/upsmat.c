@@ -89,6 +89,10 @@ static char *get_table_file_path( const char * const a_prodname,
 				  const char * const a_productdir,
 				  const char * const a_db);
 static int is_a_file(const char * const a_filename);
+static t_upstyp_product *read_chain(const char * const a_db,
+				    const char * const a_prod,
+				    const char * const a_chain,
+				    char ** const a_buffer);
 static int get_instance(const t_upslst_item * const a_read_instances,
 			const t_upslst_item * const a_flavor_list,
 			const t_upslst_item * const a_quals_list,
@@ -165,7 +169,6 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	   upserr_clear();						\
 	 }                                                              \
          else {								\
-           local_error = 1;                                             \
 	   break;                                                       \
          }								\
       }
@@ -251,7 +254,7 @@ t_upslst_item *upsmat_match_instance(
   t_upslst_item *mproduct_list = NULL;
   char *the_db, *prod_name, *the_chain, *new_string = NULL, *location = NULL;
   char do_delete = 'd';
-  int got_all_products = 0, got_all_versions = 0, local_error = 0;
+  int got_all_products = 0, got_all_versions = 0;
   int any_version = 0, any_chain = 0;
 
   /* In order to avoid doing this for each database, if a product name was
@@ -435,10 +438,14 @@ static t_upstyp_matched_product *match_instance_core(
 				 const int a_any_chain)
 {
   t_upstyp_matched_product *mproduct = NULL;
-  t_upslst_item *minst_list = NULL;
+  t_upslst_item *minst_list = NULL, *vminst_list = NULL;
+  t_upslst_item *pre_minst_list = NULL, *cinst_list = NULL;
   t_upslst_item *chain_list = NULL, *version_list = NULL;
-  int num_matches = 0, tmp_num_matches, local_error = 0;
-  char *chain, *version;
+  t_upstyp_matched_instance *minst = NULL;
+  t_upstyp_instance *cinst = NULL;
+  t_upstyp_product *read_product = NULL;
+  int num_matches = 0, tmp_num_matches;
+  char *chain, *version, *dummy;
 
   /* see if we were passed a table file. if so, don't worry about
      version and chain files, just read the table file */
@@ -486,10 +493,62 @@ static t_upstyp_matched_product *match_instance_core(
     }
 
     if (a_chain_list && (num_matches > 0)) {
+      pre_minst_list = upslst_first(minst_list);
+
       /* Now we need to go thru the list of chains that were passed us, read in
 	 each file, and associate any chains with the matched version
 	 instances */
-/*      ??????*/
+      for (chain_list = (t_upslst_item *)a_chain_list ; chain_list ;
+	   chain_list = chain_list->next) {
+	/* get the chain name */
+	chain = (char *)chain_list->data;
+	read_product = read_chain(a_db, a_prod_name, chain, &dummy);
+	if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
+	  for (cinst_list = read_product->instance_list ; cinst_list ;
+	       cinst_list = cinst_list->next) {
+	    cinst = (t_upstyp_instance *)cinst_list->data;
+	    for (vminst_list = pre_minst_list ; vminst_list ; 
+		 vminst_list = vminst_list->next) {
+	      minst = (t_upstyp_matched_instance *)vminst_list->data;
+	      if (minst->version) {       /* make sure we have one */
+		if (! strcmp(cinst->version, minst->version->version)) {
+		  /* they are the same version */
+		  if (! strcmp(cinst->flavor, minst->version->flavor)) {
+		    /* they have the same flavor */
+		    if (! strcmp(cinst->qualifiers,
+				 minst->version->qualifiers)) {
+		      /* they have the same qualifiers - this is a match */
+		      if (! minst->chain ) {
+			/* no chain here yet, fill it in */
+			minst->chain = cinst;
+			upsmem_inc_refctr((void *)cinst);
+		      } else {
+			/* we need to add a list element to the list of extra
+			   chains */
+			minst->xtra_chains = upslst_add(minst->xtra_chains,
+							cinst);
+		      }
+		      break;           /* get next chain instance */
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      /* we do not need the info read from the file.  we have taken what we
+	 want and put it on the a_minst_list */
+      ups_free_product(read_product);
+      }
+
+      /* return the xtra chain lists to the first list element */
+      for (vminst_list = pre_minst_list ; vminst_list ; 
+	   vminst_list = vminst_list->next) {
+	minst = (t_upstyp_matched_instance *)vminst_list->data;
+	if (minst->xtra_chains) {
+	  minst->xtra_chains = upslst_first(minst->xtra_chains);
+	}
+      }
     }
 
     /* We went thru the list of versions, get a matched product
@@ -561,112 +620,103 @@ static int match_from_chain( const char * const a_product,
 			     const int a_any_version,
 			     t_upslst_item ** const a_minst_list)
 {
-  int file_chars = 0, num_matches = 0, tmp_num_matches = 0;
-  char buffer[FILENAME_MAX+1];
+  int num_matches = 0, tmp_num_matches = 0;
   t_upstyp_product *read_product;
   t_upslst_item *cinst;
   t_upslst_item *tmp_flavor_list = NULL, *tmp_quals_list = NULL;
   t_upstyp_instance *inst = NULL;
   t_upstyp_matched_instance *tmp_minst_ptr = NULL;
-  char *first_flavor, *first_quals;
+  char *first_flavor, *first_quals, *buffer = NULL;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
 
-  /* Get total length of chain file name including path */
-  file_chars = (int )(strlen(a_chain) + strlen(a_product) + strlen(a_db) + 
-               sizeof(CHAIN_SUFFIX) + 4);
-  if (file_chars <= FILENAME_MAX) {
-    sprintf(buffer, "%s/%s/%s%s", a_db, a_product, a_chain, CHAIN_SUFFIX);
-    read_product = upsfil_read_file(&buffer[0]);
-    if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
-      /* get all the instances that match command line input */
-      tmp_num_matches = get_instance(read_product->instance_list,
-				     a_flavor_list, a_quals_list,
-				     a_need_unique, e_file_chain,
-				     a_minst_list);
-      if (UPS_VERBOSE) {
-	printf("%sFound %d instances in %s\n", VPREFIX, tmp_num_matches,
-	       buffer);
-      }
+  read_product = read_chain(a_db, a_product, a_chain, &buffer);
+  if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
+    /* get all the instances that match command line input */
+    tmp_num_matches = get_instance(read_product->instance_list,
+				   a_flavor_list, a_quals_list,
+				   a_need_unique, e_file_chain,
+				   a_minst_list);
+    if (UPS_VERBOSE) {
+      printf("%sFound %d instances in %s\n", VPREFIX, tmp_num_matches,
+	     buffer);
+    }
 
-      /* we do not need the info read from the file.  we have taken what we
-	 want and put it on the a_cinst_list */
-      ups_free_product(read_product);
+    /* we do not need the info read from the file.  we have taken what we
+       want and put it on the a_cinst_list */
+    ups_free_product(read_product);
 
-      if (tmp_num_matches > 0) {
-	/* for each instance that was matched, open the version file, and only
-	   look for the instance that matches the instance found in the chain
-	   file.  this insures that an instance in a chain file is
-	   matched only with an instance in the associated version file. */
-	for (cinst = *a_minst_list ; cinst ; cinst = cinst->next) {
-	  /* get a matched instance */
-	  tmp_minst_ptr = (t_upstyp_matched_instance *)(cinst->data);
-	  inst = tmp_minst_ptr->chain;
+    if (tmp_num_matches > 0) {
+      /* for each instance that was matched, open the version file, and only
+	 look for the instance that matches the instance found in the chain
+	 file.  this insures that an instance in a chain file is
+	 matched only with an instance in the associated version file. */
+      for (cinst = *a_minst_list ; cinst ; cinst = cinst->next) {
+	/* get a matched instance */
+	tmp_minst_ptr = (t_upstyp_matched_instance *)(cinst->data);
+	inst = tmp_minst_ptr->chain;
 
-	  /* check to see if a specific version was entered along with the
-	     chain.  if so, then we only match those chains that point to the
-	     same version as that which was entered. */
-	  if (a_version && !a_any_version) {
-	    /* compare the entered version with the one associated with the
-	       chain. if they do not match, get the next chain */
-	    if (strcmp(inst->version, a_version)) {
-	      /* They do not equal skip, this chain, remove it from the list
-		 and get the next one */
-	      if (cinst->prev) {               /* point to previous element */
-		cinst = cinst->prev;
-	      }
-	      upslst_delete_safe(cinst, tmp_minst_ptr, ' ');
-	      /* free matched instance */
-	      ups_free_matched_instance(tmp_minst_ptr); 
-	      continue;
+	/* check to see if a specific version was entered along with the
+	   chain.  if so, then we only match those chains that point to the
+	   same version as that which was entered. */
+	if (a_version && !a_any_version) {
+	  /* compare the entered version with the one associated with the
+	     chain. if they do not match, get the next chain */
+	  if (strcmp(inst->version, a_version)) {
+	    /* They do not equal skip, this chain, remove it from the list
+	       and get the next one */
+	    if (cinst->prev) {               /* point to previous element */
+	      cinst = cinst->prev;
 	    }
+	    upslst_delete_safe(cinst, tmp_minst_ptr, ' ');
+	    /* free matched instance */
+	    ups_free_matched_instance(tmp_minst_ptr); 
+	    continue;
 	  }
-
-	  /* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
-	     desired flavor and one of the desired qualifier to match */
-	  TMP_LISTS_SET();
-
-	  /* see if any command line info should override what we read from the
-	     files  - set tmp_upsdir, tmp_productdir */
-	  USE_CMD_LINE_INFO();
-
-	  if (UPS_VERBOSE) {
-	    printf("%sMatching with Version %s in Product %s\n", VPREFIX,
-		   inst->version, inst->product);
-	    printf("%sUsing Flavor = %s, and Qualifiers = %s\n", VPREFIX,
-		   (char *)(tmp_flavor_list->data),
-		   (char *)(tmp_quals_list->data));
-	  }
-	  tmp_num_matches = match_from_version(inst->product, inst->version,
-					       tmp_upsdir, tmp_productdir,
-					       a_db,
-					       do_need_unique, tmp_flavor_list,
-					       tmp_quals_list, a_minst_list);
-	  if (tmp_num_matches == 0) {
-	    /* We should have had a match, this is an error */
-	    upserr_add(UPS_NO_VERSION_MATCH, UPS_FATAL, buffer,
-		       inst->version);
-
-	    /* clean up */
-	    num_matches = 0;
-	    *a_minst_list = upsutl_free_matched_instance_list(a_minst_list);
-
-	    break;                        /* stop any search */
-	  }
-
-	  /* keep a running count of the number of matches found */
-	  ++num_matches;
 	}
 
-	/* we no longer need the lists */
-	TMP_LISTS_FREE();
+	/* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
+	   desired flavor and one of the desired qualifier to match */
+	TMP_LISTS_SET();
 
+	/* see if any command line info should override what we read from the
+	   files  - set tmp_upsdir, tmp_productdir */
+	USE_CMD_LINE_INFO();
+
+	if (UPS_VERBOSE) {
+	  printf("%sMatching with Version %s in Product %s\n", VPREFIX,
+		 inst->version, inst->product);
+	  printf("%sUsing Flavor = %s, and Qualifiers = %s\n", VPREFIX,
+		 (char *)(tmp_flavor_list->data),
+		 (char *)(tmp_quals_list->data));
+	}
+	tmp_num_matches = match_from_version(inst->product, inst->version,
+					     tmp_upsdir, tmp_productdir,
+					     a_db,
+					     do_need_unique, tmp_flavor_list,
+					     tmp_quals_list, a_minst_list);
+	if (tmp_num_matches == 0) {
+	  /* We should have had a match, this is an error */
+	  upserr_add(UPS_NO_VERSION_MATCH, UPS_FATAL, buffer,
+		     inst->version);
+
+	  /* clean up */
+	  num_matches = 0;
+	  *a_minst_list = upsutl_free_matched_instance_list(a_minst_list);
+
+	  break;                        /* stop any search */
+	}
+
+	/* keep a running count of the number of matches found */
+	++num_matches;
       }
-    }
-  } else {
-    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
-  }
 
+      /* we no longer need the lists */
+      TMP_LISTS_FREE();
+      
+    }
+  }
+  
 return num_matches;
 }
 
@@ -991,6 +1041,40 @@ static int is_a_file(const char * const a_filename)
 
   return(status);
   
+}
+
+/*-----------------------------------------------------------------------
+ * read_chain
+ *
+ * Read the specified chain file.
+ *
+ * Input : a database
+ *         a product name
+ *         a chain name
+ * Output: pointer to the buffer with the file path in it
+ * Return: a product structure read from the file
+ */
+t_upstyp_product *read_chain(const char * const a_db,
+			     const char * const a_prod,
+			     const char * const a_chain,
+			     char ** const a_buffer)
+{
+  int file_chars = 0;
+  char buffer[FILENAME_MAX+1];
+  t_upstyp_product *read_product = NULL;
+
+  file_chars = (int )(strlen(a_chain) + strlen(a_prod) + strlen(a_db) + 
+               sizeof(CHAIN_SUFFIX) + 4);
+  if (file_chars <= FILENAME_MAX) {
+    sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_chain, CHAIN_SUFFIX);
+    read_product = upsfil_read_file(&buffer[0]);
+    *a_buffer = buffer;
+  } else {
+    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
+    *a_buffer = 0;
+  }
+
+  return(read_product);
 }
 
 /*-----------------------------------------------------------------------
