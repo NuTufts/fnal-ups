@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "upsuname.h"
 
-#ifdef _sgi
+#ifdef __sgi
 extern char *strdup();
 exterh char *getenv();
 #endif
