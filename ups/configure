@@ -108,8 +108,8 @@ fi
 if [ x${Setups_Home:-} = x ]
 then
     echo '**' $Setups_Flag not defined in $Ups_DB_Path/.upsfiles/dbconfig
-    echo '**' Using /fnal/ups/etc
-    Setups_Home=/fnal/ups/etc
+    echo '**' Using /usr/local/etc
+    Setups_Home=/usr/local/etc
 else
     echo '**' $Setups_Flag defined as $Setups_Home in 
     echo '**' $Ups_DB_Path/.upsfiles/dbconfig
