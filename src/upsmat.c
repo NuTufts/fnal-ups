@@ -306,6 +306,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
     if ((new_string = upsutl_str_create(a_command_line->ugo_version,  ' '))) {
       all_versions = upslst_add(all_versions, new_string);
       got_all_versions = 1;
+      g_ugo_version = 1;            /* version file on command line */
     }
   }
 
@@ -448,7 +449,6 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 
 	    /* Look to see if a version was specified. */
 	    if (a_command_line->ugo_version) {
-	      g_ugo_version = 1;            /* version file on command line */
 	      if (! got_all_versions) {
 		/* get all the versions in the current product area */
 		upsutl_get_files(location, (char *)VERSION_SUFFIX,
@@ -464,6 +464,10 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 					   prod_name, all_chains,
 					   all_versions, a_need_unique,
 					   any_version, any_chain);
+
+	    /* update the mproduct_list structure with the new info */
+	    ADD_TO_MPRODUCT_LIST();
+
 	    /* may no longer need version list - free it */
 	    if (! got_all_versions) {
 	      all_versions = upslst_free(all_versions, do_delete);
@@ -477,26 +481,26 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    /* get out of the loop if we got an error */
 	    if (UPS_ERROR != UPS_SUCCESS) {
 	      if (!a_need_unique) {
-		/* we are looking for possibly many instances.  skip the error
-		   if the current instance could not be found */
-		if (UPS_ERROR == UPS_NO_FILE ||
-		     UPS_ERROR == UPS_NO_TABLE_MATCH ||
-		     UPS_ERROR == UPS_NO_VERSION_MATCH) {
-		  g_ups_error = UPS_ERROR;
-		  upserr_backup();
-		  upserr_backup();
-		}
-		else {
-		  /* it was another error so pay attention to it. */
-		  break;
-		}
-	      } else {
+                /* we are looking for possibly many instances.  skip the error
+                   if the current instance could not be found and look for
+		   the next one.  the error message is in the error buffer. */
+                if (UPS_ERROR == UPS_NO_TABLE_MATCH ||
+		    UPS_ERROR == UPS_NO_VERSION_MATCH) {
+                  g_ups_error = UPS_ERROR;
+                  upserr_backup();
+                }
+                else {
+                  /* it was another error so pay attention to it. */
+                  break;
+                }
+       } else {
 		/* we are only looking for one instance. if we are looking thru
 		   multiple databases, and have not reached the last one, then
 		   ignore the error and continue on to the next prod or db. */
 		if (db_item->next) {
 		  /* there are more databases to look thru. erase the error
-		     and continue */
+		     and continue. still to do - need to make sure on the
+		     number of times to backup. */
 		  upserr_backup();
 		  upserr_backup();
 		} else {
@@ -506,9 +510,6 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		}
 	      }
 	    }
-
-	    /* update the mproduct_list structure with the new info */
-	    ADD_TO_MPRODUCT_LIST();
 	  }
 	  /* may no longer need product list - free it */
 	  if (! got_all_products) {
@@ -676,17 +677,11 @@ static t_upstyp_matched_product *match_instance_core(
 
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
-    } else if (UPS_ERROR == UPS_NO_FILE) {
-      /* the file could not be found.  this is not an error, just no match
-	 made */
-      upserr_backup();
-      upserr_backup();
     }
     
   /* we were not passed a specific list of chains (or we were passed no chains
      at all) and we have some versions,  start by reading the version files. */
   } else if ((a_any_chain || !a_chain_list) && a_version_list) { 
-    g_ugo_version = 1;             /* version on command line */
     for (version_list = (t_upslst_item *)a_version_list; version_list;
 	 version_list = version_list->next) {
       /* get the version */
@@ -742,14 +737,12 @@ static t_upstyp_matched_product *match_instance_core(
 	      }
 	    }
 	  }
-	} else {
+	} else if (UPS_ERROR == UPS_NO_FILE) {
 	  /* if we could not find the file, then clear out the error.
 	     otherwise if a ups list is done on an entire db for test chain,
-	     all products without a test chain will generate an error */
-	  if (UPS_ERROR == UPS_NO_FILE) {
-	    upserr_backup();
-	    upserr_backup();
-	  } 
+	     all products without a test chain will generate an error. */
+	  upserr_backup();
+	  upserr_backup();
 	}
       }
 
@@ -775,7 +768,6 @@ static t_upstyp_matched_product *match_instance_core(
   } else if (a_chain_list) {
     /* we need to start with any requested chains and find the associated
        version and then table files. */
-    g_ugo_version = 0;             /* no version on command line */
     for (chain_list = (t_upslst_item *)a_chain_list; chain_list;
 	 chain_list = chain_list->next) {
       /* get the chain name */
@@ -852,7 +844,8 @@ static int match_from_chain( const char * const a_product,
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
 
-  read_product = upsget_chain_file(a_db_info->name, a_product, a_chain, &buffer);
+  read_product = upsget_chain_file(a_db_info->name, a_product, a_chain,
+				   &buffer);
   if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
     /* get all the instances that match command line input */
     tmp_num_matches = get_instance(read_product->instance_list,
@@ -928,14 +921,12 @@ static int match_from_chain( const char * const a_product,
     
     *a_minst_list = upslst_first(cinst);
     } /* if (cinst) */
-  } else {
+  } else if (UPS_ERROR == UPS_NO_FILE) {
     /* if we could not find the file then clear out the error.  otherwise if
        a ups list is done on an entire db for test chain, all products without
        a test chain will generate an error */
-    if (UPS_ERROR == UPS_NO_FILE) {
-      upserr_backup();
-      upserr_backup();
-    }
+    upserr_backup();
+    upserr_backup();
   }
   
 return num_matches;
@@ -1058,15 +1049,13 @@ static int match_from_version( const char * const a_product,
 	/* we no longer need the lists */
 	TMP_LISTS_FREE();
       }
-    } else {
+    } else if ((UPS_ERROR == UPS_NO_FILE) && (g_ugo_version)) {
       /* if we could not find the file and a version was entered on the 
 	 command line then clear out the error.  otherwise if a ups list is
 	 done on an entire db for v2_0, all products without a v2_0 will
 	 generate an error */
-      if ((UPS_ERROR == UPS_NO_FILE) && (g_ugo_version)) {
-	upserr_backup();
-	upserr_backup();
-      } 
+      upserr_backup();
+      upserr_backup();
     }
   } else {
     upserr_vplace();
