@@ -30,6 +30,7 @@
 #include "upslst.h"
 #include "upstyp.h"
 #include "ups_setup.h"
+#include "ups_unsetup.h"
 #include "ups_start.h"
 #include "ups_stop.h"
 #include "ups_configure.h"
@@ -44,7 +45,7 @@
  * Definition of public variables.
  */
 extern int UPS_VERBOSE;
-int g_LOCAL_VARS_DEF = 0;
+extern int g_LOCAL_VARS_DEF;
 
 /*
  * Declaration of private functions.
@@ -60,26 +61,26 @@ int g_LOCAL_VARS_DEF = 0;
 
 /* The enum is defined in ups_main.h */
 t_cmd_info g_cmd_info[] = {
-  {e_setup,       "setup",       "?B:cde:f:g:jkm:M:noO:q:r:tU:vVz:Z"},
-  {e_unsetup,     "unsetup",     "?cde:f:g:jm:M:noO:q:tU:vVz:Z"},
-  {e_list,        "list",        "a?cdDf:g:h:K:lm:M:noq:r:tU:vVz:Z"},
-  {e_configure,   "configure",   "?cdf:g:m:M:noO:q:r:tU:vVz:Z"},
-  {e_copy,        "copy",        "?A:cCdf:g:m:M:noO:p:P:q:r:tT:U:vVWXz:Z"},
-  {e_declare,     "declare",     "?A:cCdf:g:m:M:noO:p:q:r:tT:U:vVz:Z"},
-  {e_depend,      "depend",      "?f:K:m:M:q:r:U:vVz:Z"},
-  {e_exist,       "exist",       "?B:cde:f:g:jkm:M:oO:q:r:tU:vVz:Z"},
-  {e_modify,      "modify",      "?A:Ef:m:M:op:q:r:T:U:vVx:z:Z"},
-  {e_start,       "start",       "?cdf:g:m:M:noO:q:r:tU:vVwz:Z"},
-  {e_stop,        "stop",        "?cdf:g:m:M:noO:q:r:tU:vVz:Z"},
-  {e_tailor,      "tailor",      "?cdf:g:K:m:M:noO:q:r:tU:vVz:Z"},
-  {e_unconfigure, "unconfigure", "?cdf:g:m:M:noO:q:r:tU:vVz:Z"},
-  {e_undeclare,   "undeclare",   "?cdf:g:m:M:noO:q:r:tU:vVyYz:Z"},
-  {e_create,      "create",      "?f:m:M:p:q:vZ"},
-  {e_get,         "get",         "?cdf:Fg:m:M:noq:r:tU:vVz:Z"},
-  {e_validate,    "validate",    "?cdf:g:h:lm:M:nNoq:r:StU:vVz:Z"},
+  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z"},
+  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z"},
+  {e_list,        "list",        "a?cdDf:g:h:H:K:lm:M:noq:r:tU:vVz:Z"},
+  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
+  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z"},
+  {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z"},
+  {e_depend,      "depend",      "?f:H:K:m:M:q:r:U:vVz:Z"},
+  {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z"},
+  {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z"},
+  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z"},
+  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
+  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:tU:vVz:Z"},
+  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
+  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z"},
+  {e_create,      "create",      "?f:H:m:M:p:q:vZ"},
+  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z"},
+  {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z"},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:B:cCdDeEf:Fg:h:jkK:lm:M:nNoO:p:P:q:r:StT:uU:vVwW:x:XyYz:Z"}
+            "a?A:B:cCdDeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:uU:vVwW:x:XyYz:Z"}
 };
 
 /*
@@ -139,7 +140,7 @@ int main(int argc, char *argv[])
 	switch (g_cmd_info[i].cmd_index) {
 	case e_setup: ups_setup(command_line, temp_file, e_setup);
 	  break;
-	case e_unsetup: ups_unk(command_line, argv[1], e_unsetup);
+	case e_unsetup: ups_unsetup(command_line, temp_file, e_unsetup);
 	  break;
 	case e_list: ups_list(command_line);
 	  break;
@@ -151,7 +152,7 @@ int main(int argc, char *argv[])
 	  break;
 	case e_depend: ups_unk(command_line, argv[1], e_depend);
 	  break;
-	case e_exist: ups_unk(command_line, argv[1], e_exist);
+	case e_exist: ups_setup(command_line, temp_file, e_exist);
 	  break;
 	case e_modify: ups_unk(command_line, argv[1], e_modify);
 	  break;
