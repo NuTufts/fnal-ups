@@ -2,9 +2,9 @@ FILE = DBCONFIG
 
 AUTHORIZED_NODES = *
 #PROD_DIR_PREFIX = 
-HTML_TARGET_DIR = /tmp/html
-INFO_TARGET_DIR = /tmp/info
-NEWS_TARGET_DIR = /tmp/news
-MAN_TARGET_DIR = /tmp/man
-CATMAN_TARGET_DIR = /tmp/catman
+HTML_TARGET_DIR = ${UPS_DIR}/test/scripts/declare/tostuff/html
+INFO_TARGET_DIR = ${UPS_DIR}/test/scripts/declare/tostuff/info
+NEWS_TARGET_DIR = ${UPS_DIR}/test/scripts/declare/tostuff/news
+MAN_TARGET_DIR = ${UPS_DIR}/test/scripts/declare/tostuff/man
+CATMAN_TARGET_DIR = ${UPS_DIR}/test/scripts/declare/tostuff/catman
 
