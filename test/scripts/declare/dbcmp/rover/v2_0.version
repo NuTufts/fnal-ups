@@ -16,7 +16,7 @@ QUALIFIERS = "red"
   TABLE_DIR = /tabledir
   TABLE_FILE = tablefile
   ARCHIVE_FILE = ftp:/tarfile
-  AUTHORIZED_NODES = backyard
+  AUTHORIZED_NODES = "backyard"
   STATISTICS
   COMPILE_DIR = /tmp
   COMPILE_FILE = mycompile
