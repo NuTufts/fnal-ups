@@ -3301,12 +3301,13 @@ static int sh_output_next_part(const FILE * const a_stream,
 	  } 
 	}
       }
-      if ((status >= 0) && (a_exit_flag == DO_EXIT)) {
-	upsutl_finish_temp_file(a_stream, a_command_line, "  ");
-	if ((status = fprintf((FILE *)a_stream, "  return\n") < 0)) {
-	  FPRINTF_ERROR();
-	}
-      }
+/* We don't really want to return here since there'll be more to the file */
+/*      if ((status >= 0) && (a_exit_flag == DO_EXIT)) { */
+/*        upsutl_finish_temp_file(a_stream, a_command_line, "  "); */
+/*        if ((status = fprintf((FILE *)a_stream, "  return\n") < 0)) { */
+/*          FPRINTF_ERROR(); */
+/*        } */
+/*      } */
     }
   }
   return(status);
@@ -3357,12 +3358,13 @@ static int csh_output_next_part(const FILE * const a_stream,
 	  } 
 	}
       }
-      if ((status >= 0) && (a_exit_flag == DO_EXIT)) {
-	upsutl_finish_temp_file(a_stream, a_command_line, "  ");
-	if ((status = fprintf((FILE *)a_stream, "  exit\n") < 0)) {
-	  FPRINTF_ERROR();
-	}
-      }
+/* We don't really want to return here since there'll be more to the file */
+/*       if ((status >= 0) && (a_exit_flag == DO_EXIT)) { */
+/*         upsutl_finish_temp_file(a_stream, a_command_line, "  "); */
+/*         if ((status = fprintf((FILE *)a_stream, "  exit\n") < 0)) { */
+/*           FPRINTF_ERROR(); */
+/*         } */
+/*       } */
     }
   }
   return(status);
@@ -3375,7 +3377,7 @@ static int sh_output_last_part_req(const FILE * const a_stream,
   int status;
 
   if ((status = fprintf((FILE *)a_stream,
-	      "else\n  echo \"File (%s)  not found\"\n", a_data) < 0)) {
+	      "else\n  echo \"File (%s) not found\"\n", a_data) < 0)) {
     FPRINTF_ERROR();
   } else {
     upsutl_finish_temp_file(a_stream, a_command_line, "  ");
@@ -3393,7 +3395,7 @@ static int csh_output_last_part_req(const FILE * const a_stream,
   int status;
 
   if ((status = fprintf((FILE *)a_stream,
-	      "else\n  echo \"File (%s)  not found\"\n", a_data) < 0)) {
+	      "else\n  echo \"File (%s) not found\"\n", a_data) < 0)) {
     FPRINTF_ERROR();
   } else {
     upsutl_finish_temp_file(a_stream, a_command_line, "  ");
