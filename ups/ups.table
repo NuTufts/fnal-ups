@@ -6,6 +6,9 @@ Group:
 Flavor=ANY
 Qualifiers=""
 
+MAN_SOURCE_DIR=${UPS_PROD_DIR}/man/man
+CATMAN_SOURCE_DIR=${UPS_PROD_DIR}/man/catman
+
 Common:
    Action=configure
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
