@@ -54,6 +54,10 @@
 			free( X );		\
 			X = 0;		\
 			}
+#define case_help \
+         case '?':      \
+         uc->ugo_help = 1; \
+         break;
 #define case_a \
          case 'a':      \
          uc->ugo_a = 1; \
@@ -927,6 +931,8 @@ int upsugo_dump (struct ups_command * const uc)
          upsugo_prtlst(uc->ugo_db,"DB"); 
       if ( uc->ugo_chain ) 
          upsugo_prtlst(uc->ugo_chain,"Chains"); 
+      if ( uc->ugo_help )
+         fprintf(stdout,"--- HELP !!! ---\n",uc->ugo_help); 
       fprintf(stdout,"ugo_v %d and UPS_VERBOSE %d\n",uc->ugo_v,UPS_VERBOSE); 
     } return (0);
 }
@@ -1138,7 +1144,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          case_a case_C case_D case_e case_E
          case_F case_j case_k case_l case_S
          case_u case_v case_V case_w case_W
-         case_x case_y case_Y case_Z
+         case_x case_y case_Y case_Z case_help
          /* Chain cases */ 
          case_c case_d case_n case_t case_o
          /* List elements */
