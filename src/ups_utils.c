@@ -80,6 +80,32 @@ char * upsutl_environment(const char * const a_env_var)
 }
 
 /*-----------------------------------------------------------------------
+ * upsutl_free_inst_list
+ *
+ * Given an instance list, free all the instances and the list too.
+ * 
+ * Input : instance list pointer
+ * Output: none
+ * Return: Null
+ */
+t_upslst_item *upsutl_free_inst_list( t_upslst_item **a_inst_list)
+{
+  t_upslst_item *list_item = NULL, *tmp_inst_list = NULL;
+  
+  /* make sure we are at the beginning of the list */
+  *a_inst_list = upslst_first(*a_inst_list);
+
+  /* free the instances */
+  tmp_inst_list = *a_inst_list;
+  for (list_item = tmp_inst_list; tmp_inst_list;
+       tmp_inst_list = tmp_inst_list->next) {
+    ups_free_instance((t_ups_instance *)(tmp_inst_list->data));
+  }
+
+  /* Now free the list */
+  *a_inst_list = upslst_free(*a_inst_list, ' ');
+}
+/*-----------------------------------------------------------------------
  * upsutl_get_files
  *
  * Given a directory, return a listing of all the files which
@@ -103,29 +129,36 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
   char *new_string = NULL;
   
   if (dir = opendir(a_dir)) {
-    if (a_pattern == ANY_MATCH) {
+    if (! strcmp(a_pattern, ANY_MATCH)) {
       /* read each directory item and add it to the list */
       while ((dir_line = readdir(dir)) != NULL) {
-	if (new_string = upsutl_str_create(dir_line->d_name)) {
-	  file_list = upslst_add(file_list, (void *)new_string);
-	} else {
-	  /* the only error from upsutl_str_create is a memory error, clean up
-	     and get out */
-	  upslst_free(file_list, 'd');
-	  break;
+	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
+	  if (new_string = upsutl_str_create(dir_line->d_name)) {
+	    file_list = upslst_add(file_list, (void *)new_string);
+	  } else {
+	    /* the only error from upsutl_str_create is a memory error, clean
+	       up and get out */
+	    upslst_free(file_list, 'd');
+	    break;
+	  }
 	}
       }
     } else {
       /* read each directory item and if it contains the pattern, remove
 	 the pattern from the file name and add it to the list */
       while ((dir_line = readdir(dir)) != NULL) {
-	if (new_string = upsutl_strstr(dir_line->d_name, a_pattern)) {
-	  file_list = upslst_add(file_list, (void *)new_string);
-	} else {
-	  /* the only error from upsutl_strstr is a memory error, clean up
-	     and get out */
-	  upslst_free(file_list, 'd');
-	  break;
+	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
+	  new_string = upsutl_strstr(dir_line->d_name, a_pattern);
+	  if (UPS_ERROR == UPS_SUCCESS) {
+	    if (new_string) {
+	      file_list = upslst_add(file_list, (void *)new_string);
+	    }
+	  } else {
+	    /* the only error from upsutl_strstr is a memory error, clean up
+	       and get out */
+	    upslst_free(file_list, 'd');
+	    break;
+	  }
 	}
       }
     }

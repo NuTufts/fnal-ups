@@ -44,6 +44,7 @@
  */
 
 char *upsutl_environment(const char * const a_env_var);
+t_upslst_item *upsutl_free_inst_list( t_upslst_item **a_inst_list);
 t_upslst_item *upsutl_get_files(const char * const a_dir,
 				const char * const a_pattern);
 void upsutl_start_timing(void);
