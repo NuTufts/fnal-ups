@@ -56,6 +56,10 @@ char *upsget_OS_flavor(const t_upstyp_db * const,
 char *upsget_extended(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
+char *upsget_remall(const FILE * const,
+                    const t_upstyp_db * const,
+                    const t_upstyp_matched_instance * const,
+                    const t_upsugo_command * const);
 char *upsget_allout(const FILE * const,
                     const t_upstyp_db * const,
                     const t_upstyp_matched_instance * const,
