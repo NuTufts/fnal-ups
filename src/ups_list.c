@@ -479,6 +479,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upstyp_config  *config_ptr = 0;
   char *str_ptr;
   char *str_val;
+  char *addr;
   int count=0;
   int exists=1;
   int valid=0;
@@ -547,13 +548,18 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
       { valid=1;
         if (instance->version)
-        { printf("\"%s\" ",upsutl_get_table_file_path(command->ugo_product,
-                                                 instance->version->table_file,
-                                                 instance->version->table_dir,
-                                                 instance->version->ups_dir,
-                                                 instance->version->prod_dir,
-                                                 product->db_info,
-                                                 exists) );
+        { addr=upsutl_get_table_file_path(command->ugo_product,
+                                          instance->version->table_file,
+                                          instance->version->table_dir,
+                                          instance->version->ups_dir,
+                                          instance->version->prod_dir,
+                                          product->db_info,
+                                          exists);
+          if(addr)
+          { printf("\"%s\" ",addr);
+          } else { 
+            printf("\"\" "); 
+          }
         } else {
           printf("\"\" "); 
         }
