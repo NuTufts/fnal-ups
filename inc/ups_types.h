@@ -15,12 +15,13 @@
  *       Batavia, Il 60510, U.S.A.                                              
  *
  * MODIFICATIONS:
- *       22-jul-1997, LR, first, very preliminary
- *       25-jul-1997, DjF, added command line inputs
- *       29-jul-1997, LR, New 'unified' t_ups_instance structure.
+ *       22-Jul-1997, LR, first, very preliminary
+ *       25-Jul-1997, DjF, added command line inputs
+ *       29-Jul-1997, LR, New 'unified' t_ups_instance structure.
  *                        Added function declarations for creating
  *                        and destroying common types.
- *       30-jul-1997, LR, Added 'char *db_dir' to instance structure.
+ *       30-Jul-1997, LR, Added 'char *db_dir' to instance structure.
+ *       13-Aug-1997, LR, Added MAX_LINE_LENGTH.
  *
  ***********************************************************************/
 
@@ -178,6 +179,7 @@ typedef struct ups_command
  * Public variables
  */
 #define ANY_MATCH "*"
+#define MAX_LINE_LEN 1024
 
 
 /*
