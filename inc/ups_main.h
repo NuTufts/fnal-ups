@@ -29,6 +29,7 @@
 /*
  * Constans.
  */
+
 enum {
   e_setup,
   e_unsetup,
@@ -47,6 +48,7 @@ enum {
   e_create,
   e_get,
   e_validate,
+  /* This one must always be at the end */
   e_unk
 };
 
