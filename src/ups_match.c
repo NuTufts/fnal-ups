@@ -227,6 +227,7 @@ static t_ups_match_product *match_instance_core(
     
     /* if we got some matches, fill out our matched product structure */
     if (num_matches != 0) {
+      tinst_list = upslst_first(tinst_list);        /* back up to start */
       mproduct = match_product_new(a_db, NULL, NULL, tinst_list);
     }
     
@@ -245,6 +246,8 @@ static t_ups_match_product *match_instance_core(
     /* We went thru the list of version instances, get a matched product
        structure if we got no errors */
     if (UPS_ERROR == UPS_SUCCESS) {
+      tinst_list = upslst_first(tinst_list);        /* back up to start */
+      vinst_list = upslst_first(vinst_list);        /* back up to start */
       mproduct = match_product_new(a_db, NULL, vinst_list, tinst_list);
     }
 
@@ -266,6 +269,9 @@ static t_ups_match_product *match_instance_core(
     /* We went thru the list of version instances, get a matched product
        structure if we got no errors */
     if (UPS_ERROR == UPS_SUCCESS) {
+      tinst_list = upslst_first(tinst_list);        /* back up to start */
+      vinst_list = upslst_first(vinst_list);        /* back up to start */
+      cinst_list = upslst_first(cinst_list);        /* back up to start */
       mproduct = match_product_new(a_db, cinst_list, vinst_list, tinst_list);
     }
       
@@ -354,9 +360,8 @@ static int match_from_chain( const char * const a_product,
 
 	  /* clean up */
 	  num_matches = 0;
-	  *a_vinst_list = upslst_free(*a_cinst_list, 'd');
-	  *a_vinst_list = upslst_free(*a_vinst_list, 'd');
-	  *a_tinst_list = upslst_free(*a_tinst_list, 'd');
+	  *a_cinst_list = upslst_first(*a_cinst_list);   /* back up to start */
+	  *a_cinst_list = upslst_free(*a_cinst_list, 'd');
 
 	  break;                        /* stop any search */
 	}
@@ -460,7 +465,9 @@ static int match_from_version( const char * const a_product,
 
 	  /* clean up */
 	  num_matches = 0;
+	  *a_vinst_list = upslst_first(*a_vinst_list);    /* go to beginning */
 	  *a_vinst_list = upslst_free(*a_vinst_list, 'd');
+	  *a_tinst_list = upslst_first(*a_tinst_list);    /* go to beginning */
 	  *a_tinst_list = upslst_free(*a_tinst_list, 'd');
 
 	  break;                        /* stop any search */
@@ -725,7 +732,7 @@ static int is_a_file(const char * const a_filename)
  *         list of qualifiers to match,
  *         flag indicating if a unique instance is desired
  *         a list (empty or not) of instances
- * Output: updated list of matched instances
+ * Output: pointer to last element on updated list of instances
  * Return: none
  */
 static int get_instance(const t_upslst_item * const a_read_instances,
@@ -736,15 +743,10 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 {
   int got_match;
   t_upslst_item *tmp_list, *tmp_flavor_list, *tmp_quals_list;
-  t_upslst_item *first_instance_ptr;
   t_ups_instance *instance;
+  t_upslst_item *first_matched_inst = NULL;
   char *flavor = NULL, *quals = NULL;
   int num_matches  = 0, want_all_f = 1, want_all_q = 1;
-
-  /* save a pointer to the beginning of the instances list as we will be
-     adding to the list which returns a pointer to the last element of the
-     list.  we will need to return the first element pointer */
-  first_instance_ptr = *a_list_instances;
 
   /* loop over all the flavors from the flavor list */
   for (tmp_flavor_list = (t_upslst_item *)a_flavor_list; tmp_flavor_list ;
@@ -768,6 +770,11 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	    /* They do. Save the instances in the order they came in. */
 	    *a_list_instances = upslst_add(*a_list_instances,
 					   (void *)instance);
+	    if (first_matched_inst == NULL) {
+	      /* Save this so we can return it - this is the first new instance
+	         we added to the list this time */
+	      first_matched_inst = *a_list_instances;
+	    }
 	    ++num_matches;
 	    got_match = 1;
 	    break;
@@ -787,12 +794,12 @@ static int get_instance(const t_upslst_item * const a_read_instances,
     }
   }
 
-  /* point to the beginning of the list.  if the first instance pointer is
-     NULL, then we started the list here, so we must find the first instance */
-  if (! first_instance_ptr) {
-    *a_list_instances = upslst_first(*a_list_instances);
-  } else {
-    *a_list_instances = first_instance_ptr;
+  /* if we matched 1 or more instances this time, return a pointer to the first
+     instance that was matched.  if no match was made, return what we were
+     passed */
+  if (first_matched_inst != NULL) {
+    *a_list_instances = first_matched_inst;
   }
+
   return num_matches;
 }
