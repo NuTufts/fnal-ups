@@ -83,7 +83,7 @@ t_upslst_item *ups_start(const t_upsugo_command * const a_command_line,
       /* check if this product is authorized to be started on this node */
       if (upsutl_is_authorized(minst, mproduct->db_info, &dummy)) {
 	/* Check if we need to stop this product first.  */
-	if (a_command_line->ugo_w == 0) {
+	if (a_command_line->ugo_w == 1) {
 	  /* the command line says stop first */
 	  cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
 				    mproduct, g_cmd_info[e_stop].cmd, 
