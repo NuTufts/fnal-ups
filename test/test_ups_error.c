@@ -37,6 +37,9 @@
  * Definition of global variables.
  */
 
+extern int UPS_VERBOSE;
+extern int g_ups_line;
+extern char *g_ups_file;
 /*
  * Definition of public functions.
  */
