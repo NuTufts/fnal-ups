@@ -298,22 +298,35 @@ char *upsget_translation_env( char * const oldstr )
 
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) 
   { if(!clear_flag)                   
-    { memset( buf, 0, sizeof( buf ) );  /* clear ONLY if I need too... */
+    { memset( buf, 0, sizeof( buf ) );        /* clear ONLY if I need too... */
       clear_flag++;
     }
-    memset( env, 0, sizeof( env ) );
-    strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );  /* copy everything upto ${     */
-    if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding })*/
+    memset( env, 0, sizeof( env ) );          /* copy everything upto ${     */
+    strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );  
+    if (!(s_loc = strstr( e_loc, e_tok )))    /* set s_loc to end (finding })*/
     { upserr_add(UPS_NO_TRANSLATION, UPS_FATAL, e_loc);
-      return 0;                              /* NO matching } */
+      return 0;                               /* NO matching }               */
     }
-    e_loc += 2;                              /* Skip over the ${            */
-    strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );    /* copy from there to } in env */
+    e_loc += 2;  /* Skip over the ${ */       /* copy from there to } in env */
+    strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );    
     if ( (tr_env = (char *)getenv( env )) )
     { strcat( buf, tr_env );
     } else {
-      sprintf(error,"${%s}",env);
-      upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
+      if (!strcmp(env,"UPS_THIS_DB"))                        /* will MODIFY */
+      { tr_env = upsutl_str_create((char *)upsfil_last_file(),' ');
+        if ((e_loc = strstr(tr_env,"/.upsfiles/dbconfig"))!=0) /* mustcreate */
+        { *e_loc='\0';                         /* end before .upsfile */
+          strcat( buf, tr_env );               /* put in buffer */
+          *e_loc='/';                          /* restore */
+          upsmem_free(tr_env);                 /* free whole thing */
+        } else { 
+          sprintf(error,"${%s}",env);
+          upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
+        }
+      } else {
+        sprintf(error,"${%s}",env);
+        upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
+      }
     }
     /* move pass the '}' */
     ++s_loc;    
