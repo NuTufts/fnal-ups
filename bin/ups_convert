@@ -422,17 +422,26 @@ sub WriteTableFile {
 #       print TableFile "     doDefaults()\n";
        $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
        $key=~s/DaSeTuP//g;
-       if (open(TMPFILE,"${basedir}/ups/setup.sh")) {
-          close TMPFILE;
-          print TableFile "$key";
+#       if (open(TMPFILE,"${basedir}/ups/setup.sh")) {
+#          close TMPFILE;
+#          print TableFile "$key";
+#       }
+       if (checkfor("${basedir}/ups/setup.sh")) {
+           print TableFile "$key";
        }
        $key=~s/setup/unsetup/g;
+       $key=~s/     doDefaults\(\)//g;
        print TableFile "   Action=unsetup\n";
-       if (open(TMPFILE,"${basedir}/ups/unsetup.sh")) {
-          close TMPFILE;
-          print TableFile "$key";
+       if (checkfor("${basedir}/ups/unsetup.sh")) {
+           print TableFile "$key";
        }
-#       print TableFile "     doDefaults()\n";
+#       if (open(TMPFILE,"${basedir}/ups/unsetup.sh")) {
+#          close TMPFILE;
+#          print TableFile "$key";
+#       }
+#
+# and back to last...
+       print TableFile "      doDefaults()\n";
        $baseactions=&add_misactions;
        print TableFile "${baseactions}";
        print TableFile "End:\n";
@@ -702,23 +711,19 @@ sub add_unsetup {
 } 
 sub add_misactions { 
     $value="";
-    if (open(TMPFILE,"${basedir}/ups/tailor")) {
-       close TMPFILE;
+    if (checkfor("${basedir}/ups/tailor")) {
        $value.="   Action=Tailor\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/tailor)\n";
     }
-    if (open(TMPFILE,"${basedir}/ups/configure")) {
-       close TMPFILE;
+    if (checkfor("${basedir}/ups/configure")) {
        $value.="   Action=configure\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/configure)\n";
     }
-    if (open(TMPFILE,"${basedir}/ups/start")) {
-       close TMPFILE;
+    if (checkfor("${basedir}/ups/start")) {
        $value.="   Action=start\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/start)\n";
     }
-    if (open(TMPFILE,"${basedir}/ups/stop")) {
-       close TMPFILE;
+    if (checkfor("${basedir}/ups/stop")) {
        $value.="   Action=stop\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/stop)\n";
     }
@@ -742,4 +747,12 @@ sub split_os {
          $ros = "$eek[0]";
       }
       return $ros, $rqual;
+}
+sub checkfor {
+    my ($test) = @_;
+    $test =~ s/\$\{?([A-Z_]*)\}?/\$ENV{$1}/go;
+    $test = eval <<EOF;
+"$test"
+EOF
+    return (-f $test);
 }
