@@ -968,8 +968,8 @@ char *upsget_database(const t_upstyp_db * const db_info_ptr,
   for ( db_list=command_line->ugo_db; db_list; 
         db_list = db_list->next, count++ )
   { db=db_list->data;
-    if(count) (void) strcpy(string,":");
-    (void) strcpy(string,db->name);
+    if(count) (void) strcat(string,":");
+    (void) strcat(string,db->name);
   }
   SHUTUP;     
   return(string);     
