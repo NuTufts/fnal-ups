@@ -78,6 +78,7 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 #ifndef NULL
 #define NULL 0
 #endif
+#define VPREFIX "UPSUTL: "
 
 #define KEEP_OR_REMOVE_FILE()   \
    if (! g_keep_temp_file) {                  \
@@ -123,7 +124,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
     if (ftell((FILE *)a_stream) == 0L) {
       /* we are at the beginning of the file, nothing was written to it */
       empty_stream = 1;
-      upsver_mes(1,"Empty temp file deleted %s\n",g_temp_file_name);
+      upsver_mes(1,"%sEmpty temp file deleted %s\n",VPREFIX,g_temp_file_name);
     } else {      
       /* write any closing info to the file */
       (void )upsutl_finish_temp_file(a_stream, &command_line, "");
@@ -159,7 +160,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
 	  } else {
 	    /* output the name of the temp file that was created */
-	    upsver_mes(1,"Sourcing file %s\n",g_temp_file_name);
+	    upsver_mes(1,"%sSourcing file %s\n",VPREFIX,g_temp_file_name);
 	    (void )printf("%s\n", g_temp_file_name);
 	  }
 	  /* if we were asked to save the file, output the name again so the
@@ -187,7 +188,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	    }	   
 	    /* make sure the file is executable */
 	    if (! chmod(g_temp_file_name, mode)) {
-	      upsver_mes(1,"Executing file %s\n",g_temp_file_name);
+	      upsver_mes(1,"%sExecuting file %s\n",VPREFIX,g_temp_file_name);
 	      if (system(g_temp_file_name) < 0) {
 		upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			   strerror(errno));

@@ -442,7 +442,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                       "Specified product and version currently exists");
            return 0;
          }
-         upsver_mes(chain,"INFORMATIONAL: Instance in version file already exists\n");
+         upsver_mes(chain,
+           "%sINFORMATIONAL: Instance in version file already exists\n",
+           UPS_DECLARE);
          buffer[0]=0; /* don't create instance */
          mproduct_list = upslst_first(mproduct_list);
          mproduct = (t_upstyp_matched_product *)mproduct_list->data;
@@ -557,7 +559,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                      ups_command);
           if (UPS_ERROR == UPS_SUCCESS) 
           { if (cmd_list)
-            { upsver_mes(0,"A UPS tailor exists for this product\n");
+            { upsver_mes(0,"%sA UPS tailor exists for this product\n",
+	          UPS_DECLARE);
               upsact_cleanup(cmd_list);
             }
           } 
@@ -597,7 +600,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
             }
             /*          if (UPS_ERROR == UPS_SUCCESS)  */
             if (cmd_list)
-            { upsver_mes(0,"A UPS start/stop exists for this product\n");
+            { upsver_mes(0,"%sA UPS start/stop exists for this product\n",
+                 UPS_DECLARE);
               upsact_cleanup(cmd_list);
             } 
               upscpy_man(minst,db_info,uc,tmpfile);

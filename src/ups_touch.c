@@ -48,6 +48,7 @@ extern t_cmd_info g_cmd_info[];
 #define CHAIN "chain"
 #define VERSION "version"
 #define DECLARE "declare"
+#define VPREFIX "UPS TOUCH: "
 
 /*
  * Definition of public functions.
@@ -140,7 +141,8 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
    }
    /* if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); } */
    if (mproduct_list)    /* the product does exist */ 
-   { upsver_mes(1,"Product %s currently exist in database %s\n",
+   { upsver_mes(1,"%sProduct %s currently exist in database %s\n",
+	        VPREFIX,
                 uc->ugo_product,
                 db_info->name);
      break; 
@@ -179,7 +181,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
            upserr_vplace();
            return 0; 
          }
-         upsver_mes(1,"Chain %s currently exist\n",the_chain);
+         upsver_mes(1,"%sChain %s currently exist\n",VPREFIX,the_chain);
          chain_list->next = save_next;
          chain_list->prev = save_prev;
          mproduct_list = upslst_first(mproduct_list);
@@ -209,7 +211,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
      }
      mproduct_list = upsmat_instance(uc, db_list , need_unique);
      if (UPS_ERROR != UPS_SUCCESS) {  return 0; }
-     upsver_mes(1,"Version exists\n");
+     upsver_mes(1,"%sVersion exists\n",VPREFIX);
      mproduct_list = upslst_first(mproduct_list);
      mproduct = (t_upstyp_matched_product *)mproduct_list->data;
      minst_list = (t_upslst_item *)mproduct->minst_list;

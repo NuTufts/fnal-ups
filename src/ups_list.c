@@ -311,11 +311,11 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
   { db_info = (t_upstyp_db *)db_list->data;
     mproduct_list = ups_list_core(a_command_line,db_list);
     /*  upsugo_prtlst(mproduct_list,"the products");*/
-    upsver_mes(2,"From Database %s\n",db_info->name);
+    upsver_mes(2,"%sFrom Database %s\n",VPREFIX,db_info->name);
     mproduct_list = upslst_first(mproduct_list);  /* point to the start */
-    upsver_mes(2,"Starting sort of product list\n");
+    upsver_mes(2,"%sStarting sort of product list\n",VPREFIX);
     mproduct_list = upslst_sort0( mproduct_list , product_cmp );
-    upsver_mes(2,"Ending sort of product list\n");
+    upsver_mes(2,"%sEnding sort of product list\n",VPREFIX);
     mproduct_list = upslst_first(mproduct_list);  /* point to the start */
     if(!verify)  /* verify is list with NO output */
     {
