@@ -487,9 +487,13 @@ int upsugo_ifornota(struct ups_command * const uc)
      { addr=upsutl_str_create("*",' ');  
        uc->ugo_version = addr;      /* at this point I may not know... */
      }
-     if (!uc->ugo_flavor)
-     { addr=upsutl_str_create("*",' ');  
-       uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     if (!uc->ugo_flavor || uc->ugo_number) /* number is afterfact code */
+     { if(!uc->ugo_number)
+       { addr=upsutl_str_create("*",' ');  
+         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+       } else {
+         upsugo_bldfvr(uc);
+       }
      }
    } else {                         /* not -a but give defaults */
      if (!uc->ugo_chain && !uc->ugo_version)
