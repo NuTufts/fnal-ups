@@ -26,6 +26,9 @@
  * Standard include files, if needed for .h file
  */
 
+/* ups specific include files, if needed for .h file */
+#include "upslst.h"
+
 /*
  * Public typdef's
  */
