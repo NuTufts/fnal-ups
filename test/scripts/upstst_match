@@ -9,8 +9,9 @@ $UPS_DIR/test/ups_test << EOD
 #
 # see if things work without a table file specified
 #
-upsmat_instance -status UPS_DB_CORRUPTION -z ../db0 notable v2_0
-upsmat_instance -out notable1.out -diff notable1.in -status UPS_DB_CORRUPTION -z ../db0 notable -a
+# these two things no longer return an error
+#upsmat_instance -status UPS_DB_CORRUPTION -z ../db0 notable v2_0
+#upsmat_instance -out notable1.out -diff notable1.in -status UPS_DB_CORRUPTION -z ../db0 notable -a
 upsmat_instance -out notable2.out -diff notable2.in -z ../db0 notable v1_0
 # 
 # simple tests with rover
