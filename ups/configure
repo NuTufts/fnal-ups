@@ -202,11 +202,7 @@ Setups_Dir_Resolve()
 #	Reference_to_be_Resolved is the path reference which is to
 #	be resolved and assigned to Variable_Name. 
 #======================================================================
-    TeMp=/tmp
-    if test x$TMPDIR != x
-    then
-        TeMp=$TMPDIR
-    fi
+    TeMp=${TMPDIR:-/tmp}
     for shell in bash ksh ash sh
     do
         if test -x /bin/$shell
@@ -593,11 +589,7 @@ $sed 's%	%%' <<XEoF >$BootStrap_Dir/$Setups_Products_Script
 	prod_set=no
 	for Prod in \${Products_String}
 	do
-	    TeMp=/tmp
-	    if test x\${TMPDIR:-} != x
-	    then
-	        TeMp=\$TMPDIR
-	    fi
+	    TeMp=\${TMPDIR:-/tmp}
 	    if test \`echo \$Prod|cut -c1\` != '/'
 	    then
 		Setups_Dir_Resolve Prod \$Prod
@@ -1027,7 +1019,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	Node=\`uname -n|cut -f1 -d'.'\`
 	MACH_OS=\`uname -s\`
 
-	if test "x\$UPS_OVERRIDE" != x
+	if test "\${UPS_OVERRIDE:-x}" != x
 	then
 	    MACH_OS=\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ +]*\\)+.*/\\1/'\`
 	    Full_Flavor=\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ ]*\\).*/\\1/'\`
@@ -1071,18 +1063,18 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	done
 	Flavor=\`echo \$Full_Flavor | cut -f1 -d'.'\`
 	No_SETUP_UPS=0
-	if test \$error = 0 -a x\`echo \${UPS_DIR:-}|cut -c1\` = x/
+	if test \$error = 0 -a x\`echo \${UPS_DIR:-x}|cut -c1\` = x/
 	then
 	    if test ! -d \$UPS_DIR
 	    then
 		unset UPS_DIR
 	    fi
-	    if test "x\${SETUP_UPS:-}" != x
+	    if test "\${SETUP_UPS:-x}" != x
 	    	then
 		for field in 2 3 4 5 6 7 8
 		do
 		    f1=\`echo \$SETUP_UPS|cut -f\${field} -d'-'\`
-		    if test "x\$f1" = "x"
+		    if test "\${f1:-x}" = "x"
 		    then
 			break
 		    fi
@@ -1108,7 +1100,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	#====================================================================== 
 	# Don't trust the PRODUCTS variable if SETUP_UPS is not defined
 	#======================================================================
-	if test \$No_SETUP_UPS = 1 -o x = x"\${SETUP_UPS:-}"
+	if test \$No_SETUP_UPS = 1 -o x = "\${SETUP_UPS:-x}"
 	then
 	    unset PRODUCTS
 	fi
@@ -1128,7 +1120,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	# on the platform executing this script.  If found, utilize it to define
 	# a UPS_DIR.
 	#======================================================================
-	if test x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a x\$UPS_DIR = x
+	if test x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a \${UPS_DIR:-x} = x
 	then
 	    for fl in "\$Node" "\$Full_Flavor" "\$Flavor_9" "\$Flavor_8" "\$Flavor_7" "\$Flavor_6" "\$Flavor_5" "\$Flavor_4" "\$Flavor_3" "\$Flavor_2" "\$Flavor" "\$MACH_OS" NULL
 	    do
@@ -1136,7 +1128,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	        then
 	            UPS_DIR=\`\$cat \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}|\$grep -v '^#'\`
 	        fi
-	        if test x\${UPS_DIR:-} != x
+	        if test \${UPS_DIR:-x} != x
 	        then
 	            if test -d \$UPS_DIR
 	            then
@@ -1153,14 +1145,14 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	#
 	# This process, although thorough, is very time consuming.
 	#======================================================================
-	if test \$error = 0 -a x\${UPS_DIR:-} = x
+	if test \$error = 0 -a \${UPS_DIR:-x} = x
 	then
 	    if test -x \$Setups_Home/${Script_Prefix}.common
 	    then
 	        eval \`(unset ENV;\$Setups_Home/${Script_Prefix}.common sh)\`
 	    fi
 	fi
-	if test x\${UPS_DIR:-} != x
+	if test \${UPS_DIR:-x} != x
 	then
 	#======================================================================
 	# If we have successfully managed to find a usable version of $Name_Of_Ups,
@@ -1172,7 +1164,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	# when PRODUCTS and UPS_DIR are known at entry.  The $Name_Of_Ups setup script
 	# may define functions which are NOT inherited by sub-shells.
 	#======================================================================
-	    if test \$No_SETUP_UPS = 0 -a "x\${SETUP_UPS:-}" != x
+	    if test \$No_SETUP_UPS = 0 -a "\${SETUP_UPS:-x}" != x
 	    then
 		. \`\$UPS_DIR/bin/ups setup \$SETUP_UPS\`
 	    else
