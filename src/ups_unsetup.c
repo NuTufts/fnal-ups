@@ -135,7 +135,8 @@ t_upslst_item *ups_unsetup( const t_upsugo_command * const a_command_line,
         (void )upsugo_free(new_command_line);
       }
     } else {
-      upserr_add(UPS_NO_SETUP_ENV, UPS_FATAL, a_command_line->ugo_product);
+      upserr_add(UPS_NO_SETUP_ENV, UPS_FATAL,
+		 upsutl_upcase(a_command_line->ugo_product));
     }
   } else {
     upserr_add(UPS_NO_PRODUCT, UPS_FATAL, g_cmd_info[a_ups_command].cmd);
