@@ -121,6 +121,8 @@ void ups_declare( t_upsugo_command * const uc ,
     return;
   }
   mproduct_list = upsmat_instance(uc, db_list , need_unique);
+  if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
+  /* if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); } */
   if (mproduct_list)
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
                "Exact product definition exists");
@@ -147,13 +149,15 @@ void ups_declare( t_upsugo_command * const uc ,
  *
  ***********************************************************************/
 
+ uc->ugo_chain = upslst_new(upsutl_str_create(ANY_MATCH,' '));
+ uc->ugo_version=0;
+ uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
+ uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
  for (db_list = uc->ugo_db ; db_list ; db_list=db_list->next) 
  { db_info = (t_upstyp_db *)db_list->data;
-   uc->ugo_chain = upslst_new(upsutl_str_create(ANY_MATCH,' '));
-   uc->ugo_version=0;
-   uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
-   uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
    mproduct_list = upsmat_instance(uc, db_list , not_unique);
+   if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
+   /* if (UPS_ERROR != UPS_SUCCESS) { upserr_clear(); } */
    if (mproduct_list)    /* the product does exist */ 
    { upsver_mes(1,"Product %s currently exist in database %s\n",
                 uc->ugo_product,
@@ -192,6 +196,7 @@ void ups_declare( t_upsugo_command * const uc ,
            chain_list->prev=0;
            uc->ugo_chain=chain_list;
          mproduct_list = upsmat_instance(uc, db_list , not_unique);
+         if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
            chain_list->next = save_next;
            chain_list->prev = save_prev;
          if (mproduct_list)  /* the chain exists */
@@ -200,6 +205,7 @@ void ups_declare( t_upsugo_command * const uc ,
            uc->ugo_qualifiers=save_qualifiers;
            uc->ugo_chain=chain_list;
            mproduct_list = upsmat_instance(uc, db_list , need_unique);
+           if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
            if (mproduct_list)  /* different version only */
            { upsver_mes(1,"same flavor and qualifiers exist\n");
              mproduct_list = upslst_first(mproduct_list);
@@ -286,10 +292,12 @@ void ups_declare( t_upsugo_command * const uc ,
     uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
     uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
     mproduct_list = upsmat_instance(uc, db_list , not_unique);
+    if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
     if (mproduct_list) 
     {  uc->ugo_flavor=save_flavor;
        uc->ugo_qualifiers=save_qualifiers;
        mproduct_list = upsmat_instance(uc, db_list , need_unique);
+       if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
        if (!mproduct_list) 
        { upsver_mes(1,"Version exists adding additional instance\n");
          product = upsget_version_file(db_info->name,
@@ -370,6 +378,7 @@ void ups_declare( t_upsugo_command * const uc ,
         chain_list->prev=0;
         uc->ugo_chain=chain_list;
         mproduct_list = upsmat_instance(uc, db_list , need_unique);
+        if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); return; }
         chain_list->next = save_next;
         chain_list->prev = save_prev;
         cmd_list = upsact_get_cmd((t_upsugo_command *)uc,

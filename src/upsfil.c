@@ -807,7 +807,7 @@ void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
             case e_file_table: strcpy(file,"TABLE"); break;
             case e_file_chain: strcpy(file,"CHAIN"); break;
           }
-          upserr_add(UPS_DUPLICATE_INSTANCE, UPS_WARNING, 
+          upserr_add(UPS_DUPLICATE_INSTANCE, UPS_INFORMATIONAL, 
                      file , g_filename, 
                      vinst_ptr->product,vinst_ptr->version, 
                      vinst_ptr->flavor,vinst_ptr->qualifiers,
@@ -842,7 +842,7 @@ void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
             case e_file_table: strcpy(file,"TABLE"); break;
             case e_file_chain: strcpy(file,"CHAIN"); break;
           }
-          upserr_add(UPS_DUPLICATE_INSTANCE, UPS_WARNING, 
+          upserr_add(UPS_DUPLICATE_INSTANCE, UPS_INFORMATIONAL, 
                      file , g_filename, 
                      vinst_ptr->product,vinst_ptr->version, 
                      vinst_ptr->flavor,vinst_ptr->qualifiers,

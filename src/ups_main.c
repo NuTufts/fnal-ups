@@ -45,11 +45,13 @@
 #include "upshlp.h"
 #include "upsget.h"
 #include "upsact.h"
+#include "upsver.h"
 #include "ups_declare.h"
 #include "ups_undeclare.h"
 #include "ups_flavor.h"
 #include "ups_get.h"
 #include "ups_copy.h"
+#include "ups_modify.h"
 
 /*
  * Definition of public variables.
@@ -157,7 +159,7 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_exist: ups_setup(command_line, temp_file, e_setup);
 	    break;
-	  case e_modify:
+	  case e_modify: ups_modify(command_line, temp_file, e_modify);
 	    break;
 	  case e_start: ups_start(command_line, temp_file, e_start);
 	    break;
@@ -218,6 +220,7 @@ int main(int argc, char *argv[])
     if (ftell(temp_file) == 0L) {
       /* we are at the beginning of the file, nothing was written to it */
       empty_temp_file = 1;
+      upsver_mes(1,"Empty temp file deleted %s\n",g_temp_file_name);
     } else {      
       /* write any closing info to the file */
       (void )upsutl_finish_temp_file(temp_file, &temp_command_line, "");

@@ -31,7 +31,7 @@
 /*
  * Definition of public variables.
  */
-
+extern t_cmd_info g_cmd_info[];
 /*
  * Declaration of private functions.
  */
@@ -302,7 +302,15 @@ void ups_list( t_upsugo_command * const a_command_line , int verify )
       } printf("\n");
     }
     list_output(mproduct_list, a_command_line);
-    if (UPS_ERROR!=UPS_SUCCESS) { upserr_output(); upserr_clear(); return; }
+    if (UPS_ERROR==UPS_SUCCESS)
+    { if (mproduct_list) 
+      { upsutl_statistics(mproduct_list, g_cmd_info[e_list].cmd);
+      }
+    } else { 
+      upserr_output(); 
+      upserr_clear(); 
+      return; 
+    }
   }
     /* free the matched products */
     for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
@@ -483,7 +491,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
-  char *str_ptr;
   char *str_val;
   char *addr;
   int count=0;

@@ -135,6 +135,10 @@
          case 'x':      \
          uc->ugo_x = 1; \
          break;
+#define case_X \
+         case 'X':      \
+         uc->ugo_X = 1; \
+         break;
 #define case_y \
          case 'y':      \
          uc->ugo_y = 1; \
@@ -503,6 +507,10 @@ int upsugo_ifornota(struct ups_command * const uc)
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
        } else {
          upsugo_bldfvr(uc);
+/* test flavor=* in table */
+         addr=upsutl_str_create("*",' ');  
+         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+/* */
        }
      }
    } else {                         /* not -a but give defaults */
@@ -515,6 +523,10 @@ int upsugo_ifornota(struct ups_command * const uc)
      uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
      if (!uc->ugo_flavor) upsugo_bldfvr(uc);
+/* test flavor=* in table */
+         addr=upsutl_str_create("*",' ');  
+         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+/* */
    }
 /* If they didn't specify a database pull the environment variable */
    if (!uc->ugo_db) {
@@ -1337,7 +1349,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        { /* Single flag cases */
          case_a case_C case_e case_E case_F 
          case_j case_k case_l case_L case_s case_S
-         case_v case_V case_w case_W case_x 
+         case_v case_V case_w case_W case_x case_X
          case_y case_Y case_Z case_help
          /* Chain cases */ 
          case_c case_d case_n case_t case_o

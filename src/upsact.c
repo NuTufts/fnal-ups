@@ -415,7 +415,7 @@ t_cmd_info g_cmd_info[] = {
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_depend,      "depend",      "?cdotg:f:H:K:lm:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
+  {e_modify,      "modify",      "a?A:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},

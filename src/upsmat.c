@@ -864,6 +864,11 @@ static int match_from_chain( const char * const a_product,
       printf("%sFound %d instances in %s\n", VPREFIX, tmp_num_matches,
 	     buffer);
     }
+    if (UPS_VERIFY && !tmp_num_matches)
+    { upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "VERSION", buffer); 
+      /* upserr_output(); maybe lost don't think so here but ...*/
+    }
+
     /* for each instance that was matched, open the version file, and only
        look for the instance that matches the instance found in the chain
        file.  this insures that an instance in a chain file is
@@ -995,6 +1000,10 @@ static int match_from_version( const char * const a_product,
 	printf("%sFound %d instances in %s\n", VPREFIX, tmp_num_matches,
 	       buffer);
       }
+      if (UPS_VERIFY && !tmp_num_matches)
+      { upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "VERSION", buffer); 
+        /* upserr_output(); WHY WHY WHY ??? or it's lost !!! */
+      }
 
       /* for each instance that was matched, open the table file, and only
 	 look for the instance that matches the instance found in the version
@@ -1118,6 +1127,10 @@ static int match_from_table( const char * const a_product,
 	 printf("%sFound %d instances in %s\n", VPREFIX, num_matches,
 		full_table_file);
        }
+       if (UPS_VERIFY && !num_matches)
+       { upserr_add(UPS_MISSING_MATCH, UPS_INFORMATIONAL, "TABLE", full_table_file);
+         /* upserr_output(); no clue maybe ??? */ 
+       } 
 
       /* free the table_file_path */
       upsmem_free(full_table_file);
