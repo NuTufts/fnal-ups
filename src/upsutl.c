@@ -347,6 +347,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   t_upslst_item *minst_item = NULL, *mproduct_item = NULL;
   t_upstyp_matched_product *mproduct = NULL;
   t_upstyp_matched_instance *minst = NULL;
+  char *tmp_stat;
   char stat_file[FILENAME_MAX+1];
   int dir_s, stat_s, file_s, global_yes = 0;
   FILE *file_stream = 0;
@@ -364,8 +365,11 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   for (mproduct_item = (t_upslst_item *)a_mproduct_list ;
        mproduct_item ; mproduct_item = mproduct_item->next) {
     mproduct = (t_upstyp_matched_product *)mproduct_item->data;
-    if (mproduct->db_info->config->statistics) {
-      global_yes = 1;          /* write statistics for everything in this db */
+    if (tmp_stat = mproduct->db_info->config->statistics) {
+      if ((! strcmp(tmp_stat, ANY_MATCH)) ||
+	  (! strstr(mproduct->product, tmp_stat))) {
+	global_yes = 1;      /* write statistics for everything in this db */
+      }
     }
     for (minst_item = (t_upslst_item *)mproduct->minst_list ;
 	 minst_item ; minst_item = minst_item->next) {
