@@ -58,6 +58,7 @@ static char *the_chain=0;
 static char *save_version;
 static char *save_table_dir;		/* match won't work "how I want" */
 static char *save_table_file;		/* with table specifications     */
+static char *save_ups_dir;
 static char *username=0;
 static char *declared_date=0;
 
@@ -109,7 +110,8 @@ t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
    vinst->prod_dir=upsutl_str_create(uc->ugo_productdir,' ');
    vinst->table_dir=upsutl_str_create(save_table_dir,' ');
    vinst->table_file=upsutl_str_create(save_table_file,' ');
-   vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' ');
+/*   vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' '); */
+   vinst->ups_dir=upsutl_str_create(save_ups_dir,' ');
    vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
    vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
    vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
@@ -209,8 +211,10 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   uc->ugo_M=0;
   save_table_dir=uc->ugo_tablefiledir;
   save_table_file=uc->ugo_tablefile;
+  save_ups_dir=uc->ugo_upsdir;
   uc->ugo_tablefile=0;
   uc->ugo_tablefiledir=0;
+  uc->ugo_upsdir=0; 
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
@@ -249,12 +253,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
                "Exact product definition exists");
     return 0;
-  }
-  if (mproduct_list)
-  { if (uc->ugo_chain) { uc->ugo_version=0; }
-/* Don't do this */
-/*    ups_undeclare(uc, tmpfile, e_undeclare); */
-    uc->ugo_version=save_version;
   }
   if(!username) /* static may allready be set */
   { username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
@@ -484,6 +482,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
 /* no more matching replace "faked out stuff" */
     uc->ugo_tablefiledir=save_table_dir;
     uc->ugo_tablefile=save_table_file;
+    uc->ugo_upsdir=save_ups_dir;
     uc->ugo_m=save_m;
     uc->ugo_M=save_M;
     /* build new version instance */
