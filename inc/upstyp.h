@@ -55,6 +55,7 @@ typedef struct upstyp_config {
   char             *man_path;
   char             *info_path;
   char             *html_path;
+  char             *news_path;
 } t_upstyp_config;
 
 /* database information.  this includes the name (location) of the database
