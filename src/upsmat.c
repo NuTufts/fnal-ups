@@ -104,6 +104,14 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 #define NULL
 #endif
 
+/* sometimes when matching for > 1 instance, and error is found with a
+   product being matched.  the match routines record that error, stop 
+   matching on that product and go to the next product.  but we need to keep
+   track of the error that occurred so that when we return to the calling
+   routine, we can correctly report that an error occurred. and return all
+   the matches that we were able to make. */
+static int g_ups_error;
+
 #define VPREFIX  "UPSMAT: "
 
 #define TMP_LISTS_FREE() \
@@ -160,9 +168,20 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	}                                                              \
       }
 
-#define CHECK_NO_FILE() \
+#define CHECK_NO_FILE(file) \
+      if ((UPS_ERROR == UPS_NO_FILE) && ! a_need_unique) {      \
+	upserr_clear();						\
+      }                                                         \
+      else {							\
+        upserr_add(UPS_NO_FILE, UPS_FATAL, file);               \
+      }								\
+
+#define CHECK_SOFT_ERR() \
       if (UPS_ERROR != UPS_SUCCESS) {                                   \
-         if (UPS_ERROR == UPS_NO_FILE && ! a_need_unique) {       	\
+         if ((UPS_ERROR == UPS_NO_FILE ||                               \
+              UPS_ERROR == UPS_NO_TABLE_MATCH ||                        \
+              UPS_ERROR == UPS_NO_VERSION_MATCH) && ! a_need_unique) {  \
+	   g_ups_error = UPS_ERROR;                                     \
 	   upserr_clear();						\
 	 }                                                              \
          else {								\
@@ -255,6 +274,9 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   int got_all_products = 0, got_all_versions = 0;
   int any_version = 0, any_chain = 0;
 
+  /* initialize this to success */
+  g_ups_error = UPS_SUCCESS;
+
   /* In order to avoid doing this for each database, if a product name was
      entered, create a list (with 1 element) here */
   if (strcmp(a_command_line->ugo_product, ANY_MATCH)) {
@@ -281,7 +303,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
      /* We have a table file  and we have a product name, we do not need the
         db. */
       if (UPS_VERBOSE) {
-	printf("%sUsing Table File - %s\n", VPREFIX,
+	printf("%sOnly using Table File - %s\n", VPREFIX,
 	       (char *)a_command_line->ugo_tablefile);
       }
       MATCH_TABLE_ONLY();
@@ -372,7 +394,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    all_chains = upslst_free(all_chains, do_delete);
 	    
 	    /* get out of the loop if we got an error */
-	    CHECK_NO_FILE();
+	    CHECK_SOFT_ERR();
 	  
 	    /* update the mproduct_list structure with the new info */
 	    ADD_TO_MPRODUCT_LIST();
@@ -417,6 +439,11 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 
   /* back up to the front of the list */
   mproduct_list = upslst_first(mproduct_list);
+
+  /* return any error we encountered along the way */
+  if (g_ups_error != UPS_SUCCESS) {
+    UPS_ERROR = g_ups_error;
+  }
   return(mproduct_list);
 }
 
@@ -499,7 +526,7 @@ static t_upstyp_matched_product *match_instance_core(
       /* if we had an error & it was an error that the requested file could
 	 not be found and we are asking for many instances, then continue
 	 with the next version.  else get out. */
-      CHECK_NO_FILE();
+      CHECK_SOFT_ERR();
 
       num_matches += tmp_num_matches;
     }
@@ -530,6 +557,10 @@ static t_upstyp_matched_product *match_instance_core(
 		    if (! strcmp(cinst->qualifiers,
 				 minst->version->qualifiers)) {
 		      /* they have the same qualifiers - this is a match */
+		      if (UPS_VERBOSE) {
+			printf("%sFound associated chain - %s\n", VPREFIX,
+			       cinst->chain);
+		      }
 		      if (! minst->chain ) {
 			/* no chain here yet, fill it in */
 			minst->chain = cinst;
@@ -547,6 +578,12 @@ static t_upstyp_matched_product *match_instance_core(
 	      }
 	    }
 	  }
+	} else {
+	  /* if we could not find the file and we are looking for more than one
+	     instance then clear out the error.  otherwise if a ups list is
+	     done on an entire db for v2_0, all products without a v2_0 will
+	     generate an error */
+	  CHECK_NO_FILE(chain);
 	}
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the a_minst_list */
@@ -590,7 +627,7 @@ static t_upstyp_matched_product *match_instance_core(
       /* we had an error, if it was an error that the requested file could
 	 not be found and we are asking for many instances, then continue
 	 with the next version.  else get out. */
-      CHECK_NO_FILE();
+      CHECK_SOFT_ERR();
       
       num_matches += tmp_num_matches;
     }
@@ -728,6 +765,12 @@ static int match_from_chain( const char * const a_product,
       TMP_LISTS_FREE();
       
     }
+  } else {
+    /* if we could not find the file and we are looking for more than one
+       instance then clear out the error.  otherwise if a ups list is done 
+       on an entire db for v2_0, all products without a v2_0 will generate
+       an error */
+    CHECK_NO_FILE(a_db_info->name);
   }
   
 return num_matches;
@@ -855,6 +898,12 @@ static int match_from_version( const char * const a_product,
 	/* we no longer need the lists */
 	TMP_LISTS_FREE();
       }
+    } else {
+      /* if we could not find the file and we are looking for more than one
+	 instance then clear out the error.  otherwise if a ups list is done 
+	 on an entire db for v2_0, all products without a v2_0 will generate
+	 an error */
+      CHECK_NO_FILE(&buffer[0]);
     }
   } else {
     upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, file_chars);
@@ -916,8 +965,11 @@ static int match_from_table( const char * const a_product,
       upsmem_free(full_table_file);
     }
   } else {
-    /* Could not find the specified file  - ERROR */
-    upserr_add(UPS_NO_FILE, UPS_FATAL, a_tablefile);
+    /* if we could not find the file and we are looking for more than one
+       instance then clear out the error.  otherwise if a ups list is done 
+       on an entire db for v2_0, all products without a v2_0 will generate
+       an error */
+    CHECK_NO_FILE(full_table_file);
   }
     
     return num_matches;
