@@ -647,6 +647,12 @@ void upsfil_stat( const int iopt )
  * Definition of private functions
  */
 
+t_upstbl *g_file_cache( void )
+{
+  return g_ft;
+}
+
+
 int write_version_file( void )
 {
   t_upslst_item *l_ptr = 0;

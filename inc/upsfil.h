@@ -26,6 +26,7 @@
 
 /* ups specific include files, if needed for .h file */
 #include "upstyp.h"
+#include "upstbl.h"
 
 /* public typdef's */
 
@@ -44,6 +45,7 @@ int               upsfil_exist( const char * const ups_file );
 void              upsfil_flush( void );
 void              upsfil_stat( const int iopt );
 t_upstyp_product  *upsfil_is_in_cache( const char * const ups_file );
+t_upstbl          *g_file_cache( void );
 void              g_print_product( t_upstyp_product * const prod_ptr );
 
 /*
