@@ -365,8 +365,9 @@ t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
  * upsutl_get_files
  *
  * Given a directory, return a listing of all the files which
- * have the specified character string in them.  The character string is
- * removed from the returned string.
+ * have the specified pattern in them.  The pattern is 
+ * removed from the returned string.  The pattern must have been at the
+ * end of the original string.
  * 
  * Input : Directory where to get files, pattern to match in files
  * Output: a list of the file names
@@ -382,7 +383,8 @@ void upsutl_get_files(const char * const a_dir,
   struct direct *dir_line = NULL;
 #endif */
   DIR *dir = NULL;
-  char *new_string = NULL;
+  char *new_string = NULL, *substr = NULL;
+  int plen;
 
   if ((dir = opendir(a_dir))) {
     if (! strcmp(a_pattern, ANY_MATCH)) {
@@ -396,15 +398,24 @@ void upsutl_get_files(const char * const a_dir,
 	}
       }
     } else {
-      /* read each directory item and if it contains the pattern, remove
-	 the pattern from the file name and add it to the list */
+      /* read each directory item and if it contains the pattern at the end
+	 of the string, remove the pattern from the file name and add it to
+	 the list */
+      plen = (int )strlen (a_pattern);
       while ((dir_line = readdir(dir)) != NULL) {
 	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
-	  new_string = upsutl_strstr(dir_line->d_name, a_pattern);
-	  if (UPS_ERROR == UPS_SUCCESS) {
-	    if (new_string) {
-	      *a_file_list = upslst_add((t_upslst_item *)*a_file_list,
-					(void *)new_string);
+	  /* if the pattern is there, make sure it is at the end of the
+	     string before removing it */
+	  if (substr = strstr(dir_line->d_name, a_pattern)) {
+	    /* the pattern is in the string, now see if it is at the end */
+	    if ((int )(*(substr + plen)) == 0) {
+	      new_string = upsutl_strstr(dir_line->d_name, a_pattern);
+	      if (UPS_ERROR == UPS_SUCCESS) {
+		if (new_string) {
+		  *a_file_list = upslst_add((t_upslst_item *)*a_file_list,
+					    (void *)new_string);
+		}
+	      }
 	    }
 	  }
 	}
