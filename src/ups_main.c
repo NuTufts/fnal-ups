@@ -193,6 +193,8 @@ int main(int argc, char *argv[])
 	       bourne shell */
 	    command_line->ugo_shell = e_BOURNE;
             g_UPS_SHELL = e_BOURNE;
+	    /* fix the environment, too, 'cause ups_ugo will set it again...*/
+	    putenv("UPS_SHELL=sh");
 
 	    switch (g_cmd_info[i].cmd_index) {
 	    case e_list: mproduct_list = ups_list(command_line,0);
