@@ -183,10 +183,10 @@ char *upsget_allout(const FILE * const stream,
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr); } 
+      { fprintf((FILE *)stream,"UPS_VERBOSE=\"%s\";export UPS_VERBOSE\n",addr); } 
       addr=upsget_extended(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"UPS_EXTENDED=%s;export UPS_EXTENDED\n",addr); } 
+      { fprintf((FILE *)stream,"UPS_EXTENDED=\"%s\";export UPS_EXTENDED\n",addr); } 
       fprintf((FILE *)stream,"UPS_THIS_DB=%s;export UPS_THIS_DB\n",
                upsget_database(db,instance,command_line));
       fprintf((FILE *)stream,"UPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
@@ -199,7 +199,7 @@ char *upsget_allout(const FILE * const stream,
                upsget_shell(db,instance,command_line));
       addr=upsget_options(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"UPS_OPTIONS=%s;export UPS_OPTIONS\n",addr); } 
+      { fprintf((FILE *)stream,"UPS_OPTIONS=\"%s\";export UPS_OPTIONS\n",addr); } 
     } else { 
       fprintf((FILE *)stream,"setenv UPS_PROD_NAME=%s\n",name);
       fprintf((FILE *)stream,"setenv UPS_PROD_VERSION=%s\n",
@@ -208,10 +208,10 @@ char *upsget_allout(const FILE * const stream,
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_VERBOSE=%s\n",addr); } 
+      { fprintf((FILE *)stream,"setenv UPS_VERBOSE=\"%s\"\n",addr); } 
       addr=upsget_extended(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_EXTENDED=%s\n",addr); } 
+      { fprintf((FILE *)stream,"setenv UPS_EXTENDED=\"%s\"\n",addr); } 
       fprintf((FILE *)stream,"setenv UPS_THIS_DB=%s\n",
                upsget_database(db,instance,command_line));
       fprintf((FILE *)stream,"setenv UPS_OS_FLAVOR=%s\n",
@@ -224,7 +224,7 @@ char *upsget_allout(const FILE * const stream,
                upsget_shell(db,instance,command_line));
       addr=upsget_options(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_OPTIONS=%s\n",addr); }
+      { fprintf((FILE *)stream,"setenv UPS_OPTIONS=\"%s\"\n",addr); }
     }
   } return 0;
 }
@@ -308,6 +308,21 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
   { strcat(newstr," -r ");
     strcat(newstr,command_line->ugo_productdir);
   }
+  if ( command_line->ugo_m)
+  { strcat(newstr," -m ");
+    strcat(newstr,command_line->ugo_tablefile);
+  }
+  if ( command_line->ugo_M)
+  { strcat(newstr," -M ");
+    strcat(newstr,command_line->ugo_tablefiledir);
+  }
+  if ( command_line->ugo_O)
+  { strcat(newstr," -O \"");
+    strcat(newstr,command_line->ugo_options);
+    strcat(newstr,"\"");
+  }
+  if ( command_line->ugo_e)
+  { strcat(newstr," -e "); }
   return newstr;
 }
 
@@ -398,33 +413,37 @@ char *upsget_options(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { static char NOT[]="";
+  static char *string;
   if (command_line->ugo_O)
-  { return command_line->ugo_options;
+  { string=command_line->ugo_options;
   } else {
-    return(NOT);
+    string=NOT;
   }
+  return(string);
 }
 char *upsget_database(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { t_upslst_item *db_list;
+  static char NOT[]="";
+  static char *string;
   if (command_line->ugo_z) 
   { db_list=upslst_first(command_line->ugo_db);
-    return(db_list->data);
+    string=db_list->data;
   } else {
     if ( db_info_ptr )
-    { return db_info_ptr->name;
+    { string=db_info_ptr->name;
     } else {
-      return 0;
+      string=NOT;
     }
-  }
+  } return(string);
 }
 char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
                        const t_upstyp_matched_instance * const instance,
                        const t_upsugo_command * const command_line )
-{  char                 uname_flavor[80];
-   struct utsname       baseuname;              /* returned from uname */
-   static char                 *flavor;                /* flavor ptr */
+{  static char uname_flavor[80];
+   struct utsname baseuname;              /* returned from uname */
+   static char *flavor;                /* flavor ptr */
    flavor = uname_flavor;                       /* init pointer */
    if (uname(&baseuname) == -1) return(0);     /* do uname */
    (void) strcpy (flavor,baseuname.sysname);    /* get sysname */

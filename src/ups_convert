@@ -1,9 +1,5 @@
 #!/usr/local/bin/perl
 #
-#               -v         :  Verbose 
-#               -f flavor  :  Because it was easy, may want to split
-#                             a database but that could be hazardous...
-#                             
 # Known problems:
 #   If you have identical chains for different instances.  
 #   While this is technically not an illegal database definition the 
@@ -107,7 +103,7 @@ $#VERSION=0;   # Version specification            - reqHash,flvrchnHash
 $#FLAVOR=1;    # Flavor                           - reqHash
 $#FLAGS=2;     # flags                            - reqHash
 
-#$opt_v=1;
+$opt_v=1;
 NEXTDB:
 
 foreach $db (@dbs) {
