@@ -57,4 +57,3 @@ void ups_unk(const t_upsugo_command * const a_command_line,
   printf("I'm sorry, I don't know what to do with the command \"%s\"\n",
 	 a_unk_cmd);
 }
-
