@@ -194,19 +194,35 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                            UPS_UNDECLARE,
                             the_chain,
                             cinst ? cinst->version : "(null)" );
-              (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
-              unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
-              (void) sprintf(unchain,"un%s",the_chain);
-              cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                         mproduct, unchain,ups_command);
-              if (UPS_ERROR == UPS_SUCCESS) 
-              { upsact_process_commands(cmd_list, tmpfile);
-                upsact_cleanup(cmd_list);
-              } else {
+              (void) upsfil_write_file(product, buffer,' ',JOURNAL); 
+              if (UPS_ERROR != UPS_SUCCESS)
+              {
                 (void) upsfil_clear_journal_files();
                 upserr_vplace();
                 return 0;
               }
+
+              unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
+              (void) sprintf(unchain,"un%s",the_chain);
+              if (!uc->ugo_C)
+              {
+                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                           mproduct, unchain,ups_command);
+                if (UPS_ERROR == UPS_SUCCESS) 
+                { upsact_process_commands(cmd_list, tmpfile);
+                  upsact_cleanup(cmd_list);
+                } else {
+                  (void) upsfil_clear_journal_files();
+                  upserr_vplace();
+                  return 0;
+                }
+              }
+              else
+              {
+                upsver_mes(1,"%sSkipping %s of %s version %s due to -C option\n",
+                              UPS_UNDECLARE, unchain, uc->ugo_product, cinst->version);
+              }
+
 /* Only undeclare action when you undeclare a version not a chain
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                          mproduct,g_cmd_info[ups_command].cmd,
@@ -273,7 +289,13 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         upsver_mes(1,"%sDeleting version %s\n",
                       UPS_UNDECLARE,
                       vinst->version);
-        (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
+        (void) upsfil_write_file(product, buffer,' ',JOURNAL); 
+        if (UPS_ERROR != UPS_SUCCESS)
+        {
+          (void) upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0;
+        }
         if (!uc->ugo_C)
         {
           cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -290,8 +312,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         }
         else
         {
-          upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
-                        UPS_UNDECLARE, "unconfigure", vinst->version);
+          upsver_mes(1,"%sSkipping %s of %s version %s due to -C option\n",
+                        UPS_UNDECLARE, "unconfigure", uc->ugo_product, vinst->version);
         }
         if (!uc->ugo_C)
         {
@@ -309,8 +331,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         }
         else
         {
-          upsver_mes(1,"%sSkipping %s of version %s due to -C option\n",
-                        UPS_UNDECLARE, g_cmd_info[ups_command].cmd, vinst->version);
+          upsver_mes(1,"%sSkipping %s of %s version %s due to -C option\n",
+                        UPS_UNDECLARE, g_cmd_info[ups_command].cmd, uc->ugo_product, vinst->version);
         }
         if (uc->ugo_Y && product_home) 
         { (void) fprintf((FILE *)tmpfile,"touch %s;rm -rf %s\n",
