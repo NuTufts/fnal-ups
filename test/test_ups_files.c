@@ -20,6 +20,8 @@ int  main( int argc, char* argv[] )
     fclose( fh );
     
     g_print_product( prod_ptr );
+
+    ups_free_product( prod_ptr );    
   }
   
 
