@@ -3948,7 +3948,14 @@ static void f_proddir( ACTION_PARAMS)
 	f_envset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
     }
-
+    if (! tmp_prod_dir) {
+      /* we could not find a value to set PROD_DIR to.  this smells like an
+	 error so let the user know about it */
+      if (a_minst->version && a_minst->version->product) {
+	upserr_add(UPS_NO_PROD_DIR, UPS_INFORMATIONAL,
+		   a_minst->version->product);
+      }
+    } 
   }
 }
 
