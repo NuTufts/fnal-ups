@@ -154,6 +154,7 @@ typedef struct upstyp_product
 #define ANY_MATCH "*"
 #define NOT_EQUAL_ANY_MATCH(string) (*(string) - '\*')
 
+#define ANY_FLAVOR "ANY"
 #define MAX_LINE_LEN 1024
 #define INVALID_INDEX -1
 
