@@ -1043,15 +1043,14 @@ void upsugo_free_ugo_db( t_upslst_item * const ugo_db )
     return;
 
   l_db = upslst_first( ugo_db );
-  for ( ; l_db; l_db = l_db->next ) {
+  while( l_db ) {
     t_upstyp_db* db = (t_upstyp_db * )l_db->data;
-    upsmem_dec_refctr( db );
+    l_db = upslst_delete( l_db, db, ' ' );
     if ( upsmem_get_refctr( db ) <= 0 ) {
       upsmem_free( db->name );
       upsmem_free( db );
     }
   }
-  upslst_free( ugo_db,' ' );
 }
 
 /* ==========================================================================
