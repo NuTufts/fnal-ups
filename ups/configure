@@ -649,8 +649,8 @@ fi
 # Create the startup and shutdown scripts.
 #
  
-Boot_Start=''
-Boot_Start=`grep -i $StartUp_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'` 
+Boot_Start='yes'
+#Boot_Start=`grep -i $StartUp_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'` 
 if [ x${Boot_Start:-} = xyes ]
 then
 
@@ -723,8 +723,8 @@ then
     MACH_OS=IRIX                              
 fi                                            
 
-Boot_Start=''
-Boot_Start=\`grep -i \$StartUp_Flag \$Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'\`
+Boot_Start='yes'
+#Boot_Start=\`grep -i $StartUp_Flag \$Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'\`
 if [ x\${Boot_Start:-} = xyes ]
 then
                                               
