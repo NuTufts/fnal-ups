@@ -258,9 +258,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         vinst=vinst_list->data;
         if (uc->ugo_y || uc->ugo_Y )
         { product_home=upsget_prod_dir(db_info,minst,uc);
-          if (vinst->archive_file)
-          { archive=upsutl_str_create(vinst->archive_file,' ');
-          }
+          archive=upsget_archive_file(db_info,minst,uc,1); /* strip */
           if (uc->ugo_y && product_home)
           { fprintf(stdout,"Product home directory - \n\t%s\n",product_home);
             fprintf(stdout,"Delete this directory?");

@@ -547,6 +547,42 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
   return newstr;
 }
 
+char *upsget_archive_file(const t_upstyp_db * const db_info_ptr,
+                          const t_upstyp_matched_instance * const instance,
+                          const t_upsugo_command * const command_line,
+                          const int strip )
+{ static char *string;
+  static char *env_string;
+  static char buffer[1];
+  static char *nostring=buffer;
+  buffer[0]='\0';
+  if (command_line && command_line->ugo_archivefile)
+  { string=command_line->ugo_archivefile;
+  } else { 
+    get_element(string,archive_file);
+  }
+  if (!string)
+  { string=buffer;
+  } else {
+    if((env_string=upsget_translation_env(string))!=0)
+    { string=env_string;
+    }
+    if (strip)
+    { if (!upsutl_strincmp(string,"ftp://",6))
+      { strncpy(string,"123456",6); /* space ftp:// */
+        if (strchr(string,'/'))
+        { string=upsutl_str_create(strchr(string,'/'),'p');
+        } else { 
+          string=upsutl_str_create(string,' ');
+        }
+      }
+    } else {
+      string=upsutl_str_create(string,' ');
+    }
+  }
+  return ( string ? string : nostring ) ;
+}
+
 char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
