@@ -45,6 +45,8 @@ int get_instance(const t_upslst_item * const a_read_instances,
 			const t_upslst_item * const a_quals_list,
 			const int a_need_unique,
 			t_upslst_item **a_list_instances);
+static void print_inst(t_upslst_item * const inst_list);
+static char *get_ups_string(const char * const old_string);
 #endif
 
 #ifdef MATCH_TABLE
@@ -59,6 +61,8 @@ int match_from_table( const char * const a_product,
 		      const t_upslst_item * const a_flavor_list,
 		      const t_upslst_item * const a_quals_list,
 		      t_upslst_item ** const a_tinst_list);
+static void print_inst(t_upslst_item * const inst_list);
+static char *get_ups_string(const char * const old_string);
 #endif
 
 #ifdef MATCH_VERSION
@@ -73,6 +77,8 @@ int match_from_version( const char * const a_product,
 			const t_upslst_item * const a_quals_list,
 			t_upslst_item ** const a_vinst_list,
 			t_upslst_item ** const a_tinst_list);
+static void print_inst(t_upslst_item * const inst_list);
+static char *get_ups_string(const char * const old_string);
 #endif
 
 #ifdef MATCH_CHAIN
@@ -89,11 +95,11 @@ int match_from_chain( const char * const a_product,
 			t_upslst_item ** const a_cinst_list,
 			t_upslst_item ** const a_vinst_list,
 			t_upslst_item ** const a_tinst_list);
+static void print_inst(t_upslst_item * const inst_list);
+static char *get_ups_string(const char * const old_string);
 #endif
 
 static void test_match(int argc, char *argv[]);
-static void print_inst(t_upslst_item * const inst_list);
-static char *get_ups_string(const char * const old_string);
 
 void list_output(const t_upslst_item * const a_mproduct_list,
                  const t_upsugo_command * const a_command_line);
