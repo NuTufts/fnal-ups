@@ -38,7 +38,7 @@ static char		*database;			/* ups database */
 FILE			*ofd;				/* outfile fd */
 int			stdout_dup;			/* dup of stdout */
 t_upslst_item		*dblist = NULL;
-t_upstyp_db		dbaddr;
+t_upstyp_db		*dbaddr;
 
 upstst_argt     	argt[] = 
    {{"-unique",	UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
@@ -60,9 +60,10 @@ UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 
 if (database) 
    {
-   dbaddr.name = database;
-   dbaddr.config= NULL;
-   dblist = upslst_new(&dbaddr);
+   dbaddr = upsmem_malloc(sizeof(t_upstyp_db));
+   dbaddr->name = database;
+   dbaddr->config= NULL;
+   dblist = upslst_new(dbaddr);
    }
 /* let's get our output file descriptor setup
    ------------------------------------------ */
@@ -98,6 +99,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        if (UPS_ERROR) { upserr_output(); upserr_clear(); }
        }
    upstst_match_dump(mp);
+   if (mp) upsutl_free_matched_instance_list(mp);
    }
 
 /* dump the output to specified file and compare
@@ -113,6 +115,8 @@ if (difffile && outfile)
    sprintf (diffcmd,"diff %s %s",difffile,outfile);
    if (system(diffcmd)) printf("files %s %s differ\n",difffile,outfile);
    }
+
+if (database) upsmem_free(dbaddr);
 
 return (0);
 
@@ -172,7 +176,7 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
       if (inst->table)
          {
          printf("T:PRODUCT=%15s, VERSION=%10s, ", inst->table->product,
-             inst->table->version);
+             inst->table->version?inst->table->version:"(null)");
          printf("FLAVOR=%12s, QUALIFIERS=%s\n", inst->table->flavor,
              inst->table->qualifiers);
          }

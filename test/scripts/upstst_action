@@ -21,7 +21,7 @@ upsact_process_commands -out fly1.out -diff fly1.in setup fly v1_0
 quit
 EOD
 
-UPS_SHELL=sh;export UPS_SHELL;
+SHELL=/bin/sh;export SHELL;
 env PRODUCTS=../db1 $ERUPT_DIR/test/ups_test << EOD2
 upsact_process_commands -out fly2.out -diff fly2.in setup fly v1_0 
 quit

@@ -150,7 +150,7 @@ char *upsutl_find_manpages( const t_upstyp_matched_instance * const a_inst,
 char *upsutl_get_hostname( void )
 {
   char *tmp_buf;
-  char nodename[MAXHOSTNAMELEN];
+  static char nodename[MAXHOSTNAMELEN];
 
   /* get the hostname */
   if (! gethostname(nodename, MAXHOSTNAMELEN)) {
