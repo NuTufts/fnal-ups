@@ -45,7 +45,7 @@ typedef union _Align  {
    double           filler_7;
    float            filler_8;
    void            *filler_9;
-   int            (*filler_10)();
+   int            (*filler_10)(void);
 } ALIGN;
 
 #define MAXALIGN (sizeof(ALIGN))
