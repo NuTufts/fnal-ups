@@ -59,7 +59,7 @@ test_ups_memory : test_ups_memory.o $(LIB)/libups.a
 #
 clean :
 	@ upsClean
-	@ rm -f test_ups_error
+	@ rm -f test_ups_error test_ups_memory
 	@ rm -f test_ups_list
 
 install :

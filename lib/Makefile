@@ -19,6 +19,7 @@ all :
 #
 clean :
 	@ upsClean
+	@ rm -f libups.a
 
 install :
 	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
