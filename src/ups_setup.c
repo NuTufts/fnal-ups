@@ -94,8 +94,10 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	  if (a_command_line->ugo_j) {
 	    prod_only_ugo.ugo_j = a_command_line->ugo_j;
 	  }
-	  prod_only_ugo.ugo_z = a_command_line->ugo_z;
-	  prod_only_ugo.ugo_db = a_command_line->ugo_db;
+	  if ( a_command_line->ugo_z ) {
+	    prod_only_ugo.ugo_z = a_command_line->ugo_z;
+	    prod_only_ugo.ugo_db = a_command_line->ugo_db;
+	  }
 	  cmd_list = upsact_get_cmd(&prod_only_ugo, mproduct,
 				    g_cmd_info[e_unsetup].cmd, e_unsetup);
 	  /* the above routine will return all of the commands associated with
