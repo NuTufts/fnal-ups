@@ -301,7 +301,7 @@ fi
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.csh ]
 then
 cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.csh
-#! /bin/csh
+#!/bin/csh
 #
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
@@ -452,7 +452,7 @@ fi
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.sh ]
 then
 cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.sh
-#! /bin/sh
+#!/bin/sh
 #
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
@@ -787,7 +787,7 @@ fi
 if [ ! -r $Ups_Dir/bootstrap/${Script_Prefix}.common ]
 then
     cat <<XEoF > $Ups_Dir/bootstrap/${Script_Prefix}.common 
-#! /bin/sh 
+#!/bin/sh 
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #
@@ -1037,7 +1037,7 @@ then
     rm -f $Ups_Dir/ups/current
 fi
 cat <<XEoF >$Ups_Dir/ups/current
-#! /bin/sh
+#!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #
@@ -1224,7 +1224,7 @@ then
     rm -f $Ups_Dir/ups/uncurrent
 fi
 cat <<XEoF >$Ups_Dir/ups/uncurrent
-#! /bin/sh
+#!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #

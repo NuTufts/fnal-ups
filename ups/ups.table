@@ -3,7 +3,7 @@ Product=ups
 #*************************************************
 # Starting Group definition
 Group:
-Flavor=*
+Flavor=ANY
 Qualifiers=""
 
 Common:
