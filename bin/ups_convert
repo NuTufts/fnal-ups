@@ -427,12 +427,12 @@ sub WriteTableFile {
 # back to the OLD way AGAIN...
 #       print TableFile "     doDefaults()\n";
        if (checkfor("${basedir}/ups/setup.sh")) {
-          $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL},UPS_ENV)\n/;
+          $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL},UPS_ENV)\n/;
        } else { 
          if (checkfor("${basedir}/ups/setup")) {
-            $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup,UPS_ENV)\n/;
+            $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup,UPS_ENV)\n/;
          } else {
-           $key=~s/DaSeTuP/      doDefaults()\n/;
+           $key=~s/DaSeTuP/      proddir()\n      setupenv()\n/;
          }
        }
        print TableFile "$key";
@@ -605,11 +605,12 @@ sub WriteVersionRecs {
     } else {  
      print VersionFile "   UPS_DIR=ups\n";
     }
+# Had Source and Origin backwards
     if ( &source ) {
-       print VersionFile "   SOURCE=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
+       print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
     }
     if ( &origin ) {
-       print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
+       print VersionFile "   ARCHIVE_FILE=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
     }
     if ( &auth_nodes ) {
        print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
@@ -648,11 +649,12 @@ sub WriteVersionRecs {
     } else {  
      print VersionFile "   UPS_DIR=ups\n";
     }
+# Had Source and Origin backwards
     if ( &source ) {
-     print VersionFile "   SOURCE=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
+     print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
     }
     if ( &origin ) {
-     print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
+     print VersionFile "   ARCHIVE_FILE=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
     }
     if ( &auth_nodes ) {
      print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
