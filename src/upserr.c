@@ -124,7 +124,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 63 */  "%s: Action function \'%s\' is not supported in %s\n",
 /* 64 */  "%s: The \'execute\' function must have \'UPS_ENV\' or \'NO_UPS_ENV\' as a second parameter, not \'%s\'\n",
 /* 65 */  "%s: Flavor=ANY is not allowed in a %s file\n",
-/* 66 */  "%s: Qualifiers=ANY is not allowed in a %s file\n"
+/* 66 */  "%s: Qualifiers=ANY is not allowed in a %s file\n",
+/* 67 */  "%s: Ups command \'%s\' failed when processing temp file.\n"
 };
 
 char *g_error_ascii[] = {
@@ -195,7 +196,8 @@ char *g_error_ascii[] = {
    /* UPS_EXECUTE_ARG2        64 */ "UPS_EXECUTE_ARG2",
    /* UPS_INVALID_ANY_FLAVOR  65 */ "UPS_INVALID_ANY_FLAVOR",
    /* UPS_INVALID_ANY_QUALS   66 */ "UPS_INVALID_ANY_QUALS",
-   /* UPS_NERR                67 */ "UPS_NERR",
+   /* UPS_COMMAND_FAILED      67 */ "UPS_COMMAND_FAILED",
+   /* UPS_NERR                68 */ "UPS_NERR",
    0 };
 
 /*
