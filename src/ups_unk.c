@@ -24,6 +24,12 @@
 
 /* ups specific include files */
 #include "ups_unk.h"
+#include "upslst.h"
+#include "upstyp.h"
+#include "upserr.h"
+#include "upsutl.h"
+#include "upsmat.h"
+#include "upsact.h"
 
 /*
  * Definition of public variables.
@@ -32,6 +38,9 @@
 /*
  * Declaration of private functions.
  */
+static t_upslst_item *unk_core(const t_upsugo_command * const a_command_line,
+			       const FILE * const a_temp_file,
+			       const char * const a_unk_cmd);
 
 /*
  * Definition of global variables.
@@ -51,9 +60,73 @@
  * Return: none
  */
 void ups_unk(const t_upsugo_command * const a_command_line,
-	     const char * const a_unk_cmd, const int a_ups_command)
+	     const FILE * const a_temp_file,
+	     const char * const a_unk_cmd)
 {
+  t_upslst_item *mproduct_list = NULL;
 
-  printf("I'm sorry, I don't know what to do with the command \"%s\"\n",
-	 a_unk_cmd);
+  /* now find the desired instance and translate actions to the temp file */
+  mproduct_list = unk_core(a_command_line, a_temp_file, a_unk_cmd);
+
+  /* check if we got an error */
+  if (UPS_ERROR == UPS_SUCCESS) {
+    /* write statistics information */
+    if (mproduct_list) {
+      upsutl_statistics(mproduct_list, a_unk_cmd);
+    }
+  }
+  /* clean up the matched product list */
+  mproduct_list = upsutl_free_matched_product_list(&mproduct_list);
+}
+
+/*
+ * Definition of private globals.
+ */
+
+/*
+ * Definition of private functions.
+ */
+
+/*-----------------------------------------------------------------------
+ * unk_core
+ *
+ * Cycle through the actions for the command that was entered, translate them,
+ * and write them to the temp file.
+ *
+ * Input : information from the command line, a stream.
+ * Output: <output>
+ * Return: <return>
+ */
+static t_upslst_item *unk_core(const t_upsugo_command * const a_command_line,
+			       const FILE * const a_temp_file,
+			       const char * const a_unk_cmd)
+{
+  t_upslst_item *mproduct_list = NULL;
+  t_upstyp_matched_product *mproduct = NULL;
+  t_upslst_item *cmd_list;
+  int need_unique = 1;
+
+  /* get all the requested instances */
+  mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
+                                  NULL, need_unique);
+  if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
+    /* get the product  */
+    mproduct = (t_upstyp_matched_product *)mproduct_list->data;
+
+    /* make sure an instance was matched before proceeding */
+    if (mproduct->minst_list) {
+
+      /* Now process the actions */
+      cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
+				mproduct, a_unk_cmd);
+      if (UPS_ERROR == UPS_SUCCESS) {
+	upsact_process_commands(cmd_list, a_temp_file);
+      }
+      /* now clean up the memory that we used */
+      upsact_cleanup(cmd_list);
+    }
+  } 
+
+  return(mproduct_list);
+
 }

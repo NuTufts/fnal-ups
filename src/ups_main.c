@@ -141,13 +141,13 @@ int main(int argc, char *argv[])
 	  case e_configure: ups_configure(command_line, temp_file,
 					  e_configure);
 	    break;
-	  case e_copy: ups_unk(command_line, argv[1], e_copy);
+	  case e_copy:
 	    break;
 	  case e_depend: ups_depend(command_line, argv[1], e_depend);
 	    break;
 	  case e_exist: ups_setup(command_line, temp_file, e_exist);
 	    break;
-	  case e_modify: ups_unk(command_line, argv[1], e_modify);
+	  case e_modify:
 	    break;
 	  case e_start: ups_start(command_line, temp_file, e_start);
 	    break;
@@ -167,11 +167,11 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_get: ups_get(command_line, temp_file, e_get);
 	    break;
-	  case e_validate: ups_unk(command_line, argv[1], e_validate);
+	  case e_validate:
 	    break;
 	  case e_declare: ups_declare(command_line, temp_file, e_declare);
 	    break;
-	  case e_unk: ups_unk(command_line, argv[1], e_unk);
+	  case e_unk: ups_unk(command_line, temp_file, argv[1]);
 	    break;
 	  }
 	}

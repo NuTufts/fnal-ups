@@ -40,8 +40,8 @@
  */
 
 void ups_unk(const t_upsugo_command * const a_command_line,
-	     const char * const a_unk_cmd,
-	     const int a_ups_command);
+	     const FILE * const a_temp_file,
+	     const char * const a_unk_cmd);
 
 /*
  * Declaration of private globals.
