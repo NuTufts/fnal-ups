@@ -38,7 +38,8 @@
 /*
  * Declaration of public functions.
  */
-t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int);
+t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
+			 const int verify );
 
 /*
  * Declaration of private globals.

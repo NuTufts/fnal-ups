@@ -284,7 +284,8 @@ int product_cmp ( const void * const d1, const void * const d2 )
  * Output: 
  * Return: 
  */
-t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
+t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
+			 const int verify )
 {
   t_upslst_item *mproduct_list = NULL, *mproduct_item = NULL;
   t_upslst_item *minst_item = NULL;
