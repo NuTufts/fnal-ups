@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
   if (argv[1] && (0 == strcmp(argv[1],"parent")) && 0 != strcmp(argv[2],"-?")) {
 
       /* ups parent is an external perl script */
-
+      argv[1] = "ups_parent";
       execvp( "ups_parent", argv+1 );
       exit(1);
   }
