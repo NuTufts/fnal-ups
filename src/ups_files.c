@@ -29,11 +29,12 @@
 
 /* ups specific include files */
 #include "ups_utils.h"
-#include "ups_files.h"
 #include "ups_types.h"
 #include "ups_list.h"
 #include "ups_memory.h"
 #include "ups_error.h"
+#include "ups_keys.h"
+#include "ups_files.h"
 
 /*
  * Definition of public variables
@@ -66,8 +67,6 @@ static int            put_key( const char * const key, const char * const val );
 
 /* Utils */
 static int            trim_qualifiers( char * const str );
-static int            is_space( const char c );
-static int            ckeyi( void );
 static int            cfilei( void );
 
 /* Print stuff */
@@ -79,38 +78,10 @@ static void           print_action( t_ups_action * const act_ptr );
  * Definition of global variables
  */
 
-/* enum of known keys (changes here should be reflected in ckeyi) */
-enum e_ups_key {
+/* enum of some extra keys */
+enum {
   e_key_eol = -2,
-  e_key_eof = -1,
-  e_key_file = 0,
-  e_key_product,
-  e_key_version,
-  e_key_chain,
-  e_key_ups_db_version,
-
-  e_key_flavor,
-  e_key_qualifiers,
-  e_key_declarer,
-  e_key_declared,
-  e_key_prod_dir,
-  e_key_ups_dir,
-  e_key_table_dir,
-  e_key_table_file,
-  e_key_archive_file,
-  e_key_authorized_nodes,
-  e_key_description,
-  e_key_statistics,
-
-  e_key_action,
-  
-  e_key_group,
-  e_key_common,
-  e_key_end,
-
-  e_key_unknown,
-  
-  e_key_count
+  e_key_eof = -1
 };
 
 /* enum of known file types (changes here should be reflected in cfilei) */
@@ -131,6 +102,7 @@ static FILE           *g_fh = 0; /* file handle */
 static char           g_line[MAX_LINE_LEN] = "";  /* current line */
 static char           g_key[MAX_LINE_LEN] = "";   /* current key */
 static char           g_val[MAX_LINE_LEN] = "";   /* current value */
+static t_upskey_map   *g_mkey = 0;                /* current map */
 static int            g_ikey = e_key_unknown;     /* current key as enum */  
 static int            g_ifile = e_file_unknown;   /* current file type as enum */
 
@@ -264,7 +236,7 @@ int write_version_file( void )
   /* write file descriptor */
   
   put_key( "PRODUCT", g_pd->product );
-  put_key( "VERSION", g_pd->chaver );
+  put_key( "VERSION", g_pd->version );
   put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
 
   /* write instances */
@@ -279,7 +251,13 @@ int write_version_file( void )
 
     put_key( 0, "" );
     put_key( "FLAVOR", inst_ptr->flavor );
-    put_key( "QUALIFIERS", inst_ptr->qualifiers );
+    
+    /* qualifiers are special */
+  
+    if ( inst_ptr->qualifiers )
+      put_key( "QUALIFIERS", inst_ptr->qualifiers );
+    else 
+      put_key( "QUALIFIERS", "\"\"" );
     
     g_imargin += 2;    
     put_key( "DECLARED", inst_ptr->declared );
@@ -306,7 +284,7 @@ int write_chain_file( void )
   /* write file descriptor */
   
   put_key( "PRODUCT", g_pd->product );
-  put_key( "CHAIN", g_pd->chaver );
+  put_key( "CHAIN", g_pd->chain );
   put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
 
   /* write instances */
@@ -322,12 +300,18 @@ int write_chain_file( void )
 
     put_key( 0, "" );
     put_key( "FLAVOR", inst_ptr->flavor );
-    put_key( "QUALIFIERS", inst_ptr->qualifiers );
+    
+    /* qualifiers are special */
+  
+    if ( inst_ptr->qualifiers )
+      put_key( "QUALIFIERS", inst_ptr->qualifiers );
+    else 
+      put_key( "QUALIFIERS", "\"\"" );
     
     g_imargin += 2;
     put_key( "VERSION", inst_ptr->version );
-    put_key( "DECLARED", inst_ptr->chain_declared );
-    put_key( "DECLARER", inst_ptr->chain_declarer );
+    put_key( "DECLARED", inst_ptr->declared );
+    put_key( "DECLARER", inst_ptr->declarer );
     g_imargin -= 2;
   }  
 
@@ -344,7 +328,7 @@ int write_table_file( void )
   /* write file descriptor */
   
   put_key( "PRODUCT", g_pd->product );
-  put_key( "VERSION", g_pd->chaver );
+  put_key( "VERSION", g_pd->version );
   put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
 
   /* write instances */
@@ -359,7 +343,13 @@ int write_table_file( void )
 
     put_key( 0, "" );
     put_key( "FLAVOR", inst_ptr->flavor );
-    put_key( "QUALIFIERS", inst_ptr->qualifiers );
+    
+    /* qualifiers are special */
+  
+    if ( inst_ptr->qualifiers )
+      put_key( "QUALIFIERS", inst_ptr->qualifiers );
+    else 
+      put_key( "QUALIFIERS", "\"\"" );
     
     g_imargin += 2;
     put_key( "DESCRIPTION", inst_ptr->description );
@@ -486,7 +476,7 @@ int read_file_desc( void )
     upserr_vplace();
     upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, "(null)" );    
     return 0;
-  }
+  }  
   
   g_pd->file = upsutl_str_create( g_val, ' ' );
   
@@ -499,23 +489,11 @@ int read_file_desc( void )
   
   while ( next_key() != e_key_eof ) {
 
-    switch( g_ikey ) {
-
-    case e_key_product:
-      g_pd->product = upsutl_str_create( g_val, ' ' );
-      break;
-
-    case e_key_version:
-    case e_key_chain:
-      g_pd->chaver = upsutl_str_create( g_val, ' ' );
-      break;
-      
-    case e_key_ups_db_version:
-      g_pd->ups_db_version = upsutl_str_create( g_val, ' ' );
-      break;
-    }
-		 
     if ( is_stop_key() ) break;
+    
+    if ( g_mkey && g_mkey->p_index != INVALID_INDEX ) 
+      UPSKEY_PROD2ARR( g_pd )[g_mkey->p_index] = upsutl_str_create( g_val, ' ' );
+    
   }
 
   return 1;
@@ -570,9 +548,9 @@ t_ups_instance *read_instance( void )
   
   inst_ptr->product = upsutl_str_create( g_pd->product, ' ' );
   if ( g_ifile == e_file_chain )
-    inst_ptr->chain = upsutl_str_create( g_pd->chaver, ' ' );
+    inst_ptr->chain = upsutl_str_create( g_pd->chain, ' ' );
   else
-    inst_ptr->version = upsutl_str_create( g_pd->chaver, ' ' );
+    inst_ptr->version = upsutl_str_create( g_pd->version, ' ' );
     
   /* fill information from file ... we still need a map */
   
@@ -580,6 +558,8 @@ t_ups_instance *read_instance( void )
     
   while ( next_key() != e_key_eof ) {
 
+    if ( is_stop_key() ) break;
+    
     switch( g_ikey ) {
 
     case e_key_action:
@@ -590,67 +570,21 @@ t_ups_instance *read_instance( void )
       trim_qualifiers( g_val );
       inst_ptr->qualifiers = upsutl_str_create( g_val, ' ' );
       break;
-    
-    case e_key_version:
-      inst_ptr->version = upsutl_str_create( g_val, ' ' );
-      break;
-    
-    case e_key_declarer: 
-      if ( g_ifile == e_file_chain  ) 
-	inst_ptr->chain_declarer = upsutl_str_create( g_val, ' ' );
-      else 
-	inst_ptr->declarer = upsutl_str_create( g_val, ' ' );
-      break;
-    		 
-    case e_key_declared:
-      if ( g_ifile == e_file_chain  ) 
-	inst_ptr->chain_declared = upsutl_str_create( g_val, ' ' );
-      else 
-	inst_ptr->declared = upsutl_str_create( g_val, ' ' );
-      break;
-		 
-    case e_key_prod_dir:
-      inst_ptr->prod_dir = upsutl_str_create( g_val, ' ' );
-      break;
-		 
-    case e_key_ups_dir:
-      inst_ptr->ups_dir = upsutl_str_create( g_val, ' ' );
-      break;
-		 
-    case e_key_table_dir:
-      inst_ptr->table_dir = upsutl_str_create( g_val, ' ' );
-      break;
-		 
-    case e_key_table_file:
-      inst_ptr->table_file = upsutl_str_create( g_val, ' ' );
-      break;
-		 
-    case e_key_archive_file:      
-      inst_ptr->archive_file = upsutl_str_create( g_val, ' ' );
-      break;
-    
-    case e_key_authorized_nodes:
-      inst_ptr->authorized_nodes = upsutl_str_create( g_val, ' ' );
-      break;
       
-    case e_key_description:
-      inst_ptr->description = upsutl_str_create( g_val, ' ' );
-      break;
-    
-    case e_key_statistics:
-      inst_ptr->statistics = upsutl_str_create( "on", ' ' );
-      break;
-    
     case e_key_unknown:
       if ( g_line[0] == '_' ) {	
 	inst_ptr->unknown_list = upslst_add( inst_ptr->unknown_list,
 					     upsutl_str_create( g_line, ' ' ) );
       }
       break;
+      
+    default:
+      if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) 
+	UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = upsutl_str_create( g_val, ' ' );
+      break;    
 
     }
 
-    if ( is_stop_key() ) break;		 
   }
 
   return inst_ptr;
@@ -708,13 +642,14 @@ t_ups_action *read_action( void )
 
   while ( next_key() != e_key_eof ) {
 
+    if ( is_stop_key() ) break;
+    
     if ( g_ikey == e_key_unknown && strlen( g_line ) > 0 ) {
       cmd_ptr = upsutl_str_create( g_line, ' ' );
       if ( cmd_ptr )
 	l_cmd = upslst_add( l_cmd, cmd_ptr );
     }
     
-    if ( is_stop_key() ) break;
   }
 
   act_ptr->command_list = upslst_first( l_cmd );
@@ -870,7 +805,7 @@ int get_key( void )
 
   else {
     count = 0;
-    while ( cp && *cp && !is_space( *cp ) && *cp != '=' ) {
+    while ( cp && *cp && !isspace( *cp ) && *cp != '=' ) {
       g_key[count] = *cp;
       count++; cp++;
     }
@@ -879,7 +814,7 @@ int get_key( void )
   
     while( cp && *cp && *cp != '=' ) { cp++; }
     cp++;
-    while( cp && *cp && is_space( *cp ) ) { cp++; }
+    while( cp && *cp && isspace( *cp ) ) { cp++; }
     count = 0;
     while( cp && *cp && *cp != '\n' ) {
       g_val[count] = *cp;
@@ -888,8 +823,12 @@ int get_key( void )
     g_val[count] = 0;
   }
 
-  ckeyi();
-
+  g_mkey = upskey_get_map( g_key );
+  if ( g_mkey )
+    g_ikey = g_mkey->ikey;
+  else
+    g_ikey = e_key_unknown;
+  
   return g_ikey;
 }
 
@@ -908,10 +847,10 @@ int get_key( void )
 int put_key( const char * const key, const char * const val )
 {
   int i = 0;
-  
+
   if ( !val ) return 0;
 
-  if ( strlen( val ) > 0 ) {
+  /*  if ( strlen( val ) > 0 ) { */
     for ( i=0; i<g_imargin; i++ )
       fputc( ' ', g_fh );
 
@@ -919,7 +858,7 @@ int put_key( const char * const key, const char * const val )
       fprintf( g_fh, "%s = ", key );
   
     fprintf( g_fh, "%s", val );
-  }
+  /*  } */
 
   fputc( '\n', g_fh );
   
@@ -972,64 +911,6 @@ int trim_qualifiers( char * const str )
  * Utils
  */
 
-int is_space( const char c )
-{
-  if ( c == ' ' ) return 1;
-  if ( c == '\t' ) return 1;
-  if ( c == '\n' ) return 1;
-  if ( c == '\r' ) return 1;
-  if ( c == '\f' ) return 1;
-
-  return 0;
-}
-
-int ckeyi( void )
-{
-  /* strings of known keys */
-  static char *s_ups_keys[e_key_count] = {
-    "FILE",
-    "PRODUCT",
-    "VERSION",
-    "CHAIN",
-    "UPS_DB_VERSION",
-  
-    "FLAVOR",
-    "QUALIFIERS",
-    "DECLARER",
-    "DECLARED",
-    "PROD_DIR",
-    "UPS_DIR",
-    "TABLE_DIR",
-    "TABLE_FILE",
-    "ARCHIVE_FILE",
-    "AUTHORIZED_NODES",
-    "DESCRIPTION",
-    "STATISTICS",
-  
-    "ACTION",
-
-    "GROUP:",
-    "COMMON:",
-    "END:",
-  
-    ""
-  };
-
-  int i;
-  g_ikey = e_key_unknown;
-
-  /* for now, just a linear search ... we need a map */
-
-  for( i=0; i<e_key_count; i++ ) {    
-    if ( !strcmp( g_key, s_ups_keys[i] ) ) {
-      g_ikey = i;
-      break;
-    }
-  }
-
-  return g_ikey;
-}
-
 int cfilei( void )
 {
   /* strings of known file types ... we need a map */
@@ -1075,9 +956,8 @@ void print_instance( t_ups_instance * const inst_ptr )
   printf( "chain = %s\ndeclarer = %s\ndeclared = %s\n",
 	  inst_ptr->chain, inst_ptr->declarer, inst_ptr->declared );
   
-  printf( "chain_declarer = %s\nchain_declared = %s\nprod_dir = %s\nups_dir = %s\n",
-	  inst_ptr->chain_declarer, inst_ptr->chain_declared, inst_ptr->prod_dir,
-	  inst_ptr->ups_dir );
+  printf( "prod_dir = %s\nups_dir = %s\n",
+	  inst_ptr->prod_dir, inst_ptr->ups_dir );
   
   printf( "table_dir = %s\ntable_file = %s\narchive_file = %s\nauthorized_nodes = %s\n",
 	  inst_ptr->table_dir, inst_ptr->table_file, inst_ptr->archive_file,
@@ -1140,7 +1020,8 @@ void g_print_product( t_ups_product * const prod_ptr )
   
   printf( "\nfile    = %s\n", prod_ptr->file );
   printf( "product = %s\n", prod_ptr->product );
-  printf( "chaver  = %s\n", prod_ptr->chaver );
+  printf( "version  = %s\n", prod_ptr->version );
+  printf( "chain  = %s\n", prod_ptr->chain );
   printf( "instance_list:\n" );
 
   
