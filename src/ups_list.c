@@ -264,7 +264,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 }
 
 #define PRINT_DB(dbname) \
-{    printf("DATABASE=");                                            \
+{    printf("\nDATABASE=");                                            \
      if (dbname)                                                     \
      { printf("%s ",dbname);                                         \
      } else {                                                        \
