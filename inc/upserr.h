@@ -102,7 +102,8 @@
 #define UPS_MISMATCH_PROD_NAME  59
 #define UPS_NO_TRANSLATION      60
 #define UPS_TEMP_FILE           61
-#define UPS_NERR                62      /*  this one must always be last */
+#define UPS_NO_KEYWORD          62
+#define UPS_NERR                63      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"

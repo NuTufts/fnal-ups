@@ -119,7 +119,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 58 */  "%s: COMPILE_FILE keyword was not specified when COMPILE_DIR was, in version \'%s\'\n",
 /* 59 */  "%s: Product keyword \'%s\' must match name of product it is in \'%s\'\n",
 /* 60 */  "%s: Unable to translate or evaluate \'%s\'\n",
-/* 61 */  "%s: Name of created temp file is %s\n"
+/* 61 */  "%s: Name of created temp file is %s\n",
+/* 62 */  "%s: File %s must have %s keyword equal to %s in it\n"
 };
 
 char *g_error_ascii[] = {
@@ -185,7 +186,8 @@ char *g_error_ascii[] = {
    /* UPS_MISMATCH_PROD_NAME  59 */ "UPS_MISMATCH_PROD_NAME",
    /* UPS_NO_TRANSLATION      60 */ "UPS_NO_TRANSLATION",
    /* UPS_TEMP_FILE           61 */ "UPS_TEMP_FILE",
-   /* UPS_NERR                62 */ "UPS_NERR",
+   /* UPS_NO_KEYWORD          62 */ "UPS_NO_KEYWORD",
+   /* UPS_NERR                63 */ "UPS_NERR",
    0 };
 
 /*
