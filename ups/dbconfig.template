@@ -3,8 +3,8 @@ FILE = DBCONFIG
 # all nodes can read/use the products declared in this db
 AUTHORIZED_NODES = *
 
-# all product roots are under /usr/products:
-PROD_DIR_PREFIX = /fnal/ups
+# all product roots are under the following:
+PROD_DIR_PREFIX = /fnal/ups/prd
 
 # keep statistics about the following products:
 #   (uncomment to get stats!)
@@ -14,7 +14,7 @@ PROD_DIR_PREFIX = /fnal/ups
 # manpages, info files, get copied here:
 MAN_TARGET_DIR = /fnal/ups/man
 CATMAN_TARGET_DIR = /fnal/ups/catman
-INFO_TARGET_DIR = /fnal/ups/Info
+# INFO_TARGET_DIR = /fnal/ups/Info
 
 #
 #  automatic html and news processing not yet supported
