@@ -453,6 +453,32 @@ int upslst_count( t_upslst_item * const list_ptr )
 }
 
 /*-----------------------------------------------------------------------
+ * upslst_find
+ *
+ * Find a list element.
+ *
+ * Input : t_upslst_item *, pointer to a list
+ *         void *, pointer to the data element to find
+ *         int *, pointer to a function to be called for
+ *                comparing list items.
+ * Output: none
+ * Return: t_upslst_item *, pointer to found list element or 0.
+ */
+t_upslst_item *upslst_find( t_upslst_item * const list_ptr, 
+			    const void * const data,
+			    int (* const cmp)(const void * const, const void * const) )
+{
+  t_upslst_item *l_ptr = upslst_first( list_ptr );
+
+  for ( ; l_ptr; l_ptr = l_ptr->next ) {
+    if ( !cmp( data, l_ptr->data ) )
+      return l_ptr;	 
+  }
+  
+  return 0;
+}
+
+/*-----------------------------------------------------------------------
  * upslst_sort0
  *
  * Sorting a list. This is just a insertion sort. We should implement

@@ -81,6 +81,9 @@ t_upslst_item *upslst_copy( t_upslst_item * const list_ptr );
 
 t_upslst_item *upslst_first( t_upslst_item * const list_ptr );
 t_upslst_item *upslst_last( t_upslst_item * const list_ptr );
+t_upslst_item *upslst_find( t_upslst_item * const list_ptr, 
+			    const void * const data,
+			    int (* const cmp)(const void * const, const void * const) );
 int           upslst_count( t_upslst_item * const list_ptr );
 t_upslst_item *upslst_sort0( t_upslst_item * const c,
 			     int (* const cmp)(const void * const, const void * const) );
