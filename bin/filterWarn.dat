@@ -131,6 +131,7 @@
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "ups_create.c", 	'function parameter \'a_ups_command\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  undef, 	'function parameter \'a_inst\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  undef, 	'function parameter \'a_db_info\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_argc\' is not used in function');
