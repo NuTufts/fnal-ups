@@ -386,6 +386,25 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   return UPS_SUCCESS;
 }
 
+int upsfil_is_in_cache( const char * const ups_file )
+{
+  /* will just check if a given file is in cache */
+
+  t_upstyp_product  *pd = 0;
+  const char *key = 0;
+
+  if ( g_use_cache && g_ft ) {
+
+    key = upstbl_atom_string( ups_file );
+    pd = upstbl_get( g_ft, key );
+
+    if ( g_pd ) 
+      return 1;
+  }
+
+  return 0;
+}
+
 int upsfil_exist( const char * const ups_file )
 {
   /* will just check if a file exist,
