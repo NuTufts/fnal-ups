@@ -59,9 +59,9 @@ void print_cmd( t_upsact_cmd *cmd )
   if ( !cmd )
     return;
 
-  printf( "\nicmd = %d\n", cmd->icmd );
+  (void) printf( "\nicmd = %d\n", cmd->icmd );
   for ( i=0; i<cmd->argc; i++ ) {
-    printf( "   %d = %s\n", i, cmd->argv[i] );
+    (void) printf( "   %d = %s\n", i, cmd->argv[i] );
   }
 }
 
@@ -91,7 +91,7 @@ int  main( const int argc, char * const argv[] )
 
 
   if ( argc <= 1 ) {
-    printf( "Usage: test_upsact table_file\n" );
+    (void) printf( "Usage: test_upsact table_file\n" );
     exit( 1 );
   }
 
@@ -132,7 +132,7 @@ int  main( const int argc, char * const argv[] )
 
   for ( i=0; i<5; i++ ) {
     cp = upskey_inst_getuserval( &inst, ukk[i] );
-    printf( "%s = %s\n", ukk[i], cp );
+    (void) printf( "%s = %s\n", ukk[i], cp );
   }
   */
   
@@ -196,7 +196,7 @@ t_upslst_item *l_dep;
   
   for ( i = 0; action_line[i]; i++ ) {  
     if ( !(cmd = upsact_parse_cmd( action_line[i] )) ) {
-      printf("\nInvalid action - %s\n", action_line[i]);
+      (void) printf("\nInvalid action - %s\n", action_line[i]);
     }
     else {
       /* print_cmd( cmd ); */
@@ -205,11 +205,11 @@ t_upslst_item *l_dep;
   ugo_cmd = upsugo_bldcmd( "-c -f IRIX exmh",
 			   "zAacCdfghKtmMNoOPqrTuUv?" );
   
-  upsugo_dump( ugo_cmd, 1);
+  (void) upsugo_dump( ugo_cmd, 1);
   mproduct_list = upsmat_instance( ugo_cmd, NULL, 1 );
   list_output( upslst_first( mproduct_list ), ugo_cmd);
 
-  upsact_print( ugo_cmd, 0, "setup", e_setup, "tl" );
+  (void) upsact_print( ugo_cmd, 0, "setup", e_setup, "tl" );
 }
 
 /*-----------------------------------------------------------------------
@@ -234,9 +234,9 @@ static void test_upsact_params(void)
     if (strlen(cmd_line_ptr) > 0) {
       param_list = upsact_params( cmd_line_ptr );
       param_list = upslst_first( param_list );
-      printf("\nFor string = %s  params are:\n", cmd_line_ptr);
+      (void) printf("\nFor string = %s  params are:\n", cmd_line_ptr);
       for (tmp_item = param_list ; tmp_item ; tmp_item = tmp_item->next) {
-	printf("%s\n", (char *)tmp_item->data);
+	(void) printf("%s\n", (char *)tmp_item->data);
       }
       param_list = upslst_free(param_list, 'd');
     } else {
@@ -261,12 +261,12 @@ static void print_action( const char * const a_action_line,
 {
 
   if (a_action_line) {
-    printf("\nACTION LINE = %s\n", a_action_line);
+    (void) printf("\nACTION LINE = %s\n", a_action_line);
     if (a_params) {
-      printf("PARAMS = %s   ", a_params);
+      (void) printf("PARAMS = %s   ", a_params);
     }
     if (a_action_val >= 0) {
-      printf("VALUE = %d\n", a_action_val);
+      (void) printf("VALUE = %d\n", a_action_val);
     }
   }
 }
