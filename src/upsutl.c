@@ -208,6 +208,8 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
 	}
       }
     }
+
+    /* this guy will free 'dir' */
     closedir(dir);
 
     /* point back to the beginning of the list */
@@ -232,22 +234,23 @@ char *upsutl_get_prod_dir(const char * const a_db,
 			  const char * const a_prod_name)
 {
   char *prod_dir = NULL;
+  int prod_name_len;
 
   /* make sure a_db and a_prod_name are not both NULL */
   if (a_db || a_prod_name) {
-    prod_dir = (char *)upsmem_malloc((int )(strlen(a_db) + 
-					    strlen(a_prod_name)) + 2);
+    prod_name_len = (int )strlen(a_prod_name);
+    prod_dir = (char *)upsmem_malloc((int )strlen(a_db) + prod_name_len + 2);
     if (a_db) {
-      prod_dir = strcpy(prod_dir, a_db);       /* add the db directory */
+      strcpy(prod_dir, a_db);       /* add the db directory */
     }
 
     /* only add the / divider if we have both a db and a product name */
     if (a_db && a_prod_name) {
-      prod_dir = strcat(prod_dir, "/");        /* and a / */
+      strncat(prod_dir, "/", 1);        /* and a / */
     }
 
-    if (a_prod_name) {
-      prod_dir = strcat(prod_dir, a_prod_name);  /* and the product name */
+    if (a_prod_name) {                            /* and the product name */
+      strncat(prod_dir, a_prod_name, (unsigned int )prod_name_len);
     }
   }
 
