@@ -29,6 +29,7 @@
 #include "upsutl.h"
 #include "upsmat.h"
 #include "upsact.h"
+#include "upsmem.h"
 #include "ups_main.h"
 /*
  * Definition of public variables.
@@ -89,7 +90,9 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	     that only has a product name in it.  then upsact will look for
 	     the appropriate setup_prod environment variables to do the
 	     unsetup. Remember to add the j and the database options  */
-	  prod_only_ugo = upsmem_malloc( sizeof( t_upsugo_command ) );
+             prod_only_ugo =(struct ups_command *)
+                            upsmem_malloc( sizeof(struct ups_command));
+/*	  prod_only_ugo = upsmem_malloc( sizeof( t_upsugo_command ) ); */
 	  memset(prod_only_ugo, 0, sizeof(t_upsugo_command));
 	  prod_only_ugo->ugo_product = a_command_line->ugo_product;
 	  if (a_command_line->ugo_j) {
