@@ -39,6 +39,7 @@
 
 #define g_UPSGET "UPSGET: "
 #define UPSPRE "${UPS_"
+#define USERKEY "${_"
 #define TILDE "~"
 static char g_buffer[FILENAME_MAX+1];
 
@@ -413,6 +414,7 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
   char * loc;
   char * upto;
   char * eaddr;             /* end addr of } */
+  char * uservar;
   int count=0;
   int found=0;
   int idx=0;
@@ -457,6 +459,52 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
     strcpy(newstr,work);
     /* free(work); now static */
   }
+/* Support added 08/27/1998 DjF for _variable translation within table files */ 
+  work=holdstr;
+  strcpy(work,newstr);
+  upto = work;
+  newstr[0] = '\0';
+  any=0;
+  while ((loc = strstr(upto,USERKEY))!= 0 ) 
+  { count = ( loc - upto );
+    strncat(newstr,upto,(unsigned int )count);
+    upto += count;
+    eaddr =strchr(upto,'}');
+    if ( !eaddr ) {
+      upserr_vplace();
+      upserr_add( UPS_NO_TRANSLATION, UPS_FATAL, oldstr );
+      return oldstr;
+    }
+    *eaddr = '\0';
+    found=0;
+    uservar=upto+2;
+    if (minstance->chain)
+    {  value = upskey_inst_getuserval( minstance->chain,uservar);
+       found=1;
+    }
+    if (minstance->version && !value )
+    {  value = upskey_inst_getuserval( minstance->version,uservar);
+       found=1;
+    }
+    if (minstance->table && !value )
+    {  value = upskey_inst_getuserval( minstance->table,uservar);
+       found=1;
+    }
+    if(value) 
+    { strcat(newstr,value);
+      any++;
+    }
+    if (!found) { strcat(newstr,upto); strcat(newstr,"}"); } 
+    *eaddr = '}';
+    upto =strchr(upto,'}') + 1;
+  }
+  if (any)
+  { strcat(newstr,upto);
+  } else {
+    strcpy(newstr,work);
+    /* free(work); now static */
+  }
+/* End Modifications 08/27/1998 */
   /* work = (char *) malloc((size_t)(strlen(newstr) +1)); */
   work=holdstr;
   strcpy(work,newstr);
