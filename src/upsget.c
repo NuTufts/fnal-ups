@@ -204,12 +204,9 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   }
   if (any)
   { strcat(newstr,upto);
-/* test 
-    upsget_allout(stdout,db_info_ptr,instance,command_line);
-*/
     return newstr;
   } else {
-    return 0;
+    return oldstr;
   }
 }
 
@@ -258,6 +255,8 @@ char *upsget_shell(const t_upstyp_db * const db_info_ptr,
     } else {
       return ("csh");
     }
+  } else {
+    return ("");
   }
 }
 char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
