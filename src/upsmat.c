@@ -208,24 +208,20 @@ static int g_ugo_version = 0;
       }                                              \
     }
 
-#define FREE_INVALID_INSTANCES() \
-    if ((tmp_minst_list = master_minst_list)) {                              \
-      int did_delete;                                                        \
-      do {                                                                   \
-	did_delete = 0;                                                      \
-	minst = (t_upstyp_matched_instance *)tmp_minst_list->data;           \
-	if (minst->invalid_instance) {                                       \
-	  if (! tmp_minst_list->prev) {                                      \
-	    /* this is the first element on the list, master_minst_list will \
-	       need to be reset as it is now pointing to a deleted entry */  \
-	    master_minst_list = tmp_minst_list->next;                        \
-	  }                                                                  \
-	  tmp_minst_list = upslst_delete_safe(tmp_minst_list, minst, ' ');   \
-	  minst = ups_free_matched_instance(minst);                          \
-	  did_delete = 1;                                                    \
-	}                                                                    \
-      } while (tmp_minst_list && tmp_minst_list->next &&                     \
-	       (!did_delete && (tmp_minst_list = tmp_minst_list->next)));    \
+#define FREE_INVALID_INSTANCES(minst_list) \
+    if (minst_list) {                                                    \
+      t_upslst_item *tmp_list = NULL;                                    \
+      do {                                                               \
+	minst = (t_upstyp_matched_instance *)minst_list->data;           \
+	if (minst->invalid_instance) {                                   \
+	  minst_list = upslst_delete_safe(minst_list, minst, ' ');       \
+	  minst = ups_free_matched_instance(minst);                      \
+	} else {                                                         \
+          tmp_list = minst_list;                                         \
+          minst_list = minst_list->next;                                 \
+	}                                                                \
+      } while (minst_list);                                              \
+      minst_list = upslst_first(tmp_list);                               \
     }
 
 /*
@@ -683,11 +679,11 @@ static t_upstyp_matched_product *match_instance_core(
 				   a_need_unique, a_command_line->ugo_flavor,
 				   a_command_line->ugo_qualifiers,
 				   &master_minst_list);
+    /* clean out any invalid instances */
+    FREE_INVALID_INSTANCES(master_minst_list);
+
     if (num_matches > 0) {
       /* we got some matches, fill out our matched product structure */
-      /* clean out any invalid instances */
-      FREE_INVALID_INSTANCES();
-
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
     }
@@ -710,15 +706,14 @@ static t_upstyp_matched_product *match_instance_core(
 					   a_command_line->ugo_qualifiers, 
 					   &tmp_minst_list);
 
+      /* clean out any invalid instances */
+      FREE_INVALID_INSTANCES(tmp_minst_list);
+
       /* append matched instances to master list */
       master_minst_list = upslst_add_list(master_minst_list, tmp_minst_list);
       tmp_minst_list = NULL;
 
       num_matches += tmp_num_matches;
-    }
-    if (num_matches > 0) {
-      /* clean out any invalid instances */
-      FREE_INVALID_INSTANCES();
     }
     if (a_chain_list && (num_matches > 0)) {
       /* Now we need to go thru the list of chains that were passed us, read in
@@ -798,6 +793,8 @@ static t_upstyp_matched_product *match_instance_core(
 					 a_command_line->ugo_flavor,
 					 a_command_line->ugo_qualifiers, 
 					 a_any_version, &tmp_minst_list);
+      /* clean out any invalid instances */
+      FREE_INVALID_INSTANCES(tmp_minst_list);
 
       /* append matched instances to master list */
       master_minst_list = upslst_add_list(master_minst_list, tmp_minst_list);
@@ -809,9 +806,6 @@ static t_upstyp_matched_product *match_instance_core(
     /* We went thru the list of chain instances, get a matched product
        structure if we got any matches */
     if (num_matches > 0) {
-      /* clean out any invalid instances */
-      FREE_INVALID_INSTANCES();
-
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
     }
