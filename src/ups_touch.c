@@ -123,8 +123,9 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc ,
                "Product specified doesn't exists");
     return 0;
   }
-  username=upsutl_user();
-  declared_date = upsutl_time_date();
+  username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFUALT);
+  declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
+				    STR_TRIM_DEFAULT);
 
 /************************************************************************
  *

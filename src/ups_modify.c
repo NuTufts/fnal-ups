@@ -126,11 +126,12 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
-  username=upsutl_user();
+  username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
 /*  seconds=time(0);
   mytime = localtime(&seconds);
   mytime->tm_mon++;  correct jan=0 */
-  declared_date = upsutl_time_date();
+  declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
+				    STR_TRIM_DEFAULT);
   while((loc=strchr(declared_date,' '))!=0)
   { *loc='_';
   }

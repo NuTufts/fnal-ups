@@ -136,11 +136,12 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                "Exact product definition exists");
     return 0; */
   }
-  username=upsutl_user();
+  username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
   seconds=time(0);
   mytime = localtime(&seconds);
   mytime->tm_mon++; /* correct jan=0 */
-  declared_date = upsutl_time_date();
+  declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
+				    STR_TRIM_DEFAULT);
 /* (char *) malloc((size_t)(9));
   sprintf(declared_date,"%d-%d-%d",
           mytime->tm_mon,mytime->tm_mday,mytime->tm_year);

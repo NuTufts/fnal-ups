@@ -229,8 +229,11 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	}
 
 	/*       fill in the instance fields that are maintained by UPS */
-	new_instance->modifier = upsutl_user();
-	new_instance->modified = upsutl_time_date();
+	new_instance->modifier = upsutl_str_create(upsutl_user(),
+						   STR_TRIM_DEFAULT);
+	new_instance->modified = upsutl_str_create(
+					   upsutl_time_date(STR_TRIM_DEFAULT), 
+					   STR_TRIM_DEFAULT);
 
 	/*       if we are merging with the environment, walk through all the
 		 actions.  if we encounter a setupRequired, setupOptional,
@@ -402,7 +405,9 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	COPY_TO_INSTANCE(ugo_db->data, old_version_instance, db_dir);
 	
 	new_instance->declarer = new_instance->modifier;
+	upsmem_inc_refctr(new_instance->modifier);
 	new_instance->declared = new_instance->modified;
+	upsmem_inc_refctr(new_instance->modified);
 
 	/* remove info that is specific to the table file, now we are
 	   constructing a version file instance */
