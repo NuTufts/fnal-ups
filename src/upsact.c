@@ -1762,7 +1762,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-void f_doDefaults( const t_upstyp_matched_instance * const a_inst,
+void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
