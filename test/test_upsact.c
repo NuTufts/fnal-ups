@@ -41,9 +41,6 @@
  * Declaration of private functions.
  */
 static void test_upsact_parse(void);
-static void test_upsact_params(void);
-static void print_action( const char * const a_action_line,
-		   const char * const a_params, const int a_action_val);
 
 void list_output(const t_upslst_item * const a_mproduct_list,
                  const t_upsugo_command * const a_command_line);
@@ -212,67 +209,3 @@ t_upslst_item *mproduct_list;
 
   (void) upsact_print( ugo_cmd, 0, "setup", e_setup, "tl" );
 }
-
-/*-----------------------------------------------------------------------
- * test_upsact_params
- *
- * test the routine that parses the parameters.  keep taking string input from
- * the command line until a null line is received.
- *
- * Input : none
- * Output: none
- * Return: none
- */
-/*
-static void test_upsact_params(void)
-{
-  char cmd_line[500];
-  char *cmd_line_ptr = NULL;
-  t_upslst_item *param_list = NULL, *tmp_item;
-
-  while (1) {
-    cmd_line_ptr = gets(&cmd_line[0]);
-    if (strlen(cmd_line_ptr) > 0) {
-      param_list = upsact_params( cmd_line_ptr );
-      param_list = upslst_first( param_list );
-      (void) printf("\nFor string = %s  params are:\n", cmd_line_ptr);
-      for (tmp_item = param_list ; tmp_item ; tmp_item = tmp_item->next) {
-	(void) printf("%s\n", (char *)tmp_item->data);
-      }
-      param_list = upslst_free(param_list, 'd');
-    } else {
-      break;
-    }
-  }
-
-}
-*/
-/*-----------------------------------------------------------------------
-
- * print_action_info
- *
- * print the passed in action information
- *
- * Input : action line, parameters, value
- * Output: none
- * Return: none
- */
-static void print_action( const char * const a_action_line,
-			  const char * const a_params, const int a_action_val)
-{
-
-  if (a_action_line) {
-    (void) printf("\nACTION LINE = %s\n", a_action_line);
-    if (a_params) {
-      (void) printf("PARAMS = %s   ", a_params);
-    }
-    if (a_action_val >= 0) {
-      (void) printf("VALUE = %d\n", a_action_val);
-    }
-  }
-}
-
-
-
-
-
