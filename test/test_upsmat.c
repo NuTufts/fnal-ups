@@ -118,9 +118,9 @@ static void test_match(int argc, char *argv[])
   char *list_valid_opts = "a?cdDf:g:h:K:lm:M:noq:r:tU:vVz:Z";
   int need_unique = 0;
   t_upslst_item *mproduct_list, *mproduct_item;
-  t_upstyp_match_product *mproduct = NULL;
+  t_upstyp_matched_product *mproduct = NULL;
 
-  /* Figure out which command was entered TBD and avoid the need_unique flag */
+  /* avoid the need_unique flag */
   argc -= 2;
 
   if (! strcmp(argv[1],"1")) {
@@ -134,21 +134,7 @@ static void test_match(int argc, char *argv[])
       upserr_output();
       break;
     }
-    if (mproduct_list) {
-      mproduct_list = upslst_first(mproduct_list);
-      for (mproduct_item = mproduct_list ; mproduct_item ; 
-	   mproduct_item = mproduct_item->next) {
-	mproduct = (t_upstyp_match_product *)mproduct_item->data;
-	printf("\nChain Instances:\n");
-	print_inst(mproduct->chain_list);
-	printf("Version Instances:\n");
-	print_inst(mproduct->version_list);
-	printf("Table Instances:\n");
-	print_inst(mproduct->table_list);
-      }
-    } else {
-      printf("No instances matched\n");
-    }
+    list_output(mproduct_list, command_line);
   }
 }
 
@@ -304,29 +290,5 @@ static char *get_ups_string(const char * const old_string)
   return new_string;
 }
 
-static void print_inst(t_upslst_item * const inst_list)
-{
-  t_upstyp_instance *instPtr = NULL;
-  t_upslst_item *item = NULL;
-
-  for (item = inst_list ; item ; item = item->next) {
-    instPtr = (t_upstyp_instance *)item->data;
-    if (instPtr->product) {
-      printf("PRODUCT = %s   ", instPtr->product);
-    }
-    if (instPtr->version) {
-      printf("VERSION = %s   ", instPtr->version);
-    }
-    if (instPtr->chain) {
-      printf("CHAIN = %s\n", instPtr->chain);
-    }
-    if (instPtr->flavor) {
-      printf("FLAVOR = %s   ", instPtr->flavor);
-    }
-    if (instPtr->qualifiers) {
-      printf("QUALIFIERS = %s\n\n", instPtr->qualifiers);
-    }
-  }
-}
 
 
