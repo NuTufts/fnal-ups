@@ -60,13 +60,13 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS);
 /*
  * Definition of global variables.
  */
-static char g_dollarsign = "$";
+#define g_DOLLARSIGN  "$"
 #define VERIFY_DIR_SPEC(dir)   \
     if (dir) {                                                              \
       char *trans_dir;                                                      \
       struct stat file_stat;                                                \
       trans_dir = upsget_translation(a_minst, a_db, a_command_line, dir);   \
-      if (strstr(trans_dir, g_dollarsign)) {                                \
+      if (strstr(trans_dir, g_DOLLARSIGN)) {                                \
         upserr_add(UPS_VERIFY_ENV_VAR, UPS_WARNING, dir);                   \
       }                                                                     \
       if (! stat(trans_dir, &file_stat)) {                                  \
@@ -83,7 +83,7 @@ static char g_dollarsign = "$";
     if (file) {                                                              \
       char *trans_file;                                                      \
       trans_file = upsget_translation(a_minst, a_db, a_command_line, file);  \
-      if (strstr(trans_file, g_dollarsign)) {                                \
+      if (strstr(trans_file, g_DOLLARSIGN)) {                                \
         upserr_add(UPS_VERIFY_ENV_VAR, UPS_WARNING, file);                   \
       }                                                                      \
       if (upsutl_is_a_file(trans_file) == UPS_NO_FILE) {                     \
