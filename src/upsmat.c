@@ -229,7 +229,9 @@ static int g_ugo_version = 0;
 	minst = (t_upstyp_matched_instance *)minst_list->data;           \
 	if (minst->invalid_instance) {                                   \
 	  minst_list = upslst_delete_safe(minst_list, minst, ' ');       \
-	  /* do not free the instance as it is still in the cache too */ \
+	  /* just free the structure around the instance as the rest is  \
+             in the cache */                                             \
+          ups_free_matched_instance_structure(minst);                    \
 	} else {                                                         \
           tmp_list = minst_list;                                         \
           minst_list = minst_list->next;                                 \

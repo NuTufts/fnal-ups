@@ -179,6 +179,8 @@ t_upstyp_matched_product *ups_free_matched_product(
 t_upstyp_matched_instance *ups_new_matched_instance( void );
 t_upstyp_matched_instance *ups_free_matched_instance(
                                  t_upstyp_matched_instance * const minst_ptr);
+t_upstyp_matched_instance *ups_free_matched_instance_structure(
+                                 t_upstyp_matched_instance * const minst_ptr);
 t_upstyp_product     *ups_new_product( void );
 int               ups_free_product( t_upstyp_product * const prod_ptr );
 t_upstyp_instance    *ups_new_instance( void );

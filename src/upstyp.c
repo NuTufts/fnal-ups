@@ -65,9 +65,19 @@ t_upstyp_matched_product *ups_new_matched_product(
    (t_upstyp_matched_product *)upsmem_malloc(sizeof(t_upstyp_matched_product));
 
   mprod_ptr->db_info = (t_upstyp_db *)a_db_info;
-  upsmem_inc_refctr((void *)a_db_info);
+  if (a_db_info) {
+    upsmem_inc_refctr((void *)a_db_info);
+    if (a_db_info->name) {
+      upsmem_inc_refctr((void *)a_db_info->name);
+    }
+    if (a_db_info->config) {
+      upsmem_inc_refctr((void *)a_db_info->config);
+    }
+  }
   mprod_ptr->product = (char *)a_prod_name;
-  upsmem_inc_refctr((void *)a_prod_name);
+  if (a_prod_name) {
+    upsmem_inc_refctr((void *)a_prod_name);
+  }
   mprod_ptr->minst_list = (t_upslst_item *)a_minst_list;
 
   /* do not increment the reference counter for the matched instance list as
@@ -93,9 +103,18 @@ t_upstyp_matched_product *ups_free_matched_product(
     /* we incremented the ref counter in the ups_new_matched_product function,
        doing a free here will decrement it or free it */
     if (all_gone(a_mproduct)) {
-      upsmem_free(a_mproduct->db_info->name);
-      upsmem_free(a_mproduct->db_info->config);
-      upsmem_free(a_mproduct->product);
+      if (a_mproduct->db_info) {
+	if (a_mproduct->db_info->config) {
+	  upsmem_dec_refctr((void *)a_mproduct->db_info->config);
+	}
+	if (a_mproduct->db_info->name) {
+	  upsmem_free(a_mproduct->db_info->name);
+	}
+	upsmem_free(a_mproduct->db_info);
+      }
+      if (a_mproduct->product) {
+	upsmem_free(a_mproduct->product);
+      }
       /* we do not free the matched instance list as it was not malloced when
 	 we created the new mproduct. nor was the reference counter
 	 incremented */
@@ -155,6 +174,28 @@ t_upstyp_matched_instance *ups_free_matched_instance(
 	   xchain_item = xchain_item->next); {
 	ups_free_instance((t_upstyp_instance *)xchain_item->data);
       }
+    }
+    ups_free_matched_instance_structure(minst_ptr);
+  }
+
+  return NULL;
+}
+
+/*-----------------------------------------------------------------------
+ * ups_free_matched_instance_structure
+ *
+ * Will free all space associated with the structure of a matched instance
+ *  but not the instances themselves.
+ *
+ * Input : the matched instance structure pointer
+ * Output: none
+ * Return: NULL
+ */
+t_upstyp_matched_instance *ups_free_matched_instance_structure(
+                                 t_upstyp_matched_instance * const minst_ptr)
+{
+  if (minst_ptr && all_gone(minst_ptr)) {
+    if (minst_ptr->xtra_chains) {
     upslst_free(minst_ptr->xtra_chains, ' ');
     }
 
