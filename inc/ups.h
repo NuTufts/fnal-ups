@@ -52,6 +52,7 @@
 #include "ups_start.h"
 #include "ups_stop.h"
 #include "ups_tailor.h"
+#include "ups_touch.h"
 #include "ups_unconfigure.h"
 #include "ups_unk.h"
 #include "ups_unsetup.h"

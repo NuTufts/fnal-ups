@@ -65,6 +65,7 @@ enum {
   e_start,
   e_stop,
   e_tailor,
+  e_touch,
   e_unconfigure,
   e_undeclare,
   e_create,

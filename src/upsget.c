@@ -283,6 +283,8 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   char * value;
   char * work;
   newstr[0] = '\0';
+  if (!product) { return(oldstr); }
+  if (!product->minst_list) { return(oldstr); }
   inst_list = product->minst_list;
   db_info_ptr = product->db_info;
   instance = (t_upstyp_matched_instance *)(inst_list->data);
@@ -660,7 +662,7 @@ t_upstyp_product *upsget_version_file(const char * const a_db,
                                       char ** const a_buffer)
 {
   int file_chars = 0;
-  char buffer[FILENAME_MAX+1];
+  static char buffer[FILENAME_MAX+1];
   t_upstyp_product *read_product = NULL;
 
   file_chars = (int )(strlen(a_version) + strlen(a_prod) + strlen(a_db) + 

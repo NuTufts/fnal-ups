@@ -42,6 +42,7 @@
 #include "ups_tailor.h"
 #include "ups_unk.h"
 #include "ups_depend.h"
+#include "ups_touch.h"
 #include "upserr.h"
 #include "upsutl.h"
 #include "upshlp.h"
@@ -195,6 +196,9 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_declare: mproduct_list =
 			    ups_declare(command_line, temp_file, e_declare);
+	    break;
+	  case e_touch: mproduct_list =
+			    ups_touch(command_line, temp_file, e_touch);
 	    break;
 	  case e_unk: mproduct_list = 
 			ups_unk(command_line, temp_file, argv[1]);

@@ -228,6 +228,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
              product = upsget_chain_file(db_info->name,
                                          uc->ugo_product,
                                          the_chain, &file);
+             strcpy(buffer,file);
              if ((UPS_ERROR == UPS_SUCCESS) && product )
              { cinst_list=upsmat_match_with_instance( cinst, product );
                cinst=cinst_list->data;
@@ -236,7 +237,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                upsver_mes(1,"Deleting %s chain of version %s\n",
                              the_chain,
                              cinst->version);
-               (void )upsfil_write_file(product, file,' '); 
+               (void )upsfil_write_file(product, buffer,' '); 
+               product->instance_list=upslst_free(product->instance_list,'d');
                unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
                sprintf(unchain,"un%s",the_chain);
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -246,7 +248,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                upsact_cleanup(cmd_list);
              }
            } /* Get chain file (maybe again) */
-           sprintf(file,"%s/%s/%s%s",
+           sprintf(buffer,"%s/%s/%s%s",
                    db_info->name,
                    uc->ugo_product,
                    the_chain,CHAIN_SUFFIX);
@@ -254,20 +256,17 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            { product = upsget_chain_file(db_info->name,
                                        uc->ugo_product,
                                        the_chain, &file);
+           strcpy(buffer,file);
            /* if(!product) Chain deleted was all only one */ 
            } else { 
              product = ups_new_product();
-/*             sprintf(file,"%s/%s/%s%s",
-                     db_info->name,
-                     uc->ugo_product,
-                     the_chain,CHAIN_SUFFIX); */
              product->file = CHAIN;
              product->product=uc->ugo_product;
              product->chain = the_chain;
            }
          } else { /* new chain does NOT exist at all */
            product = ups_new_product();
-           sprintf(file,"%s/%s/%s%s",
+           sprintf(buffer,"%s/%s/%s%s",
                    db_info->name,
                    uc->ugo_product,
                    the_chain,CHAIN_SUFFIX);
@@ -291,8 +290,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          upsver_mes(1,"Adding %s chain version %s to %s\n",
                     the_chain,
                     new_cinst->version,
-                    file);
-         (void )upsfil_write_file(product, file,'d');  
+                    buffer);
+         (void )upsfil_write_file(product, buffer,'d');  
+         product->instance_list=upslst_free(product->instance_list,'d');
         }
       }
 /************************************************************************
@@ -322,13 +322,15 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                        uc->ugo_product,
                                        uc->ugo_version,
                                        &file);
+         strcpy(buffer,file);
        } else { 
          upsver_mes(1,"Instance in version file allready exists");
          *file='\0'; /* don't do create instance */
+         buffer[0]='\0';
        }
     } else { /* new version does NOT exist at all */
       product = ups_new_product();
-      sprintf(file,"%s/%s/%s%s",
+      sprintf(buffer,"%s/%s/%s%s",
               db_info->name,
               uc->ugo_product,
               uc->ugo_version,VERSION_SUFFIX);
@@ -387,8 +389,12 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
           upslst_add(product->instance_list,new_vinst);
       upsver_mes(1,"Adding version %s to %s\n",
                  new_vinst->version,
-                 file);
-      (void )upsfil_write_file(product, file, 'd');  
+                 buffer);
+      (void )upsfil_write_file(product, buffer, 'd');  
+      if (new_vinst->user_list)
+      { new_vinst->user_list=upslst_free(new_vinst->user_list,'d');
+      }
+      product->instance_list=upslst_free(product->instance_list,'d');
     } 
     if (uc->ugo_chain)
     { uc->ugo_flavor=save_flavor;

@@ -54,7 +54,8 @@ int main (argc,argv)
 
 	int 	status = 0;
 	struct ups_command * uc;
-        char    * cmdline = "-f FlAVoR pRoDa V2";
+        char    * cmdline = "-f FlAVoR pRoDa V2"; 
+/*        char * cmdline = "tknew v8_1 -p \"bad news\" "; */
 
 
 /*
@@ -85,7 +86,7 @@ while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
 /*
 	if (status != UPS_SUCCESS) fprintf(stderr," %s \n", UPS_ERRTXT[status]);
 */
-        uc=upsugo_bldcmd(cmdline,"AacCdfghKtmMNoOPqrTuU");
+        uc=upsugo_bldcmd(cmdline,"AacCdfghKtmMNoOpPqrTuU");
         if (uc) 
 	{ upsugo_dump(uc,TRUE);
           upsugo_free(uc); 
