@@ -1187,6 +1187,13 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	unset Flavor_3 Flavor_4 Flavor_5 Flavor_6 Flavor_7 Flavor_8 Flavor_9
 	unset Setups_Dir_Resolve No_SETUP_UPS
 	unset Node BootStrap_Dir Setups_Current fl Flavor Setups_Home Name_Of_Ups
+	# OSF1 /bin/sh leaves /tmp/shNNNNN files sometimes
+	if [ \$MACH_OS = OSF1 -a -f /tmp/sh\$\$0 ] 
+	then
+	   ls -l /tmp/sh\$\$0
+	   rm -f /tmp/sh\$\$0
+	fi
+
 XEoF
 #======================================================================
 # End of the creation of the setups.sh script.  
