@@ -783,8 +783,8 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	  }
 	}
 	if (file_stream) {
-	  /* NOTE: time_date already has a carriage return in it */
-	  if (fprintf(file_stream, "USER = %s\n   DATE = %s", user, time_date)
+	  if (fprintf(file_stream, "USER = %s\n   DATE = %s\n", user,
+		      time_date)
 	      > 0) {
 	    if (fprintf(file_stream, "   COMMAND = %s\n", a_command) > 0) {
 	      if (minst->version) {
@@ -1000,14 +1000,24 @@ char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
  * Input : none
  * Output: none
  * Return: character string containing the current time and date
+ *          formatted like "YYYY-MM-DD HH:MM:SS TZ"
  */
 char *upsutl_time_date(void)
 {
-  time_t now;
+  time_t now, len;
+  static char buff[MAX_LINE_LEN];
+  char *buf_ptr;
 
   /* Get the current time and date */
   now = time(NULL);
-  return (ctime(&now));
+  len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d %H:%M:%S GMT",
+			  gmtime(&now));
+  if (len == 0) {
+    buf_ptr = NULL;
+  } else {
+    buf_ptr = buff;
+  }
+  return (buf_ptr);
 }
 
 /*-----------------------------------------------------------------------
