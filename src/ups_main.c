@@ -28,6 +28,8 @@
 #include "ups_list.h"
 #include "ups_unk.h"
 #include "upserr.h"
+#include "upsutl.h"
+#include "upshlp.h"
 
 /*
  * Definition of public variables.
@@ -124,45 +126,54 @@ int main(int argc, char *argv[])
       upsutl_start_timing();
     }
 
-    switch (g_cmd_info[i].cmd_index) {
-       case e_setup: ups_unk(command_line, argv[1]);
-	 break;
-       case e_unsetup: ups_unk(command_line, argv[1]);
-	 break;
-       case e_list: ups_list(command_line);
-	 break;
-       case e_configure: ups_unk(command_line, argv[1]);
-	 break;
-       case e_copy: ups_unk(command_line, argv[1]);
-	 break;
-       case e_declare: ups_unk(command_line, argv[1]);
-	 break;
-       case e_depend: ups_unk(command_line, argv[1]);
-	 break;
-       case e_exist: ups_unk(command_line, argv[1]);
-	 break;
-       case e_modify: ups_unk(command_line, argv[1]);
-	 break;
-       case e_start: ups_unk(command_line, argv[1]);
-	 break;
-       case e_stop: ups_unk(command_line, argv[1]);
-	 break;
-       case e_tailor: ups_unk(command_line, argv[1]);
-	 break;
-       case e_unconfigure: ups_unk(command_line, argv[1]);
-	 break;
-       case e_undeclare: ups_unk(command_line, argv[1]);
-	 break;
-       case e_create: ups_unk(command_line, argv[1]);
-	 break;
-       case e_get: ups_unk(command_line, argv[1]);
-	 break;
-       case e_validate: ups_unk(command_line, argv[1]);
-	 break;
-       case e_unk: ups_unk(command_line, argv[1]);
-	 break;
+    if (!command_line->ugo_help) {
+      /* no help requested - do the command */
+      switch (g_cmd_info[i].cmd_index) {
+      case e_setup: ups_unk(command_line, argv[1]);
+	break;
+      case e_unsetup: ups_unk(command_line, argv[1]);
+	break;
+      case e_list: ups_list(command_line);
+	break;
+      case e_configure: ups_unk(command_line, argv[1]);
+	break;
+      case e_copy: ups_unk(command_line, argv[1]);
+	break;
+      case e_declare: ups_unk(command_line, argv[1]);
+	break;
+      case e_depend: ups_unk(command_line, argv[1]);
+	break;
+      case e_exist: ups_unk(command_line, argv[1]);
+	break;
+      case e_modify: ups_unk(command_line, argv[1]);
+	break;
+      case e_start: ups_unk(command_line, argv[1]);
+	break;
+      case e_stop: ups_unk(command_line, argv[1]);
+	break;
+      case e_tailor: ups_unk(command_line, argv[1]);
+	break;
+      case e_unconfigure: ups_unk(command_line, argv[1]);
+	break;
+      case e_undeclare: ups_unk(command_line, argv[1]);
+	break;
+      case e_create: ups_unk(command_line, argv[1]);
+	break;
+      case e_get: ups_unk(command_line, argv[1]);
+	break;
+      case e_validate: ups_unk(command_line, argv[1]);
+	break;
+      case e_unk: ups_unk(command_line, argv[1]);
+	break;
+      }
+    } else {
+      /* output help */
+      switch (g_cmd_info[i].cmd_index) {
+      case e_unk: upshlp_command(NULL);              /* print out all help */
+	break;
+      default:    upshlp_command(g_cmd_info[i].cmd); /* specific help only */
+      }
     }
-
     if (command_line->ugo_Z) {
       upsutl_stop_timing();
     }
@@ -177,3 +188,4 @@ int main(int argc, char *argv[])
 
   return 0;
 }
+
