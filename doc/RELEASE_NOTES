@@ -38,4 +38,8 @@ Now the steps are:
 <li>cd $UPS_DIR
 <li>make all
 </ul>
+<li>
+ups copy command now uses -G in order to pass options to the declare.  -O is
+no longer used.
+
 </ul>
