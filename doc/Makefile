@@ -11,8 +11,12 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all :
-	@echo all target does nothing
+all :	help_file
+
+
+help_file : 
+	@rm -f  ups_help.dat
+	@${UPS_DIR}/doc/build_help_file.pl > ups_help.dat
 
 #
 # Now standard targets
