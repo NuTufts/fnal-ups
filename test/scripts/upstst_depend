@@ -8,9 +8,9 @@ depend bee1 v1_0 -f NULL -z ./db1 -K DECLARER
 ups_echo ====
 depend bee1 v1_0 -f NULL -z ./db1 -K ACTION
   ups_echo ====
-depend bee1      -f NUL L -z ./db1 -m bee1.table
+depend bee1     -f NULL  -z ./db1 -m bee1.table
 ups_echo ====
-depend bee1      -f NULL -z ./db1 -M ./db1/bee3/bee.table
+depend bee1      -f NULL -z ./db1 -M ./db1/bee3/v2_0.table
 ups_echo ====
 
 depend bee3 -z ./db1 -f NULL v2_0
