@@ -91,7 +91,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   char buffer[FILENAME_MAX+1];
   char *file=buffer;
   char *the_chain;
-  char *the_flavor;
+  char *the_flavor = NULL;
   char *the_qualifiers;
   char *saddr;				/* start address for -O manipulation */
   char *eaddr;				/* end address for -O manipulation */
@@ -460,7 +460,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
 /* I'm going to create the save instance and just put everything in 
    there as the first fix for this */
       new_vinst->sav_inst = ups_new_instance();
-      new_vinst->sav_inst->prod_dir=new_vinst->prod_dir;
+      new_vinst->sav_inst->prod_dir=upsutl_str_create(new_vinst->prod_dir,' ');
       if((hold_env=upsget_translation_env(new_vinst->prod_dir))!=0)
       { new_vinst->prod_dir=upsutl_str_create(hold_env,' '); }
       if((hold_env=upsget_translation_env(new_vinst->compile_dir))!=0)
