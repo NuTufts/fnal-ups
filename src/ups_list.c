@@ -22,6 +22,8 @@
  *                        In that way, successive calls using previous
  *                        return will be fast.  
  *                        Changed 'bot' to 'last' and 'top' to 'first'.
+ *       30-Jul-1997, LR, Added functions to add list to list,
+ *                        upslst_add_list, upslst_insert_list.
  *
  ***********************************************************************/
 
@@ -109,6 +111,7 @@ t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt )
  *
  * Input : t_upslst_item *, pointer to a list, if NULL a new list will
  *         be created.
+ *         void *, data element for list.
  * Output: none
  * Return: t_upslst_item *, pointer to the first item of the list or NULL
  *
@@ -148,6 +151,7 @@ t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr )
  *
  * Input : t_upslst_item *, pointer to a list, if NULL a new list will
  *         be created.
+ *         void *, data element for list.
  * Output: none
  * Return: t_upslst_item *, pointer to the last item of the list or NULL
  *
@@ -178,6 +182,74 @@ t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr )
   l_new->next = NULL;
 
   return l_new;
+}
+
+/*-----------------------------------------------------------------------
+ * upslst_insert_list
+ *
+ * Will add a list to the first item.
+ *
+ * Input : t_upslst_item *, pointer to a list, if NULL a new list will
+ *         be created.
+ *         t_upslist_item*, pointer to a list to be inserted.
+ * Output: none
+ * Return: t_upslst_item *, pointer to the first item of the list or NULL
+ */
+t_upslst_item *upslst_insert_list( t_upslst_item *list_ptr, t_upslst_item *list_new )
+{
+  t_upslst_item *l_first = NULL;
+  t_upslst_item *l_new_last = NULL;
+
+  if ( !list_new ) {
+    return upslst_first( list_ptr );
+  }
+  
+  if ( !list_ptr ) {
+    list_ptr = list_new;
+    return upslst_first( list_ptr );
+  }
+
+  l_first = upslst_first( list_ptr );
+  l_new_last = upslst_last( list_new );
+
+  l_first->prev = l_new_last;
+  l_new_last->next = l_first;
+
+  return upslst_first( list_new );  
+}
+
+/*-----------------------------------------------------------------------
+ * upslst_add_list
+ *
+ * Will add a list to the last item.
+ *
+ * Input : t_upslst_item *, pointer to a list, if NULL a new list will
+ *         be created.
+ *         t_upslist_item*, pointer to a list to be added.
+ * Output: none
+ * Return: t_upslst_item *, pointer to the lastt item of the list or NULL
+ */
+t_upslst_item *upslst_add_list( t_upslst_item *list_ptr, t_upslst_item *list_new )
+{
+  t_upslst_item *l_last = NULL;
+  t_upslst_item *l_new_first = NULL;
+
+  if ( !list_new ) {
+    return upslst_last( list_ptr );
+  }
+  
+  if ( !list_ptr ) {
+    list_ptr = list_new;
+    return upslst_last( list_ptr );
+  }
+
+  l_last = upslst_last( list_ptr );
+  l_new_first = upslst_first( list_new );
+
+  l_last->next = l_new_first;
+  l_new_first->prev = l_last;
+
+  return upslst_last( list_new );  
 }
 
 /*-----------------------------------------------------------------------

@@ -30,14 +30,13 @@
  * Constans.
  */
 
-
 /*
  * Types.
  */
 typedef struct upslst_item
 {
   struct upslst_item    *prev;
-  void                    *data;
+  void                  *data;
   struct upslst_item    *next;
 } t_upslst_item;
 
@@ -49,6 +48,9 @@ t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt );
 t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr );
 t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr );
 t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt );
+
+t_upslst_item *upslst_insert_list( t_upslst_item *list_ptr, t_upslst_item *list_new );
+t_upslst_item *upslst_add_list( t_upslst_item *list_ptr, t_upslst_item *list_new );
 
 t_upslst_item *upslst_first( t_upslst_item *list_ptr );
 t_upslst_item *upslst_last( t_upslst_item *list_ptr );
