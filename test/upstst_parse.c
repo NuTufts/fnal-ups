@@ -94,7 +94,7 @@ if (length >= ARGSIZ)
    abort();
    }
 
-g_Specified_args[0] = NULL;
+g_Specified_args[0] = 0;
 
 retValue = upstst_pass1(argcPtr, argv, argTable, options);/* take out switch */
 if (retValue) return (retValue);			/* return error */
@@ -525,8 +525,8 @@ for (infoPtr = argTable; infoPtr->type != UPSTST_ARGV_END; infoPtr++)
                   * '[...]' from infoPtr->key. Store the result in keyBuf[].
                   */
          (void) sprintf(keyBuf, "%s", &infoPtr->key[1]);
-         for (pSp = keyBuf; *pSp != NULL; pSp++)
-            if (*pSp == '>' || *pSp == ']') *pSp = NULL;
+         for (pSp = keyBuf; *pSp != 0; pSp++)
+            if (*pSp == '>' || *pSp == ']') *pSp = 0;
 
          (void) fprintf(stderr,"Programmer Error: %s is not a ", infoPtr->key);
          (void) fprintf(stderr,"supported object for positional\n parameters. ");
