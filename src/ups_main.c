@@ -236,6 +236,9 @@ int main(int argc, char *argv[])
       if (UPS_ERROR != UPS_SUCCESS) {
 	rstatus = 1;                   /* return an error to the user */
 	break;
+      } else if ((g_cmd_info[i].cmd_index == e_exist) && (! mproduct_list)) {
+	rstatus = 1;                   /* error if found no product */
+	break;
       }
 
       /* we need to save the shell info here as the next call to upsugo_next
