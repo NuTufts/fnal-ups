@@ -74,7 +74,7 @@ enum {
   e_touch,
   e_unconfigure,
   e_undeclare,
-  e_create,
+  e_create,              /* This has gone away */
   e_get,
   e_flavor,
   e_help,
