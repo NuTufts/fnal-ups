@@ -1,6 +1,11 @@
 Product:          ProdE
 Flavor:           IRIX+5.3
                   IRIX+5
+                  IRIX+4
+                  IRIX+3
+                  IRIX+2
+                  IRIX+1
+                  IRIX+0
                   IRIX
                   NULL
                   ANY
