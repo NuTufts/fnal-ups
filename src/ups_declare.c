@@ -106,6 +106,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   time_t seconds=0;
   char * save_table_dir;		/* match won't work "how I want" */
   char * save_table_file;		/* with table specifications     */
+  int save_m=uc->ugo_m;
+  int save_M=uc->ugo_M;
   uc->ugo_m=0;
   uc->ugo_M=0;
   save_table_dir=uc->ugo_tablefiledir;
@@ -362,7 +364,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                       "Specified product and version currently exists");
            return 0;
          }
-         upsver_mes(0,"Instance in version file allready exists\n");
+         upsver_mes(0,"INFORMATIONAL: Instance in version file already exists\n");
          buffer[0]=0; /* don't create instance */
          mproduct_list = upslst_first(mproduct_list);
          mproduct = (t_upstyp_matched_product *)mproduct_list->data;
@@ -377,6 +379,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       product->product=upsutl_str_create(uc->ugo_product,' ');
       product->version = upsutl_str_create(uc->ugo_version,' ');
     }
+/* no more matching replace "faked out stuff" */
+    uc->ugo_tablefiledir=save_table_dir;
+    uc->ugo_tablefile=save_table_file;
+    uc->ugo_m=save_m;
+    uc->ugo_M=save_M;
     /* build new version instance */
     if (buffer[0]!=0) /* instance doesn't exist */
     { new_vinst=ups_new_instance();
@@ -393,8 +400,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       new_vinst->prod_dir=upsutl_str_create(uc->ugo_productdir,' ');
 /*      new_vinst->table_dir=uc->ugo_tablefiledir;
         new_vinst->table_file=uc->ugo_tablefile;   */
-      uc->ugo_tablefiledir=save_table_dir;
-      uc->ugo_tablefile=save_table_file;
       new_vinst->table_dir=upsutl_str_create(save_table_dir,' ');
       new_vinst->table_file=upsutl_str_create(save_table_file,' ');
       new_vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' ');
