@@ -68,10 +68,6 @@ void upserr_output (void);
  * Declarations of public variables.
  */
 
-extern int UPS_VERBOSE = 0;     /* start out not verbose */
-extern int g_ups_line = 0;
-extern char *g_ups_file = '\0';
-
 #define upserr_place() g_ups_line=__LINE__; g_ups_file=(char *)__FILE__;
 
 #endif /* _UPS_ERROR_H_ */
