@@ -208,6 +208,6 @@ t_ups_command     *upsugo_next(const int ups_argc,
 
 t_ups_command     *upsugo_env(char * const product,
 			       char * const validopts);
-
+int                upsugo_free(struct ups_command * const uc);
 #endif /* _UPS_TYPES_H_ */
 
