@@ -1,0 +1,26 @@
+FILE = DBCONFIG
+
+# all nodes can read/use the products declared in this db
+AUTHORIZED_NODES = *
+
+# all product roots are under /usr/products:
+PROD_DIR_PREFIX = /usr/products
+
+# keep statistics about the following products:
+STATISTICS = edt,tpu,tkreq
+
+# manpages, info files, etc. go here:
+MAN_PATH = /usr/products/man
+CATMAN_PATH = /usr/products/catman
+INFO_PATH = /usr/products/Info
+HTML_PATH = /usr/products/SunOS/html/www-oss/docs
+NEWS_PATH = /dev/null
+
+# this db contains the ups product; copy the setups.[c]sh
+#  and cached files to this directory
+SETUPS_PATH = /usr/local/etc
+
+# this db contains the upd product; look for the upd
+#  user callouts here:
+UPD_USERCODE = /usr/products/ups_database/upd/usercode
+                
