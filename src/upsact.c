@@ -88,7 +88,7 @@ static char *g_file_ext[e_MAX_SHELL] = {"sh", "csh"};
 #define OLD_FLAG "OLD"
 #define CATMANPAGES "catman"
 #define MANPAGES "man"
-#define DROPIT "$UPS_DIR/bin/dropit"
+#define DROPIT "$UPS_DIR/bin/dropit -e"
 /*
  * Private types
  */
