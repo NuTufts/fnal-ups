@@ -31,9 +31,9 @@ Script_Prefix=set${Name_Of_Ups}
 
 Setups_Advanced_Sh_Str="bash ksh ash sh"
 
-Setups_Products_Init_Default="\${Node}/products/ups_database \
-				/usr/products/ups_database \
-				/afs/fnal/ups/db"
+#Setups_Products_Init_Default="\${Node}/products/ups_database \
+#				/usr/products/ups_database \
+#				/afs/fnal/ups/db"
 
 # ===  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE ===
 
@@ -97,6 +97,55 @@ then
 else
     echo '**' $Setups_Flag defined as $Setups_Home in 
     echo '**' $Ups_DB_Path/.upsfiles/dbconfig
+fi
+if test -x /bin/echo
+then
+    ECHO=/bin/echo
+elif test  -x /usr/bin/echo
+then
+    ECHO=/usr/bin/echo
+else
+    ECHO=echo
+fi
+
+if test `echo $Setups_Home|cut -c1` != '/'
+then
+    TeMp=/tmp
+    if test x${TMPDIR:-} != x
+    then
+        TeMp=$TMPDIR
+    fi
+    for sh in $Setups_Advanced_Sh_Str
+    do
+        if test -x /usr/bin/${sh}
+        then
+            Name_Of_Sh=/usr/bin/${sh}
+            break
+        elif test -x /bin/${sh}
+        then
+            Name_Of_Sh=/bin/${sh}
+            break
+        fi
+    done
+    cat <<XxEoF >$TeMp/Ash_$$
+#!${Name_Of_Sh}
+eval dir=\$1
+$ECHO \$dir
+XxEoF
+    chmod +x $TeMp/Ash_$$
+    Setups_Products_List_Home=`$TeMp/Ash_$$ $Setups_Home`
+    rm -f $TeMp/Ash_$$
+fi
+
+if test ! -f $Setups_Products_List_Home/$Setups_Products_Init_File
+then
+    echo '****' $Setups_Products_List_Home/$Setups_Products_Init_File does not exist
+    echo '****' Ups cannot be configured.
+    echo '-------------------------------'
+    echo Please copy $UPS_PROD_DIR/ups/$Setups_Products_Init_File.template
+    echo to $Setups_Home/$Setups_Products_Init_File 
+    echo and edit it as appropriate before reconfiguring ups.
+    exit 1
 fi
 
 #
@@ -231,7 +280,7 @@ BootStrap_Dir=$BootStrap_Dir
 
 Products_String_File=$Setups_Products_Init_File
 
-Setups_Products_Init_Default="$Setups_Products_Init_Default"
+#Setups_Products_Init_Default="$Setups_Products_Init_Default"
 
 if test -x /bin/echo
 then
@@ -302,7 +351,10 @@ then
 #    Products_String=\`cat \$BootStrap_Dir/\$Products_String_File|grep -v '^#'\`
 #    Products_String="\${UPS_EXTRA_DIR} \${Products_String}"
 else
-    Products_String="\${UPS_EXTRA_DIR} \${Setups_Products_Init_Default}"
+#    Products_String="\${UPS_EXTRA_DIR} \${Setups_Products_Init_Default}"
+    echo \$Products_List_Home/\$Products_String_File not found.
+    echo ups was not properly configured.
+    exit 1 
 fi
 #Products_String="\${Products_String:-} ${Ups_DB_Path:-}"
 #
@@ -1053,7 +1105,7 @@ BootStrap_Dir=$BootStrap_Dir
 # the database was initialized
 #
 
-Product_String="$Setups_Products_Init_Default $Ups_DB_Path"
+#Product_String="$Setups_Products_Init_Default $Ups_DB_Path"
 
 #
 # === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
