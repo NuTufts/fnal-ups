@@ -64,7 +64,8 @@
 #define UPS_INVALID_SHELL       21
 #define UPS_NEED_UNIQUE         22
 #define UPS_SYSTEM_ERROR        23
-#define UPS_NERR                24      /*  this one must always be last */
+#define UPS_NOT_AUTH            24
+#define UPS_NERR                25      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
