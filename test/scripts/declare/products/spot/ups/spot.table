@@ -1,6 +1,6 @@
 FILE = table
 
-FLAVOR = NULL
+FLAVOR = ANY
 QUALIFIERS = ""
 
 ACTION = declare

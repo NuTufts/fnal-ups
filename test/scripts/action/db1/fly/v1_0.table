@@ -1,7 +1,7 @@
 FILE = TABLE
 PRODUCT = fly
 
-FLAVOR = NULL
+FLAVOR = ANY
 QUALIFIERS = ""
 INFO_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/info
 HTML_SOURCE_DIR = ${UPS_DIR}/test/scripts/action/prod/html

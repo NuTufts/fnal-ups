@@ -11,6 +11,4 @@ QUALIFIERS = ""
   MODIFIER = votava
   MODIFIED = 1998-04-09 22.31.57 GMT
   PROD_DIR = ${UPS_DIR}/test/scripts/undeclare/products/spot
-  UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = spot.table
