@@ -134,56 +134,56 @@ return (0);
 
 int upstst_declare(int argc, char ** const argv)
 { return(upstst_command(argc,argv, 
-          (void *)&ups_declare,"ups_declare",e_declare)); }
+          (const void * (*)()) &ups_declare,"ups_declare",e_declare)); }
 
 int upstst_undeclare(int argc, char ** const argv)
 { return(upstst_command(argc,argv, 
-          (void *)&ups_undeclare,"ups_undeclare",e_undeclare)); }
+          (const void * (*)()) &ups_undeclare,"ups_undeclare",e_undeclare)); }
 
 int upstst_configure(int argc, char ** const argv)
 { return(upstst_command(argc,argv, 
-          (void *)&ups_configure,"ups_configure",e_configure)); }
+          (const void * (*)()) &ups_configure,"ups_configure",e_configure)); }
 
 int upstst_unconfigure(int argc, char ** const argv)
 { return(upstst_command(argc,argv, 
-          (void *)&ups_unconfigure,"ups_unconfigure",e_unconfigure)); }
+          (const void * (*)()) &ups_unconfigure,"ups_unconfigure",e_unconfigure)); }
 
 int upstst_tailor(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_tailor,"ups_tailor",e_tailor)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_tailor,"ups_tailor",e_tailor)); }
 
 int upstst_copy(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_copy,"ups_copy",e_copy)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_copy,"ups_copy",e_copy)); }
 
 int upstst_start(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_start,"ups_start",e_start)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_start,"ups_start",e_start)); }
 
 int upstst_stop(int argc, char ** const argv)
-{ return(upstst_command(argc,argv, (void *)&ups_stop,"ups_stop",e_stop)); }
+{ return(upstst_command(argc,argv, (const void * (*)()) &ups_stop,"ups_stop",e_stop)); }
 
 int upstst_flavor(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_flavor,"ups_flavor",e_flavor)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_flavor,"ups_flavor",e_flavor)); }
 
 int upstst_get(int argc, char ** const argv)
-{ return (upstst_command(argc,argv,(void *)&ups_get,"ups_get",e_get)); }
+{ return (upstst_command(argc,argv,(const void * (*)()) &ups_get,"ups_get",e_get)); }
 
 int upstst_modify(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_modify,"ups_modify",e_modify)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_modify,"ups_modify",e_modify)); }
 
 int upstst_setup(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_setup,"ups_setup",e_setup));}
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_setup,"ups_setup",e_setup));}
 
 int upstst_unsetup(int argc, char ** const argv)
 { return(upstst_command(argc,argv, 
-          (void *)&ups_unsetup,"ups_unsetup",e_unsetup)); }
+          (const void * (*)()) &ups_unsetup,"ups_unsetup",e_unsetup)); }
 
 int upstst_unk(int argc, char ** const argv)
-{ return (upstst_command(argc,argv, (void *)ups_unk,"ups_unk",e_unk)); }
+{ return (upstst_command(argc,argv, (const void * (*)()) &ups_unk,"ups_unk",e_unk)); }
 
 int upstst_depend(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)ups_depend,"ups_depend",e_depend)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_depend,"ups_depend",e_depend)); }
 
 int upstst_touch(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)ups_touch,"ups_touch",e_touch)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_touch,"ups_touch",e_touch)); }
 
 int upstst_list(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)ups_list,"ups_list",e_list)); }
+{ return(upstst_command(argc,argv,(const void * (*)()) &ups_list,"ups_list",e_list)); }
