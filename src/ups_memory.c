@@ -25,7 +25,6 @@
 
 /* ups specific include files */
 #include "ups_error.h"
-#include "ups_list.h"
 #include "ups_memory.h"
 
 /*
@@ -36,21 +35,13 @@
  * Definition of global variables.
  */
 
-/* header attached to each piece of memory requested with upsmem_malloc */
-typedef struct upsmem_header {
-  void *data;
-  int  num_bytes;
-  int  reference_counter;
-} t_upsmem_header;
-
-/* linked list of allocated memory blocks */
-static t_upslst_item *g_memory_list = 0;
+#define UPSMEM_INT int
+#define UPSMEM_GET_TOP(memPtr) ((char *)memPtr - sizeof(UPSMEM_INT))
+#define UPSMEM_GET_USER(memPtr) ((char *)memPtr + sizeof(UPSMEM_INT))
 
 /*
  * Declaration of private functions.
  */
-
-static t_upsmem_header *find_saved_data(const void * const a_data);
 
 /*
  * Definition of public functions.
@@ -59,8 +50,8 @@ static t_upsmem_header *find_saved_data(const void * const a_data);
 /*-----------------------------------------------------------------------
  * upsmem_malloc
  *
- * Malloc the requested amount and save it on a linked list so we can keep
- * track of reference counts.
+ * Malloc the requested amount. Add 4 bytes at the front of the memory to
+ * use as a reference counter for putting things on lists.
  *
  * Input : number of bytes to malloc
  * Output: none
@@ -68,45 +59,26 @@ static t_upsmem_header *find_saved_data(const void * const a_data);
  */
 void *upsmem_malloc(const int a_bytes)
 {
-  void *dataPtr = 0;
-  t_upsmem_header *memory;
-  int hdr_and_data_bytes;
+  int *dataPtr = 0;
 
   /* Return if no memory requested */
   if (a_bytes > 0) {
-    hdr_and_data_bytes = a_bytes + (int )sizeof(t_upsmem_header);
-    dataPtr = (void *)malloc((unsigned int)hdr_and_data_bytes);
+    dataPtr = (int *)malloc((unsigned int)(a_bytes +
+					   (int )(sizeof(UPSMEM_INT))));
     if (dataPtr != 0) {
       /* We got the memory, initialize it */
-      memory = (t_upsmem_header *)dataPtr;
-      memory->reference_counter = 0;
-      memory->data = (void *)(memory + (int )sizeof(t_upsmem_header));
-      memory->num_bytes = a_bytes;
-      dataPtr = (void *)memory->data;
-
-      /* Add the memory to the linked list of stuff */
-      if (g_memory_list == 0) {
-	/* First time through - create the list */
-	g_memory_list = upslst_new((void *)memory);
-      } else {
-	g_memory_list = upslst_insert(g_memory_list, (void *)memory);
-      }
-
-      /* Now make sure there was not an error mallocing the list element */
-      if (g_memory_list == 0) {
-	/* Yes there was an error, free what we have */
-	free (memory);
-	dataPtr = 0;
-      }
+      *dataPtr = 0;
+      dataPtr = (int *)UPSMEM_GET_USER(dataPtr);
     }
   }
-  return dataPtr;
+  return (void *)dataPtr;
 }
 
 /*-----------------------------------------------------------------------
  * upsmem_free
  *
- * Free the passed memory if the reference count is zero.
+ * Free the passed memory if the reference count is zero.  We assume that this
+ * memory has been previously malloced by upsmem_malloc.
  *
  * Input : address of memory to free
  * Output: none
@@ -114,27 +86,39 @@ void *upsmem_malloc(const int a_bytes)
  */
 void upsmem_free(void *a_data)
 {
-  t_upsmem_header *memory;
+  void *data_ptr;
 
-  /* See if the passed memory is saved in g_memory_list */
-  memory = find_saved_data(a_data);
-
-  if (memory != 0) {
-    /* Yes the memory was on the list. check the reference counter.
-       if it is <= 0, then free the data and the memory header, else do
-       nothing */
-    if (memory->reference_counter <= 0) {
-      /* okay, remove this item from the list and free it */
-      g_memory_list = upslst_delete(g_memory_list, (void *)memory, ' ');
-      free(memory);
+  if (a_data != 0) {
+    /* check the reference counter. if it is <= 0, then free the data and 
+       the memory header, else do nothing */
+    if ( upsmem_get_refctr(a_data) <= 0) {
+      /* okay, free it */
+      data_ptr = UPSMEM_GET_TOP(a_data);
+      free(data_ptr);
       a_data = 0;
     }
-  } else {
-    /* No the memory was not on the list, free like normal */
-    free(a_data);
-    a_data = 0;
   }
+}
 
+/*-----------------------------------------------------------------------
+ * upsmem_get_refctr
+ *
+ * Return the reference counter associated with the passed data
+ *
+ * Input : address of data whose reference counter is to be returned
+ * Output: none
+ * Return: none
+ */
+int upsmem_get_refctr(const void * const a_data)
+{
+  int *int_ptr;
+  int counter = 0;
+
+  if (a_data != 0) {
+    int_ptr = (int *)UPSMEM_GET_TOP(a_data);
+    counter = *int_ptr;
+  }
+  return(counter);
 }
 
 /*-----------------------------------------------------------------------
@@ -148,14 +132,12 @@ void upsmem_free(void *a_data)
  */
 void upsmem_inc_refctr(const void * const a_data)
 {
-  t_upsmem_header *memory;
+  int *int_ptr;
 
-  /* See if the passed memory is saved in g_memory_list */
-  memory = find_saved_data(a_data);
-
-  if (memory != 0) {
-    /* Yes the memory was on the list. increment the reference counter. */
-    ++(memory->reference_counter);
+  if (a_data != 0) {
+    /* increment the reference counter. */
+    int_ptr = (int *)UPSMEM_GET_TOP(a_data);
+    ++(*int_ptr);
   }
 }
 
@@ -170,73 +152,12 @@ void upsmem_inc_refctr(const void * const a_data)
  */
 void upsmem_dec_refctr(const void * const a_data)
 {
-  t_upsmem_header *memory;
+  int *int_ptr;
 
-  /* See if the passed memory is saved in g_memory_list */
-  memory = find_saved_data(a_data);
-
-  if (memory != 0) {
-    /* Yes the memory was on the list. decrement the reference counter. */
-    --(memory->reference_counter);
+  if (a_data != 0) {
+    /* increment the reference counter. */
+    int_ptr = (int *)UPSMEM_GET_TOP(a_data);
+    --(*int_ptr);
   }
 }
 
-/*-----------------------------------------------------------------------
- * upsmem_print
- *
- * Print out g_memory_list.  Used mainly for debugging purposes.
- *
- * Input : none
- * Output: none
- * Return: none
- */
-void upsmem_print(void)
-{
-  int i;
-  t_upslst_item *tempItem = 0;
-  t_upsmem_header *memItem;
-
-  tempItem = g_memory_list;
-  if (tempItem == 0) {
-    printf("No memory on the list\n");
-  } else {
-    for (i = 0; tempItem != 0; ++i) {
-      memItem = tempItem->data;
-      printf("Num of Bytes = %d, Reference Count = %d\n", memItem->num_bytes,
-	     memItem->reference_counter);
-      tempItem = tempItem->next;
-    }
-  }
-}
-
-/*
- * Definition of private functions.
- */
-
-/*-----------------------------------------------------------------------
- * find_saved_data
- *
- * Given a pointer to user data, find the memory header list element that
- * corresponds to it
- *
- * Input : data pointer
- * Output: none
- * Return: pointer to the memory list element
- *
- */
-static t_upsmem_header *find_saved_data(const void * const a_data)
-{
-  t_upslst_item *list_item;
-  t_upsmem_header *data_item;
-  t_upsmem_header *data_header = 0;
-
-  for (list_item = g_memory_list; list_item; list_item = list_item->next) {
-    data_item = (t_upsmem_header *)list_item->data;
-    if ((void *)data_item->data == a_data) {
-      /* we found the match get out */
-      data_header = data_item;
-      break;
-    }
-  }
-  return data_header;
-}

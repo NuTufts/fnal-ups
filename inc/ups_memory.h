@@ -40,9 +40,9 @@
 
 void *upsmem_malloc(const int a_bytes);
 void upsmem_free(void *a_data);
+int upsmem_get_refctr(const void * const a_data);
 void upsmem_inc_refctr(const void * const a_data);
 void upsmem_dec_refctr(const void * const a_data);
-void upsmem_print(void);
 
 #endif /* _UPS_XYZ_H_ */
 

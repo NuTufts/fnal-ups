@@ -51,9 +51,6 @@ int main(void)
 
   upsutl_start_timing();
 
-  printf("\nPrint out the memory list before adding anything, should get nothing\n");
-  upsmem_print();
-
   /* Now malloc a few things */
   myc = (char *)upsmem_malloc(myc_bytes);
   myc2 = (char *)upsmem_malloc(myc2_bytes);
@@ -61,10 +58,6 @@ int main(void)
   myc4 = (char *)upsmem_malloc(myc4_bytes);
   myc5 = (char *)upsmem_malloc(myc5_bytes);
   myc6 = (char *)upsmem_malloc(myc6_bytes);
-
-  printf("\nPrint out the memory list, should have 6 items with sizes %d, %d, %d, %d, %d, %d\n",
-	myc6_bytes, myc5_bytes, myc4_bytes, myc3_bytes, myc2_bytes, myc_bytes);
-  upsmem_print();
 
   /* Now increment a few reference counters */
   upsmem_inc_refctr((void *)myc);
@@ -80,8 +73,12 @@ int main(void)
   upsmem_inc_refctr((void *)myc6);
   upsmem_inc_refctr((void *)myc6);
 
-  printf("\nIncremented reference counters, should be 3, 5, 0, 3, 0, 1\n");
-  upsmem_print();
+  printf("\nIncremented reference counters, should be 1, 0, 3, 0, 5, 3\n");
+  printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
+	 upsmem_get_refctr((void *)myc), upsmem_get_refctr((void *)myc2),
+	 upsmem_get_refctr((void *)myc3), upsmem_get_refctr((void *)myc4),
+	 upsmem_get_refctr((void *)myc5), upsmem_get_refctr((void *)myc6));
+
 
   /* Decrement the reference counters */
   upsmem_dec_refctr((void *)myc2);
@@ -90,8 +87,11 @@ int main(void)
   upsmem_dec_refctr((void *)myc5);
   upsmem_dec_refctr((void *)myc5);
 
-  printf("\nDecremented counters, now have 6 items with reference counters - 3, 2, 0, 2, -1, 1\n");
-  upsmem_print();
+  printf("\nDecremented counters, now have 6 items with reference counters - 1, -1, 2, 0, 2, 3\n");
+  printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
+	 upsmem_get_refctr((void *)myc), upsmem_get_refctr((void *)myc2),
+	 upsmem_get_refctr((void *)myc3), upsmem_get_refctr((void *)myc4),
+	 upsmem_get_refctr((void *)myc5), upsmem_get_refctr((void *)myc6));
 
   /* now free everything */
   upsmem_dec_refctr((void *)myc);
@@ -103,7 +103,10 @@ int main(void)
   upsmem_dec_refctr((void *)myc6);
   upsmem_dec_refctr((void *)myc6);
   printf("\nDecremented all counters, now have 6 items with reference counters < 0\n");
-  upsmem_print();
+  printf("And REALLY are - %d, %d, %d, %d, %d, %d\n",
+	 upsmem_get_refctr((void *)myc), upsmem_get_refctr((void *)myc2),
+	 upsmem_get_refctr((void *)myc3), upsmem_get_refctr((void *)myc4),
+	 upsmem_get_refctr((void *)myc5), upsmem_get_refctr((void *)myc6));
 
   upsmem_free(myc);
   upsmem_free(myc2);
@@ -112,15 +115,8 @@ int main(void)
   upsmem_free(myc5);
   upsmem_free(myc6);
 
-  printf("\nPrint out empty memory list again\n");
-  upsmem_print();
-
-  /* Do an extra free - see if we blow up */
-  upsmem_free(myc);
-
   upsutl_stop_timing();
   upserr_output();
-
 
   return 0;
 }
