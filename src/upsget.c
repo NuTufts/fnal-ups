@@ -103,9 +103,10 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_EXTENDED", upsget_extended },
   { "${UPS_FLAGS", 0 },
   { "${UPS_FLAGSDEPEND", 0 },
-  { "${UPS_THIS_DB", upsget_database },
+  { "${UPS_THIS_DB", upsget_this_db},
   { "${UPS_SETUP", upsget_envstr },
   { "${UPS_ORIGIN", upsget_origin },
+  { "${PRODUCTS", upsget_database },
   {  0, 0 }
 } ;
 
@@ -194,7 +195,7 @@ char *upsget_allout(const FILE * const stream,
         fprintf((FILE *)stream,"unset UPS_EXTENDED\n");
       } 
       fprintf((FILE *)stream,"UPS_THIS_DB=%s;export UPS_THIS_DB\n",
-               upsget_database(db,instance,command_line));
+               upsget_this_db(db,instance,command_line));
       fprintf((FILE *)stream,"UPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
                upsget_OS_flavor(db,instance,command_line));
       fprintf((FILE *)stream,"UPS_PROD_FLAVOR=%s;export UPS_PROD_FLAVOR\n",
@@ -225,7 +226,7 @@ char *upsget_allout(const FILE * const stream,
         fprintf((FILE *)stream,"unsetenv UPS_EXTENDED\n");
       }
       fprintf((FILE *)stream,"setenv UPS_THIS_DB=%s\n",
-               upsget_database(db,instance,command_line));
+               upsget_this_db(db,instance,command_line));
       fprintf((FILE *)stream,"setenv UPS_OS_FLAVOR=%s\n",
                upsget_OS_flavor(db,instance,command_line));
       fprintf((FILE *)stream,"setenv UPS_PROD_FLAVOR=%s\n",
@@ -262,7 +263,8 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   inst_list = product->minst_list;
   db_info_ptr = product->db_info;
   instance = (t_upstyp_matched_instance *)(inst_list->data);
-  while ((loc = strstr(upto,UPSPRE))!= 0 ) 
+  while (((loc = strstr(upto,UPSPRE))!= 0 ) ||
+         ((loc = strstr(upto,"${PRODUCTS}"))!=0) )
   { count = ( loc - upto );
     strncat(newstr,upto,count);
     upto += count;
@@ -434,6 +436,23 @@ char *upsget_options(const t_upstyp_db * const db_info_ptr,
   return(string);
 }
 char *upsget_database(const t_upstyp_db * const db_info_ptr,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ t_upslst_item *db_list;
+  t_upstyp_db *db;
+  static char buffer[2028];
+  static char *string=buffer;
+  int count=0;
+  buffer[0]='\0';
+  for ( db_list=command_line->ugo_db; db_list; 
+        db_list = db_list->next, count++ )
+  { db=db_list->data;
+    if(count) strcpy(string,":");
+    strcpy(string,db->name);
+  } return(string);     
+} 
+
+char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { t_upslst_item *db_list;
