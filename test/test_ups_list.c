@@ -7,7 +7,7 @@ void print_list( t_upslst_item *list_ptr );
 
 void main( void )
 {
-  t_upslst_item *l_ptr;
+  t_upslst_item *l_ptr1, *l_ptr2;
   char *data_ptr = 0;
   
   /*
@@ -29,53 +29,73 @@ void main( void )
    */
   
   printf( "\nCreating and adding as last 1\n" );
-  l_ptr = upslst_add( 0, (void*)1 );
-  print_list( l_ptr );
+  l_ptr1 = upslst_add( 0, (void*)1 );
+  print_list( l_ptr1 );
   
   printf( "\nAdding as last 2\n" );
-  l_ptr = upslst_add( l_ptr, (void*)2 );
-  print_list( l_ptr );
+  l_ptr1 = upslst_add( l_ptr1, (void*)2 );
+  print_list( l_ptr1 );
   
   data_ptr = (char *)malloc( 1024 );
   printf( "\nInserting as first !!! %0x\n", (int)data_ptr );
-  l_ptr = upslst_insert( l_ptr, data_ptr );
-  print_list( l_ptr );
+  l_ptr1 = upslst_insert( l_ptr1, data_ptr );
+  print_list( l_ptr1 );
   
   printf( "\nAdding as last 3\n" );
-  l_ptr = upslst_add( l_ptr, (void*)3 );
-  print_list( l_ptr );
+  l_ptr1 = upslst_add( l_ptr1, (void*)3 );
+  print_list( l_ptr1 );
 
   printf( "\nAdding as last 4\n" );
-  l_ptr = upslst_add( l_ptr, (void*)4 );
-  print_list( l_ptr );
+  l_ptr1 = upslst_add( l_ptr1, (void*)4 );
+  print_list( l_ptr1 );
 
-  /*
-  printf( "Deleting the list:\n" );
-  free ( data_ptr );
-  l_ptr = upslst_free( l_ptr, ' ' );
-  print_list( l_ptr );
-  */
+  printf( "\nCreating another list and adding as last 1001\n" );
+  l_ptr2 = upslst_add( 0, (void*)4097 );
+  print_list( l_ptr2 );
+  
+  printf( "\nAdding as last 1002\n" );
+  l_ptr2 = upslst_add( l_ptr2, (void*)4098 );
+  print_list( l_ptr2 );
+
+  printf( "\nAdding as last 1003\n" );
+  l_ptr2 = upslst_add( l_ptr2, (void*)4099 );
+  print_list( l_ptr2 );
+
+  printf( "\nAdding as last 1004\n" );
+  l_ptr2 = upslst_add( l_ptr2, (void*)4100 );
+  print_list( l_ptr2 );
+
+  printf( "\nInserting list to list\n" );
+  l_ptr1 = upslst_insert_list( l_ptr1, l_ptr2 );
+  print_list( l_ptr1 );  
   
   printf( "\nDeleting 1\n" );
-  l_ptr = upslst_delete( l_ptr, (void*)1, ' ' );
-  print_list( l_ptr );
+  l_ptr1 = upslst_delete( l_ptr1, (void*)1, ' ' );
+  print_list( l_ptr1 );
   
   printf( "\nDeleting 2\n" );
-  l_ptr = upslst_delete( l_ptr, (void*)2, ' ' );
-  print_list( l_ptr );
+  l_ptr1 = upslst_delete( l_ptr1, (void*)2, ' ' );
+  print_list( l_ptr1 );
   
   printf( "\nDeleting 4\n" );
-  l_ptr = upslst_delete( l_ptr, (void*)4, ' ' );
-  print_list( l_ptr );
+  l_ptr1 = upslst_delete( l_ptr1, (void*)4, ' ' );
+  print_list( l_ptr1 );
   
   printf( "\nDeleting 3\n" );
-  l_ptr = upslst_delete( l_ptr, (void*)3, ' ' );
-  print_list( l_ptr );
+  l_ptr1 = upslst_delete( l_ptr1, (void*)3, ' ' );
+  print_list( l_ptr1 );
   
   printf( "\nDeleting %0x with option 'd'\n", (int)data_ptr );
-  l_ptr = upslst_delete( l_ptr, (void*)data_ptr, 'd' );
-  print_list( l_ptr );
+  l_ptr1 = upslst_delete( l_ptr1, (void*)data_ptr, 'd' );
+  print_list( l_ptr1 );
   
+  printf( "\nDeleting 1004\n" );
+  l_ptr1 = upslst_delete( l_ptr1, (void*)4100, ' ' );
+  print_list( l_ptr1 );
+  
+  printf( "\nDeleting all:\n" );
+  l_ptr1 = upslst_free( l_ptr1, ' ' );
+  print_list( l_ptr1 );
 }
 
 void print_list( t_upslst_item *list_ptr )
