@@ -61,8 +61,7 @@ static t_upstyp_matched_product *match_instance_core(
 static int match_from_chain( const char * const a_product,
 			     const char * const a_chain,
 			     const char * const a_version,
-			     const char * const a_upsdir,
-			     const char * const a_productdir,
+			     const t_upsugo_command * const a_command_line,
 			     const t_upstyp_db * const a_db_info,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
@@ -71,8 +70,7 @@ static int match_from_chain( const char * const a_product,
 			     t_upslst_item ** const a_minst_list);
 static int match_from_version( const char * const a_product,
 			       const char * const a_version,
-			       const char * const a_upsdir,
-			       const char * const a_productdir,
+			       const t_upsugo_command * const a_command_line,
 			       const t_upstyp_db * const a_db_info,
 			       const int a_need_unique,
 			       const t_upslst_item * const a_flavor_list,
@@ -129,20 +127,6 @@ static int g_ugo_version = 0;
 #define TMP_LISTS_SET()	\
      tmp_flavor_list.data = (void *)(inst->flavor);                  \
      tmp_quals_list.data = (void *)(inst->qualifiers);
-
-/* if ups directory and prod directory were entered on the command line then
-   use those values instead of the ones in the read in instance. */
-#define USE_CMD_LINE_INFO() \
-      if (a_upsdir) {                                \
-	tmp_upsdir = (char *)a_upsdir;               \
-      } else {                                       \
-	tmp_upsdir = inst->ups_dir;                  \
-      }                                              \
-      if (a_productdir) {                            \
-	tmp_productdir = (char *)a_productdir;       \
-      } else {                                       \
-	tmp_productdir = inst->prod_dir;             \
-      }                                              
 
 /* check the list with the a_need_unique flag.  report an error if we need
    a unique instance and there is more than one on the list. */
@@ -788,8 +772,7 @@ static t_upstyp_matched_product *match_instance_core(
       upsver_mes(MATVLEVEL, "%sMatching with Version - %s\n", VPREFIX,
 		 version);
       tmp_num_matches = match_from_version(a_prod_name, version,
-					   a_command_line->ugo_upsdir,
-					   a_command_line->ugo_productdir,
+					   a_command_line,
 					   a_db_info, a_need_unique,
 					   a_command_line->ugo_flavor,
 					   a_command_line->ugo_qualifiers, 
@@ -871,9 +854,7 @@ static t_upstyp_matched_product *match_instance_core(
       upsver_mes(MATVLEVEL, "%sMatching with Chain - %s\n", VPREFIX, chain);
       tmp_num_matches = match_from_chain(a_prod_name, chain, 
 					 a_command_line->ugo_version,
-					 a_command_line->ugo_upsdir,
-					 a_command_line->ugo_productdir,
-					 a_db_info, 
+					 a_command_line, a_db_info, 
 					 a_need_unique,
 					 a_command_line->ugo_flavor,
 					 a_command_line->ugo_qualifiers, 
@@ -918,8 +899,7 @@ static t_upstyp_matched_product *match_instance_core(
 static int match_from_chain( const char * const a_product,
 			     const char * const a_chain,
 			     const char * const a_version,
-			     const char * const a_upsdir,
-			     const char * const a_productdir,
+			     const t_upsugo_command * const a_command_line,
 			     const t_upstyp_db * const a_db_info,
 			     const int a_need_unique,
 			     const t_upslst_item * const a_flavor_list,
@@ -933,7 +913,6 @@ static int match_from_chain( const char * const a_product,
   t_upstyp_instance *inst = NULL;
   t_upstyp_matched_instance *tmp_minst_ptr = NULL, *minst;
   char *buffer = NULL;
-  char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
   t_upslst_item tmp_flavor_list = {NULL, NULL, NULL};
   t_upslst_item tmp_quals_list = {NULL, NULL, NULL};
@@ -988,18 +967,13 @@ static int match_from_chain( const char * const a_product,
 	   desired flavor and one of the desired qualifier to match */
 	TMP_LISTS_SET();
 
-	/* see if any command line info should override what we read from the
-	   files  - set tmp_upsdir, tmp_productdir */
-	USE_CMD_LINE_INFO();
-
 	upsver_mes(MATVLEVEL, "%sMatching with Version %s in Product %s\n",
 		   VPREFIX, inst->version, a_product);
 	upsver_mes(MATVLEVEL, "%sUsing Flavor = %s, and Qualifiers = %s\n",
 		   VPREFIX, (char *)(tmp_flavor_list.data),
 		   (char *)(tmp_quals_list.data));
 	tmp_num_matches = match_from_version(a_product, inst->version,
-					     tmp_upsdir, tmp_productdir,
-					     a_db_info,
+					     a_command_line, a_db_info,
 					     do_need_unique, &tmp_flavor_list,
 					     &tmp_quals_list, &cinst);
 	if (tmp_num_matches == 0) {
@@ -1050,8 +1024,7 @@ return num_matches;
  */
 static int match_from_version( const char * const a_product,
 			       const char * const a_version,
-			       const char * const a_upsdir,
-			       const char * const a_productdir,
+			       const t_upsugo_command * const a_command_line,
 			       const t_upstyp_db * const a_db_info,
 			       const int a_need_unique,
 			       const t_upslst_item * const a_flavor_list,
@@ -1068,7 +1041,7 @@ static int match_from_version( const char * const a_product,
   t_upslst_item tmp_quals_list = {NULL, NULL, NULL};
   t_upstyp_instance *inst;
   t_upstyp_matched_instance *tmp_minst_ptr = NULL, *minst;
-  char *tmp_upsdir, *tmp_productdir;
+  char *tmp_upsdir, *tmp_productdir, *tmp_tabledir;
   int do_need_unique = 1;
 
   tmp_any_flavor_list.prev = &tmp_flavor_list;
@@ -1121,9 +1094,23 @@ static int match_from_version( const char * const a_product,
 	      TMP_LISTS_SET();
 	      
 	      /* see if any command line info should override what we read from
-		 the files - set tmp_upsdir, tmp_productdir */
-	      USE_CMD_LINE_INFO();
-	      
+		 the files */
+	      if (a_command_line->ugo_U) {
+		tmp_upsdir = (char *)a_command_line->ugo_upsdir;
+	      } else {
+		tmp_upsdir = inst->ups_dir;
+	      }
+	      if (a_command_line->ugo_M) {
+		tmp_tabledir = (char *)a_command_line->ugo_tablefiledir;
+	      } else {
+		tmp_tabledir = inst->table_dir;
+	      }
+	      if (a_command_line->ugo_r) {
+		tmp_productdir = (char *)a_command_line->ugo_productdir;
+	      } else {
+		tmp_productdir = inst->prod_dir;
+	      }
+
 	      upsver_mes(MATVLEVEL, 
 			 "%sMatching with Version %s in Product %s using Table file %s\n",
 			 VPREFIX, inst->version, a_product, inst->table_file);
@@ -1132,7 +1119,7 @@ static int match_from_version( const char * const a_product,
 			 (char *)(tmp_quals_list.data));
 	      tmp_num_matches = match_from_table(a_product,
 						 inst->table_file,
-						 inst->table_dir, tmp_upsdir,
+						 tmp_tabledir, tmp_upsdir,
 						 tmp_productdir, a_db_info,
 						 do_need_unique,
 						 &tmp_flavor_list, 
