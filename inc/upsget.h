@@ -21,7 +21,7 @@
 #ifndef _UPSGET_H_
 #define _UPSGET_H_
 char *upsget_translation( const t_upstyp_matched_instance * const minstance,
-			  const t_upstyp_db *db_info_ptr,
+			  const t_upstyp_db * const db_info_ptr,
 			  const t_upsugo_command * const command_line,
 			  char * const oldstr );
 char *upsget_translation_env( char * const oldstr );
@@ -90,6 +90,6 @@ t_upstyp_product *upsget_version_file (const char * const,
 char *upsget_database(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
-char *upsget_tilde_dir(char *);
+char *upsget_tilde_dir(char * const );
 int upsget_key(const t_upstyp_instance * const);
 #endif /* _UPSGET_H_ */

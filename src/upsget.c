@@ -293,13 +293,13 @@ char *upsget_translation_env( char * const oldstr )
 
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) 
   { memset( env, 0, sizeof( env ) );
-    strncat( buf, s_loc, e_loc - s_loc );    /* copy everything upto ${     */
+    strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );  /* copy everything upto ${     */
     if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding })*/
     { upserr_add(UPS_NO_TRANSLATION, UPS_FATAL, e_loc);
       return 0;                              /* NO matching } */
     }
     e_loc += 2;                              /* Skip over the ${            */
-    strncpy( env, e_loc, s_loc - e_loc );    /* copy from there to } in env */
+    strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );    /* copy from there to } in env */
     if ( (tr_env = (char *)getenv( env )) )
     { strcat( buf, tr_env );
     } else {
@@ -340,13 +340,13 @@ char *upsget_translation_tilde( char * const oldstr )
 
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, TILDE)) != 0 ) 
   { memset( env, 0, sizeof( env ) );
-    strncat( buf, s_loc, e_loc - s_loc );    /* copy everything upto ~      */
+    strncat( buf, s_loc, (unsigned int )(e_loc - s_loc) );    /* copy everything upto ~      */
     if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding /)*/
     { s_loc = strstr( e_loc, " ");           /* set s_loc to end space */
     }
 /*    e_loc++;  oops tilde_dir does that... Skip over the ~             */
     if (s_loc)
-    { strncpy( env, e_loc, s_loc - e_loc );  /* copy from there to / in env */
+    { strncpy( env, e_loc, (unsigned int )(s_loc - e_loc) );  /* copy from there to / in env */
     } else {
       strcpy(env,e_loc);
     }
@@ -367,7 +367,7 @@ char *upsget_translation_tilde( char * const oldstr )
   }
 }
 char *upsget_translation( const t_upstyp_matched_instance * const minstance,
-			  const t_upstyp_db *db_info_ptr,
+			  const t_upstyp_db *const db_info_ptr,
 			  const t_upsugo_command * const command_line,
 			  char * const oldstr )
 {
@@ -654,7 +654,7 @@ char *upsget_database(const t_upstyp_db * const db_info_ptr,
     strcpy(string,db->name);
   } return(string);     
 } 
-char *upsget_tilde_dir(char * addr)
+char *upsget_tilde_dir(char * const addr)
 {
   struct passwd *pdp;
   static char buffer[FILENAME_MAX+1];
