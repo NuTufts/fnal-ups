@@ -1877,6 +1877,12 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 	if ( !setup_ugo_cmd->ugo_j )
 	  setup_ugo_cmd->ugo_j = ugo_cmd->ugo_j; 
 	the_ugo_cmd = setup_ugo_cmd;
+
+	/* since we have to remach, 
+	   don't use the passed matched product !!! */
+
+	mat_prod = 0;
+
 	unsetup_flag = 1;
       }
     }
