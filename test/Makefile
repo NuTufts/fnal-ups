@@ -108,6 +108,11 @@ upstst_match.o : upstst_match.c $(LIB)/libups.a
 #
 clean :
 	@ ../bin/upsClean
+	@ rm -f scripts/*/log/*.out scripts/*/log/*.out.*sh
+	@ rm -rf scripts/copy/db1/bee3/ups
+	@ rm -rf scripts/declare/dbclean scripts/declare/tostuff
+	@ rm -rf scripts/declare/products/spot/ups/toinfo
+	@ rm -rf scripts/undeclare/dbclean
 
 spotless :
 	@ ../bin/upsClean

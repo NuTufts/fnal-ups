@@ -23,4 +23,4 @@ help_file :
 #
 spotless clean :
 	@ ../bin/upsClean
-
+	@ rm -f ./ups_help.dat
