@@ -68,7 +68,7 @@ extern int g_LOCAL_VARS_DEF;
 t_cmd_info g_cmd_info[] = {
   {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z"},
   {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z"},
-  {e_list,        "list",        "a?cdDf:g:h:H:K:lm:M:noq:r:tU:vVz:Z"},
+  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z"},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z"},
   {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z"},
   {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z"},
@@ -85,7 +85,7 @@ t_cmd_info g_cmd_info[] = {
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z"},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:B:cCdDeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:uU:vVwW:x:XyYz:Z"}
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z"}
 };
 
 /*
