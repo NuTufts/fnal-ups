@@ -49,7 +49,7 @@ int main (argc,argv)
 
 	struct ups_command * uc;
 
-while ((uc = upsugo_next(argc,argv,"AacCdfghKltmMNoOPqrTuUv")) != 0 )
+while ((uc = upsugo_next(argc,argv,"AacCdfghKltmMNoOPqrTuUvz")) != 0 )
       { ups_list(uc); 
         upserr_output();
        }
