@@ -94,13 +94,16 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
       (*myfunc)(uc,afd,calledby);
    had_error = UPS_ERROR;
    if (UPS_ERROR != estatus)
-      {                                                 
-      fprintf(stderr,"function: %s\n",funcname);       
-      fprintf(stderr,"%s: %s, %s: %s\n","actual status",
-         g_error_ascii[UPS_ERROR],"expected status",    
-         g_error_ascii[estatus]);                       
-      if (UPS_ERROR) upserr_output();                  
-      }                                                
+   { fprintf(stderr,"function: %s\n",funcname);       
+     fprintf(stderr,"%s: %s, %s: %s\n","actual status",
+             g_error_ascii[UPS_ERROR],"expected status",    
+             g_error_ascii[estatus]);                       
+     /* if (UPS_ERROR) upserr_output(); DjF */ 
+   } else { /* it's expected so clear it DjF */
+     upserr_clear();
+   }
+/* last command COULD have been sucessful but still have errors DjF */
+   upserr_output(); 
    upserr_clear();
    if (had_error) continue;
    upsutl_finish_up(fufd,uc->ugo_shell,calledby,FALSE);
