@@ -124,7 +124,7 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
     all_products = upsutl_get_files(a_db, (char *)ANY_MATCH);
   } else {
     /* we only have one product to list out */
-    if (new_string = upsutl_str_create(a_command_line->ugo_product)) {
+    if ((new_string = upsutl_str_create(a_command_line->ugo_product))) {
       all_products = upslst_add(all_products, new_string);
     } 
   }
@@ -153,7 +153,7 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
       } else {
 	if (a_command_line->ugo_version) {
 	  /* we only have one version to list out */
-	  if (new_string = upsutl_str_create(a_command_line->ugo_version)) {
+	  if ((new_string = upsutl_str_create(a_command_line->ugo_version))) {
 	    all_versions = upslst_add(all_versions, new_string);
 	  } 
 	}

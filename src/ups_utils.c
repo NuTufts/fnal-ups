@@ -104,6 +104,8 @@ t_upslst_item *upsutl_free_inst_list( t_upslst_item **a_inst_list)
 
   /* Now free the list */
   *a_inst_list = upslst_free(*a_inst_list, ' ');
+
+  return NULL;
 }
 /*-----------------------------------------------------------------------
  * upsutl_get_files
@@ -128,12 +130,12 @@ t_upslst_item * upsutl_get_files(const char * const a_dir,
   DIR *dir = NULL;
   char *new_string = NULL;
   
-  if (dir = opendir(a_dir)) {
+  if ((dir = opendir(a_dir))) {
     if (! strcmp(a_pattern, ANY_MATCH)) {
       /* read each directory item and add it to the list */
       while ((dir_line = readdir(dir)) != NULL) {
 	if (strcmp(dir_line->d_name, ".") && strcmp(dir_line->d_name, "..")) {
-	  if (new_string = upsutl_str_create(dir_line->d_name)) {
+	  if ((new_string = upsutl_str_create(dir_line->d_name))) {
 	    file_list = upslst_add(file_list, (void *)new_string);
 	  } else {
 	    /* the only error from upsutl_str_create is a memory error, clean
@@ -329,10 +331,10 @@ char *upsutl_strstr( const char * const a_str, const char * const a_pattern)
   int pat_len, str_len, substr_pos;
   int i, j;
 
-  if (substr = strstr(a_str, a_pattern)) {
+  if ((substr = strstr(a_str, a_pattern))) {
     /* The pattern was found */
     str_len = (int )strlen(a_str);
-    if (new_string = upsutl_str_create((char *)a_str)) {
+    if ((new_string = upsutl_str_create((char *)a_str))) {
       /* create a new string without the pattern */
       pat_len = (int )strlen(a_pattern);
       substr_pos = (int )(substr - a_str);   /* char position of sub string */
