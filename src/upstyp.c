@@ -139,7 +139,7 @@ t_upstyp_matched_instance *ups_new_matched_instance( void )
     (t_upstyp_matched_instance *)upsmem_malloc(
 					    sizeof(t_upstyp_matched_instance));
 
-  memset( inst_ptr, 0, sizeof( t_upstyp_matched_instance ) );
+  (void) memset( inst_ptr, 0, sizeof( t_upstyp_matched_instance ) );
 
   return inst_ptr;
 }
@@ -158,23 +158,23 @@ t_upstyp_matched_instance *ups_free_matched_instance(
 {
   if (minst_ptr && all_gone(minst_ptr)) {
     if (minst_ptr->chain) {
-      ups_free_instance(minst_ptr->chain);
+      (void) ups_free_instance(minst_ptr->chain);
     }
     if (minst_ptr->version) {
-      ups_free_instance(minst_ptr->version);
+      (void) ups_free_instance(minst_ptr->version);
     }
     if (minst_ptr->table) {
-      ups_free_instance(minst_ptr->table);
+      (void) ups_free_instance(minst_ptr->table);
     }
     if (minst_ptr->xtra_chains) {
       t_upslst_item * xchain_item = NULL;
   
       for (xchain_item = minst_ptr->xtra_chains ; xchain_item ;
 	   xchain_item = xchain_item->next); {
-	ups_free_instance((t_upstyp_instance *)xchain_item->data);
+	(void) ups_free_instance((t_upstyp_instance *)xchain_item->data);
       }
     }
-    ups_free_matched_instance_structure(minst_ptr);
+    (void) ups_free_matched_instance_structure(minst_ptr);
   }
 
   return NULL;
@@ -195,7 +195,7 @@ t_upstyp_matched_instance *ups_free_matched_instance_structure(
 {
   if (minst_ptr && all_gone(minst_ptr)) {
     if (minst_ptr->xtra_chains) {
-    upslst_free(minst_ptr->xtra_chains, ' ');
+    (void) upslst_free(minst_ptr->xtra_chains, ' ');
     }
 
     upsmem_free(minst_ptr);
@@ -218,7 +218,7 @@ t_upstyp_product *ups_new_product( void )
   t_upstyp_product *prod_ptr =
     (t_upstyp_product *)upsmem_malloc( sizeof( t_upstyp_product ) );
 
-  memset( prod_ptr, 0, sizeof( t_upstyp_product ) );
+  (void) memset( prod_ptr, 0, sizeof( t_upstyp_product ) );
 
   return prod_ptr;
 }
@@ -253,20 +253,20 @@ int ups_free_product( t_upstyp_product * const prod_ptr )
     while( l_ptr ) {
       inst_ptr = l_ptr->data;
       l_ptr = upslst_delete( l_ptr, inst_ptr, ' ' );
-      ups_free_instance( inst_ptr );
+      (void) ups_free_instance( inst_ptr );
     }
 
     /* get rid of user key words */
 
-    if ( prod_ptr->user_list ) { upslst_free( prod_ptr->user_list, 'd' ); }
+    if ( prod_ptr->user_list ) { (void) upslst_free( prod_ptr->user_list, 'd' ); }
     
     /* get rid of comments */
 
-    upslst_free( prod_ptr->comment_list, 'd' );
+    (void) upslst_free( prod_ptr->comment_list, 'd' );
 
     /* get rid of config structure */
     
-    ups_free_config( prod_ptr->config );
+    (void) ups_free_config( prod_ptr->config );
 
     upsmem_free( prod_ptr );
   }
@@ -288,7 +288,7 @@ t_upstyp_instance *ups_new_instance( void )
   t_upstyp_instance *inst_ptr =
     (t_upstyp_instance *)upsmem_malloc( sizeof( t_upstyp_instance ) );
   
-  memset( inst_ptr, 0, sizeof( t_upstyp_instance ) );
+  (void) memset( inst_ptr, 0, sizeof( t_upstyp_instance ) );
 
   return inst_ptr;
 }
@@ -342,16 +342,16 @@ int ups_free_instance( t_upstyp_instance * const inst_ptr )
     
     if ( inst_ptr->db_dir ) { upsmem_free( inst_ptr->db_dir ); }
   
-    if ( inst_ptr->user_list ) { upslst_free( inst_ptr->user_list, 'd' ); }
+    if ( inst_ptr->user_list ) { (void) upslst_free( inst_ptr->user_list, 'd' ); }
     
     l_ptr = upslst_first( inst_ptr->action_list );
     while( l_ptr ) {
       act_ptr = l_ptr->data;
       l_ptr = upslst_delete( l_ptr, act_ptr, ' ' );
-      ups_free_action( act_ptr );
+      (void) ups_free_action( act_ptr );
     }
 
-    ups_free_instance( inst_ptr->sav_inst );
+    (void) ups_free_instance( inst_ptr->sav_inst );
 
     upsmem_free ( inst_ptr );
   }
@@ -373,7 +373,7 @@ t_upstyp_action *ups_new_action( void )
   t_upstyp_action *act_ptr =
     (t_upstyp_action *)upsmem_malloc( sizeof( t_upstyp_action ) );
   
-  memset( act_ptr, 0, sizeof( t_upstyp_action ) );
+  (void) memset( act_ptr, 0, sizeof( t_upstyp_action ) );
 
   return act_ptr;
 }
@@ -417,7 +417,7 @@ t_upstyp_config *ups_new_config( void )
   t_upstyp_config *conf_ptr =
     (t_upstyp_config *)upsmem_malloc( sizeof( t_upstyp_config ) );
   
-  memset( conf_ptr, 0, sizeof( t_upstyp_config ) );
+  (void) memset( conf_ptr, 0, sizeof( t_upstyp_config ) );
 
   return conf_ptr;
 }
