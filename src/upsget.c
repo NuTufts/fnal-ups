@@ -164,7 +164,7 @@ static t_var_sub g_var_subs[] = {
 /*  { "${UPS_MODIFIER", upsget_modifier, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
 /*  { "${UPS_NEWS_SOURCE_DIR", upsget_news_source_dir, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
 /*  { "${UPS_NEWS_TARGET_DIR", upsget_news_target_dir, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
-/*  { "${UPS_ORIGIN", upsget_origin, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */  */
+/*  { "${UPS_ORIGIN", upsget_origin, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
 /*  { "${UPS_PROD_CHAIN", upsget_prod_chain, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
 /*  { "${UPS_PROD_DIR_PREFIX", upsget_prod_dir_prefix, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
 /*  { "${UPS_SETUPS_DIR", upsget_setups_dir, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
