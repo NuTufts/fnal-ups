@@ -128,6 +128,9 @@ static int            g_imargin = 0;
  */
 t_upstyp_product *upsfil_read_file( const char * const ups_file )
 {
+
+  UPS_ERROR = UPS_SUCCESS;
+
   if ( !ups_file || strlen( ups_file ) <= 0 ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
     return 0;
