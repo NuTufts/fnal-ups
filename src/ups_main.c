@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 	  case e_unconfigure: ups_unconfigure(command_line, temp_file,
 					      e_unconfigure);
 	    break;
-	  case e_undeclare: ups_unk(command_line, argv[1], e_undeclare);
+	  case e_undeclare: ups_undeclare(command_line);
 	    break;
 	  case e_create: ups_create(command_line, e_create);
 	    break;

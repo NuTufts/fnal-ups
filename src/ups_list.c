@@ -211,24 +211,59 @@ void list_K(const t_upstyp_matched_instance * const instance,
 #define defaults(INSTANCE) \
 {   printf("\tVERSION=%s", minst_ptr->INSTANCE->version);            \
     printf("\tFLAVOR=%s\n", minst_ptr->INSTANCE->flavor);            \
-    if (minst_ptr->INSTANCE->qualifiers &&                           \
-       strlen(minst_ptr->INSTANCE->qualifiers))                      \
-    { printf("\t\tQUALIFIERS=%s", minst_ptr->INSTANCE->qualifiers);  \
+    if (minst_ptr->INSTANCE->qualifiers)                             \
+    { if(strlen(minst_ptr->INSTANCE->qualifiers))                    \
+      { printf("\t\tQUALIFIERS=%s", minst_ptr->INSTANCE->qualifiers);  \
+      } else {      /* damn inconsistant if you ask me */              \
+        printf("\t\tQUALIFIERS=\"\"");                                 \
+      }                                                                \
     } else {                                                         \
       printf("\t\tQUALIFIERS=\"\"");                                 \
     }                                                                \
     if (minst_ptr->xtra_chains)                                      \
-    { printf("\tCHAINS=%s", minst_ptr->INSTANCE->chain);             \
-      for (clist = minst_ptr->xtra_chains ;                          \
+    { printf("\tChains=");                                           \
+    } else {                                                         \
+      printf("\tChain=");                                            \
+    }                                                                \
+    if ( minst_ptr->INSTANCE->chain )                                \
+    { printf("%s", minst_ptr->INSTANCE->chain);                      \
+    } else {                                                         \
+      printf("\"\"");                                                \
+    }                                                                \
+    if (minst_ptr->xtra_chains)                                      \
+    { for (clist = minst_ptr->xtra_chains ;                          \
            clist ; clist = clist->next)                              \
       { cinst_ptr = (t_upstyp_instance *)clist->data;                \
         printf(",%s", cinst_ptr->chain );                            \
       }                                                              \
-    } else {                                                         \
-      if ( minst_ptr->INSTANCE->chain )                              \
-      { printf("\tCHAIN=%s", minst_ptr->INSTANCE->chain);            \
+    } printf("\n");                                                  \
+}
+#define WAW(WHAT) \
+{    if (minst_ptr->version)                                         \
+    { if (minst_ptr->version->WHAT)                                  \
+      { printf("%s", minst_ptr->version->WHAT);                      \
       } else {                                                       \
-        printf("\tCHAIN=\"\"");                                      \
+        printf("\"\"");                                              \
+      }                                                              \
+    } else {                                                         \
+      printf("\"\"");                                                \
+    }                                                                \
+    if (minst_ptr->chain)                                            \
+    { if (minst_ptr->chain->WHAT)                                    \
+      { printf(",%s", minst_ptr->chain->WHAT);                       \
+      } else {                                                       \
+        printf(",\"\"");                                             \
+      }                                                              \
+      if (minst_ptr->xtra_chains)                                    \
+      { for (clist = minst_ptr->xtra_chains ;                        \
+             clist ; clist = clist->next)                            \
+        { cinst_ptr = (t_upstyp_instance *)clist->data;              \
+          if (cinst_ptr->WHAT)                                       \
+          { printf(",%s", cinst_ptr->WHAT);                          \
+          } else {                                                   \
+            printf(",\"\"");                                         \
+          }                                                          \
+        }                                                            \
       }                                                              \
     } printf("\n");                                                  \
 }
@@ -351,6 +386,10 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upstyp_matched_instance *minst_ptr = NULL;
   t_upstyp_config  *config_ptr = 0;
   t_upslst_item *ul_ptr = 0;
+  t_upslst_item *al_ptr = 0;
+  t_upslst_item *l_ptr = 0;
+  t_upstyp_action *ac_ptr = 0;
+  char *nodes=0;
   int count=0;
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
@@ -374,7 +413,11 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           }
         }
         if (a_command_line->ugo_l && minst_ptr->version )
-        { printf("\t\tHOME=");
+        { printf("\t\tDeclared="); WAW(declared)
+          printf("\t\tDeclarer="); WAW(declarer)
+          printf("\t\tModified="); WAW(modified)
+          printf("\t\tModifier="); WAW(modifier)
+          printf("\t\tHome=");
           if (mproduct->db_info) 
           { config_ptr = mproduct->db_info->config;
             if (config_ptr) 
@@ -383,6 +426,11 @@ void list_output(const t_upslst_item * const a_mproduct_list,
             }
           }
           printf("%s\n", minst_ptr->version->prod_dir);
+          if (upsutl_is_authorized( minst_ptr, mproduct->db_info,nodes))
+          { printf("\t\tAuthorized, Nodes=%s\n",nodes);
+          } else {
+            printf("\t\tNOT Authorized, Nodes=%s\n",nodes);
+          }
           if (minst_ptr->version->ups_dir)
           { printf("\t\tUPS=%s\n", minst_ptr->version->ups_dir);
           } else {
@@ -403,10 +451,25 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           } else {
             printf("\t\tDESCRIPTION=\"\"\n");
           }
-     for ( ul_ptr = upslst_first( minst_ptr->version->user_list ); 
-            ul_ptr; ul_ptr = ul_ptr->next, count++ )
-        { printf("\t\t%s \n",ul_ptr->data); /* Give keys and values */
-      }
+          for ( ul_ptr = upslst_first( minst_ptr->version->user_list ); 
+                ul_ptr; ul_ptr = ul_ptr->next, count++ )
+          { printf("\t\t%s \n",ul_ptr->data); /* Give keys and values */
+          }
+        }
+        if (a_command_line->ugo_l) 
+        { if (minst_ptr->table)
+          { for ( al_ptr = upslst_first( minst_ptr->table->action_list ); 
+                  al_ptr; al_ptr = al_ptr->next, count++ )
+            { ac_ptr=al_ptr->data;
+              printf("\t\tAction=%s\n",ac_ptr->action);
+              if ( ac_ptr->command_list )
+              { l_ptr = upslst_first( ac_ptr->command_list );
+                for ( ; l_ptr; l_ptr = l_ptr->next )
+                { printf( "\t\t\t%s\n", (char*)l_ptr->data );
+                }
+              }
+            }
+          }
         }
         printf("\n");
       } else { 
@@ -476,7 +539,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
           if (!str_val) 
           { printf("\"\" ");
           } else {
-            printf("\"%s\" ",str_val);
+            if (strlen(str_val))
+            { printf("\"%s\" ",str_val);
+            } else { 
+              printf("\"%s\" ",l_ptr->data);
+            }
           } 
         } 
       }
@@ -492,7 +559,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
       if (!str_val) 
       { printf("\"\" ");
       } else {
-        printf("\"%s\" ",str_val);
+        if (strlen(str_val))
+        { printf("\"%s\" ",str_val);
+        } else { 
+          printf("\"%s\" ",l_ptr->data);
+        }
       } 
     }
   }

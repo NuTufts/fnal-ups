@@ -42,7 +42,7 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
 	          ups_configure.o ups_unconfigure.o ups_unsetup.o \
 	          ups_tailor.o ups_create.o ups_unk.o ups_declare.o \
-                  ups_depend.o ups_get.o
+                  ups_depend.o ups_get.o ups_undeclare.o
 
 CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsfil.A upsugo.A upsmat.A ups_list.A  \
