@@ -105,6 +105,7 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_FLAGSDEPEND", 0 },
   { "${UPS_THIS_DB", upsget_database },
   { "${UPS_SETUP", upsget_envstr },
+  { "${UPS_ORIGIN", upsget_origin },
   {  0, 0 }
 } ;
 
@@ -182,10 +183,10 @@ char *upsget_allout(const FILE * const stream,
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr); }
+      { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr); } 
       addr=upsget_extended(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"UPS_EXTENDED=%s;export UPS_EXTENDED\n",addr); }
+      { fprintf((FILE *)stream,"UPS_EXTENDED=%s;export UPS_EXTENDED\n",addr); } 
       fprintf((FILE *)stream,"UPS_THIS_DB=%s;export UPS_THIS_DB\n",
                upsget_database(db,instance,command_line));
       fprintf((FILE *)stream,"UPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
@@ -198,8 +199,7 @@ char *upsget_allout(const FILE * const stream,
                upsget_shell(db,instance,command_line));
       addr=upsget_options(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"UPS_OPTIONS=%s;export UPS_OPTIONS\n",addr); }
-      
+      { fprintf((FILE *)stream,"UPS_OPTIONS=%s;export UPS_OPTIONS\n",addr); } 
     } else { 
       fprintf((FILE *)stream,"setenv UPS_PROD_NAME=%s\n",name);
       fprintf((FILE *)stream,"setenv UPS_PROD_VERSION=%s\n",
@@ -208,10 +208,10 @@ char *upsget_allout(const FILE * const stream,
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_VERBOSE=%s\n",addr); }
+      { fprintf((FILE *)stream,"setenv UPS_VERBOSE=%s\n",addr); } 
       addr=upsget_extended(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_EXTENDED=%s\n",addr); }
+      { fprintf((FILE *)stream,"setenv UPS_EXTENDED=%s\n",addr); } 
       fprintf((FILE *)stream,"setenv UPS_THIS_DB=%s\n",
                upsget_database(db,instance,command_line));
       fprintf((FILE *)stream,"setenv UPS_OS_FLAVOR=%s\n",
@@ -315,7 +315,18 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { static char *string;
-  get_element(string,prod_dir);
+  if (command_line->ugo_r)
+  { string=command_line->ugo_productdir;
+  } else { 
+    get_element(string,prod_dir);
+  }
+  return string;
+}
+char *upsget_origin(const t_upstyp_db * const db_info_ptr,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ static char *string;
+  get_element(string,origin);
   return string;
 }
 char *upsget_product(const t_upstyp_db * const db_info_ptr,
@@ -365,38 +376,47 @@ char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { static char string[2];
+  static char NOT[]="";
   if (command_line->ugo_v)
   { sprintf(string,"%.1d",command_line->ugo_v);
     return (string);
   } else {
-    return 0;
+    return(NOT);
   } 
 }
 char *upsget_extended(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
-{ static char EXTENDED[]="extended";
+{ static char EXTENDED[]="1";
+  static char NOT[]="";
   if (command_line->ugo_e)
   { return(EXTENDED);
   } else {
-  } return 0;
+  } return(NOT);
 }
 char *upsget_options(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
-{ if (command_line->ugo_O)
+{ static char NOT[]="";
+  if (command_line->ugo_O)
   { return command_line->ugo_options;
   } else {
-    return 0;
+    return(NOT);
   }
 }
 char *upsget_database(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
-{ if ( db_info_ptr )
-  { return db_info_ptr->name;
+{ t_upslst_item *db_list;
+  if (command_line->ugo_z) 
+  { db_list=upslst_first(command_line->ugo_db);
+    return(db_list->data);
   } else {
-    return 0;
+    if ( db_info_ptr )
+    { return db_info_ptr->name;
+    } else {
+      return 0;
+    }
   }
 }
 char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,

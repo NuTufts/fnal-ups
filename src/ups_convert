@@ -422,12 +422,14 @@ sub WriteTableFile {
        }
        print TableFile "Common:\n";
        print TableFile "   Action=setup\n";
-       $key=~s/DaSeTuP/      doDefaults()\n      source(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
+       print TableFile "     doDefaults()\n";
+       $key=~s/DaSeTuP/      source(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
        $key=~s/DaSeTuP//g;
        print TableFile "$key";
        $key=~s/setup/unsetup/g;
        print TableFile "   Action=unsetup\n";
        print TableFile "$key";
+       print TableFile "     doDefaults()\n";
        $baseactions=&add_misactions;
        print TableFile "${baseactions}";
        print TableFile "End:\n";
