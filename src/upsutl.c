@@ -51,6 +51,9 @@
 #ifdef _SGIAPI
 extern int gethostname(char *, int);
 #endif
+#ifdef __linux__
+extern int gethostname(char *, int);
+#endif
 
 /* ups specific include files */
 #include "upsutl.h"
