@@ -1,0 +1,1310 @@
+#! /bin/sh
+# Copyright (c) 1998 Universities Research Association, Inc.
+#       All Rights Reserved
+#
+#
+# This material resulted from work developed under a Government Contract and
+# is subject to the following license:  The Government retains a paid-up,
+# nonexclusive, irrevocable worldwide license to reproduce, prepare derivative
+# works, perform publicly and display publicly by or for the Government,
+# including the right to distribute to other Government contractors.  Neither
+# the United States nor the United States Department of Energy, nor any of
+# their employees, makes any warranty, express or implied, or assumes any
+# legal liability or responsibility for the accuracy, completeness, or
+# usefulness of any information, apparatus, product, or process disclosed, or
+# represents that its use would not infringe privately owned rights.
+#
+
+Setups_Flag=SETUPS_PATH
+
+StartUp_Flag=UPS_START
+
+Setups_Products_Init_File=upsdb_list
+
+Setups_Products_Script=setups_products_init.sh
+
+Ups_Dir=$UPS_PROD_DIR
+ 
+Name_Of_Ups=$UPS_PROD_NAME
+
+Script_Prefix=set${Name_Of_Ups}
+
+Setups_Products_Init_Default="/\${Node}/products/ups_database/declared \
+				/usr/products/ups_database/declared \
+				/usr/products/declared \
+				/afs/fnal/products/ups_database/declared \
+				/usr/upsII/ups_database/devel \
+				/usr/upsII/ups_database/declared/oss \
+				/usr/upsII/ups_database/declared/afs"
+
+# ===  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE ===
+
+if [ x${Test_Prod_Dir} != x ]
+then
+    Ups_Dir=$Test_Prod_Dir
+fi
+
+if [ x${Ups_Dir:-} = x ]
+then
+    exit
+fi
+Node=`uname -n|cut -f1 -d'.'`
+#
+# Make an advanced shell for the products initialization script,
+# if we can.
+#
+if [ -x /bin/ksh ]
+then
+    Name_Of_Sh=/bin/ksh
+elif [ -x /bin/bash ]
+then
+    Name_Of_Sh=/bin/bash
+else
+    Name_Of_Sh=/bin/sh
+fi
+#
+# Parse the SETUPS_PATH from the dbconfig file
+#
+if [ -f $Ups_DB_Path/.upsfiles/dbconfig ]
+then
+    Setups_Home=`grep $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'`
+fi
+if [ x${Setups_Home:-} = x ]
+then
+    Setups_Home=/usr/local/etc
+fi
+
+
+#
+# determine the location for the startup and shutdown files.
+# The startup and shutdown scripts need not live in the same
+# directory as the startup and shutdown lists.
+#
+
+Startup_Home=$Setups_Home
+#Startup_Home=${Ups_DB_Path}/.upsfiles/\${Start_Or_Stop}
+
+Configure_Date=`date`
+#
+# It is not realistic to require multiple declarations into AFS space
+# Lets do it right.  We simply need to be able to write into read/write
+# AFS land and read it back to do the copies into the cache area.
+#
+# The following algorithm is known to be overly simplistic
+# A better one is in the works
+# However, this should work most of the time at Fermilab
+#
+Ups_Dir=`echo $Ups_Dir|sed 's%/afs/fnal/products%/afs/.fnal.gov/products%'`
+Ups_Dir=`echo $Ups_Dir|sed 's%/afs/fnal.gov/products%/afs/.fnal.gov/products%'`
+
+if [ ! -w $Ups_Dir ]
+then
+#
+# Woops.  Can't write in the home directory of ups.
+# This is fatal.
+#
+    echo '****'
+    echo '****'
+    echo '****' Unable to write to $Ups_Dir
+    echo '****'
+    echo '****' $Name_Of_Ups configure failure
+    echo '****'
+    echo '****'
+    exit 1
+fi
+
+if [ ! -w $Ups_Dir/ups ]
+then
+#
+# Can't write into the ups area.
+# This is  also fatal.  We must create the ups scripts.
+#
+    echo '****'
+    echo '****'
+    echo '****' Unable to write to $Ups_Dir/ups
+    echo '****'
+    echo '****' $Name_Of_Ups configure failure
+    echo '****'
+    echo '****'
+    exit 1
+fi
+
+if [ ! -d $Ups_Dir/bootstrap ]
+then
+    mkdir $Ups_Dir/bootstrap
+fi
+
+if [ ! -w $Ups_Dir/bootstrap ]
+then
+    echo '****'
+    echo '****'
+    echo '****' Unable to write to $Ups_Dir/bootstrap
+    echo '****'
+    echo '****' $Name_Of_Ups configure failure
+    echo '****'
+    echo '****'
+    exit 1
+fi
+#
+#
+# Create the local copy of the cache file.
+# This file MUST be a fresh copy to avoid complications.
+#
+if [ -f $Ups_Dir/bootstrap/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR} ]
+then
+    rm -f $Ups_Dir/bootstrap/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
+fi
+cat <<XEoF >$Ups_Dir/bootstrap/set${Name_Of_Ups}.cache.${UPS_PROD_FLAVOR}
+#
+# This file was created when ${Name_Of_Ups} ${UPS_PROD_VERSION} 
+# was configured on $Node.
+# ${Configure_Date}
+#
+$UPS_PROD_DIR
+XEoF
+#
+# Ensure that some sort of PRODUCTS initialization string exists.
+#
+if [ ! -f $Setups_Home/$Setups_Products_Init_File ]
+then
+    if [ -f $Ups_Dir/ups/$Setups_Products_Init_File ]
+    then
+        cp $Ups_Dir/ups/$Setups_Products_Init_File $Ups_Dir/bootstrap
+    else
+        cat <<XEoF >$Ups_Dir/bootstrap/$Setups_Products_Init_File 
+	${Ups_DB_Path}
+	$Setups_Products_Init_Default
+XEoF
+        cp $Ups_Dir/bootstrap/$Setups_Products_Init_File $Ups_Dir/ups
+    fi
+fi
+#
+if [ ! -x $Ups_Dir/bootstrap/$Setups_Products_Script ]
+then
+#
+# Create the script to create PRODUCTS.  NOTE: This script is 
+# preferably a korn shell, but may, with slight loss of 
+# functionality, be a bash script.  If it is forced, because 
+# neither of these exist, to run as a bourne shell, the results
+# are likely to be less than desired.
+#
+cat <<XEoF >$Ups_Dir/bootstrap/$Setups_Products_Script 
+#! $Name_Of_Sh
+#
+# Copyright (c) 1998 Universities Research Association, Inc.
+#       All Rights Reserved
+#
+#
+# This material resulted from work developed under a Government Contract and
+# is subject to the following license:  The Government retains a paid-up,
+# nonexclusive, irrevocable worldwide license to reproduce, prepare derivative
+# works, perform publicly and display publicly by or for the Government,
+# including the right to distribute to other Government contractors.  Neither
+# the United States nor the United States Department of Energy, nor any of
+# their employees, makes any warranty, express or implied, or assumes any
+# legal liability or responsibility for the accuracy, completeness, or
+# usefulness of any information, apparatus, product, or process disclosed, or
+# represents that its use would not infringe privately owned rights.
+#
+# The $Setups_Products_Script script uses the information in the 
+# $Setups_Home/$Setups_Products_Init_File which was 
+# edited when $Name_Of_Ups database was established, if present.  
+# If this information is missing, the $Setups_Products_Script 
+# will default to a copy in 
+# $Ups_Dir/ups/$Setups_Products_Init_File.
+# This may not be entirely suitable in all cases.
+#
+# This script was generated when $Name_Of_Ups was configured.
+#
+
+Setups_Home=$Setups_Home
+
+Products_String_File=$Setups_Products_Init_File
+
+# =====  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE  =====
+
+# 
+# Define the node variables.  They're all the same, in case the user goofs.
+#
+Node=\`uname -n|cut -f1 -d'.'\`
+node=\$Node; NODE=\$Node
+#
+# Find one of the PRODUCTS strings.  There should be several copies.
+# the one in $Setups_Home is preferred.
+#
+if [ -r \$Setups_Home/\$Products_String_File ]
+then
+    Products_String=\`cat \$Setups_Home/\$Products_String_File|grep -v '^#'\`
+    Products_String="\${UPS_EXTRA_DIR} \${Products_String}"
+elif [ -r $Ups_Dir/bootstrap/\$Products_String_File ]
+then
+    Products_String=\`cat $Ups_Dir/bootstrap/\$Products_String_File|grep -v '^#'\`
+    Products_String="\${UPS_EXTRA_DIR} \${Products_String}"
+elif [ -r $Ups_Dir/ups/\$Products_String_File ]
+then
+    Products_String=\`cat $Ups_Dir/ups/\$Products_String_File|grep -v '^#'\`
+    Products_String="\${UPS_EXTRA_DIR} \${Products_String}"
+fi
+Products_String="\${Products_String:-} ${Ups_DB_Path:-}"
+#
+# Search the PRODUCTS string for existing directories.  They only 
+# count if they exist.  Format the result as a UPSII PRODUCTS
+# environment variable.
+#
+prod_set=no
+for Prod in \${Products_String}
+do
+    eval "Prod=\$Prod"
+    if [ -d \$Prod ]
+    then
+	if [ \$prod_set = no ]
+        then
+	    PRODUCTS=\$Prod
+	    prod_set=yes
+
+        elif [ \`echo \$PRODUCTS|grep -c \$Prod\` = "0" ]
+        then
+	    PRODUCTS=\${PRODUCTS}:\${Prod}
+	fi
+    fi
+done
+#
+# output the result as an eval string which will set the PRODUCTS environment
+# variable in the invoking shell.  NOTE: this is shell family sensitive.
+#
+if [ x\`echo \${PRODUCTS:-}|cut -c1\` = x/ ]
+then
+    if [ \$UPS_SHELL = sh ]
+    then
+        cat <<EoF
+        PRODUCTS=\$PRODUCTS; export PRODUCTS;
+EoF
+    elif [ \$UPS_SHELL = csh ]
+    then
+        cat <<EoF
+        setenv PRODUCTS "\$PRODUCTS";
+EoF
+    fi
+fi
+XEoF
+#
+# End of the creation of the PRODUCTS script
+#
+# Make it executable.
+#
+chmod +x $Ups_Dir/bootstrap/$Setups_Products_Script
+fi
+#
+#
+# Create the setups.csh file in the bootstrap directory.
+#
+if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.csh ]
+then
+cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.csh
+#! /bin/csh
+#
+# Copyright (c) 1998 Universities Research Association, Inc.
+#       All Rights Reserved
+#
+#
+# This material resulted from work developed under a Government Contract and
+# is subject to the following license:  The Government retains a paid-up,
+# nonexclusive, irrevocable worldwide license to reproduce, prepare derivative
+# works, perform publicly and display publicly by or for the Government,
+# including the right to distribute to other Government contractors.  Neither
+# the United States nor the United States Department of Energy, nor any of
+# their employees, makes any warranty, express or implied, or assumes any
+# legal liability or responsibility for the accuracy, completeness, or
+# usefulness of any information, apparatus, product, or process disclosed, or
+# represents that its use would not infringe privately owned rights.
+#
+# The ${Script_Prefix}.csh script is designed to be sourced at shell invocation
+# including the time of login.  It uses several other scripts located
+# in $Setups_Home to determine the 
+# PRODUCTS and UPS_DIR environment variables. 
+# 
+# This script and all the scripts utilized are created when a version 
+# of $Name_Of_Ups is configured.
+#
+# The scripts utilized by the ${Script_Prefix}.csh script are:
+# 
+#    $Setups_Home/$Setups_Products_Script
+#
+#    $Setups_Home/${Script_Prefix}.common,
+#     as a last resort.
+#
+#    $Setups_Home/set${Name_Of_Ups}.cache.'<flavor>' 
+#    is used to determine the UPS_DIR variable.
+#
+
+set Setups_Home=$Setups_Home
+
+
+# =====  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE =====
+
+
+set Name_Of_Ups=$Name_Of_Ups
+setenv UPS_SHELL csh
+#
+# Determine probable flavor names for the version of $Name_Of_Ups
+# which would execute on this platform.
+#
+setenv MACH_OS \`uname -s\`
+set mach=\`echo \$MACH_OS|cut -c1-4\`
+if ( \$mach == IRIX ) setenv MACH_OS IRIX
+set Flavor=\$MACH_OS'+'\`uname -r|cut -f1 -d'.'\`
+if ( \$MACH_OS == AIX ) set Flavor=\$MACH_OS'+'\`uname -v\`
+if ( \$MACH_OS == HP-UX ) set Flavor=\$MACH_OS'+'\`uname -r|cut -f2 -d'.'\`
+#
+# Define the PRODUCTS variable, if needed
+#
+if (  ! \$?PRODUCTS ) then
+    if ( -x \${Setups_Home}/$Setups_Products_Script ) then
+        eval \`\${Setups_Home}/$Setups_Products_Script\`
+    endif
+endif
+if ( \$?UPS_DIR ) then
+    if ( x\`echo \$UPS_DIR|cut -c1\` != x/ ) then
+        unsetenv UPS_DIR
+        unset UPS_DIR
+    endif
+else
+    unsetenv UPS_DIR
+    unset UPS_DIR
+endif
+#
+# Attempt to determine the file name of the cached ups information from the 
+# naming convention and the probable flavors which might execute correctly
+# on the platform executing this script.  If found, utilize it to define
+# a usable UPS_DIR.
+#
+if ( \$?PRODUCTS && ! \$?UPS_DIR ) then
+    foreach fl ( \$Flavor \$MACH_OS NULL )
+        if ( -r \${Setups_Home}/set\${Name_Of_Ups}.cache.\${fl} ) then
+	    setenv UPS_DIR \`cat \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}|grep -v '^#'\`
+            if ( \$?UPS_DIR ) then
+               if ( -d \$UPS_DIR ) then
+	             break
+                else
+                    unsetenv UPS_DIR
+                endif
+            endif
+        endif
+    end
+endif
+#
+# If we have been unsuccessful so far, search the possible products 
+# databases for some $Name_Of_Ups which might execute on the this platform.
+#
+# This process, although thorough, is very time consuming.
+#
+if ( ! \$?UPS_DIR ) then
+    if ( -x \$Setups_Home/${Script_Prefix}.common ) then
+	eval \`\$Setups_Home/${Script_Prefix}.common\`
+    else if ( -x /usr/local/etc/${Script_Prefix}.common ) then
+	eval \`/usr/local/etc/${Script_Prefix}.common\`
+    endif
+endif
+#
+# If everything failed, report same and return.
+#
+# DO NOT EXIT - this might be the login shell.
+#
+if (! \$?UPS_DIR ) then
+    echo '****'
+    echo '****'
+    echo '**** Unable to initialize the UPSII environment'
+    echo '****'
+    echo '****'
+else
+#
+# If we have successfully managed to find a usable version of $Name_Of_Ups,
+# give this version of $Name_Of_Ups the information  found so far and let it 
+# determine the BEST version.
+#
+# This extra step ensures that the appropriate $Name_Of_Ups search order
+# is followed to arive at the final result.  It also is the step executed
+# even when PRODUCTS and UPS_DIR are known at entry.  The $Name_Of_Ups 
+# setup script may set aliases which are NOT inherited by sub-shells.
+#
+#
+#    source \$UPS_DIR/ups/setup.csh
+#    setup \$Name_Of_Ups
+    source \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
+endif
+#
+# Because this is designed to be sourced, it is nice to unset the local
+# shell variables
+#
+unset NODE
+unset node
+
+unset mach
+unset Flavor
+unset Setups_Home
+unset Name_Of_Ups
+XEoF
+fi
+#
+#
+# Create, if necessary, the setups.sh script
+#
+if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.sh ]
+then
+cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.sh
+#! /bin/sh
+#
+# Copyright (c) 1998 Universities Research Association, Inc.
+#       All Rights Reserved
+#
+#
+# This material resulted from work developed under a Government Contract and
+# is subject to the following license:  The Government retains a paid-up,
+# nonexclusive, irrevocable worldwide license to reproduce, prepare derivative
+# works, perform publicly and display publicly by or for the Government,
+# including the right to distribute to other Government contractors.  Neither
+# the United States nor the United States Department of Energy, nor any of
+# their employees, makes any warranty, express or implied, or assumes any
+# legal liability or responsibility for the accuracy, completeness, or
+# usefulness of any information, apparatus, product, or process disclosed, or
+# represents that its use would not infringe privately owned rights.
+#
+# The ${Script_Prefix}.sh script is designed to be sourced at shell invocation
+# including the time of login.  It uses several other scripts located in  
+# $Setups_Home to determine the 
+# PRODUCTS and UPS_DIR environment variables.This script and all the 
+# scripts utilized are created when a version of $Name_Of_Ups is configured.
+#
+# The scripts utilized by the ${Script_Prefix}.sh script are:
+# 
+#    $Setups_Home/$Setups_Products_Script
+#
+#    $Setups_Home/${Script_Prefix}.common,
+#    as a last resort.
+#
+#    $Setups_Home/set${Name_Of_Ups}.cache.'<flavor>' 
+#    is used to determine the value of UPS_DIR.
+#    
+#
+# ===		SYS ADMIN AREA		=====
+#
+# The following shell variables are defined here:
+#
+#       Setups_Home
+#
+#       Name_Of_Ups
+#
+# Please check their values and change, if necessary, following
+# their descriptions below.
+#
+#
+# Because the shell languages manage to lose the filename
+# of the file being sourced the Setups_Home variable
+# exists to assist in installing the codes on non Fermilab
+# machines.  Change this to the directory in which the
+# setups.* scripts live.
+
+Setups_Home=$Setups_Home
+
+# Name_Of_Ups should always be ups at Fermilab, unless in beta test
+
+Name_Of_Ups=$Name_Of_Ups
+  
+# === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
+
+UPS_SHELL=sh; export UPS_SHELL
+#
+# The following kludge fixes the problem caused by switching shell
+# families.  Many members of the bourne shell family do not set the
+# SHELL environment variable, thus leaving it at its previous value.
+#
+# Some versions of $Name_Of_Ups use this to determine the instructions
+# to be generated for execution.
+#
+if [ \`echo x\${SHELL:-}|grep -c csh\` != '0' ]
+then
+    SHELL=/bin/sh;export SHELL
+fi
+#
+# Determine probable flavor names for the version of $Name_Of_Ups
+# which would execute on this platform.
+#
+Node=\`uname -n|cut -f1 -d'.'\`
+MACH_OS=\`uname -s\`
+if [ \`echo \$MACH_OS|cut -c1-4\` = IRIX ]
+then
+    MACH_OS=IRIX
+fi
+export MACH_OS
+Flavor=\$MACH_OS'+'\`uname -r|cut -f1 -d'.'\`
+if [ \$MACH_OS = AIX ]
+then
+    Flavor=\$MACH_OS'+'\`uname -v\`
+fi
+if [ \$MACH_OS = HP-UX ]
+then
+    Flavor=\$MACH_OS'+'\`uname -r|cut -f2 -d'.'\`
+fi
+if [ x\`echo \${UPS_DIR:-}|cut -c1\` = x/ ]
+then
+    if [ ! -d \$UPS_DIR ]
+    then
+	unset UPS_DIR
+    fi
+else
+	unset UPS_DIR
+fi
+#
+# Attempt to define the PRODUCTS variable.
+#
+if [ x\`echo \${PRODUCTS:-}|cut -c1\` != x/ ]
+then
+    if [ -x \${Setups_Home}/$Setups_Products_Script ] 
+    then
+        eval \`\${Setups_Home}/$Setups_Products_Script\`
+    fi   
+fi
+#
+# Attempt to determine the file name of the cached ups information from the 
+# naming convention and the probable flavors which might execute correctly
+# on the platform executing this script.  If found, utilize it to define
+# a UPS_DIR.
+#
+if [ x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a x\$UPS_DIR = x ]
+then
+    for fl in \$Node \$Flavor \$MACH_OS NULL
+    do
+        if [ -r \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl} ]
+        then
+            UPS_DIR=\`cat \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}|grep -v '^#'\`
+        fi
+        if [ x\${UPS_DIR:-} != x ]
+        then
+            if [ -d \$UPS_DIR ]
+            then
+                break
+            else
+                unset UPS_DIR
+            fi
+        fi
+   done
+fi
+#
+# If we have been unsuccessful so far, search the possible products 
+# databases for some $Name_Of_Ups which might execute on this platform.
+#
+# This process, although thorough, is very time consuming.
+#
+if [ x\${UPS_DIR:-} = x ]
+then
+    if [ -x \$Setups_Home/${Script_Prefix}.common ]
+    then
+        eval \`\$Setups_Home/${Script_Prefix}.common sh\`
+    elif [ -x /usr/local/etc/${Script_Prefix}.common ]
+    then
+        eval \`/usr/local/etc/${Script_Prefix}.common sh\`
+    fi
+fi
+if [ x\${UPS_DIR:-} != x ]
+then
+#
+# If we have successfully managed to find a usable version of $Name_Of_Ups,
+# give this version of $Name_Of_Ups the information  found so far and let it 
+# determine the BEST version.
+#
+# This extra step ensures that the appropriate $Name_Of_Ups search order is
+# followed to arive at the final result.  It also is the step executed even
+# when PRODUCTS and UPS_DIR are known at entry.  The $Name_Of_Ups setup script
+# may define functions which are NOT inherited by sub-shells.
+#
+#	. \$UPS_DIR/ups/setup.sh
+#	setup \$Name_Of_Ups
+	. \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
+else
+#
+# If everything failed, report same and return.
+#
+# DO NOT EXIT - this might be the login shell.
+#
+	echo '****'
+	echo '**** Unable to initialize UPSII environment'
+	echo '****'
+fi
+#
+# Because this is designed to be "sourced", its nice to unset the shell
+# variables.
+#
+unset Node
+unset Flavor
+unset Setups_Home
+unset Name_Of_Ups
+XEoF
+#
+#
+# End of the creation of the setups.sh script.  
+#
+fi
+#
+# Create the startup and shutdown scripts.
+#
+ 
+Boot_Start=''
+Boot_Start=`grep -i $StartUp_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'` 
+if [ x${Boot_Start:-} = xyes ]
+then
+
+for Start_Or_Stop in startup shutdown
+do
+cat <<XEoF >$Ups_Dir/ups/ups_${Start_Or_Stop}
+#!/bin/sh 
+#
+#================== Copyright Notice =====================
+# 
+#Copyright (c) 1990 Universities Research Association, Inc.
+#                  All Rights Reserved
+# 
+#=========================================================
+#
+# The primary functionality of the $Start_Or_Stop script is to provide the
+# basic ups environment for the products which will be started as a
+# result of sourcing the appropriate file.  No attempt is made to
+# determine that the file being sourced is appropriate in other then
+# name.
+#
+# The algorithm employed here looks in the PRODUCTS environment
+# variable for directories of the form /.../.upsfiles/${Start_Or_Stop},
+# /.../${Start_Or_Stop}, or /.../../${Start_Or_Stop} for ${Start_Or_Stop} files of the
+# form \$Node.products or \$MACH_OS.products.  Where \$Node is the
+# unqualified name of the machine on which the script is executing and 
+# \$MACH_OS is the base level operating system name as returned by uname -s.  
+#
+# Only the first such file is sourced from the first directory in which 
+# one is found. 
+#
+# The $Start_Or_Stop script was generated when $Name_Of_Ups was configured.
+#
+
+Script_Prefix=$Script_Prefix
+
+Setups_Home=$Setups_Home
+
+Ups_DB_Path=$Ups_DB_Path
+
+Setup_List=${Ups_DB_Path}/.upsfiles/${Start_Or_Stop}
+
+# ===== DO NOT EDIT BELOW THIS LINE  ====  DO NOT REMOVE THIS LINE ====
+
+# 
+# set the appropriate environmental variables for root 
+# 
+if [ ! -f /usr/local/etc/setpath.sh ]
+then
+    PATH=\${PATH}:/usr/local/bin; export PATH 
+else 
+    . /usr/local/etc/setpath.sh 
+fi 
+if [ ! -f \$Setups_Home/\${Script_Prefix}.sh ]
+then
+    echo '****'
+    echo '****' \$Name_Of_Ups initialization file 
+    echo '****' \$Setups_Home/\${Script_Prefix}.sh not found
+    echo '****'
+    exit 1
+else	
+    . \$Setups_Home/\${Script_Prefix}.sh
+fi
+                                              
+Node=\`uname -n|cut -f1 -d'.'\`               
+                                              
+MACH_OS=\`uname -s\`                          
+if [ \`echo \$MACH_OS|cut -c1-4\` = IRIX ]    
+then                                          
+    MACH_OS=IRIX                              
+fi                                            
+                                              
+#for starts in \$Startup_Home
+for starts in \`echo \${PRODUCTS}|tr ':' ' '\`
+do
+    starts_dir=\$starts
+    if [ ! -d \$starts_dir ]
+    then
+	continue
+    fi
+    if [ -d \$starts/.upsfiles/$Start_Or_Stop ]
+    then
+	starts_dir=\$starts/.upsfiles/$Start_Or_Stop
+    elif [ -d \$starts/$Start_Or_Stop ]
+    then
+        starts_dir=\$starts/$Start_Or_Stop
+    elif [ -d \$starts/../$Start_Or_Stop ]
+    then
+        starts_dir=\$starts/../$Start_Or_Stop
+    fi
+    started='0';
+#
+# execute the appropriate node.products file
+#
+    if [ -f \$starts_dir/\$Node.products ]
+    then 
+	. \$starts_dir/\$Node.products
+	started='1'
+#
+# execute the appropriate flavor.products file
+# 
+    elif [ -f \$starts_dir/\$MACH_OS.products ]
+    then
+	. \$starts_dir/\$MACH_OS.products
+	started='1'
+    fi 
+    if [ \$started = '1' ]
+    then
+	break
+    fi
+done
+#
+# If we made it this far, we found nothing to start
+# Report the fact.
+#
+if [ \$started = '0' ]
+then
+    cat <<EoF
+    '****'
+    '****' No $Start_Or_Stop files were found - nothing done.
+    '****'
+EoF
+fi
+XEoF
+chmod 0771 $Ups_Dir/ups/ups_${Start_Or_Stop}
+done
+fi
+#
+#
+# Create the setups.common.  It is sincerely hoped that 
+# this will never be needed.
+#
+# IT IS  V E R  Y    S   L    O     W
+#
+if [ ! -r $Ups_Dir/bootstrap/${Script_Prefix}.common ]
+then
+    cat <<XEoF > $Ups_Dir/bootstrap/${Script_Prefix}.common 
+#! /bin/sh 
+# Copyright (c) 1998 Universities Research Association, Inc.
+#       All Rights Reserved
+#
+#
+# This material resulted from work developed under a Government Contract and
+# is subject to the following license:  The Government retains a paid-up,
+# nonexclusive, irrevocable worldwide license to reproduce, prepare derivative
+# works, perform publicly and display publicly by or for the Government,
+# including the right to distribute to other Government contractors.  Neither
+# the United States nor the United States Department of Energy, nor any of
+# their employees, makes any warranty, express or implied, or assumes any
+# legal liability or responsibility for the accuracy, completeness, or
+# usefulness of any information, apparatus, product, or process disclosed, or
+# represents that its use would not infringe privately owned rights.
+#
+# Setups common
+#
+# This is the work-horse of the setupsII family.  The primary
+# function is to determine where the "current" version of ups
+# suitable to be executed on the resident node is located.
+#
+# This file was created by the $Name_Of_Ups configure script when
+# $Name_Of_Ups was installed.
+#
+#
+#
+# ===			SYS ADMIN AREA 			===
+#
+# The following shell variables are defined here:
+#
+#	Setups_Home_Dir
+#
+#	Setups_Product_Init_File
+#
+#	Name_Of_Ups
+#
+# Please check their values and change, if necessary, following 
+# their descriptions below.
+#
+#	
+# Because the shell languages manage to lose the filename
+# of the file being sourced, the Setups_Home_Dir variable
+# exists to assist in installing the codes on non Fermilab
+# machines.  Change this to the directory in which the
+# setups.* scripts live.
+
+Setups_Home_Dir=$Setups_Home
+
+Setups_Product_Init_File=$Setups_Products_Init_File
+
+Name_Of_Ups=$Name_Of_Ups
+#
+# The following sets the default value for the product_string.
+# Later logic will attempt to find the value defined when 
+# the database was initialized
+#
+
+Product_String="\${UPS_EXTRA_DIR:-} \
+	    ${Ups_DB_Path:-} \
+            /\${Node}/products/ups_database/declared \
+            ~products/ups_database/declared \
+            ~products/ups_database \
+            ~products/upsdb \
+            /usr/products/ups_database/declared \
+		/usr/products/ups_database \
+		/usr/products/declared \
+            /afs/fnal/products/ups_database/declared \
+           /afs/fnal/products/upsdb \
+    		/usr/upsII/ups_database/devel \
+		/usr/upsII/ups_database/declared/oss \
+		/usr/upsII/ups_database/declared/afs"
+
+#
+# === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
+
+Shell=\$UPS_SHELL
+
+Node=\`uname -n|cut -f1 -d'.'\`
+
+if [ -r \$Setups_Home_Dir/\$Setups_Product_Init_File ]
+then
+	Product_String=\`cat \$Setups_Home_Dir/\$Setups_Product_Init_File|grep -v '^#'\`
+elif [ -r /usr/local/etc/\$Setups_Product_Init_File ]
+then
+	Product_String=\`cat /usr/local/etc/\$Setups_Product_Init_File|grep -v '^#'\`
+fi
+#
+# Determine a likely flavor to search for.  The actual search 
+# should find something useful on this platform.
+#
+MACH_OS=\`uname -s\`
+if [ \`echo \$MACH_OS|cut -c1-4\` = IRIX ]
+then
+    MACH_OS=IRIX
+fi
+export MACH_OS
+r=\`uname -r|cut -f1 -d'.'\`
+if [ \$MACH_OS = AIX ]
+then
+    r=\`uname -v\`
+fi
+if [ \$MACH_OS = HP-UX ]
+then
+    r=\`uname -v|cut -f2 -d'.'\`
+fi
+Flavor_Wanted=\${MACH_OS}+\${r}
+# 
+# All right.  Now $Name_Of_Ups is still a $Name_Of_Ups product
+# as such it must live in a PRODUCTS database.
+#
+# Find the PRODUCTS databases.
+#
+if [ "x\`echo \${PRODUCTS:-}|cut -c1\`" != "x/" ]
+then
+    prodset=no
+    for Prod in \$Product_String
+    do
+        if [ -d \$Prod ]
+        then
+	    if [ \$prodset = no ]
+            then
+		PRODUCTS=\$Prod
+		prodset=yes
+            elif [ \`echo \$PRODUCTS|grep -c \$Prod\` = "0" ]
+            then
+                PRODUCTS="\$PRODUCTS' '\${Prod}"
+            fi
+        fi
+    done
+fi
+#
+# Now for the time consuming search of the PRODUCTS for an 
+# appropriate 'current' version of $Name_Of_Ups.
+#
+if [ "x\`echo \${PRODUCTS:-}|cut -c1\`" = "x/" ]
+then
+    PRODUCTS=\`echo \$PRODUCTS|tr ':' ' '\`
+    for Prod in \${PRODUCTS}
+    do
+	if [ -r \$Prod/\${Name_Of_Ups}/current.chain ]
+	then
+	    Parse_curr=\$Prod/\${Name_Of_Ups}/current.chain
+	    while read string
+	    do	
+		key=\`echo \$string|cut -f1 -d'=' -s|tr 'a-z' 'A-Z'\`
+		val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'\`
+		if [ x\${val} != x ]
+		then
+		    if [ "\$key" = "FLAVOR" ]
+		    then
+			FLAVOR=\$val
+		    elif [ "\$key" = "VERSION" ]
+		    then
+			VERSION=\$val
+		    fi
+		fi
+		if [ x\${VERSION} != x -a x\${FLAVOR} != x ]
+		then
+		    if [ \$FLAVOR = \$Flavor_Wanted -o \$FLAVOR = \$MACH_OS ]
+		    then
+			Ups_Version_File=\${VERSION}.version
+			Ups_Flavor=\$FLAVOR
+			Ups_Version=\$VERSION
+			Parse_ver=\$Prod/\${Name_Of_Ups}/\$Ups_Version_File
+        		while read string
+        		do
+            		    key=\`echo \$string|cut -f1 -d'='|tr 'a-z' 'A-Z'\`
+            		    val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'\`
+            		    if [ "x\${key}" = xFLAVOR ]
+            		    then
+                		FLAVOR=\$val
+            		    fi
+            		    if [ "x\${key}" = xPROD_DIR ]
+            		    then
+                		PROD_DIR=\$val
+            		    fi
+            		    if [ x\${FLAVOR} != x -a x\${PROD_DIR} != x ]
+            		    then
+                		if [ \$FLAVOR = \$Ups_Flavor ]
+                		then
+                    		    UPS_DIR=\$PROD_DIR;export UPS_DIR
+				    export PRODUCTS
+#				    . \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
+    				    if [ \$Shell = 'sh' ]
+    				    then
+        				cat <<EoF
+        				PRODUCTS="\${PRODUCTS}"; export PRODUCTS;
+        				UPS_DIR=\$UPS_DIR; export UPS_DIR;
+EoF
+    				    elif [ \$Shell = 'csh' ]
+    				    then
+        				cat <<EoF
+        				setenv PRODUCTS "\${PRODUCTS}";
+        				setenv UPS_DIR \$UPS_DIR;
+EoF
+    				    else
+        				cat <<EoF
+        				echo '**';
+        				echo '**' Shell class "\$Shell" unknown;
+        				echo '**';
+EoF
+				    fi
+				    touch /tmp/.__SeTuPs_.\$$
+                    		    break	# exit while read version file
+                		fi
+            		    FLAVOR=''
+            		    PROD_DIR=''
+            		    fi
+        		done < \$Parse_ver
+			rm -f /tmp/VSeTuPs.\$$
+			if [ -r /tmp/.__SeTuPs_.\$$ ]
+			then
+			    break	# exit while read current.chain
+			fi
+		    fi
+		    FLAVOR=''
+		    VERSION=''
+		fi
+	    done < \$Parse_curr
+	    rm -f /tmp/.SeTuPs.\$$
+	    if [ -r /tmp/.__SeTuPs_.\$$ ]
+	    then
+		break	# Exit for Prod
+	    fi
+        fi
+    done        # End of for Prod
+
+rm -f /tmp/.__SeTuPs_.\$$
+fi
+XEoF
+#
+# End of the creation phase of setups.common
+fi
+# Make setups.common executable
+#
+chmod +x $Ups_Dir/bootstrap/${Script_Prefix}.common
+#
+#
+#                        U P S   S U B - D I R E C T O R Y
+#
+# Begin the creation phase for the usual ups scripts
+#
+# Create the current script
+#
+if [ -r $Ups_Dir/ups/current ]
+then
+    rm -f $Ups_Dir/ups/current
+fi
+cat <<XEoF >$Ups_Dir/ups/current
+#! /bin/sh
+# Copyright (c) 1998 Universities Research Association, Inc.
+#       All Rights Reserved
+#
+#
+# This material resulted from work developed under a Government Contract and
+# is subject to the following license:  The Government retains a paid-up,
+# nonexclusive, irrevocable worldwide license to reproduce, prepare derivative
+# works, perform publicly and display publicly by or for the Government,
+# including the right to distribute to other Government contractors.  Neither
+# the United States nor the United States Department of Energy, nor any of
+# their employees, makes any warranty, express or implied, or assumes any
+# legal liability or responsibility for the accuracy, completeness, or
+# usefulness of any information, apparatus, product, or process disclosed, or
+# represents that its use would not infringe privately owned rights.
+#
+# Current script for $Name_Of_Ups
+#
+# This file is created by the $Name_Of_Ups product configure script.
+#
+# The primary function of this script is to copy the files from 
+# the bootstrap sub-directory of the $Name_Of_Ups product to the 
+# $Setups_Home directory, if needed.
+#
+
+Name_Of_Ups=$Name_Of_Ups
+
+Setups_Home=$Setups_Home
+
+Startup_Home=$Startup_Home
+
+# Setups_Products_Init_File=$Setups_Products_Init_File
+
+# Setups_Products_Script=$Setups_Products_Script
+
+# =====  DO NOT EDIT BELOW THIS LINE  ===   DO NOT REMOVE THIS LINE  ====
+
+Ups_Dir=$UPS_PROD_DIR
+
+if [ x\${Test_Prod_Dir} != x ]
+then
+    Ups_Dir=\$Test_Prod_Dir
+fi
+
+error='0'
+#
+# If the $Setups_Home is in AFS space, 
+# force it to the read/write area.
+#
+# The following algorithm is known to be overly simplistic
+# A better one is in the works
+# However, this should work most of the time at Fermilab
+#
+if [ ! -w \$Setups_Home ]
+then
+    Setups_Home=\`echo \$Setups_Home|sed 's%/afs/fnal/products%/afs/.fnal.gov/products%'\`
+    Setups_Home=\`echo \$Setups_Home|sed 's%/afs/fnal.gov/products%/afs/.fnal.gov/products%'\`
+fi
+if [ ! -w \$Setups_Home ]
+then
+    echo '****'
+    echo '****'
+    echo '****' Unable to write to \$Setups_Home
+    echo '****'
+    echo '****' \$Name_Of_Ups current script failure
+    echo '****'
+    echo '****'
+    exit 1
+fi
+#
+# If this version of $Name_Of_Ups was declared in AFS space, we wrote the
+# bootstrapping files into the read/write area.  Force reads from there.
+#
+# The following algorithm is known to be overly simplistic
+# A better one is in the works
+# However, this should work most of the time at Fermilab
+#
+Ups_Dir=\`echo \$Ups_Dir|sed 's%/afs/fnal/products%/afs/.fnal.gov/products%'\`
+Ups_Dir=\`echo \$Ups_Dir|sed 's%/afs/fnal.gov/products%/afs/.fnal.gov/products%'\`
+#
+# Don't forget to copy the ${Script_Prefix}.common script to
+# /usr/local/etc.  Just in case everything else
+# fails
+#
+if [ -w /usr/local/etc ]
+then
+    cp \$Ups_Dir/bootstrap/${Script_Prefix}.common /usr/local/etc
+fi
+#
+# Move all the files from the bootstrap directory to 
+# $Setups_Home.
+# Only move the files which have changed
+#
+#if [ -f \$Ups_Dir/bootstrap/set\${Name_Of_Ups}.cache.\* ]
+#then
+    for filex in \$Ups_Dir/bootstrap/* 
+    do
+        Diff_rc='0'
+	file=\`echo \$filex|sed "s%\$Ups_Dir/bootstrap/%%"\`
+        if [ ! -f \$Setups_Home/\$file ]
+        then
+            Diff_rc='1'
+        else
+            diff -b \$Ups_Dir/bootstrap/\$file \$Setups_Home/\$file >/dev/null
+            Diff_rc=\$?
+        fi
+        if [ \$Diff_rc != '0' ]
+        then
+            cp \$Ups_Dir/bootstrap/\$file \$Setups_Home
+	    if [ \$? != '0' ]
+	    then
+		error='1'
+		echo '****' 
+		echo '****' An error has prevented the copy of
+		echo '****' \$Ups_Dir/bootstrap/\$file to 
+		echo '****' \$Setups_Home
+		echo '****'
+	    else
+#
+# The removal of the file avoids a possible clash if
+# $Name_Of_Ups is renamed.  There would still be files
+# laying around with possibly BAD data.  Because the names
+# of the files are related to the name of the product, as
+# declared, the configure script would be unable to detect
+# the problem.
+#
+#
+		rm -f \$Ups_Dir/bootstrap/\$file
+	    fi
+	else
+	    rm -f \$Ups_Dir/bootstrap/\$file
+        fi
+    done
+#fi
+
+if [ \$error = '1' ]
+then
+    echo '****' 
+    echo '**** Error(s) have caused the current script to fail'
+    echo '****'
+    echo '****'
+    exit 1
+fi
+#
+# Copy the startup and shutdown scripts to their final
+# resting place. This is sensitive to the structure
+# of the directory path.  Sub-directories may need to
+# be to be created.
+#
+for Start_Or_Stop in startup shutdown
+do
+    if [ -f \$Ups_Dir/ups/\ups_${Start_Or_Stop} ]
+    then
+	if [ \`echo \$Startup_Home|grep -c '.upsfiles'\` != 0 ]
+	then
+ 	    if [ ! -d \$Startup_Home/\$Start_Or_Stop ]
+	    then
+	        mkdir \$Startup_Home/\$Start_Or_Stop
+	    fi
+    	    cp \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/\$Start_Or_Stop/ups_\${Start_Or_Stop}
+            cp  \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/\$Start_Or_Stop/ups_\${Start_Or_Stop}.sh       
+            cp  \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/\$Start_Or_Stop/ups_\${Start_Or_Stop}.csh
+
+	else
+	    cp  \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}
+	    cp  \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}.sh 
+	    cp  \$Ups_Dir/ups/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}.csh 
+	fi     
+   fi
+done
+    
+XEoF
+#
+# End of the creation of the current script
+#
+# Make it executable
+#
+chmod +x $Ups_Dir/ups/current
+#
+#
+# Create the uncurrent script
+#
+if [ -w $Ups_Dir/ups/uncurrent ]
+then
+    rm -f $Ups_Dir/ups/uncurrent
+fi
+cat <<XEoF >$Ups_Dir/ups/uncurrent
+#! /bin/sh
+# Copyright (c) 1998 Universities Research Association, Inc.
+#       All Rights Reserved
+#
+#
+# This material resulted from work developed under a Government Contract and
+# is subject to the following license:  The Government retains a paid-up,
+# nonexclusive, irrevocable worldwide license to reproduce, prepare derivative
+# works, perform publicly and display publicly by or for the Government,
+# including the right to distribute to other Government contractors.  Neither
+# the United States nor the United States Department of Energy, nor any of
+# their employees, makes any warranty, express or implied, or assumes any
+# legal liability or responsibility for the accuracy, completeness, or
+# usefulness of any information, apparatus, product, or process disclosed, or
+# represents that its use would not infringe privately owned rights.
+#
+# The ups product uncurrent script
+#
+# The goal of this script is to prevent the overlapping of cache data.
+# One of the problems with the caching of setups data is that the data
+# could wind up pointing to a non-current product instance.  The
+# instance might even have been removed.
+#
+# This script attempts to remove the cache file associated with the
+# product flavor.  The uncurrent phase of ups will make the instance
+# non-current.
+#
+# Should the removal phase fail, an error message will be printed
+# with a suggested course of action.
+#
+# This file was created when the $Name_Of_Ups product was configured.
+#
+
+Name_Of_Ups=$Name_Of_Ups
+
+Setups_Home=$Setups_Home
+
+# ===  DO NOT EDIT BELOW THIS LINE  =====  DO NOT REMOVE THIS LINE  =====
+
+#
+# Don't  try to remove a non-existant file
+#
+if [ ! -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR} ]
+    exit 0
+fi
+
+#
+#Remove the setups.cache file from 
+# $Setups_Home
+#
+if [ -w \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR} ]
+then
+    rm -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR}
+else
+#
+# If we can't remove the file, print error message and fail.
+#
+    echo '****' 
+    echo '****'
+    echo '****' Cannot remove \$Setups_Home/set\${Name_Of_Ups}.cache.\${UPS_PROD_FLAVOR
+    echo '****' Insuffient privilege.
+    echo '****'
+    echo '****' If this is being executed as part of the process of making 
+    echo '****' \$Name_Of_Ups current, the current script is also likely to fail.
+    echo '****'
+    echo '****' Please notify your System Administrator.
+    echo '****'
+    echo '****' \$Name_Of_Ups uncurrent script failed
+    echo '****'
+#    exit 1
+fi
+XEoF
+#
+# End of creation of uncurrent
+#
+# Make it executable
+#
+chmod +x $Ups_Dir/ups/uncurrent
+#
+# Whew 
+#
+echo '**'
+echo '**' $Name_Of_Ups $UPS_PROD_VERSION has been successfully configured
+echo '**'

@@ -1,0 +1,34 @@
+File=Table
+Product=ups
+#*************************************************
+# Starting Group definition
+Group:
+Flavor=*
+Qualifiers=""
+
+Common:
+   Action=uncurrent
+     doDefaults()
+     envSet(Ups_DB_Path, ${UPS_THIS_DB})
+     execute(${UPS_PROD_DIR}/ups/uncurrent)
+   Action=unconfigure
+     doDefaults{}
+     execute(${UPS_PROD_DIR}/ups/unconfigure)
+   Action=configure
+     doDefaults()
+     envSet(Ups_DB_Path, ${UPS_THIS_DB})
+      execute(${UPS_PROD_DIR}/ups/configure})
+   Action=current
+     doDefaults()
+     envSet(Ups_DB_Path, ${UPS_THIS_DB})
+      execute(${UPS_PROD_DIR}/ups/current})
+   Action=setup
+     doDefaults()
+      sourceRequired(${UPS_PROD_DIR}/ups/setup.${UPS_SHELL})
+   Action=unsetup
+      sourceRequired(${UPS_PROD_DIR}/ups/unsetup.${UPS_SHELL})
+     doDefaults()
+End:
+# End Group definition
+#*************************************************
+

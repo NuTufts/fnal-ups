@@ -1,0 +1,40 @@
+# Sample upsdb_list file.
+#
+# This template is provided as an example.  There
+# has been no attempt to provide all possible formats
+# or directories.
+#
+# Please modify the list below to include
+# those directories in which products are likely
+# to be found on any nodes of this cluster.
+#
+# The directories will be searched in the order of this
+# list, after modification, for ups product resolution.
+#
+# There is NO requirement that any directory
+# exist on all nodes.  However, it is important
+# that at least one of the directories exist.
+# Further, it is required that at least one of the
+# existing directories be a UPSII database containing
+# the ups product.
+#
+# If there are node specific databases,
+# the Node variable is defined for the database
+# search routines as the unqualified node name of
+# the machine on which the setups script is executing.
+#
+# Tilde (~) expansion is supported as the
+# home directory of a user name.
+#
+${Node}/products/ups_database/declared
+~products/ups_database/declared 
+~products/ups_database 
+~products/upsdb 
+/usr/products/ups_database/declared 
+/usr/products/ups_database 
+/usr/products/declared 
+/afs/fnal/products/ups_database/declared 
+/afs/fnal/products/upsdb 
+/usr/upsII/ups_database/devel 
+/usr/upsII/ups_database/declared/oss 
+/usr/upsII/ups_database/declared/afs
