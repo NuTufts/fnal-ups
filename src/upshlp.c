@@ -62,9 +62,9 @@ int upshlp_command(const char * const what)
     struct  upslst_item * l_ptr=0;
     char    * addr=0;
     char    * data;
-    char    * command;
+    char    * command=0;
     int     count=0;
-    char    * option;
+    char    * option=0;
     char    * last ;
     int     found=0;			/* did I find the command? */
     char    * erupt_dir;
