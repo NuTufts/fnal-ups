@@ -489,27 +489,26 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		  /* update the mproduct_list structure with the new info */
 		  ADD_TO_MPRODUCT_LIST();
 		  
-		  /* may no longer need version list - free it */
-		  if (! got_all_versions) {
-		    all_versions = upslst_free(all_versions, do_delete);
-		  }
-		  
-		  /* may no longer need chain list - free it */
-		  if (! got_all_chains) {
-		    all_chains = upslst_free(all_chains, do_delete);
-		  }
-		
 		  /* get out of the loop if we got an error */
 		  if (UPS_ERROR != UPS_SUCCESS) {
 		    if (!a_need_unique) {
 		      /* we are looking for possibly many instances.  skip the
 			 error if current instance could not be found and look
 			 for the next one. error message is in error buffer. */
-		      if (UPS_ERROR == UPS_NO_TABLE_MATCH ||
-			  UPS_ERROR == UPS_NO_VERSION_MATCH) {
-			g_ups_error = UPS_ERROR;
-			/* erase the last error from the error buffer */
-			upserr_backup();
+		      if (UPS_ERROR == UPS_NO_VERSION_MATCH  ||
+			  UPS_ERROR == UPS_NO_TABLE_MATCH) {
+			if (UPS_ERROR == UPS_NO_TABLE_MATCH) {
+			  g_ups_error = UPS_ERROR;
+			} else if (! all_versions) {
+			  /* if the user asked for versions and we did not find
+			     them, ignore the error, not all products will have
+			     the same versions.  however if the user asked for
+			     chains and we could not find the version this is
+			     an error we need to report. */
+			  g_ups_error = UPS_ERROR;
+			  /* erase the last error from the error buffer */
+			  upserr_backup();
+			}
 		      }
 		      else {
 			/* it was another error so pay attention to it. */
@@ -532,6 +531,15 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 			break;
 		      }
 		    }
+		  }
+		  /* may no longer need version list - free it */
+		  if (! got_all_versions) {
+		    all_versions = upslst_free(all_versions, do_delete);
+		  }
+		  
+		  /* may no longer need chain list - free it */
+		  if (! got_all_chains) {
+		    all_chains = upslst_free(all_chains, do_delete);
 		  }
 		} else {
 		  /* the entered product does not exist in this database */
@@ -931,7 +939,8 @@ static int match_from_chain( const char * const a_product,
 	minst = (t_upstyp_matched_instance *)minst_item->data;
 	if (minst->chain && minst->chain->chain &&
 	    strcmp(minst->chain->chain, a_chain)) {
-	  upserr_add(UPS_MISMATCH_CHAIN, minst->chain->chain, a_chain);
+	  upserr_add(UPS_MISMATCH_CHAIN, UPS_WARNING, minst->chain->chain,
+		     a_chain);
 	}
       }
     }
@@ -972,7 +981,7 @@ static int match_from_chain( const char * const a_product,
 					     a_command_line, a_db_info,
 					     do_need_unique, &tmp_flavor_list,
 					     &tmp_quals_list, &cinst);
-	if (tmp_num_matches == 0) {
+	if (tmp_num_matches == 0 && (UPS_ERROR != UPS_NO_TABLE_MATCH )) {
 	  /* We should have had a match, this is an error */
 	  upserr_vplace();
 	  upserr_add(UPS_NO_VERSION_MATCH, UPS_FATAL, buffer,
@@ -1067,8 +1076,8 @@ static int match_from_version( const char * const a_product,
 	  minst = (t_upstyp_matched_instance *)minst_item->data;
 	  if (minst->version && minst->version->version &&
 	      strcmp(minst->version->version, a_version)) {
-	    upserr_add(UPS_MISMATCH_VERSION, minst->version->version,
-		       a_version);
+	    upserr_add(UPS_MISMATCH_VERSION, UPS_WARNING, 
+		       minst->version->version, a_version);
 	  }
 	}
       }
