@@ -143,7 +143,7 @@ void upsget_remall(const FILE * const stream,
       fprintf((FILE *)stream,"%sunset UPS_OS_FLAVOR\n", pdefault);
       fprintf((FILE *)stream,"%sunset UPS_PROD_FLAVOR\n", pdefault);
       fprintf((FILE *)stream,"%sunset UPS_PROD_QUALIFIERS\n", pdefault);
-      fprintf((FILE *)stream,"%sunset UPS_SHELL\n", pdefault);
+/*      fprintf((FILE *)stream,"%sunset UPS_SHELL\n", pdefault); */
       fprintf((FILE *)stream,"%sunset UPS_OPTIONS\n", pdefault);
     } else { 
       fprintf((FILE *)stream,"%sunsetenv UPS_PROD_NAME\n", pdefault);
@@ -155,7 +155,7 @@ void upsget_remall(const FILE * const stream,
       fprintf((FILE *)stream,"%sunsetenv UPS_OS_FLAVOR\n", pdefault);
       fprintf((FILE *)stream,"%sunsetenv UPS_PROD_FLAVOR\n", pdefault);
       fprintf((FILE *)stream,"%sunsetenv UPS_PROD_QUALIFIERS\n", pdefault);
-      fprintf((FILE *)stream,"%sunsetenv UPS_SHELL\n", pdefault);
+/*      fprintf((FILE *)stream,"%sunsetenv UPS_SHELL\n", pdefault); */
       fprintf((FILE *)stream,"%sunsetenv UPS_OPTIONS\n", pdefault);
     }
   } 
@@ -228,8 +228,8 @@ void upsget_allout(const FILE * const stream,
                pdefault, upsget_flavor(db,instance,command_line));
       fprintf((FILE *)stream,"%sUPS_PROD_QUALIFIERS=%s;export UPS_PROD_QUALIFIERS\n",
                pdefault,upsget_qualifiers(db,instance,command_line));
-      fprintf((FILE *)stream,"%sUPS_SHELL=%s;export UPS_SHELL\n",
-               pdefault,upsget_shell(db,instance,command_line));
+/*      fprintf((FILE *)stream,"%sUPS_SHELL=%s;export UPS_SHELL\n",
+               pdefault,upsget_shell(db,instance,command_line)); */
       addr=upsget_options(db,instance,command_line);
       if (addr) 
       { fprintf((FILE *)stream,"%sUPS_OPTIONS=\"%s\";export UPS_OPTIONS\n",
@@ -260,8 +260,8 @@ void upsget_allout(const FILE * const stream,
                upsget_flavor(db,instance,command_line));
       fprintf((FILE *)stream,"%ssetenv UPS_PROD_QUALIFIERS %s\n",pdefault,
                upsget_qualifiers(db,instance,command_line));
-      fprintf((FILE *)stream,"%ssetenv UPS_SHELL %s\n",pdefault,
-               upsget_shell(db,instance,command_line));
+/*      fprintf((FILE *)stream,"%ssetenv UPS_SHELL %s\n",pdefault,
+               upsget_shell(db,instance,command_line)); */
       addr=upsget_options(db,instance,command_line);
       if (addr) 
       { fprintf((FILE *)stream,"%ssetenv UPS_OPTIONS \"%s\"\n",pdefault,

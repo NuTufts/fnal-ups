@@ -357,6 +357,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                        &file);
          strcpy(buffer,file);
        } else { 
+         if (!save_chain) /* declaring the same this over and not chains */
+         { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+                      "Specified product and version currently exists");
+           return 0;
+         }
          upsver_mes(0,"Instance in version file allready exists\n");
          buffer[0]=0; /* don't create instance */
          mproduct_list = upslst_first(mproduct_list);
