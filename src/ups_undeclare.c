@@ -176,6 +176,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
             product = upsget_chain_file(db_info->name,
                                         uc->ugo_product,
                                         the_chain, &file);
+            strcpy(buffer,file);
             if ((UPS_ERROR == UPS_SUCCESS) && product )
             { cinst_list=upsmat_match_with_instance( cinst, product );
               cinst=cinst_list->data;
@@ -184,7 +185,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
               upsver_mes(1,"Deleting %s of version %s\n",
                             the_chain,
                             cinst->version);
-              (void )upsfil_write_file(product, file,' '); 
+              (void )upsfil_write_file(product, buffer,' '); 
               unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
               sprintf(unchain,"un%s",the_chain);
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -224,6 +225,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                                     uc->ugo_product,
                                     uc->ugo_version, 
                                     &file);
+      strcpy(buffer,file);
       if ((UPS_ERROR == UPS_SUCCESS) && product )
       { vinst_list=upsmat_match_with_instance( vinst, product );
         vinst=vinst_list->data;
@@ -257,7 +259,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
            upslst_delete(product->instance_list,vinst,'d');
         upsver_mes(1,"Deleting version %s\n",
                       vinst->version);
-        (void )upsfil_write_file(product, file,' '); 
+        (void )upsfil_write_file(product, buffer,' '); 
 /*        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                    mproduct, UNDECLARE,ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
