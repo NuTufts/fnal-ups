@@ -81,7 +81,7 @@
 }
 
 
-typedef char * (*var_func)(const t_upstyp_matched_product * const product,
+typedef char * (*var_func)(const t_upstyp_db * const db_info_ptr,
                            const t_upstyp_matched_instance * const instance,
                            const t_upsugo_command * const command_line );
 
@@ -118,6 +118,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
 {
   t_upslst_item *inst_list;
   t_upstyp_matched_instance *instance;
+  t_upstyp_db *db_info_ptr;
   static char newstr[4096];
   char * loc;
   char * upto;
@@ -130,6 +131,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   newstr[0] = '\0';
   upto = oldstr;
   inst_list = product->minst_list;
+  db_info_ptr = product->db_info;
   instance = (t_upstyp_matched_instance *)(inst_list->data);
   while ((loc = strstr(upto,UPSPRE))!= 0 ) 
   { count = ( loc - upto );
@@ -141,7 +143,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
     for ( idx=0; g_var_subs[idx].string!=0; idx++) 
     { if (!strcmp(g_var_subs[idx].string,upto)) 
       { if (g_var_subs[idx].func)
-        {  value=g_var_subs[idx].func(product,instance,command_line);
+        {  value=g_var_subs[idx].func(db_info_ptr,instance,command_line);
            if(value) strcat(newstr,value);
         }
         found=1;
@@ -160,42 +162,42 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   }
 }
 
-char *upsget_prod_dir(const t_upstyp_matched_product * const product,
+char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,prod_dir);
   return string;
 }
-char *upsget_product(const t_upstyp_matched_product * const product,
+char *upsget_product(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,product);
   return string;
 }
-char *upsget_version(const t_upstyp_matched_product * const product,
+char *upsget_version(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,version);
   return string;
 }
-char *upsget_flavor(const t_upstyp_matched_product * const product,
+char *upsget_flavor(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,flavor);
   return string;
 }
-char *upsget_qualifiers(const t_upstyp_matched_product * const product,
+char *upsget_qualifiers(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char *string;
   get_element(string,qualifiers);
   return string;
 }
-char *upsget_shell(const t_upstyp_matched_product * const product,
+char *upsget_shell(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { 
@@ -207,7 +209,7 @@ char *upsget_shell(const t_upstyp_matched_product * const product,
     }
   }
 }
-char *upsget_verbose(const t_upstyp_matched_product * const product,
+char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char string[2];
@@ -217,7 +219,7 @@ char *upsget_verbose(const t_upstyp_matched_product * const product,
     sprintf(string,"");
   } return string;
 }
-char *upsget_extended(const t_upstyp_matched_product * const product,
+char *upsget_extended(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { char string[2];
@@ -227,7 +229,7 @@ char *upsget_extended(const t_upstyp_matched_product * const product,
     sprintf(string,"");
   } return string;
 }
-char *upsget_options(const t_upstyp_matched_product * const product,
+char *upsget_options(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { if (command_line->ugo_O)
@@ -236,16 +238,16 @@ char *upsget_options(const t_upstyp_matched_product * const product,
     return 0;
   }
 }
-char *upsget_database(const t_upstyp_matched_product * const product,
+char *upsget_database(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
-{ if ( product->db_info )
-  { return product->db_info->name;
+{ if ( db_info_ptr )
+  { return db_info_ptr->name;
   } else {
     return 0;
   }
 }
-char *upsget_OS_flavor(const t_upstyp_matched_product * const product,
+char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
                        const t_upstyp_matched_instance * const instance,
                        const t_upsugo_command * const command_line )
 {  char                 uname_flavor[80];
