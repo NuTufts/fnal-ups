@@ -50,7 +50,8 @@
 
 extern void list_K( const t_upstyp_matched_instance * const instance, 
 		    const t_upsugo_command * const command, 
-		    const t_upstyp_matched_product * const product);
+		    const t_upstyp_matched_product * const product,
+		    int ignore_match_done );
 
 /*
  * Definition of public variables.
@@ -536,7 +537,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 	old_ugo_key = dep_ugo->ugo_key;
 	dep_ugo->ugo_key = ugo_cmd->ugo_key;
 	
-	list_K( mat_inst, dep_ugo, mat_prod );
+	list_K( mat_inst, dep_ugo, mat_prod, 1 );
 	
 	dep_ugo->ugo_key = old_ugo_key;
       }

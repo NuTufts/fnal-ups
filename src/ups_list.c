@@ -43,7 +43,8 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 
 void list_K(const t_upstyp_matched_instance * const instance,
             const t_upsugo_command * const a_command_line, 
-            const t_upstyp_matched_product * const product);
+            const t_upstyp_matched_product * const product,
+	    int match_done );
 void print_chain(const t_upstyp_matched_instance * const instance,
                  char * const string);
 /*
@@ -639,13 +640,13 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         }
         printf("\n");
       } else {
-        list_K(instance,a_command_line,mproduct);
+        list_K(instance,a_command_line,mproduct,g_MATCH_DONE);
       }
     }
     /* we must check if we only read in a dbconfig file, this can only
        happen when -K is also entered */
     if (! g_MATCH_DONE) 
-    { list_K(instance,a_command_line,mproduct);
+    { list_K(instance,a_command_line,mproduct,g_MATCH_DONE);
     }
 /* end product loop */
   }
@@ -653,7 +654,8 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 
 void list_K(const t_upstyp_matched_instance * const instance, 
             const t_upsugo_command * const command, 
-            const t_upstyp_matched_product * const product)
+            const t_upstyp_matched_product * const product,
+	    int match_done )
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *cinst_ptr = 0;
@@ -669,7 +671,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   if (product->db_info) 
   { config_ptr = product->db_info->config;
   }
-  if (g_MATCH_DONE)
+  if (match_done)
   { for ( l_ptr = upslst_first( command->ugo_key ); 
 	  l_ptr; l_ptr = l_ptr->next, count++ )
     { valid=0;
