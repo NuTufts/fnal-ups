@@ -11,6 +11,9 @@ $UPS_DIR/test/ups_test << EOD
 # all instances of all products sorted alphabetically
 #
 list -out all.out -diff all.in -z db1 -a
+# 
+# Test to make sure the relative path is working with the dbconfig file
+list -out relchk.out -diff relchk.in -z db1 -a -l jessie 
 #
 # long listing  - let's see it all for an instance with not much, and for
 #   	and instance with the whole shabang.
