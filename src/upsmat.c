@@ -875,12 +875,12 @@ static int match_from_chain( const char * const a_product,
 
 	if (UPS_VERBOSE) {
 	  printf("%sMatching with Version %s in Product %s\n", VPREFIX,
-		 inst->version, inst->product);
+		 inst->version, a_product);
 	  printf("%sUsing Flavor = %s, and Qualifiers = %s\n", VPREFIX,
 		 (char *)(tmp_flavor_list->data),
 		 (char *)(tmp_quals_list->data));
 	}
-	tmp_num_matches = match_from_version(inst->product, inst->version,
+	tmp_num_matches = match_from_version(a_product, inst->version,
 					     tmp_upsdir, tmp_productdir,
 					     a_db_info,
 					     do_need_unique, tmp_flavor_list,
@@ -996,13 +996,13 @@ static int match_from_version( const char * const a_product,
 	      
 	      if (UPS_VERBOSE) {
 		printf("%sMatching with Version %s in Product %s using Table file %s\n",
-		       VPREFIX, inst->version, inst->product,
+		       VPREFIX, inst->version, a_product,
 		       inst->table_file);
 		printf("%sUsing Flavor %s and Qualifiers %s\n", VPREFIX,
 		       (char *)(tmp_flavor_list->data),
 		       (char *)(tmp_quals_list->data));
 	      }
-	      tmp_num_matches = match_from_table(inst->product,
+	      tmp_num_matches = match_from_table(a_product,
 						 inst->table_file,
 						 inst->table_dir, tmp_upsdir,
 						 tmp_productdir, a_db_info,
