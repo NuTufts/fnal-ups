@@ -118,6 +118,19 @@ int main(void)
   upserr_output();
   fprintf(stderr, "-------------------------------------------------\n");
 
+  fprintf(stderr, "\nOutputing 2 messages.\n");
+  upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD8", "FILE28");
+  UPS_VERBOSE = 1;
+  upserr_vplace();
+  upserr_add(UPS_INVALID_KEYWORD, UPS_FATAL, "KYWD9", "FILE29");
+  upserr_output();
+  fprintf(stderr, "-------------------------------------------------\n");
+
+  fprintf(stderr, "\nAnd now backup over the last one.\n");
+  upserr_backup();
+  upserr_output();
+  fprintf(stderr, "-------------------------------------------------\n");
+
   return 0;
 }
 
