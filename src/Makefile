@@ -34,9 +34,9 @@ CFLAGScia = $(INCDIRS)
 
 #
 #
-OBJECTS = ups_error.o ups_list.o
+OBJECTS = ups_error.o ups_list.o ups_memory.o
 
-CIAOBJECTS = ups_error.a  ups_list.a
+CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o
 
 LDFLAGS = $(LLIBS)
 
@@ -74,10 +74,10 @@ $(LIB)/libups.a : $(OBJECTS)
 # Main programs.
 #
 
-$(BIN)/erSetup :  setupMain.c $(LIB)/libups.a
+$(BIN)/Setup :  setupMain.c $(LIB)/libups.a
 	$(CC) -o $@ $(CFLAGS) $(CCCHK) setupMain.c $(LDFLAGS)
 
-$(BIN)/erUnsetup :  unsetupMain.c $(LIB)/libups.a
+$(BIN)/Unsetup :  unsetupMain.c $(LIB)/libups.a
 	$(CC) -o $@ $(CFLAGS) $(CCCHK) unsetupMain.c $(LDFLAGS)
 
 #
@@ -109,13 +109,21 @@ make :
                                                         "-env $$ccenv *.c"; \
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
+
+# DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
+# src DIRECTORY TO GENERATE IT
 #START_DEPEND
-ups_error.o: ups_error.c $(ERUPT_DIR)/inc/ups_error.h
-ups_list.o: ups_list.c $(ERUPT_DIR)/inc/ups_list.h
-
-
-
-
-
-
-
+ups_error.o:	ups_error.c
+ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_list.o:	ups_list.c
+ups_list.o:	./../inc/ups_list.h
+ups_match.o:	ups_match.c
+ups_match.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_memory.o:	ups_memory.c
+ups_memory.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_memory.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
+ups_utils.o:	ups_utils.c
+upsugo_utils.o:	upsugo_utils.c
+upsugo_utils.o:	./../inc/ups_types.h
+upsugo_utils.o:	./../inc/ups_list.h
