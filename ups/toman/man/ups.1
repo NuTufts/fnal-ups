@@ -1,4 +1,4 @@
-.TH upd 1 1999-12-08
+.TH ups 1 2000-06-02
 .SH NAME
 ups, upd, setup, unsetup -- access to Fermilab local products
 .SH DESCRIPTION
@@ -204,8 +204,8 @@ ups, upd, setup, unsetup -- access to Fermilab local products
  Allows user to manually edit product files and then performs
  syntax/content validation.
  Options
-     -?, -A, -a, -E, -f, -H, -M, -m, -N, -p, -q, -r, -T, -U, -V, -v,
-     -Z, -z
+     -?, -A, -c, -d, -E, -f, -H, -M, -m, -n, -N, -o, -p, -q, -r, -t,
+     -T, -U, -V, -v, -Z, -z
 
 .B "ups start [options] product [version]"
  Allows automatic startup for products that need to load drivers start
@@ -477,14 +477,24 @@ ups, upd, setup, unsetup -- access to Fermilab local products
 .SH SEE ALSO
 sh(1), csh(1), bash(1), tcsh(1)
 .SH BUGS
+ o Malformed use of ${UPS_KEYWORD} (like leaving off the closing brace),
+   results in a confusing error message, and can log out the process.
+ o sourceReqCheck and fileCheck are slightly broken.  They attempt to use
+   a 'return 1' statement which produces the message "sh: Cannot perform
+   a return when not in function mode."
  o User defined variables in group stanzas get lost.
+ o The modify command doesn't behave correctly when multiple instances
+   match, or when a product has no declared chain.
  o Modify's -E option does nothing.
+ o Some ups commands (current, verify, user-defined actions) on non-existent
+   products 'succeed' but do nothing, when they should report an error.
  o The bash shell complains about sourcing /dev/null.
  o There have been reports of declarations being incorrectly made in the 
    first database in the $PRODUCTS list if there's a match (error?) in the 
    nth database.
  o There have been reports of problems with list -K with empty database
    directories.
+ o There have been reports of bogus duplicate instances being found.
  o (Un)declares may fail if there's an error detected, even if it's not
    relevant to the product at hand.
  o Leading spaces in quoted strings (used with -G and -O, for example)
