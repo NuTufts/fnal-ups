@@ -39,3 +39,6 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 11. Change the single function doDefaults to be a separate one for each
 	supported action (i.e. - doDefaultSetup())
+
+12. Fully support news and html files more generally.
+
