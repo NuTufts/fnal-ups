@@ -48,6 +48,7 @@ enum {
   e_create,
   e_get,
   e_validate,
+  e_help,
   /* This one must always be at the end */
   e_unk
 };

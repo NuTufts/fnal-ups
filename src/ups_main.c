@@ -83,6 +83,8 @@ t_cmd_info g_cmd_info[] = {
   {e_create,      "create",      "?f:H:m:M:p:q:vZ"},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z"},
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z"},
+  {e_help,        "help",
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z"},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
             "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z"}
@@ -126,7 +128,7 @@ int main(int argc, char *argv[])
 	keep_temp_file = command_line->ugo_V;
       }
 
-      if (!command_line->ugo_help) {
+      if (!command_line->ugo_help && (g_cmd_info[i].cmd_index != e_help)) {
 	/* no help requested - do the command */
 
 	/* open the temp file. this is where shell specific action code will\
@@ -189,6 +191,7 @@ int main(int argc, char *argv[])
       } else {
 	/* output help */
 	switch (g_cmd_info[i].cmd_index) {
+	case e_help:
 	case e_unk: (void )upshlp_command(NULL);       /* print out all help */
 	  break;
 	  /* specific help */
