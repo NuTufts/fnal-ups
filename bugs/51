@@ -6,3 +6,6 @@ State: Confirmed
 This appears to be new behavior in ups v4_6; a ups declare should
 be running the "declare" "configure" and chain actions for any
 chains being declared, but it should not run "tailor".
+
+This was discoverd on d0bbin, on an upd install of sam_bootstrap v4_0_0.
+
