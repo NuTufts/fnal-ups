@@ -72,7 +72,7 @@ cia :	$(CIAOBJECTS)
 # Build main line executable
 #
 $(BIN)/ups : ups_main.o library
-	$(CC) -o $@ $(CCCHK) $(CFLAGS) ups_main.o $(LDFLAGS)
+	$(CC) ups_main.o -o $@  $(CFLAGS) $(LDFLAGS)
 
 #
 # Compile UPS library source
