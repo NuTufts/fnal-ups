@@ -105,7 +105,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 44 */  "%s: Missing match in %s file \n   File: %s\n",
 /* 45 */  "%s: Product \'%s\' has no %s %s\n",
 /* 46 */  "%s: Found no match for product \'%s\'\n",
-/* 47 */  "%s: Unexpected key word - \'%s\' in \'%s\', line %d\n"
+/* 47 */  "%s: Unexpected key word - \'%s\' in \'%s\', line %d\n",
+/* 48 */  "%s: File cache is corrupt\n"
 };
 
 char *g_error_ascii[] = {
@@ -157,7 +158,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_INSTANCE         45 */ "UPS_NO_INSTANCE",
    /* UPS_NO_MATCH            46 */ "UPS_NO_MATCH",
    /* UPS_UNEXPECTED_KEYWORD  47 */ "UPS_UNEXPECTED_KEYWORD",
-   /* UPS_NERR                48 */ "UPS_NERR",
+   /* UPS_FILEMAP_CORRUPT     48 */ "UPS_FILEMAP_CORRUPT",
+   /* UPS_NERR                49 */ "UPS_NERR",
    0 };
 
 /*

@@ -26,6 +26,7 @@
 #include <stddef.h>
 
 #include "upstbl.h"
+#include "upserr.h"
 
 /************************************************************************
  *
@@ -265,8 +266,10 @@ void upstbl_map( t_upstbl * const table,
   for ( i = 0; i < table->size; i++ )
     for ( p = table->buckets[i]; p; p = p->link ) {
       apply( p->key, &p->value, cl );
-      if ( table->timestamp == stamp )
+      if ( table->timestamp != stamp ) {
+	upserr_add( UPS_FILEMAP_CORRUPT, UPS_FATAL );
 	return;
+      }
     }
 }
 
