@@ -3807,7 +3807,7 @@ static void f_proddir( ACTION_PARAMS)
       } else {
 	tmp_prod_dir = a_minst->version->prod_dir;
       }
-      if (! a_minst->version->prod_name) {
+      if (! a_minst->version->product) {
 	/* we do not have a product name in the version file.  therefore use
 	   the product name from the command line */
 	tmp_prod_name = a_command_line->ugo_product;
