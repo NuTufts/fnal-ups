@@ -610,7 +610,7 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
 **
 */
 static char *
-ugo_old2newquals( char *inaddr ) {
+ugo_old2newquals( const char *inaddr ) {
     static char buf[1024]; /* OH NO!! bogus limit on qualifier length... */
     char *p2 = buf, *p1 = inaddr;
 
