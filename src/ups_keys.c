@@ -27,6 +27,7 @@
 /* ups specific include files */
 #include "ups_types.h"
 #include "ups_memory.h"
+#include "ups_utils.h"
 #include "ups_keys.h"
 
 /*
@@ -108,7 +109,7 @@ t_upskey_map *upskey_get_map( const char * const str )
   /* for now, just a linear search */
   
   for ( keys = g_key_map; keys->key; keys++ ) {
-    if ( !strcmp( keys->key, str ) )
+    if ( !upsutl_stricmp( keys->key, str ) )
       return keys;
   }
 
