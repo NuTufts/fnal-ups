@@ -44,9 +44,8 @@
 /*
  * Definition of global variables.
  */
-
-static t_upslst_item *g_mproduct_list = NULL;
 extern t_cmd_info g_cmd_info[];
+
 /*
  * Definition of public functions.
  */

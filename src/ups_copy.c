@@ -247,7 +247,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 		 unsetup command.  if so, we parse it completely, replace
 		 the parameter with the value of setup_<prod>, and reconstruct
 		 the command line.  the new one replaces the old one. */
-	      if (command = upsact_parse_cmd((char *)command_item->data)) {
+	      if ((command = upsact_parse_cmd((char *)command_item->data))) {
 		switch (command->icmd) {
 		case e_setupoptional:
 		case e_setuprequired:
