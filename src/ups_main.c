@@ -131,6 +131,7 @@ int main(int argc, char *argv[])
 	      /* error in open */
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
 			 strerror(errno));
+	      upserr_add(UPS_OPEN_FILE, UPS_FATAL, g_temp_file_name);
 	    }
 	  } else {
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam", strerror(errno));
