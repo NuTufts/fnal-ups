@@ -252,7 +252,7 @@ int UPS_NEED_DB=1;
 
 #define case_q case 'q': uc->ugo_q = 1; \
    if ( *argbuf )                                                  \
-   { upsugo_bldqual(uc,*argbuf);                                   \
+   { (void) upsugo_bldqual(uc,*argbuf);                            \
      *argbuf=0;                                                    \
      break;                                                        \
    }                                                               \
@@ -261,14 +261,14 @@ int UPS_NEED_DB=1;
      { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" ); \
        break;                                                      \
      }                                                             \
-     upsugo_bldqual(uc,arg_str);                                   \
+     (void) upsugo_bldqual(uc,arg_str);                            \
      break;                                                        \
    }                                                               \
    errflg = 1;                                                     \
    break;
 #define case_z case 'z': uc->ugo_z = 1; \
    if ( *argbuf )                                                  \
-   { upsugo_blddb(uc,*argbuf);                                     \
+   { (void) upsugo_blddb(uc,*argbuf);                              \
      *argbuf=0;                                                    \
      break;                                                        \
    }                                                               \
@@ -277,7 +277,7 @@ int UPS_NEED_DB=1;
      { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "z" ); \
        break;                                                      \
      }                                                             \
-     upsugo_blddb(uc,arg_str);                                     \
+     (void) upsugo_blddb(uc,arg_str);                              \
      break;                                                        \
    }                                                               \
    errflg = 1;                                                     \
@@ -324,7 +324,7 @@ if (!uc->ugo_H)
  { if (uname(&baseuname) == -1) return(-1);	/* do uname */
    (void) strcpy (flavor,baseuname.sysname);	/* get sysname */
    if (!strncmp(flavor,"IRIX",4))		/* Slam all IRIXanything */
-   { strcpy(flavor,"IRIX");
+   { (void) strcpy(flavor,"IRIX");
    }
    (void) strcat (flavor,"+");			/* add plus */
    if (strncmp(baseuname.sysname,"AIX",3) == 0)	/* because AIX is different */
@@ -348,7 +348,7 @@ if (!uc->ugo_H)
    {   addr=upsutl_str_create(l_ptr->data,' ');
        upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-       strcpy(flavor,l_ptr->data);
+       (void) strcpy(flavor,l_ptr->data);
        flavor_sub()
    }
 /*   upslst_free(uc->ugo_osname,'d');    need -f and -H
@@ -384,7 +384,7 @@ void upsugo_setshell(struct ups_command * const uc)
    { if((SHELL = (char *)getenv("UPS_SHELL")) == 0) /* check for UPS_SHELL   */
      { if((SHELL = (char *)getenv("SHELL")) == 0)   /* failed check SHELL    */
        { g_UPS_SHELL=e_BOURNE;             /* no SHELL either                */
-         strcpy(SHELL,"sh");               /* go bourne set to sh for match  */
+         (void) strcpy(SHELL,"sh");        /* go bourne set to sh for match  */
        } else {                            /* got SHELL value                */
          if (strstr(SHELL,"csh"))          /* is it csh?            UK!      */
          { g_UPS_SHELL=e_CSHELL;
@@ -449,7 +449,7 @@ int upsugo_ifornota(struct ups_command * const uc)
          upsver_mes(3,"%sNo flavor specified set to %s\n",UPSUGO,addr); 
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
        } else {
-         upsugo_bldfvr(uc);                   /* build the appropriate os */
+         (void) upsugo_bldfvr(uc);            /* build the appropriate os */
          addr=upsutl_str_create(ANY_FLAVOR,' ');           /* flavor and add */
          upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr); /* to the list */
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
@@ -466,7 +466,7 @@ int upsugo_ifornota(struct ups_command * const uc)
        uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
      if (!uc->ugo_flavor)                    /* no flavor? */
-     { upsugo_bldfvr(uc);                    /* build it too! */
+     { (void) upsugo_bldfvr(uc);             /* build it too! */
      }
      addr=upsutl_str_create(ANY_FLAVOR,' ');   /* if not -a EVERYBODY gets */
      upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr);  /* * flavor -a IS  */
@@ -483,7 +483,7 @@ int upsugo_ifornota(struct ups_command * const uc)
      } else {
         /* addr = (char *) malloc((size_t)(strlen(PRODUCTS) +1)); */
         addr=temp; /* use static instead of alloc space */
-        strcpy(addr,PRODUCTS);
+        (void) strcpy(addr,PRODUCTS);
         loc=addr;
         while ( loc && *loc )  /* covert any space ( tab etc ) to a space */
         { if (isspace( (unsigned long )(*(loc)) ) ) { *loc=' '; }
@@ -492,13 +492,13 @@ int upsugo_ifornota(struct ups_command * const uc)
         while ((loc=strchr(addr,' '))!=0) /* more then one database ? */
         { *loc = 0;
           PRODUCTS = upsutl_str_create(addr,' '); /* name is up to space */
-          upsugo_blddb(uc,PRODUCTS);              /* add it to the list */
+          (void) upsugo_blddb(uc,PRODUCTS);       /* add it to the list */
           upsmem_free(PRODUCTS);                  /* free the old new space */
           addr=loc+1;                             /* was allocated */
           while(*addr==' ') { addr=addr+1; }
         }
         PRODUCTS = upsutl_str_create(addr,' ');   /* no more spaces add what */
-        upsugo_blddb(uc,PRODUCTS);                /* is left */
+        (void) upsugo_blddb(uc,PRODUCTS);         /* is left */
         upsmem_free(PRODUCTS);                    /* free the temp space */
      }
    } 
@@ -546,7 +546,7 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
    }
    db=upsutl_str_create(db,'p'); /* add the database entry */
    addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
-   memset (addr,0,sizeof(struct upstyp_db));
+   (void) memset (addr,0,sizeof(struct upstyp_db));
    addr->name = db;
    upsver_mes(3,"%sAdding database %s\n",UPSUGO,addr->name); 
    uc->ugo_db = upslst_add(uc->ugo_db,addr);
@@ -558,7 +558,7 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  /* db may not be free because it's pointed to by db config do NOT free */
  db=upsutl_str_create(inaddr,'p');
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
- memset (addr, 0, sizeof(struct upstyp_db));
+ (void) memset (addr, 0, sizeof(struct upstyp_db));
  addr->name = db;                /* add last or only to the database list */
  upsver_mes(3,"%sAdding database %s\n",UPSUGO,addr->name); 
  uc->ugo_db = upslst_add(uc->ugo_db,addr);
@@ -592,7 +592,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
 
  if ( strchr(inaddr,'?') == 0) {       /* no optional qualifiers */
   addr=upsutl_str_create(inaddr,'p');
-  upsutl_str_sort(addr,':');
+  (void) upsutl_str_sort(addr,':');
   uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
  } else {
   addr=upsutl_str_create(inaddr,'p');
@@ -654,7 +654,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   waddr=upsutl_str_create(oaddr,'p');   /* new list trimed */
   upsmem_free(oaddr);                   /* disgard work string */
   oaddr=waddr;                          /* optional string in oaddr */
-  upsutl_str_sort(oaddr,'?');
+  (void) upsutl_str_sort(oaddr,'?');
   optionals[0]=oaddr;
   ++qcount;
   waddr=oaddr;
@@ -707,7 +707,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
           naddr=addr; /* should be a null string yes? */
         }
       }
-      upsutl_str_sort(naddr,':'); 
+      (void) upsutl_str_sort(naddr,':'); 
       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
     }
  }
@@ -798,7 +798,7 @@ char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
 	    if((*argv[argindx] == '-') && (strlen(argv[argindx]) >2))
 		{
 		buff = (char *) malloc((size_t)(strlen(argv[argindx]) +1));
-		strcpy(buff, argv[argindx]);
+		(void) strcpy(buff, argv[argindx]);
 		*argbuf = buff + 2;
 		}
 	    return argv[argindx];
@@ -860,7 +860,7 @@ int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *
 	   {
 
 	   if (lcv_new >= MAX_ARGS - 1)   { /* Make sure no buffer overflow */
-	       fprintf(stderr, 
+	       (void) fprintf(stderr, 
 	         "ups: Error - maximum command line buffer limit exceeded\n");
 	       return (1);
 	   }
@@ -880,7 +880,7 @@ int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *
 			if (str_length)
 			     {
 			     argv_new[lcv_new] = (char *) malloc(str_length+1);
-			     strncpy(argv_new[lcv_new],temp,str_length);
+			     (void) strncpy(argv_new[lcv_new],temp,str_length);
 			     argv_new[lcv_new++][str_length] = '\0';
 			     }
 			temp = strchr(temp,(int) string[0]);
@@ -928,13 +928,13 @@ int upsugo_free (struct ups_command * const uc)
       if ( uc->ugo_version ) 
          upsmem_free(uc->ugo_version); 
       if ( uc->ugo_auth ) 
-         upslst_free(uc->ugo_auth,'d'); 
+         (void) upslst_free(uc->ugo_auth,'d'); 
       if ( uc->ugo_flavor ) 
-         upslst_free(uc->ugo_flavor,'d'); 
+         (void) upslst_free(uc->ugo_flavor,'d'); 
       if ( uc->ugo_host ) 
-         upslst_free(uc->ugo_host,'d'); 
+         (void) upslst_free(uc->ugo_host,'d'); 
       if ( uc->ugo_key ) 
-         upslst_free(uc->ugo_key,'d'); 
+         (void) upslst_free(uc->ugo_key,'d'); 
       if ( uc->ugo_tablefiledir ) 
          upsmem_free(uc->ugo_tablefiledir); 
       if ( uc->ugo_tablefile ) 
@@ -956,7 +956,7 @@ int upsugo_free (struct ups_command * const uc)
 /*      if ( uc->ugo_override ) 
          upsmem_free(uc->ugo_override);  */
       if ( uc->ugo_qualifiers ) 
-         upslst_free(uc->ugo_qualifiers,'d'); 
+         (void) upslst_free(uc->ugo_qualifiers,'d'); 
       if ( uc->ugo_productdir ) 
          upsmem_free(uc->ugo_productdir); 
       if ( uc->ugo_archivefile ) 
@@ -966,7 +966,7 @@ int upsugo_free (struct ups_command * const uc)
       if ( uc->ugo_db )
 	 upsugo_free_ugo_db( uc->ugo_db );
       if ( uc->ugo_chain ) 
-         upslst_free(uc->ugo_chain,'d'); 
+         (void) upslst_free(uc->ugo_chain,'d'); 
       upsmem_free(uc);
     } return (0);
 }
@@ -1018,9 +1018,9 @@ int upsugo_dump (struct ups_command * const uc,
 {
     if(uc)
     { if ( uc->ugo_product ) 
-         printf("Product:          %s\n",uc->ugo_product); 
+         (void) printf("Product:          %s\n",uc->ugo_product); 
       if ( uc->ugo_version ) 
-         printf("Version:          %s\n",uc->ugo_version); 
+         (void) printf("Version:          %s\n",uc->ugo_version); 
       if ( uc->ugo_auth ) 
          upsugo_prtlst(uc->ugo_auth,  "Authorized Nodes: ",prnt_ptr); 
       if ( uc->ugo_flavor ) 
@@ -1032,46 +1032,46 @@ int upsugo_dump (struct ups_command * const uc,
       if ( uc->ugo_key ) 
          upsugo_prtlst(uc->ugo_key,   "Key:              ",prnt_ptr); 
       if ( uc->ugo_tablefiledir ) 
-         printf("Tablefiledir:     %s\n",uc->ugo_tablefiledir); 
+         (void) printf("Tablefiledir:     %s\n",uc->ugo_tablefiledir); 
       if ( uc->ugo_tablefile ) 
-         printf("Tablefile:        %s\n",uc->ugo_tablefile); 
+         (void) printf("Tablefile:        %s\n",uc->ugo_tablefile); 
       if ( uc->ugo_anyfile ) 
-         printf("Anyfile:          %s\n",uc->ugo_anyfile); 
+         (void) printf("Anyfile:          %s\n",uc->ugo_anyfile); 
       if ( uc->ugo_options ) 
-         printf("Options:          %s\n",uc->ugo_options); 
+         (void) printf("Options:          %s\n",uc->ugo_options); 
       if ( uc->ugo_passed ) 
-         printf("Passed:          %s\n",uc->ugo_passed); 
+         (void) printf("Passed:          %s\n",uc->ugo_passed); 
       if ( uc->ugo_description ) 
-         printf("Description:      %s\n",uc->ugo_description); 
+         (void) printf("Description:      %s\n",uc->ugo_description); 
 /*      if ( uc->ugo_override ) 
-         printf("Override:         %s\n",uc->ugo_override); */
+         (void) printf("Override:         %s\n",uc->ugo_override); */
       if ( uc->ugo_L) 
-         printf("LongListing\n"); 
+         (void) printf("LongListing\n"); 
       if ( uc->ugo_P) 
-         printf("Product not in a database (-P)\n"); 
+         (void) printf("Product not in a database (-P)\n"); 
       if ( uc->ugo_qualifiers ) 
-         upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers:       ",prnt_ptr); 
+         (void) upsugo_prtlst(uc->ugo_qualifiers,"Qualifiers:       ",prnt_ptr); 
       if ( uc->ugo_productdir ) 
-         printf("Productdir:       %s\n",uc->ugo_productdir); 
+         (void) printf("Productdir:       %s\n",uc->ugo_productdir); 
       if ( uc->ugo_archivefile ) 
-         printf("Archivefile:      %s\n",uc->ugo_archivefile); 
+         (void) printf("Archivefile:      %s\n",uc->ugo_archivefile); 
       if ( uc->ugo_upsdir ) 
-         printf("Upsdir:           %s\n",uc->ugo_upsdir); 
+         (void) printf("Upsdir:           %s\n",uc->ugo_upsdir); 
       if ( uc->ugo_origin) 
-         printf("Origin:           %s\n",uc->ugo_origin); 
+         (void) printf("Origin:           %s\n",uc->ugo_origin); 
       if ( uc->ugo_compile_dir) 
-         printf("Compile Dir:           %s\n",uc->ugo_compile_dir); 
+         (void) printf("Compile Dir:           %s\n",uc->ugo_compile_dir); 
       if ( uc->ugo_compile_file) 
-         printf("Compile File:           %s\n",uc->ugo_compile_file); 
+         (void) printf("Compile File:           %s\n",uc->ugo_compile_file); 
       if ( uc->ugo_number) 
-         printf("UGO number[0-3]+1:           %d\n",uc->ugo_number); 
+         (void) printf("UGO number[0-3]+1:           %d\n",uc->ugo_number); 
       if ( uc->ugo_db ) 
          upsugo_prtdb(uc->ugo_db,"DB:               ",prnt_ptr); 
       if ( uc->ugo_chain ) 
          upsugo_prtlst(uc->ugo_chain,"Chains:           ",prnt_ptr); 
       if ( uc->ugo_help )
-         printf("--- HELP !!! ---\n"); 
-      printf("ugo_v %d and UPS_VERBOSE %d\n",uc->ugo_v,UPS_VERBOSE); 
+         (void) printf("--- HELP !!! ---\n"); 
+      (void) printf("ugo_v %d and UPS_VERBOSE %d\n",uc->ugo_v,UPS_VERBOSE); 
     } return (0);
 }
 
@@ -1097,22 +1097,22 @@ void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title ,
    * Note use of upslst_first(), to be sure to start from first item
    */
   if (prnt_ptr)
-     printf("%s\n",title);
+     (void) printf("%s\n",title);
   else
-     printf("%s",title);
+     (void) printf("%s",title);
   for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ )
   { if(prnt_ptr)
-      {printf("ref count %d\n",upsmem_get_refctr(l_ptr->data));
-       printf( "%03d: p=%08x, i=%08x, n=%08x, data=%s\n",
+      {(void) printf("ref count %d\n",upsmem_get_refctr(l_ptr->data));
+       (void) printf( "%03d: p=%08x, i=%08x, n=%08x, data=%s\n",
             count, (int)l_ptr->prev, (int)l_ptr,
             (int)l_ptr->next, (char *)l_ptr->data );
       }
    else
       {
       if (l_ptr == upslst_first(list_ptr))                           
-         printf ("%s\n", (char *)l_ptr->data);              
+         (void) printf ("%s\n", (char *)l_ptr->data);              
       else                                                      
-         printf ("                  %s\n",  (char *)l_ptr->data); 
+         (void) printf ("                  %s\n",  (char *)l_ptr->data); 
       }
   }
 }
@@ -1139,25 +1139,25 @@ void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title ,
    * Note use of upslst_first(), to be sure to start from first item
    */
   if (prnt_ptr)
-     printf("%s\n",title);
+     (void) printf("%s\n",title);
   else
-     printf("%s",title);
+     (void) printf("%s",title);
   for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ )
   {addr=l_ptr->data;
    if(prnt_ptr)
       {
-      printf("ref count %d\n",upsmem_get_refctr(l_ptr->data));
-      printf("%03d: p=%08x, i=%08x, n=%08x, ",
+      (void) printf("ref count %d\n",upsmem_get_refctr(l_ptr->data));
+      (void) printf("%03d: p=%08x, i=%08x, n=%08x, ",
            count, (int)l_ptr->prev, (int)l_ptr, (int)l_ptr->next);
       addr=l_ptr->data;
-      printf("data=%s\n", (char *)addr->name);
+      (void) printf("data=%s\n", (char *)addr->name);
       }
    else
       {
       if (l_ptr == upslst_first(list_ptr))
-         printf ("%s\n", (char *)addr->name);
+         (void) printf ("%s\n", (char *)addr->name);
       else
-         printf ("                  %s\n",  (char *)addr->name);
+         (void) printf ("                  %s\n",  (char *)addr->name);
       }
   }
 }
@@ -1232,7 +1232,7 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
        for (argc = 1;argc < count;argc++)
            { length = (int)strcspn(waddr," ");
              argv[argc] = (char *) malloc((size_t)(length + 1));
-             strncpy(argv[argc],waddr,(size_t)length);
+             (void) strncpy(argv[argc],waddr,(size_t)length);
              argv[argc][length] = '\0';
              if ((waddr = strchr(waddr, ' ')) != 0) 
                 { waddr++;
@@ -1243,7 +1243,7 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      ugo_commands=0;
      verbose=UPS_VERBOSE;
      uc=upsugo_next(argc,argv,validopts);
-     upslst_free(ugo_commands,' '); /* do NOT delete data */
+     (void) upslst_free(ugo_commands,' '); /* do NOT delete data */
      ugo_commands=hold;
      UPS_VERBOSE=verbose;
      return(uc);
@@ -1289,7 +1289,7 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
        for (argc = 1;argc < count;argc++)
            { length = (int)strcspn(waddr," ");
              argv[argc] = (char *) malloc((size_t)(length + 1));
-             strncpy(argv[argc],waddr,(size_t)length);
+             (void) strncpy(argv[argc],waddr,(size_t)length);
              argv[argc][length] = '\0';
              if ((waddr = strchr(waddr, ' ')) != 0) 
                 { waddr++;
@@ -1300,7 +1300,7 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
      ugo_commands=0;
      verbose=UPS_VERBOSE;
      uc=upsugo_next(argc,argv,validopts);
-     upslst_free(ugo_commands,' '); /* do NOT free data!!! */
+     (void) upslst_free(ugo_commands,' '); /* do NOT free data!!! */
      ugo_commands=hold;
      UPS_VERBOSE=verbose;
      return(uc);
@@ -1339,7 +1339,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
    struct ups_command * luc=0;
   if ( ugo_commands ) { /* subsequent call */ 
      /* dealloc your brain out */ 
-     upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
+     (void) upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
      ugo_commands=upslst_delete(ugo_commands,ugo_commands->data, 'd');
      if (ugo_commands && ugo_commands->data) /* && data needed? */
      {  luc = ugo_commands->data;
@@ -1356,11 +1356,11 @@ t_upsugo_command *upsugo_next(const int old_argc,
 ** line to be parsed the index must be reset!!!
 */
    uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-   memset (uc, 0, sizeof(struct ups_command));
+   (void) memset (uc, 0, sizeof(struct ups_command));
    argindx=0;
    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
-   upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
+   (void) upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
    while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
    { if(*arg_str == '-')      /* is it an option */
      { if (!strchr(validopts,(int)*(arg_str+1))) { 
@@ -1389,10 +1389,10 @@ t_upsugo_command *upsugo_next(const int old_argc,
        }
      } else {
        if ( strchr(arg_str,',') != 0 )
-       { upsugo_ifornota(uc);
+       { (void) upsugo_ifornota(uc);
          ugo_commands = upslst_add(ugo_commands,uc);
          uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-         memset (uc, 0, sizeof(struct ups_command));
+         (void) memset (uc, 0, sizeof(struct ups_command));
        } else { 
          addr=upsutl_str_create(arg_str,' ');
          if ( !uc->ugo_product ) 
@@ -1410,7 +1410,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
    if (!ugo_commands) 
    { addr=upsutl_str_create("*",' ');
      uc->ugo_product = addr;
-     upsugo_ifornota(uc);             
+     (void) upsugo_ifornota(uc);             
      ugo_commands = upslst_add(ugo_commands,uc);
    }
    ugo_commands=upslst_first(ugo_commands);
