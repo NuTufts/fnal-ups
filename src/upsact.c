@@ -2189,7 +2189,7 @@ static void f_envremove( const t_upstyp_matched_instance * const a_inst,
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit.sh -p \"$%s\" -i %s %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		  "upstmp=`dropit -p \"$%s\" -i %s %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2197,7 +2197,7 @@ static void f_envremove( const t_upstyp_matched_instance * const a_inst,
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "setenv upstmp \"`dropit.sh -p \"$%s\" -i %s %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s $upstmp\nunsetenv upstmp\n#\n",
+		  "setenv upstmp \"`dropit -p \"$%s\" -i %s %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") setenv %s $upstmp\nunsetenv upstmp\n#\n",
 		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2547,7 +2547,7 @@ static void f_pathremove( const t_upstyp_matched_instance * const a_inst,
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit.sh -p \"$%s\" -i %s %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		  "upstmp=`dropit -p \"$%s\" -i %s %s`;\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter, 
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2555,7 +2555,7 @@ static void f_pathremove( const t_upstyp_matched_instance * const a_inst,
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		 "setenv upstmp \"`dropit.sh -p \"$%s\" -i %s %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
+		 "setenv upstmp \"`dropit -p \"$%s\" -i %s %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
 		  a_cmd->argv[0], delimiter, a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
