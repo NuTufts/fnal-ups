@@ -632,12 +632,12 @@ static int match_from_table( const char * const a_product,
  * Output: none
  * Return: table file location
  */
-char *get_table_file_path( const char * const a_prodname,
-			   const char * const a_tablefile,
-			   const char * const a_tablefiledir,
-			   const char * const a_upsdir,
-			   const char * const a_productdir,
-			   const char * const a_db)
+static char *get_table_file_path( const char * const a_prodname,
+				  const char * const a_tablefile,
+				  const char * const a_tablefiledir,
+				  const char * const a_upsdir,
+				  const char * const a_productdir,
+				  const char * const a_db)
 {
   char buffer[FILENAME_MAX+1];   /* max size of file name and path on system */
   char *path_ptr = NULL;
