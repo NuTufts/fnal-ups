@@ -145,7 +145,7 @@ status = dup2(fileno(ofd),STDOUT_FILENO);	/* reset it to output file */
    --------------------- */
 
 UPS_ERROR = UPS_SUCCESS;
-while (uc = upsugo_next(argc,argv,options))	/* for all commands */
+while ((uc = upsugo_next(argc,argv,options)) != 0)	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    (void) upsugo_dump(uc,FALSE);		/* display */
