@@ -952,11 +952,13 @@ int put_key( const char * const key, const char * const val )
   if ( key && strlen( key ) > 0 ) {
     fprintf( g_fh, "%s = ", key );
     if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
-	 !upsutl_stricmp( "DESCRIPTION", key ) )
+	 !upsutl_stricmp( "DESCRIPTION", key ) ||
+	 !upsutl_stricmp( "AUTHORIZED_NODES", key ) )
       fputc( '\"', g_fh );
     fprintf( g_fh, "%s", val );
     if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
-	 !upsutl_stricmp( "DESCRIPTION", key ) )
+	 !upsutl_stricmp( "DESCRIPTION", key ) ||
+	 !upsutl_stricmp( "AUTHORIZED_NODES", key ) )
       fputc( '\"', g_fh );      
   }
   else {
