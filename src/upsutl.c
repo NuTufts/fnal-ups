@@ -112,7 +112,7 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 {
   int empty_stream = 0;
   t_upsugo_command command_line;
-  mode_t mode = (mode_t )0777;   /* rwx by owner and group and all*/
+  mode_t mode = 0777;   /* rwx by owner and group and all*/
 
   /* we will need the shell information when we call upsutl_remall from within
      upsutl_finish_temp_file */
@@ -998,7 +998,7 @@ static unsigned char stricmp_charmap[] = {
 /*-----------------------------------------------------------------------
  * upsutl_stricmp
  *
- * A case insencitive version of strcmp. It's a directly copy of
+ * A case insensitive version of strcmp. It's a directly copy of
  * strcasecmp (found e.g in gnu's libc), which is normaly not
  * supported in ANSI C.
  *
@@ -1021,6 +1021,8 @@ int upsutl_stricmp( const char *s1, const char *s2 )
       return 0;
     }
   }
+  /* added to appease the osf1 compiler.  we should never get here */
+  return 0;
 }
 
 /*-----------------------------------------------------------------------
