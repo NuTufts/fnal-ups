@@ -111,6 +111,34 @@ int upsugo_bldfvr(struct ups_command * uc)
         return(0);
      }
    }
+/* Linux - which I know very little about...
+   It has been suggested to drop down on odd version I don't know
+   if this is a correct thing to do???
+*/
+   if ((strncmp(baseuname->sysname,"Linux",5)) == 0)
+   { (void) strcpy(baseuname->machine,"Linux+");
+     (void) strcat(baseuname->machine,baseuname->release);
+     loc=strchr(baseuname->machine,'.');
+     *loc='-';
+     loc=strchr(baseuname->machine,'.');
+     *loc=0;				/* second dot not first */
+     loc=strchr(baseuname->machine,'-');
+     *loc='.';				/* return dot */
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'.');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'+');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     addr=str_create("NULL");
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     return(0);
+   }
+
    return(-1);
 }
 
