@@ -46,6 +46,9 @@ extern int UPS_VERBOSE;
 static t_ups_match_product *match_instance_core(
 				   const t_ups_command * const a_command_line,
 				   const char * const a_db,
+				   const char * const a_prod_name,
+				   const t_upslst_item * const a_chain_list,
+				   const t_upslst_item * const a_version,
 				   const int a_need_unique);
 static int match_from_chain( const char * const a_product,
 			     const char * const a_chain,
@@ -156,6 +159,9 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 t_ups_match_product *upsmat_match_instance(
 				   const t_ups_command * const a_command_line,
 				   const char * const a_db,
+				   const char * const a_prod_name,
+				   const t_upslst_item * const a_chain_list,
+				   const t_upslst_item * const a_version,
 				   const int a_need_unique)
 {
   t_upslst_item *db_item;
@@ -166,7 +172,8 @@ t_ups_match_product *upsmat_match_instance(
 
     /* if no database was specified and we have a table file that is ok */
     if ((a_command_line->ugo_db == NULL) && (a_command_line->ugo_M)) {
-      mproduct = match_instance_core(a_command_line, NULL, a_need_unique);
+      mproduct = match_instance_core(a_command_line, NULL, a_prod_name,
+				     a_chain_list, a_version, a_need_unique);
     } else {
       for ( db_item = (t_upslst_item *)a_command_line->ugo_db ; db_item ;
 	    db_item = db_item->next ) {
@@ -174,8 +181,9 @@ t_ups_match_product *upsmat_match_instance(
 	  printf("%sSearching UPS database - %s\n", VPREFIX,
 		 (char *)db_item->data);
 	}
-	mproduct = match_instance_core(a_command_line,
-				       (char *)db_item->data, a_need_unique);
+	mproduct = match_instance_core(a_command_line, (char *)db_item->data,
+				       a_prod_name, a_chain_list,
+				       a_version, a_need_unique);
 	if (UPS_ERROR != UPS_SUCCESS) {
 	  /* We found an error, return */
 	  break;
@@ -191,8 +199,8 @@ t_ups_match_product *upsmat_match_instance(
     if (UPS_VERBOSE) {
       printf("%sSearching UPS database - %s\n", VPREFIX, (char *)a_db);
     }
-    mproduct = match_instance_core(a_command_line, (char *)a_db,
-				   a_need_unique);
+    mproduct = match_instance_core(a_command_line, (char *)a_db, a_prod_name,
+				   a_chain_list, a_version, a_need_unique);
   }
   return mproduct;
 }
@@ -211,22 +219,25 @@ t_ups_match_product *upsmat_match_instance(
  *
  * Actually do all the matching work for the product and version.
  *
- * Input : the command line input, a database and a flag specifying a unique
- *         instance is desired.
+ * Input : the command line input, a database, product name, list of chains,
+ *         list of versions and a flag specifying a unique instance is desired.
  * Output: none
  * Return: a pointer to the instances matched from the files read.
  */
 static t_ups_match_product *match_instance_core(
 				   const t_ups_command * const a_command_line,
 				   const char * const a_db,
+				   const char * const a_prod_name,
+				   const t_upslst_item * const a_chain_list,
+				   const t_upslst_item * const a_version_list,
 				   const int a_need_unique)
 {
   t_ups_match_product *mproduct = NULL;
   t_upslst_item *vinst_list = NULL, *tinst_list = NULL;
   t_upslst_item *cinst_list = NULL;
-  t_upslst_item *chain_list = NULL;
+  t_upslst_item *chain_list = NULL, *version_list = NULL;
   int num_matches;
-  char *chain;
+  char *chain, *version;
 
   /* see if we were passed a table file. if so, don't worry about
      version and chain files, just read the table file */
@@ -235,7 +246,7 @@ static t_ups_match_product *match_instance_core(
       printf("%sMatching with Table file  - %s\n", VPREFIX,
 	     a_command_line->ugo_tablefile);
     }
-    num_matches = match_from_table(a_command_line->ugo_product,
+    num_matches = match_from_table(a_prod_name,
 				   a_command_line->ugo_tablefile,
 				   a_command_line->ugo_tablefiledir,
 				   a_command_line->ugo_upsdir,
@@ -253,18 +264,29 @@ static t_ups_match_product *match_instance_core(
     
   /* see if we were passed a version. if so, don't worry
      about chains, just read the associated version file */
-  } else if (a_command_line->ugo_version != NULL) {
-    if (UPS_VERBOSE) {
-      printf("%sMatching with Version - %s\n", VPREFIX,
-	     a_command_line->ugo_version);
+  } else if (a_version_list) {
+    for (version_list = (t_upslst_item *)a_version_list; version_list;
+	 version_list = version_list->next) {
+      /* get the version */
+      version = (char *)version_list->data;
+      if (UPS_VERBOSE) {
+	printf("%sMatching with Version - %s\n", VPREFIX, version);
+      }
+      num_matches = match_from_version(a_prod_name, version,
+				       a_command_line->ugo_upsdir,
+				       a_command_line->ugo_productdir, a_db, 
+				       a_need_unique,
+				       a_command_line->ugo_flavor,
+				       a_command_line->ugo_qualifiers, 
+				       &vinst_list, &tinst_list);
+      if (UPS_ERROR != UPS_SUCCESS) {
+	/* we had an error, get out */
+	break;
+      }
     }
-    num_matches = match_from_version(a_command_line->ugo_product,
-				     a_command_line->ugo_version,
-				     a_command_line->ugo_upsdir,
-				     a_command_line->ugo_productdir, a_db, 
-				     a_need_unique, a_command_line->ugo_flavor,
-				     a_command_line->ugo_qualifiers, 
-				     &vinst_list, &tinst_list);
+
+    /* We went thru the list of versions, get a matched product
+       structure if we got no errors */
     if (UPS_ERROR == UPS_SUCCESS) {
       if (num_matches > 0) {
 	tinst_list = upslst_first(tinst_list);        /* back up to start */
@@ -272,18 +294,17 @@ static t_ups_match_product *match_instance_core(
 	mproduct = ups_new_mp(a_db, NULL, vinst_list, tinst_list);
       }
     }
-
   } else {
     /* we need to start with any requested chains and find the associated
        version and then table files. */
-    for (chain_list = a_command_line->ugo_chain; chain_list ;
+    for (chain_list = (t_upslst_item *)a_chain_list; chain_list;
 	 chain_list = chain_list->next) {
       /* get the chain name */
       chain = (char *)chain_list->data;
       if (UPS_VERBOSE) {
 	printf("%sMatching with Chain - %s\n", VPREFIX, chain);
       }
-      num_matches = match_from_chain(a_command_line->ugo_product, chain,
+      num_matches = match_from_chain(a_prod_name, chain,
 				     a_command_line->ugo_upsdir,
 				     a_command_line->ugo_productdir, a_db, 
 				     a_need_unique, a_command_line->ugo_flavor,
@@ -495,7 +516,7 @@ static int match_from_version( const char * const a_product,
 
 	/* It is ok if we do not have a table file.  then we just do whatever
 	   the default action is */
-	if (!inst->table_file) {
+	if (inst->table_file) {
 	  /* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
 	     desired flavor and one of the desired qualifier to match */
 	  TMP_LISTS_SET();
