@@ -149,8 +149,10 @@ ups_append_release(char *buf)
       tpoint = strchr(baseuname.release,'.');
       if (tpoint) 
 	  tpoint = strchr(tpoint+1,'.');  /* after kernel verision */
-      if (tpoint)
+      if (tpoint) {
+	  *tpoint = '-';
 	  strcpy(tpoint+1, glibc_version);
+      }
     }
 #endif
 #endif
