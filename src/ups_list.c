@@ -36,7 +36,8 @@
  * Declaration of private functions.
  */
 
-t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line);
+t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
+                             t_upslst_item * const db_list );
 void list_output(const t_upslst_item * const a_mproduct_list,
 		 const t_upsugo_command * const a_command_line);
 
@@ -227,30 +228,44 @@ void ups_list( t_upsugo_command * const a_command_line )
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *tmp_mprod_list = NULL;
+  t_upstyp_db *db_info = 0;
+  t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
 
   /* Get all the requested instances */
-  mproduct_list = ups_list_core(a_command_line);
-  /*  upsugo_prtlst(mproduct_list,"the products");*/
-  mproduct_list = upslst_first(mproduct_list);  /* point to the start */
-  upsver_mes(2,"Starting sort of product list\n");
-  mproduct_list = upslst_sort0( mproduct_list , product_cmp );
-  upsver_mes(2,"Ending sort of product list\n");
-  mproduct_list = upslst_first(mproduct_list);  /* point to the start */
+ 
+  for (db_list = a_command_line->ugo_db ; db_list ; db_list=db_list->next) 
+  { db_info = (t_upstyp_db *)db_list->data;
+    mproduct_list = ups_list_core(a_command_line,db_list);
+    /*  upsugo_prtlst(mproduct_list,"the products");*/
+    upsver_mes(2,"From Database %s\n",db_info->name);
+    mproduct_list = upslst_first(mproduct_list);  /* point to the start */
+    upsver_mes(2,"Starting sort of product list\n");
+    mproduct_list = upslst_sort0( mproduct_list , product_cmp );
+    upsver_mes(2,"Ending sort of product list\n");
+    mproduct_list = upslst_first(mproduct_list);  /* point to the start */
 
-  /* Output the requested information from the instances */
-  /*  upsugo_dump(a_command_line);*/
-  list_output(mproduct_list, a_command_line);
-
-  /* free the matched products */
-  for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
-       tmp_mprod_list = tmp_mprod_list->next) {
-    mproduct = (t_upstyp_matched_product *)tmp_mprod_list->data;
-    ups_free_matched_product(mproduct);      /* free the data */
+    /* Output the requested information from the instances */
+    /*  upsugo_dump(a_command_line);*/
+    if (!a_command_line->ugo_K)
+    { printf("DATABASE=");
+      if (db_info->name)
+      { printf("%s ",db_info->name);
+      } else {
+        printf("\"\" ");
+      } printf("\n");
+    }
+    list_output(mproduct_list, a_command_line);
+  
+    /* free the matched products */
+    for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
+         tmp_mprod_list = tmp_mprod_list->next) {
+      mproduct = (t_upstyp_matched_product *)tmp_mprod_list->data;
+      ups_free_matched_product(mproduct);      /* free the data */
+    }
+    /* now free the list */
+    tmp_mprod_list = upslst_free(tmp_mprod_list, ' ');
   }
-  /* now free the list */
-  tmp_mprod_list = upslst_free(tmp_mprod_list, ' ');
-
 }
 
 
@@ -263,7 +278,8 @@ void ups_list( t_upsugo_command * const a_command_line )
  * Output: <output>
  * Return: <return>
  */
-t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line)
+t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
+                             t_upslst_item * const db_list )
 {
   t_upslst_item *mproduct_list = NULL;
   int need_unique = 0;
@@ -281,7 +297,8 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line)
   }
 
   /* Get all the instances that the user requested */
-  mproduct_list = upsmat_instance(a_command_line, NULL, need_unique);
+/*  mproduct_list = upsmat_instance(a_command_line, NULL, need_unique); */
+  mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
 
   return(mproduct_list);
 }
@@ -313,17 +330,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
     { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
 /* A as in a single product loop */
       if (!a_command_line->ugo_K)
-      { printf("DATABASE=");
-        if(mproduct->db_info)
-        { if (mproduct->db_info->name)
-          { printf("%s ",mproduct->db_info->name);
-          } else {
-            printf("\"\" ");
-          }
-        } else {
-          printf("\"\" ");
-        } printf("\n");
-        printf("\tPRODUCT=%s",mproduct->product);
+      { printf("\tPRODUCT=%s",mproduct->product);
         if (minst_ptr->chain) 
         { defaults(chain)
         } else { 
