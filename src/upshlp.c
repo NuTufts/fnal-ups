@@ -135,8 +135,7 @@ int upshlp_command(const char * const what)
   }
   if ( !what || strlen( what ) <= 0 ) 
   { fprintf(stdout,"UPS commands:\n\n");
-    fprintf(stdout,"for specific command options\n");
-    fprintf(stdout,"use ups help COMMAND, or COMMAND -?\n\n");
+    fprintf(stdout,"for specific command options use \"ups COMMAND -?\"\n\n");
     for ( l_ptr = upslst_first(command_description); 
           l_ptr; l_ptr = l_ptr->next, count++ )
     { if (strncmp(last,l_ptr->data,12)) {
