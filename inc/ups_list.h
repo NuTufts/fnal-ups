@@ -50,6 +50,8 @@ t_ups_list_item *ups_list_insert( t_ups_list_item *list_ptr, void *data_ptr );
 t_ups_list_item *ups_list_add( t_ups_list_item *list_ptr, void *data_ptr );
 t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, char copt );
 
+t_ups_list_item *ups_list_top( t_ups_list_item *list_ptr );
+t_ups_list_item *ups_list_bot( t_ups_list_item *list_ptr );
 /*
  * Declaration of private globals.
  */

@@ -32,8 +32,6 @@
 /*
  * Declaration of private functions.
  */
-t_ups_list_item *get_list_top( t_ups_list_item *list_ptr );
-t_ups_list_item *get_list_bot( t_ups_list_item *list_ptr );
 
 /*
  * Definition of global variables.
@@ -82,9 +80,9 @@ t_ups_list_item *ups_list_free( t_ups_list_item *list_ptr, char copt )
 {
   t_ups_list_item *l_ptr = NULL;
   t_ups_list_item *l_tmp = NULL;
-  t_ups_list_item *l_top = get_list_top( list_ptr );
+  t_ups_list_item *l_top = ups_list_top( list_ptr );
 
-  if ( !l_top ) return;
+  if ( !l_top ) return NULL;
 
   l_ptr = l_top;
   while( l_ptr ) {
@@ -112,7 +110,7 @@ t_ups_list_item *ups_list_insert( t_ups_list_item *list_ptr, void *data_ptr )
   t_ups_list_item *l_top = NULL;
   t_ups_list_item *l_new = NULL;
 
-  l_top = get_list_top( list_ptr );
+  l_top = ups_list_top( list_ptr );
 
   if ( !l_top ) return NULL;
   
@@ -142,7 +140,7 @@ t_ups_list_item *ups_list_add( t_ups_list_item *list_ptr, void *data_ptr )
   t_ups_list_item *l_bot = NULL;
   t_ups_list_item *l_new = NULL;
 
-  l_bot = get_list_bot( list_ptr );
+  l_bot = ups_list_bot( list_ptr );
 
   if ( !l_bot ) return NULL;
   
@@ -155,7 +153,7 @@ t_ups_list_item *ups_list_add( t_ups_list_item *list_ptr, void *data_ptr )
   l_new->prev = l_bot;
   l_new->next = NULL;
 
-  return get_list_top( l_new );
+  return ups_list_top( l_new );
 }
 
 /*-----------------------------------------------------------------------
@@ -176,7 +174,7 @@ t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, cha
   t_ups_list_item *l_prev = NULL;
   t_ups_list_item *l_top = NULL;
 
-  l_top = get_list_top( list_ptr );
+  l_top = ups_list_top( list_ptr );
   
   for ( l_ptr = l_top; l_ptr; l_ptr = l_ptr->next ) {
     l_prev = l_ptr->prev;
@@ -202,13 +200,8 @@ t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, cha
   return NULL;
 }
 
-
-/*
- * Definition of private functions.
- */
-
 /*-----------------------------------------------------------------------
- * get_list_top
+ * ups_list_top
  *
  * Will return top item of passed list.
  *
@@ -216,7 +209,7 @@ t_ups_list_item *ups_list_delete( t_ups_list_item *list_ptr, void *data_ptr, cha
  * Output: none
  * Return: t_ups_list_item *, pointer to top of list
  */
-t_ups_list_item *get_list_top( t_ups_list_item *list_ptr )
+t_ups_list_item *ups_list_top( t_ups_list_item *list_ptr )
 {
   t_ups_list_item *l_ptr = NULL;
   
@@ -228,7 +221,7 @@ t_ups_list_item *get_list_top( t_ups_list_item *list_ptr )
 }
 
 /*-----------------------------------------------------------------------
- * get_list_bot
+ * ups_list_bot
  *
  * Will return bottom item of passed list.
  *
@@ -236,7 +229,7 @@ t_ups_list_item *get_list_top( t_ups_list_item *list_ptr )
  * Output: none
  * Return: t_ups_list_item *, pointer to end of list
  */
-t_ups_list_item *get_list_bot( t_ups_list_item *list_ptr )
+t_ups_list_item *ups_list_bot( t_ups_list_item *list_ptr )
 {
   t_ups_list_item *l_ptr = NULL;
   
@@ -246,3 +239,8 @@ t_ups_list_item *get_list_bot( t_ups_list_item *list_ptr )
 
   return l_ptr;
 }
+
+/*
+ * Definition of private functions.
+ */
+
