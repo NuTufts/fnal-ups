@@ -3141,7 +3141,7 @@ static void f_pathremove( ACTION_PARAMS)
       CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
       GET_WHATS_LEFT()
       if (fprintf((FILE *)a_stream,
-          "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
+          "setenv upstmp \"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"%s\") set %s=($upstmp)\nrehash\nunsetenv upstmp\n#\n",
 		  pathPtr, delimiter, delimiter, a_cmd->argv[1], whats_left,
 		  pathPtr) < 0) {
 	FPRINTF_ERROR();
