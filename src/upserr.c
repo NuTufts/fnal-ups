@@ -49,7 +49,7 @@ char *g_ups_file = '\0';
  */
 #define G_BUFSIZE 2000
 #define G_ERROR_INIT -1
-#define G_ERROR_BUF_MAX 30
+#define G_ERROR_BUF_MAX 100
 
 static int g_buf_counter = G_ERROR_INIT;   /* pointer to current message */
 static int g_buf_start = G_ERROR_INIT;     /* pointer to oldest message */
