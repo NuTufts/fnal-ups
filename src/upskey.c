@@ -55,7 +55,7 @@
  *   1   : key can be in a table file
  *   2   : key can be in a chain file
  *   3   : key can be in a config file
- *   4   : spare
+ *   4   : upsfil will translate env. variables in the corresponding value
  *   5   : spare
  *   6   : spare
  *   7   : spare
@@ -74,15 +74,15 @@ static t_upskey_map g_key_map[] =
   { e_key_modifier,         "MODIFIER",         NO,    7,   NO, 0x00000001 },
   { e_key_modified,         "MODIFIED",         NO,    8,   NO, 0x00000001 },
   { e_key_origin,           "ORIGIN",           NO,    9,   NO, 0x00000001 },
-  { e_key_prod_dir,         "PROD_DIR",         NO,   10,   NO, 0x00000001 },
-  { e_key_ups_dir,          "UPS_DIR",          NO,   11,   NO, 0x00000001 },
-  { e_key_table_dir,        "TABLE_DIR",        NO,   12,   NO, 0x00000001 },
+  { e_key_prod_dir,         "PROD_DIR",         NO,   10,   NO, 0x00010001 },
+  { e_key_ups_dir,          "UPS_DIR",          NO,   11,   NO, 0x00010001 },
+  { e_key_table_dir,        "TABLE_DIR",        NO,   12,   NO, 0x00010001 },
   { e_key_table_file,       "TABLE_FILE",       NO,   13,   NO, 0x00000001 },
   { e_key_archive_file,     "ARCHIVE_FILE",     NO,   14,   NO, 0x00000001 },
   { e_key_authorized_nodes, "AUTHORIZED_NODES", NO,   15,    2, 0x00001001 },
   { e_key_description,      "DESCRIPTION",      NO,   16,   NO, 0x00000010 },
   { e_key_statistics,       "STATISTICS",       NO,   17,    3, 0x00001001 },
-  { e_key_compile_dir,      "COMPILE_DIR",      NO,   18,   NO, 0x00000001 },
+  { e_key_compile_dir,      "COMPILE_DIR",      NO,   18,   NO, 0x00010001 },
   { e_key_compile_file,     "COMPILE_FILE",     NO,   19,   NO, 0x00000001 },
   { e_key_catman_files,     "CATMAN_FILES",     NO,   20,   NO, 0x00000010 },
   { e_key_html_files,       "HTML_FILES",       NO,   21,   NO, 0x00000010 },
@@ -94,7 +94,7 @@ static t_upskey_map g_key_map[] =
   { e_key_action,           "ACTION",           NO,   26,   NO, 0x00000010 },
   { e_key_unknown,          "USER",             NO,   27,   NO, 0x00000011 },
 
-  { e_key_prod_dir_prefix,  "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00001000 },
+  { e_key_prod_dir_prefix,  "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00011000 },
   { e_key_man_path,         "MAN_PATH",         NO,   NO,    4, 0x00001000 },
   { e_key_catman_path,      "CATMAN_PATH",      NO,   NO,    5, 0x00001000 },
   { e_key_info_path,        "INFO_PATH",        NO,   NO,    6, 0x00001000 },
