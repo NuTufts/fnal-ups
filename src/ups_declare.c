@@ -99,6 +99,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upstyp_instance *new_cinst;             /* new chain instance  */
   t_upstyp_instance *tinst;                 /*   table instance      */
   t_upstyp_instance *new_vinst;             /* new version instance  */
+  char *hold_env; /* temporary holding place for translated env's */
   char *username;
   struct tm *mytime;
   char *declared_date;
@@ -442,6 +443,18 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         }
       }
       new_vinst->authorized_nodes=allauthnodes;
+/* I'm going to create the save instance and just put everything in 
+   there as the first fix for this */
+      new_vinst->sav_inst = ups_new_instance();
+      new_vinst->sav_inst->prod_dir=new_vinst->prod_dir;
+      if((hold_env=upsget_translation_env(new_vinst->prod_dir))!=0)
+      { new_vinst->prod_dir=upsutl_str_create(hold_env,' '); }
+      if((hold_env=upsget_translation_env(new_vinst->compile_dir))!=0)
+      { new_vinst->compile_dir=upsutl_str_create(hold_env,' '); }
+      if((hold_env=upsget_translation_env(new_vinst->ups_dir))!=0)
+      { new_vinst->ups_dir=upsutl_str_create(hold_env,' '); }
+      if((hold_env=upsget_translation_env(new_vinst->table_dir))!=0)
+      { new_vinst->table_dir=upsutl_str_create(hold_env,' '); }
 /* If I'm creating a totally matched version I have to create the matched 
    product structure by hand since it really doesn't exist yet on disk
    and a call to get it will fail
