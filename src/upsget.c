@@ -111,27 +111,37 @@ typedef char * (*var_func)(const t_upstyp_db * const db_info_ptr,
 typedef struct s_var_sub {
   char *string;
   var_func func;
+  int include_in_env;
+  int unset_if_null;
+  int quote_string;
 } t_var_sub;
 
+#define DO_INCLUDE_IN_ENV 1
+#define DO_NOT_INCLUDE_IN_ENV 0
+#define DO_UNSET_IF_NULL 1
+#define DO_NOT_UNSET_IF_NULL 0
+#define DO_QUOTE_STRING 1
+#define DO_NOT_QUOTE_STRING 0
+
 static t_var_sub g_var_subs[] = {
-  { "${UPS_PROD_NAME", upsget_product },
-  { "${UPS_PROD_VERSION", upsget_version },
-  { "${UPS_PROD_FLAVOR", upsget_flavor },
-  { "${UPS_OS_FLAVOR", upsget_OS_flavor },
-  { "${UPS_PROD_QUALIFIERS", upsget_qualifiers },
-  { "${UPS_PROD_DIR", upsget_prod_dir },
-  { "${UPS_SHELL", upsget_shell },
-  { "${UPS_OPTIONS", upsget_options },
-  { "${UPS_VERBOSE", upsget_verbose },
-  { "${UPS_EXTENDED", upsget_extended },
-  { "${UPS_THIS_DB", upsget_this_db},
-  { "${UPS_SETUP", upsget_envstr },
-  { "${UPS_COMPILE", upsget_compile },
-  { "${UPS_ORIGIN", upsget_origin },
-  { "${UPS_SOURCE", upsget_source },
-  { "${UPS_UPS_DIR", upsget_ups_dir },
-  { "${PRODUCTS", upsget_database },
-  {  0, 0 }
+  { "${UPS_PROD_NAME", upsget_product, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_PROD_VERSION", upsget_version, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_QUOTE_STRING },
+  { "${UPS_PROD_DIR", upsget_prod_dir, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_QUOTE_STRING },
+  { "${UPS_UPS_DIR", upsget_ups_dir, DO_INCLUDE_IN_ENV, DO_UNSET_IF_NULL, DO_QUOTE_STRING },
+  { "${UPS_VERBOSE", upsget_verbose, DO_INCLUDE_IN_ENV, DO_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_EXTENDED", upsget_extended, DO_INCLUDE_IN_ENV, DO_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_THIS_DB", upsget_this_db, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_OS_FLAVOR", upsget_OS_flavor, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_PROD_FLAVOR", upsget_flavor, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_PROD_QUALIFIERS", upsget_qualifiers, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_SHELL", upsget_shell, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_OPTIONS", upsget_options, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_QUOTE_STRING },
+  { "${UPS_SETUP", upsget_envstr, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_COMPILE", upsget_compile, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_ORIGIN", upsget_origin, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_SOURCE", upsget_source, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${PRODUCTS", upsget_database, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  {  0, 0, 0, 0, 0 }
 } ;
 
 
@@ -143,47 +153,44 @@ void upsget_remall(const FILE * const stream,
 		    const char * const prefix )
 {
   char *pdefault;
+  char *unset;
+  static char unset_b [] = "unset";
+  static char unset_c [] = "unsetenv";
+  int idx;
 
   if (prefix)
   {
     pdefault = (char *)prefix;
-  } else {
+  } else
+  {
     pdefault = "";
   }
 
+/* Figure out how we should unset our variables */
+
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_NAME\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_VERSION\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_DIR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_UPS_DIR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_THIS_DB\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_OS_FLAVOR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_FLAVOR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunset UPS_PROD_QUALIFIERS\n", pdefault);
-/*    (void) fprintf((FILE *)stream,"%sunset UPS_SHELL\n", pdefault); */
-    (void) fprintf((FILE *)stream,"%sunset UPS_OPTIONS\n", pdefault);
+    unset = unset_b;
     break;
   case e_CSHELL:
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_NAME\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_VERSION\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_DIR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_UPS_DIR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_THIS_DB\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_OS_FLAVOR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_FLAVOR\n", pdefault);
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_PROD_QUALIFIERS\n", pdefault);
-/*    (void) fprintf((FILE *)stream,"%sunsetenv UPS_SHELL\n", pdefault); */
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_OPTIONS\n", pdefault);
+    unset = unset_c;
     break;
   default:
+    unset = 0;
     upserr_add(UPS_NOSHELL, UPS_WARNING, UPS_UNKNOWN_TEXT);
     break;
-  } 
+  }
+
+/* Run through the list of candidates and eliminate the right ones */
+
+  for (idx=0; g_var_subs[idx].string!=0; idx++) 
+  {
+    if (g_var_subs[idx].include_in_env)
+    {
+      (void) fprintf((FILE *)stream,"%s%s %s\n", pdefault, unset,
+                     g_var_subs[idx].string+2);
+    }
+  }
 }
 
 void upsget_envout(const FILE * const stream, 
@@ -222,6 +229,8 @@ void upsget_allout(const FILE * const stream,
 { char *addr;
   char *name;
   char *pdefault;
+  int idx;
+
   if (prefix)
   { 
     pdefault = (char *)prefix;
@@ -231,95 +240,57 @@ void upsget_allout(const FILE * const stream,
 
   get_element(name,product);
   if (!name)
-/*  { name = " ";      no name in file, set to space */      
   { name = command_line->ugo_product;
     upserr_add(UPS_NO_KEYWORD, UPS_INFORMATIONAL, "for this version", 
-             "PRODUCT", name );
-    /* put out info here !!! */
+             "PRODUCT", name );           /* put out info here !!! */
   }
+
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    (void) fprintf((FILE *)stream,"%sUPS_PROD_NAME=%s;export UPS_PROD_NAME\n",
-	       pdefault, name);
-    (void) fprintf((FILE *)stream,"%sUPS_PROD_VERSION=\"%s\";export UPS_PROD_VERSION\n",
-               pdefault, upsget_version(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%sUPS_PROD_DIR=\"%s\";export UPS_PROD_DIR\n",
-               pdefault, upsget_prod_dir(db,instance,command_line));
-    addr=upsget_ups_dir(db,instance,command_line);
-    if (strlen(addr))
-    { (void) fprintf((FILE *)stream,"%sUPS_UPS_DIR=\"%s\";export UPS_UPS_DIR\n",
-                 pdefault, addr);
-    } else {
-      (void) fprintf((FILE *)stream,"%sunset UPS_UPS_DIR\n", pdefault);
-    }
-    addr=upsget_verbose(db,instance,command_line);
-    if (strlen(addr)) 
-    { (void) fprintf((FILE *)stream,"%sUPS_VERBOSE=%s;export UPS_VERBOSE\n",
-		 pdefault, addr);
-    } else { 
-      (void) fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
-    }
-    addr=upsget_extended(db,instance,command_line);
-    if (strlen(addr))
-    { (void) fprintf((FILE *)stream,"%sUPS_EXTENDED=%s;export UPS_EXTENDED\n",
-		 pdefault, addr); 
-    } else { 
-      (void) fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
-    } 
-    (void) fprintf((FILE *)stream,"%sUPS_THIS_DB=%s;export UPS_THIS_DB\n",pdefault,
-               upsget_this_db(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%sUPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
-	       pdefault, upsget_OS_flavor(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%sUPS_PROD_FLAVOR=%s;export UPS_PROD_FLAVOR\n",
-               pdefault, upsget_flavor(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%sUPS_PROD_QUALIFIERS=%s;export UPS_PROD_QUALIFIERS\n",
-               pdefault,upsget_qualifiers(db,instance,command_line));
-/*    (void) fprintf((FILE *)stream,"%sUPS_SHELL=%s;export UPS_SHELL\n",
-               pdefault,upsget_shell(db,instance,command_line)); */
-    addr=upsget_options(db,instance,command_line);
-    if (addr) 
-    { (void) fprintf((FILE *)stream,"%sUPS_OPTIONS=\"%s\";export UPS_OPTIONS\n",
-		 pdefault,addr); } 
-    break;
-
   case e_CSHELL:
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_NAME %s\n",pdefault,name);
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_VERSION \"%s\"\n",pdefault,
-               upsget_version(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_DIR \"%s\"\n",pdefault,
-               upsget_prod_dir(db,instance,command_line));
-    addr=upsget_ups_dir(db,instance,command_line);
-    if (strlen(addr))
-    { (void) fprintf((FILE *)stream,"%ssetenv UPS_UPS_DIR \"%s\"\n",pdefault,addr);
-    } else {
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_UPS_DIR\n",pdefault);
+    for (idx=0; g_var_subs[idx].string!=0; idx++)
+    {
+      if (g_var_subs[idx].include_in_env)
+      {
+        char *the_string = g_var_subs[idx].string+2;
+        char *a_quote = g_var_subs[idx].quote_string ? "\"" : "";
+        char *the_value = "";
+
+        if (g_var_subs[idx].func)
+        {
+          the_value = g_var_subs[idx].func(db,instance,command_line);
+          if (the_value == 0)
+            the_value = "";
+        }
+
+        if ((!g_var_subs[idx].unset_if_null) || (*the_value != 0))
+        {
+          switch (command_line->ugo_shell) {
+          case e_BOURNE:
+            (void) fprintf((FILE *)stream,"%s%s=%s%s%s;export %s\n", pdefault, 
+                           the_string, a_quote, the_value, a_quote, the_string);
+            break;
+      
+          case e_CSHELL:
+            (void) fprintf((FILE *)stream,"%ssetenv %s %s%s%s\n", pdefault, 
+                           the_string, a_quote, the_value, a_quote);
+            break;
+          }
+        }
+        else
+        {
+          switch (command_line->ugo_shell) {
+          case e_BOURNE:
+            (void) fprintf((FILE *)stream,"%sunset %s\n", pdefault, the_string);
+            break;
+      
+          case e_CSHELL:
+            (void) fprintf((FILE *)stream,"%sunsetenv %s\n", pdefault, the_string);
+            break;
+          }
+        }
+      }
     }
-    addr=upsget_verbose(db,instance,command_line);
-    if (strlen(addr))
-    { (void) fprintf((FILE *)stream,"%ssetenv UPS_VERBOSE %s\n",pdefault,addr);
-    } else { 
-    (void) fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n",pdefault);
-    }
-    addr=upsget_extended(db,instance,command_line);
-    if (strlen(addr))
-    { (void) fprintf((FILE *)stream,"%ssetenv UPS_EXTENDED %s\n",pdefault,addr); 
-    } else { 
-      (void) fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n",pdefault);
-    }
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_THIS_DB %s\n",pdefault,
-               upsget_this_db(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_OS_FLAVOR %s\n",pdefault,
-               upsget_OS_flavor(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_FLAVOR %s\n",pdefault,
-               upsget_flavor(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_QUALIFIERS %s\n",pdefault,
-               upsget_qualifiers(db,instance,command_line));
-/*    (void) fprintf((FILE *)stream,"%ssetenv UPS_SHELL %s\n",pdefault,
-               upsget_shell(db,instance,command_line)); */
-    addr=upsget_options(db,instance,command_line);
-    if (addr) 
-    { (void) fprintf((FILE *)stream,"%ssetenv UPS_OPTIONS \"%s\"\n",pdefault,
-		 addr); }
     break;
 
   default:
@@ -877,7 +848,7 @@ char *upsget_version(const t_upstyp_db * const db_info_ptr,
   static char *nostring="";
   get_element(string,version);
   SHUTUP;
-  return ( string ? string : nostring ) ;
+  return string;
 }
 char *upsget_flavor(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
