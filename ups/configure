@@ -92,8 +92,10 @@ fi
 if test x${Setups_Home:-} = x
 then
     echo '**' $Setups_Flag not defined in $Ups_DB_Path/.upsfiles/dbconfig
-    echo '**' Using /usr/local/etc
-    Setups_Home=/usr/local/etc
+#    echo '**' Using /usr/local/etc
+#    Setups_Home=/usr/local/etc
+    echo '**' Configure cannot continue.
+    exit 1
 else
     echo '**' $Setups_Flag defined as $Setups_Home in 
     echo '**' $Ups_DB_Path/.upsfiles/dbconfig
@@ -180,15 +182,15 @@ then
     echo '****' $Name_Of_Ups configure failure
     exit 1
 fi
-rm -f $BootStrap_Dir/*
-if test -f $BootStrap_Dir/.write_Test
+rm -f $BootStrap_Dir/.Write_Test
+if test -f $BootStrap_Dir/.Write_Test
 then
     echo ''
     echo '****' WARNING:  Cannot remove files from $BootStrap_Dir
     echo '****'           Configure may fail.  Continuing .......
     echo ''
 fi
-type_test=x`ls -l /usr/local/bin/funame|cut -c1-10|sed 's% %%g'|cut -c1`
+type_test=x`ls -l /usr/local/bin/funame 2>/dev/null|cut -c1-10|sed 's% %%g'|cut -c1`
 if test $type_test = 'xl'
 then
     echo ''
@@ -202,7 +204,7 @@ then
     echo '**           to' $UPS_PROD_DIR/bin/funame
     echo ''
 fi
-type_Test=x`ls -l /usr/local/bin/dropit|cut -c1-10|sed 's% %%g'|cut -c1`
+type_Test=x`ls -l /usr/local/bin/dropit 2>/dev/null|cut -c1-10|sed 's% %%g'|cut -c1`
 if test $type_test = 'xl'
 then
     echo ''
@@ -438,6 +440,7 @@ fi
 #
 # Create the setups.csh file in the bootstrap directory.
 #
+rm -f $BootStrap_Dir/${Script_Prefix}.csh
 if test ! -f $BootStrap_Dir/${Script_Prefix}.csh
 then
 echo '**' Creating $BootStrap_Dir/${Script_Prefix}.csh
@@ -513,6 +516,47 @@ if ( \$mach == IRIX ) setenv MACH_OS IRIX
 set Flavor=\$MACH_OS'+'\`uname -r|cut -f1 -d'.'\`
 if ( \$MACH_OS == AIX ) set Flavor=\$MACH_OS'+'\`uname -v\`
 if ( \$MACH_OS == HP-UX ) set Flavor=\$MACH_OS'+'\`uname -r|cut -f2 -d'.'\`
+
+if ( \$?UPS_DIR ) then
+    if ( x\`echo \$UPS_DIR|cut -c1\` != x/ ) then
+        unsetenv UPS_DIR
+        unset UPS_DIR
+	unsetenv SETUP_UPS
+    else
+	if ( \$?SETUP_UPS ) then
+	    set Ups_Flavor=''
+	    foreach field ( 2 3 4 5 6 7 8 )
+		set f1=\`echo \$SETUP_UPS|cut -f\${field} -d '-'\`
+		if ( "x\$f1" == "x" ) then
+		    break
+		endif
+	 	set fq=\`echo \$f1|cut -c1\`
+		if ( x\$fq == xf ) then
+		    set Ups_Flavor=\`echo \$f1|cut -f2 -d' '\`
+		    break
+		endif
+	    end
+	    if ( x\$Ups_Flavor != x\$Flavor ) then
+	        unsetenv UPS_DIR
+	        unsetenv SETUP_UPS
+	    endif
+	    unset fi
+	    unset fq
+	    unset Ups_Flavor
+	endif
+    endif
+else
+    unsetenv UPS_DIR
+    unset UPS_DIR
+    unsetenv SETUP_UPS
+endif
+#
+# Don't trust PRODUCTS if SETUP_UPS is not defined
+#
+if ( ! \$?SETUP_UPS ) then
+    unset PRODUCTS
+    unsetenv PRODUCTS
+endif
 #
 # Define the PRODUCTS variable, if needed
 #
@@ -520,15 +564,6 @@ if (  ! \$?PRODUCTS ) then
     if ( -x \${Setups_Home}/$Setups_Products_Script ) then
         eval \`\${Setups_Home}/$Setups_Products_Script\`
     endif
-endif
-if ( \$?UPS_DIR ) then
-    if ( x\`echo \$UPS_DIR|cut -c1\` != x/ ) then
-        unsetenv UPS_DIR
-        unset UPS_DIR
-    endif
-else
-    unsetenv UPS_DIR
-    unset UPS_DIR
 endif
 #
 # Attempt to determine the file name of the cached ups information from the 
@@ -582,7 +617,11 @@ else
 # setup script may set aliases which are NOT inherited by sub-shells.
 #
 #
-    source \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
+    if ( \$?SETUP_UPS ) then
+	source \`\$UPS_DIR/bin/ups setup \$SETUP_UPS\`
+    else
+        source \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
+    endif
 endif
 #
 # Because this is designed to be sourced, it is nice to unset the local
@@ -605,6 +644,7 @@ fi
 #
 # Create, if necessary, the setups.sh script
 #
+rm -f $BootStrap_Dir/${Script_Prefix}.sh
 if test ! -f $BootStrap_Dir/${Script_Prefix}.sh
 then
 echo '**' Creating $BootStrap_Dir/${Script_Prefix}.sh
@@ -757,8 +797,38 @@ then
     then
 	unset UPS_DIR
     fi
+    if test "x\${SETUP_UPS:-}" != x
+    then
+	for field in 2 3 4 5 6 7 8
+	do
+	    f1=\`echo \$SETUP_UPS|cut -f\${field} -d'-'\`
+	    if test "x\$f1" = "x"
+	    then
+		break
+	    fi
+	    if test \`echo \$f1|cut -c1\` = f
+	    then
+		Ups_Flavor=\`echo \$f1|cut -f2 -d' '\`
+		break
+	    fi
+	done
+	if test x\${Flavor} != x\${Ups_Flavor:-}
+	then
+	    unset UPS_DIR
+	    unset SETUP_UPS
+	fi
+	unset f1
+	unset Ups_Flavor
+    fi
 else
 	unset UPS_DIR
+fi
+#
+# Don't trust the PRODUCTS variable if SETUP_UPS is not defined
+#
+if test x = x"\${SETUP_UPS:-}"
+then
+    unset PRODUCTS
 fi
 #
 # Attempt to define the PRODUCTS variable.
@@ -778,6 +848,7 @@ fi
 #
 if test x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a x\$UPS_DIR = x
 then
+    unset SETUP_UPS
     for fl in \$Node \$Flavor \$MACH_OS NULL
     do
         if test -r \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}
@@ -820,7 +891,12 @@ then
 # when PRODUCTS and UPS_DIR are known at entry.  The $Name_Of_Ups setup script
 # may define functions which are NOT inherited by sub-shells.
 #
+    if test "x\${SETUP_UPS:-}" != x
+    then
+	. \`\$UPS_DIR/bin/ups setup \$SETUP_UPS\`
+    else
 	. \`\$UPS_DIR/bin/ups setup \$Name_Of_Ups\`
+    fi
 else
 #
 # If everything failed, report same and return.
@@ -1487,9 +1563,10 @@ done
 		echo '****' \$BootStrap_Dir/\$file to 
 		echo '****' \$Setups_Home
 	    fi
-	    chmod +x \$Setups_Home/\$file
+	    chmod +rx \$Setups_Home/\$file
 	else
 	    echo '**' \$file identical to \$Setups_Home/\$file - not copied.
+	    chmod +rx \$Setups_Home/\$file
         fi
     done
 
