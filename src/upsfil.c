@@ -27,6 +27,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 /* ups specific include files */
 #include "upsutl.h"
@@ -262,6 +264,19 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
     return UPS_OPEN_FILE;
   }
+
+  /* check if prod_ptr is empty, if empty remove the file */
+
+  if ( upslst_count( prod_ptr->instance_list ) <= 0 ) {
+    const char *key = upstbl_atom_string( ups_file );
+    P_VERB_s( 1, "Removing file (product is empty)" );
+    /* remove product from cache */
+    upstbl_remove( g_ft, key );
+    /* remove file */
+    remove( ups_file );
+    return UPS_SUCCESS;
+  }
+
 
   /* check if directory exist */
 
