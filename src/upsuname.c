@@ -7,7 +7,7 @@
 
 #ifdef __sgi
 extern char *strdup();
-exterh char *getenv();
+extern char *getenv();
 #endif
 
 #define HOST_BUF_SIZE 1024
