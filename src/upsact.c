@@ -1898,8 +1898,8 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 	  lcl_cmd.argv[1] = a_inst->version->prod_dir;
 	  f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 	}
-	upsget_envout(a_stream, a_db_info, a_inst, a_command_line);
       }
+      upsget_envout(a_stream, a_db_info, a_inst, a_command_line);
       break;
     case e_chain:	/* None */
       break;
