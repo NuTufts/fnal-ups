@@ -26,9 +26,9 @@
 #include <string.h>                       /* for memset */
 
 /* ups specific include files */
-#include "../inc/ups_types.h"
-#include "../inc/ups_memory.h"
-#include "../inc/ups_list.h"
+#include "ups_types.h"
+/* #include "ups_memory.h" */
+#include "ups_list.h"
 
 /*
  * Definition of public variables
@@ -54,7 +54,7 @@
 t_ups_product *ups_new_product( void )
 {  
   t_ups_product *prod_ptr =
-    (t_ups_product *)upsmem_malloc( sizeof( t_ups_product ) );
+    (t_ups_product *)malloc( sizeof( t_ups_product ) );
   
   memset( prod_ptr, 0, sizeof( t_ups_product ) );
   return prod_ptr;
@@ -79,12 +79,12 @@ int ups_free_product( t_ups_product *prod_ptr )
   if ( prod_ptr->product ) { free( prod_ptr->product); }
   if ( prod_ptr->chaver ) { free( prod_ptr->chaver ); }
   
-  for ( l_ptr = upslst_first( prod_ptr->instance_list ); l_ptr; l_ptr->next ) {
+  for ( l_ptr = upslst_first( prod_ptr->instance_list ); l_ptr; l_ptr = l_ptr->next ) {
     ups_free_action( l_ptr->data );
   }
   upslst_free( prod_ptr->instance_list, ' ' );
 
-  upsmem_free( prod_ptr );
+  free( prod_ptr );
   
   return 1;
 }
@@ -101,7 +101,7 @@ int ups_free_product( t_ups_product *prod_ptr )
 t_ups_instance *ups_new_instance( void )
 {
   t_ups_instance *inst_ptr =
-    (t_ups_instance *)upsmem_malloc( sizeof( t_ups_instance ) );
+    (t_ups_instance *)malloc( sizeof( t_ups_instance ) );
   
   memset( inst_ptr, 0, sizeof( t_ups_instance ) );
   return inst_ptr;
@@ -142,12 +142,12 @@ int ups_free_instance( t_ups_instance *inst_ptr )
   
   if ( inst_ptr->unknown_list ) upslst_free( inst_ptr->unknown_list, 'd' );
   
-  for ( l_ptr = upslst_first( inst_ptr->action_list ); l_ptr; l_ptr->next ) {
+  for ( l_ptr = upslst_first( inst_ptr->action_list ); l_ptr; l_ptr = l_ptr->next ) {
     ups_free_action( l_ptr->data );
   }
   upslst_free( inst_ptr->action_list, ' ' );
 
-  upsmem_free ( inst_ptr );
+  free ( inst_ptr );
 
   return 1;
 }
@@ -164,7 +164,7 @@ int ups_free_instance( t_ups_instance *inst_ptr )
 t_ups_action *ups_new_action( void )
 {
   t_ups_action *act_ptr =
-    (t_ups_action *)upsmem_malloc( sizeof( t_ups_action ) );
+    (t_ups_action *)malloc( sizeof( t_ups_action ) );
   
   memset( act_ptr, 0, sizeof( t_ups_action ) );
   return act_ptr;
@@ -186,7 +186,7 @@ int ups_free_action( t_ups_action *act_ptr )
   if ( act_ptr->action ) { free( act_ptr->action ); }
   if ( act_ptr->command_list ) { upslst_free( act_ptr->command_list, 'd' ); }
 
-  upsmem_free( act_ptr );
+  free( act_ptr );
 
   return 1;
 }
