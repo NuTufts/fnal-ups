@@ -80,7 +80,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        upserr_output(); upserr_clear();
        return (0);
        }
-   mp = upsmat_instance(uc,unique);
+   mp = upsmat_instance(uc,NULL,unique);
    if (UPS_ERROR != estatus)                    	/* error? */
        {
        fprintf(stderr,"%s: %s, %s: %s\n","actual status",

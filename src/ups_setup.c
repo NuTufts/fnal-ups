@@ -114,7 +114,7 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 
   /* get all the requested instances */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
-					need_unique);
+				  NULL, need_unique);
   if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
     /* get the product to be set up */
     mproduct = (t_upstyp_matched_product *)mproduct_list->data;
@@ -138,7 +138,8 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 					   g_cmd_info[e_unsetup].valid_opts)) {
 	    /* we found the SETUP_<PROD> so get a new instance based on the
 	       env variable. */
-	    new_mproduct_list = upsmat_instance(new_command_line, need_unique);
+	    new_mproduct_list = upsmat_instance(new_command_line, NULL,
+						need_unique);
 	    if (new_mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
 	      /* get the product to be set up */
 	      new_mproduct =

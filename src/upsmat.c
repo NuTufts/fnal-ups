@@ -262,9 +262,11 @@ static int g_ups_error;
  * Return: a list of matched products
  */
 t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
-				     const int a_need_unique)
+			       const t_upslst_item * const a_db_info,
+			       const int a_need_unique)
 {
   t_upstyp_db *db_info = NULL;
+  t_upslst_item *db_list;
   t_upslst_item *db_item, *all_products = NULL, *product_item;
   t_upslst_item *all_versions = NULL;
   t_upslst_item *chain_item, *all_chains = NULL, *all_tmp_chains = NULL;
@@ -275,6 +277,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
   char do_delete = 'd';
   int got_all_products = 0, got_all_versions = 0;
   int any_version = 0, any_chain = 0;
+  void *saved_next = NULL;
 
   /* initialize this to success */
   g_ups_error = UPS_SUCCESS;
@@ -300,7 +303,17 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
     }
   }
 
-  if (a_command_line->ugo_db) {
+  /* figure out where we are getting our database from */
+  if (a_db_info) {
+    /* the user passed a particular one */
+    db_list = (t_upslst_item *)a_db_info;
+    saved_next = db_list->next;
+    db_list->next = NULL;                     /* we only want this one */
+  } else {
+    db_list = a_command_line->ugo_db;
+  }
+
+  if (db_list) {
     if (a_command_line->ugo_M && a_command_line->ugo_product) {
      /* We have a table file  and we have a product name, we do not need the
         db. */
@@ -311,8 +324,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
       MATCH_TABLE_ONLY();
     } else {
       /* we have at least one db */
-      for (db_item = a_command_line->ugo_db ; db_item ;
-	   db_item = db_item->next) {
+      for (db_item = db_list ; db_item ; db_item = db_item->next) {
 	db_info = (t_upstyp_db *)db_item->data;
 	if (UPS_VERBOSE) {
 	  printf("%sSearching UPS database - %s\n", VPREFIX, db_info->name);
@@ -442,6 +454,11 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 
   /* back up to the front of the list */
   mproduct_list = upslst_first(mproduct_list);
+
+  /* restore the next pointer of the db list */
+  if (a_db_info) {
+    db_list->next = saved_next;
+  }
 
   /* return any error we encountered along the way */
   if (g_ups_error != UPS_SUCCESS) {

@@ -360,7 +360,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
     return 0;
 
   if ( !mat_prod ) {
-    l_mproduct = upsmat_instance( ugo_cmd, 1 );
+    l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
     if ( !l_mproduct || !l_mproduct->data )
       return 0;
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
@@ -525,7 +525,7 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
     return 0;
 
   if ( !mat_prod ) {
-    t_upslst_item *l_mproduct = upsmat_instance( (t_upsugo_command *)ugo_cmd, 1 );
+    t_upslst_item *l_mproduct = upsmat_instance( (t_upsugo_command *)ugo_cmd, NULL, 1 );
     if ( !l_mproduct || !l_mproduct->data )
       return 0;
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
@@ -590,7 +590,7 @@ t_upslst_item *next_cmd( t_upslst_item *dep_list,
 	  continue;
 	}
 	
-	l_mproduct = upsmat_instance( new_ugo, 1 );
+	l_mproduct = upsmat_instance( new_ugo, NULL, 1 );
 	if ( !l_mproduct || !l_mproduct->data ) {
 	  printf( "???? no product on %s\n", p_line );
 	  continue;

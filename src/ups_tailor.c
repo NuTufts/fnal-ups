@@ -206,13 +206,12 @@ static t_upslst_item *tailor_core(
 {
   t_upslst_item *mproduct_list = NULL;
   t_upstyp_matched_product *mproduct = NULL;
-  t_upstyp_matched_instance *minst = NULL;
   t_upslst_item *cmd_list;
   int need_unique = 1;
 
   /* get all the requested instances */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
-					need_unique);
+				  NULL, need_unique);
   if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
     /* get the product to be tailored */
     mproduct = (t_upstyp_matched_product *)mproduct_list->data;

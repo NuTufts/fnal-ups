@@ -40,7 +40,8 @@
  * Declaration of public functions.
  */
 t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
-				     const int a_need_unique);
+			       const t_upslst_item * const a_db_info,
+			       const int a_need_unique);
 
 /*
  * Declaration of private globals.

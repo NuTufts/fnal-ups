@@ -75,7 +75,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        upserr_output(); upserr_clear();
        return (0);
        }
-   mp = upsmat_instance(uc,unique);
+   mp = upsmat_instance(uc,NULL,unique);
    UPSTST_CHECK_UPS_ERROR(estatus);
    upstst_trans_dump(mp,ofd,uc,transstring);
    }

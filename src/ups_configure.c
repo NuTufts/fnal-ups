@@ -113,7 +113,7 @@ static t_upslst_item *configure_core(
 
   /* get all the requested instances */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
-					need_unique);
+				  NULL, need_unique);
   if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
     /* get the product to be configured */
     mproduct = (t_upstyp_matched_product *)mproduct_list->data;

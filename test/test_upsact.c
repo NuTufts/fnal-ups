@@ -183,7 +183,7 @@ t_upslst_item *l_dep;
 			   "zAacCdfghKtmMNoOPqrTuUv?" );
   
   upsugo_dump( ugo_cmd, 1);
-  mproduct_list = upsmat_instance( ugo_cmd, 1 );
+  mproduct_list = upsmat_instance( ugo_cmd, NULL, 1 );
   list_output( upslst_first( mproduct_list ), ugo_cmd);
 
   l_dep = upsact_get_cmd( ugo_cmd, 0, "setup" );

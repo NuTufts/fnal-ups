@@ -98,7 +98,8 @@ void ups_unsetup( const t_upsugo_command * const a_command_line,
  * Output: <output>
  * Return: <return>
  */
-static t_upslst_item *unsetup_core(const t_upsugo_command * const a_command_line,
+static t_upslst_item *unsetup_core(
+				 const t_upsugo_command * const a_command_line,
 				 const FILE * const a_temp_file,
 				 const int a_ups_command)
 {
@@ -111,7 +112,7 @@ static t_upslst_item *unsetup_core(const t_upsugo_command * const a_command_line
 
   /* get all the requested instances */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
-					need_unique);
+				  NULL, need_unique);
   if (mproduct_list && (UPS_ERROR == UPS_SUCCESS)) {
     /* get the product to be set up */
     mproduct = (t_upstyp_matched_product *)mproduct_list->data;
