@@ -51,7 +51,7 @@ dropit() {
 	x-s) d_s=true; shift 1;;
 	x-f) d_f=true; shift 1;;
 	x--) shift 1; break;;
-	*) break;;
+ 	x*)  d_p="$d_p $1"; shift 1;;
 	esac
     done
 
