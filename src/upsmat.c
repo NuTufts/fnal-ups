@@ -481,7 +481,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		    } else {
 		      chain_item = a_command_line->ugo_chain;
 		    }
-		    for ( tmp_chain ; chain_item ;
+		    for ( tmp_chain = chain_item ; chain_item ;
 			  chain_item = chain_item->next) {
 		      the_chain = (char *)(tmp_chain->data);
 		      
