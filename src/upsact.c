@@ -268,6 +268,9 @@ static void f_dodefaults( ACTION_PARAMS);
     /* determine if we are to set the ups local environment variables */  \
     if ((! upsutl_stricmp(a_cmd->argv[1], UPS_ENV))) {                    \
       no_ups_env_flag = DO_UPS_ENV;                                       \
+    } else if (upsutl_stricmp(a_cmd->argv[1], NO_UPS_ENV)) {              \
+      /* the second parameter was not UPS_ENV or NO_UPS_ENV, an error */  \
+      upserr_add(UPS_EXECUTE_ARG2, UPS_FATAL, a_cmd->argv[1]);            \
     }
 
 #define SH_OUTPUT_LAST_PART_OPT() \
@@ -3032,44 +3035,46 @@ static void f_execute( ACTION_PARAMS)
     /* Determine which flags (if any) were entered */
     GET_UPS_ENV();
   
-  /* define all of the UPS local variables that the user may need. */
-  if (no_ups_env_flag == DO_UPS_ENV) {
-    upsget_allout(a_stream, a_db_info, a_minst, a_command_line, "  ");
-    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
-  }
-    switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      if (a_cmd->argc == g_func_info[a_cmd->icmd].min_params) {
-	if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0]) < 0) {
-	  FPRINTF_ERROR();
-	}
-      } else {
-	if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n", a_cmd->argv[2],
-		    a_cmd->argv[0], a_cmd->argv[2]) < 0) {
-	  FPRINTF_ERROR();
-	}
+    if (UPS_ERROR == UPS_SUCCESS) {
+      /* define all of the UPS local variables that the user may need. */
+      if (no_ups_env_flag == DO_UPS_ENV) {
+	upsget_allout(a_stream, a_db_info, a_minst, a_command_line, "  ");
+	g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
       }
-      break;
-    case e_CSHELL:
-      if (a_cmd->argc == g_func_info[a_cmd->icmd].min_params) {
-	if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0])< 0) {
-	  FPRINTF_ERROR();
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+	if (a_cmd->argc == g_func_info[a_cmd->icmd].min_params) {
+	  if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0]) < 0) {
+	    FPRINTF_ERROR();
+	  }
+	} else {
+	  if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n",
+		      a_cmd->argv[2], a_cmd->argv[0], a_cmd->argv[2]) < 0) {
+	    FPRINTF_ERROR();
+	  }
 	}
-      } else {
-	if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n#\n",
-		    a_cmd->argv[2], a_cmd->argv[0])< 0) {
-	  FPRINTF_ERROR();
+	break;
+      case e_CSHELL:
+	if (a_cmd->argc == g_func_info[a_cmd->icmd].min_params) {
+	  if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0])< 0) {
+	    FPRINTF_ERROR();
+	  }
+	} else {
+	  if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n#\n",
+		      a_cmd->argv[2], a_cmd->argv[0])< 0) {
+	    FPRINTF_ERROR();
+	  }
 	}
+	break;
+      default:
+	upserr_vplace();
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
-      break;
-    default:
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_func_info[a_cmd->icmd].cmd);
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_vplace();
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_func_info[a_cmd->icmd].cmd);
+      }
     }
   }
 }
@@ -3721,37 +3726,39 @@ static void f_sourceoptional( ACTION_PARAMS)
     GET_FLAGS();
     GET_UPS_ENV();
 
-    switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
-	if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				NO_CHECK, no_ups_env_flag, a_minst, a_db_info,
-				a_command_line) < 0) {
-	  FPRINTF_ERROR();
-	} else {
-	  SH_OUTPUT_LAST_PART_OPT();
+    if (UPS_ERROR == UPS_SUCCESS) {
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+	if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
+	  if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
+				  NO_CHECK, no_ups_env_flag, a_minst,
+				  a_db_info, a_command_line) < 0) {
+	    FPRINTF_ERROR();
+	  } else {
+	    SH_OUTPUT_LAST_PART_OPT();
+	  }
 	}
-      }
-      break;
-    case e_CSHELL:
-      if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
-	if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				NO_CHECK, no_ups_env_flag, a_minst, a_db_info,
-				a_command_line) < 0) {
-	  FPRINTF_ERROR();
-	} else {
-	  CSH_OUTPUT_LAST_PART_OPT();
+	break;
+      case e_CSHELL:
+	if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
+	  if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
+				   NO_CHECK, no_ups_env_flag, a_minst,
+				   a_db_info, a_command_line) < 0) {
+	    FPRINTF_ERROR();
+	  } else {
+	    CSH_OUTPUT_LAST_PART_OPT();
+	  }
 	}
+	break;
+      default:
+	upserr_vplace();
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
-      break;
-    default:
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_func_info[a_cmd->icmd].cmd);
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_vplace();
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_func_info[a_cmd->icmd].cmd);
+      }
     }
   }
 }
@@ -3830,37 +3837,39 @@ static void f_sourceoptcheck( ACTION_PARAMS)
     GET_FLAGS();
     GET_UPS_ENV();
 
-    switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
-	if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				DO_CHECK, no_ups_env_flag, a_minst, a_db_info,
-				a_command_line) < 0) {
-	  FPRINTF_ERROR();
-	} else {
-	  SH_OUTPUT_LAST_PART_OPT();	
+    if (UPS_ERROR == UPS_SUCCESS) {
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+	if (sh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
+	  if (sh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
+				  DO_CHECK, no_ups_env_flag, a_minst,
+				  a_db_info, a_command_line) < 0) {
+	    FPRINTF_ERROR();
+	  } else {
+	    SH_OUTPUT_LAST_PART_OPT();	
+	  }
 	}
-      }
-      break;
-    case e_CSHELL:
-      if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
-	if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
-				DO_CHECK, no_ups_env_flag, a_minst, a_db_info,
-				a_command_line) < 0) {
-	  FPRINTF_ERROR();
-	} else {
-	  CSH_OUTPUT_LAST_PART_OPT();
+	break;
+      case e_CSHELL:
+	if (csh_output_first_check(a_stream, a_cmd->argv[0]) >= 0) {
+	  if (csh_output_next_part(a_stream, a_cmd->argv[0], exit_flag,
+				   DO_CHECK, no_ups_env_flag, a_minst,
+				   a_db_info, a_command_line) < 0) {
+	    FPRINTF_ERROR();
+	  } else {
+	    CSH_OUTPUT_LAST_PART_OPT();
+	  }
 	}
+	break;
+      default:
+	upserr_vplace();
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
-      break;
-    default:
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_func_info[a_cmd->icmd].cmd);
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_vplace();
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_func_info[a_cmd->icmd].cmd);
+      }
     }
   }
 }
