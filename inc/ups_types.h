@@ -169,6 +169,6 @@ int               ups_free_instance( t_ups_instance * const inst_ptr );
 t_ups_action      *ups_new_action( void );
 int               ups_free_action( t_ups_action * const act_ptr );
 
-t_ups_command     *upsugo_next(const int ups_argc,const char *ups_argv[],const char *validopts);
+t_ups_command     *upsugo_next(int ups_argc, char *ups_argv[], char *validopts);
 
 #endif /* _UPS_TYPES_H_ */
