@@ -365,7 +365,6 @@ char *upsget_translation_tilde( char * const oldstr )
     }
     if ( (tr_env = (char *)upsget_tilde_dir( env )) )
     { strcat( buf, tr_env );
-      strcat( buf, "/" );
     } else {
       sprintf(error,"~%s",env);
       upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
@@ -475,7 +474,10 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
     found=0;
     if (strchr(upto,'~')) 
     { value=upsget_tilde_dir(upto);
-      if(value) { strcat(newstr,value); }
+      if(value) 
+      { strcat(newstr,value); 
+        strcat(newstr,"/");
+      }
       found=1;
       any++;
     } else { 
