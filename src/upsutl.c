@@ -84,6 +84,7 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
       }                                                         \
     }
 
+#define G_SAVE_PATH(s) path_ptr = (char *)upsmem_malloc(s); strcpy(path_ptr, buffer)
 
 static clock_t g_start_cpu, g_finish_cpu;
 static time_t g_start_w, g_finish_w;
@@ -93,6 +94,137 @@ static char g_buffer[FILENAME_MAX+1];
 /*
  * Definition of public functions.
  */
+
+/*-----------------------------------------------------------------------
+ * upsutl_get_table_file_path
+ *
+ * Given table file and the directories, find the absolute path
+ * to the file.  This depends on the following hierarchy for places to look
+ * for the existence of the table file  -
+ *
+ *    Look in each of the following successively till the file is found.  If
+ *    the file is not found, it is an error.  If one of the pieces is missing,
+ *    say - ups_dir - then that step is skipped.  NOTE: there is no default for
+ *    the table file name. if the prod_dir_prefix is missing that step is
+ *    still done with the prefix just left off.
+ *
+ *         tablefiledir/tablefile
+ *         ups_dir/tablefile
+ *         prod_dir_prefix/prod_dir/ups_dir/tablefile
+ *         db/prodname/tablefile
+ *         tablefile
+ * 
+ *
+ * Input : product name
+ *         table file name
+ *         table file directory
+ *         ups directory information
+ *         product dir
+ *         ups database directory
+ * Output: none
+ * Return: table file location
+ */
+char *upsutl_get_table_file_path( const char * const a_prodname,
+				  const char * const a_tablefile,
+				  const char * const a_tablefiledir,
+				  const char * const a_upsdir,
+				  const char * const a_productdir,
+				  const t_upstyp_db * const a_db_info)
+{
+  char buffer[FILENAME_MAX+1];   /* max size of file name and path on system */
+  char *path_ptr = NULL;
+  int file_chars, total_chars;
+  int found = 0;
+
+  if (a_tablefile != NULL) {
+    file_chars = (int )strlen(a_tablefile) + 2;  /* length plus trailing null 
+						    and leading '/' */
+    /* try tablefiledir/tablefile */
+    if (a_tablefiledir != NULL) {
+      if ((total_chars = file_chars + (int )strlen(a_tablefiledir))
+	  <= FILENAME_MAX) {
+	sprintf(buffer, "%s/%s", a_tablefiledir, a_tablefile);
+	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	  G_SAVE_PATH(total_chars);      /* found it - save it */
+	  found = 1;
+	}
+      } else {
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+      }
+    }
+    /* try ups_dir/tablefile */
+    if ((found == 0) && (a_upsdir != NULL)) {
+      if ((total_chars = file_chars + (int )strlen(a_upsdir))
+	  <= FILENAME_MAX) {
+	sprintf(buffer, "%s/%s", a_upsdir, a_tablefile);
+	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	  G_SAVE_PATH(total_chars);         /* found it */
+	  found = 1;
+	}
+      } else {
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+      }
+    }
+    /* try prod_dir/ups_dir/tablefile */
+    if ((found == 0) && (a_upsdir != NULL) && (a_productdir != NULL)) {
+      if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
+	if ((total_chars += (int )strlen(a_productdir) + 
+	                    (int )strlen(a_db_info->config->prod_dir_prefix) +
+	                    1) <= FILENAME_MAX) {
+	  sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
+		                         a_productdir, a_upsdir, a_tablefile);
+	  if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	    G_SAVE_PATH(total_chars);        /* found it */
+	    found = 1;
+	  }
+	} else {
+	  upserr_vplace();
+	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	}
+      } else {
+	if ((total_chars += (int )strlen(a_productdir) + 1) <= FILENAME_MAX) {
+	  sprintf(buffer, "%s/%s/%s", a_productdir, a_upsdir, a_tablefile);
+	  if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	    G_SAVE_PATH(total_chars);        /* found it */
+	    found = 1;
+	  }
+	} else {
+	  upserr_vplace();
+	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	}
+      }
+    }
+    /* try db/prod_name/tablefile */
+    if ((found == 0) && (a_db_info != NULL) && (a_prodname != NULL)) {
+      if ((total_chars = file_chars + (int )(strlen(a_prodname) +
+					     strlen(a_db_info->name)) + 1)
+	  <= FILENAME_MAX) {
+	sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname, a_tablefile);
+	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	  G_SAVE_PATH(total_chars);        /* found it */
+	}
+      } else {
+	upserr_vplace();
+	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+      }
+    }
+    /* try ./tablefile */
+    if ((found == 0) && ((total_chars = file_chars) <= FILENAME_MAX)) {
+      sprintf(buffer, "%s", a_tablefile);
+      if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	G_SAVE_PATH(file_chars);            /* found it */
+	found = 1;
+      }
+    } else {
+      upserr_vplace();
+      upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+    }
+  }
+
+return path_ptr;
+}
 
 /*-----------------------------------------------------------------------
  * upsutl_finish_temp_file
