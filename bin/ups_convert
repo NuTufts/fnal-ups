@@ -219,7 +219,7 @@ LINE:
           }
 # This is ups_dir - didn't know about this bad boy... (Mar 24 CST 1998)
           if (/^\s*ups_dir:\s*.*/o) {
-             $instanceHash{$opKey}{$verKey}[$#UPSDIR] = $_[1]; 
+             $instanceHash{$opKey}{$verKey}[$#UPSDIR] = &fix_env_specs($_[1]); 
           }
 # This is Authorized nodes..
           if (/^\s*Authorized_Nodes:\s*.*/o) {
@@ -424,13 +424,14 @@ sub WriteTableFile {
        }
        print TableFile "Common:\n";
        print TableFile "   Action=setup\n";
-# back to the OLD way AGAIN...
-#       print TableFile "     doDefaults()\n";
-       if (checkfor("${basedir}/ups/setup.sh")) {
-          $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL},UPS_ENV)\n/;
+# Can't just redefine the look for place since I want to keep the 
+# ${UPS_PROD_DIR}/ups for things without the ups_dir specifically set !!
+       if ($tud) { $uud=$tud; } else { $uud="${basedir}/ups"; }
+       if (checkfor("${uud}/setup.sh")) {
+          $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_UPS_DIR}\/setup.\${UPS_SHELL},UPS_ENV)\n/;
        } else { 
-         if (checkfor("${basedir}/ups/setup")) {
-            $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup,UPS_ENV)\n/;
+         if (checkfor("${tud}/setup")) {
+            $key=~s/DaSeTuP/      proddir()\n      setupenv()\n      sourceRequired(\${UPS_UPS_DIR}\/setup,UPS_ENV)\n/;
          } else {
            $key=~s/DaSeTuP/      proddir()\n      setupenv()\n/;
          }
@@ -585,6 +586,8 @@ sub WriteVersionRecs {
        print VersionFile "Product=$PRODUCT\n";
        print VersionFile "Version=$version\n";
        print VersionFile "# \n";
+# ups dir's for versions are the same (Table Ups Dir tud)
+       $tud=$instanceHash{$flvr}{$version}[$#UPSDIR];
     }
     ( $sos, $qual ) = &split_os ( $flvr );
     $DaTe=&convert_to_gmt($instanceHash{$flvr}{$version}[$#WHEN]);
@@ -600,8 +603,7 @@ sub WriteVersionRecs {
     $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
     print VersionFile "   PROD_DIR=$PrOd_DiR\n";
     if ( &upsdir ) {
-     $UpS_Dir=&fix_env_specs($instanceHash{$flvr}{$version}[$#UPSDIR]);
-     print VersionFile "   UPS_DIR=$UpS_DiR\n";
+     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
     } else {  
      print VersionFile "   UPS_DIR=ups\n";
     }
@@ -644,8 +646,7 @@ sub WriteVersionRecs {
     $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
     print VersionFile "   PROD_DIR=$PrOd_DiR\n";
     if ( &upsdir ) {
-     $UpS_Dir=&fix_env_specs($instanceHash{$flvr}{$version}[$#UPSDIR]);
-     print VersionFile "   UPS_DIR=$UpS_DiR\n";
+     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
     } else {  
      print VersionFile "   UPS_DIR=ups\n";
     }
@@ -739,54 +740,34 @@ sub add_setup {
 } 
 sub add_misactions { 
     $value="";
-    if (checkfor("${basedir}/ups/tailor")) {
+    if ($tud) { $uud=$tud; } else { $uud="${basedir}/ups"; }
+    if (checkfor("${uud}/tailor")) {
        $value.="   Action=Tailor\n";
-#       $value.="      proddir()\n";
        $value.="      execute(\${UPS_PROD_DIR}/ups/tailor,UPS_ENV)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      unproddir()\n"
     }
-    if (checkfor("${basedir}/ups/tailor.sh}")) {
+    if (checkfor("${uud}/tailor.sh}")) {
        $value.="   Action=Tailor\n";
-#       $value.="      proddir()\n";
-       $value.="      execute(\${UPS_PROD_DIR}/ups/tailor.\${UPS_SHELL},UPS_ENV)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      unproddir()\n"
+       $value.="      execute(\${UPS_UPS_DIR}/tailor.\${UPS_SHELL},UPS_ENV)\n";
     }
-    if (checkfor("${basedir}/ups/configure")) {
+    if (checkfor("${uud}/configure")) {
        $value.="   Action=Configure\n";
-#       $value.="      proddir()\n";
-       $value.="      execute(\${UPS_PROD_DIR}/ups/configure,UPS_ENV)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      unproddir()\n"
+       $value.="      execute(\${UPS_UPS_DIR}/configure,UPS_ENV)\n";
     }
-    if (checkfor("${basedir}/ups/configure.sh")) {
+    if (checkfor("${uud}/configure.sh")) {
        $value.="   Action=Configure\n";
-#       $value.="      proddir()\n";
-       $value.="      execute(\${UPS_PROD_DIR}/ups/configure.\${UPS_SHELL},UPS_ENV)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      unproddir()\n"
+       $value.="      execute(\${UPS_UPS_DIR}/configure.\${UPS_SHELL},UPS_ENV)\n";
     }
-    if (checkfor("${basedir}/ups/start")) {
+    if (checkfor("${uud}/start")) {
        $value.="   Action=start\n";
-#       $value.="      proddir()\n";
-       $value.="      execute(\${UPS_PROD_DIR}/ups/start,UPS_ENV)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      unproddir()\n";
+       $value.="      execute(\${UPS_UPS_DIR}/start,UPS_ENV)\n";
     }
-    if (checkfor("${basedir}/ups/stop")) {
+    if (checkfor("${uud}/stop")) {
        $value.="   Action=stop\n";
-#       $value.="      proddir()\n";
-       $value.="      execute(\${UPS_PROD_DIR}/ups/stop,UPS_ENV)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      unproddir()\n";
+       $value.="      execute(\${UPS_UPS_DIR}/stop,UPS_ENV)\n";
     }
-    if (checkfor("${basedir}/ups/current")) {
+    if (checkfor("${uud}/current")) {
        $value.="   Action=Current\n";
-#       $value.="      proddir()\n";
-       $value.="      execute(\${UPS_PROD_DIR}/ups/current,UPS_ENV)\n";
-#       $value.="      doDefaults()\n";
-#       $value.="      unproddir()\n";
+       $value.="      execute(\${UPS_UPS_DIR}/current,UPS_ENV)\n";
     }
     return $value
 }
@@ -815,7 +796,6 @@ sub checkfor {
     $test = eval <<EOF;
 "$test"
 EOF
-#    print "$test\n";
     $test=&expandtildes($test);
     return (-f $test);
 }
