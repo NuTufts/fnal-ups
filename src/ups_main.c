@@ -66,7 +66,7 @@ extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
 extern int g_UPS_SHELL; /* Ugliness!!! */
 int g_simulate = 0;
-static mode_t g_umask = 0;
+static mode_t g_umask = 022;
 extern int UPS_NEED_DB;
 
 /*
@@ -144,10 +144,7 @@ int main(int argc, char *argv[])
 	    /* See if we can open the file (rw) to write to. */
 	    old_umask = umask(g_umask);
 
-	/*  if ((temp_file = fopen(g_temp_file_name,"w")) == NULL)	*/
-
-	    if (((temp_desc = open(g_temp_file_name,O_RDWR|O_CREAT,0744)) <= 0) ||
-	        ((temp_file = fdopen(temp_desc,"w")) == NULL))
+	    if ((temp_file = fopen(g_temp_file_name,"w")) == NULL)
 	    {
 	      /* error in open */
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
