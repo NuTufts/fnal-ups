@@ -530,15 +530,20 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       }
       if (uc->ugo_O)
       { if ( strchr(uc->ugo_options,':') == 0)
-        { new_vinst->user_list = 
+        { 
+	  if ( strchr(uc->ugo_options,'=') )
+	  { new_vinst->user_list = 
              upslst_add(new_vinst->user_list,upsutl_str_create(uc->ugo_options,' '));
+	  }
         } else {
           saddr=uc->ugo_options;
           while ((eaddr = strchr(saddr,':')) != 0 )
           { *eaddr='\0';
-            naddr=upsutl_str_create(saddr,' ');
-            new_vinst->user_list = 
-               upslst_add(new_vinst->user_list,naddr);
+            if ( strchr(uc->ugo_options,'=') )
+	    { naddr=upsutl_str_create(saddr,' ');
+              new_vinst->user_list = 
+                upslst_add(new_vinst->user_list,naddr);
+	    }
             *eaddr=':'; /* put back : want to free whole list later */
             saddr=eaddr+1;
           }
