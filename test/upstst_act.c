@@ -62,7 +62,7 @@ stdout_dup = dup(STDOUT_FILENO);		/* dup stdout */
    --------------------- */
 
 UPS_ERROR = UPS_SUCCESS;
-while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
+while ((uc = upsugo_next(argc,argv,UPSTST_ALLOPTS)) != 0)	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    (void) upsact_print(uc,NULL,action,upsact_action2enum(action),options);
@@ -139,7 +139,7 @@ stdout_dup = dup(STDOUT_FILENO);		/* dup stdout */
    --------------------- */
 
 UPS_ERROR = UPS_SUCCESS;
-while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
+while ((uc = upsugo_next(argc,argv,UPSTST_ALLOPTS)) != 0)	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    cmd_list = upsact_get_cmd(uc,NULL,action,upsact_action2enum(action));
