@@ -123,8 +123,10 @@ typedef struct ups_command
  */
 enum e_shell_type {
   e_INVALID_SHELL = -1,
+  e_MIN_SHELL = 0,
   e_BOURNE = 0,
-  e_CSHELL
+  e_CSHELL,
+  e_MAX_SHELL
 };
 
 #define SETUPENV "SETUP_"
