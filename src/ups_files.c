@@ -152,6 +152,11 @@ static int            g_imargin = 0;
  */
 t_ups_product *upsfil_read_file( const char * const ups_file )
 {
+  if ( !ups_file || strlen( ups_file ) <= 0 ) {
+    upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
+    return 0;
+  }
+       
   g_fh = fopen ( ups_file, "r" );
   if ( ! g_fh ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
@@ -186,8 +191,11 @@ int upsfil_write_file( t_ups_product * const prod_ptr,
     return 0;
   g_pd = prod_ptr;
 
-  if ( strlen( ups_file ) <= 0 )
+  if ( !ups_file || strlen( ups_file ) <= 0 ) {
+    upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
     return 0;
+  }
+  
   g_fh = fopen ( ups_file, "w" );
   if ( ! g_fh ) {
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
