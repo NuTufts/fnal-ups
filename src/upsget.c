@@ -592,7 +592,7 @@ t_upstyp_product *upsget_chain_file(const char * const a_db,
                                     char ** const a_buffer)
 {
   int file_chars = 0;
-  char buffer[FILENAME_MAX+1];
+  static char buffer[FILENAME_MAX+1];
   t_upstyp_product *read_product = NULL;
 
   file_chars = (int )(strlen(a_chain) + strlen(a_prod) + strlen(a_db) + 
