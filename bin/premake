@@ -301,19 +301,23 @@ if [ \( "$needEmacs" = "yes" \) -a "$EMACS_DIR" = ""  ]; then
 	exit 1
 fi
 
-if [ "${logFile}" != "" ]; then
-	echo   "#++"							>  ${logFile}
-	echo   "# ABSTRACT:	Log file from building target $target"	>> ${logFile}
-	echo   "#"							>> ${logFile}
-	echo   "# ENVIRONMENT:	UNIX make with sdssmake"		>> ${logFile}
-fi
-
-	echo   "$makeCmd"						>> ${logFile}
-	echo   ""							>> ${logFile}
-fi
-
 trap "/bin/rm -f .status.$$" 0; echo 0 > .status.$$
 makeCmd="if make $flags PMFLAGS='$flags' $target; then :; else echo 1 > .status.$$; fi"
+
+if [ "${logFile}" != "" ]; then
+	echo   "#++"						>  ${logFile}
+	echo   "# ABSTRACT: Log file from building $target"	>> ${logFile}
+	echo   "#"						>> ${logFile}
+	echo   "# ENV:  UNIX make with premake"			>> ${logFile}
+	echo   "#"                                              >> ${logFile}
+	echo   "# BUILDER:   ${LOGNAME:-}, Build date: `date`"  >> ${logFile}
+	echo   "#--"                                            >> ${logFile}
+	echo   ""                                               >> ${logFile}
+	echo   "$makeCmd"					>> ${logFile}
+	echo   ""						>> ${logFile}
+fi
+
+echo "make $flags $target\n"
 
 eval $makeCmd ${logPipe:-}
 status=`cat .status.$$`
