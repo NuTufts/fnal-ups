@@ -9,17 +9,20 @@ $| = 1;
 print 1, "\% completed.  \r";
 make_hflavorlist();
 print int(30*100/$entries), "\% completed.  \r";
+
 @rootlist = parseargs();
+
 if ($#rootlist != -1) {
 
-    # build a fresh tree each time, since we only put in thingss
-    # that involve us in a ups depend.
+    # build a fresh tree each time, since we only put things in the tree
+    # that involve the target in a ups depend.
 
     for $root (@rootlist) {
 	@tree = ();
 	@visited = ();
 	find_parents($root);
 	dump_tree() if $debug > 2;
+        print "\n";
         recurse_tree($root, '');
     }
     exit(0);
@@ -31,22 +34,36 @@ if ($#rootlist != -1) {
 
 #
 # list of all toplevel ups flavor -3 values we might see.
-# if we get a -2-ish flavor, (i.e. IRIX+6) we slap a ".x" 
+# if we get a -2-ish flavor, (i.e. IRIX+6) we pick a good guess
 # on the end.  If it's a -1-ish flavor we don't care, 'cause
 # "-H IRIX" is sufficient if there are no IRIX+x flavors...
 #
+
+%plus_three_guess = (
+ 	"IRIX+6" => "IRIX+6.5",
+	"SunOS+5" => "SunOS+5.6",
+        "Linux+2" => "Linux+2.2",
+	"OSF1+V4" => "OSF1+V4.0",
+);
+
 sub make_hflavorlist {
 
     $ourflavor = `ups flavor -3`;
+    chomp($ourflavor);
     %hflavorlist = ();
     $entries = 30;
     open(FLAVORS,"ups list -aK flavor 2>/dev/null |");
     while (<FLAVORS>) {
-       $entries++;
-       s/\A\s*"//o;
+       $entries++;		# count how many
+       s/\A\s*"//o;		#  trim quotes
        s/"\s*\Z//o;
-       next unless m/\+/o;
-       s/\Z/.x/ unless m/\./o;
+       next unless m/\+/o;	# don't care...
+
+       if ( $plus_three_guess{$_} ) {
+	   $_ = $plus_three_guess{$_};
+       } else {
+           s/\Z/.x/ unless m/\./o;
+       }
        $hflavorlist{$_} = 1;
     }
     close(FLAVORS);
@@ -112,9 +129,9 @@ sub parseargs {
     #
     # if they gave us a -z, set $PRODUCTS, and whine if they used -K
     #
-    for $f (@ARGV) {
+    for (@ARGV) {
         if ($dashz) {
- 	   $::ENV{'PRODUCTS'} = $f;
+ 	   $::ENV{'PRODUCTS'} = $_;
 	   $dashz = 0
         }
 	if (/^-.*z/) {
@@ -220,10 +237,15 @@ sub dodeps {
 	   $cmd = "ups depend -K+:database $sp 2>/dev/null |";
 
 	   # weed out duplicates!
+           # this rewriting to -H stuff could give duplicates, and
+           # it's already pretty darn slow...
+
            next if $didthat{$cmd};
            $didthat{$cmd} = 1;
 
+	   print "cmd is $cmd\n" if $debug;
 	   open(DEPEND, $cmd);
+
 	   $useit = 0;
 	   while(<DEPEND>) {
 	       print "got $_" if $debug;
@@ -241,6 +263,10 @@ sub dodeps {
 
 	   print "doing _direct_ dependencies for $sp\n" if $debug;
 	   $cmd = "ups depend -j -K+:database $sp 2>/dev/null |";
+
+           next if $didthat{$cmd};
+           $didthat{$cmd} = 1;
+
 	   print "cmd is $cmd\n" if $debug;
 	   open(DEPEND, $cmd);
 

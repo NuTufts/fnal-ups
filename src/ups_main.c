@@ -101,6 +101,15 @@ int main(int argc, char *argv[])
   int need_help = 0;
   char *on_what = NULL;
 
+
+  if (argv[1] && (0 == strcmp(argv[1],"parent"))) {
+
+      /* ups parent is an external perl script */
+
+      execvp( "ups_parent", argv+1 );
+      exit(1);
+  }
+
   if (argv[1] && (strcmp(argv[1],"-?"))) {
     /* Figure out which command was entered */
     while (g_cmd_info[i].cmd) {
