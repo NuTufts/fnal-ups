@@ -535,3 +535,4 @@ html-html:
 	dest=$(DOCROOT)/html						;\
 	find . -name '*.html' -print |					 \
 	    cpio -dumpv $$dest
+
