@@ -120,6 +120,7 @@ static int g_MATCH_DONE = 0;
   FromConfig(ups_db_version,"DB_Version")                         \
   FromConfig(prod_dir_prefix,"Prod_dir_prefix")                   \
   FromConfig(man_target_dir,"Man_Target_dir")                     \
+  FromConfig(catman_target_dir,"Catman_Target_dir")               \
   FromConfig(html_target_dir,"Html_Target_dir")                   \
   FromConfig(info_target_dir,"Info_Target_dir")                   \
 }
