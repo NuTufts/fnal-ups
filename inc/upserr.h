@@ -120,6 +120,8 @@
 #define UPS_INFORMATIONAL   "INFORMATIONAL"
 #define UPS_INFORMATIONAL_LEN 13
 
+#define UPS_UNKNOWN_TEXT    "(unknown)"
+
 /*
  * Types.
  */
