@@ -395,4 +395,5 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         upsact_cleanup(cmd_list);
       }
     }
+    return 0;
 }

@@ -227,4 +227,5 @@ if (strcmp(uc->ugo_product,"*"))
  } else { 
    fprintf(stdout,"Unable to generate temporary file name(tmpnam)\n");
  }
+ return(mproduct_list);
 }
