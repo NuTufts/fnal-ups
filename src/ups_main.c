@@ -209,11 +209,6 @@ int main(int argc, char *argv[])
 	  if ((UPS_ERROR == UPS_SUCCESS) && mproduct_list) {
 	    upsutl_statistics(mproduct_list, g_cmd_info[i].cmd);
 	  }
-
-	  if (mproduct_list) {
-	    /* clean up the matched product list */
-	    mproduct_list = upsutl_free_matched_product_list(&mproduct_list);
-	  }
 	}
       } else {
 	/* output help */
@@ -269,6 +264,11 @@ int main(int argc, char *argv[])
 	(void )printf("/dev/null\n");
 	break;
       }
+      /* flush the journaling cache of files so the changes made internally are
+	 actually written out to disk. only do this when command succeeds  */
+      if (UPS_ERROR == UPS_SUCCESS) {
+	upsfil_flush();
+      }
     } else {
       if (UPS_ERROR == UPS_SUCCESS ) {
 	switch (g_cmd_info[i].cmd_index) {
@@ -304,9 +304,12 @@ int main(int argc, char *argv[])
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
 			 strerror(errno));
 	      KEEP_OR_REMOVE_FILE();
+	    } else {
+	      /* flush the journaling cache of files so the changes made
+		 internally are actually written out to disk */
+	      upsfil_flush();
 	    }
 	  }
-	  
 	}
       } else {  /* there was an error while doing the command */
 	switch (g_cmd_info[i].cmd_index) {
@@ -326,7 +329,6 @@ int main(int argc, char *argv[])
       }
     }
   }
-
   /* output any errors and the timing information */
   upserr_output();
 
