@@ -993,7 +993,6 @@ int upsutl_split_sort_merge( char * const str, const char c )
 
   /* split, fill buf with evenly spaced items */
 
-  printf( "ct = %s\n", ct );
   p = strtok( str, ct );
   do {
     strcpy( &buf[count*max_len], p );
