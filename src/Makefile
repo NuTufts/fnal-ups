@@ -40,13 +40,14 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 	  upsver.o upsact.o upsget.o
 
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
+	          ups_configure.o ups_unconfigure.o \
 	          ups_unk.o
 
 CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsfil.A upsugo.A upsmat.A ups_list.A  \
 	     upskey.A upshlp.A ups_unk.A ups_setup.A \
 	     upsver.A upsact.A upsget.A ups_start.A \
-	     ups_stop.A
+	     ups_stop.A ups_configure.A ups_unconfigure.A
 
 LDFLAGS = $(LLIBS)
 
@@ -105,6 +106,40 @@ make :
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
 # src DIRECTORY TO GENERATE IT
 #START_DEPEND
+ups_configure.o:	ups_configure.c
+ups_configure.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_configure.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_exist.o:	ups_exist.c
+ups_exist.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_exist.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_exist.o:	$(ERUPT_DIR)/inc/ups_main.h
 ups_list.o:	ups_list.c
 ups_list.o:	$(ERUPT_DIR)/inc/ups.h
 ups_list.o:	$(ERUPT_DIR)/inc/upserr.h
@@ -138,6 +173,10 @@ ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_start.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_stop.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_configure.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_unconfigure.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -199,6 +238,23 @@ ups_stop.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_stop.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_unconfigure.o:	ups_unconfigure.c
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/ups_main.h
 ups_unk.o:	ups_unk.c
 ups_unk.o:	$(ERUPT_DIR)/inc/ups_unk.h
 ups_unk.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -257,6 +313,10 @@ upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_start.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_stop.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_configure.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_unconfigure.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/ups_list.h
 upsact_premerge.o:	$(ERUPT_DIR)/inc/upsugo.h
