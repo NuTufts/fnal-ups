@@ -183,12 +183,12 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
             strcpy(buffer,file);
             if ((UPS_ERROR == UPS_SUCCESS) && product )
             { cinst_list=upsmat_match_with_instance( cinst, product );
-              cinst=cinst_list->data;
+              cinst = cinst_list ? cinst_list->data : 0;
               product->instance_list = 
                  upslst_delete(product->instance_list,cinst,'d');
               upsver_mes(1,"Deleting %s of version %s\n",
                             the_chain,
-                            cinst->version);
+                            cinst ? cinst->version : "(null)" );
               (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
               unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
               sprintf(unchain,"un%s",the_chain);
