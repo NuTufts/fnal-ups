@@ -209,9 +209,14 @@
 
 &fe ('OSF1'	, undef		, undef	, 'I'	, undef, 2, undef, 'of padding have been implicitly inserted prior to this member for proper');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef, 'is not used - if this is intended, it should be cast to');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, "upsutl.c", 'The last statement in non-void function "upsutl_strincmp|upsutl_stricmp"');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, "upsutl.c", 'In this statement, the identifier \"gethostname\" is implicitly declared');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/stdib\.h',     'In this declaration, a storage class without a declarator is meaningless');
 &fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xlib\.h', 'The type of the function');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, "upsact.c", 'The last statement in non-void function "get_act|cmp_ugo_db|upsact_parse_cmd"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, "upsget.c", 'The last statement in non-void function "upsget_translation_env|upsget_translation_tilde|upsget_shell|upsget_verbose"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, "upskey.c", 'The last statement in non-void function "upskey_inst_getval|upskey_inst_setval|upskey_prod_getval|upskey_prod_setval"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, "upsugo.c", 'The last statement in non-void function "upsugo_env|upsugo_next"');
 
 #   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
 #   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
