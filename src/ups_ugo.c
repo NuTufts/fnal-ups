@@ -228,6 +228,10 @@ int upsugo_ifornota(struct ups_command * const uc)
      { addr=upsutl_str_create("*",' ');  
        uc->ugo_version = addr;      /* at this point I may not know... */
      }
+     if (!uc->ugo_flavor)
+     { addr=upsutl_str_create("*",' ');  
+       uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     }
    } else {                         /* not -a but give defaults */
 /* oops... This is called before version may be set!!! */
 /*     if (!uc->ugo_chain || !uc->ugo_version) */ /* If no chain current      */
@@ -241,6 +245,7 @@ int upsugo_ifornota(struct ups_command * const uc)
      { addr=upsutl_str_create("",' ');
      uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
+     if (!uc->ugo_flavor) upsugo_bldfvr(uc);
    }
 /* If they didn't specify a database pull the environment variable */
    if (!uc->ugo_db) {
@@ -1240,7 +1245,7 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
            add_ver=0;
          } else { 
            uc->ugo_product = addr;
-           if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
+/*           if (!uc->ugo_flavor) test=upsugo_bldfvr(uc); */
            test = upsugo_ifornota(uc);
            luc=uc;
            add_ver=1;
@@ -1279,7 +1284,7 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
              add_ver=0;
            } else { 
              uc->ugo_product = addr;
-             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
+/*             if (!uc->ugo_flavor) test=upsugo_bldfvr(uc); */
              test = upsugo_ifornota(uc);
              ugo_commands = upslst_add(ugo_commands,uc);
              uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
@@ -1306,7 +1311,7 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
    if (!ugo_commands) 
    { addr=upsutl_str_create("*",' ');
      uc->ugo_product = addr;
-     if (!uc->ugo_flavor) test=upsugo_bldfvr(uc);
+/*     if (!uc->ugo_flavor) test=upsugo_bldfvr(uc); */
      test = upsugo_ifornota(uc);             
 /* need more ?? ... */
      ugo_commands = upslst_add(ugo_commands,uc);
