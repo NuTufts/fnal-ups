@@ -61,3 +61,5 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 
 16. support flow control (if tests) in actions
 
+17. allow automatic unsetting up of a compiled product to automatically
+	prepend an 'un' to the script name and optionally run that script.
