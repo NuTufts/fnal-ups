@@ -87,7 +87,7 @@ setenv products "../db1"
 #
 setenv ups_compile ""
 #
-alias rambo "SlyStalone !*"
+alias rambo 'SlyStalone \!*'
 #
 unalias rambo
 #
