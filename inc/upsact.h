@@ -129,7 +129,7 @@ typedef struct upsact_cmd {
   int  icmd;
   int  argc;
   char *argv[UPS_MAX_ARGC];
-  char *pmem;
+  char *pbuf;
 } t_upsact_cmd;
 
 typedef struct upsact_item {
@@ -139,6 +139,7 @@ typedef struct upsact_item {
   t_upstyp_matched_product   *mat;
   t_upstyp_action            *act;
   t_upsact_cmd               *cmd;
+  t_upsugo_command           *dep_ugo;
 } t_upsact_item;
 
 /* all individual command information */
@@ -177,6 +178,10 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product * const mat_prod,
 			       const char * const act_name,
 			       int ups_cmd );
+t_upslst_item *upsact_get_dep( t_upsugo_command * const ugo_cmd,
+			       t_upstyp_matched_product * const mat_prod,
+			       const char * const act_name,
+			       int ups_cmd );
 int upsact_print( t_upsugo_command * const ugo_cmd,
 		  t_upstyp_matched_product *mat_prod,
 		  const char * const act_name,
@@ -188,7 +193,9 @@ t_upslst_item *upsact_check_files(
 			    const t_upstyp_matched_product * const a_mproduct,
 			    const t_upsugo_command * const a_command_line,
 			    char * const a_cmd);
-void upsact_free_upsact_cmd( t_upsact_cmd * const act_cmd );
+t_upsact_cmd *upsact_new_upsact_cmd( const char * const act_str );
+void upsact_free_act_cmd( t_upsact_cmd * const act_cmd );
+void upsact_free_act_item( t_upsact_item * const act_itm );
 void upsact_print_cmd( const t_upsact_cmd * const cmd_cur );
 void upsact_print_item( const t_upsact_item *const p_cur, char * sopt );
 int  upsact_action2enum( const char * const act_name );
