@@ -3,10 +3,19 @@
 # test the file routines
 # ============================================================================
 touch dummy.file
+cd $ERUPT_DIR/test/scripts
 $ERUPT_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
+upsfil_read_file database/dog_v2_0.version.input
+upsfil_write_file database/dog_v2_0.version.output
+upsfil_write_file -status UPS_OPEN_FILE /junk/junk/junk
+upsfil_write_file -status UPS_UNKNOWN_FILETYPE /junk/junk/junk
+upserr_clear
 upsfil_read_file -status UPS_OPEN_FILE blah
+upserr_clear
 upsfil_read_file -status UPS_READ_FILE dummy.file
+upserr_clear
 quit
 EOD
+diff database/dog_v2_0.version.input database/dog_v2_0.version.output
 rm dummy.file
