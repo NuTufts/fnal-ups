@@ -44,7 +44,10 @@ UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 
 upstst_file = upsfil_read_file(filename);
+UPSTST_CHECK_UPS_ERROR(estatus);
+#if 0
 UPSTST_CHECK_CALL(UPSTST_NONZEROSUCCESS,upstst_file,estatus);
+#endif
 return (0);
 }
 

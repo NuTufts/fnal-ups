@@ -9,7 +9,7 @@
 # version=VERSION
 File=Chain
 Product=lassie
-Chain=mydog
+Chain=test
 # 
 Flavor=NULL
 Qualifiers="nodbg:opt"
@@ -17,3 +17,8 @@ Version=v2_0
 Declarer="roddy"
 Declared=5-14-97
 # 
+Flavor=OSF1
+Qualifiers=""
+Version=v2_0
+Declarer="roddy"
+Declared=5-14-97

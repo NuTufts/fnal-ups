@@ -1,0 +1,32 @@
+#!/bin/ksh
+# ============================================================================
+# test the file routines
+# ============================================================================
+PRODUCTS=""
+cd $ERUPT_DIR/test/scripts/list
+$ERUPT_DIR/test/ups_test << EOD
+#ups_echo "================================================================="
+#
+#
+# all instances of all products sorted alphabetically
+#
+ups_list -out all.out -diff all.in -z db1 -a
+#
+# long listing  - let's see it all for an instance with not much, and for
+#   	and instance with the whole shabang.
+#    still need to check about auth nodes. should empty fields be listed
+#    what about MODIFY_DATE? 
+#    actions should be listed too
+#
+ups_list -out long.out -diff long.in -z db1 -a -l spot v2_0
+#
+# test getting keywords
+#
+ups_list -out key1.out -diff key1.in -z db1 -q long spot v2_0 -K "JUNK:_DUMMY:ARCHIVE_FILE:AUTHORIZED_NODES"
+ups_list -out key2.out -diff key2.in -z db1 -a lassie -K +
+ups_list -out key3.out -diff key3.in -z db1 -a lassie -K +:DECLARED
+#
+# need to test all of the switches to list 
+# need to test multiple databases
+quit
+EOD
