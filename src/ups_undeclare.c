@@ -276,7 +276,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         upsver_mes(1,"Deleting version %s\n",
                       vinst->version);
         (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
-/*        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                    mproduct, UNDECLARE,ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
         { upsact_process_commands(cmd_list, tmpfile); 
@@ -286,7 +286,6 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
           upserr_vplace();
           return 0;
         }
-*/
         if (uc->ugo_Y) 
         { fprintf((FILE *)tmpfile,"rm -rf %s\n",product_home);
         }
