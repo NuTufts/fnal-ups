@@ -228,6 +228,7 @@ LINE:
              $temp = $_[1];
              $temp =~ s/\]/\"/;
              $temp =~ s/\[/\"/;
+             $temp =~ s/,/:/g;
              $instanceHash{$opKey}{$verKey}[$#AUTHNDS] = $temp; 
           }
 # Distribution, any arbitrary number... 
