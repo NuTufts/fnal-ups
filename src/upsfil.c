@@ -352,6 +352,15 @@ void write_journal_file( const void *key, void ** prod, void *cl )
     }
   }
 
+  {                             /* Bogus block that pretends to use unused arguments */
+    static long bit_bucket;
+    if (&bit_bucket == 0)
+    {
+      bit_bucket ^= (long) cl;
+      bit_bucket ^= (long) key;
+    }
+  }
+  
 }
 
 /*-----------------------------------------------------------------------
@@ -385,6 +394,16 @@ void clear_journal_file( const void *key, void ** prod, void *cl )
   /* a little helper for upsfil_clear_journal_files */
   t_upstyp_product *p = (t_upstyp_product *)*prod;
   p->journal = NOJOURNAL;
+
+  {                             /* Bogus block that pretends to use unused arguments */
+    static long bit_bucket;
+    if (&bit_bucket == 0)
+    {
+      bit_bucket ^= (long) cl;
+      bit_bucket ^= (long) key;
+    }
+  }
+
 }
 /*-----------------------------------------------------------------------
  * upsfil_clear_journal_files
