@@ -127,11 +127,12 @@ const char *upstbl_atom_new( const char * const str,
   for ( h = 0, i = 0; i < len; i++ )
     h = (h<<1) + scatter[(unsigned char)str[i]];
   h &= NELEMS(buckets)-1;
+
   for ( p = buckets[h]; p; p = p->link )
     if ( len == p->len ) {
 
-      /* since many files have a common directory path,
-         string comparison starts from the end */
+      /* 'optimized' for file names: since many files have a common 
+         directory path, string comparison starts from the end */
 
       for ( i = len-1; i >=0 && p->str[i] == str[i]; )
 	i--;
@@ -343,15 +344,15 @@ void upstbl_free( T * const table )
   free( *table );
 }
 
-void upstbl_dump( T const table )
+void upstbl_dump( T const table, const int iopt )
 {
   int i;
   struct binding *p;
 
-  if ( !table || (table->length <= 0) )
+  printf( "total number of items in table = %d\n", table ? table->length : 0 );
+  if ( iopt <= 0 )
     return;
 
-  printf( "total number of items in table = %d\n", table->length );
   for ( i = 0; i < table->size; i++ )
     for ( p = table->buckets[i]; p; p = p->link )
       printf( "bucket %d : %s\n", i, (char *)p->key );

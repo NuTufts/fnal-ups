@@ -42,7 +42,7 @@ extern void  upstbl_map( T const table,
 			 void * const cl );
 extern void  **upstbl_to_array( T const table, 
 				void * const end );
-extern void upstbl_dump( T const table );
+extern void upstbl_dump( T const table, const int iopt );
 
 /* Atom interface */
 
