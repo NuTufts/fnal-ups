@@ -2776,7 +2776,7 @@ static void f_exeaccess( ACTION_PARAMS)
 	FPRINTF_ERROR();
       }
       if (fprintf((FILE *)a_stream,
-		  "then\n  echo \"exeAccess failed for %s\"\n  return 1\nfi\n", 
+		  "then\n  echo \"exeAccess failed for %s\"\n  return 1\nfi\n", /* Needs fixing */
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
@@ -2889,7 +2889,7 @@ static void f_filetest( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "if [ ! %s %s ]; then\necho \"%s\";\nreturn 1;\nfi;\n#\n",
+		  "if [ ! %s %s ]; then\necho \"%s\";\nreturn 1\nfi;\n#\n", /* Needs fixing */
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
 	FPRINTF_ERROR();
       }
@@ -3273,7 +3273,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 	} else {
 	  upsutl_finish_temp_file(a_stream, a_command_line, "    ");
 	  if ((status = fprintf((FILE *)a_stream,
-		      "    return 1\n  fi\n  unset UPS_STATUS\n") < 0)) {
+		      "    return 1\n  fi\n  unset UPS_STATUS\n") < 0)) { /* Needs fixing */
 	      FPRINTF_ERROR();
 	  } 
 	}
@@ -3360,7 +3360,7 @@ static int sh_output_last_part_req(const FILE * const a_stream,
     FPRINTF_ERROR();
   } else {
     upsutl_finish_temp_file(a_stream, a_command_line, "  ");
-    if ((status = fprintf((FILE *)a_stream, "  return 1\nfi\n#\n") < 0)) {
+    if ((status = fprintf((FILE *)a_stream, "  return 1\nfi\n#\n") < 0)) { /* Needs fixing */
       FPRINTF_ERROR();
     }
   }
