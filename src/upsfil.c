@@ -421,7 +421,7 @@ int write_version_file( void )
     put_key( "DECLARER", inst_ptr->declarer );
     put_key( "MODIFIED", inst_ptr->modified );
     put_key( "MODIFIER", inst_ptr->modifier );
-    put_key( "ORIGON", inst_ptr->origin );
+    put_key( "ORIGIN", inst_ptr->origin );
     put_key( "PROD_DIR", inst_ptr->prod_dir );
     put_key( "UPS_DIR", inst_ptr->ups_dir );
     put_key( "TABLE_DIR", inst_ptr->table_dir );
