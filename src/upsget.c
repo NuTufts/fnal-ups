@@ -109,6 +109,7 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_COMPILE", upsget_compile },
   { "${UPS_ORIGIN", upsget_origin },
   { "${UPS_SOURCE", upsget_source },
+  { "${UPS_UPS_DIR", upsget_ups_dir },
   { "${PRODUCTS", upsget_database },
   {  0, 0 }
 } ;
@@ -508,6 +509,8 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
   }
   if ( command_line->ugo_v)
   { strcat(newstr," -v "); }
+  if ( command_line->ugo_j)
+  { strcat(newstr," -j "); }
   if ( command_line->ugo_r)
   { strcat(newstr," -r ");
     strcat(newstr,command_line->ugo_productdir);
@@ -541,6 +544,34 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
   }
   return string;
 }
+char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ static char *string;
+  static char *prefix_string;
+  if (command_line->ugo_U)
+  { string=command_line->ugo_upsdir;
+  } else { 
+    get_element(string,ups_dir);
+  }
+  if (UPSRELATIVE(string))
+  { if (db_info_ptr->config)
+    { if (db_info_ptr->config->prod_dir_prefix)
+      { prefix_string = upsutl_str_create(db_info_ptr->config->prod_dir_prefix,' '); 
+        prefix_string = upsutl_str_crecat(prefix_string,"/"); 
+        prefix_string = upsutl_str_crecat(prefix_string,string); 
+        return prefix_string;
+      } else { 
+        return string;
+      }
+    } else { 
+      return string;
+    }
+  } else {
+    return string;
+  }
+} 
+
 char *upsget_compile(const t_upstyp_db * const db_info_ptr,
                      const t_upstyp_matched_instance * const instance,
                      const t_upsugo_command * const command_line )
