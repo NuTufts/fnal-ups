@@ -530,7 +530,8 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   char *nodes=0;
   int count=0;
   static char buffer[20];
-  int valid; /* bogus for macros */
+  int valid = 0;     /* needed by the From* macros */
+  valid ^= 0;        /* but is not used by us except for this bogus reference */
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) 
