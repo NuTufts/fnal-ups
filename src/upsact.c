@@ -370,13 +370,13 @@ t_cmd_info g_cmd_info[] = {
   {e_unold,         "unold", 0, 0x00000000, e_old},
   {e_untest,        "untest", 0, 0x00000000, e_test},
   {e_unchain,       "unchain", 0, 0x00000000, e_chain},
-  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:stU:vVz:Z", 0x00000001, e_invalid_action},
-  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:stU:vVz:Z", 0x00000001, e_setup},
+  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:stU:vVz:Z0123", 0x00000001, e_invalid_action},
+  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:stU:vVz:Z0123", 0x00000001, e_setup},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000000, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_declare},
-  {e_depend,      "depend",      "?cdotg:f:H:K:lm:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
+  {e_depend,      "depend",      "?cdotg:f:H:K:lm:M:q:r:RU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_modify,      "modify",      "a?A:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
@@ -1168,7 +1168,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
       
       /* quit if option P set and optional command */
 
-      if ( p_act_itm->ugo->ugo_P && !(i_cmd & 1) )
+      if ( p_act_itm->ugo->ugo_R && !(i_cmd & 1) )
 	continue;
 
       new_act_itm = new_act_item( p_act_itm->ugo, p_act_itm->mat,  
@@ -1204,7 +1204,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       /* quit if option P set and optional command */
 
-      if ( p_act_itm->ugo->ugo_P && !(i_cmd & 1) )
+      if ( p_act_itm->ugo->ugo_R && !(i_cmd & 1) )
 	continue;
 
       /* get the ugo command */
@@ -1353,7 +1353,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       
       /* quit if option P set and optional command */
 
-      if ( p_act_itm->ugo->ugo_P && !(i_cmd & 1) )
+      if ( p_act_itm->ugo->ugo_R && !(i_cmd & 1) )
 	continue;
 
       /* note: level is not incremented */
@@ -1410,7 +1410,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       /* quit if option P set and optional command */
 
-      if ( p_act_itm->ugo->ugo_P && !(i_cmd & 1) )
+      if ( p_act_itm->ugo->ugo_R && !(i_cmd & 1) )
 	continue;
       
       /* get the ugo command */
