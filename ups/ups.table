@@ -12,7 +12,7 @@ CATMAN_SOURCE_DIR=${UPS_PROD_DIR}/man/catman
 Common:
    Action=configure
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
-     execute(${UPS_PROD_DIR}/ups/configure, UPS_ENV)
+     execute(${UPS_UPS_DIR}/configure, UPS_ENV)
 
    Action=current
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
