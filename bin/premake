@@ -25,6 +25,7 @@ makefile_file=""        # User supplied makefile name
 needEmacs=""            # used to check for EMACS_DIR if target is tag_file
 logFile=""		# Log make output?
 defs="$defs SHELL=/bin/sh"	# misc. definitions to pass to make
+insight=""              # compile with Insure (only on IRIX)
 
 
 #------------------------------------------------------------------------
@@ -85,6 +86,8 @@ for a in "$@" ; do
 		positional=-cflags;;
 	  -deb*|-DEB*)
 		dbg=1;;
+	  -i)
+	        insight=1;;
 	  -FULLOPT*|-fullopt*)
 		$opt=1
 		fullopt=1;;
@@ -101,6 +104,7 @@ Valid flags are:
 	-help		Print this message
 	-optimise	Compile with optimisation
 	-log file	Log make output to a file
+	-i              Compile with Insure (only on IRIX)
 
 flags may be upper of lower case, and may be truncated. All other
 flags are passed to make. The make variable $(PMFLAGS) is set to the options
@@ -199,8 +203,12 @@ case $ccenv in
 				cflags="$cflags -mips4";;
 			esac
 		fi
-		cc="cc $size"
-
+                if [ "x$insight" != "x" ]
+                then
+	                cc="insight"
+		else
+		        cc="cc $size"
+		fi
 		if [ \( $ccenv = irix4 \) -o \( $ccenv = IRIX4 \) ]; then 
 			ccenv=IRIX; export ccenv;
 			SGI_IRIX4=1; export SGI_IRIX4;
