@@ -125,19 +125,21 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 	uc->ugo_l = 0;	/* long (listing)			*/
 /*	uc->ugo_L = 0;	UNDEFINED				*/
 	uc->ugo_n = 0;	/* new chain				*/
-/*	uc->ugo_N = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_N = 0;	/* And N file                           */
+	uc->ugo_m = 0;	/* Table file directory			*/
+	uc->ugo_M = 0;	/* Table file name			*/
 	uc->ugo_o = 0;	/* old chain				*/
-/*	uc->ugo_O = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_O = 0;	/* set UPS_OPTIONS to value             */
 /*	uc->ugo_p = 0;	/* CODE INCOMPLETE			*/
-/*	uc->ugo_P = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_P = 0;	/* override product name                */
 /*	uc->ugo_q = 0;	/* CODE INCOMPLETE			*/
 /*	uc->ugo_Q = 0;	UNDEFINED				*/
-/*	uc->ugo_r = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_r = 0;	/* set PROD_DIR to value                */
 /*	uc->ugo_R = 0;	UNDEFINED				*/
 	uc->ugo_S = 0;	/* Syntax Checking			*/
 /*	uc->ugo_s = 0;	UNDEFINED				*/
 	uc->ugo_t = 0;	/* test chain				*/
-/*	uc->ugo_T = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_T = 0;	/* CODE INCOMPLETE			*/
 	uc->ugo_u = 0;	/* uncompile first			*/
 /*	uc->ugo_U = 0;	/* CODE INCOMPLETE			*/
 	uc->ugo_v = 0;	/* verbose				*/
@@ -155,6 +157,8 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    uc->ugo_chain_last = 0;
    uc->ugo_flavor_first = 0;
    uc->ugo_flavor_last = 0;
+   uc->ugo_key_first = 0;
+   uc->ugo_key_last = 0;
    argbuf = (char **)malloc(sizeof(char *)+1);
    *argbuf = 0;
 
@@ -304,6 +308,171 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                }
                  errflg = 1;
                  break;
+         case 'K':
+              uc->ugo_K = 1;
+              if ( *argbuf ) 
+              { while((loc=strchr(*argbuf,','))!=0) {
+                  addr=*argbuf;
+                  *argbuf=loc+1;
+                  *loc = 0;
+                  ugo_make_next(addr,&uc->ugo_key_last,&uc->ugo_key_first);
+               }
+               ugo_make_next(*argbuf,&uc->ugo_key_last,&uc->ugo_key_first);
+               *argbuf = 0;
+               break;
+               }
+               if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
+               { if(*arg_str == '-')
+                 { errflg = 1;
+                   break;
+                 }
+                 while((loc=strchr(arg_str,','))!=0) {
+                    addr=arg_str;
+                    arg_str=loc+1;
+                    *loc = 0;
+                    ugo_make_next(addr,&uc->ugo_key_last,&uc->ugo_key_first);
+                 }
+                 ugo_make_next(arg_str,&uc->ugo_key_last,&uc->ugo_key_first);
+                 break;
+               }
+                 errflg = 1;
+                 break;
+         case 'm':
+              uc->ugo_m = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_tablefiledir = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_tablefiledir = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'M':
+              uc->ugo_M = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_tablefile = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_tablefile = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'N':
+              uc->ugo_N = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_anyfile = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_anyfile = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'O':
+              uc->ugo_O = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_options = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_options = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'P':
+              uc->ugo_P = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_override = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_override = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'r':
+              uc->ugo_r = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_productdir = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_productdir = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'T':
+              uc->ugo_T = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_archivefile = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_archivefile = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'U':
+              uc->ugo_U = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_upsdir = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { errflg = 1;
+                  break;
+                }
+		uc->ugo_upsdir = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
          case 'A':
               uc->ugo_A = 1;
               if ( *argbuf ) 
@@ -329,35 +498,6 @@ struct ups_command * upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                    ugo_make_next(addr,&uc->ugo_auth_last,&uc->ugo_auth_first);
                 }
                 ugo_make_next(arg_str,&uc->ugo_auth_last,&uc->ugo_auth_first);
-                break;
-              }
-              errflg = 1;
-              break;
-         case 'K':
-              uc->ugo_K = 1;
-              if ( *argbuf ) 
-              {  while((loc=strchr(*argbuf,','))!=0) {
-                    addr=*argbuf;
-                    *argbuf=loc+1;
-                    *loc = 0;
-                    ugo_make_next(addr,&uc->ugo_key_last,&uc->ugo_key_first);
-                 }
-                 ugo_make_next(*argbuf,&uc->ugo_key_last,&uc->ugo_key_first);
-                 *argbuf = 0;
-                 break;
-              }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
-              { if(*arg_str == '-')
-                { errflg = 1;
-                  break;
-                }
-                while((loc=strchr(arg_str,','))!=0) {
-                   addr=arg_str;
-                   arg_str=loc+1;
-                   *loc = 0;
-                   ugo_make_next(addr,&uc->ugo_key_last,&uc->ugo_key_first);
-                }
-                ugo_make_next(arg_str,&uc->ugo_key_last,&uc->ugo_key_first);
                 break;
               }
               errflg = 1;
