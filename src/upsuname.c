@@ -116,6 +116,10 @@ ups_append_release(char *buf)
 	return;
    }
 
+   if (0 != (p = strchr(basnuname.release, '('))) {
+	/* releases with parens in them break stuff, so cut it off there */
+	*p = 0;
+   }
    if (strncmp(baseuname.sysname,"AIX",3) == 0) /* because AIX is different */
    { 
        (void) strcat(buf,baseuname.version); 	/* add in version */
