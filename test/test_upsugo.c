@@ -47,7 +47,7 @@ void print_list( t_upslst_item *list_ptr );
 **                                                                           
 ** ==========================================================================
 */                                                                           
-void main (argc,argv)
+int main (argc,argv)
 	int	argc;
 	char	*argv[];
 {
