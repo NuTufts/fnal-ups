@@ -44,11 +44,12 @@ extern int              upstst_debug;            /* debug flag */
 
 #define UPSTST_CHECK_CALL(type,returnval,estatus) {	\
    int macstatus = 0;				\
-   if (type == UPSTST_ZEROSUCCESS) 		\
+   int mactype = type;				\
+   if (mactype == UPSTST_ZEROSUCCESS) 		\
       macstatus = (int)(returnval);		\
-   else if (type == UPSTST_NONZEROSUCCESS)	\
+   else if (mactype == UPSTST_NONZEROSUCCESS)	\
       {						\
-      if (returnval != 0) macstatus = UPS_SUCCESS;	\
+      if (returnval) macstatus = UPS_SUCCESS;	\
       else macstatus = UPS_ERROR;		\
       }						\
    if (macstatus != estatus)			\
@@ -57,7 +58,7 @@ extern int              upstst_debug;            /* debug flag */
       (void) fprintf (stderr, "%s: %s, %s: %s\n",	\
          "actual status",g_error_ascii[macstatus],\
 	 "expected status", g_error_ascii[estatus]);\
-      if (macstatus != 0)			\
+      if (macstatus)				\
          {					\
          upserr_output();			\
          upserr_clear();			\
