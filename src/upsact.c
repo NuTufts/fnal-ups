@@ -93,57 +93,51 @@ int g_COMPILE_FLAG = 0;
  * Declaration of private functions.
  */
 
-int parse_params( const char * const a_params,
-		   char *argv[] );
+static int parse_params( const char * const a_params,
+			 char *argv[] );
 
 static int not_yet_created(const int * const array, const int index,
 			   const char element);
 static char get_man_subdir(char * const a_man_file);
-t_upslst_item *next_cmd( t_upslst_item * const top_list,
-			 t_upslst_item *dep_list,
-			 t_upsact_item * const p_act_itm,
-			 const char * const act_name,
-			 const char copt );
-t_upslst_item *next_top_prod( t_upslst_item * top_list,
-			      t_upsact_item *const p_act_itm, 
-			      const char *const act_name );
-t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
-			  t_upstyp_matched_product * mat_prod,
-			  const char * const act_name );
-t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
-			     t_upstyp_matched_product *mat_prod,
-			     const char * const act_name );
-char *get_mode( const t_upsact_item *const p_act_itm ); 
-t_upsugo_command *get_ugo( t_upsact_cmd * const p_cmd );
-t_upsact_item *find_prod_name( t_upslst_item *const dep_list,
-			       const char *const prod_name );
-t_upsact_item *find_prod_dep_name( t_upslst_item *const dep_list,
-				   const char *const prod_name );
-t_upsact_item *find_actitm_ptr( t_upslst_item* const dep_list,
-				const t_upsact_item* const act_item );
-t_upsact_item *find_ugo_ptr( t_upslst_item* const dep_list,
-			     const t_upsact_item* const p_act_itm );
-t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
-			     t_upstyp_matched_product *mat_prod,
-			     const int level,
-			     const int mode,
-			     const char * const act_name );
-t_upsact_item *copy_act_item( const t_upsact_item * const act_itm );
-t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
-			   t_upstyp_db * const db );
-t_upslst_item* merge_ugo_db( t_upslst_item * const db_list1, 
-			    t_upslst_item * const db_list2 );
-t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm, 
-				     const char * const act_name, 
-				     const int iact );
-t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
-				     t_upslst_item *const cmd_list );
-char *actitem2str( const t_upsact_item *const p_act_itm );
-t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
-				  const int i_act );
-int lst_cmp_str( t_upslst_item * const l1, 
-		 t_upslst_item * const l2 );
-int do_exit_action( const t_upsact_cmd * const a_cmd );
+static t_upslst_item *next_cmd( t_upslst_item * const top_list,
+				t_upslst_item *dep_list,
+				t_upsact_item * const p_act_itm,
+				const char * const act_name,
+				const char copt );
+static t_upslst_item *next_top_prod( t_upslst_item * top_list,
+				     t_upsact_item *const p_act_itm, 
+				     const char *const act_name );
+static t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
+				 t_upstyp_matched_product * mat_prod,
+				 const char * const act_name );
+static t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
+				    t_upstyp_matched_product *mat_prod,
+				    const char * const act_name );
+static t_upsugo_command *get_ugo( t_upsact_cmd * const p_cmd );
+static t_upsact_item *find_prod_name( t_upslst_item *const dep_list,
+				      const char *const prod_name );
+static t_upsact_item *find_prod_dep_name( t_upslst_item *const dep_list,
+					  const char *const prod_name );
+static t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
+				    t_upstyp_matched_product *mat_prod,
+				    const int level,
+				    const int mode,
+				    const char * const act_name );
+static t_upsact_item *copy_act_item( const t_upsact_item * const act_itm );
+static int cmp_ugo_db( const void * const d1, const void * const d2 );
+static t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
+				      t_upstyp_db * const db );
+static t_upslst_item* merge_ugo_db( t_upslst_item * const db_list1, 
+				    t_upslst_item * const db_list2 );
+static t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm, 
+					    const char * const act_name, 
+					    const int iact );
+static t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
+					    t_upslst_item *const cmd_list );
+static char *actitem2str( const t_upsact_item *const p_act_itm );
+static t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
+					 const int i_act );
+static int do_exit_action( const t_upsact_cmd * const a_cmd );
 
 /* functions to handle specific action commands */
 
@@ -349,7 +343,7 @@ static char *g_cshPath = "path";
 static char *g_shDelimiter = ":";
 static char *g_cshDelimiter = " ";
 
-/* this one, is a pointer ugo_command from the command line */
+/* this one, is a pointer to the ugo_command from the command line */
 static t_upsugo_command *g_ugo_cmd = 0;
 
 
@@ -1428,9 +1422,9 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       if ( ! new_ugo && (i_cmd & 2) )
 	continue;
 
-      /* if product is at the top level, use that instance */
+      /* if product is at the top level always use that instance */
       
-      if ( new_ugo && p_act_itm->level > 0 )
+      if ( new_ugo )
 	new_act_itm = find_prod_name( top_list, new_ugo->ugo_product );
 
       /* if product is already in our setup list, go to next product */
@@ -1711,30 +1705,10 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
     return 0;
 }
 
-int lst_cmp_str( t_upslst_item * const l1, 
-		 t_upslst_item * const l2 )
-{
-  /* will compare all strings in a list of strings */
-
-  int dc = 0;
-  t_upslst_item *l_1 = upslst_first( l1 );
-  t_upslst_item *l_2 = upslst_first( l2 );
-
-  if ( (dc = (upslst_count( l_1 ) - upslst_count( l_2 )) != 0 ) )
-    return dc;
-
-  for ( ; l_1; l_1 = l_1->next, l_2 = l_2->next ) {
-    if ( (dc = strcmp( (char *)l_1->data, (char *)l_2->data )) )
-      return dc;
-  }
-
-  return 0;
-}
-
 t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd )
 {
-  /* it will, for un/setup commmand lines build the corresponding
-     ugo commans structure, using upsugo_bldcmd */
+  /* it will, for un/setup action functions build the corresponding
+     ugo command structure, using upsugo_bldcmd */
 
   t_upsugo_command *a_ugo = 0;
   int i_act = p_cmd->iact;
@@ -1814,74 +1788,6 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
   return act_itm;
 }
 
-char *get_mode( const t_upsact_item *const p_act )
-{
-  /* will buil a string representing the action items mode:
-     'nc' where n is the action level, c is a single character,
-     describing: 'o' optional action, 'r' required action and
-     't' top level action */
-
-  static char s_mode[8];
-  char *sm = "--";
-
-  if ( p_act->mode == e_invalid_cmd ) {
-    sm = "--";
-  }
-  else if ( p_act->mode & 4 ) {  /* exeaction */
-    if ( p_act->mode & 1 ) 
-      sm = "er";  /* required */
-    else
-      sm = "eo";  /* optional */
-  }
-  else if ( p_act->mode & 2 ) {  /* unsetup */
-    if ( p_act->mode & 1 ) 
-      sm = "ur";
-    else
-      sm = "uo";
-  }
-  else {                         /* setup */
-    if ( p_act->mode & 1 ) 
-      sm = "sr";
-    else
-      sm = "so";
-  }
-
-  sprintf( s_mode, "%d:%s", p_act->level, sm );
-
-  return s_mode;
-}
-
-
-t_upsact_item *find_ugo_ptr( t_upslst_item* const dep_list,
-			     const t_upsact_item* const act_item )
-{
-  /* in a list of act_item's it will find the item corresponding to
-     passed act_item ugo pointer */
-
-  t_upslst_item *l_ptr = upslst_first( dep_list );
-  for ( ; l_ptr; l_ptr = l_ptr->next ) {
-    t_upsact_item *act_ptr = (t_upsact_item *)l_ptr->data;
-    if ( act_item->ugo == act_ptr->ugo )
-      return act_ptr;
-  }
-  return 0;    
-}
-
-t_upsact_item *find_actitm_ptr( t_upslst_item* const dep_list,
-				const t_upsact_item* const act_item )
-{
-  /* in a list of act_item's it will find the item corresponding to
-     passed act_item pointer */
-
-  t_upslst_item *l_ptr = upslst_first( dep_list );
-  for ( ; l_ptr; l_ptr = l_ptr->next ) {
-    t_upsact_item *act_ptr = (t_upsact_item *)l_ptr->data;
-    if ( act_item == act_ptr )
-      return act_ptr;
-  }
-  return 0;    
-}
-
 t_upsact_item *find_prod_dep_name( t_upslst_item *const dep_list,
 				   const char *const prod_name )
 {
@@ -1912,6 +1818,16 @@ t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
   return 0;    
 }
 
+int cmp_ugo_db( const void * const d1, const void * const d2 )
+{
+  /* a littel helper for prepend_ugo_db and merge_ugo_db */
+
+  t_upstyp_db *db1 = (t_upstyp_db *)d1;
+  t_upstyp_db *db2 = (t_upstyp_db *)d2;
+
+  return upsutl_stricmp( db1->name, db2->name );
+}
+
 t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list, 
 			       t_upstyp_db * const db )
 {
@@ -1919,44 +1835,25 @@ t_upslst_item *prepend_ugo_db( t_upslst_item * const db_list,
      database list */
 
   t_upslst_item *l_db = upslst_first( db_list );
+  t_upslst_item *f_db_itm = 0;
   t_upstyp_db *f_db = 0;
 
-  /* does database list contain passed db */
+  /* if passed database list contain passed db, remove it */
 
-  for ( ; l_db; l_db = l_db->next ) {
-    t_upstyp_db *c_db = (t_upstyp_db *)l_db->data;
-    if ( upsutl_stricmp( db->name, c_db->name ) ) {
-      f_db = c_db;
-      break;      
-    }
-  }
-
-  /* if found, remove database */
-
-  l_db = upslst_first( db_list );
-  if ( f_db ) {
+  if ( (f_db_itm = upslst_find( l_db, db, cmp_ugo_db )) ) {
+    f_db = (t_upstyp_db *)f_db_itm->data;
     l_db = upslst_delete( l_db, f_db, ' ' );
   }
   else {
     upsmem_inc_refctr( db );
     f_db = db;
   }
-
+    
   /* prepend database */
 
   l_db = upslst_insert( l_db, f_db );
 
   return l_db;
-}
-
-int cmp_db( const void * const d1, const void * const d2 )
-{
-  /* a littel helper for merge_ugo_db */
-
-  t_upstyp_db *db1 = (t_upstyp_db *)d1;
-  t_upstyp_db *db2 = (t_upstyp_db *)d2;
-
-  return upsutl_stricmp( db1->name, db2->name );
 }
 
 t_upslst_item* merge_ugo_db( t_upslst_item * const l_db1,
@@ -1982,7 +1879,7 @@ t_upslst_item* merge_ugo_db( t_upslst_item * const l_db1,
 
     /* if nessecary add database */
       
-    if ( !upslst_find( l_1, db, cmp_db ) ) {
+    if ( !upslst_find( l_1, db, cmp_ugo_db ) ) {
       upsmem_inc_refctr( db );
       l_1 = upslst_add( l_1, db );
     }
