@@ -29,7 +29,7 @@ upsact_process_commands uncurrent   fly v4_0 -out fly6.out -diff fly6.in
 #  where there is no current chain for product for the 
 #  unsetup before setting up product.
 # 
-setup oregano v1_0
+setup oregano v1_0 -out oregano.out -diff oregano.in
 quit
 EOD
 SHELL=/bin/sh;export SHELL;
