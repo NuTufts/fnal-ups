@@ -267,7 +267,7 @@ enum {
   e_setupoptional = 0,
   e_setuprequired,
   e_unsetupoptional,
-  e_unsetuprequired,
+  e_unsetuprequired, /* this action have to be the last setup/unsetup action */
   e_envappend,
   e_envremove,
   e_envprepend,
@@ -549,12 +549,22 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
     p_cmd = upsact_parse_cmd( p_line );
 
     if ( p_cmd && p_cmd->icmd >= 0 ) {
-      if ( p_cmd->icmd <= e_unsetuprequired ) {
-	t_upsact_item *new_cur = 0;
-	t_upsugo_command *new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
-	new_cur = new_act_item( new_ugo, 0, 0, act_name );
-	top_list = upslst_add( top_list, new_cur );
+      t_upsact_item *new_cur = 0;
+      t_upsugo_command *new_ugo = 0;
+      switch ( p_cmd->icmd ) 
+      {
+      case e_setuprequired: case e_setupoptional:
+	new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+	new_cur = new_act_item( new_ugo, 0, 0, "SETUP");
+	break;
+	
+      case e_unsetuprequired: case e_unsetupoptional:
+	new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+	new_cur = new_act_item( new_ugo, 0, 0, "UNSETUP");
+	break;
       }
+      if ( new_cur )
+	top_list = upslst_add( top_list, new_cur );
     }
   }
 
@@ -588,7 +598,7 @@ t_upslst_item *next_cmd( t_upslst_item *top_list,
 
     if ( p_cmd && p_cmd->icmd >= 0 ) {
       if ( p_cmd->icmd > e_unsetuprequired ) {
-	t_upsact_item *new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
+	t_upsact_item *new_cur = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
 	new_cur->level = p_cur->level;
 	new_cur->ugo = p_cur->ugo;
 	new_cur->mat = p_cur->mat;
@@ -621,7 +631,15 @@ t_upslst_item *next_cmd( t_upslst_item *top_list,
 	}
 	
 	if ( !new_cur ) {
-	  new_cur = new_act_item( new_ugo, 0, 0, act_name );
+	  switch ( p_cmd->icmd ) 
+	  {
+	  case e_setuprequired: case e_setupoptional:
+	    new_cur = new_act_item( new_ugo, 0, 0, "SETUP");
+	    break;	
+	  case e_unsetuprequired: case e_unsetupoptional:
+	    new_cur = new_act_item( new_ugo, 0, 0, "UNSETUP");
+	    break;
+	  }
 	  if ( !new_cur ) {
 	    printf( "???? no action_item for %s\n", p_line );
 	    continue;
@@ -762,7 +780,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
   }
 
-  act_item = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
+  act_item = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
   act_item->level = level;
   act_item->ugo = ugo_cmd;
   act_item->mat = mat_prod;
