@@ -1,0 +1,37 @@
+FILE = TABLE
+FLAVOR = ANY
+QUALIFIERS = ""
+
+ACTION = SETUP
+   sourceCompileReq("$UPS_DIR/test/scripts/compile/log/rover.out")
+   doDefaults()
+# do environment variable tests
+   envset(OPERA,"AIDA FAUST")
+   envappend(OPERA,"MADAM_BUTTERFLY CARMEN"," ")
+   envprepend(OPERA,FIDELIO,' ')
+   envremove(OPERA,FAUST,' ')
+   envunset(OPERA)
+   envsetifnotset(TMPDIR,/tmp)
+# do path tests
+   pathset(path,/bin:/usr/local/bin:/local/etc:/mybin)
+   pathAppend(path,emacs/bin,emacs/etc)
+   pathprepend(path,emacs/test)
+   pathremove(path,emacs)
+   pathremove(path,bin)
+# do file tests
+   filetest(blah,r,"can't read file")
+# setup tests
+# this is already done by earlier action tests?
+#   setupOptional(blah)
+#   setupRequired(blah)
+# execute tests
+   exeAccess(ls)
+#aliases
+   addalias (rambo,"SlyStalone %s")
+   unalias  (rambo)
+# source tests
+   sourceRequired(reqfile1,NO_UPS_ENV, continue)
+
+action = configure
+   writeCompileReq("$UPS_DIR/test/scripts/compile/log/rover.out")
+
