@@ -126,6 +126,8 @@ sub parseargs {
         }
     }
 
+    # don't redirect stderr, this is how they find out about 
+    # command line errors, etc.
     $cmd = "ups list -K+:database $a |";
     print "cmd is $cmd\n" if $debug > 1;
     open(LIST, $cmd);
