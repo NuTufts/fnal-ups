@@ -2530,7 +2530,7 @@ static void f_envappend( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2586,7 +2586,7 @@ static void f_envprepend( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
@@ -2669,7 +2669,7 @@ static void f_envremove( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }    
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2706,7 +2706,7 @@ static void f_envset( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2745,7 +2745,7 @@ static void f_envsetifnotset( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2780,7 +2780,7 @@ static void f_envunset( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2831,7 +2831,7 @@ static void f_exeaccess( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2890,7 +2890,7 @@ static void f_execute( ACTION_PARAMS)
       default:
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2935,7 +2935,7 @@ static void f_filetest( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -2990,7 +2990,7 @@ static void f_pathappend( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3045,7 +3045,7 @@ static void f_pathprepend( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
@@ -3111,7 +3111,7 @@ static void f_pathremove( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3153,7 +3153,7 @@ static void f_pathset( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3210,7 +3210,7 @@ static void f_addalias( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3245,7 +3245,7 @@ static void f_unalias( ACTION_PARAMS)
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
       upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3443,7 +3443,7 @@ static void f_sourcecompilereq( ACTION_PARAMS)
       default:
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
       }
 
       if (UPS_ERROR != UPS_SUCCESS) {
@@ -3493,7 +3493,7 @@ static void f_sourcecompileopt( ACTION_PARAMS)
       default:
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3550,7 +3550,7 @@ static void f_sourcerequired( ACTION_PARAMS)
       default:
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
       }
     } else {
       FPRINTF_ERROR();
@@ -3608,7 +3608,7 @@ static void f_sourceoptional( ACTION_PARAMS)
       default:
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3665,7 +3665,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
       default:
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
       }
     } else {
       FPRINTF_ERROR();
@@ -3723,7 +3723,7 @@ static void f_sourceoptcheck( ACTION_PARAMS)
       default:
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
 	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
       }
       if (UPS_ERROR != UPS_SUCCESS) {
         OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
