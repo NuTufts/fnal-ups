@@ -40,6 +40,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <netdb.h>        /* needed on SunOS to get MAXHOSTNAMELEN */
 /* #ifdef _SYSTYPE_SVR4 */
 #include <dirent.h>
 /* #else
@@ -141,7 +142,7 @@ int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
   a_nodes = NULL;
 
   /* get the hostname */
-  if (nodename = upsutl_get_hostname()) {
+  if ((nodename = upsutl_get_hostname())) {
     /* first check in the product instances to see if there is any
        authorization information there.  check in each file to make sure
        that if there is a specific list of nodes, that the current node is
