@@ -77,7 +77,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 17 */  "%s: Invalid value \"%s\" for argument \"%s\"\n",
 /* 18 */  "%s: Invalid action - %s\n",
 /* 19 */  "%s: Invalid argument to action - %s\n",
-/* 20 */  "%s: To many arguments to action - %s\n",
+/* 20 */  "%s: Too many arguments to action - %s\n",
 /* 21 */  "%s: Invalid shell - %s\n",
 /* 22 */  "%s: Need unique instance but multiple \"%s\" found \n"
 /* 23 this is the last */
