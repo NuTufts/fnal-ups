@@ -1610,8 +1610,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
                         ((i_cmd & 2) ? "un" : ""),
                         ((i_cmd & 1) ? "required" : "optional"),
                         setup_string);
-        upsutl_statistics ((t_upslst_item const * const) &mproduct, setup_string);
-
+        upsutl_statistics (&mproduct, setup_string);
       }
     }
   }
