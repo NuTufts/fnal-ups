@@ -9,6 +9,7 @@ QUALIFIERS = "nodbg:opt"
   PROD_DIR = /NULL/lassie
   UPS_DIR = ups
   TABLE_FILE = lassie.table
+  ORIGIN = roddy@village.england
 
 FLAVOR = IRIX+5.3
 QUALIFIERS = "nodbg:opt"

@@ -79,7 +79,7 @@ if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);
 if (difffile && outfile)
    {
    sprintf (diffcmd,"diff %s %s",difffile,outfile);
-   system(diffcmd);
+   if (system(diffcmd)) printf("files %s %s differ\n",difffile,outfile);
    }
 
 return (0);
@@ -148,7 +148,7 @@ if(fileno(ofd) != STDOUT_FILENO) fclose(ofd);
 if (difffile && outfile)
    {
    sprintf (diffcmd,"diff %s %s",difffile,outfile);
-   system(diffcmd);
+   if (system(diffcmd)) printf("files %s %s differ\n",difffile,outfile);
    }
 
 return (0);

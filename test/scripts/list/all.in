@@ -1,61 +1,61 @@
 DATABASE=db1 
-	PRODUCT=lassie	VERSION=v1_0	FLAVOR=NULL
-		QUALIFIERS=nodbg:opt	CHAIN=""
+	Product=lassie	Version=v1_0	Flavor=NULL
+		Qualifiers=nodbg:opt	Chain=""
 
-	PRODUCT=lassie	VERSION=v1_0	FLAVOR=IRIX+5.3
-		QUALIFIERS=nodbg:opt	CHAIN=""
+	Product=lassie	Version=v1_0	Flavor=IRIX+5.3
+		Qualifiers=nodbg:opt	Chain=""
 
-	PRODUCT=lassie	VERSION=v1_0	FLAVOR=IRIX+6.2
-		QUALIFIERS=""	CHAIN=""
+	Product=lassie	Version=v1_0	Flavor=IRIX+6.2
+		Qualifiers=""	Chain=""
 
-	PRODUCT=lassie	VERSION=v1_0	FLAVOR=OSF1
-		QUALIFIERS=""	CHAIN=current
+	Product=lassie	Version=v1_0	Flavor=OSF1
+		Qualifiers=""	Chain=current
 
-	PRODUCT=lassie	VERSION=v2_0	FLAVOR=NULL
-		QUALIFIERS=nodbg:opt	CHAINS=current,mydog,test
+	Product=lassie	Version=v2_0	Flavor=NULL
+		Qualifiers=nodbg:opt	Chains=current,mydog,test
 
-	PRODUCT=lassie	VERSION=v2_0	FLAVOR=IRIX+5.3
-		QUALIFIERS=nodbg:opt	CHAIN=""
+	Product=lassie	Version=v2_0	Flavor=IRIX+5.3
+		Qualifiers=nodbg:opt	Chain=""
 
-	PRODUCT=lassie	VERSION=v2_0	FLAVOR=IRIX+5
-		QUALIFIERS=nodbg:opt	CHAIN=current
+	Product=lassie	Version=v2_0	Flavor=IRIX+5
+		Qualifiers=nodbg:opt	Chain=current
 
-	PRODUCT=lassie	VERSION=v2_0	FLAVOR=IRIX+6.2
-		QUALIFIERS=""	CHAIN=""
+	Product=lassie	Version=v2_0	Flavor=IRIX+6.2
+		Qualifiers=""	Chain=""
 
-	PRODUCT=lassie	VERSION=v2_0	FLAVOR=OSF1
-		QUALIFIERS=""	CHAIN=test
+	Product=lassie	Version=v2_0	Flavor=OSF1
+		Qualifiers=""	Chain=test
 
-	PRODUCT=rover	VERSION=v2_0	FLAVOR=NULL
-		QUALIFIERS=nodbg:opt	CHAIN=""
+	Product=rover	Version=v2_0	Flavor=NULL
+		Qualifiers=nodbg:opt	Chain=""
 
-	PRODUCT=rover	VERSION=v2_0	FLAVOR=IRIX+5.3
-		QUALIFIERS=nodbg:opt	CHAIN=""
+	Product=rover	Version=v2_0	Flavor=IRIX+5.3
+		Qualifiers=nodbg:opt	Chain=""
 
-	PRODUCT=rover	VERSION=v2_0	FLAVOR=IRIX+5
-		QUALIFIERS=nodbg:opt	CHAIN=""
+	Product=rover	Version=v2_0	Flavor=IRIX+5
+		Qualifiers=nodbg:opt	Chain=""
 
-	PRODUCT=rover	VERSION=v2_0	FLAVOR=IRIX+6.2
-		QUALIFIERS=""	CHAIN=""
+	Product=rover	Version=v2_0	Flavor=IRIX+6.2
+		Qualifiers=""	Chain=""
 
-	PRODUCT=rover	VERSION=v2_0	FLAVOR=OSF1
-		QUALIFIERS=""	CHAIN=""
+	Product=rover	Version=v2_0	Flavor=OSF1
+		Qualifiers=""	Chain=""
 
-	PRODUCT=snoopy	VERSION=v1_0	FLAVOR=NULL
-		QUALIFIERS=charlie:linus:lucy:pigpen:violet	CHAIN=""
+	Product=snoopy	Version=v1_0	Flavor=NULL
+		Qualifiers=charlie:linus:lucy:pigpen:violet	Chain=""
 
-	PRODUCT=snoopy	VERSION=v1_0	FLAVOR=NULL
-		QUALIFIERS=linus:lucy:pigpen:violet	CHAIN=""
+	Product=snoopy	Version=v1_0	Flavor=NULL
+		Qualifiers=linus:lucy:pigpen:violet	Chain=""
 
-	PRODUCT=snoopy	VERSION=v1_0	FLAVOR=NULL
-		QUALIFIERS=""	CHAIN=""
+	Product=snoopy	Version=v1_0	Flavor=NULL
+		Qualifiers=""	Chain=""
 
-	PRODUCT=snoopy	VERSION=v1_0	FLAVOR=NULL
-		QUALIFIERS=pigpen	CHAIN=""
+	Product=snoopy	Version=v1_0	Flavor=NULL
+		Qualifiers=pigpen	Chain=""
 
-	PRODUCT=spot	VERSION=v2_0	FLAVOR=NULL
-		QUALIFIERS=""	CHAIN=""
+	Product=spot	Version=v2_0	Flavor=NULL
+		Qualifiers=""	Chain=""
 
-	PRODUCT=spot	VERSION=v2_0	FLAVOR=NULL
-		QUALIFIERS=long	CHAIN=""
+	Product=spot	Version=v2_0	Flavor=NULL
+		Qualifiers=long	Chain=""
 

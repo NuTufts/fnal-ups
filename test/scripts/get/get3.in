@@ -1,8 +1,10 @@
 setenv UPS_PROD_NAME=lassie
 setenv UPS_PROD_VERSION=v2_0
 setenv UPS_PROD_DIR=/NULL/lassie
-setenv UPS_THIS_DB=(null)
+unsetenv UPS_VERBOSE
+unsetenv UPS_EXTENDED
 setenv UPS_OS_FLAVOR=IRIX+5.3
 setenv UPS_PROD_FLAVOR=NULL
 setenv UPS_PROD_QUALIFIERS=nodbg:opt
 setenv UPS_SHELL=csh
+setenv UPS_OPTIONS=""

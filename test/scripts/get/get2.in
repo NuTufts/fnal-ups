@@ -1,0 +1,15 @@
+Name         = lassie	
+Version      = v2_0	
+Flavor       = NULL	
+Qualifiers   = nodbg:opt	
+Prod dir     = /dog/house	
+Shell        = csh	
+Options      = 	
+Verbose      = 	
+Extended     = 	
+Flags        = 	
+Flags Depend = 	
+This Db      = 	
+Setup        = lassie v2_0 -f NULL -z ../list/db1 -q nodbg:opt -r /dog/house	
+Origin       = roddy@village.england	
+Junk         = ${JUNK}	

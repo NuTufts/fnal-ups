@@ -12,7 +12,10 @@ QUALIFIERS = "long"
 COMMON:
 
 ACTION=SETUP
+	ya hey der
 ACTION=CONFIGURE
+	junk
 ACTION=BLAH
+	more junk
 
 END:

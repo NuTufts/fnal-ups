@@ -1,0 +1,27 @@
+UPSMAT: Searching UPS database - ../list/db1
+UPSFIL: ../list/db1/../dbconfig - Open file for read ERROR
+UPSMAT: Looking for Product = lassie
+UPSMAT: Matching with Version - v2_0
+UPSFIL: ../list/db1/lassie/v2_0.version - Open file for read
+UPSFIL: ../list/db1/lassie/v2_0.version - Read 5 item(s)
+UPSMAT: Found 1 instances in ../list/db1/lassie/v2_0.version
+UPSMAT: Matching with Version v2_0 in Product lassie using Table file lassie.table
+UPSMAT: Using Flavor NULL and Qualifiers nodbg:opt
+UPSFIL: ../list/db1/lassie/lassie.table - Open file for read
+UPSFIL: ../list/db1/lassie/lassie.table - Read 5 item(s)
+UPSMAT: Found 1 instances in ../list/db1/lassie/lassie.table
+Name         = lassie	
+Version      = v2_0	
+Flavor       = NULL	
+Qualifiers   = nodbg:opt	
+Prod dir     = /NULL/lassie	
+Shell        = csh	
+Options      = -blah	
+Verbose      = 1	
+Extended     = 1	
+Flags        = 	
+Flags Depend = 	
+This Db      = 	
+Setup        = lassie v2_0 -f NULL -z ../list/db1 -q nodbg:opt -v 	
+Origin       = roddy@village.england	
+Junk         = ${JUNK}	

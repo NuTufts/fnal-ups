@@ -14,9 +14,6 @@ ups_list -out all.out -diff all.in -z db1 -a
 #
 # long listing  - let's see it all for an instance with not much, and for
 #   	and instance with the whole shabang.
-# ???still need to check about auth nodes. should empty fields be listed
-# ???what about MODIFY_DATE? 
-# ???actions should be listed too
 #
 ups_list -out long.out -diff long.in -z db1 -a -l spot v2_0
 #
