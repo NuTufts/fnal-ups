@@ -97,7 +97,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
   }
   if (uc->ugo_version && uc->ugo_chain)
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
-           "Specificy a version, which will remove ALL chains, or chains(s)");
+    "Specify a version, which will remove ALL chains, or chains(s) not both");
     return 0;
   }
   if ((int)(upslst_count(uc->ugo_flavor) != 2 ) )
