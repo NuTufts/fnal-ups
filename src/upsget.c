@@ -499,7 +499,7 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
     strcat(newstr,db_info_ptr->name);
   }
   get_element(string,qualifiers);
-  if ( string )
+  if (*string != '\0')
   { strcat(newstr," -q ");
     strcat(newstr,string);
   }
