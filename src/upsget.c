@@ -862,34 +862,38 @@ char *upsget_shell(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char SH[]="sh";
   static char CSH[]="csh";
+  char *answer;
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    return (SH);
+    answer = SH;
     break;
   case e_CSHELL:
-    return (CSH);
+    answer = CSH;
     break;
   default:
+    answer = 0;
     break;
   }
-  return (0);
+  return (answer);
 }
 char *upsget_source(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { static char SH[]=".";
   static char CSH[]="source";
+  char *answer;
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    return (SH);
+    answer = SH;
     break;
   case e_CSHELL:
-    return (CSH);
+    answer = CSH;
     break;
   default:
+    answer = 0;
     break;
   }
-  return (0);
+  return (answer);
 }
 char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
