@@ -143,6 +143,7 @@ int main(int argc, char *argv[])
 	  if ((g_temp_file_name = tmpnam(NULL)) != NULL) {
 	    /* See if we can open the file (rw) to write to. */
 	    old_umask = umask(g_umask);
+	    (void) umask(old_umask | 022);
 
 	    if ((temp_file = fopen(g_temp_file_name,"w")) == NULL)
 	    {
@@ -152,7 +153,7 @@ int main(int argc, char *argv[])
 	      upserr_add(UPS_OPEN_FILE, UPS_FATAL, g_temp_file_name);
 	    }
 	    /* set this back to what it was */
-	    (void )umask(old_umask);
+	    (void) umask(old_umask);
 	  } else {
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam", strerror(errno));
 	  }
