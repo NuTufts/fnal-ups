@@ -161,10 +161,10 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { if (instance->chain->ELEMENT)                     \
       { printf("%s:",instance->chain->ELEMENT);         \
       } else {                                          \
-        printf(":");                                    \
+        printf("\"\":");                                \
       }                                                 \
     } else {                                            \
-      printf(":");                                      \
+      printf("\"\":");                                  \
     }                                                   \
     if (instance->xtra_chains)                          \
     { for (clist = instance->xtra_chains ;              \
@@ -177,10 +177,10 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { if (instance->version->ELEMENT)                   \
       { printf("%s ",instance->version->ELEMENT);       \
       } else {                                          \
-        printf(" ");                                    \
+        printf("\"\" ");                                \
       }                                                 \
     } else {                                            \
-      printf(" ");                                      \
+      printf("\"\" ");                                  \
     }                                                   \
   }                                                     \
 }
