@@ -438,13 +438,25 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	    if (UPS_VERBOSE) {
 	      printf("%sLooking for Product = %s\n", VPREFIX, prod_name);
 	    }
-	    /* Check if chains were requested */
-	    if (a_command_line->ugo_chain) {
+	    /* Check if chains were requested. if a specific version was
+	     passed, but no chain, the we will want to report all chains.
+	     this is only true in the case where we are not looking for a
+	     unique instance. this way we do not require setup to open up
+	     all of the chain files */
+	    if (a_command_line->ugo_chain ||
+		(a_command_line->ugo_version && !a_need_unique)) {
 	      /* we may have already made a list of them above. check before
 		 doing anything here */
 	      if (! got_all_chains) {
-		for (chain_item = a_command_line->ugo_chain ; chain_item ;
-		     chain_item = chain_item->next) {
+		if (a_command_line->ugo_version) {
+		  /* a specific version was entered so we want to report on
+		     all chains that point to the specified version */
+		  chain_item = upslst_new(upsutl_str_create(ANY_MATCH,
+							    STR_TRIM_DEFAULT));
+		} else {
+		  chain_item = a_command_line->ugo_chain;
+		}
+		for ( ; chain_item ; chain_item = chain_item->next) {
 		  the_chain = (char *)(chain_item->data);
 		
 		  if (! strcmp(the_chain, ANY_MATCH)) {
