@@ -220,7 +220,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 
       /* STEP 1: translate the -G string into a ugo_command structure */
       if (a_command_line->ugo_G) {
-	new_command_line = upsugo_bldcmd(a_command_line->ugo_options,
+	new_command_line = upsugo_bldcmd(a_command_line->ugo_passed,
 				     g_cmd_info[a_ups_command].valid_opts);
 	/* if the -O string did not contain a -z part to specify the ups
 	   database, then bldcmd translated $PRODUCTS.  however that may
