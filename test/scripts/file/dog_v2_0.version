@@ -1,0 +1,30 @@
+FILE = VERSION
+PRODUCT = puffin
+VERSION = v2_0
+
+FLAVOR = IRIX
+QUALIFIERS = "nodebug,superoptimized"
+  DECLARED = 1-1-98
+  DECLARER = jetson
+  PROD_DIR = /usr/prod/IRIX/puffin/v2_0
+  UPS_DIR = ups
+  TABLE_DIR = ups
+  TABLE_FILE = v2_0.table
+
+FLAVOR = IRIX+6.2
+QUALIFIERS = ""
+  DECLARED = 1-1-98
+  DECLARER = jetson
+  PROD_DIR = /usr/prod/IRIX/puffin/v2_0
+  UPS_DIR = ups
+  TABLE_DIR = ups
+  TABLE_FILE = v2_0.table
+
+FLAVOR = OSF1
+QUALIFIERS = ""
+  DECLARED = 1-1-98
+  DECLARER = jetson
+  PROD_DIR = /usr/prod/OSF1/puffin/v2_0
+  UPS_DIR = ups
+  TABLE_DIR = ups
+  TABLE_FILE = v2_0.table
