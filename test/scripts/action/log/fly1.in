@@ -38,7 +38,7 @@ echo "can't read file"
 exit 1
 endif
 #
-??? whereis ls
+which ls
 if ($status == 1) exit 1
 #
 setenv mystatus "`ls -l`"
