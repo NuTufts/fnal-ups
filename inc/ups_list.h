@@ -25,6 +25,7 @@
 /* standard include files, if needed for .h file */
 
 /* ups specific include files, if needed for .h file */
+#include "upsugo.h"
 
 /*
  * Constans.
