@@ -32,7 +32,7 @@ OBJECTS =
 LDFLAGS = $(LLIBS)
 
 UNIT_TESTS = test_upserr test_upslst test_upsmem test_upsutl test_upsugo \
-	test_upsmat test_upsact
+	test_upsmat test_upsact test_upsfil
 
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
 	upstst_misc.o upstst_parse.o upstst_err.o upstst_fil.o	\
