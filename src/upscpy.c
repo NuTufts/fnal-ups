@@ -544,7 +544,10 @@ static char get_man_subdir(char * const a_man_file)
        ret_val = *sp++;
        /* Ignore obviously bogus file extensions. */
        if ((ret_val == '.') || (ret_val == 'g') || (ret_val == 'z') || (ret_val == 'Z'))
+       {
+         ret_val = NO_EXTENSION;
          continue;
+       }
        /* check to see if this file extension is 1 or 2 characters
           possibly followed by a compression extension. */
        if ((ret_val == '\0') || ((next_c = *sp++) == '\0'))
