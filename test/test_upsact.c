@@ -69,6 +69,10 @@ void print_cmd( t_upsact_cmd *cmd )
  * Definition of public functions.
  */
 
+char *uk[] = {"_sjkd=233", "_abc=yyy", "_kul=oo99", "_ohoh2", "_ohoh=4" };
+char *ukk[] = {"_sjkd", "_abc", "_kul", "_ohoh", "_ohoh2" };
+t_upslst_item *a_l = 0;
+
 /*-----------------------------------------------------------------------
  * main
  *
@@ -113,10 +117,29 @@ int  main( const int argc, char * const argv[] )
   /*  test_upsact_parse();
   upserr_output();
   */
-  test_upsact_parse();
 
-  upserr_output();
+  /*
+  t_upstyp_instance inst;
+  t_upslst_item *l_usr = 0;
+  char *cp;
+  int i;
+
+  for ( i=0; i<5; i++ ) {
+    cp = upsutl_str_create( uk[i] );
+    l_usr = upslst_add( l_usr, cp );
+  }
+  inst.user_list = l_usr;
+
+  for ( i=0; i<5; i++ ) {
+    cp = upskey_inst_getuserval( &inst, ukk[i] );
+    printf( "%s = %s\n", ukk[i], cp );
+  }
+  */
   
+
+  test_upsact_parse();
+  upserr_output();
+
   return 0;
 }
 
@@ -179,18 +202,14 @@ t_upslst_item *l_dep;
       /* print_cmd( cmd ); */
     }
   }
-  ugo_cmd = upsugo_bldcmd( "-c -f IRIX  exmh",
+  ugo_cmd = upsugo_bldcmd( "-c -f IRIX exmh",
 			   "zAacCdfghKtmMNoOPqrTuUv?" );
   
   upsugo_dump( ugo_cmd, 1);
   mproduct_list = upsmat_instance( ugo_cmd, NULL, 1 );
   list_output( upslst_first( mproduct_list ), ugo_cmd);
 
-  l_dep = upsact_get_cmd( ugo_cmd, 0, "setup" );
-  l_dep = upslst_first( l_dep );
-  for ( ; l_dep; l_dep = l_dep->next ) {
-    upsact_print_item( l_dep->data );
-  }
+  upsact_print( ugo_cmd, 0, "setup", "tl" );
 }
 
 /*-----------------------------------------------------------------------
