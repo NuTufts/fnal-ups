@@ -300,12 +300,12 @@ t_cmd_info g_cmd_info[] = {
   {e_old,           "old", 0, 0x00000000, e_invalid_action},
   {e_test,          "test", 0, 0x00000000, e_invalid_action},
   {e_chain,         "chain", 0, 0x00000000, e_invalid_action},
-  {e_uncurrent,     "uncurrent", 0, 0x00000001, e_invalid_action},
-  {e_undevelopment, "undevelopment", 0, 0x00000000, e_invalid_action},
-  {e_unnew,         "unnew", 0, 0x00000000, e_invalid_action},
-  {e_unold,         "unold", 0, 0x00000000, e_invalid_action},
-  {e_untest,        "untest", 0, 0x00000000, e_invalid_action},
-  {e_unchain,       "unchain", 0, 0x00000000, e_invalid_action},
+  {e_uncurrent,     "uncurrent", 0, 0x00000001, e_current},
+  {e_undevelopment, "undevelopment", 0, 0x00000000, e_development},
+  {e_unnew,         "unnew", 0, 0x00000000, e_new},
+  {e_unold,         "unold", 0, 0x00000000, e_old},
+  {e_untest,        "untest", 0, 0x00000000, e_test},
+  {e_unchain,       "unchain", 0, 0x00000000, e_chain},
   {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:stU:vVz:Z", 0x00000001, e_invalid_action},
   {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:stU:vVz:Z", 0x00000001, e_setup},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
@@ -318,8 +318,8 @@ t_cmd_info g_cmd_info[] = {
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000000, e_invalid_action},
+  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_configure},
+  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000000, e_declare},
   {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000, e_invalid_action},
@@ -340,12 +340,14 @@ t_cmd_info g_cmd_info[] = {
  * by the action. The six parameter is the corresponding 'undo' command.
  */
 t_cmd_map g_cmd_maps[] = {
-  { "setupoptional", e_setupoptional, NULL, 0, 0, e_unsetupoptional },
-  { "setuprequired", e_setuprequired, NULL, 0, 0, e_unsetuprequired },
-  { "unsetupoptional", e_unsetupoptional, NULL, 0, 0, e_setupoptional },
-  { "unsetuprequired", e_unsetuprequired, NULL, 0, 0, e_setuprequired },
-  { "exeactionoptional", e_exeactionoptional, NULL, 1, 1, e_invalid_cmd },
-  { "exeactionrequired", e_exeactionrequired, NULL, 1, 1, e_invalid_cmd },
+  { "setupoptional", e_setupoptional, NULL, 1, 1, e_unsetupoptional },
+  { "setuprequired", e_setuprequired, NULL, 1, 1, e_unsetuprequired },
+  { "unsetupoptional", e_unsetupoptional, NULL, 1, 1, e_setupoptional },
+  { "unsetuprequired", e_unsetuprequired, NULL, 1, 1, e_setuprequired },
+  { "exeactionoptional", e_exeactionoptional, NULL, 1, 1, e_rev_exeactionoptional },
+  { "exeactionrequired", e_exeactionrequired, NULL, 1, 1, e_rev_exeactionrequired },
+  { "rev_exeactionoptional", e_rev_exeactionoptional, NULL, 1, 1, e_invalid_cmd },
+  { "rev_exeactionrequired", e_rev_exeactionrequired, NULL, 1, 1, e_invalid_cmd },
   { "sourcecompilereq", e_sourcecompilereq, f_sourcecompilereq, 1, 1, e_invalid_cmd },
   { "sourcecompileopt", e_sourcecompileopt, f_sourcecompileopt, 1, 1, e_invalid_cmd },
   { "envappend", e_envappend, f_envappend, 2, 3, e_envremove },
@@ -355,15 +357,15 @@ t_cmd_map g_cmd_maps[] = {
   { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_envunset },
   { "envunset", e_envunset, f_envunset, 1, 1, e_invalid_cmd },
   { "pathappend", e_pathappend, f_pathappend, 2, 3, e_pathremove },
-  { "pathremove", e_pathremove, f_pathremove, 2, 3, e_invalid_cmd },
+  { "pathremove", e_pathremove, f_pathremove, 2, 3, e_pathappend},
   { "pathprepend", e_pathprepend, f_pathprepend, 2, 3, e_pathremove },
   { "pathset", e_pathset, f_pathset, 2, 2, e_envunset },
   { "addalias", e_addalias, f_addalias, 2, 2, e_unalias },
   { "unalias", e_unalias, f_unalias, 1, 1, e_invalid_cmd },
-  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 3, e_invalid_cmd },
-  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 3, e_invalid_cmd },
-  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 3, e_invalid_cmd },
-  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_invalid_cmd },
+  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 3, e_sourceoptional },
+  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 3, e_sourceoptional },
+  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 3, e_sourceoptcheck },
+  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_sourceoptcheck },
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
   { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
@@ -639,7 +641,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 
         /* save the location in the array */
 
-	icmd = i;
+	icmd = g_cmd_maps[i].icmd;
 	
 	break;
       }
@@ -815,7 +817,7 @@ int upsact_action2enum( const char * const act_name )
   if ( act_name ) {
     for ( i=0; g_cmd_info[i].cmd; i++ ) {
       if (! upsutl_stricmp(g_cmd_info[i].cmd, act_name)) {
-	iact = i;
+	iact = g_cmd_info[i].cmd_index;
 	break;
       }
     }
@@ -1037,6 +1039,11 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 
       new_ugo = get_ugosetup( p_act_itm, p_cmd ); 
 
+      /* new_ugo can be null if doing unsetup */
+
+      if ( ! new_ugo && (i_cmd & 2) )
+	continue;
+
       /* get the action item */
 
       if ( i_cmd & 2 ) 
@@ -1123,7 +1130,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
     p_cmd->iact = i_act;
     i_cmd = p_cmd->icmd;
 
-    if ( i_cmd > e_exeactionrequired ) {
+    if ( i_cmd > e_rev_exeactionrequired ) {
 
       /* STANDARD action commands to be added to the list
 	 ================================================ */
@@ -1174,6 +1181,23 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	continue;
       }
 
+      /* SPECIAL, if ghost commands e_rev_exeactionoptional or e_rev_exeactionrequired 
+         then reverse commands */
+
+      if ( i_cmd == e_rev_exeactionoptional || 
+	   i_cmd == e_rev_exeactionrequired ) {
+
+	t_upstyp_action *old_act = new_act_itm->act;
+	t_upstyp_action *new_act = 0;
+
+	new_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
+	new_act->action = (char *)malloc( strlen( old_act->action ) + 1 );
+	strcpy( new_act->action, old_act->action );
+	new_act->command_list = reverse_command_list( new_act_itm, old_act->command_list );
+
+	new_act_itm->act = new_act;
+      }
+
       /* note: action name is parents action name */
 
       dep_list = next_cmd( top_list, dep_list, new_act_itm,  action_name, copt );
@@ -1197,6 +1221,11 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       /* get the ugo command */
 
       new_ugo = get_ugosetup( p_act_itm, p_cmd ); 
+
+      /* new_ugo can be null if doing unsetup */
+
+      if ( ! new_ugo && (i_cmd & 2) )
+	continue;
 
       /* if product is at the top level, use that instance */
       
@@ -1394,7 +1423,7 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 
   /* fetch product name,
      if it's not a simple command, let ugo do it */
-  
+
   if ( ! strchr( cmd_line, ' ' ) ) {
     strcpy( s_pname, cmd_line );
   }
@@ -1810,30 +1839,31 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm,
      1) reverse action, if exist (g_cmd_info.uncmd_index)
      2) a dodefault() action, if default bit set (g_cmd_info.flags) */
 
+  t_upstyp_action *p_unact = 0;
   t_upstyp_action *p_act = 0;
   int i_uncmd = 0;
 
   if ( iact == e_invalid_action )
     return 0;
 
-  if ( (i_uncmd = g_cmd_info[iact].uncmd_index) != e_invalid_action ) {
-    t_upstyp_action* act_p = get_act( p_act_itm->ugo, p_act_itm->mat, g_cmd_info[i_uncmd].cmd );
+  if ( (i_uncmd = g_cmd_info[iact].uncmd_index) != e_invalid_action &&
+       (p_act = get_act( p_act_itm->ugo, p_act_itm->mat, g_cmd_info[i_uncmd].cmd )) ) {
 
-    p_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
-    p_act->action = (char *)malloc( strlen( act_name ) + 1 );
-    strcpy( p_act->action, act_name );
-    p_act->command_list = reverse_command_list( p_act_itm, act_p->command_list );
+    p_unact = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
+    p_unact->action = (char *)malloc( strlen( act_name ) + 1 );
+    strcpy( p_unact->action, act_name );
+    p_unact->command_list = reverse_command_list( p_act_itm, p_act->command_list );
   }      
   else if ( (g_cmd_info[iact].flags)&0x00000001 ) {
-    p_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
-    p_act->action = (char *)malloc( strlen( act_name ) + 1 );
-    strcpy( p_act->action, act_name );
-    p_act->command_list = 0;
-    p_act->command_list = upslst_add( p_act->command_list, 
+    p_unact = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
+    p_unact->action = (char *)malloc( strlen( act_name ) + 1 );
+    strcpy( p_unact->action, act_name );
+    p_unact->command_list = 0;
+    p_unact->command_list = upslst_add( p_unact->command_list, 
 					upsutl_str_create( "dodefaults()", ' ' ) );
   }
 
-  return p_act;
+  return p_unact;
 }
 
 t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm, 
@@ -1871,14 +1901,61 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	  argc = p_cmd->argc;
 
 	strcat( buf, "(" );
-	for ( i=0; i<argc; i++ ) {
-	  if ( i > 0 ) strcat( buf, ", " );	    
+	
+	/* handle first argument */
+
+	if ( i_cmd == e_sourcerequired ||
+	     i_cmd == e_sourceoptional ||
+	     i_cmd == e_sourcereqcheck ||
+	     i_cmd == e_sourceoptcheck ) {
+	  
+	  /* SPECIAL case for source*( file_path, ... ), 
+	     we will prepend or remove an 'un' from file name */
+
+	  char *fp = p_cmd->argv[0];
+	  char *fn = 0;
+
+	  /* handle directory path ... who said DOS ? */
+
+	  if ( (fn = strrchr( fp, '/' )) ) {
+	    fn++;
+	    strncat( buf, fp, (size_t)( fn - fp ) );
+	  }
+	  else
+	    fn = fp;
+
+	  /* modify file name */
+
+	  if ( !upsutl_strincmp( fn, "un", 2 ) )
+	    fn += 2; 	         /* remove 'un' */
+	  else
+	    strcat( buf, "un" ); /* prepend 'un', always lower case */
+
+	  strcat( buf, fn );
+
+	  /* SPECIAL end */ 
+
+	}
+	else {
+	  
+	  /* normal */
+
+	  if ( argc > 0 )
+	    strcat( buf, p_cmd->argv[0] );
+	}
+
+	/* handle the rest of the arguments */
+
+	for ( i=1; i<argc; i++ ) {
+	  strcat( buf, ", " );	    
 	  strcat( buf, p_cmd->argv[i] );
 	}
 	strcat( buf, ")" );
 
-	l_ucmd = upslst_add( l_ucmd, 
-			     upsutl_str_create( buf, ' ' ) );
+	/* use insert, to reverse the order of commands */
+
+	l_ucmd = upslst_insert( l_ucmd, 
+				upsutl_str_create( buf, ' ' ) );
       }
       upsmem_free( p_cmd );      
     }    

@@ -86,7 +86,9 @@ enum {
   e_unsetupoptional,
   e_unsetuprequired,
   e_exeactionoptional,
-  e_exeactionrequired,  /* the order of the (un)setup and exeaction enums are importend */
+  e_exeactionrequired,     /* the order of the (un)setup and exeaction enums are importend */
+  e_rev_exeactionoptional, /* these two are internal ghost commands */
+  e_rev_exeactionrequired, /* created when reversing a list of commands */
   e_sourcecompilereq,
   e_sourcecompileopt,
   e_envappend,
