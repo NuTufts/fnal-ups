@@ -134,7 +134,7 @@ static void test_match(int argc, char *argv[])
       upserr_output();
       break;
     }
-    list_output(mproduct_list, command_line);
+    (void) list_output(mproduct_list, command_line);
   }
 }
 
@@ -285,7 +285,7 @@ static char *get_ups_string(const char * const old_string)
 
   bytes = (int )strlen(old_string);
   new_string = (char *)upsmem_malloc(bytes);
-  strcpy(new_string, old_string);
+  (void) strcpy(new_string, old_string);
 
   return new_string;
 }
