@@ -85,7 +85,7 @@ t_upstyp_matched_product *ups_new_matched_product(
 t_upstyp_matched_product *ups_free_matched_product(
                                  t_upstyp_matched_product * const a_mproduct)
 {
-  if (! a_mproduct) {
+  if (a_mproduct) {
     /* we incremented the ref counter in the ups_new_matched_product function,
        doing a free here will decrement it or free it */
     if (all_gone(a_mproduct)) {
