@@ -607,6 +607,7 @@ int upsugo_dump (struct ups_command * const uc)
          upsugo_prtlst(uc->ugo_db,"DB"); 
       if ( uc->ugo_chain ) 
          upsugo_prtlst(uc->ugo_chain,"Chains"); 
+      fprintf(stdout,"ugo_v %d and UPS_VERBOSE %d\n",uc->ugo_v,UPS_VERBOSE); 
     } return (0);
 }
 
@@ -791,6 +792,8 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
      last_command=ugo_commands;      /* need pointer to drop & remove struct */
      if ( ugo_commands=ugo_commands->next ) {
         upslst_delete( last_command, last_command->data, 'd');
+        luc = ugo_commands->data;
+        UPS_VERBOSE = luc->ugo_v;
         return (t_upsugo_command *)ugo_commands->data; 
      } else {
         return 0;
@@ -804,7 +807,7 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
    while ((arg_str= upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)
-   { my_argc=+1; 
+   { my_argc+=1; 
      if(*arg_str == '-')      /* is it an option */
      { if (!strchr(validopts,(int)*(arg_str+1))) { 
           upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, arg_str+1);
@@ -846,8 +849,7 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
               uc->ugo_u = 1;
               break;
          case 'v':
-              uc->ugo_v =+1;
-              UPS_VERBOSE=1;
+              uc->ugo_v +=1;
               break;
          case 'V':
               uc->ugo_V = 1;
@@ -1370,6 +1372,8 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
      ugo_commands = upslst_add(ugo_commands,uc);
    }
    ugo_commands=upslst_first(ugo_commands);
+   luc = ugo_commands->data;
+   UPS_VERBOSE=luc->ugo_v;
    return (t_upsugo_command *)ugo_commands->data; 
    } /* not subsequent call ... */
 }
