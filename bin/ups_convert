@@ -277,8 +277,9 @@ sub writeflvrReqs {
              if ( ! $CatFlag && $reqCat eq "POSTREQ" ) {
                 $CatFlaq=1;
                    $flvrverHash{$flavor}{$version}{$reqType}.=&add_setup;
-                   $basedir=&prod_dir;
              }
+# always set basedir
+                   $basedir=&prod_dir;
           }
           @use = sort keys %{ $reqHash{$reqType}{$reqCat} };
           foreach $reqName ( @use ) {
@@ -421,13 +422,13 @@ sub WriteTableFile {
        print TableFile "     doDefaults()\n";
        $key=~s/DaSeTuP/      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
        $key=~s/DaSeTuP//g;
-       if (open(TMPFILE,"${basedir}/ups/setup.${UPS_SHELL}")) {
+       if (open(TMPFILE,"${basedir}/ups/setup.sh")) {
           close TMPFILE;
           print TableFile "$key";
        }
        $key=~s/setup/unsetup/g;
        print TableFile "   Action=unsetup\n";
-       if (open(TMPFILE,"${basedir}/ups/unsetup.${UPS_SHELL}")) {
+       if (open(TMPFILE,"${basedir}/ups/unsetup.sh")) {
           close TMPFILE;
           print TableFile "$key";
        }
