@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
       if (UPS_ERROR == UPS_SUCCESS) {
 	switch (g_cmd_info[i].cmd_index) {
-	case e_setup: ups_unk(command_line, argv[1]);
+	case e_setup: ups_setup(command_line, temp_file);
 	  break;
 	case e_unsetup: ups_unk(command_line, argv[1]);
 	  break;
