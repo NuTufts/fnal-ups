@@ -287,16 +287,33 @@ static void f_dodefaults( ACTION_PARAMS);
 
 #define P_VERB_s( iver, str ) \
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s\n", \
-				str )
+				str ? str : "(null)" )
 
 #define P_VERB_s_s( iver, str1, str2 ) \
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s\n", \
-				str1, str2 )
-  
-#define P_VERB_s_s_i( iver, str1, str2, inum ) \
-  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %d\n", \
-				str1, str2, inum )
-     
+				str1 ? str1 : "(null)", \
+				str2 ? str2 : "(null)" )
+
+#define P_VERB_s_s_s( iver, str1, str2, str3 ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %s\n", \
+				str1 ? str1 : "(null)", \
+				str2 ? str2 : "(null)", \
+				str3 ? str3 : "(null)" )
+
+#define P_VERB_s_s_s_s( iver, str1, str2, str3, str4 ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %s %s\n", \
+				str1 ? str1 : "(null)", \
+				str2 ? str2 : "(null)", \
+				str3 ? str3 : "(null)", \
+				str4 ? str4 : "(null)" )
+
+#define P_VERB_s_s_s_s_s( iver, str1, str2, str3, str4, str5 ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s %s %s %s %s\n", \
+				str1 ? str1 : "(null)", \
+				str2 ? str2 : "(null)", \
+				str3 ? str3 : "(null)", \
+				str4 ? str4 : "(null)", \
+				str5 ? str5 : "(null)" )
 
 /*
  * Definition of global variables.
@@ -345,7 +362,7 @@ t_cmd_info g_cmd_info[] = {
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_touch,     "touch",     "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_invalid_action},
+  {e_touch,       "touch",       "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_configure},
   {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000000, e_undeclare},
   {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
@@ -647,8 +664,6 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   
   while ( act_s && *act_s && isspace( *(act_s) ) ){ ++act_s; }
 
-  P_VERB_s_s( 3, "Parsing line:", act_s );
-  
   if ( !act_s || !*act_s )
     return 0;
 
@@ -702,12 +717,24 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   if ( icmd != e_invalid_action ) {
     pcmd->icmd = icmd;
     pcmd->argc = parse_params( act_s, pcmd->argv );
-    P_VERB_s_s_i( 3, "Parse result #arg:", g_cmd_maps[icmd].cmd, pcmd->argc );
+
+    if ( UPS_VERBOSE ) {
+      strcpy( g_buff, g_cmd_maps[icmd].cmd );
+      strcat( g_buff, "(" );
+      for ( i = 0; i < pcmd->argc; i++ ) {
+	strcat( g_buff, pcmd->argv[i] );
+	if ( i < pcmd->argc-1 )
+	  strcat( g_buff, ", " );
+      }
+      strcat( g_buff, ")" );
+      P_VERB_s_s( 3, "Parsed line:", g_buff );
+    }
+
     return pcmd;
   }
   else {
     upsmem_free( pcmd );
-    P_VERB_s( 3, "Parse nothing" );
+    P_VERB_s( 3, "Parsed line: (null)" );
     return 0;
   }
 }
@@ -1016,14 +1043,22 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
     l_cmd = p_act_itm->act->command_list;
   }
   else {
+    P_VERB_s_s_s_s_s( 3, "Action top(", act_name, ") for:", actitem2str( p_act_itm ),
+		      "(null)" );
     return top_list;
   }
 
+  P_VERB_s_s_s_s( 3, "Action top(", act_name, ") for:", actitem2str( p_act_itm ) );
+
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
+
+    P_VERB_s_s( 3, "Parsing line:", l_cmd->data );
+  
     p_line = upsget_translation(
 		 (t_upstyp_matched_instance *)p_act_itm->mat->minst_list->data,
 		 p_act_itm->mat->db_info, p_act_itm->ugo,
 		 (char *)l_cmd->data );
+
     p_cmd = upsact_parse_cmd( p_line );
     i_cmd = p_cmd ? p_cmd->icmd : e_invalid_cmd;
 
@@ -1167,14 +1202,21 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       /* if we don't have an action, take care of defaults cases, controlled by: 
 	 g_cmd_info.flags, g_cmd_info.uncmd_index and g_cmd_maps.icmd_undo */
 
-      if ( !(p_act_itm->act = new_default_action( p_act_itm, act_name, i_act )) )
+      if ( !(p_act_itm->act = new_default_action( p_act_itm, act_name, i_act )) ) {
+	P_VERB_s_s_s_s_s( 3, "Action(", act_name, ") for:", actitem2str( p_act_itm ),
+			  "(null)" );
 	return dep_list;
+      }
     }
   }
   
+  P_VERB_s_s_s_s( 3, "Action(", act_name, ") for:", actitem2str( p_act_itm ) );
+
   l_cmd = p_act_itm->act->command_list;
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
 
+    P_VERB_s_s( 3, "Parsing line:", (char *)l_cmd->data );
+  
     /* translate and parse command */
 
     p_line = upsget_translation(
@@ -1898,7 +1940,8 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm,
 {
   /* it will create a new t_upstyp_action. It will be:
      1) reverse action, if exist (g_cmd_info.uncmd_index)
-     2) a dodefault() action, if default bit set (g_cmd_info.flags) */
+     2) a dodefault() action, if default bit set (g_cmd_info.flags) 
+     3) else, nothing */
 
   t_upstyp_action *p_unact = 0;
   t_upstyp_action *p_act = 0;
