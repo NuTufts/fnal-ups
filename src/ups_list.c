@@ -380,9 +380,12 @@ void list_K(const t_upstyp_matched_instance * const instance,
             const t_upstyp_matched_product * const product)
 {
   t_upslst_item *l_ptr = 0;
+  t_upslst_item *ul_ptr = 0;
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
+  size_t str_len=0;
+  char *str_ptr;
   int count=0;
   if (product->db_info) 
   { config_ptr = product->db_info->config;
@@ -411,6 +414,24 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromConfig(man_path,"MAN_PATH")
     FromConfig(html_path,"HTML_PATH")
     FromConfig(info_path,"INFO_PATH")
+    if (!strncmp(l_ptr->data,"USERKEY",7) || !strncmp(l_ptr->data,"userkey",7))
+    { for ( ul_ptr = upslst_first( instance->version->user_list ); 
+            ul_ptr; ul_ptr = ul_ptr->next, count++ )
+      { if (strlen(l_ptr->data) == 7) /* no specific key give all */
+        { printf("%s ",ul_ptr->data); /* clearly a quick hack */
+        } else {
+          str_ptr=l_ptr->data;
+          str_ptr+=8;
+          str_len=strlen(str_ptr);
+          if (!strncmp(ul_ptr->data,str_ptr,str_len))
+          { str_ptr=ul_ptr->data;
+            str_ptr+=str_len;
+            str_ptr++;
+            printf("%s ",str_ptr);
+          }
+        } 
+      }
+    }
   }
   printf("\n");
 }
