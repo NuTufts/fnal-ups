@@ -1010,8 +1010,8 @@ then
 	    Parse_curr=\$Prod/\${Name_Of_Ups}/current.chain
 	    while read string
 	    do	
-		key=\`echo \$string|cut -f1 -d'=' -s|tr 'a-z' 'A-Z'\`
-		val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'\`
+		key=\`echo \$string|cut -f1 -d'=' -s|tr 'a-z' 'A-Z'|sed 's% %%g'\`
+		val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'|sed 's% %%g'\`
 		if [ x\${val} != x ]
 		then
 		    if [ "\$key" = "FLAVOR" ]
@@ -1032,8 +1032,8 @@ then
 			Parse_ver=\$Prod/\${Name_Of_Ups}/\$Ups_Version_File
         		while read string
         		do
-            		    key=\`echo \$string|cut -f1 -d'='|tr 'a-z' 'A-Z'\`
-            		    val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'\`
+            		    key=\`echo \$string|cut -f1 -d'='|tr 'a-z' 'A-Z'|sed 's% %%g'\`
+            		    val=\`echo \$string|cut -f2 -d'=' -s|cut -f1 -d'#'|sed 's% %%g'\`
             		    if [ "x\${key}" = xFLAVOR ]
             		    then
                 		FLAVOR=\$val
@@ -1229,6 +1229,10 @@ fi
         if [ \$Diff_rc != '0' ]
         then
 	    echo '**' Copying bootstrap/\$file to \$Setups_Home
+	    if [ -f \$Setups_Home/\$file ]
+	    then
+		cp \$Setups_Home/\$file \$Setups_Home/\$file.BAK
+	    fi
             cp \$Ups_Dir/bootstrap/\$file \$Setups_Home
 	    if [ \$? != '0' ]
 	    then
