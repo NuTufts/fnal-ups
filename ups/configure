@@ -186,6 +186,7 @@ then
     echo '****'
     exit 1
 fi
+rm -f $Ups_Dir/bootstrap/*
 #
 #
 # Create the local copy of the cache file.
@@ -342,7 +343,6 @@ fi
 #
 # Create the setups.csh file in the bootstrap directory.
 #
-rm -f $Ups_Dir/bootstrap/${Script_Prefix}.csh
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.csh ]
 then
 echo '**'
@@ -497,7 +497,6 @@ fi
 #
 # Create, if necessary, the setups.sh script
 #
-rm -f $Ups_Dir/bootstrap/${Script_Prefix}.sh
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.sh ]
 then
 echo '**'
@@ -846,7 +845,6 @@ fi
 #
 # IT IS  V E R  Y    S   L    O     W
 #
-rm -f $Ups_Dir/bootstrap/${Script_Prefix}.common
 if [ ! -r $Ups_Dir/bootstrap/${Script_Prefix}.common ]
 then
     echo '**'
