@@ -73,6 +73,7 @@ static int               write_action( t_upstyp_action * const act );
 t_upslst_item            *find_group( t_upslst_item * const list_ptr, const char copt );
 
 /* Line parsing */
+static int               find_start_key( void );
 static int               get_key( void );
 static int               next_key( void );
 static int               is_stop_key( void );
@@ -102,7 +103,10 @@ enum {
   e_key_eof = -1
 };
 
-#define CHAR_REMOVE " \t\n\r\f\""
+#define WCHARS " \t\n\r\f"
+#define QUOTES "\"\'"
+#define WCHARSQ " \t\n\r\f\"\'"
+
 #define SEPARATION_LINE "#*************************************************\n#"
 
 static t_upstyp_product  *g_pd = 0; /* current product to fill */
@@ -663,7 +667,7 @@ int read_file( void )
       l_ptr = read_groups();
       break;
 
-    default:
+    default: /* if not flavor or group, ignore it */
       next_key();
     }
     
@@ -692,7 +696,7 @@ t_upslst_item *read_comments( void )
   
   while ( fgets( g_line, MAX_LINE_LEN, g_fh ) ) {
 
-    if ( !upsutl_str_remove_edges( g_line, CHAR_REMOVE ) ) continue;   
+    if ( !upsutl_str_remove_edges( g_line, WCHARS ) ) continue;   
     if ( g_line[0] == '#' ) {
       l_ptr = upslst_add( l_ptr, upsutl_str_create( g_line, ' ' ) );
     }
@@ -716,6 +720,12 @@ t_upslst_item *read_comments( void )
  */
 int read_file_type( void )
 {
+  /* all lines are ignore until a 'start_key' */
+  
+  find_start_key();
+  
+  /* if first 'start_key' is not file type, generate an error */
+
   if ( g_ikey != e_key_file ) {
     upserr_vplace();
     upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, "(null)" );    
@@ -845,9 +855,13 @@ t_upslst_item *read_instances( void )
 	if ( inst_ptr )
         { if (UPS_VERIFY) { verify_keys(l_ptr,inst_ptr); }
 	  l_ptr = upslst_add( l_ptr, inst_ptr );
-	} else {
+	} 
+
+	/* let's try just to continue
+	else {
 	  break;
         }
+	*/
     }
     
     return upslst_first( l_ptr );
@@ -1022,7 +1036,7 @@ t_upstyp_config *read_config( void )
   while ( next_key() != e_key_eof ) {
 
     if ( g_ikey == e_key_statistics ) {
-      upsutl_str_remove( g_val, CHAR_REMOVE );  
+      upsutl_str_remove( g_val, WCHARSQ );  
       upsutl_str_sort( g_val, ':' );
       didit = 1;
     }
@@ -1060,9 +1074,12 @@ t_upslst_item *read_groups( void )
         { if (UPS_VERIFY) { verify_groups(l_ptr,l_tmp_ptr); }
 	  l_ptr = upslst_add_list( l_ptr, l_tmp_ptr );
 	}
+
+	/* let's try just to continue 
 	else {
 	  break;
 	}
+	*/
 	
     }
 
@@ -1088,7 +1105,13 @@ t_upslst_item *read_group( void )
     if ( g_ikey != e_key_group ) 
       return 0;
     
-    if ( next_key() != e_key_flavor )
+    next_key();
+
+    /* skip to next start key */
+
+    find_start_key();
+  
+    if ( g_ikey != e_key_flavor )
       return 0;
 
     l_inst_ptr = read_instances();
@@ -1129,6 +1152,24 @@ t_upslst_item *read_group( void )
  * Line parsing
  */
 
+
+/*-----------------------------------------------------------------------
+ * find_start_key
+ *
+ * Will skip lines until next start key
+ *
+ * Input : none
+ * Output: none
+ * Return: int, enum of current key.
+ */
+int find_start_key( void )
+{
+  /* skip to next start key */
+
+  while ( !is_start_key() && next_key() != e_key_eof ) {}
+  return g_ikey;
+}
+ 
 /*-----------------------------------------------------------------------
  * next_key
  *
@@ -1154,7 +1195,7 @@ int next_key( void )
 
     P_VERB_s_i_s_nn( 3, "reading line :", g_line_count, g_line );
   
-    if ( !upsutl_str_remove_edges( g_line, CHAR_REMOVE ) ) continue;
+    if ( !upsutl_str_remove_end_quotes( g_line, QUOTES, WCHARS ) ) continue;
 
     if ( get_key() != e_key_eol ) {
       return g_ikey;
@@ -1343,7 +1384,7 @@ int trim_qualifiers( char * const str )
   for ( i=0; i<len; i++ )
     str[i] = (char)tolower( (int)str[i] );
   
-  upsutl_str_remove( str, CHAR_REMOVE );  
+  upsutl_str_remove( str, WCHARSQ );  
   upsutl_str_sort( str, ':' );
 
   return (int)strlen( str );
