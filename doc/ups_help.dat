@@ -80,8 +80,8 @@ undeclare   :?cdfgHmMnoOqrtUvVyYzZ:
 : version will be removed
 unsetup     :?cdefgHjmMnoOqstUvVzZ:
 : Return the environment to a pre-setup state.
-validate    :?cdfghHlmMnNoqrStUvVzZ:
-: Check the specified files for correct formatting 
+verify      :?cdfghHlmMnNoqrStUvVzZ:
+: Check the specified instances for correct formatting 
 : and information.
 # from : to EOL, lines not starting with - are continuation.
 OPTIONS     :
