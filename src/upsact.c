@@ -368,7 +368,7 @@ t_cmd_info g_cmd_info[] = {
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000000, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:p:q:r:stT:u:U:vVz:Z0123", 0x00000000, e_declare},
-  {e_depend,      "depend",      "?cdnotg:f:H:K:lm:M:q:r:RU:vVz:Z0123", 0x00000000, e_invalid_action},
+  {e_depend,      "depend",      "?cdnotg:f:H:jK:lm:M:q:r:RU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_modify,      "modify",      "a?A:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:stU:vVwz:Z", 0x00000000, e_invalid_action},
@@ -1324,13 +1324,31 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       if ( copt != 'd' ) {
 
-	t_upsact_item *new_act_itm = copy_act_item( p_act_itm );
+	t_upsact_item *new_act_itm = 0;
+
+	/* SPECIAL case, if we are in compile mode, we should ignore
+	   the source compile function */
+
+	if ( g_COMPILE_FLAG &&
+	     (i_cmd == e_sourcecompilereq || i_cmd == e_sourcecompileopt) ) {
+
+	  /* if this is the very top product, we should remove all functions above
+             the source compile  */
+
+	  if ( p_act_itm->ugo == g_ugo_cmd )
+	    dep_list = 0;
+
+	  continue;
+	}
+
+	new_act_itm = copy_act_item( p_act_itm );
 	new_act_itm->cmd = p_cmd;
 	dep_list = upslst_add( dep_list, new_act_itm );
 
-	/* check if we should continue */
+	/* check if we should continue, we will not exit if we are
+	   fetching dependencies */
 
-	if ( do_exit_action( p_cmd ) )
+	if ( do_exit_action( p_cmd ) && (g_ups_cmd != e_depend) )
 	  break;
       }
 
@@ -3476,6 +3494,11 @@ static void f_writecompilescript(ACTION_PARAMS)
 
   /* skip this whole action if we are being called while compiling */
   if (! g_COMPILE_FLAG) {
+
+    /* let everybody know we are in compile mode */
+
+    g_COMPILE_FLAG = 1;
+
     save_g_shell = g_UPS_SHELL;
     save_shell = a_command_line->ugo_shell;
 
@@ -3552,9 +3575,7 @@ static void f_writecompilescript(ACTION_PARAMS)
 	      /* 5   process actions and write them to the compile file. mark
 		     that action functions are being called due to a compile
 		     command */
-	      g_COMPILE_FLAG = 1;
 	      upsact_process_commands(cmd_list, compile_file);
-	      g_COMPILE_FLAG = 0;
 
 	      /* 6   close the compile file */
 	      upsutl_unset_upsvars(compile_file, a_command_line, "");
@@ -3596,6 +3617,11 @@ static void f_writecompilescript(ACTION_PARAMS)
     /* reset the shell back to its original value. */
     a_command_line->ugo_shell = save_shell;
     g_UPS_SHELL = save_g_shell;
+
+    /* let everybody know we are out of compile mode */
+
+    g_COMPILE_FLAG = 0;
+
   }
 }
 
