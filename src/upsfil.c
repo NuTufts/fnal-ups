@@ -2012,7 +2012,9 @@ void trim_cache( void )
 
 int trim_qualifiers( char * const str )
 {
-  int i;
+  /* qualifiers are now case sensitive
+  int i; 
+  */
   
   if ( !str || strlen( str ) <= 0 ) return 0;
 
