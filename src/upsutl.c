@@ -237,7 +237,7 @@ t_upstyp_product *upsutl_get_config( const char * const a_db)
   char *buffer = NULL;
   
   buffer = (char *)malloc(strlen(a_db) + (unsigned int )CONFIG_SIZE +
-			  (unsigned int ) 4);
+			  (unsigned int ) 5);
   if (buffer) {
     sprintf(buffer, "%s/../%s", a_db, CONFIG_FILE);
     read_product = upsfil_read_file(buffer);
