@@ -10,7 +10,7 @@
 char **
 ups_have_flavor_override() {
     static char **res = 0;
-    static char *parts[3];
+    static char *parts[3] = {0,0,0};
     char *override;
     char *scan;
     extern char *getenv();
@@ -106,19 +106,19 @@ ups_append_release(char *buf)
 {
    struct utsname baseuname;              	/* returned from uname */
    static char dstr[80];
-   char **p;
+   char **p, *pc;
 
    if (uname(&baseuname) == -1) 
        return;     				/* do uname */
 
-   if (0 != (p = ups_have_flavor_override())) {
+   if (0 != (p = ups_have_flavor_override()) && 0 != p[1]) {
 	(void)strcat(buf, p[1]);
 	return;
    }
 
-   if (0 != (p = strchr(baseuname.release, '('))) {
+   if (0 != (pc = strchr(baseuname.release, '('))) {
 	/* releases with parens in them break stuff, so cut it off there */
-	*p = 0;
+	*pc = 0;
    }
    if (strncmp(baseuname.sysname,"AIX",3) == 0) /* because AIX is different */
    { 
@@ -146,7 +146,7 @@ ups_append_default_quals(char *buf) {
    if (strlen(buf) > 0) {
 	(void)strcat(buf,":");
    }
-   if (0 != (p = ups_have_flavor_override())) {
+   if (0 != (p = ups_have_flavor_override()) && p[2] ) {
 	(void)strcat(buf, p[2]);
 	return;
    }
