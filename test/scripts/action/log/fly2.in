@@ -24,6 +24,8 @@ unset upstmp;
 #
 unset OPERA
 #
+if [ ! ${TMPDIR-} ]; then TMPDIR="/tmp";export TMPDIR
+#
 PATH="/bin:/usr/local/bin:/local/etc:/mybin";export PATH
 #
 PATH="${PATH-}:emacs/bin";export PATH
@@ -47,8 +49,6 @@ hash ls;
 if [ $? -eq 1 ]; then return 1; fi
 #
 mystatus=`ls -l`;export mystatus
-#
-inshell
 #
 echo "from extra1"
 #
@@ -84,11 +84,15 @@ products="../db1";export products
 #
 ups_compile="";export ups_compile
 #
+rambo () { SlyStalone $@ }
+#
+unset rambo
+
 cp info/* /tmp/info
 #
-???  cp man/* /tmp/man
+cp man/* /tmp/man
 #
-??? cp catman/* /tmp/catman
+cp catman/* /tmp/catman
 #
 cp html/* /tmp/html
 #

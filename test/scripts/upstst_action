@@ -20,6 +20,9 @@ upsact_print -out snoopy2.out -diff snoopy2.in setup snoopy v3_0 -z ../db1:../db
 upsact_process_commands -out fly1.out -diff fly1.in setup fly v1_0 
 upsact_process_commands setup fly v2_0 -status UPS_ACTION_PARSE 
 upsact_process_commands -out fly3.out -diff fly3.in setup fly v3_0 
+upsact_process_commands unsetup     fly v4_0 -out fly4.out -diff fly4.in 
+upsact_process_commands unconfigure fly v4_0 -out fly5.out -diff fly5.in 
+upsact_process_commands uncurrent   fly v4_0 -out fly6.out -diff fly6.in 
 quit
 EOD
 

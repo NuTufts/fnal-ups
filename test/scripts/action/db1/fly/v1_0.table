@@ -12,6 +12,7 @@ ACTION = SETUP
    envprepend(OPERA,FIDELIO,' ')
    envremove(OPERA,FAUST,' ')
    envunset(OPERA)
+   envsetifnotset(TMPDIR,/tmp)
 # do path tests
    pathset(path,/bin:/usr/local/bin:/local/etc:/mybin)
    pathAppend(path,emacs/bin,emacs/etc)
@@ -27,8 +28,6 @@ ACTION = SETUP
 # execute tests
    exeAccess(ls)
    execute("ls -l",mystatus)
-   shexecute(inshell)
-   cshexecute(incshell)
    exeActionOptional(extra1)
    exeActionOptional(extra2)
    exeActionRequired(extra3)
@@ -50,6 +49,9 @@ ACTION = SETUP
    envset(ups_this_db,${UPS_THIS_DB})
    envset(products,${PRODUCTS})
    envset(ups_compile,${UPS_COMPILE})
+#aliases
+   addalias (rambo,"SlyStalone %s")
+   unalias  (rambo)
 # copy tests
    copyInfo(info)
    copyMan(man)

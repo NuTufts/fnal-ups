@@ -22,6 +22,8 @@ unsetenv upstmp
 #
 unsetenv OPERA
 #
+if (! ${?TMPDIR}) setenv TMPDIR "/tmp"
+#
 set path=(/bin:/usr/local/bin:/local/etc:/mybin)
 rehash
 #
@@ -50,8 +52,6 @@ which ls
 if ($status == 1) exit 1
 #
 setenv mystatus "`ls -l`"
-#
-incshell
 #
 echo "from extra1"
 #
@@ -87,11 +87,15 @@ setenv products "../db1"
 #
 setenv ups_compile ""
 #
+alias rambo "SlyStalone !*"
+#
+unalias rambo
+#
 cp info/* /tmp/info
 #
-??? cp man/* /tmp/man
+cp man/* /tmp/man
 #
-??? cp catman/* /tmp/catman
+cp catman/* /tmp/catman
 #
 cp html/* /tmp/html
 #
