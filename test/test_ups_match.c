@@ -114,17 +114,17 @@ int main(const int argc, char *argv[])
 static void test_match(const int argc, char *argv[])
 {
   t_ups_match_product *mproduct = NULL;
-  t_upslst_item *flavor_list = NULL, *quals_list = NULL;
+  t_upslst_item *flavor_list = NULL, *quals_list = NULL, *version_list = NULL;
   int need_unique = 0, i;
   char *new_string = NULL;
-  char *ups_db = "/usrdevel/s1/berman/upsdb";
+  char *ups_db = "/home/t2/berman/work/erupt/erupt_database/db";
   t_ups_command command_line;
 
   if (! strcmp(argv[1],"1")) {
     need_unique = 1;
   }
 
-  for (i = 3; i < argc; i += 2) {
+  for (i = 5; i < argc; i += 2) {
     new_string = get_ups_string(argv[i]);
     flavor_list = upslst_add(flavor_list, new_string);
     new_string = get_ups_string(argv[i+1]);
@@ -135,8 +135,14 @@ static void test_match(const int argc, char *argv[])
   flavor_list = upslst_first(flavor_list);
   quals_list = upslst_first(quals_list);
 
-  command_line.ugo_product = "tigger";
-  command_line.ugo_version = "v2_0";
+  command_line.ugo_product = get_ups_string(argv[3]);
+  if (strcmp(argv[4], "")) {
+    command_line.ugo_version = get_ups_string(argv[4]);
+    new_string = get_ups_string(command_line.ugo_version);
+    version_list = upslst_new(new_string);
+  } else {
+    command_line.ugo_version = NULL;
+  }
   command_line.ugo_flavor = flavor_list;
   command_line.ugo_qualifiers = quals_list;
   new_string = get_ups_string(ups_db);
@@ -148,13 +154,20 @@ static void test_match(const int argc, char *argv[])
   new_string = get_ups_string(argv[2]);
   command_line.ugo_chain = upslst_new(new_string);
 
-  mproduct = upsmat_match_instance(&command_line, (char *)NULL, need_unique);
-  printf("\nChain Instances:\n");
-  print_inst(mproduct->chain_list);
-  printf("\nVersion Instances:\n");
-  print_inst(mproduct->version_list);
-  printf("\nTable Instances:\n");
-  print_inst(mproduct->table_list);
+  mproduct = upsmat_match_instance(&command_line, (char *)NULL, 
+				   command_line.ugo_product,
+				   command_line.ugo_chain, version_list,
+				   need_unique);
+  if (mproduct) {
+    printf("\nChain Instances:\n");
+    print_inst(mproduct->chain_list);
+    printf("\nVersion Instances:\n");
+    print_inst(mproduct->version_list);
+    printf("\nTable Instances:\n");
+    print_inst(mproduct->table_list);
+  } else {
+    printf("Mo instances matched\n");
+  }
 }
 
 #ifdef GET_INSTANCE
