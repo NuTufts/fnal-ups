@@ -99,7 +99,7 @@ fi
 #
 if [ -f $Ups_DB_Path/.upsfiles/dbconfig ]
 then
-    Setups_Home=`grep -i $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '#'|cut -f2 -d'='|sed 's% %%'`
+    Setups_Home=`grep -i $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '#'|cut -f2 -d'='|sed 's% %%g'`
 fi
 if [ x${Setups_Home:-} = x ]
 then
@@ -716,7 +716,7 @@ fi
 #
  
 Boot_Start='yes'
-#Boot_Start=`grep -i $StartUp_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'` 
+#Boot_Start=`grep -i $StartUp_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%g'|tr 'A-Z' 'a-z'` 
 if [ x${Boot_Start:-} = xyes ]
 then
 
@@ -794,7 +794,7 @@ then
 fi                                            
 
 Boot_Start='yes'
-#Boot_Start=\`grep -i $StartUp_Flag \$Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'|tr 'A-Z' 'a-z'\`
+#Boot_Start=\`grep -i $StartUp_Flag \$Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%g'|tr 'A-Z' 'a-z'\`
 if [ x\${Boot_Start:-} = xyes ]
 then
                                               
