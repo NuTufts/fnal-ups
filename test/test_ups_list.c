@@ -48,20 +48,20 @@ void main (argc,argv)
 {
 
 	struct ups_command * uc;
-/* printf("string = %s\n",upsget_translation_env("${POODUCTS}"));
+/* (void) printf("string = %s\n",upsget_translation_env("${POODUCTS}"));
 upserr_output();
 upserr_clear();
-printf("string = %s\n",upsget_translation_env("${PRODUCTS"));
+(void) printf("string = %s\n",upsget_translation_env("${PRODUCTS"));
 upserr_output();
 */
-printf("string = %s<\n",upsget_translation_env("~fagan/spit"));
+(void) printf("string = %s<\n",upsget_translation_env("~fagan/spit"));
 upserr_output();
-printf("string = %s<\n",upsget_translation_env("~fagan "));
+(void) printf("string = %s<\n",upsget_translation_env("~fagan "));
 upserr_output();
-printf("string = %s<\n",upsget_translation_env("~fagan"));
+(void) printf("string = %s<\n",upsget_translation_env("~fagan"));
 upserr_output();
 while ((uc = upsugo_next(argc,argv,"AacCdfghKltmMNoOPqrTuUvz")) != 0 )
-      { ups_list(uc,0); 
+      { (void) ups_list(uc,0); 
         upserr_output();
        }
 upsfil_stat(1);

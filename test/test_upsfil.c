@@ -9,7 +9,7 @@ int  main( const int argc, char * const argv[] )
   t_upstyp_product *prod_ptr = NULL;
 
   if ( argc <= 1 ) {
-    printf( "Usage: test_upsfil file_name\n" );
+    (void) printf( "Usage: test_upsfil file_name\n" );
     exit( 1 );
   }
 
@@ -19,8 +19,8 @@ int  main( const int argc, char * const argv[] )
 
     if ( prod_ptr ) {
       /*      g_print_product( prod_ptr ); */
-      upsfil_write_file( prod_ptr, "ups.out",' ' ,NOJOURNAL);
-      ups_free_product( prod_ptr );
+      (void) upsfil_write_file( prod_ptr, "ups.out",' ' ,NOJOURNAL);
+      (void) ups_free_product( prod_ptr );
     }
   }
   
