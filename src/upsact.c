@@ -1895,7 +1895,9 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
   /* create a partial action structure for top product */
 
   act_itm = new_act_item( the_ugo_cmd, mat_prod, 0, i_mod, act_name );
-  act_itm->unsetup = unsetup_flag;
+
+  if ( act_itm )
+    act_itm->unsetup = unsetup_flag;
 
   g_top_unsetup = unsetup_flag;
 
