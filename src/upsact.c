@@ -74,13 +74,15 @@ typedef struct s_cmd_map {
 
 int parse_params( const char * a_params,
 		   char *argv[] );
-int next_cmd( t_upstyp_action *action,
-	      t_upsact_item *p_cur, 
-	      const char * const act_name );
+t_upslst_item *next_cmd( t_upstyp_action *action,
+			 t_upslst_item *dep_list,
+			 t_upsact_item *p_cur, 
+			 const char * const act_name );
 t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
 			  t_upstyp_matched_product *mat_prod,
 			  char *act_name );
-t_upsact_item *find_product( const char *const prod_name );
+t_upsact_item *find_product( t_upslst_item *dep_list,
+			     const char *const prod_name );
 
 /* functions to handle specific action commands */
 
@@ -343,9 +345,6 @@ static t_cmd_map g_cmd_maps[] = {
   { 0,0,0,0,0 }
 };
 
-static t_upslst_item *g_list = 0;
-static int           g_list_count = 0;
-
 /*
  * Definition of public functions.
  */
@@ -369,6 +368,8 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
   t_upstyp_matched_instance *mat_inst;
   t_upslst_item *l_item;
   t_upstyp_action *p_act;
+  t_upslst_item *dep_list = 0;
+
 
   t_upslst_item *l_mproduct;
 
@@ -391,16 +392,9 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
 
   /* get setup for top level product */
 
-  g_list_count = 0;
-  if ( g_list )
-    upsact_cleanup();
+  dep_list = next_cmd( p_act, dep_list, new_cur, act_name );
 
-  next_cmd( p_act, new_cur, act_name );
-
-  if ( g_list_count > 0 )
-    return upslst_first( g_list );
-  else
-    return 0;
+  return upslst_first( dep_list );
 }
 
 /*-----------------------------------------------------------------------
@@ -475,11 +469,9 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   }
 }
 
-void upsact_cleanup( void )
+void upsact_cleanup( t_upslst_item *dep_list )
 {
-  /* here you should cleanup g_list */
-  g_list_count = 0;
-  g_list = 0;
+  /* here you should cleanup dep_list */
 }
 
 void upsact_print_item( const t_upsact_item *const p_cur )
@@ -571,7 +563,8 @@ t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
  * Output: none
  * Return: t_upsact_cmd *,
  */
-int next_cmd( t_upstyp_action *action,
+t_upslst_item *next_cmd( t_upstyp_action *action,
+			 t_upslst_item *dep_list,
 			 t_upsact_item *p_cur,
 			 const char * const act_name )
 {
@@ -588,8 +581,7 @@ int next_cmd( t_upstyp_action *action,
 	new_cur->ugo = p_cur->ugo;
 	new_cur->mat = p_cur->mat;
 	new_cur->cmd = p_cmd;
-	g_list = upslst_add( g_list, new_cur );
-	g_list_count++;
+	dep_list = upslst_add( dep_list, new_cur );
 	continue;
       }
       else if ( p_cmd->icmd >= 0 ) { /* here we go again */
@@ -607,7 +599,7 @@ int next_cmd( t_upstyp_action *action,
 
 	/* check if product is already in list */
 	
-	if ( find_product( new_ugo->ugo_product ) ) {
+	if ( find_product( dep_list, new_ugo->ugo_product ) ) {
 	  /* ??? free stuff */
 	  continue;
 	}
@@ -628,18 +620,19 @@ int next_cmd( t_upstyp_action *action,
 	new_cur->ugo = new_ugo;
 	new_cur->mat = new_mat;
 	new_cur->cmd = 0;
-	next_cmd( new_act, new_cur, act_name );
+	dep_list = next_cmd( new_act, dep_list, new_cur, act_name );
 	continue;
       }
     }
   }
   
-  return g_list_count;
+  return dep_list;
 }
 
-t_upsact_item *find_product( const char *const prod_name )
+t_upsact_item *find_product( t_upslst_item* dep_list,
+			     const char *const prod_name )
 {
-  t_upslst_item *l_ptr = upslst_first( g_list );
+  t_upslst_item *l_ptr = upslst_first( dep_list );
 
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     t_upsact_item *p_item = (t_upsact_item *)l_ptr->data;

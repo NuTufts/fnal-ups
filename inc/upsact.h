@@ -62,7 +62,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
 			       t_upstyp_matched_product *mat_prod,
 			       const char * const act_name );
 t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str );
-void upsact_cleanup();
+void upsact_cleanup( t_upslst_item *dep_list );
 void upsact_print_cmd( const t_upsact_cmd * const cmd_cur );
 void upsact_print_item( const t_upsact_item *const p_cur );
 
