@@ -500,6 +500,7 @@ void upsutl_stop_timing(void)
 
   /* Add the times to the error stack */
   upserr_add(UPS_TIME, UPS_INFORMATIONAL, duration_cpu, duration_w);
+  UPS_ERROR = UPS_SUCCESS;
 }
 
 /*-----------------------------------------------------------------------
