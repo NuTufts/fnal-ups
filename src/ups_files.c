@@ -54,7 +54,7 @@ static t_upslst_item  *read_comments( void );
 static int            write_version_file( void );
 static int            write_chain_file( void );
 static int            write_table_file( void );
-static int            write_action( t_ups_action *act );
+static int            write_action( t_ups_action * const act );
 
 
 /* Line parsing */
@@ -357,7 +357,7 @@ int write_table_file( void )
   return 1;
 } 
 
-int write_action( t_ups_action* act_ptr )
+int write_action( t_ups_action * const act_ptr )
 {
   t_upslst_item *l_com = 0;
   char *com;
@@ -936,12 +936,12 @@ int trim_qualifiers( char * const str )
 
   len = (int)strlen( str );
   for ( i=0; i<len; i++ )
-    str[i] = tolower( str[i] );
+    str[i] = (char)tolower( (int)str[i] );
   
   upsutl_str_remove( str, CHAR_REMOVE );  
   upsutl_str_sort( str, ',' );
 
-  return strlen( str );
+  return (int)strlen( str );
 }
 
 /*
