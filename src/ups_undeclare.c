@@ -100,21 +100,22 @@ void ups_undeclare( t_upsugo_command * const uc )
   FILE *tmpfile;
 
   if (!uc->ugo_product || (!uc->ugo_version && !uc->ugo_chain) )
-  { printf("To undeclare a product you must specify a product and version or chain(s) \n");
+  { printf("To undeclare a product -\n");
+    printf("\tyou must specify a product and version OR chain(s) \n");
+    exit(1);
+  }
+  if (uc->ugo_version && uc->ugo_chain)
+  { printf("To undeclare a product -\n");
+    printf("\tspecify a version, which will remove ALL chains, OR chain(s) \n");
     exit(1);
   }
   if (!uc->ugo_f || (int)(upslst_count(uc->ugo_flavor) > 1) )
   { printf("To Declare a product you must specify A flavor \n");
     exit(1);
   }
-/*
-  if ((int)(upslst_count(uc->ugo_chain) > 1) )
-  { printf("Multiple chains specified\n");
-    exit(1);
-  } */
   mproduct_list = upsmat_instance(uc, db_list , need_unique);
   if (!mproduct_list)
-  { printf("No match doing NOTHING\n");
+  { printf("Can find NO matching product entry - doing NOTHING\n");
     exit(1);
   }
   username=upsutl_user();
@@ -132,6 +133,9 @@ void ups_undeclare( t_upsugo_command * const uc )
  * Check for product in ANY database if so use that database 
  * otherwise set to first database listed
  *
+ * Also if someone specifys a version find all chains put them
+ * in the command line and remove them
+ *
  ***********************************************************************/
 /* may still be in multiple databases pick first and stay there! */
  for (db_list = uc->ugo_db ; db_list ; db_list=db_list->next) 
@@ -141,6 +145,19 @@ void ups_undeclare( t_upsugo_command * const uc )
    { upsver_mes(1,"Product %s currently exist in database %s\n",
                 uc->ugo_product,
                 db_info->name);
+     if ( uc->ugo_version ) /* insert all chains in command */
+     { mproduct = (t_upstyp_matched_product *)mproduct_list->data;
+       minst_list = mproduct->minst_list;
+       minst = (t_upstyp_matched_instance *)(minst_list->data);
+       if(minst->chain)
+       { uc->ugo_chain = upslst_add(uc->ugo_chain,minst->chain->chain);
+         if (minst->xtra_chains)
+         { for (chain_list = minst->xtra_chains ; 
+                chain_list ; chain_list = chain_list->next)
+           { cinst = (t_upstyp_instance *)chain_list->data;
+             if(cinst->chain) /* has too right?? */
+             { uc->ugo_chain = upslst_add(uc->ugo_chain,cinst->chain);
+     } } } } }
      break; 
    } db_info=0;
   } 
@@ -159,7 +176,6 @@ void ups_undeclare( t_upsugo_command * const uc )
           save_prev = chain_list->prev;
           chain_list->next=0;
           chain_list->prev=0;
-          upsugo_dump(uc,0);
           mproduct_list = upsmat_instance(uc, db_list , need_unique);
           chain_list->next = save_next;
           chain_list->prev = save_prev;
@@ -194,15 +210,15 @@ void ups_undeclare( t_upsugo_command * const uc )
           } 
        } 
     }
-/* An else would work too, I'm not sure of what the final code will do! */
-    if (!uc->ugo_chain)
-    { exit (0); /* removed chain only when specified */ 
-    }
 /************************************************************************
  *
  * Chains have been complete on the version file...
  *
  ***********************************************************************/
+/* If they specified the version all chains were removed by this point */
+/* If they didn't specify a version we Don't continue...               */
+    if (!uc->ugo_version) { exit(0); }
+
 /* We want NOTHING to do with chains at this point - it is out of sync */
     uc->ugo_chain=0;
     mproduct_list = upsmat_instance(uc, db_list , need_unique);
