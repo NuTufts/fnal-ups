@@ -39,6 +39,9 @@ extern t_cmd_info g_cmd_info[];
 
 static void shutup(const FILE * const tmpfile, const int ups_command);
 
+#define SHUTUP \
+  if ((&bit_bucket == 0) && 0) shutup (tmpfile, ups_command);
+
 /*
  * Definition of global variables.
  */
@@ -240,7 +243,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
        }
      }
 
-    if ((&bit_bucket == 0) && 0) shutup (tmpfile, ups_command);
+    SHUTUP;
 
     return 0;
 }
