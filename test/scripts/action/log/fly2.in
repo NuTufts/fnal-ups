@@ -40,9 +40,9 @@ mystatus=`ls -l`;export mystatus
 #
 inshell
 #
-echo "from extra1
+echo "from extra1"
 #
-echo "from extra3
+echo "from extra3"
 #
 ups_prod_name="fly";export ups_prod_name
 #

@@ -45,9 +45,9 @@ setenv mystatus "`ls -l`"
 #
 incshell
 #
-echo "from extra1
+echo "from extra1"
 #
-echo "from extra3
+echo "from extra3"
 #
 setenv ups_prod_name "fly"
 #
