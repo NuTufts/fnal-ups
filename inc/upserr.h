@@ -73,7 +73,8 @@
 #define UPS_FILE_EXISTS         30
 #define UPS_NO_TABLE_FILE       31
 #define UPS_VERSION_EXISTS      32
-#define UPS_NERR                33      /*  this one must always be last */
+#define UPS_TABLEFILE_AND_VERSION 33
+#define UPS_NERR                34      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"

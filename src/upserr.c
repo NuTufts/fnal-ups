@@ -88,9 +88,10 @@ static char *g_error_messages[UPS_NERR] = {
 /* 28 */  "%s: Unable to determine user shell, value = %s\n",
 /* 29 */  "%s: Unsetup of %s failed, continuing with setup\n",
 /* 30 */  "%s: Cannot create file %s, it already exists\n",
-/* 31 */  "%s: No table file name was specified on the command line\n"
-/* 32 */  "%s: Version specified allready exists\n"
-/* 33 this is the last */
+/* 31 */  "%s: No table file name was specified on the command line\n",
+/* 32 */  "%s: Version specified already exists\n",
+/* 33 */  "%s: Version/Chain and Table file both cannot be specified on the command line \n"
+/* 34 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -127,7 +128,8 @@ char *g_error_ascii[] = {
    /* UPS_FILE_EXISTS         30 */ "UPS_FILE_EXISTS",
    /* UPS_NO_TABLE_FILE       31 */ "UPS_NO_TABLE_FILE",
    /* UPS_VERSION_EXISTS      32 */ "UPS_NO_TABLE_FILE",
-   /* UPS_NERR                33 */ "UPS_NERR",
+   /* UPS_TABLEFILE_AND_VERSION 33 */ "UPS_TABLEFILE_AND_VERSION",
+   /* UPS_NERR                34 */ "UPS_NERR",
    0 };
 
 /*
