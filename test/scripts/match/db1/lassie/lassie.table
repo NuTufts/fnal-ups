@@ -19,4 +19,11 @@ FLAVOR = OSF1
 QUALIFIERS = ""
 
 COMMON:
+   ACTION=SETUP
+    setupRequired("snoopy v1_0 -f NULL")
 END:
+
+
+
+
+

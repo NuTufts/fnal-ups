@@ -1,22 +1,25 @@
 FILE = TABLE
 PRODUCT = rover
 
+
 GROUP:
 
-FLAVOR = NULL
-QUALIFIERS = "nodbg:opt"
+FLAVOR=NULL
 
-FLAVOR = IRIX+5
-QUALIFIERS = "nodbg:opt"
-
-FLAVOR = IRIX+5.3
-QUALIFIERS = "nodbg:opt"
-
-FLAVOR = IRIX+6.2
-QUALIFIERS = ""
-
-FLAVOR = OSF1
-QUALIFIERS = ""
 
 COMMON:
+
+ACTION=SETUP
+  doDefaults()
+ setupRequired("snoopy v1_0")
+  
+
 END:
+
+
+
+
+
+
+
+
