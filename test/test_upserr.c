@@ -113,6 +113,11 @@ int main(void)
   upserr_output();
   fprintf(stderr, "-------------------------------------------------\n");
 
+  upserr_clear();
+  fprintf(stderr, "\nOutputing with an empty stack - expect nothing.\n");
+  upserr_output();
+  fprintf(stderr, "-------------------------------------------------\n");
+
   return 0;
 }
 
