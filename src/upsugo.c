@@ -88,7 +88,7 @@ int UPS_NEED_DB=1;
 #define case_V case 'V': uc->ugo_V = 1; break;
 #define case_w case 'w': uc->ugo_w = 1; break;
 #define case_W case 'W': uc->ugo_W = 1; break;
-#define case_x case 'x': uc->ugo_x = 1; break;
+/* #define case_x case 'x': uc->ugo_x = 1; break; */ /* Likely never to be implemented */
 #define case_X case 'X': uc->ugo_X = 1; break;
 #define case_y case 'y': uc->ugo_y = 1; break;
 #define case_Y case 'Y': uc->ugo_Y = 1; break;
@@ -1371,7 +1371,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
           case_a case_C case_e case_E case_F 
           case_j case_k case_l case_L case_P 
           case_R case_s case_S case_v case_V 
-          case_w case_W case_x case_X case_y 
+          case_w case_W /* case_x */ case_X case_y 
           case_Y case_Z case_help
           /* Chain cases */ 
           case_c case_d case_n case_t case_o
