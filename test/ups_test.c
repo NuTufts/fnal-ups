@@ -37,6 +37,7 @@ int upstst_list(int, char**);		int upstst_depend(int, char**);
 int upstst_declare(int, char**);	int upstst_undeclare(int, char**);
 int upstst_configure(int, char**);	int upstst_unconfigure(int, char**);
 int upstst_tailor(int, char**);		int upstst_copy(int, char**);
+int upstst_flavor(int, char**);
 int upstst_start(int, char**);		int upstst_stop(int, char**);
 int upstst_get(int, char**);		int upstst_modify(int, char**);
 int upstst_setup(int, char**);		int upstst_unsetup(int, char**);
