@@ -49,10 +49,8 @@ int UPS_NEED_DB=1;
 
 #define MAX_ARGS 1000
 #define UPSUGO "UPSUGO: "
-#define FREE( X )	{			\
-			free( X );		\
-			X = 0;		\
-			}
+#define FREE( X ) free( X ); X = 0;
+
 #define flavor_sub() \
 {  while ((loc = strrchr(flavor,'.'))) \
       { *loc = 0; \
@@ -70,305 +68,216 @@ int UPS_NEED_DB=1;
    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
 }
-#define case_help \
-         case '?':      \
-         uc->ugo_help = 1; \
-         break;
-#define case_a \
-         case 'a':      \
-         uc->ugo_a = 1; \
-         break;
-#define case_C \
-         case 'C':      \
-         uc->ugo_C = 1; \
-         break;
-#define case_e \
-         case 'e':      \
-         uc->ugo_e = 1; \
-         break;
-#define case_E \
-         case 'E':      \
-         uc->ugo_E = 1; \
-         break;
-#define case_F \
-         case 'F':      \
-         uc->ugo_F = 1; \
-         break;
-#define case_j \
-         case 'j':      \
-         uc->ugo_j = 1; \
-         break;
-#define case_k \
-         case 'k':      \
-         uc->ugo_k = 1; \
-         break;
-#define case_l \
-         case 'l':      \
-         uc->ugo_l = 1; \
-         break;
-#define case_L \
-         case 'L':      \
-         uc->ugo_L = 1; \
-         break;
-#define case_R \
-         case 'R':      \
-         uc->ugo_R = 1; \
-         break;
-#define case_s \
-         case 's':      \
-         uc->ugo_s = 1; \
-         break;
-#define case_S \
-         case 'S':      \
-         uc->ugo_S = 1; \
-         break;
-#define case_v \
-         case 'v':      \
-         uc->ugo_v +=1; \
-         UPS_VERBOSE=uc->ugo_v; \
-         break;
-#define case_V \
-         case 'V':      \
-         uc->ugo_V = 1; \
-         break;
-#define case_w \
-         case 'w':      \
-         uc->ugo_w = 1; \
-         break;
-#define case_W \
-         case 'W':      \
-         uc->ugo_W = 1; \
-         break;
-#define case_x \
-         case 'x':      \
-         uc->ugo_x = 1; \
-         break;
-#define case_X \
-         case 'X':      \
-         uc->ugo_X = 1; \
-         break;
-#define case_y \
-         case 'y':      \
-         uc->ugo_y = 1; \
-         break;
-#define case_Y \
-         case 'Y':      \
-         uc->ugo_Y = 1; \
-         break;
-#define case_Z \
-         case 'Z':      \
-         uc->ugo_Z = 1; \
-         break;
-/* -0 exact match */
-/* -1 machine major version */
-/* -2 machine only */
-/* -3 generic unix machine */
-#define case_0 \
-         case '0':      \
-         uc->ugo_number = 1; \
-         break;
-#define case_1 \
-         case '1':      \
-         uc->ugo_number = 2; \
-         break;
-#define case_2 \
-         case '2':      \
-         uc->ugo_number = 3; \
-         break;
-#define case_3 \
-         case '3':      \
-         uc->ugo_number = 4; \
-         break;
+/* Single flag set cases */
+#define case_help case '?': uc->ugo_help = 1; break;
+#define case_a case 'a': uc->ugo_a = 1; break;
+#define case_C case 'C': uc->ugo_C = 1; break;
+#define case_e case 'e': uc->ugo_e = 1; break;
+#define case_E case 'E': uc->ugo_E = 1; break;
+#define case_F case 'F': uc->ugo_F = 1; break;
+#define case_j case 'j': uc->ugo_j = 1; break;
+#define case_k case 'k': uc->ugo_k = 1; break;
+#define case_l case 'l': uc->ugo_l = 1; break;
+#define case_L case 'L': uc->ugo_L = 1; break;
+#define case_P case 'P': uc->ugo_P = 1; break;
+#define case_R case 'R': uc->ugo_R = 1; break;
+#define case_s case 's': uc->ugo_s = 1; break;
+#define case_S case 'S': uc->ugo_S = 1; break;
+/* Set verbose IMMEDIATELY rest of line parsed will be verbose */
+#define case_v case 'v': uc->ugo_v +=1; UPS_VERBOSE=uc->ugo_v; break;
+#define case_V case 'V': uc->ugo_V = 1; break;
+#define case_w case 'w': uc->ugo_w = 1; break;
+#define case_W case 'W': uc->ugo_W = 1; break;
+#define case_x case 'x': uc->ugo_x = 1; break;
+#define case_X case 'X': uc->ugo_X = 1; break;
+#define case_y case 'y': uc->ugo_y = 1; break;
+#define case_Y case 'Y': uc->ugo_Y = 1; break;
+#define case_Z case 'Z': uc->ugo_Z = 1; break;
+/* 0-n most generic to most specific match */
+#define case_0 case '0': uc->ugo_number = 1; break;
+#define case_1 case '1': uc->ugo_number = 2; break;
+#define case_2 case '2': uc->ugo_number = 3; break;
+#define case_3 case '3': uc->ugo_number = 4; break;
+
+/* Add a specified chain to the list */
 #define add_chain(CHAIN) \
          addr=upsutl_str_create(CHAIN,' ');              \
          uc->ugo_chain = upslst_add(uc->ugo_chain,addr); 
-#define case_c \
-         case 'c':             \
-         uc->ugo_c = 1;        \
-         add_chain("current"); \
-         break;
-#define case_d \
-         case 'd':                 \
-         uc->ugo_d = 1;            \
-         add_chain("development"); \
-         break;
-#define case_n \
-         case 'n':         \
-         uc->ugo_n = 1;    \
-         add_chain("new"); \
-         break;
-#define case_t \
-         case 't':          \
-         uc->ugo_t = 1;     \
-         add_chain("test"); \
-         break;
-#define case_o \
-         case 'o':         \
-         uc->ugo_o = 1;    \
-         add_chain("old"); \
-         break;
-#define set_value( ELEMENT , ARG )                                         \
-{                                                                          \
-         if ( *argbuf )                                                    \
-         { addr=upsutl_str_create(*argbuf,'p');                            \
-           ELEMENT = addr;                                                 \
-           *argbuf = 0;                                                    \
-           break;                                                          \
-         }                                                                 \
-         if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
-         { if(*arg_str == '-' || *arg_str == ',' )                         \
-           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
-             break;                                                        \
-           }                                                               \
-           addr=upsutl_str_create(arg_str,'p');                            \
-           ELEMENT = addr;                                                 \
-           break;                                                          \
-         }                                                                 \
-         errflg = 1;                                                       \
-         break;                                                            \
+/* All "defined" chains given by a flag */
+#define case_c case 'c': uc->ugo_c = 1; add_chain("current"); break;
+#define case_d case 'd': uc->ugo_d = 1; add_chain("development"); break;
+#define case_n case 'n': uc->ugo_n = 1; add_chain("new"); break;
+#define case_t case 't': uc->ugo_t = 1; add_chain("test"); break;
+#define case_o case 'o': uc->ugo_o = 1; add_chain("old"); break;
+
+/* This routine set the element to the next arguement but it has to
+   determine if the value is part of the same argument (argv) or a
+   seperate one.  i.e. -m X.table or -mX.table or -m"X.table" or ...
+   It also does a simple validation to make sure the arguement is not 
+   - (another flag) or a , (the next command)
+   
+*/
+#define set_value( ELEMENT , ARG )                                  \
+{ if ( *argbuf )                                                    \
+  { addr=upsutl_str_create(*argbuf,'p');                            \
+    ELEMENT = addr;                                                 \
+    *argbuf = 0;                                                    \
+    break;                                                          \
+  }                                                                 \
+  if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
+  { if(*arg_str == '-' || *arg_str == ',' )                         \
+    { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
+      break;                                                        \
+    }                                                               \
+    addr=upsutl_str_create(arg_str,'p');                            \
+    ELEMENT = addr;                                                 \
+    break;                                                          \
+  }                                                                 \
+  errflg = 1;                                                       \
+  break;                                                            \
 } 
-#define set_value_nop( ELEMENT , ARG )                                     \
-{                                                                          \
-         if ( *argbuf )                                                    \
-         { addr=upsutl_str_create(*argbuf,' ');                            \
-           ELEMENT = addr;                                                 \
-           *argbuf = 0;                                                    \
-           break;                                                          \
-         }                                                                 \
-         if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
-         { if(*arg_str == '-' || *arg_str == ',' )                         \
-           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
-             break;                                                        \
-           }                                                               \
-           addr=upsutl_str_create(arg_str,' ');                            \
-           ELEMENT = addr;                                                 \
-           break;                                                          \
-         }                                                                 \
-         errflg = 1;                                                       \
-         break;                                                            \
+/* Same as above used only for description DOES NOT PACK           */
+#define set_value_nop( ELEMENT , ARG )                              \
+{ if ( *argbuf )                                                    \
+  { addr=upsutl_str_create(*argbuf,' ');                            \
+    ELEMENT = addr;                                                 \
+    *argbuf = 0;                                                    \
+    break;                                                          \
+  }                                                                 \
+  if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)     \
+  { if(*arg_str == '-' || *arg_str == ',' )                         \
+    { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
+      break;                                                        \
+    }                                                               \
+    addr=upsutl_str_create(arg_str,' ');                            \
+    ELEMENT = addr;                                                 \
+    break;                                                          \
+  }                                                                 \
+  errflg = 1;                                                       \
+  break;                                                            \
 } 
-#define set_O_value( ELEMENT , ARG )                                       \
-{        if ( *argbuf )                                                    \
-         { addr=upsutl_str_create(*argbuf,' ');                            \
-           ELEMENT = addr;                                                 \
-           *argbuf = 0;                                                    \
-           break;                                                          \
-         }                                                                 \
-         if((arg_str = ups_argv[++argindx]))     \
-         { addr=upsutl_str_create(arg_str,' ');                            \
-           ELEMENT = addr;                                                 \
-           break;                                                          \
-         }                                                                 \
-         errflg = 1;                                                       \
-         break;                                                            \
+
+/* -O is a totally special arguement 
+   It has to take the value and not care if it looks like an option
+   because it is an option but not on this command line
+*/
+#define set_O_value( ELEMENT , ARG )     \
+{ if ( *argbuf )                         \
+  { addr=upsutl_str_create(*argbuf,' '); \
+    ELEMENT = addr;                      \
+    *argbuf = 0;                         \
+    break;                               \
+  }                                      \
+  if((arg_str = ups_argv[++argindx]))    \
+  { addr=upsutl_str_create(arg_str,' '); \
+    ELEMENT = addr;                      \
+    break;                               \
+  }                                      \
+  errflg = 1;                            \
+  break;                                 \
 }
-#define build_list( LIST_ELEMENT , ARG )                                   \
-{                                                                          \
-         if ( *argbuf )                                                    \
-         { while((loc=strchr(*argbuf,':'))!=0) {                           \
-             addr=*argbuf;                                                 \
-             *argbuf=loc+1;                                                \
-             *loc = 0;                                                     \
-             addr=upsutl_str_create(addr,'p');                             \
-             LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                 \
-           }                                                               \
-           addr=upsutl_str_create(*argbuf,'p');                            \
-           LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                   \
-           *argbuf = 0;                                                    \
-           break;                                                          \
-         }                                                                 \
-         if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)      \
-         { if(*arg_str == '-' || *arg_str == ',' )                         \
-           { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG );   \
-             break;                                                        \
-           }                                                               \
-           while((loc=strchr(arg_str,':'))!=0) {                           \
-             addr=arg_str;                                                 \
-             arg_str=loc+1;                                                \
-             *loc = 0;                                                     \
-             addr=upsutl_str_create(addr,'p');                             \
-             LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                 \
-           }                                                               \
-           addr=upsutl_str_create(arg_str,'p');                            \
-           LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                   \
-           break;                                                          \
-         }                                                                 \
-         errflg = 1;                                                       \
-         break;                                                            \
+/* This builds the list of optionally : seperated arguements on the
+   command line.  The examples of how this can be specified appears
+   nearly endless.  It handles the flag with or with spaces and 
+   quotes on the whole arguement or even as a piece of the arguement.
+   It should also be noted that individual parts (seperated by :) 
+   are also packed into a single value.  
+   i.e. -fOS1:" MYOS":"ANY OS":OSEND 
+   is the same a -f "OS1:MYOS:ANYOS:OSEND" of course with or wihout "'s
+   NOTE: build list includes the BREAK
+*/
+#define build_list( LIST_ELEMENT , ARG )                          \
+{ if ( *argbuf )                                                  \
+  { while((loc=strchr(*argbuf,':'))!=0)                           \
+    { addr=*argbuf;                                               \
+      *argbuf=loc+1;                                              \
+      *loc = 0;                                                   \
+      addr=upsutl_str_create(addr,'p');                           \
+      LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);               \
+    }                                                             \
+    addr=upsutl_str_create(*argbuf,'p');                          \
+    LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                 \
+    *argbuf = 0;                                                  \
+    break;                                                        \
+  }                                                               \
+  if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)    \
+  { if(*arg_str == '-' || *arg_str == ',' )                       \
+    { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG ); \
+      break;                                                      \
+    }                                                             \
+    while((loc=strchr(arg_str,':'))!=0)                           \
+    { addr=arg_str;                                               \
+      arg_str=loc+1;                                              \
+      *loc = 0;                                                   \
+      addr=upsutl_str_create(addr,'p');                           \
+      LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);               \
+    }                                                             \
+    addr=upsutl_str_create(arg_str,'p');                          \
+    LIST_ELEMENT = upslst_add(LIST_ELEMENT,addr);                 \
+    break;                                                        \
+  }                                                               \
+  errflg = 1;                                                     \
+  break;                                                          \
 }
-#define case_g \
-         case 'g':       \
-         uc->ugo_g = 1;  \
-         build_list (uc->ugo_chain , "g") 
-#define case_f \
-         case 'f':       \
-         uc->ugo_f = 1;  \
-         build_list (uc->ugo_flavor , "f") 
-#define case_H \
-         case 'H':      \
-         uc->ugo_H = 1; \
-         build_list (uc->ugo_osname , "H") 
-#define case_h \
-         case 'h':       \
-         uc->ugo_h = 1;  \
-         build_list (uc->ugo_host , "h") 
-#define case_K \
-         case 'K':       \
-         uc->ugo_K = 1;  \
-         build_list (uc->ugo_key , "K") 
-#define case_A \
-         case 'A':       \
-         uc->ugo_A = 1;  \
-         build_list (uc->ugo_auth , "A") 
-#define case_b \
-         case 'b':       \
-         uc->ugo_b = 1;  \
-         set_value (uc->ugo_compile_file, "b") 
-#define case_D \
-         case 'D':       \
-         uc->ugo_D = 1;  \
-         set_value (uc->ugo_origin , "D") 
-#define case_m \
-         case 'm':       \
-         uc->ugo_m = 1;  \
-         set_value (uc->ugo_tablefile , "m") 
-#define case_M \
-         case 'M':       \
-         uc->ugo_M = 1;  \
-         set_value (uc->ugo_tablefiledir, "M")    
-#define case_N \
-         case 'N':       \
-         uc->ugo_N = 1;  \
-         set_value (uc->ugo_anyfile , "N")    
-#define case_O \
-         case 'O':       \
-         uc->ugo_O = 1;  \
-         set_O_value (uc->ugo_options , "O") 
-#define case_p \
-         case 'p':       \
-         uc->ugo_p = 1;  \
-         set_value_nop (uc->ugo_description , "p")
-#define case_P \
-         case 'P':       \
-         uc->ugo_P = 1;  \
-         break;
-/*         set_value (uc->ugo_override , "P") */
-#define case_r           \
-         case 'r':       \
-         uc->ugo_r = 1;  \
-         set_value (uc->ugo_productdir , "r")
-#define case_T           \
-         case 'T':       \
-         uc->ugo_T = 1;  \
-         set_value (uc->ugo_archivefile , "T")
-#define case_u           \
-         case 'u':       \
-         uc->ugo_u = 1;  \
-         set_value (uc->ugo_compile_dir, "u")
-#define case_U           \
-         case 'U':       \
-         uc->ugo_U = 1;  \
-         set_value (uc->ugo_upsdir , "U")
+/* list element options */
+#define case_A case 'A': uc->ugo_A = 1; build_list (uc->ugo_auth , "A") 
+#define case_f case 'f': uc->ugo_f = 1; build_list (uc->ugo_flavor , "f") 
+#define case_g case 'g': uc->ugo_g = 1; build_list (uc->ugo_chain , "g") 
+#define case_H case 'H': uc->ugo_H = 1; build_list (uc->ugo_osname , "H") 
+#define case_h case 'h': uc->ugo_h = 1; build_list (uc->ugo_host , "h") 
+#define case_K case 'K': uc->ugo_K = 1; build_list (uc->ugo_key , "K") 
+
+/* single value options */
+#define case_b case 'b': uc->ugo_b = 1; set_value (uc->ugo_compile_file, "b") 
+#define case_D case 'D': uc->ugo_D = 1; set_value (uc->ugo_origin , "D") 
+#define case_m case 'm': uc->ugo_m = 1; set_value (uc->ugo_tablefile , "m") 
+#define case_M case 'M': uc->ugo_M = 1; set_value (uc->ugo_tablefiledir, "M")
+#define case_N case 'N': uc->ugo_N = 1; set_value (uc->ugo_anyfile , "N")    
+#define case_r case 'r': uc->ugo_r = 1; set_value (uc->ugo_productdir , "r")
+#define case_T case 'T': uc->ugo_T = 1; set_value (uc->ugo_archivefile , "T")
+#define case_u case 'u': uc->ugo_u = 1; set_value (uc->ugo_compile_dir, "u")
+#define case_U case 'U': uc->ugo_U = 1; set_value (uc->ugo_upsdir , "U")
+
+/* Special case -O value (no check) */
+#define case_O case 'O': uc->ugo_O = 1; \
+        set_O_value (uc->ugo_options , "O") 
+
+/* Special case -p value (no pack) */
+#define case_p case 'p': uc->ugo_p = 1; \
+        set_value_nop (uc->ugo_description , "p")
+
+#define case_q case 'q': uc->ugo_q = 1; \
+   if ( *argbuf )                                                  \
+   { upsugo_bldqual(uc,*argbuf);                                   \
+     *argbuf=0;                                                    \
+     break;                                                        \
+   }                                                               \
+   if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)    \
+   { if(*arg_str == '-')                                           \
+     { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" ); \
+       break;                                                      \
+     }                                                             \
+     upsugo_bldqual(uc,arg_str);                                   \
+     break;                                                        \
+   }                                                               \
+   errflg = 1;                                                     \
+   break;
+#define case_z case 'z': uc->ugo_z = 1; \
+   if ( *argbuf )                                                  \
+   { upsugo_blddb(uc,*argbuf);                                     \
+     *argbuf=0;                                                    \
+     break;                                                        \
+   }                                                               \
+   if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)    \
+   { if(*arg_str == '-')                                           \
+     { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "z" ); \
+       break;                                                      \
+     }                                                             \
+     upsugo_blddb(uc,arg_str);                                     \
+     break;                                                        \
+   }                                                               \
+   errflg = 1;                                                     \
+   break;
 
    int	errflg = 0;
    t_upslst_item *ugo_commands = 0;
@@ -382,7 +291,7 @@ int UPS_NEED_DB=1;
 char * upsugo_getarg( const int , char **,char ** const );
 int upsugo_rearg(const int ,char **,int * const,char **);
 int upsugo_ifornota(struct ups_command * const uc);
-void upsugo_setfixed(struct ups_command * const uc);
+void upsugo_setshell(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
 int upsugo_blddb(struct ups_command * const uc, char * inaddr);
 void upsugo_prtdb(t_upslst_item * const list_ptr,
@@ -441,55 +350,57 @@ if (!uc->ugo_H)
    upslst_free(uc->ugo_osname,'d');
    uc->ugo_osname=0;
  } 
- if (uc->ugo_number)
- { count = upslst_count(uc->ugo_flavor);
-   if(uc->ugo_number > upslst_count(uc->ugo_flavor))
-   { uc->ugo_number=upslst_count(uc->ugo_flavor); }
-   l_ptr = upslst_first(uc->ugo_flavor);
-   while ( l_ptr  )
-   { if( uc->ugo_number != count )
+ if (uc->ugo_number)                       /* specified a specific os level  */
+ { count = upslst_count(uc->ugo_flavor);   /* if they specified a level more */
+   if(uc->ugo_number > upslst_count(uc->ugo_flavor))   /* specific then      */
+   { uc->ugo_number=upslst_count(uc->ugo_flavor); } /* available set to max  */
+   l_ptr = upslst_first(uc->ugo_flavor);   /* Start at begining of list      */
+   while ( l_ptr  )                        /* loop threw tossing unwanted    */
+   { if( uc->ugo_number != count )         /* levels of the flavor           */
      { upsver_mes(3,"%sNumber specified deleting %s from flavor list\n",
                   UPSUGO,l_ptr->data); 
        l_ptr = upslst_delete_safe( l_ptr, l_ptr->data, 'd' ); 
-     } else {
-       uc->ugo_flavor=l_ptr;
-       l_ptr=l_ptr->next;
+     } else {                              /* this is the level we want      */
+       uc->ugo_flavor=l_ptr;               /* just pass it up and leave it   */
+       l_ptr=l_ptr->next;                  /* there                          */
      } count--;
    } 
  } 
  return(0);
 }
 /* ===========================================================================
-** ROUTINE	upsugo_setfixed()
+** ROUTINE	upsugo_setshell()
 **
+** Set the shell type of the user in the command line 
 */
-void upsugo_setfixed(struct ups_command * const uc)
+void upsugo_setshell(struct ups_command * const uc)
 {
-   char   * SHELL;                           /* SHELL value */
-   if (g_UPS_SHELL==e_INVALID_SHELL)
-   { if((SHELL = (char *)getenv("UPS_SHELL")) == 0)
-     { if((SHELL = (char *)getenv("SHELL")) == 0)
-       { g_UPS_SHELL=e_BOURNE;
-         strcpy(SHELL,"sh");
-       } else { 
-         if (strstr(SHELL,"csh"))
+   char   * SHELL;                         /* SHELL value hopefully UPS_SHELL*/
+   if (g_UPS_SHELL==e_INVALID_SHELL)       /* If it has not allready been set*/
+   { if((SHELL = (char *)getenv("UPS_SHELL")) == 0) /* check for UPS_SHELL   */
+     { if((SHELL = (char *)getenv("SHELL")) == 0)   /* failed check SHELL    */
+       { g_UPS_SHELL=e_BOURNE;             /* no SHELL either                */
+         strcpy(SHELL,"sh");               /* go bourne set to sh for match  */
+       } else {                            /* got SHELL value                */
+         if (strstr(SHELL,"csh"))          /* is it csh?            UK!      */
          { g_UPS_SHELL=e_CSHELL;
          } else { 
            g_UPS_SHELL=e_BOURNE;
          }
-       }
-       upserr_add(UPS_NOSHELL, UPS_INFORMATIONAL, SHELL);
-     } else { 
+       }                                 /* let them know that you impromised*/
+       upserr_add(UPS_NOSHELL, UPS_INFORMATIONAL, SHELL); /* the shell value */
+     } else {                            /* UPS_SHELL was set set accordingly*/
        if (strstr(SHELL,"csh"))
        { g_UPS_SHELL=e_CSHELL;
        } else { 
          g_UPS_SHELL=e_BOURNE;
        }
      }
-   } uc->ugo_shell=g_UPS_SHELL;
+   } uc->ugo_shell=g_UPS_SHELL;           /* Store the shell value in command*/
 }
+
 /* ===========================================================================
-** ROUTINE	upsugo_ifornota()
+** ROUTINE	upsugo_ifornota() ( if on not a ) specified 
 **
 ** This routine is called at the end of the command sequence to fill in
 ** any defaults if not otherwise specified and sets the values appropriately
@@ -506,65 +417,63 @@ int upsugo_ifornota(struct ups_command * const uc)
    char   * loc;
    static char temp[1024];
 
-   if (!uc->ugo_product) 
-   { addr=upsutl_str_create("*",' ');
+   if (!uc->ugo_product)                        /* no product                */
+   { addr=upsutl_str_create("*",' ');           /* wildcard product name     */
      upsver_mes(3,"%sNo product specified set to %s\n",UPSUGO,addr); 
-     uc->ugo_product = addr;
+     uc->ugo_product = addr;                   /* put in command as specified*/
    }
-   if (uc->ugo_a)                           /* did the user specify -a */
+   if (uc->ugo_a)                               /* did the user specify -a */
    { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
      { upsver_mes(3,"%sNo chain specified set to *\n",UPSUGO); 
-       add_chain("*")
+       add_chain("*")                           /* no chain -> OR <- version */
      }
-     if (!uc->ugo_qualifiers) 
-     { addr=upsutl_str_create("*",' ');
+     if (!uc->ugo_qualifiers)                   /* no qualifiers */
+     { addr=upsutl_str_create("*",' ');         /* wildcard them too */
        upsver_mes(3,"%sNo qualifiers specified set to %s\n",UPSUGO,addr); 
        uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
      if (!uc->ugo_version)          /* unallocated if later specified */
-     { addr=upsutl_str_create("*",' ');  
+     { addr=upsutl_str_create("*",' ');         /* no version wildcard */
        upsver_mes(3,"%sNo version specified set to %s\n",UPSUGO,addr); 
        uc->ugo_version = addr;      /* at this point I may not know... */
      }
 /* the ugo_number is an after the fact processing and the -H is kept
    in the os_name until after so they must be dealt with specifically  */
-     if (!uc->ugo_flavor || uc->ugo_number /* || uc->ugo_H */ ) 
-     { if(!uc->ugo_number /* && !uc->ugo_H */ )
+     if (!uc->ugo_flavor || uc->ugo_number )  /* no flavor or a number */
+     { if(!uc->ugo_number )                   /* no number wildcare flavor */
        { addr=upsutl_str_create("*",' ');  
          upsver_mes(3,"%sNo flavor specified set to %s\n",UPSUGO,addr); 
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
        } else {
-         upsugo_bldfvr(uc);
-/* test flavor=* in table */
-         addr=upsutl_str_create(ANY_FLAVOR,' ');  
-         upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr); 
+         upsugo_bldfvr(uc);                   /* build the appropriate os */
+         addr=upsutl_str_create(ANY_FLAVOR,' ');           /* flavor and add */
+         upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr); /* to the list */
          uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-/* */
        }
      }
    } else {                         /* not -a but give defaults */
-     if (!uc->ugo_chain && !uc->ugo_version)
+     if (!uc->ugo_chain && !uc->ugo_version) /* no chain or version no -a */
      { upsver_mes(3,"%sNo (-a) Adding chain current\n",UPSUGO,addr); 
-       add_chain("current");
+       add_chain("current");                 /* give them current chain */
      }
-     if (!uc->ugo_qualifiers)       /* no qualifiers = ""       */
+     if (!uc->ugo_qualifiers)                /* no qualifiers = ""       */
      { addr=upsutl_str_create("",' ');
        upsver_mes(3,"%sNo (-a) Adding qualifiers \"\"\n",UPSUGO,addr); 
        uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
-     if (!uc->ugo_flavor) upsugo_bldfvr(uc);
-/* test flavor=* in table */
-         addr=upsutl_str_create(ANY_FLAVOR,' ');  
-         upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr); 
-         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-/* */
+     if (!uc->ugo_flavor)                    /* no flavor? */
+     { upsugo_bldfvr(uc);                    /* build it too! */
+     }
+     addr=upsutl_str_create(ANY_FLAVOR,' ');   /* if not -a EVERYBODY gets */
+     upsver_mes(3,"%sAdding flavor %s\n",UPSUGO,addr);  /* * flavor -a IS  */
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
    }
 /* If they didn't specify a database pull the environment variable */
-   if (!uc->ugo_db) {
-     if((PRODUCTS = (char *)getenv("PRODUCTS")) == 0)
-     { if (!uc->ugo_m) /* no table file either, I'm dead */
-       { if(UPS_NEED_DB)
-         { upserr_add(UPS_NO_DATABASE, UPS_FATAL); 
+   if (!uc->ugo_db) {                        /* do I have any database? */
+     if((PRODUCTS = (char *)getenv("PRODUCTS")) == 0) /* nope */
+     { if (!uc->ugo_m)                     /* no table file either, I'm dead */
+       { if(UPS_NEED_DB)                   /* ups flavor & create don't need */
+         { upserr_add(UPS_NO_DATABASE, UPS_FATAL);  /* a database */
          }
        }
      } else {
@@ -572,21 +481,21 @@ int upsugo_ifornota(struct ups_command * const uc)
         addr=temp; /* use static instead of alloc space */
         strcpy(addr,PRODUCTS);
         loc=addr;
-        while ( loc && *loc ) 
+        while ( loc && *loc )  /* covert any space ( tab etc ) to a space */
         { if (isspace( (unsigned long )(*(loc)) ) ) { *loc=' '; }
           ++loc; 
         }
-        while ((loc=strchr(addr,' '))!=0) {
-                *loc = 0;
-                PRODUCTS = upsutl_str_create(addr,' ');
-                upsugo_blddb(uc,PRODUCTS);
-                upsmem_free(PRODUCTS);
-                addr=loc+1; 
-                while(*addr==' ') { addr=addr+1; }
+        while ((loc=strchr(addr,' '))!=0) /* more then one database ? */
+        { *loc = 0;
+          PRODUCTS = upsutl_str_create(addr,' '); /* name is up to space */
+          upsugo_blddb(uc,PRODUCTS);              /* add it to the list */
+          upsmem_free(PRODUCTS);                  /* free the old new space */
+          addr=loc+1;                             /* was allocated */
+          while(*addr==' ') { addr=addr+1; }
         }
-        PRODUCTS = upsutl_str_create(addr,' ');
-        upsugo_blddb(uc,PRODUCTS);
-        upsmem_free(PRODUCTS);
+        PRODUCTS = upsutl_str_create(addr,' ');   /* no more spaces add what */
+        upsugo_blddb(uc,PRODUCTS);                /* is left */
+        upsmem_free(PRODUCTS);                    /* free the temp space */
      }
    } 
    return(0);
@@ -608,40 +517,45 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  struct upstyp_db * addr;
 /* All NT database paths must have \ following : if not a seperator */
 /* PRODUCTS or -z "C:\/local/products:GROUP:\/usr/products"         */
- while((loc=strchr(inaddr,':'))!=0)
- { inaddr=loc+1;
+/* They say to define it the "unix" way but since this was added    */
+/* cause someone didn't and it broke and it works I'm leaving it    */
+/* convert PC specifications of PRODUCTS with drive:\paths to drive|\ */
+/* so they don't split the : as a seperate database, later I convert  */
+/* them back if this was done on the nt flag                        */
+ while((loc=strchr(inaddr,':'))!=0)    /* all drive:\ to drive|\    */
+ { inaddr=loc+1;                       /* | was the otherwise unusable */
    if(*inaddr=='\\') 
    { *loc = '|'; 
      nt++;			/* Do not endure pain if not necessary */
    }
  }
  inaddr=saddr;
- while((loc=strchr(inaddr,':'))!=0)
- {  db=inaddr;
+ while((loc=strchr(inaddr,':'))!=0)  /* loop threw the : seperated list */
+ { db=inaddr;
    inaddr=loc+1;
    *loc = 0;
-   if(nt) 
+   if(nt)                       /* if it was a nt specification now fix it */
    { loc=strchr(db,'|');
      if (loc) 
-     { *loc=':'; 
+     { *loc=':';                /* back to the original : */
      }
    }
-   db=upsutl_str_create(db,'p');
+   db=upsutl_str_create(db,'p'); /* add the database entry */
    addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
    memset (addr,0,sizeof(struct upstyp_db));
    addr->name = db;
    upsver_mes(3,"%sAdding database %s\n",UPSUGO,addr->name); 
    uc->ugo_db = upslst_add(uc->ugo_db,addr);
  }
- if(nt) 
- { loc=strchr(inaddr,'|');
+ if(nt)                         /* last or only still need to check and */
+ { loc=strchr(inaddr,'|');      /* fix the nt | to : */
    if (loc) { *loc=':'; }
  }
  /* db may not be free because it's pointed to by db config do NOT free */
  db=upsutl_str_create(inaddr,'p');
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
  memset (addr, 0, sizeof(struct upstyp_db));
- addr->name = db;
+ addr->name = db;                /* add last or only to the database list */
  upsver_mes(3,"%sAdding database %s\n",UPSUGO,addr->name); 
  uc->ugo_db = upslst_add(uc->ugo_db,addr);
  *inaddr = 0;
@@ -650,6 +564,11 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
 /* ===========================================================================
 ** ROUTINE	upsugo_bldqual()
 **
+** build the optional and required all possible combination list 
+** This will return the best to worst match with up to 2 optionals
+** after that the order of alphabetical bias.  If that is unacceptable
+** the whole list will have to be resorted again based on the number
+** of elements (seperated) by :'s and then alphabetically
 */
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
 {
@@ -675,22 +594,22 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   addr=upsutl_str_create(inaddr,'p');
 /* remove all ?qualifiers from required string */
   waddr=addr;				/* work address */
-  while (*waddr)   
-  { if (*waddr==':')
+  while (*waddr)                      /* while not end of string */
+  { if (*waddr==':')                  /* if : not an optional */
     { onq=0;
     } else {
-      if (*waddr=='?'||onq)
-      { onq=1;
-        *waddr=' ';
-      }
-    }
+      if (*waddr=='?'||onq)           /* on optional start converting */
+      { onq=1;                        /* option to space until it's   */
+        *waddr=' ';                   /* completely spaces and string */
+      }                               /* no longer contains the optional */
+    }                                 /* qualifiers in the list */
     ++waddr;
   }
-  waddr=addr;
-  while (*waddr&&!done) 
-  { if (*waddr!=' '&&*waddr!=':')
-    { done=1;
-    } else { 
+  waddr=addr;                         /* */ 
+  while (*waddr&&!done)               /* this is to make the first qualifer */
+  { if (*waddr!=' '&&*waddr!=':')     /* not optional if it's not ? since it */
+    { done=1;                         /* did not begin with a : */
+    } else {                          /* */
       if (*waddr==':') 
       { *waddr=' ';
         done=1;
@@ -704,9 +623,9 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   oaddr=upsutl_str_create(inaddr,'p');
   onc=1;                               /* must assume first no spec is , */
   waddr=oaddr;				/* work address */
-  while (*waddr)   
-  { if (*waddr=='?')
-    { onc=0;
+  while (*waddr)                       /* now we have build the optional */
+  { if (*waddr=='?')                   /* list removing the required */
+    { onc=0;                           /* list elements */
     } else {
       if (*waddr==':'||onc)
       { onc=1;
@@ -717,7 +636,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   }
   waddr=oaddr;
   done=0;
-  while (*waddr&&!done) 
+  while (*waddr&&!done)                /* also have to make first optional */
   { if (*waddr!=' '&&*waddr!='?')
     { done=1;
     } else { 
@@ -735,8 +654,8 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   optionals[0]=oaddr;
   ++qcount;
   waddr=oaddr;
-  while((loc=strchr(waddr,'?'))!=0)
-  { optionals[qcount]=loc+1;
+  while((loc=strchr(waddr,'?'))!=0)     /* build a optional argument */
+  { optionals[qcount]=loc+1;            /* array and with a count    */
     ++qcount;
     *loc=0;
     waddr=loc+1;
@@ -746,9 +665,9 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
 ** are sorted as well) for atleast up to 2 optional qualifiers without
 ** resorting the list based on number of elements. upslst_insert 
 */
-    for ( i=(1<<(qcount))-1; i >=0; --i) 
-    { opinit=0;
-      waddr=0;
+    for ( i=(1<<(qcount))-1; i >=0; --i)  /* this is the n*2-1 routine */
+    { opinit=0;                           /* that works out all possible */
+      waddr=0;                            /* options */
       for ( j=0; j < qcount; ++j)
       { if ( i & (1<<(qcount-j-1)) )
         { if(!opinit)
@@ -1242,6 +1161,8 @@ void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title ,
 **                                                                           
 ** DESCRIPTION                                                               
 **
+** This routine get the value of the environment setup and converts it
+** to a ugo command structure. 
 **                                                                           
 ** VALUES RETURNED                                                           
 **      +++                                                                  
@@ -1309,6 +1230,8 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
 **                                                                           
 ** DESCRIPTION                                                               
 **
+** This builds the command structure from the arguement from the string
+** this is used for reading things like setupRequired in the table file
 **                                                                           
 ** VALUES RETURNED                                                           
 **      +++                                                                  
@@ -1369,15 +1292,16 @@ t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
 **                                                                           
 ** ==========================================================================
 */                                                                           
-t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const validopts)
+t_upsugo_command *upsugo_next(const int old_argc,
+                              char *old_argv[],
+                              char * const validopts)
 {
    char   *arg_str;
 
    char   * addr;
    char   * loc;
-   int				ups_argc;	/* argv and argc with white 
-							space and commas    */
-   char				*ups_argv[MAX_ARGS]; /* reformatted */
+   int    ups_argc;            /* argv and argc with white space and commas  */
+   char   *ups_argv[MAX_ARGS]; /* reformatted */
    
    char   **argbuf;		/* String to hold residual argv stuff*/
 				/* returned by upsugo_getarg */
@@ -1393,7 +1317,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
      ugo_commands=upslst_delete(ugo_commands,ugo_commands->data, 'd');
      if (ugo_commands && ugo_commands->data) /* && data needed? */
      {  luc = ugo_commands->data;
-        upsugo_setfixed(luc);
+        upsugo_setshell(luc);
         UPS_VERBOSE = luc->ugo_v;
 	upsugo_liststart(luc);  /* move all lists to first element */
         return (t_upsugo_command *)ugo_commands->data; 
@@ -1432,34 +1356,8 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          case_b case_D case_m case_M case_N 
          case_O case_p case_r case_T 
          case_u case_U 
-         /* number sets */
-         case_0 case_1 case_2 case_3
-         case 'q':
-              uc->ugo_q = 1;
-              if ( *argbuf ) 
-              { upsugo_bldqual(uc,*argbuf); *argbuf=0; break; }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" );
-                  break;
-                }
-                upsugo_bldqual(uc,arg_str); break;
-              }
-              errflg = 1;
-              break;
-         case 'z':
-              uc->ugo_z = 1;
-              if ( *argbuf ) 
-              { upsugo_blddb(uc,*argbuf); *argbuf=0; break; }
-              if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
-              { if(*arg_str == '-')
-                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "z" );
-                  break;
-                }
-                upsugo_blddb(uc,arg_str); break;
-              }
-              errflg = 1;
-              break;
+         case_0 case_1 case_2 case_3 /* number sets */
+         case_q case_z               /* special cases */
          default:
             errflg = 1;
        }
@@ -1491,7 +1389,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
    }
    ugo_commands=upslst_first(ugo_commands);
    luc = ugo_commands->data;
-   upsugo_setfixed(luc);
+   upsugo_setshell(luc);
    UPS_VERBOSE=luc->ugo_v;
 /* don't want to change now but I don't think this is right??? */
    upsugo_liststart(luc);      /* move all lists to first element */
