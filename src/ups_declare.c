@@ -319,7 +319,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  db_info->name,
                  uc->ugo_product,
                  the_chain,CHAIN_SUFFIX);
-         if (upsfil_exist(buffer))        /* does chain file exist at all */
+         if (upsfil_exist(file))        /* does chain file exist at all */
          { upsver_mes(1,"%sChain %s currently exist\n",UPS_DECLARE,the_chain);
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
@@ -351,7 +351,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                product = upsget_chain_file(db_info->name,
                                            uc->ugo_product,
                                            the_chain, &file);
-               strcpy(buffer,file);
                if ((UPS_ERROR == UPS_SUCCESS) && product )
                { cinst_list=upsmat_match_with_instance( cinst, product );
                  cinst=cinst_list->data;
@@ -381,28 +380,17 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                product = upsget_chain_file(db_info->name,
                                            uc->ugo_product,
                                            the_chain, &file);
-               strcpy(buffer,file);
              }
            } /* Get chain file (maybe again) */
-           sprintf(buffer,"%s/%s/%s%s",
-                   db_info->name,
-                   uc->ugo_product,
-                   the_chain,CHAIN_SUFFIX);
            if (upsfil_exist(file))
            { product = upsget_chain_file(db_info->name,
                                        uc->ugo_product,
                                        the_chain, &file);
-           /* allready there  strcpy(buffer,file); */
-           /* if(!product) Chain deleted was all only one */ 
            } else { 
              product=upsdcl_new_product(uc);
            }
          } else { /* new chain does NOT exist at all */
            product=upsdcl_new_product(uc);
-           sprintf(buffer,"%s/%s/%s%s",
-                   db_info->name,
-                   uc->ugo_product,
-                   the_chain,CHAIN_SUFFIX);
          }
          /* build new chain instance */
          if (!the_flavor) { the_flavor=save_flavor->data; }
@@ -411,8 +399,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          product->instance_list = 
             upslst_add(product->instance_list,new_cinst);
          upsver_mes(1,"%sAdding %s chain version %s to %s\n",
-                    UPS_DECLARE, the_chain, new_cinst->version, buffer);
-         (void )upsfil_write_file(product, buffer,' ',JOURNAL);  
+                    UPS_DECLARE, the_chain, new_cinst->version, file);
+         (void )upsfil_write_file(product, file,' ',JOURNAL);  
         }
       }
 /************************************************************************
@@ -447,7 +435,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                        uc->ugo_product,
                                        uc->ugo_version,
                                        &file);
-         strcpy(buffer,file);
+         strcpy(buffer,file); /* hum */
        } else { 
          if (!save_chain) /* declaring the same this over and not chains */
          { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
