@@ -250,6 +250,14 @@ ups, upd, setup, unsetup -- access to Fermilab local products
      -0, -1, -2, -3, -?, -C, -c, -d, -f, -g, -H, -M, -m, -n, -O, -o,
      -q, -r, -t, -U, -V, -v, -Y, -y, -Z, -z
 
+.B "ups parent [options] [product] [version]"
+ Outputs an inverse dependency tree for each product instance specified.
+ Unlike ups depend, it shows what products depend on the specified instances,
+ rather than what products the specified instances depend upon.
+ Options
+     -0, -1, -2, -3, -?, -a, -c, -d, -f, -g, -H, -K, -l, -M, -m, -n,
+     -o, -q, -r, -t, -U, -v, -Z, -z
+
 .B "Command Option Descriptions"
 
 .B "-0"
