@@ -55,7 +55,8 @@ int main (argc,argv)
 	signal(SIGSEGV, ups_signal_handler);
 */
 
-	uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU");
+while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
+{
 	fprintf(stdout,"product: %s\n",uc->ugo_product);
 	fprintf(stdout,"version: %s\n",uc->ugo_version);
 	if (uc->ugo_C) {
@@ -118,6 +119,7 @@ int main (argc,argv)
             print_list( uc->ugo_qualifiers );
 	    fprintf(stdout,"\n");
 	}
+}
 /*
 	if (status != UPS_SUCCESS) fprintf(stderr," %s \n", UPS_ERRTXT[status]);
 */
