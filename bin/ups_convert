@@ -600,8 +600,10 @@ sub WriteTableFile {
 	    print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
 	    print VersionFile "   MODIFIED=$DaTe\n";
 	    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-	    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
-	    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
+#	    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
+#	    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
+# Don't want it here only in check for....
+ 	    print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
 	    if ( &upsdir ) {
 	     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
 	    } else {  
@@ -643,8 +645,9 @@ sub WriteTableFile {
 	    print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
 	    print VersionFile "   MODIFIED=$DaTe\n";
 	    print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-	    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
-	    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
+#	    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
+#	    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
+ 	    print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
 	    if ( &upsdir ) {
 	     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
 	    } else {  
