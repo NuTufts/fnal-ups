@@ -1,0 +1,115 @@
+#**************************** Copyright Notice ********************************
+#*                                                                            *
+#* Copyright (c) 1991 Universities Research Association, Inc.                 *
+#*               All Rights Reserved.                                         *
+#*                                                                            *
+#******************************************************************************
+#==============================================================================
+#** DESCRIPTION
+#**
+#**   UPS help file  
+#**                                                                           
+#** DEVELOPERS                                                                
+#**
+#**       Eileen Berman
+#**       David Fagan
+#**       Lars Rasmussen
+#**                                                                           
+#**      Batavia, Il 60510, U.S.A.                                            
+#**                                                                           
+#** MODIFICATIONS                                                             
+#**
+#**      Sep 17 1997, DjF, First
+#**      Jan 6  1998, EB, Added some text for command help
+# 
+# File definition is extreamly rigid for speed  
+# "#"'s are start of lines are comments NO MATTER WHAT.
+#Information about command presented EXACTLY as typed line for
+#line until OPTIONS or a : not found 
+COMMANDS    :
+configure   :?cdfgHmMnoOqrtUvVzZ: 
+: The configure command environmentally configures a product instance.
+copy        :?AcCdfgHmMnoOpPqrtTUvVWXzZ:
+: The copy command allows one instance of a product to be declared "like" another.
+create      :?fHmMpqvZ:
+: The create command blaa blaa
+declare     :?AcCdfgHmMnoOpqrtTUvVzZ:
+: The declare command adds a product instance to a UPS Database.
+depend      :?cdotgfHKmMqrUvVzZ:
+: The depend command lists (for a specified UPS product instance) UPS product requirements or all UPS product instances that have the specified UPS product instance as a requirement.
+exist       :?BcdefgHjkmMoOqrtUvVzZ:
+: The exist command determines if a setup command with the same options would likely succeed.
+get         :?cdfFgHmMnoqrtUvVzZ:
+: The get command blaa blaa
+help        :?:This is sort of a special case since it will accept commands
+: The help command blaa blaa
+list        :a?cdfghHKlmMnoqrtUvVzZ:
+: The list command blaa blaa
+modify      :?AEfHmMopqrTUvVxzZ:
+: The modify command blaa blaa
+setup       :?BcdefgHjkmMnoOqrtUvVzZ:
+: The setup command blaa blaa
+start       :?cdfgHmMnoOqrtUvVwzZ: 
+: The start command blaa blaa
+stop        :?cdfgHmMnoOqrtUvVzZ: 
+: The stop command blaa blaa
+tailor      :?cdfghHKmMnoOqrtUvVzZ: 
+: The tailor command blaa blaa
+unconfigure :?cdfgHmMnoOqrtUvVzZ: 
+: The unconfigure command blaa blaa
+undeclare   :?cdfgHmMnoOqrtUvVyYzZ:
+: The undeclare command blaa blaa
+unsetup     :?cdefgHjmMnoOqtUvVzZ:
+: The unsetup command blaa blaa
+validate    :?cdfghHlmMnNoqrStUvVzZ:
+: The validate command blaa blaa
+# from : to EOL, lines not starting with - are continuation.
+OPTIONS     :
+-? :print out usage information 
+-a :include all instances 
+-A :nodes : authorized nodes 
+-B :depProdName="options" : prepend the listed options to the 
+:setupRequired line for the UPS required product 
+:with name depProdName 
+-c :current chain 
+-C :don't do configure 
+-d :development chain 
+-e :define $UPS_EXTENDED 
+-E :run the editor in $EDITOR on the requested file (the default) 
+-f :flavor : flavor to use (operating system[+release]) 
+-F :return list of files that are associated with the product but 
+:do not live in the products' area 
+-g :chainName : chain to use 
+-h :nodeName : use this node 
+-H :flavor : use this as the flavor and build a flavor table from it 
+-j :applies to top level product and not UPS product requirements 
+-k :do not execute unsetup files first 
+-K :"keywords" : return information from these keywords only 
+-l :produce a long listing 
+-m :tableFile : table file name
+-M :tableFileDir : table file directory 
+-n :new chain 
+-N :any file parsable by UPS 
+-o :old chain 
+-O :"options" : set $UPS_OPTIONS to "options" 
+-p :"description" : product description 
+-P :productName : product name override 
+-q :qualifiers : required or optional qualifiers that are 
+:to be part of the instance 
+-r :dir : set $PROD_DIR to dir 
+-S :check syntax only 
+-t :test chain 
+-T :archivefile : archive file 
+-U :upsDir : ups directory location 
+-v :print out extra 'debugging' info
+-V :do not delete the temp file 
+-w :stop first then start 
+-W :use environment variables to determine instances of UPS 
+:product requirements 
+-x :"DELETE [cmd] [order#] | INSERT value [cmd] [order#] | 
+:REPLACE value [cmd] [order#]" : edit action lists 
+-X :execute command instead of just echoing it 
+-y :delete home directory, query 
+-Y :delete home directory, no query 
+-z :database : use this database to get instance information 
+-Z :time this command 
