@@ -18,19 +18,19 @@ all :
 # Now standard targets
 #
 clean :
-	@ eruptClean
+	@ upsClean
 
 install :
-	@if [ "$(ERUPT_INSTALL_DIR)" = "" ]; then \
+	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
 		echo You have not specified a destination directory >&2; \
 		exit 1; \
 	fi
-	@ rm -rf $(ERUPT_INSTALL_DIR)/inc
-	@ mkdir $(ERUPT_INSTALL_DIR)/inc
-	cp -r Makefile $(ERUPT_INSTALL_DIR)/inc
-	cp -r * $(ERUPT_INSTALL_DIR)/inc
+	@ rm -rf $(UPS_INSTALL_DIR)/inc
+	@ mkdir $(UPS_INSTALL_DIR)/inc
+	cp -r Makefile $(UPS_INSTALL_DIR)/inc
+	cp -r * $(UPS_INSTALL_DIR)/inc
 	@( \
-		cd $(ERUPT_INSTALL_DIR)/inc ;\
+		cd $(UPS_INSTALL_DIR)/inc ;\
 		find . \( -type d -name CVS -prune -o \
 			-name Makefile -name \*~ \) -exec rm -rf {} \; \
 	)

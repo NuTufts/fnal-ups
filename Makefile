@@ -23,9 +23,9 @@ SHELL		= /bin/sh
 #   PRODDIR	The value of the environment value name $(PRODDIRNAME).
 #
 
-PROD		=   ERUPT
-PRODDIRNAME	=   $ERUPT_INSTALL_DIR
-PRODDIR		= $(ERUPT_INSTALL_DIR)
+PROD		=   UPS
+PRODDIRNAME	=   $UPS_INSTALL_DIR
+PRODDIR		= $(UPS_INSTALL_DIR)
 
 #*******************************************************************************
 
@@ -130,7 +130,7 @@ clean :
 	@ echo ""
 	@ echo "Cleaning in . = `pwd`"
 	@ echo ""
-	@ eruptClean
+	@ upsClean
 	@ for subdir in bin doc inc lib src test; do \
 		if [ -d $$subdir ]; then \
 			(cd $$subdir; echo ""; echo "Cleaning in ./$$subdir"; echo ""; $(MAKE) $(MFLAGS) clean); \

@@ -3,7 +3,7 @@ SHELL = /bin/sh
 #  1) This file is designed to be invoked by a shell script called premake
 #  which selects supported options.
 #
-#  2) This file re-builds the erupt.
+#  2) This file re-builds ups.
 #
 #  3) Environment:
 # Environmental variables -
@@ -29,7 +29,7 @@ LIB	= ../lib
 BIN	= ../bin
 DOC	= ../doc
 
-CFLAGS	  = $(ERUPT_CFLAGS) $(INCDIRS)
+CFLAGS	  = $(UPS_CFLAGS) $(INCDIRS)
 CFLAGScia = $(INCDIRS)
 
 #
@@ -53,51 +53,51 @@ all : library
 tag_file : 
 	$(EMACS_DIR)/bin/etags -t *.c ../inc/*.h
 
-library : $(LIB)/liberupt.a
+library : $(LIB)/libups.a
 
 cia :	$(CIAOBJECTS)
 	cia $(CIAOBJECTS)
 
 #
-# Compile ERUPT library source
+# Compile UPS library source
 #
-$(LIB)/liberupt.a : $(OBJECTS)
-	@echo "=== ERUPT BUILD : Building Unix library (liberupt.a) ==="
-	$(AR) $(ARFLAGS) $(LIB)/liberupt.a $?
+$(LIB)/libups.a : $(OBJECTS)
+	@echo "=== UPS BUILD : Building Unix library (libups.a) ==="
+	$(AR) $(ARFLAGS) $(LIB)/libups.a $?
 	- if [ "$(RANLIB)" != "" -a -x "$(RANLIB)" ]; then \
-		$(RANLIB) $(LIB)/liberupt.a; \
+		$(RANLIB) $(LIB)/libups.a; \
 	fi
-	@echo "=== ERUPT BUILD : Unix library (liberupt.a) built ==="
+	@echo "=== UPS BUILD : Unix library (libups.a) built ==="
 	@echo
 
 #
 # Main programs.
 #
 
-$(BIN)/erSetup :  setupMain.c $(LIB)/liberupt.a
+$(BIN)/erSetup :  setupMain.c $(LIB)/libups.a
 	$(CC) -o $@ $(CFLAGS) $(CCCHK) setupMain.c $(LDFLAGS)
 
-$(BIN)/erUnsetup :  unsetupMain.c $(LIB)/liberupt.a
+$(BIN)/erUnsetup :  unsetupMain.c $(LIB)/libups.a
 	$(CC) -o $@ $(CFLAGS) $(CCCHK) unsetupMain.c $(LDFLAGS)
 
 #
 # Now standard targets
 #
 clean :
-	@ eruptClean
+	@ upsClean
 
 install :
-	@if [ "$(ERUPT_INSTALL_DIR)" = "" ]; then \
+	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
 		echo You have not specified a destination directory >&2; \
 		exit 1; \
 	fi
-	@ rm -rf $(ERUPT_INSTALL_DIR)/src
-	@ mkdir $(ERUPT_INSTALL_DIR)/src
-	cp -r Makefile $(ERUPT_INSTALL_DIR)/src
-	cp -r *.c $(ERUPT_INSTALL_DIR)/src
-	@chmod 644 $(ERUPT_INSTALL_DIR)/src/*.c
+	@ rm -rf $(UPS_INSTALL_DIR)/src
+	@ mkdir $(UPS_INSTALL_DIR)/src
+	cp -r Makefile $(UPS_INSTALL_DIR)/src
+	cp -r *.c $(UPS_INSTALL_DIR)/src
+	@chmod 644 $(UPS_INSTALL_DIR)/src/*.c
 	@( \
-		cd $(ERUPT_INSTALL_DIR)/src ;\
+		cd $(UPS_INSTALL_DIR)/src ;\
 		find . \( -type d -name CVS -prune -o \
 			-name Makefile -name \*~ \) -exec rm -rf {} \; \
 	)

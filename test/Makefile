@@ -3,7 +3,7 @@ SHELL = /bin/sh
 #  1) This file is designed to be invoked by a shell script called premake
 #  which selects supported options.
 #
-#  2) This file re-builds the erupt tests.
+#  2) This file re-builds the ups tests.
 #
 #  3) Environment:
 # Environmental variables -
@@ -23,7 +23,7 @@ LIB	= ../lib
 BIN	= ../bin
 DOC	= ../doc
 
-CFLAGS	  = $(ERUPT_CFLAGS) $(INCDIRS)
+CFLAGS	  = $(UPS_CFLAGS) $(INCDIRS)
 
 #
 #
@@ -39,29 +39,32 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : 
+all : test_ups_error
 
 #
 # Main programs.
 #
 
+test_ups_error : $$@.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
+
 #
 # Now standard targets
 #
 clean :
-	@ eruptClean
+	@ upsClean
 
 install :
-	@if [ "$(ERUPT_INSTALL_DIR)" = "" ]; then \
+	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
 		echo You have not specified a destination directory >&2; \
 		exit 1; \
 	fi
-	@ rm -rf $(ERUPT_INSTALL_DIR)/test
-	@ mkdir $(ERUPT_INSTALL_DIR)/test
-	cp -r Makefile $(ERUPT_INSTALL_DIR)/test
-	cp -r * $(ERUPT_INSTALL_DIR)/test
+	@ rm -rf $(UPS_INSTALL_DIR)/test
+	@ mkdir $(UPS_INSTALL_DIR)/test
+	cp -r Makefile $(UPS_INSTALL_DIR)/test
+	cp -r * $(UPS_INSTALL_DIR)/test
 	@( \
-		cd $(ERUPT_INSTALL_DIR)/test ;\
+		cd $(UPS_INSTALL_DIR)/test ;\
 		find . \( -type d -name CVS -prune -o \
 			-name Makefile -name \*~ \) -exec rm -rf {} \; \
 	)
