@@ -1783,32 +1783,21 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     case e_setup:	/* Define <PROD>_DIR and SETUP_<PROD> */
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
-
-      switch ( a_command_line->ugo_shell) {
-      case e_BOURNE:
-	lcl_cmd.argv[0] = "PATH";
-	break;
-      case e_CSHELL:
-	lcl_cmd.argv[0] = "path";
-	break;
-      default:
-	upserr_vplace();
-	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-      }
       lcl_cmd.argc = 2;              /* # of args for both function calls */
       uprod_name = upsutl_upcase(a_inst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
 	if (a_inst->version->prod_dir) {
 	  strcpy(buff, uprod_name);
 	  strcat(buff, "_DIR");
+	  lcl_cmd.argv[0] = buff;
 	  lcl_cmd.argv[1] = a_inst->version->prod_dir;
-	  lcl_cmd.icmd = e_pathappend;
-	  f_pathappend(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+	  lcl_cmd.icmd = e_pathset;
+	  f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 	}
 	strcpy(buff, SETUPENV);
 	strcat(buff, uprod_name);
 	lcl_cmd.argv[0] = buff;
-	lcl_cmd.argv[1] = "-f flavor -c dum dum";  /* ????? temp */
+	lcl_cmd.argv[1] = "\"-f flavor -c dum dum\"";  /* ????? temp */
 	lcl_cmd.icmd = e_envset;
 	f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
