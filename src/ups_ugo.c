@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
+#include <bstring.h>
 #include <sys/utsname.h>
 
 #include "ups_types.h"
@@ -64,7 +65,6 @@ char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf);
 int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
-void upsugo_prtlst( t_upslst_item *list_ptr, char * const title );
 int upsugo_dump (struct ups_command * const uc);
 
 
@@ -569,7 +569,7 @@ int upsugo_dump (struct ups_command * const uc)
 **                                                                           
 ** ==========================================================================
 */
-void upsugo_prtlst( t_upslst_item *list_ptr , char * const title )
+void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title )
 {
   t_upslst_item *l_ptr;
   int count = 0;
@@ -680,71 +680,7 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
    struct ups_command * uc;
    struct ups_command * luc=0;
    uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-   uc->ugo_product = 0;
-   uc->ugo_version = 0;
-   uc->ugo_key = 0;
-   uc->ugo_qualifiers = 0;
-   uc->ugo_auth = 0;
-   uc->ugo_db = 0;
-/* Chain flags, still setting them in addition to chain list 
-** to be consistant and possibly could be used				*/
-
-	uc->ugo_a = 0;	/* All include				*/
-	uc->ugo_A = 0;	/* Authorized Host(s) 			*/
-/*	uc->ugo_b = 0;	UNDEFINED				*/
-	uc->ugo_B = 0;	/* CODE INCOMPLETE			*/
-	uc->ugo_c = 0;	/* current specified			*/
-	uc->ugo_C = 0;	/* Don't do Configure			*/
-	uc->ugo_d = 0;	/* development chain			*/
-	uc->ugo_D = 0;	/* list all versions with archive file	*/
-	uc->ugo_e = 0;	/* Define ups_extended			*/
-	uc->ugo_E = 0;	/* Run Editor 				*/
-	uc->ugo_f = 0;	/* Flavor(s) specified			*/
-	uc->ugo_F = 0;	/* Return list of files not in product	*/
-/*	uc->ugo_G = 0;	UNDEFINED				*/
-	uc->ugo_g = 0;	/* Did they request a "special" chain?	*/
-	uc->ugo_h = 0;	/* Host(s) specified			*/
-/*	uc->ugo_H = 0;	UNDEFINED				*/
-	uc->ugo_j = 0;	/* applies to top level product		*/
-/*	uc->ugo_J = 0;	UNDEFINED				*/
-	uc->ugo_k = 0;	/* Don't do unsetup first		*/
-	uc->ugo_K = 0;	/* Keywords				*/
-	uc->ugo_l = 0;	/* long (listing)			*/
-/*	uc->ugo_L = 0;	UNDEFINED				*/
-	uc->ugo_n = 0;	/* new chain				*/
-	uc->ugo_N = 0;	/* And N file                           */
-	uc->ugo_m = 0;	/* Table file directory			*/
-	uc->ugo_M = 0;	/* Table file name			*/
-	uc->ugo_o = 0;	/* old chain				*/
-	uc->ugo_O = 0;	/* set UPS_OPTIONS to value             */
-	uc->ugo_p = 0;	/* Description                          */
-	uc->ugo_P = 0;	/* override product name                */
-	uc->ugo_q = 0;	/* qualifiers                           */
-/*	uc->ugo_Q = 0;	UNDEFINED				*/
-	uc->ugo_r = 0;	/* set PROD_DIR to value                */
-/*	uc->ugo_R = 0;	UNDEFINED				*/
-	uc->ugo_S = 0;	/* Syntax Checking			*/
-/*	uc->ugo_s = 0;	UNDEFINED				*/
-	uc->ugo_t = 0;	/* test chain				*/
-	uc->ugo_T = 0;	/* archivefile  			*/
-	uc->ugo_u = 0;	/* uncompile first			*/
-	uc->ugo_U = 0;	/* upsdir                               */
-	uc->ugo_v = 0;	/* verbose				*/
-	uc->ugo_V = 0;	/* Don't delete temp file(s)		*/
-	uc->ugo_w = 0;	/* stop first then start		*/
-	uc->ugo_W = 0;	/* use environment variables		*/
-	uc->ugo_x = 0;	/* CODE INCOMPLETE			*/
-	uc->ugo_X = 0;	/* execute instead of echo??		*/
-	uc->ugo_y = 0;	/* delete home dir, no query		*/
-	uc->ugo_Y = 0;	/* delete home dir, query		*/
-	uc->ugo_z = 0;	/* Database(s) were specified		*/
-	uc->ugo_Z = 0;	/* Time this command			*/
-
-	uc->ugo_flavor = 0; 
-	uc->ugo_host = 0; 
-	uc->ugo_auth = 0; 
-	uc->ugo_db = 0; 
-	uc->ugo_chain = 0; 
+   bzero (uc,sizeof(struct ups_command));
   if ( ugo_commands ) { /* subsequent call */ 
      /* dealloc your brain out */ 
      upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
