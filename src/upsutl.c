@@ -456,7 +456,6 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   char mode[] = "a,access=lock";              /* create new file or append
 						 to existing one */
   char *time_date, *user;
-  char tmpBuf[1000];
 
   /* Get the current time and date */
   time_date = upsutl_time_date();
@@ -513,39 +512,31 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	}
 	if (file_stream) {
 	  /* NOTE: time_date already has a carriage return in it */
-	  sprintf(tmpBuf, "USER = %s\n   DATE = %s", user, time_date);
-	  if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
-		     file_stream) == strlen(tmpBuf)) {
-	    sprintf(tmpBuf, "   COMMAND = %s\n", a_command);
-	    if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
-		       file_stream) == strlen(tmpBuf)) {
-	      sprintf(tmpBuf,
+	  if (fprintf(file_stream, "USER = %s\n   DATE = %s", user, time_date)
+	      == EOF) {
+	    if (fprintf(file_stream, "   COMMAND = %s\n", a_command) == EOF) {
+	      if (fprintf(file_stream,
 		    "   FLAVOR = %s\n   QUALIFIERS = '%s'\n   VERSION = %s\n", 
 		    minst->version->flavor, minst->version->qualifiers,
-		    minst->version->version);
-	      if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
-			 file_stream) == strlen(tmpBuf)) {
-		sprintf(tmpBuf, "%s\n", DIVIDER);
+		    minst->version->version) == EOF) {
 		/* Write out divider */
-		if (fwrite((void *)tmpBuf, (size_t )1, (size_t )strlen(tmpBuf),
-			   file_stream) == strlen(tmpBuf)) {
-		} else {
-		  upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+		if (fprintf(file_stream, "%s\n", DIVIDER) != EOF) {
+		  upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 			     strerror(errno));
 		  break;
 		}
 	      } else {
-		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 			   strerror(errno));
 		break;
 	      }
 	    } else {
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 			 strerror(errno));
 	      break;
 	    }
 	  } else {
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fwrite",
+	    upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 		       strerror(errno));
 	    break;
 	  } 
