@@ -38,7 +38,6 @@ int upstst_declare(int, char**);	int upstst_undeclare(int, char**);
 int upstst_configure(int, char**);	int upstst_unconfigure(int, char**);
 int upstst_tailor(int, char**);		int upstst_copy(int, char**);
 int upstst_start(int, char**);		int upstst_stop(int, char**);
-int upstst_create(int, char**);		int upstst_flavor(int, char**);
 int upstst_get(int, char**);		int upstst_modify(int, char**);
 int upstst_setup(int, char**);		int upstst_unsetup(int, char**);
 int upstst_touch(int, char**); 		int upstst_unk(int, char**);		
@@ -82,7 +81,6 @@ upstst_cmd_table_t upstst_my_cmds[] = {
 	"copy",			upstst_copy,
 	"start",		upstst_start,
 	"stop",			upstst_stop,
-	"create",		upstst_create,
 	"flavor",		upstst_flavor,
 	"get",			upstst_get,
 	"modify",		upstst_modify,

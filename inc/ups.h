@@ -42,7 +42,6 @@
 #include "ups_list.h"
 #include "ups_configure.h"
 #include "ups_copy.h"
-#include "ups_create.h"
 #include "ups_declare.h"
 #include "ups_depend.h"
 #include "ups_flavor.h"

@@ -38,7 +38,6 @@
 #include "ups_configure.h"
 #include "ups_unconfigure.h"
 #include "ups_list.h"
-#include "ups_create.h"
 #include "ups_tailor.h"
 #include "ups_unk.h"
 #include "ups_depend.h"
@@ -210,8 +209,6 @@ int main(int argc, char *argv[])
 					      e_undeclare);
 	      break;
 	    case e_flavor: ups_flavor(command_line);
-	      break;
-	    case e_create: ups_create(command_line, e_create);
 	      break;
 	    case e_get: mproduct_list = ups_get(command_line, temp_file,
 						e_get);

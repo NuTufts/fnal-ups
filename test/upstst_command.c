@@ -160,9 +160,6 @@ int upstst_start(int argc, char ** const argv)
 int upstst_stop(int argc, char ** const argv)
 { return(upstst_command(argc,argv, (void *)&ups_stop,"ups_stop",e_stop)); }
 
-int upstst_create(int argc, char ** const argv)
-{ return(upstst_command(argc,argv,(void *)&ups_create,"ups_create",e_create)); }
-
 int upstst_flavor(int argc, char ** const argv)
 { return(upstst_command(argc,argv,(void *)&ups_flavor,"ups_flavor",e_flavor)); }
 
