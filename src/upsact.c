@@ -395,7 +395,7 @@ t_cmd_info g_cmd_info[] = {
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vVz:Z0123", 0x00000010, e_declare},
   {e_depend,      "depend",      "?cdg:f:H:jK:lm:M:noq:r:RtU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_exist,       "exist",       "?B:cdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
-  {e_modify,      "modify",      "?aA:E:f:H:m:M:Np:q:r:T:U:vVx:z:Z", 0x00000010, e_invalid_action},
+  {e_modify,      "modify",      "?aA:E:f:H:m:M:Np:q:r:T:U:vVz:Z", 0x00000010, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:Pq:r:stU:vVwz:Z0123", 0x00000010, e_invalid_action},
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_tailor,      "tailor",      "?cdf:g:H:K:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
@@ -407,7 +407,7 @@ t_cmd_info g_cmd_info[] = {
   {e_verify,      "verify",      "?acdf:g:H:m:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_help,        "help",        "?v", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
-  {e_unk,         NULL,          "?aA:b:B:cCdD:eE:f:Fg:G:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:x:XyYz:Z0123",
+  {e_unk,         NULL,          "?aA:b:B:cCdD:eE:f:Fg:G:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:XyYz:Z0123",
                                   0x00000010, e_invalid_action}
 };
 
