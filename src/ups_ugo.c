@@ -54,7 +54,7 @@
 			}
 
    int	errflg = 0;
-  t_upslst_item *ugo_commands = 0;
+   t_upslst_item *ugo_commands = 0;
     int argindx;
 
 /* ===========================================================================
@@ -201,8 +201,8 @@ int upsugo_bldfvr(struct ups_command * const uc)
 int upsugo_ifornota(struct ups_command * const uc)
 {
    char   * addr;
-   if (uc->ugo_a)                   /* did the user specify -a */
-   { if (!uc->ugo_chain)            /* If no chain all chains  */
+   if (uc->ugo_a)                           /* did the user specify -a */
+   { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
      { addr=upsutl_str_create("*",' ');
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
      }
@@ -215,7 +215,7 @@ int upsugo_ifornota(struct ups_command * const uc)
        uc->ugo_version = addr;      /* at this point I may not know... */
      }
    } else {                         /* not -a but give defaults */
-     if (!uc->ugo_chain)            /* If no chain current      */
+     if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain current      */
      { addr=upsutl_str_create("current",' ');
        uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
      }
@@ -443,6 +443,69 @@ char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
 
 }
 
+
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_env
+**                                                                           
+** DESCRIPTION                                                               
+**
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/                                                                           
+t_ups_command *upsugo_env(char * const product,char * const validopts)
+{
+     char * setup_prod;                          /* SETUP_PROD name */
+     char * setup_env;                           /* SETUP_PROD value */
+     char * waddr;                               /* work address */
+     struct ups_command * uc=0;
+     int argc=0;
+     int    count=0;
+     int    length=0;
+     char ** argv;
+     t_upslst_item *hold = 0;
+     
+     setup_prod = (char *) malloc((size_t)(strlen(product) +7));
+     (void) strcpy(setup_prod,"SETUP_");
+     (void) strcat(setup_prod,product);
+     if((setup_env = (char *)getenv(setup_prod)) == 0)
+     { return (uc);
+     } else {
+/* I'm going to count the number of spaces in the environment variable
+** there cannot be more arguments than spaces...
+*/
+       waddr=setup_env;
+       while ((waddr != 0) && (strlen(waddr) > 0))
+             { if ((waddr = strchr(waddr,' ')) != 0) 
+                  { for( ; (*waddr == ' ') ; waddr++ ) ; }
+                count++;
+             }
+       count++;  /* add one more for the program who called */
+       argv = (char **) malloc((size_t)count*sizeof(char *));
+       argv[1] = (char *) malloc((size_t)(strlen("upsugo_env") +1));
+       (void) strcpy(argv[1],"upsugo_env");
+       waddr=setup_env;
+       for (argc = 1;argc < count;argc++)
+           { length = (int)strcspn(waddr," ");
+             argv[argc] = (char *) malloc((size_t)(length + 1));
+             strncpy(argv[argc],waddr,(size_t)length);
+             argv[argc][length] = '\0';
+             if ((waddr = strchr(waddr, ' ')) != 0) 
+                { waddr++;
+                  for( ; (*waddr == ' ') ; waddr++ ) ;
+                }
+           }
+     hold=ugo_commands;
+     ugo_commands=0;
+     uc=upsugo_next(argc,argv,validopts);
+     ugo_commands=hold;
+     return(uc);
+     }
+}
+
 /* ==========================================================================
 **                                                                           
 ** ROUTINE: upsugo_next
@@ -511,18 +574,18 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
 	uc->ugo_M = 0;	/* Table file name			*/
 	uc->ugo_o = 0;	/* old chain				*/
 	uc->ugo_O = 0;	/* set UPS_OPTIONS to value             */
-	uc->ugo_p = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_p = 0;	/* Description                          */
 	uc->ugo_P = 0;	/* override product name                */
-	uc->ugo_q = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_q = 0;	/* qualifiers                           */
 /*	uc->ugo_Q = 0;	UNDEFINED				*/
 	uc->ugo_r = 0;	/* set PROD_DIR to value                */
 /*	uc->ugo_R = 0;	UNDEFINED				*/
 	uc->ugo_S = 0;	/* Syntax Checking			*/
 /*	uc->ugo_s = 0;	UNDEFINED				*/
 	uc->ugo_t = 0;	/* test chain				*/
-	uc->ugo_T = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_T = 0;	/* archivefile  			*/
 	uc->ugo_u = 0;	/* uncompile first			*/
-	uc->ugo_U = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_U = 0;	/* upsdir                               */
 	uc->ugo_v = 0;	/* verbose				*/
 	uc->ugo_V = 0;	/* Don't delete temp file(s)		*/
 	uc->ugo_w = 0;	/* stop first then start		*/
@@ -837,6 +900,23 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                   break;
                 }
 		uc->ugo_options = arg_str;
+                break;
+              }
+              errflg = 1;
+              break;
+         case 'p':
+              uc->ugo_p = 1;
+              if ( *argbuf ) 
+              {  uc->ugo_description = *argbuf;
+                 *argbuf = 0;
+                 break;
+              }
+              if((arg_str = upsugo_getarg(ups_argc,ups_argv, argbuf)) != 0)
+              { if(*arg_str == '-')
+                { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "p" );
+                  break;
+                }
+		uc->ugo_description = arg_str;
                 break;
               }
               errflg = 1;
