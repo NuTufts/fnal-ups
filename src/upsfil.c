@@ -51,17 +51,61 @@ extern t_upskey_map g_key_map[];
 /*
  * Definition of public variables.
  */
+
 extern int UPS_VERBOSE;
 extern int UPS_VERIFY;
+
+/* table of seeds for finding groups in table files, 
+   yep, it's ugly */
+
+enum {
+  e_group_count = 9,
+  e_group_items = 7
+};
+static int g_groups[ e_group_count ][ e_group_items ] = 
+{ 
+  {
+    e_key_action, -1, -1, -1, -1, -1, -1
+  },
+  {
+    e_key_description, e_key_man_source_dir, e_key_catman_source_dir, 
+    e_key_html_source_dir, e_key_info_source_dir, e_key_news_source_dir, -1
+  },
+  {
+    e_key_man_source_dir, e_key_catman_source_dir, e_key_html_source_dir,
+    e_key_info_source_dir, e_key_news_source_dir, -1, -1
+  },
+  {
+    e_key_description, -1, -1, -1, -1, -1, -1
+  },
+  {
+    e_key_man_source_dir, -1, -1, -1, -1, -1, -1
+  },
+  {
+    e_key_catman_source_dir, -1, -1, -1, -1, -1, -1
+  },
+  {
+    e_key_html_source_dir, -1, -1, -1, -1, -1, -1
+  },
+  {
+    e_key_info_source_dir, -1, -1, -1, -1, -1, -1
+  },
+  {
+    e_key_news_source_dir, -1, -1, -1, -1, -1, -1
+  },
+};
 
 /*
  * Declaration of private functions
  */
+
+/* reading */
 static int               read_file( void );
 static int               read_file_type( void );
 static int               read_file_desc( void );
 static t_upstyp_instance *read_instance( void );
 static t_upslst_item     *read_instances( void );
+static t_upstyp_instance *read_common( void );
 static t_upstyp_action   *read_action( void );
 static t_upslst_item     *read_actions( void );
 static t_upstyp_config   *read_config( void );
@@ -69,36 +113,59 @@ static t_upslst_item     *read_group( void );
 static t_upslst_item     *read_groups( void );
 static t_upslst_item     *read_comments( void );
 
+/* writing */
 static int               write_version_file( void );
 static int               write_chain_file( void );
 static int               write_table_file( void );
 static int               write_action( t_upstyp_action * const act );
-t_upslst_item            *find_group( t_upslst_item * const list_ptr, 
-				      const char copt );
+static int               put_inst_keys( int * keys,
+					t_upstyp_instance * const inst,
+					int do_act );
+static int               put_inst_keys_mask( int * ikeys,
+					     t_upstyp_instance * const inst,
+					     int * ymask,
+					     int * nmask);
+static int               put_head_keys( int * keys );
+static int               put_key( const char * const key, const char * const val );
+static int               put_group( t_upslst_item * const l_inst,
+				    int * const keys,
+				    int * const common_mask );
 
-/* Line parsing */
+/* and arithmetic */
+static t_upslst_item     *find_group( t_upslst_item * const list_ptr, 
+				      const char copt,
+				      int * const ikeys );
+static int               *find_common_mask_list( t_upslst_item *l_inst,
+						 int * const ikeys );
+static int               *find_common_mask( t_upstyp_instance * const inst1,
+					    t_upstyp_instance * const inst2,
+					    int * const ikeys );
+
+/* line parsing */
 static int               find_start_key( void );
 static int               get_key( void );
-static int               next_key( void );
+static int               next_key( int ignore_unknown );
 static int               is_stop_key( void );
 static int               is_start_key( void );
-int                      put_inst_keys( int * keys,
-					t_upstyp_instance * const inst );
-int                      put_head_keys( int * keys );
-static int               put_key( const char * const key, const char * const val );
 
-/* Utils */
+/* verifying */
+static void              verify_keys( t_upslst_item * l_ptr, 
+				      t_upstyp_instance * inst_ptr );
+static void              verify_groups( t_upslst_item * l_ptr,
+					t_upslst_item * n_ptr);
+
+/* print stuff */
+static void              print_instance( t_upstyp_instance * const inst_ptr );
+static void              print_action( t_upstyp_action * const act_ptr );
+/* print_product has gone semi public */
+
+/* utils */
 void                     trim_cache( void );
 static int               trim_qualifiers( char * const str );
 static int               cfilei( void );
 t_upslst_item            *copy_action_list( t_upslst_item * const list_ptr );
-static void verify_keys(t_upslst_item * l_ptr, t_upstyp_instance * inst_ptr);
-static void verify_groups(t_upslst_item * l_ptr,t_upslst_item * n_ptr);
-
-/* Print stuff */
-static void              print_instance( t_upstyp_instance * const inst_ptr );
-static void              print_action( t_upstyp_action * const act_ptr );
-/* print_product has gone semi public */
+int                      add_to_instance( t_upstyp_instance * const inst,
+					  t_upstyp_instance * const inst_add );
 
 /*
  * Definition of global variables
@@ -122,6 +189,7 @@ static FILE              *g_fh = 0; /* file handle */
 static char              g_line[MAX_LINE_LEN] = "";  /* current line */
 static char              g_key[MAX_LINE_LEN] = "";   /* current key */
 static char              g_val[MAX_LINE_LEN] = "";   /* current value */
+static char              *g_tval = 0;                /* current translated value */
 static t_upskey_map      *g_mkey = 0;                /* current map */
 static int               g_ikey = e_key_unknown;     /* current key as enum */  
 static int               g_ifile = e_file_unknown;   /* current file type as enum */
@@ -139,6 +207,7 @@ static int               g_call_count = 0;           /* # times read_file is cal
 #define P_VERB( iver, str ) \
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s\n", \
 			        (str))
+
 #define P_VERB_s( iver, str ) \
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s\n", \
 			       g_filename, (str))
@@ -188,14 +257,15 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
   g_call_count++;
 
+
+  /* if we use cache, check if file is in cache */
+
   if ( g_use_cache ) {
     if ( !g_ft )
       g_ft = upstbl_new( 300 );
 
     key = upstbl_atom_string( ups_file );
     g_pd = upstbl_get( g_ft, key );
-
-    /* check if product is in cache */
 
     if ( g_pd ) {
       g_call_cache_count++;
@@ -220,6 +290,8 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   }
   P_VERB_s( 1, "Open file for read" );
   
+  /* read the file and fill the product structure */
+
   g_pd = ups_new_product();
   if ( g_pd ) {       
     if ( !read_file() ) {
@@ -236,7 +308,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   
   fclose( g_fh );
 
-  /* add product to table */
+  /* add product to cache */
 
   if ( g_ft && g_pd )
     upstbl_put( g_ft, key, g_pd );
@@ -370,7 +442,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     return UPS_OPEN_FILE;
   }
 
-  /* get table key */
+  /* get key to cache */
 
   if ( g_use_cache ) {
     if ( !g_ft ) {
@@ -379,7 +451,8 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     key = upstbl_atom_string( ups_file );
   }
 
-  /* handle journal files */
+  /* handle journal files,
+     a journal file will just be added to the cache */
 
   prod_ptr->journal = journal;
   if ( journal == JOURNAL ) {
@@ -400,7 +473,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     return UPS_SUCCESS;
   }
 
-  /* if we are a JOURNAL file we should not come here */
+  /* if we are a JOURNAL we should not come here */
 
   /* check if prod_ptr is empty, if empty remove the file */
 
@@ -415,7 +488,8 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   }
 
 
-  /* check if directory exist */
+  /* check if directory exist,
+     if not, create it */
 
   if ( copt == 'd' && 
        upsutl_is_a_file( ups_file ) == UPS_NO_FILE ) {
@@ -496,12 +570,6 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   g_filename = 0;
 
   return UPS_SUCCESS;
-}
-
-void trim_cache( void )
-{
-  if ( g_use_cache && g_ft )
-    upstbl_trim( g_ft );
 }
 
 t_upstyp_product  *upsfil_is_in_cache( const char * const ups_file )
@@ -610,16 +678,8 @@ int write_version_file( void )
     put_key( 0, "" );
     put_key( 0, SEPARATION_LINE );
 
-    put_inst_keys( ikeys, inst_ptr );
+    put_inst_keys( ikeys, inst_ptr, 0 );
 
-    /* write user defined key words */
-
-    if ( inst_ptr->user_list ) {
-      t_upslst_item *l_ptr = upslst_first( inst_ptr->user_list );
-      for ( ; l_ptr; l_ptr = l_ptr->next ) {
-	put_key( 0, l_ptr->data );
-      }
-    }
   }  
 
   return 1;
@@ -655,7 +715,7 @@ int write_chain_file( void )
     put_key( 0, "" );
     put_key( 0, SEPARATION_LINE );
 
-    put_inst_keys( ikeys, inst_ptr );
+    put_inst_keys( ikeys, inst_ptr, 0 );
   }  
 
   return 1;
@@ -664,74 +724,65 @@ int write_chain_file( void )
 int write_table_file( void )
 {
   t_upslst_item *l_inst = 0;
-  t_upslst_item *l_act = 0;
   t_upstyp_instance *inst_ptr = 0;
-  t_upstyp_action *act_ptr = 0;
+  int *common_mask;
+  int o_imargin;
+  int *tbl_keys;
+  int *keys;
+  int ig;
 
   t_upslst_item *l_copy, *l_ptr;
 
   /* write file descriptor */
   
-  put_key( "FILE", g_pd->file );
-  put_key( "PRODUCT", g_pd->product );
-  put_key( "VERSION", g_pd->version );
-  put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
+  put_head_keys( upskey_tblhead_arr() );  
   put_key( 0, "" );
 
-  /* write groups */
+  /* REMEBER that the array of keys returned from upskey_*_arr() is static,
+     so, the reason we set tbl_keys here, is because we only need the table
+     instance keys for the rest of this scope */
+
+  tbl_keys = upskey_tblinst_arr();
+
+  /* write groups based on seeds defined in g_groups */
 
   l_copy = upslst_copy( g_pd->instance_list );
-  find_group( l_copy, 's' );
-  while( (l_ptr = find_group( 0, ' ' )) ) {
-    put_key( 0, SEPARATION_LINE );
-    put_key( 0, "GROUP:");
-    g_imargin += 2;
-    for ( l_ptr = upslst_first( l_ptr ); l_ptr; l_ptr = l_ptr->next ) {
-      inst_ptr = (t_upstyp_instance *)l_ptr->data;
-      put_key( "FLAVOR", inst_ptr->flavor );
-      put_key( "QUALIFIERS", inst_ptr->qualifiers );
-      put_key( "DESCRIPTION", inst_ptr->description );
-      put_key( 0, "" );
-      
-    }
-    g_imargin -= 2;
-    put_key( 0, "COMMON:" );    
-    g_imargin += 2;
-    l_act = upslst_first( inst_ptr->action_list );
-    for( ; l_act; l_act = l_act->next ) {
-      act_ptr = (t_upstyp_action *)l_act->data;
-      write_action( act_ptr );
-    }
-    g_imargin -= 2;      
-    put_key( 0, "" );
-    put_key( 0, "END:" );
-    put_key( 0, "" );
-  }
-  l_copy = find_group( 0, 'e' );
 
-  /* write instances */
+  for ( ig = 0; ig < e_group_count; ig++ ) {
+
+    find_group( l_copy, 's', 0 );
+    while( (l_ptr = find_group( 0, ' ', g_groups[ ig ] )) ) {
+
+      /* check for other and set common keys */
+
+      common_mask = find_common_mask_list( l_ptr, tbl_keys );
+      for ( keys = g_groups[ ig ]; *keys != -1; keys++ )
+	common_mask[ *keys ] = 1;
+
+      put_group( l_ptr, tbl_keys, common_mask );
+    }
+
+    l_copy = find_group( 0, 'e', 0 );
+  }
+
+  /* write the rest */
   
   l_inst = upslst_first( l_copy );
+  o_imargin = g_imargin;
   for( ; l_inst; l_inst = l_inst->next ) {
+
+    g_imargin = o_imargin;
+
     inst_ptr = (t_upstyp_instance *)l_inst->data;
     if ( !inst_ptr || !inst_ptr->flavor ) {
       /* handle error !!! */
-      return 0;
+      continue;
     }
 
     g_item_count++;
     put_key( 0, SEPARATION_LINE );
-    put_key( "FLAVOR", inst_ptr->flavor );
-    put_key( "QUALIFIERS", inst_ptr->qualifiers );
-    
-    g_imargin += 2;
-    put_key( "DESCRIPTION", inst_ptr->description );
-    l_act = upslst_first( inst_ptr->action_list );
-    for( ; l_act; l_act = l_act->next ) {
-      act_ptr = (t_upstyp_action *)l_act->data;
-      write_action( act_ptr );
-    }
-    g_imargin -= 2;
+    put_inst_keys( tbl_keys, inst_ptr, 1 );
+    g_imargin = o_imargin;
     put_key( 0, "" );    
   }  
 
@@ -808,7 +859,7 @@ int read_file( void )
       break;
 
     default: /* if not flavor or group, ignore it */
-      next_key();
+      next_key( 0 );
     }
     
     if ( l_ptr ) {
@@ -900,10 +951,16 @@ int read_file_desc( void )
     return 0;
   }  
 
-  while ( next_key() != e_key_eof ) {
+  next_key( 0 );
 
-    if ( is_stop_key() ) break;
-    
+  while ( !is_stop_key() ) {
+
+    if ( g_ikey == e_key_user_defined ) {
+      sprintf( g_line, "%s = %s", g_key, g_val );
+      g_pd->user_list = upslst_add( g_pd->user_list, 
+				    upsutl_str_create( g_line, ' ' ) );
+    }
+
     if ( g_mkey && g_mkey->p_index != INVALID_INDEX ) {
       UPSKEY_PROD2ARR( g_pd )[g_mkey->p_index] = upsutl_str_create( g_val, ' ' );
     }
@@ -911,6 +968,8 @@ int read_file_desc( void )
       upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
 				   g_key, g_filename, g_line_count );
     }
+
+    next_key( 0 );
   }
 
   return 1;
@@ -979,6 +1038,7 @@ void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
       }
     }
 }
+
 /*-----------------------------------------------------------------------
  * read_instances
  *
@@ -1042,76 +1102,73 @@ t_upstyp_instance *read_instance( void )
   
   inst_ptr->flavor = upsutl_str_create( g_val, ' ' );
 
-  while ( next_key() != e_key_eof ) {
+  next_key( 0 );
 
-    /* the world are full of special cases */
+  while ( !is_stop_key() ) {
 
-    if ( g_ikey == e_key_action )
-      inst_ptr->action_list = read_actions();
+    if ( g_ikey == e_key_action ) {
+
+      inst_ptr->action_list = 
+	upslst_add_list( inst_ptr->action_list, read_actions() );
+
+    }
+    else {
+
+      switch( g_ikey ) {
+
+      case e_key_action:
+	inst_ptr->action_list = 
+	  upslst_add_list( inst_ptr->action_list, read_actions() );
+
+      case e_key_qualifiers:
+	trim_qualifiers( g_val );
+	inst_ptr->qualifiers = upsutl_str_create( g_val, ' ' );
+	break;
       
-    if ( is_stop_key() ) break;
-    
-    switch( g_ikey ) {
-
-    case e_key_qualifiers:
-      trim_qualifiers( g_val );
-      inst_ptr->qualifiers = upsutl_str_create( g_val, ' ' );
-      break;
-      
-    case e_key_unknown:
-      if ( g_line[0] == '_' ) {
-	sprintf( g_line, "%s=%s", g_key, g_val );
+      case e_key_user_defined:
+	sprintf( g_line, "%s = %s", g_key, g_val );
 	inst_ptr->user_list = upslst_add( inst_ptr->user_list, 
 					  upsutl_str_create( g_line, ' ' ) );
-      }
-      else {
-	upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
-				     g_key, g_filename, g_line_count );
-
-	/* ups_free_instance( inst_ptr ); 
-	   return 0; */
-      }
-      break;
+	break;
       
-    default:
-      if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) { 
+      default:
+	if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) { 
 
-	char *sval = g_val;
+	  char *val = g_val;
 
-	if (UPS_VERIFY) { 
-	  if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0) { 
-	    printf("duplicate key in file %s line %d\n", 
-		   g_filename, g_line_count); 
-            printf("key %s value %s \n", 
-		   g_key, g_val); 
-          }
-        }
+	  if ( UPS_VERIFY ) { 
+	    if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0 ) { 
+	      printf("duplicate key in file %s line %d\n", 
+		     g_filename, g_line_count); 
+	      printf("key %s value %s \n", 
+		     g_key, g_val); 
+	    }
+	  }
 
-	/* if key is allowed to contain env.var, we will translate.
-           the original string has to be saved (in inst_ptr->sav_inst)
-	   if written out to file */
-
-	if ( UPSKEY_TRY_TRANSLATE( g_mkey->flag ) ) {
-	  char *tran_val = upsget_translation_env( sval ); 
-	  if ( tran_val ) {
+	  /* if key value contain env.var, the original string will be saved
+	     be saved (in inst_ptr->sav_inst) if written out to file */
+	  
+	  if ( g_tval ) {
+	  
 	    if ( ! inst_ptr->sav_inst )
 	      inst_ptr->sav_inst = ups_new_instance();
 
 	    UPSKEY_INST2ARR( inst_ptr->sav_inst )[g_mkey->i_index] = 
-	      upsutl_str_create( sval, ' ' );
-	    sval = tran_val;
+	      upsutl_str_create( val, ' ' );
+	    val = g_tval;
 	  }
+	
+	  UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = 
+	    upsutl_str_create( val, ' ' );
 	}
-
-	UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = 
-	  upsutl_str_create( sval, ' ' );
+	else if ( UPS_VERIFY ) {
+	  upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
+				       g_key, g_filename, g_line_count );
+	}
+	break;
       }
-      else if ( UPS_VERIFY ) {
-	upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
-				     g_key, g_filename, g_line_count );
-      }
-      break;    
-
+      
+      next_key( 0 );
     }
 
   }
@@ -1126,6 +1183,98 @@ t_upstyp_instance *read_instance( void )
 		g_filename, g_line_count );
 
       inst_ptr->qualifiers = upsutl_str_create( "", ' ' );
+    }
+
+    g_item_count++;
+  }
+
+  return inst_ptr;
+}
+
+/*-----------------------------------------------------------------------
+ * read_common
+ *
+ * Will read a common block. which is close to a single instance.
+ *
+ * Input : none
+ * Output: none
+ * Return: pointer to an instance
+ */
+t_upstyp_instance *read_common( void )
+{
+  t_upstyp_instance *inst_ptr = 0;
+  
+  inst_ptr = ups_new_instance();
+
+  next_key( 0 );
+
+  while ( ! is_stop_key() ) {
+
+    /* actions */
+
+    if ( g_ikey == e_key_action ) {
+
+      inst_ptr->action_list = 
+	upslst_add_list( inst_ptr->action_list, read_actions() );
+
+
+    }
+    else {
+
+      switch( g_ikey ) {
+
+      case e_key_qualifiers:
+	if ( UPS_VERIFY ) { 
+	  printf( "read qualifiers key in a common section, in file %s, line %d",
+		  g_filename, g_line_count );
+	}
+	break;
+      
+      case e_key_user_defined:
+	sprintf( g_line, "%s = %s", g_key, g_val );
+	inst_ptr->user_list = upslst_add( inst_ptr->user_list, 
+					  upsutl_str_create( g_line, ' ' ) );
+	break;
+      
+      default:
+	if ( g_mkey && g_mkey->i_index != INVALID_INDEX ) { 
+
+	  char *val = g_val;
+
+	  if ( UPS_VERIFY ) { 
+	    if( UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] != 0 ) { 
+	      printf("duplicate key in file %s line %d\n", 
+		     g_filename, g_line_count); 
+	      printf("key %s value %s \n", 
+		     g_key, g_val); 
+	    }
+	  }
+
+	  /* if key value contain env.var, the original string will be saved
+	     be saved (in inst_ptr->sav_inst) if written out to file */
+
+	  if ( g_tval ) {
+	    
+	    if ( ! inst_ptr->sav_inst )
+	      inst_ptr->sav_inst = ups_new_instance();
+	    
+	    UPSKEY_INST2ARR( inst_ptr->sav_inst )[g_mkey->i_index] = 
+	      upsutl_str_create( val, ' ' );
+	    val = g_tval;
+	  }
+
+	  UPSKEY_INST2ARR( inst_ptr )[g_mkey->i_index] = 
+	    upsutl_str_create( val, ' ' );
+	}
+	else if ( UPS_VERIFY ) {
+	  upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
+				       g_key, g_filename, g_line_count );
+	}
+	break;
+      }
+
+      next_key( 0 );
+
     }
 
     g_item_count++;
@@ -1184,15 +1333,17 @@ t_upstyp_action *read_action( void )
   act_ptr = ups_new_action();
   act_ptr->action = upsutl_str_create( g_val, ' ' );
 
-  while ( next_key() != e_key_eof ) {
+  next_key( 1 );
 
-    if ( is_stop_key() ) break;
-    
+  while ( !is_stop_key() && g_ikey != e_key_action ) {
+
     if ( g_ikey == e_key_unknown && strlen( g_line ) > 0 ) {
       cmd_ptr = upsutl_str_create( g_line, ' ' );
       if ( cmd_ptr )
 	l_cmd = upslst_add( l_cmd, cmd_ptr );
     }
+    
+    next_key( 1 );
     
   }
 
@@ -1214,7 +1365,7 @@ t_upstyp_config *read_config( void )
 {
   t_upstyp_config *conf_ptr = ups_new_config();
 
-  while ( next_key() != e_key_eof ) {
+  while ( next_key( 0 ) != e_key_eof ) {
 
     if ( g_ikey == e_key_statistics ) {
       upsutl_str_remove( g_val, WCHARSQ );  
@@ -1222,8 +1373,23 @@ t_upstyp_config *read_config( void )
       g_item_count++;
     }
       
+    if ( g_ikey == e_key_user_defined ) {
+      sprintf( g_line, "%s = %s", g_key, g_val );
+      g_pd->user_list = upslst_add( g_pd->user_list, 
+				    upsutl_str_create( g_line, ' ' ) );
+    }
+
+    /* for config files we don't keep the original record, cuz we 
+       never write out these files, if we do we should  */
+
     if ( g_mkey && g_mkey->c_index != INVALID_INDEX ) {
-      UPSKEY_CONF2ARR( conf_ptr )[g_mkey->c_index] = upsutl_str_create( g_val, ' ' );
+
+      char *val = g_val;
+
+      if ( g_tval )
+	val = g_tval;
+
+      UPSKEY_CONF2ARR( conf_ptr )[g_mkey->c_index] = upsutl_str_create( val, ' ' );
       g_item_count++;
     }
   }
@@ -1250,8 +1416,10 @@ t_upslst_item *read_groups( void )
     while  ( g_ikey == e_key_group ) {
 	l_tmp_ptr = read_group();
 
-	if ( l_tmp_ptr )
-        { if (UPS_VERIFY) { verify_groups(l_ptr,l_tmp_ptr); }
+	if ( l_tmp_ptr ) { 
+	  if ( UPS_VERIFY ) { 
+	    verify_groups(l_ptr,l_tmp_ptr); 
+	  }
 	  l_ptr = upslst_add_list( l_ptr, l_tmp_ptr );
 	}
 
@@ -1279,13 +1447,13 @@ t_upslst_item *read_group( void )
 {
     t_upslst_item *l_ptr = 0;
     t_upslst_item *l_inst_ptr = 0;
-    t_upslst_item *l_act_ptr = 0;
     t_upstyp_instance *inst_ptr = 0;
+    t_upstyp_instance *com_ptr = 0;
 
     if ( g_ikey != e_key_group ) 
       return 0;
     
-    next_key();
+    next_key( 0 );
 
     /* skip to next start key */
 
@@ -1299,33 +1467,28 @@ t_upslst_item *read_group( void )
     if ( !l_inst_ptr )
       return 0;
 
-    if ( g_ikey == e_key_common ) {
-	next_key();
-	l_act_ptr = read_actions();
-    }
+    if ( g_ikey == e_key_common )
+      com_ptr = read_common();
 
-    /* add actions to instances */
+    /* add common to instances */
 
-    if ( l_act_ptr ) {
+    if ( l_inst_ptr && com_ptr ) {
+
+      /* copy common to instance list,
+	 currently common will overwrite */
+
       l_ptr = upslst_first( l_inst_ptr );
-      inst_ptr = (t_upstyp_instance *)l_ptr->data;
-      inst_ptr->action_list = l_act_ptr;
-      l_ptr = l_ptr->next;
-
-      /* make a reference for all other instances,  */
-      /* not to the list but to list data elements. */
-      /* can not call upslist_copy directly, since  */
-      /* the command list would then be shared.     */
-      
       for ( ; l_ptr; l_ptr = l_ptr->next ) {
 	inst_ptr = (t_upstyp_instance *)l_ptr->data;	
-	inst_ptr->action_list = copy_action_list( l_act_ptr );
+	add_to_instance( inst_ptr, com_ptr );
       }
     }
 
-    while ( next_key() == e_key_end ) {}
+    ups_free_instance( com_ptr );
+
+    find_start_key();
     
-    return l_inst_ptr;
+    return upslst_first( l_inst_ptr );
 }
 
 /*
@@ -1351,7 +1514,7 @@ int find_start_key( void )
       upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
 				   g_key, g_filename, g_line_count );
     }
-    next_key();
+    next_key( 0 );
   }
   return g_ikey;
 }
@@ -1365,10 +1528,11 @@ int find_start_key( void )
  * Output: none
  * Return: int, enum of current key.
  */
-int next_key( void )
+int next_key( int ignore_unknown )
 {  
   g_key[0] = 0;
   g_val[0] = 0;
+  g_tval = 0;
   g_line[0] = 0;
   g_ikey = e_key_eof;
   g_mkey = 0;
@@ -1384,7 +1548,24 @@ int next_key( void )
     if ( !upsutl_str_remove_edges( g_line, WCHARS ) ) continue;
 
     if ( get_key() != e_key_eol ) {
-      return g_ikey;
+
+      /* translate key value, if needed */
+
+      if ( g_mkey && 
+	   g_ikey != e_key_unknown &&
+	   g_val[0] &&
+	   UPSKEY_TRY_TRANSLATE( g_mkey->flag ) ) {
+
+	g_tval = upsget_translation_env( g_val ); 
+      }
+
+      if ( !ignore_unknown && g_ikey == e_key_unknown ) {
+	upserr_vplace(); upserr_add( UPS_UNEXPECTED_KEYWORD, UPS_INFORMATIONAL,
+				     g_key, g_filename, g_line_count );
+      }
+      else {
+	return g_ikey;
+      }
     }
   }
 
@@ -1449,10 +1630,15 @@ int get_key( void )
   }
 
   g_mkey = upskey_get_map( g_key );
-  if ( g_mkey )
+  if ( g_mkey ) {
     g_ikey = g_mkey->ikey;
-  else
-    g_ikey = e_key_unknown;
+  }
+  else {
+    if ( g_line[0] == '_' ) 
+      g_ikey = e_key_user_defined;
+    else
+      g_ikey = e_key_unknown;
+  }
 
   if ( has_val ) {
     P_VERB_s_i_s_s_s( 3, "parsed line  :", g_line_count, g_key, "=", g_val );
@@ -1462,6 +1648,55 @@ int get_key( void )
   }
 
   return g_ikey;
+}
+
+/*-----------------------------------------------------------------------
+ * put_group
+ *
+ * Will print and format a groups. common items are defined by the passed
+ * common mask.
+ * It will not print anything if val is empty.
+ *
+ * Input : t_upslst_item*, list of instances
+ *         int *, common mask
+ * Output: none
+ * Return: int, 1 fine, 0 not fine
+ */
+int put_group( t_upslst_item * const l_inst, 
+	       int * const keys,
+	       int * const common_mask )
+{
+  int o_imargin;
+  t_upslst_item *l_i = upslst_first( l_inst );
+  t_upstyp_instance *p_inst;
+
+  if ( upslst_count( l_inst ) == 0 ) 
+    return 0;
+
+  put_key( 0, SEPARATION_LINE );
+  put_key( 0, "GROUP:");
+  g_imargin += 2;
+  o_imargin = g_imargin;
+  for ( ; l_i; l_i = l_i->next ) {
+
+    p_inst = (t_upstyp_instance *)l_i->data;
+    put_inst_keys_mask( keys, p_inst, 0, common_mask );
+    put_key( 0, "" );
+    g_imargin = o_imargin;
+  }
+
+  g_imargin -= 2;
+  put_key( 0, "COMMON:" );    
+  g_imargin += 2;
+
+  put_inst_keys_mask( keys, p_inst, common_mask, 0 );
+
+  g_imargin -= 2; 
+  put_key( 0, "" );
+  put_key( 0, "END:" );
+  put_key( 0, "" );
+
+  return 1;
 }
 
 /*-----------------------------------------------------------------------
@@ -1477,10 +1712,27 @@ int get_key( void )
 int put_head_keys( int * ikeys ) 
 {
   t_upskey_map *map =  0;
+  int do_user_def = 0;
+
   for ( ; ikeys && *ikeys != -1; ikeys++ ) {
+
+    if ( *ikeys == e_key_user_defined ) {
+      do_user_def = 1;
+      continue;
+    }
+
     map = &g_key_map[ *ikeys ];
     put_key( map->key, 
 	     UPSKEY_PROD2ARR( g_pd )[ map->p_index ] );
+  }
+
+  /* write user defined key words */
+
+  if ( do_user_def && g_pd->user_list ) {
+    t_upslst_item *l_ptr = upslst_first( g_pd->user_list );
+    for ( ; l_ptr; l_ptr = l_ptr->next ) {
+      put_key( 0, l_ptr->data );
+    }
   }
 
   return 1;
@@ -1496,28 +1748,151 @@ int put_head_keys( int * ikeys )
  * Output: none
  * Return: int, 1 fine, 0 not fine
  */
-int put_inst_keys( int * ikeys, t_upstyp_instance * const inst ) 
+int put_inst_keys( int * ikeys, 
+		   t_upstyp_instance * const inst, 
+		   int do_act ) 
 {
   t_upskey_map *map =  0;
   t_upstyp_instance *sav_inst = inst->sav_inst;
+  t_upslst_item *l_act;
+  t_upstyp_action *p_act;
   char *val = 0;
+  int do_actions = 0;
+  int do_user_def = 0;
   
   for ( ; ikeys && *ikeys != -1; ikeys++ ) {
+
+    /* we do actions and user keys outside the loop */
+
+    if ( *ikeys == e_key_action && do_act ) {
+      do_actions = 1;
+      continue;
+    }
+
+    if ( *ikeys == e_key_user_defined ) {
+      do_user_def = 1;
+      continue;
+    }
+
     map = &g_key_map[ *ikeys ];
     if ( !sav_inst ||  !(val = UPSKEY_INST2ARR( sav_inst )[ map->i_index ]) )
       val = UPSKEY_INST2ARR( inst )[ map->i_index ];
 
-    /* statistics is the only ups key we know there has no value */
+    /* statistics is the only ups key that has no value ... i hope */
 
-    if ( map->ikey == e_key_statistics && val )
+    if ( *ikeys == e_key_statistics && val )
       put_key( 0, "STATISTICS" );
     else
       put_key( map->key, val );
 
     /* cosmetic */
 
-    if ( map->ikey == e_key_qualifiers )
+    if ( *ikeys == e_key_qualifiers )
       g_imargin += 2;
+  }
+
+  /* write user defined key words */
+
+  if ( do_user_def && inst->user_list ) {
+    t_upslst_item *l_ptr = upslst_first( inst->user_list );
+    for ( ; l_ptr; l_ptr = l_ptr->next ) {
+      put_key( 0, l_ptr->data );
+    }
+  }
+
+  /* write actions */
+
+  if ( do_actions ) {
+    l_act = upslst_first( inst->action_list );
+    for( ; l_act; l_act = l_act->next ) {
+      p_act = (t_upstyp_action *)l_act->data;
+      write_action( p_act );
+    }
+  }
+
+  return 1;
+}
+
+/*-----------------------------------------------------------------------
+ * put_inst_keys_mask
+ *
+ * Will print and format passed key and val for a ups file instance using
+ * and and and not and mask.
+ * It will not print anything if val is empty.
+ *
+ * Input : int *, arrays of indexes to print
+ *         int *, array, and mask
+ *         int *, array, not mask
+ * Output: none
+ * Return: int, 1 fine, 0 not fine
+ */
+int put_inst_keys_mask( int * ikeys, 
+			t_upstyp_instance * const inst, 
+			int * ymask, 
+			int * nmask) 
+{
+  t_upskey_map *map =  0;
+  t_upstyp_instance *sav_inst = inst->sav_inst;
+  t_upslst_item *l_act;
+  t_upstyp_action *p_act;
+  char *val = 0;
+  int do_actions = 0;
+  int do_user_def = 0;
+  
+  for ( ; ikeys && *ikeys != -1; ikeys++ ) {
+
+    /* mask out/in */
+
+    if ( (ymask && !ymask[ *ikeys ]) ||
+	 (nmask && nmask[ *ikeys ]) )
+      continue;
+
+    /* we do actions and user keys outside the loop */
+
+    if ( *ikeys == e_key_action ) {
+      do_actions = 1;
+      continue;
+    }
+
+    if ( *ikeys == e_key_user_defined ) {
+      do_user_def = 1;
+      continue;
+    }
+
+    map = &g_key_map[ *ikeys ];
+    if ( !sav_inst ||  !(val = UPSKEY_INST2ARR( sav_inst )[ map->i_index ]) )
+      val = UPSKEY_INST2ARR( inst )[ map->i_index ];
+
+    /* statistics is the only ups key we know there has no value */
+
+    if ( *ikeys == e_key_statistics && val )
+      put_key( 0, "STATISTICS" );
+    else
+      put_key( map->key, val );
+
+    /* cosmetic */
+
+    if ( *ikeys == e_key_qualifiers )
+      g_imargin += 2;
+  }
+
+  /* write user defined key words */
+
+  if ( do_user_def && inst->user_list ) {
+    t_upslst_item *l_ptr = upslst_first( inst->user_list );
+    for ( ; l_ptr; l_ptr = l_ptr->next ) {
+      put_key( 0, l_ptr->data );
+    }
+  }
+
+  /* actions */
+
+  if ( do_actions ) {
+    l_act = upslst_first( inst->action_list );
+    for( ; l_act; l_act = l_act->next ) {
+      p_act = (t_upstyp_action *)l_act->data;
+      write_action( p_act );
+    }
   }
 
   return 1;
@@ -1551,12 +1926,12 @@ int put_key( const char * const key, const char * const val )
     if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
 	 !upsutl_stricmp( "DESCRIPTION", key ) ||
 	 !upsutl_stricmp( "AUTHORIZED_NODES", key ) )
-      fputc( '\"', g_fh );
+      fputc( '"', g_fh );
     fprintf( g_fh, "%s", val );
     if ( !upsutl_stricmp( "QUALIFIERS", key ) ||
 	 !upsutl_stricmp( "DESCRIPTION", key ) ||
 	 !upsutl_stricmp( "AUTHORIZED_NODES", key ) )
-      fputc( '\"', g_fh );      
+      fputc( '"', g_fh );      
   }
   else {
     fprintf( g_fh, "%s", val );
@@ -1577,8 +1952,10 @@ int is_start_key( void )
     return 1;
   if ( g_ikey == e_key_file )
     return 1;
+  /*
   if ( g_ikey == e_key_action ) 
     return 1;
+  */
 
   return 0;
 }
@@ -1627,6 +2004,12 @@ int cfilei( void )
   return g_ifile;
 }
 
+void trim_cache( void )
+{
+  if ( g_use_cache && g_ft )
+    upstbl_trim( g_ft );
+}
+
 int trim_qualifiers( char * const str )
 {
   int i, len;
@@ -1641,6 +2024,54 @@ int trim_qualifiers( char * const str )
   upsutl_str_sort( str, ':' );
 
   return (int)strlen( str );
+}
+
+int add_to_instance( t_upstyp_instance * const inst,
+		     t_upstyp_instance * const inst_add )
+{
+  int *ikeys = upskey_inst_arr();
+  char *val_add;
+  int index = -1;
+
+  if ( !inst || !inst_add )
+    return 0;
+
+  for ( ; *ikeys != -1; ikeys++ ) {
+    
+    index = g_key_map[*ikeys].i_index;
+
+    if ( (val_add = UPSKEY_INST2ARR( inst_add )[ index ] ) ) {
+
+      if ( *ikeys == e_key_action )
+	continue;
+
+      else if ( *ikeys == e_key_user_defined )
+	inst->user_list = upslst_copy( inst_add->user_list );
+
+      else {
+	char *val;
+	if ( (val = UPSKEY_INST2ARR( inst )[ *ikeys ]) ) {
+	  upsmem_free( val );
+	}
+	UPSKEY_INST2ARR( inst )[ index ] = upsutl_str_create( val_add, ' ' );
+      }
+    }
+  }
+
+  /* actions */
+
+  if ( inst_add->action_list )
+    inst->action_list = copy_action_list( inst_add->action_list );
+
+  /* the untranslated values */
+  
+  if ( inst_add->sav_inst ) {
+    if ( ! inst->sav_inst )
+      inst->sav_inst = ups_new_instance();      
+    add_to_instance( inst->sav_inst, inst_add->sav_inst );
+  }
+
+  return 1;
 }
 
 t_upslst_item *copy_action_list( t_upslst_item * const list_ptr )
@@ -1662,6 +2093,241 @@ t_upslst_item *copy_action_list( t_upslst_item * const list_ptr )
   }
 
   return upslst_first( l_ptr2 );
+}
+
+int *find_common_mask_list( t_upslst_item *l_inst,
+			    int * const keys_arr )
+{
+  static int c_mask[ e_key_count ];
+  t_upslst_item *l_i1 = upslst_first( l_inst );
+  int *ikeys = keys_arr;
+  int *c_mask_i;
+  int i;
+
+  /* set all keys to common */
+
+  for ( i = 0; i < e_key_count; i++ )
+    c_mask[ i ] = 1;
+
+  for ( ; l_i1; l_i1 = l_i1->next ) {
+
+    t_upstyp_instance *inst1 = (t_upstyp_instance *)l_i1->data;
+    t_upslst_item *l_i2 = l_i1->next;
+
+    for ( ; l_i2; l_i2 = l_i2->next ) {
+
+      t_upstyp_instance *inst2 = (t_upstyp_instance *)l_i2->data;
+
+      /* check for common keys in table instances */
+
+      c_mask_i = find_common_mask( inst1, inst2, ikeys );
+
+      /* set keys uncommon if no match */
+
+      for ( i = 0; i < e_key_count; i++ ) {
+	if ( ! c_mask_i[ i ] )
+	  c_mask[ i ] = 0;
+
+      }
+    }
+  }
+
+  return c_mask;
+}
+
+int *find_common_mask( t_upstyp_instance * const inst1,
+		       t_upstyp_instance * const inst2,
+		       int * const keys_arr )
+{
+  static int c_mask[ e_key_count ];
+  int *ikeys = keys_arr;
+  t_upskey_map *map;
+  char *val1, *val2;
+  int i;
+
+  for ( i = 0; i < e_key_count; i++ )
+    c_mask[ i ] = 0;
+
+  for( ; *ikeys != -1; ikeys++ ) {
+
+    /* note: flavor and qualifier will never go common,
+       file reading don't like that */
+
+    if ( *ikeys <= e_key_qualifiers || 
+	 *ikeys == e_key_action ||
+	 g_key_map[ *ikeys ].i_index == INVALID_INDEX )
+      continue;
+
+    map = &g_key_map[ *ikeys ];
+	
+    if ( !map )
+      continue;
+
+    if ( (val1 = UPSKEY_INST2ARR( inst1 )[ map->i_index ]) && 
+	 (val2 = UPSKEY_INST2ARR( inst2 )[ map->i_index ]) ) {
+
+      /* set keys common */
+
+      if ( !upsutl_stricmp( val1, val2 ) )
+	c_mask[ *ikeys ] = 1;
+
+    }	
+  }
+
+  return c_mask;
+}
+
+int action_cmp ( const void * const d1, 
+		 const void * const d2 )
+{
+  /* a little helper for cmp_actions */
+
+  t_upstyp_action *a1 = (t_upstyp_action *)d1;
+  t_upstyp_action *a2 = (t_upstyp_action *)d2;
+
+  return upsutl_stricmp( a1->action, a2->action );
+}
+
+int cmp_actions( t_upslst_item *l_ptr1, 
+		 t_upslst_item *l_ptr2 )
+{
+  l_ptr1 = upslst_first( l_ptr1 );
+  l_ptr2 = upslst_first( l_ptr2 );
+  
+  if ( l_ptr1 == l_ptr2 )
+    return 0;
+  
+  if ( l_ptr1 == 0 || l_ptr2 == 0 )
+    return 1;
+
+  if ( upslst_count( l_ptr1 ) != upslst_count( l_ptr2 ) )
+    return 1;
+
+  /* sort actions, so it's easier to compare */
+  
+  l_ptr1 = upslst_sort0( l_ptr1, action_cmp );
+  l_ptr2 = upslst_sort0( l_ptr2, action_cmp );
+
+  for ( ; l_ptr1 && l_ptr2; l_ptr1 = l_ptr1->next, l_ptr2 = l_ptr2->next ) {
+    t_upstyp_action *a1 = (t_upstyp_action *)l_ptr1->data;
+    t_upstyp_action *a2 = (t_upstyp_action *)l_ptr2->data;
+    t_upslst_item *c1, *c2;
+
+    /* same action name ? */
+    
+    if ( upsutl_stricmp( a1->action, a2->action ) )
+      return 1;
+
+    /* compare list of commands */
+    
+    c1 = upslst_first( a1->command_list );
+    c2 = upslst_first( a2->command_list );
+    
+    if ( c1 == c2 )
+      continue;
+  
+    if ( c1 == 0 || c2 == 0 )      
+      return 1;
+
+    if ( upslst_count( c1 ) != upslst_count( c2 ) )
+      return 1;
+
+    for ( ; c1 && c2; c1 = c1->next, c2 = c2->next ) {
+      if ( strcmp( (char *)c1->data, (char *)c2->data ) )
+	return 1;    
+    }
+  }
+
+  /* if we came so far, they match */
+  
+  return 0;
+}
+
+t_upslst_item *find_group( t_upslst_item * const list_ptr, 
+			   const char copt, 
+			   int * const keys_arr )
+{
+  static t_upslst_item* l_orig = 0;
+
+  t_upslst_item *l_grp = 0;
+  t_upslst_item *l_itm = 0;
+  t_upstyp_instance *inst = 0;
+
+  switch ( copt ) {
+    
+  case 's':
+    l_orig = list_ptr;
+    return 0;
+    
+  case 'e':
+    l_itm = upslst_first( l_orig );
+    l_orig = 0;
+    return l_itm;
+  }
+  
+  if ( !l_orig ) 
+    return 0;
+
+  /* find a group */
+
+  l_itm = l_orig;
+  while ( !l_grp && l_itm && l_itm->next ) {
+    inst = (t_upstyp_instance *)l_itm->data;
+    l_itm = l_itm->next;
+    
+    while ( l_itm ) {
+
+      t_upstyp_instance *is = (t_upstyp_instance *)l_itm->data;
+      t_upskey_map *map;
+      int goon = 0;
+      int *ikeys;
+
+      for ( ikeys = keys_arr; *ikeys != -1; ikeys++ ) {
+
+	/* compare actions */
+
+	if ( *ikeys == e_key_action ) {
+
+	  goon = 
+	    !cmp_actions( inst->action_list, is->action_list );
+
+	}
+
+	/* compare strings ... we hope */
+
+	else if ( (map = &g_key_map[ *ikeys ]) ) {
+
+	  char *val1, *val2;
+	  goon = 
+	    ((val1 = UPSKEY_INST2ARR( inst )[ map->i_index ]) && 
+	    (val2 = UPSKEY_INST2ARR( is )[ map->i_index ]) &&
+	    !upsutl_stricmp( val1, val2 ));
+
+	}
+
+	if ( !goon )
+	  break;
+      }
+      
+      if ( goon ) {
+	l_grp = upslst_add( l_grp, is );
+	l_itm = upslst_delete_safe( l_itm, is, ' ' );
+      }
+      else {
+	l_itm = l_itm->next;
+      }
+    }
+  }
+
+  /* if any group, insert first instance in group
+     and remove it from original list. */
+  
+  if ( l_grp ) {
+    l_grp = upslst_insert( l_grp, inst );
+    l_orig = upslst_delete( l_orig, inst, ' ' );
+  }
+
+  return l_grp;    
 }
 
 /*
@@ -1760,118 +2426,4 @@ void g_print_product( t_upstyp_product * const prod_ptr )
 
   if ( prod_ptr->config )
     upskey_conf_print( prod_ptr->config ); 
-}
-
-int action_cmp ( const void * const d1, const void * const d2 )
-{
-  t_upstyp_action *a1 = (t_upstyp_action *)d1;
-  t_upstyp_action *a2 = (t_upstyp_action *)d2;
-
-  return upsutl_stricmp( a1->action, a2->action );
-}
-
-int cmp_actions( t_upslst_item *l_ptr1, t_upslst_item *l_ptr2 )
-{
-  l_ptr1 = upslst_first( l_ptr1 );
-  l_ptr2 = upslst_first( l_ptr2 );
-  
-  if ( l_ptr1 == l_ptr2 )
-    return 0;
-  
-  if ( l_ptr1 == 0 || l_ptr2 == 0 )
-    return 1;
-
-  if ( upslst_count( l_ptr1 ) != upslst_count( l_ptr2 ) )
-    return 1;
-
-  /* sort actions, so it's easier to compare */
-  
-  l_ptr1 = upslst_sort0( l_ptr1, action_cmp );
-  l_ptr2 = upslst_sort0( l_ptr2, action_cmp );
-
-  for ( ; l_ptr1 && l_ptr2; l_ptr1 = l_ptr1->next, l_ptr2 = l_ptr2->next ) {
-    t_upstyp_action *a1 = (t_upstyp_action *)l_ptr1->data;
-    t_upstyp_action *a2 = (t_upstyp_action *)l_ptr2->data;
-    t_upslst_item *c1, *c2;
-
-    /* same action name ? */
-    
-    if ( upsutl_stricmp( a1->action, a2->action ) )
-      return 1;
-
-    /* compare list of commands */
-    
-    c1 = upslst_first( a1->command_list );
-    c2 = upslst_first( a2->command_list );
-    
-    if ( c1 == c2 )
-      continue;
-  
-    if ( c1 == 0 || c2 == 0 )      
-      return 1;
-
-    if ( upslst_count( c1 ) != upslst_count( c2 ) )
-      return 1;
-
-    for ( ; c1 && c2; c1 = c1->next, c2 = c2->next ) {
-      if ( strcmp( (char *)c1->data, (char *)c2->data ) )
-	return 1;    
-    }
-  }
-
-  /* if we came so far, they match */
-  
-  return 0;
-}
-
-t_upslst_item *find_group( t_upslst_item * const list_ptr, const char copt )
-{
-  t_upslst_item *l_grp = 0;
-  t_upslst_item *l_itm = 0;
-  t_upstyp_instance *inst = 0;
-  static t_upslst_item* l_orig = 0;
-
-  switch ( copt ) {
-    
-  case 's':
-    l_orig = list_ptr;
-    return 0;
-    
-  case 'e':
-    l_itm = upslst_first( l_orig );
-    l_orig = 0;
-    return l_itm;
-  }
-  
-  if ( !l_orig ) 
-    return 0;
-
-  /* find a group */
-
-  l_itm = l_orig;
-  while ( !l_grp && l_itm && l_itm->next ) {
-    inst = (t_upstyp_instance *)l_itm->data;
-    l_itm = l_itm->next;
-    
-    while ( l_itm ) {
-      t_upstyp_instance *is = (t_upstyp_instance *)l_itm->data;
-      if ( !cmp_actions( inst->action_list, is->action_list ) ) {
-	l_grp = upslst_add( l_grp, is );
-	l_itm = upslst_delete_safe( l_itm, is, ' ' );
-      }
-      else {
-	l_itm = l_itm->next;
-      }
-    }
-  }
-
-  /* if any group, insert first instance in group */
-  /* and remove it from original list.            */
-  
-  if ( l_grp ) {
-    l_grp = upslst_insert( l_grp, inst );
-    l_orig = upslst_delete( l_orig, inst, ' ' );
-  }
-
-  return l_grp;    
 }

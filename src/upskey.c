@@ -73,6 +73,10 @@ static int g_ikeys[ e_key_count+1 ];
  *      file, like FILE and PRODUCT) be sure the file header writing control 
  *      routines are doing the right thing: upskey_*head_arr.
  *
+ *
+ * Note: The location of the keys from FILE to QUALIFIERS and from GROUP: to END:
+ *       is kind of importend for the reading and writing functions.
+ *
  */
 t_upskey_map g_key_map[] =
 {
@@ -81,12 +85,13 @@ t_upskey_map g_key_map[] =
   { e_key_version,          "VERSION",          2,     1,   NO, 0x00000111 }, 
   { e_key_chain,            "CHAIN",            3,     4,   NO, 0x00000110 },
   { e_key_ups_db_version,   "UPS_DB_VERSION",   4,    NO,    0, 0x00001111 },
+
   { e_key_flavor,           "FLAVOR",           NO,    2,   NO, 0x00000111 },
   { e_key_qualifiers,       "QUALIFIERS",       NO,    3,   NO, 0x00000111 },
   { e_key_declarer,         "DECLARER",         NO,    5,   NO, 0x00000101 },
   { e_key_declared,         "DECLARED",         NO,    6,   NO, 0x00000101 },
-  { e_key_modifier,         "MODIFIER",         NO,    7,   NO, 0x00000001 },
-  { e_key_modified,         "MODIFIED",         NO,    8,   NO, 0x00000001 },
+  { e_key_modifier,         "MODIFIER",         NO,    7,   NO, 0x00000101 },
+  { e_key_modified,         "MODIFIED",         NO,    8,   NO, 0x00000101 },
   { e_key_origin,           "ORIGIN",           NO,    9,   NO, 0x00000001 },
   { e_key_prod_dir,         "PROD_DIR",         NO,   10,   NO, 0x00010001 },
   { e_key_ups_dir,          "UPS_DIR",          NO,   11,   NO, 0x00010001 },
@@ -94,7 +99,7 @@ t_upskey_map g_key_map[] =
   { e_key_table_file,       "TABLE_FILE",       NO,   13,   NO, 0x00000001 },
   { e_key_archive_file,     "ARCHIVE_FILE",     NO,   14,   NO, 0x00000001 },
   { e_key_authorized_nodes, "AUTHORIZED_NODES", NO,   15,    2, 0x00001001 },
-  { e_key_description,      "DESCRIPTION",      NO,   16,   NO, 0x00000010 },
+  { e_key_description,      "DESCRIPTION",       5,   16,   NO, 0x00000111 },
   { e_key_statistics,       "STATISTICS",       NO,   17,    3, 0x00001001 },
   { e_key_compile_dir,      "COMPILE_DIR",      NO,   18,   NO, 0x00010001 },
   { e_key_compile_file,     "COMPILE_FILE",     NO,   19,   NO, 0x00000001 },
@@ -106,7 +111,7 @@ t_upskey_map g_key_map[] =
 
   { e_key_db_dir,           "DB_DIR",           NO,   25,   NO, 0x00000000 },
   { e_key_action,           "ACTION",           NO,   26,   NO, 0x00000010 },
-  { e_key_unknown,          "USER",             NO,   27,   NO, 0x00000001 },
+  { e_key_user_defined,     "USER",              6,   27,   NO, 0x00001111 },
 
   { e_key_prod_dir_prefix,  "PROD_DIR_PREFIX",  NO,   NO,    1, 0x00011000 },
   { e_key_man_target_dir,   "MAN_TARGET_DIR",   NO,   NO,    4, 0x00001000 },
@@ -121,6 +126,7 @@ t_upskey_map g_key_map[] =
   { e_key_common,           "COMMON:",          NO,   NO,   NO, 0x00000010 },
   { e_key_end,              "END:",             NO,   NO,   NO, 0x00000010 },
 
+  { e_key_unknown,0,0,0,0 },
   { e_key_count,0,0,0,0 },
 };
 
@@ -148,26 +154,6 @@ t_upskey_map *upskey_get_map( const char * const str )
       return keys;
   }
 
-  return 0;
-}
-
-/*-----------------------------------------------------------------------
- * upskey_get_map_i
- *
- * Will return a map (t_upskey_map) for passed enum key.
- *
- * Input : int, enum of key.
- * Output: none.
- * Return: t_upskey_map *, corresponding map, or 0.
- */
-t_upskey_map *upskey_get_map_i( int ikey )
-{
-  /*
-  if ( ikey >= 0 && ikey < e_key_count )
-    return &g_ikey_map[ ikey ];
-  else
-    return 0;
-  */
   return 0;
 }
 
@@ -345,10 +331,38 @@ char *upskey_prod_setval( t_upstyp_product * const prod,
 }
 
 /*
- * The following six routines will return an array of key enums for
- * valid keys as a file descriptor (head) or as an instance in ups files 
+ * The following six or seven routines will return an array of key enums 
+ * for valid keys as a file descriptor (head) or as an instance in ups files 
  * (version, table, chain). Mainly used by the upsfil writing routines.
  */
+
+int *upskey_prod_arr()
+{
+  t_upskey_map *keys = &g_key_map[ 0 ];
+  int i = 0;
+
+  for ( ; keys->key; keys++ )
+    if ( keys->p_index != NO )
+      g_ikeys[i++] = keys->ikey;
+
+  g_ikeys[i] = -1;
+
+  return g_ikeys;
+}
+
+int *upskey_inst_arr()
+{
+  t_upskey_map *keys = &g_key_map[ 0 ];
+  int i = 0;
+
+  for ( ; keys->key; keys++ )
+    if ( keys->i_index != NO )
+      g_ikeys[i++] = keys->ikey;
+
+  g_ikeys[i] = -1;
+
+  return g_ikeys;
+}
 
 int *upskey_verhead_arr()
 {
@@ -359,7 +373,9 @@ int *upskey_verhead_arr()
   g_ikeys[1] = e_key_product;
   g_ikeys[2] = e_key_version;
   g_ikeys[3] = e_key_ups_db_version;
-  g_ikeys[4] = -1;
+  g_ikeys[4] = e_key_description;
+  g_ikeys[5] = e_key_user_defined;
+  g_ikeys[6] = -1;
 
   return g_ikeys;
 }
@@ -370,7 +386,7 @@ int *upskey_verinst_arr()
   int i = 0;
 
   for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
-    if ( UPSKEY_ISIN_VERSION( keys->flag ) && keys->ikey != e_key_unknown )
+    if ( UPSKEY_ISIN_VERSION( keys->flag ) )
       g_ikeys[i++] = keys->ikey;
   }
   g_ikeys[i] = -1;
@@ -378,7 +394,7 @@ int *upskey_verinst_arr()
   return g_ikeys;
 }
 
-int *upskey_tabhead_arr()
+int *upskey_tblhead_arr()
 {
 
   /* tsk, tsk */
@@ -387,18 +403,20 @@ int *upskey_tabhead_arr()
   g_ikeys[1] = e_key_product;
   g_ikeys[2] = e_key_version;
   g_ikeys[3] = e_key_ups_db_version;
-  g_ikeys[4] = -1;
+  g_ikeys[4] = e_key_description;
+  g_ikeys[5] = e_key_user_defined;
+  g_ikeys[6] = -1;
 
   return g_ikeys;
 }
 
-int *upskey_tabinst_arr()
+int *upskey_tblinst_arr()
 {
   t_upskey_map *keys = &g_key_map[ e_key_flavor ];
   int i = 0;
 
   for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
-    if ( UPSKEY_ISIN_TABLE( keys->flag ) && keys->ikey != e_key_unknown )
+    if ( UPSKEY_ISIN_TABLE( keys->flag ) )
       g_ikeys[i++] = keys->ikey;
   }
   g_ikeys[i] = -1;
@@ -415,7 +433,9 @@ int *upskey_chnhead_arr()
   g_ikeys[1] = e_key_product;
   g_ikeys[2] = e_key_chain;
   g_ikeys[3] = e_key_ups_db_version;
-  g_ikeys[4] = -1;
+  g_ikeys[4] = e_key_description;
+  g_ikeys[5] = e_key_user_defined;
+  g_ikeys[6] = -1;
 
   return g_ikeys;
 }
@@ -430,7 +450,7 @@ int *upskey_chninst_arr()
 
   
   for ( ; keys->key && keys->ikey < e_key_group; keys++ ) {
-    if ( UPSKEY_ISIN_CHAIN( keys->flag ) && keys->ikey != e_key_unknown )
+    if ( UPSKEY_ISIN_CHAIN( keys->flag ) )
       g_ikeys[i++] = keys->ikey;
   }
   g_ikeys[i] = -1;

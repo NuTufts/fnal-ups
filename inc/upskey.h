@@ -48,6 +48,10 @@ enum e_upskey_key {
 
   e_key_flavor,
   e_key_qualifiers,
+
+  /* it's improtend that flavor and qualifier is the first instance
+     keys, which is not part of the file descriptor */
+
   e_key_declarer,
   e_key_declared,
   e_key_modifier,
@@ -71,7 +75,7 @@ enum e_upskey_key {
 
   e_key_db_dir,
   e_key_action,
-  e_key_unknown,
+  e_key_user_defined,
 
   e_key_prod_dir_prefix,
   e_key_man_target_dir,
@@ -89,6 +93,7 @@ enum e_upskey_key {
   e_key_common,
   e_key_end,
 
+  e_key_unknown,
   e_key_count
 };
 
@@ -136,7 +141,6 @@ typedef union upskey_config_u {
  * Declaration of public functions.
  */
 t_upskey_map *upskey_get_map( const char * const skey );
-t_upskey_map *upskey_get_map_i( int ikey );
 char         *upskey_inst_getval( t_upstyp_instance * const inst,
 				  const char * const skey );
 char         *upskey_inst_setval( t_upstyp_instance * const inst,
@@ -148,10 +152,12 @@ char         *upskey_inst_getuserval(t_upstyp_instance * const inst,
 				  const char * const skey );
 int          *upskey_verhead_arr();
 int          *upskey_verinst_arr();
-int          *upskey_tabhead_arr();
-int          *upskey_tabinst_arr();
+int          *upskey_tblhead_arr();
+int          *upskey_tblinst_arr();
 int          *upskey_chnhead_arr();
 int          *upskey_chninst_arr();
+int          *upskey_inst_arr();
+int          *upskey_prod_arr();
 void         upskey_inst_print( const t_upstyp_instance * const prod );
 
 char         *upskey_prod_getval( t_upstyp_product * const prod,

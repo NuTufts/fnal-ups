@@ -246,6 +246,7 @@ int ups_free_product( t_upstyp_product * const prod_ptr )
     if ( prod_ptr->version ) { upsmem_free( prod_ptr->version ); }
     if ( prod_ptr->chain ) { upsmem_free( prod_ptr->chain ); }
     if ( prod_ptr->ups_db_version ) { upsmem_free( prod_ptr->ups_db_version ); }
+    if ( prod_ptr->description ) { upsmem_free( prod_ptr->description ); }
 
     /* get rid of instances */
     
@@ -256,6 +257,10 @@ int ups_free_product( t_upstyp_product * const prod_ptr )
       ups_free_instance( inst_ptr );
     }
 
+    /* get rid of user key words */
+
+    if ( prod_ptr->user_list ) { upslst_free( prod_ptr->user_list, 'd' ); }
+    
     /* get rid of comments */
 
     upslst_free( prod_ptr->comment_list, 'd' );

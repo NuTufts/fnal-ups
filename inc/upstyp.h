@@ -147,10 +147,13 @@ typedef struct upstyp_product
   char             *version;
   char             *chain;
   char             *ups_db_version;
+  char             *description;  
+  t_upslst_item    *user_list;
   
   t_upslst_item    *instance_list;
   t_upslst_item    *comment_list;
   t_upstyp_config  *config;
+
   int              journal;
 } t_upstyp_product;
 
