@@ -5,7 +5,8 @@ GROUP:
 
 FLAVOR = ANY
 QUALIFIERS = ""
-man_source_dir = ups/toman
+man_source_dir = toman
+catman_source_dir = toman
 
 COMMON:
 
