@@ -2,6 +2,20 @@
 <p>
 <ul>
 <li>
+There are new template files in the ups area for the dbconfig file and the
+upsdb_list file.
+<li>
+Many fixes were made to the configuration script, particularly for NT.
+<li>
+When UPS uses dropit, it will now always use the '-e' switch, for an exact
+match.
+<li>
+Dependencies of products will now use the same search order of UPS databases
+for finding an instance as the top level product. (i.e. - the order specified
+in $PRODUCTS).
+<li>
+Man pages are located in $UPS_DIR/man
+<li>
 Added an informatinal message to ups start/stop/tailor/configure/unconfigure to
 let the user know when the instance was not matched.
 <li>
