@@ -32,7 +32,7 @@
 #include "upsmem.h"
 #include "upstyp.h"
 #include "upsutl.h"
-
+#include "upsver.h"
 #include "ups_list.h"
 
 #endif /* _UPS_H_ */
