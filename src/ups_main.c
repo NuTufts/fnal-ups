@@ -63,7 +63,6 @@ extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
 int g_simulate;
-extern mode_t g_umask = 000;
 
 /*
  * Declaration of private functions.
@@ -127,10 +126,6 @@ int main(int argc, char *argv[])
 
       if (!command_line->ugo_help && (g_cmd_info[i].cmd_index != e_help)) {
 	/* no help requested - do the command */
-
-	/* set our umask so that if we create a file it has a standard set
-	   of permissions */
-	(void )umask(g_umask);
 
 	/* open the temp file. this is where shell specific action code will\
 	   be put */

@@ -80,6 +80,8 @@ static time_t g_start_w, g_finish_w;
 static char g_stat_dir[] = "statistics/";
 static char g_unknown_user[] = "UNKNOWN";
 static char g_buffer[FILENAME_MAX+1];
+static mode_t g_umask = 0;
+
 /*
  * Definition of public functions.
  */
@@ -727,6 +729,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   char mode[] = "a,access=lock";              /* create new file or append
 						 to existing one */
   char *time_date, *user;
+  mode_t old_umask;
 
   /* Get the current time and date */
   time_date = upsutl_time_date();
@@ -767,13 +770,17 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	    } else {
 	      strcat(stat_file, mproduct->product);         /* filename */
 
-	      /* See if we can open the file we are supposed to write to. */
+	      /* See if we can open the file (rw) to write to. */
+	      old_umask = umask(g_umask);
+
 	      if ((file_stream = fopen(stat_file, mode)) == NULL) {
 		/* Error opening file */
 		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
 			   strerror(errno));
 		upserr_add(UPS_OPEN_FILE, UPS_WARNING, stat_file);
 	      }
+	      /* set this back to what it was */
+	      (void )umask(old_umask);
 	    }
 	  } else {
 	    /* Error size of directory path to file is too long */
