@@ -123,6 +123,7 @@ OPTIONS     :
 -o :old chain 
 -O :"options" : set $UPS_OPTIONS to "options" 
 -p :"description" : product description 
+-P : do not look in a database for this product
 -q :qualifiers : colon separated list ofrequired or optional qualifiers
 :that are to be part of the instance
 -r :dir : set $PROD_DIR to dir 
