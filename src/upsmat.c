@@ -582,7 +582,10 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
  * Given an instance and a read in product structure, return a pointer
  * to the instance (in the product structure) that matches (version, flavor
  * and quals) the passed in instance.  This will be used for example. to pick
- * out chains that point to already matched versions.
+ * out chains that point to already matched versions. (NOTE: this will not
+ * currently work when one of the instances is read in from a table file as 
+ * the instance may have flavor or qualifiers set to "*".  this matches all 
+ * but the compare will not pick that up.)
  * 
  *
  * Input : instance, and a read in product structure
@@ -1164,9 +1167,13 @@ static int get_instance(const t_upslst_item * const a_read_instances,
       for (tmp_list = (t_upslst_item *)a_read_instances; tmp_list ;
 	   tmp_list = tmp_list->next) {
 	instance = (t_upstyp_instance *)(tmp_list->data);
-	if (want_all_f || (! strcmp(instance->flavor, flavor))) {
+	if (want_all_f || (! strcmp(instance->flavor, flavor)) ||
+	    ((a_file_type == e_file_table) && 
+	     (! strcmp(instance->flavor, ANY_MATCH)))) {
 	  /* They do - now compare the qualifiers */
-	  if (want_all_q || (! strcmp(instance->qualifiers, quals))) {
+	  if (want_all_q || (! strcmp(instance->qualifiers, quals)) ||
+	      ((a_file_type == e_file_table) && 
+	       (! strcmp(instance->qualifiers, ANY_MATCH)))) {
 	    /* They do. Save the instances in the order they came in. */
 	    if (a_file_type == e_file_chain) {
 	      /* this instance was read in from a chain file, create a new
