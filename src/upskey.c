@@ -201,7 +201,10 @@ t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
 /*-----------------------------------------------------------------------
  * upskey_inst_getuserval
  *
- * Will return from an instance, the value defined by the passed user key
+ * Will return from an instance, the value defined by the passed user key.
+ * If user key is defined but have no value, it will return a pointer
+ * to a static zero length string.
+ * If user key is not defined, it will return 0.
  *
  * Input : t_upstyp_instance *, an instance.
  *         char *, action name
@@ -211,8 +214,10 @@ t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
 char *upskey_inst_getuserval( t_upstyp_instance * const inst,
 			      const char * const skey )
 {
+  static char *sany = "";
   t_upslst_item *usr_l = 0;
-  char *sp = 0;
+  char *sp_d = 0;
+  char *sp_e = 0;
   size_t len = 0;
 
   if ( !inst || !inst->user_list || !skey ) 
@@ -221,9 +226,15 @@ char *upskey_inst_getuserval( t_upstyp_instance * const inst,
   len = strlen( skey );
   usr_l = upslst_first( inst->user_list );
   for ( ; usr_l; usr_l = usr_l->next ) {
-    if ( (sp = strchr( (char *)usr_l->data, '=' )) ) {
-      if ( !upsutl_strincmp( (char *)usr_l->data, skey, len ) )
-	return ++sp;
+    sp_d = (char *)usr_l->data;
+    if ( (sp_e = strchr( sp_d, '=' )) ) {
+      if ( (len == (sp_e - sp_d)) && 
+	   !upsutl_strincmp( sp_d, skey, len ) )
+	return ++sp_e;
+    }
+    else if ( (len == strlen( sp_d )) && 
+	      !upsutl_strincmp( sp_d, skey, len ) ) {
+      return sany;	      
     }
   }
 
