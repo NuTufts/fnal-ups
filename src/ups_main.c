@@ -250,7 +250,8 @@ int main(int argc, char *argv[])
       if (UPS_ERROR != UPS_SUCCESS) {
 	rstatus = 1;                   /* return an error to the user */
 	break;
-      } else if ((g_cmd_info[i].cmd_index == e_exist) && (! mproduct_list)) {
+      } else if ((g_cmd_info[i].cmd_index == e_exist) && (! mproduct_list) &&
+		 !command_line->ugo_help) {
 	rstatus = 1;                   /* error if found no product */
 	break;
       }
