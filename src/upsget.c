@@ -34,22 +34,6 @@
  * Definition of public variables.
  */
 
-/*
- * Private constants
- */
-#define T t_upstbl
-
-struct T {
-  int size;
-  int length;
-  unsigned timestamp;
-  struct binding {
-    struct binding *link;
-    const void *key;
-    void *value;
-  } **buckets;
-};
-
 #define UPSPRE "${UPS_"
 #define TILDE "~"
 
@@ -674,7 +658,7 @@ t_upstyp_product *upsget_version_file(const char * const a_db,
 
 int upsget_key(const t_upstyp_instance * const instance)
 { const char *key=0;
-  T g_ft = 0;
+  t_upstbl *g_ft = 0;
   static char buffer[MAX_LINE_LEN];
   char *skey=buffer;
   int i;

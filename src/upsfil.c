@@ -121,7 +121,7 @@ static int               g_item_count = 0;
 static int               g_line_count = 0;
 
 static int               g_use_cache = 1;            /* turn on/off use of cache */
-static t_upstbl          g_ft = 0;                   /* pointer to file cache */
+static t_upstbl          *g_ft = 0;                  /* pointer to file cache */
 static int               g_call_cache_count = 0;     /* # times cache is used */
 static int               g_call_count = 0;           /* # times read_file is called */
 

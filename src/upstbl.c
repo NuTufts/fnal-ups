@@ -174,34 +174,21 @@ int upstbl_atom_length( const char * const str )
  *
  */
 
-#define T t_upstbl
-
-struct T {
-  int size;
-  int length;
-  unsigned timestamp;
-  struct binding {
-    struct binding *link;
-    const void *key;
-    void *value;
-  } **buckets;
-};
-
 #define CMPATOM( x, y ) ((x) != (y))
 #define HASHATOM( k ) ((unsigned int)(k)>>2)
 
-T upstbl_new( int hint )
+t_upstbl *upstbl_new( int hint )
 {
-  T table;
+  t_upstbl *table;
   int i;
-  static int primes[] = { 509, 509, 1021, 2053, 4093,
-			  8191, 16381, 32771, 65521, INT_MAX };
+  static unsigned int primes[] = { 509, 509, 1021, 2053, 4093,
+				   8191, 16381, 32771, 65521, INT_MAX };
 
   if ( hint <= 0 ) 
     hint = 0;
-  for ( i = 1; primes[i] < hint; i++ );
+  for ( i = 1; primes[i] < (unsigned int)hint; i++ );
   table = malloc( sizeof( *table ) + (size_t)(primes[i-1]*sizeof( table->buckets[0] )) );
-  table->size = primes[i-1];
+  table->size = (int)primes[i-1];
   table->buckets = (struct binding **)(table + 1);
   for (i = 0; i < table->size; i++)
     table->buckets[i] = NULL;
@@ -210,7 +197,7 @@ T upstbl_new( int hint )
   return table;
 }
 
-void *upstbl_get( T const table, const void * const key ) 
+void *upstbl_get( t_upstbl * const table, const void * const key ) 
 {
   int i;
   struct binding *p;
@@ -226,7 +213,7 @@ void *upstbl_get( T const table, const void * const key )
   return p ? p->value : NULL;
 }
 
-void *upstbl_put( T const table, const void * const key, void * const value ) 
+void *upstbl_put( t_upstbl * const table, const void * const key, void * const value ) 
 {
   int i;
   struct binding *p;
@@ -256,15 +243,15 @@ void *upstbl_put( T const table, const void * const key, void * const value )
   return prev;
 }
 
-int upstbl_length( T const table ) 
+int upstbl_length( t_upstbl * const table ) 
 {
   if ( !table )
     return 0;
   return table->length;
 }
 
-void upstbl_map( T const table,
-		 void apply(const void *, void **, void *),
+void upstbl_map( t_upstbl * const table,
+		 void apply(const void *, void **, void * ),
 		 void * const cl ) 
 {
   int i;
@@ -283,7 +270,7 @@ void upstbl_map( T const table,
     }
 }
 
-void *upstbl_remove( T const table, 
+void *upstbl_remove( t_upstbl * const table, 
 		     const void * const key ) 
 {
   int i;
@@ -307,7 +294,7 @@ void *upstbl_remove( T const table,
   return NULL;
 }
 
-void **upstbl_to_array( T const table, void * const end ) 
+void **upstbl_to_array( t_upstbl * const table, void * const end ) 
 {
   int i, j = 0;
   void **array;
@@ -327,7 +314,7 @@ void **upstbl_to_array( T const table, void * const end )
   return array;
 }
 
-void upstbl_free( T * const table ) 
+void upstbl_free( t_upstbl ** const table ) 
 {
   if ( !table || !*table )
     return;
@@ -344,7 +331,7 @@ void upstbl_free( T * const table )
   free( *table );
 }
 
-void upstbl_dump( T const table, const int iopt )
+void upstbl_dump( t_upstbl * const table, const int iopt )
 {
   int i;
   struct binding *p;
