@@ -1,0 +1,6 @@
+UPS v4_1
+--------
+
+o fixed heading of help output
+o fixed -0, -1, -2, and -3 help text
+o upcased product name in error message
