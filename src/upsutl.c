@@ -132,7 +132,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
       /* we are at the beginning of the file, nothing was written to it */
       empty_stream = 1;
       upsver_mes(1,"%sEmpty temp file deleted %s\n",VPREFIX,g_temp_file_name);
-    } else {      
+    } else {
       /* write any closing info to the file */
       (void) upsutl_finish_temp_file(a_stream, &command_line, "");
     }
