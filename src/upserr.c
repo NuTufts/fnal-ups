@@ -103,7 +103,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 42 */  "%s: Duplicate instance in %s file\n   %s \n   key = \"%s\" \"%s\" \"%s\" \"%s\" hash(%d)\n",
 /* 43 */  "%s: Specified %s file %s\n   does not exist in specified or default locations\n", /* file not found not good enough */
 /* 44 */  "%s: Missing match in %s file \n   File: %s\n",
-/* 45 */  "%s: Product \'%s\' has no %s %s %s\n",
+/* 45 */  "%s: Product \'%s\' (with qualifiers \'%s\'), has no %s %s %s\n",
 /* 46 */  "%s: Found no match for product \'%s\'\n",
 /* 47 */  "%s: Unexpected key word \'%s\' in \'%s\', line %d\n",
 /* 48 */  "%s: File cache is corrupt\n",

@@ -139,11 +139,13 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	  (NOT_EQUAL_ANY_MATCH(a_command_line->ugo_version))) {
 	upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
 		   a_command_line->ugo_product,
+		   (char *)a_command_line->ugo_qualifiers->data,
 		   a_command_line->ugo_version, "version",
 		   "(or may not exist)");
       } else if (a_command_line->ugo_chain) {
 	upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
 		   a_command_line->ugo_product,
+		   (char *)a_command_line->ugo_qualifiers->data,
 		   (char *)a_command_line->ugo_chain->data, "chain",
 		   "(or may not exist)");
       }
