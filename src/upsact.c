@@ -116,10 +116,9 @@ static t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 				    const char * const act_name );
 static t_upsugo_command *get_ugo( t_upsact_cmd * const p_cmd, 
 				  int * const unsetup_flag );
+static int is_prod_done( const char *const prod_name );
 static t_upsact_item *find_prod_name( t_upslst_item *const dep_list,
 				      const char *const prod_name );
-static t_upsact_item *find_prod_dep_name( t_upslst_item *const dep_list,
-					  const char *const prod_name );
 static t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 				    t_upstyp_matched_product *mat_prod,
 				    const int level,
@@ -354,6 +353,8 @@ static char *g_cshDelimiter = " ";
 /* this one, is a pointer to the ugo_command from the command line */
 static t_upsugo_command *g_ugo_cmd = 0;
 
+/* this one, will hold the list of setuped products */
+static t_upslst_item *g_prod_done = 0;
 
 /* 
  * Note: This array should in princip be in ups_main.c, but since
@@ -635,6 +636,7 @@ t_upslst_item *upsact_get_dep( t_upsugo_command * const ugo_cmd,
   g_ups_cmd = ups_cmd;
   g_ugo_cmd = ugo_cmd;
   g_top_unsetup = 0;
+  g_prod_done = 0;
 
   if ( !ugo_cmd || !act_name )
     return 0;
@@ -665,6 +667,8 @@ t_upslst_item *upsact_get_dep( t_upsugo_command * const ugo_cmd,
 
   upsact_cleanup( top_list );
 
+  upslst_free( g_prod_done, ' ' );
+
   return upslst_first( dep_list );
 }
 
@@ -692,6 +696,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   g_ups_cmd = ups_cmd;
   g_ugo_cmd = ugo_cmd;
   g_top_unsetup = 0;
+  g_prod_done = 0;
 
   if ( !ugo_cmd || !act_name )
     return 0;
@@ -716,6 +721,8 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   /* clean up top list */
 
   upsact_cleanup( top_list );
+
+  upslst_free( g_prod_done, ' ' );
 
   return upslst_first( dep_list );
 }
@@ -1333,6 +1340,10 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
   i_act = upsact_action2enum( act_name );
 
+  /* add product to list of products we have done */
+
+  g_prod_done = upslst_add( g_prod_done, p_act_itm->ugo->ugo_product );
+
   if ( !p_act_itm->act ) {
     if ( copt == 'd' ) {
       
@@ -1352,6 +1363,8 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
   }
   
   P_VERB_s_s_s_s( 3, "Action(", act_name, ") for:", actitem2str( p_act_itm ) );
+
+  /* process the command functions */
 
   l_cmd = p_act_itm->act->command_list;
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
@@ -1505,6 +1518,14 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       /* if product is already in our setup list, go to next product */
 
+      if ( new_ugo ) {
+	if ( is_prod_done( new_ugo->ugo_product ) ) {
+	  continue;
+	}
+	
+      }
+
+      /*
       if ( new_ugo && copt == 'd' ) {
 	if ( find_prod_dep_name( dep_list, new_ugo->ugo_product ) ) { 
 	  continue;
@@ -1515,6 +1536,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  continue;
 	}
       }
+      */
 	
       /* add a dependency item */
 
@@ -1833,8 +1855,8 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
     return 0;
   
   /* if no database was specified by the action function (-z) then upsugo_bldcmd
-     will have picked up $PRODUCTS. if databases (-z) was specified at the command 
-     line that is not correct */
+     will have picked up $PRODUCTS, which is not correct if databases (-z) was specified 
+     on the command line */
 
   if ( !a_ugo->ugo_z && g_ugo_cmd->ugo_z ) {
     
@@ -1915,20 +1937,16 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
   return act_itm;
 }
 
-t_upsact_item *find_prod_dep_name( t_upslst_item *const dep_list,
-				   const char *const prod_name )
+int is_prod_done( const char *const prod_name )
 {
-  /* in a list of act_item's it will find the item corresponding to
-     passed product dependency name */
-
-  t_upslst_item *l_ptr = upslst_first( (t_upslst_item *)dep_list );
+  t_upslst_item *l_ptr = upslst_first( g_prod_done );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
-    t_upsact_item *p_item = (t_upsact_item *)l_ptr->data;
-    if ( upsutl_stricmp( prod_name, p_item->dep_ugo->ugo_product ) == 0 )
-      return p_item;
+    if ( upsutl_stricmp( prod_name, (char *)l_ptr->data ) == 0 )
+      return 1;
   }
-  return 0;    
+  return 0;      
 }
+
 
 t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
 				 const char *const prod_name )
