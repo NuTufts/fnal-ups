@@ -21,10 +21,10 @@
  ***********************************************************************/
 
 /* standard include files */
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <errno.h>
 
 /* ups specific include files */
 #include "upsact.h"
@@ -48,30 +48,16 @@
 #define DQUOTE '"'
 #define COMMA ','
 #define OPEN_PAREN '('
-#define MAX_ARGC 100
-#define WSPACE " \t\n\r\f"
+#define CLOSE_PAREN ')'
+#define WSPACE " \t\n\r\f\""
 
 /*
  * Private types
  */
 
-/* this one is just to bundle current information */
-typedef struct s_cmd_cur {
-  const t_upstyp_instance *inst;
-  const char *action_name;
-  const struct s_cmd_map *map;
-  int argc;
-  char *argv[MAX_ARGC];
-} t_cmd_cur;
 
 /* this one is the type of a action command handler */
-typedef void (*tpf_cmd)( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const struct s_cmd_map * const a_cmd_map,
-			 const int a_argc,
-			 const char ** const a_argv);
+typedef int (*tpf_cmd)( const t_upsact_cmd * const cmd_ptr, const char copt );
 
 /* this one is the type for a single action command */
 typedef struct s_cmd_map {
@@ -86,8 +72,15 @@ typedef struct s_cmd_map {
  * Declaration of private functions.
  */
 
-int upsact_params( char * const a_params, char *argv[] );
-int upsact_parse( const char * const a_action_line, t_cmd_cur * const cmd_cur );
+int parse_params( const char * a_params,
+		   char *argv[] );
+int next_cmd( t_upstyp_action *action,
+	      t_upsact_item *p_cur, 
+	      const char * const act_name );
+t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
+			  t_upstyp_matched_product *mat_prod,
+			  char *act_name );
+t_upsact_item *find_product( const char *const prod_name );
 
 /* functions to handle specific action commands */
 
@@ -249,7 +242,6 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       err_message = "";                            \
     }
 
-
 /*
  * Definition of global variables.
  */
@@ -311,9 +303,10 @@ enum {
 };
 
 /* These action commands are listed in order of use.  Hopefully the more
-   used actions are at the front of the list. Also the ones most used by
-   setup and unsetup are at the front of the array.  The actions in this
-   array MUST appear in the same order in the above enumeration */
+ * used actions are at the front of the list. Also the ones most used by
+ * setup and unsetup are at the front of the array.  The actions in this
+ * array MUST appear in the same order in the following enumeration
+ */
 
 static t_cmd_map g_cmd_maps[] = {
   { "setupoptional", e_setupoptional, NULL, 0, 0 },
@@ -350,83 +343,321 @@ static t_cmd_map g_cmd_maps[] = {
   { 0,0,0,0,0 }
 };
 
+static t_upslst_item *g_list = 0;
+static int           g_list_count = 0;
 
 /*
  * Definition of public functions.
  */
 
 /*-----------------------------------------------------------------------
- * upsact_get_shell_code
+ * upsact_get_cmd
  *
- * Write the actions' equivalent shell specific code to the stream.
- * We assume the following has been done already -
- *        the action has been parsed and verified
- *        all supported local UPS environment variables in the action have
- *            been replaced with their value.
- *
- * Input : instance information, command line information and the
- *         parsed action information.
+ * Input : t_upsugo_command *,
+ *         t_upstyp_matched_product *,
+ *         char *,
  * Output: none
- * Return: pointer to string of translated action
+ * Return: t_upsact_tree *,
  */
-void upsact_get_shell_code( const t_upstyp_matched_instance * const a_inst,
-			    const t_upstyp_db * const a_db_info,
-			    const t_upsugo_command * const a_command_line,
-			    const FILE * const a_stream,
-			    const t_cmd_cur * const a_actcmd)
+t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
+			       t_upstyp_matched_product *mat_prod,
+			       const char * const act_name )
 {
+  static char * valid_switch = "AacCdfghKtmMNoOPqrTuUv";
+  
+  t_upsact_item *new_cur;
+  t_upstyp_matched_instance *mat_inst;
+  t_upslst_item *l_item;
+  t_upstyp_action *p_act;
 
-  /* Call the function associated with the action command */
-  if (g_cmd_maps[a_actcmd->map->icmd].func) {
-    g_cmd_maps[a_actcmd->map->icmd].func( a_inst, a_db_info, a_command_line,
-					a_stream, a_actcmd->map,
-					a_actcmd->argc,
-					(const char ** const)(&(a_actcmd->argv[0])));
+  t_upslst_item *l_mproduct;
+
+  if ( !ugo_cmd || !act_name )
+    return 0;
+
+  if ( !mat_prod ) {
+    l_mproduct = upsmat_match_instance( ugo_cmd, 1 );
+    if ( !l_mproduct || !l_mproduct->data )
+      return 0;
+    mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
   }
+
+  new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
+  new_cur->indent = 0;
+  new_cur->ugo = ugo_cmd;
+  new_cur->mat = mat_prod;
+  new_cur->cmd = 0;
+  p_act = get_act( ugo_cmd, mat_prod, act_name );
+
+  /* get setup for top level product */
+
+  g_list_count = 0;
+  if ( g_list )
+    upsact_cleanup();
+
+  next_cmd( p_act, new_cur, act_name );
+
+  if ( g_list_count > 0 )
+    return g_list;
+  else
+    return 0;
 }
 
 /*-----------------------------------------------------------------------
- * upsact_translate_cmd
+ * upsact_parse_cmd
  *
  * It will translate a single action command line.
+ * The returned t_upsact_cmd structure is valid untill next call to
+ * upsact_parse_cmd.
  *
  * Input : action line.
  * Output: none
- * Return: 
+ * Return: t_upsact_cmd *, a translated command line
  */
-int upsact_translate_cmd( const char * const cmd_str )
+t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 {
-  int ierr = UPS_SUCCESS;  
-  t_cmd_cur cmd_cur;
+  static char trim_chars[] = " \t\n\r\f)";
+  t_upsact_cmd *pcmd;
+  char *act_s = (char *)cmd_str, *act_e = NULL;
+  int icmd = e_invalid_action;
+  int i;
+  int len;
 
-  cmd_cur.map = NULL;
-  cmd_cur.argc = 0;
+  /* get rid of leading spaces */
   
-  if ( upsact_parse( cmd_str, &cmd_cur ) != e_invalid_cmd ) { 
-    
-    /* Replace all ups pre-set local variables with their actual values in
-       the parameters before they are split up. */
-    /* new_params = upsact_local_vars(params, a_local_vars); */
+  while ( act_s && *act_s && isspace( *(act_s) ) ){ ++act_s; }
 
-    /* handle action */
+  if ( !act_s || !*act_s )
+    return 0;
+
+  /* create a new command structure */
+  
+  pcmd = (t_upsact_cmd *)malloc( sizeof( t_upsact_cmd ) );
+  pcmd->pmem = (char *)malloc( strlen( act_s ) + 1 );  
+  
+  strcpy( pcmd->pmem, act_s );
+  act_s = pcmd->pmem;
+
+  if ( (act_e = strchr( act_s, OPEN_PAREN )) != NULL ) {
+    len = act_e - act_s;
+
+    /* look for action in the supported action array */
     
+    for ( i = 0; g_cmd_maps[i].cmd; ++i ) {
+      if ( !upsutl_strincmp( act_s, g_cmd_maps[i].cmd, (size_t)len ) ) {
+	
+	/* we found a match. create a pointer to a string with these parameters.
+	   note - it does not include an open parenthesis */
+	act_s = act_e + 1;
+		 
+	/* trim off whitespace & the ending ")" */	  
+	upsutl_str_remove_edges( act_s, trim_chars );
+
+        /* save the location in the array */
+	icmd = i;
+	
+	break;
+      }
+    }
+  }
+
+  /* fill p_cmd, split parameter string into a list of arguments */
+  
+  if ( icmd != e_invalid_action ) {
+    pcmd->icmd = icmd;    
+    pcmd->argc = parse_params( act_s, pcmd->argv );
+    return pcmd;
   }
   else {
-    /* invalid action */
-    upserr_vplace();
-    upserr_add( UPS_INVALID_ACTION, UPS_WARNING, cmd_str );
-    ierr = UPS_INVALID_ACTION;
+    free( pcmd->pmem );
+    free( pcmd );
+    return 0;
+  }
+}
+
+void upsact_cleanup( void )
+{
+  /* here you should cleanup g_list */
+  g_list_count = 0;
+  g_list = 0;
+}
+
+void upsact_print_item( const t_upsact_item *const p_cur )
+{
+  t_upstyp_matched_instance *mat_inst;
+  t_upstyp_instance *inst;
+  int i;
+  
+  if ( !p_cur )
+    return;
+  
+  mat_inst = (t_upstyp_matched_instance *)(upslst_first( p_cur->mat->minst_list ))->data;
+  if ( mat_inst->chain )
+    inst = mat_inst->chain;
+  else if ( mat_inst->version )
+    inst = mat_inst->version;
+  else if ( mat_inst->table )
+    inst = mat_inst->table;
+  else {
+    printf( "%s: No matched instance found\n", p_cur->mat->product );
+    return;
   }
 
-  return ierr;
+  for ( i=0; i<p_cur->indent; i++ ) { printf( "\t" ); }
+  printf( "%d:( %s, %s, %s, \"%s\" ):", p_cur->indent, inst->product,
+	  inst->flavor, inst->version, inst->qualifiers );
+  upsact_print_cmd( p_cur->cmd );  
+}
+
+void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
+{
+  int i;
+  int icmd;
+  
+  if ( !cmd_cur )
+    return;
+
+  icmd = cmd_cur->icmd;
+  
+  printf( "%s(", g_cmd_maps[icmd].cmd );
+  for ( i = 0; i < cmd_cur->argc; i++ ) {
+    if ( i == cmd_cur->argc - 1 ) 
+      printf( " %s ", cmd_cur->argv[i] );
+    else
+      printf( " %s,", cmd_cur->argv[i] );
+  }
+  printf( ")\n" ); 
+}
+
+/*
+ * Private functions
+ */
+
+/*-----------------------------------------------------------------------
+ * get_act
+ *
+ * Input : t_upsugo_command *,
+ * Output: none
+ * Return: t_upsact_action *,
+ */
+t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
+  	                         t_upstyp_matched_product *mat_prod,
+			         char *act_name )
+{
+  t_upstyp_matched_instance *mat_inst;
+  t_upsugo_command *u_cmd;
+
+  if ( !ugo_cmd || !act_name )
+    return 0;
+
+  if ( !mat_prod ) {
+    t_upslst_item *l_mproduct = upsmat_match_instance( ugo_cmd, 1 );
+    if ( !l_mproduct || !l_mproduct->data )
+      return 0;
+    mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
+  }
+
+  mat_inst = (t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
+  if ( mat_inst->table ) 
+    return upskey_inst_getaction( mat_inst->table, act_name );
+  else
+    return 0;
 }
 
 /*-----------------------------------------------------------------------
- * upsact_params
+ * next_cmd
+ *
+ * Input : t_upsact_tree *,
+ * Output: none
+ * Return: t_upsact_cmd *,
+ */
+int next_cmd( t_upstyp_action *action,
+			 t_upsact_item *p_cur,
+			 const char * const act_name )
+{
+  static char * valid_switch = "AacCdfghKtmMNoOPqrTuUv";
+  t_upslst_item *l_cmd = action->command_list;
+  t_upsact_cmd *p_cmd = 0;
+
+  for ( ; l_cmd; l_cmd = l_cmd->next ) {
+    p_cmd = upsact_parse_cmd( (char *)l_cmd->data );
+    if ( p_cmd ) {
+      if ( p_cmd->icmd > e_unsetuprequired ) {
+	t_upsact_item *new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
+	new_cur->indent = p_cur->indent;
+	new_cur->ugo = p_cur->ugo;
+	new_cur->mat = p_cur->mat;
+	new_cur->cmd = p_cmd;
+	g_list = upslst_add( g_list, new_cur );
+	g_list_count++;
+	continue;
+      }
+      else if ( p_cmd->icmd >= 0 ) { /* here we go again */
+	t_upstyp_action *new_act = 0;
+	t_upstyp_matched_product *new_mat = 0;
+	t_upslst_item *l_mproduct = 0;
+	t_upsact_item *new_cur = 0;
+	t_upsugo_command *new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
+	if ( !new_ugo ) {
+	  printf( "???? no new ugo\n" );
+	  continue;
+	}
+
+	/* check if product is already at first level */
+
+	/* check if product is already in list */
+	
+	if ( find_product( new_ugo->ugo_product ) ) {
+	  /* ??? free stuff */
+	  continue;
+	}
+	
+	l_mproduct = upsmat_match_instance( new_ugo, 1 );
+	if ( !l_mproduct || !l_mproduct->data ) {
+	  printf( "???? no product\n" );
+	  continue;
+	}
+	new_mat = (t_upstyp_matched_product *)l_mproduct->data;
+	new_act = get_act( new_ugo, new_mat, act_name );
+	if ( !new_act ) {
+	  printf( "???? no new act\n" );
+	  continue;
+	}
+	new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
+	new_cur->indent = p_cur->indent + 1;
+	new_cur->ugo = new_ugo;
+	new_cur->mat = new_mat;
+	new_cur->cmd = 0;
+	next_cmd( new_act, new_cur, act_name );
+	continue;
+      }
+    }
+  }
+  
+  return g_list_count;
+}
+
+t_upsact_item *find_product( const char *const prod_name )
+{
+  t_upslst_item *l_ptr = upslst_first( g_list );
+
+  for ( ; l_ptr; l_ptr = l_ptr->next ) {
+    t_upsact_item *p_item = (t_upsact_item *)l_ptr->data;
+    if ( upsutl_stricmp( prod_name, p_item->ugo->ugo_product ) == 0 )
+      return p_item;
+  }
+
+  return 0;    
+}
+
+/*-----------------------------------------------------------------------
+ * parse_params
  *
  * Given an action's parameters split them up into separate params and
  * return a linked list of the separate parameters.  The parameters are
  * separated by commas, but ignore commas within quotes.
+ *
+ * The routine writes into passed parameter string.
  *
  * called by upsact_parse.
  *
@@ -435,15 +666,15 @@ int upsact_translate_cmd( const char * const cmd_str )
  * Output: pointer to array of arguments
  * Return: number of arguments found
  */
-int upsact_params( char * const a_params, char **argv )
+int parse_params( const char * a_params, char **argv )
 {
-  char *ptr = a_params, *saved_ptr = NULL;
-  char *act_str, *new_ptr;
+  char *ptr = (char *)a_params, *saved_ptr = NULL;
+  char *new_ptr;
   int count = 0;
 
   while ( ptr && *ptr ) {
 
-    if ( count >= MAX_ARGC ) {
+    if ( count >= UPS_MAX_ARGC ) {
       upserr_vplace();
       upserr_add( UPS_TOO_MANY_ACTION_ARG, UPS_FATAL, a_params );
       return 0;
@@ -465,11 +696,8 @@ int upsact_params( char * const a_params, char **argv )
 	
 	/* did not find another quote  - take the end of the line as end of
 	   string and end of param list */
-
-	act_str = upsutl_str_create( ptr, STR_TRIM_DEFAULT );
-	upsutl_str_remove_edges( act_str, WSPACE );
-	argv[count++] = act_str;
-	saved_ptr = NULL;         /* no longer valid, we got the param */
+	
+	saved_ptr = ptr;         /* no longer valid, we got the param */
 	ptr = NULL;               /* all done */
       }
       else {
@@ -484,13 +712,13 @@ int upsact_params( char * const a_params, char **argv )
 
       if ( saved_ptr ) {
 	
-	/* we have a param, add it to the list */
+	/* we have a param, create a new pointer to the string */
+        /* and add it to the list */
 	
-	*ptr = '\0';                /* temporary so only take param */
-	act_str = upsutl_str_create( saved_ptr, STR_TRIM_DEFAULT );
-	upsutl_str_remove_edges( act_str, WSPACE );
-	argv[count++] = act_str;
-	*ptr = COMMA;              /* restore */
+	*ptr = '\0';
+	upsutl_str_remove_edges( saved_ptr, WSPACE );
+	argv[count++] = saved_ptr;
+	
       }
       ++ptr;                       /* go past the comma */
       saved_ptr = ptr;             /* start of param */
@@ -508,79 +736,11 @@ int upsact_params( char * const a_params, char **argv )
   if ( saved_ptr ) {
     
     /* Get the last one too */
-    
-    act_str = upsutl_str_create( saved_ptr, STR_TRIM_DEFAULT );
-    upsutl_str_remove_edges( act_str, WSPACE );
-    argv[count++] = act_str;
+    upsutl_str_remove_edges( saved_ptr, WSPACE );
+    argv[count++] = saved_ptr;
   }
   
   return count;
-}
-
-/*-----------------------------------------------------------------------
- * upsact_parse
- *
- * Given an action return the parameters as a separate string, and an integer
- * corresponding to the action string.  In later routines more strcmp's can
- * be avoided.
- *
- * Input : action line
- * Output: action parameter string, integer action value
- * Return: enum of corresponding action
- */
-int upsact_parse( const char * const a_action_line, t_cmd_cur * const cmd_cur )
-{
-  static char trim_chars[] = " \t\n\r\f)";
-  const char *act_s = a_action_line, *act_e = NULL;
-  char *param_str = NULL;
-  int icmd = e_invalid_cmd;
-  int i;
-  int len;
-
-  /* First split the line to separate the action from the parameters. Locate
-     the first non space character and the first '(' as that will define the
-     action */
-
-  /* get rid of leading spaces */
-  
-  while ( act_s && *act_s && isspace( (int )*(act_s) ) ){ ++act_s; };
-
-  if ( !act_s || !*act_s )
-    return e_invalid_cmd;
-
-  if ( (act_e = strchr( act_s, OPEN_PAREN )) != NULL ) {
-    len = act_e - act_s;
-
-    /* look for action in the supported action array */
-    
-    for ( i = 0; g_cmd_maps[i].cmd; ++i ) {
-      if ( !upsutl_strincmp( act_s, g_cmd_maps[i].cmd, (size_t)len ) ) {
-	
-	/* we found a match. create a new string with these parameters.
-	   note - it does not include an open parenthesis */
-	
-	if ( (param_str = upsutl_str_create( (char *)&act_s[len+1],
-			   STR_TRIM_DEFAULT) ) != NULL ) {
-	    
-	  /* trim off beginning & ending whitespace & the ending ")" */
-	    
-	  upsutl_str_remove_edges( param_str, trim_chars );
-	  icmd = i;                /* save the location in the array */
-	}
-	break;
-      }
-    }
-  }
-
-  /* fill cmd_cur and split parameter string into a list of arguments */
-  
-  if ( icmd != e_invalid_cmd ) {
-    cmd_cur->map = &g_cmd_maps[icmd];
-    cmd_cur->argc = upsact_params( param_str, cmd_cur->argv );
-  }
-  
-    
-  return icmd;
 }
 
 
