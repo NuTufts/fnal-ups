@@ -111,6 +111,54 @@ static t_var_sub g_var_subs[] = {
 /*
  * Definition of public functions.
  */
+char *upsget_allout(const FILE * const stream, 
+                    const t_upstyp_db * const db,
+                    const t_upstyp_matched_instance * const instance,
+                    const t_upsugo_command * const command_line )
+{ char work[80];
+  char *addr;
+  char *name;
+  if (command_line->ugo_shell == e_INVALID_SHELL)
+  { upserr_add(UPS_NOSHELL);
+  } else {
+    get_element(name,product);
+    strcpy(work,name);
+    strcat(work,"_DIR");
+    addr=work;
+    while (*addr) {*addr=toupper((int)*addr);++addr;}
+    if (command_line->ugo_shell == e_BOURNE )
+    { fprintf((FILE *)stream,"UPS_PROD_NAME=%s;export UPS_PROD_NAME\n",name);
+      fprintf((FILE *)stream,"UPS_PROD_VERSION=%s;export UPS_PROD_VERSION\n",
+               upsget_version(db,instance,command_line));
+      fprintf((FILE *)stream,"UPS_PROD_DIR=%s;export UPS_PROD_DIR\n",
+               upsget_prod_dir(db,instance,command_line));
+      fprintf((FILE *)stream,"%s=%s;export %s\n",work,
+               upsget_prod_dir(db,instance,command_line));
+      addr=upsget_verbose(db,instance,command_line);
+      if (addr) 
+      { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr); }
+      addr=upsget_extended(db,instance,command_line);
+      if (addr) 
+      { fprintf((FILE *)stream,"UPS_EXTENDED=%s;export UPS_EXTENDED\n",addr); }
+      fprintf((FILE *)stream,"UPS_THIS_DB=%s;export UPS_THIS_DB\n",
+               upsget_database(db,instance,command_line));
+    } else { 
+      fprintf((FILE *)stream,"setenv UPS_PROD_NAME=%s\n",name);
+      fprintf((FILE *)stream,"setenv UPS_PROD_VERSION=%s\n",
+               upsget_version(db,instance,command_line));
+      fprintf((FILE *)stream,"setenv UPS_PROD_DIR=%s\n",
+               upsget_prod_dir(db,instance,command_line));
+      addr=upsget_verbose(db,instance,command_line);
+      if (addr) 
+      { fprintf((FILE *)stream,"setenv UPS_VERBOSE=%s\n",addr); }
+      addr=upsget_extended(db,instance,command_line);
+      if (addr) 
+      { fprintf((FILE *)stream,"setenv UPS_EXTENDED=%s\n",addr); }
+      fprintf((FILE *)stream,"setenv UPS_THIS_DB=%s\n",
+               upsget_database(db,instance,command_line));
+    }
+  } return 0;
+}
 
 char *upsget_translation( const t_upstyp_matched_product * const product,
                   const t_upsugo_command * const command_line,
@@ -156,6 +204,9 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   }
   if (any)
   { strcat(newstr,upto);
+/* test 
+    upsget_allout(stdout,db_info_ptr,instance,command_line);
+*/
     return newstr;
   } else {
     return 0;
@@ -215,19 +266,18 @@ char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
 { char string[2];
   if (command_line->ugo_v)
   { sprintf(string,"%.1d",command_line->ugo_v);
+    return string;
   } else {
-    sprintf(string,"");
-  } return string;
+    return 0;
+  } 
 }
 char *upsget_extended(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
-{ char string[2];
-  if (command_line->ugo_e)
-  { sprintf(string,"1");
+{ if (command_line->ugo_e)
+  { return("extended");
   } else {
-    sprintf(string,"");
-  } return string;
+  } return 0;
 }
 char *upsget_options(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
