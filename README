@@ -1,0 +1,294 @@
+
+                                 R E A D M E
+
+
+Product Name:           Unix Product Support UPS
+Product Version:        Various
+Date (mm/dd/yyyy):      11/06/1998
+
+------------------------------------------------------------------------
+
+                        ORIGIN
+                        ======
+Product Contact
+
+    User Application Support Group
+    Fermi National Accelerator Laboratory - Mail Station 369
+    P.O Box 500
+    Batavia, IL 60510
+    Internet: ups_support@fnal.gov
+
+Fermilab Standard Government Sponsorship Notice
+
+    This work was performed at Fermi National Accelerator Laboratory,
+    which is operated by Universities Research Association, Inc., under
+    contract DE-AC02-76CHO3000 with the U.S. Department of Energy.
+
+Acknowledgements
+
+    UPS has had a long history at Fermilab.  Many individuals from
+    several groups within the Fermilab Computing Division have
+    assisted in the development of ups.  Among the groups participating
+    in the development from the design phase on are:
+
+        The Computing Division Online Support group (CD/OLS)
+
+        The Computing Division User Applications Support group (CD/UAS)
+
+        The, now defunct, Computing Division ACCESS group.
+                                                             
+
+------------------------------------------------------------------------
+
+                        TERMS AND CONDITIONS
+                        ====================
+
+This software has been made freely available with a request for
+collaborative input subject to standard Fermitools Terms and Conditions
+given in full below.
+
+------------------------------------------------------------------------
+
+                        PRODUCT DESCRIPTION
+                        ===================
+
+UPS (Unix Product Support) is a Fermilab product which in its
+   simplest usage provides a uniform access to entities (products)
+   on all platforms.   
+
+Ups features include support for:
+
+        Multiple concurrent versions of products.
+
+        Products for multiple operating systems and 
+        releases in a single, ups-managed, database.
+
+        Multiple, ups-managed, databases.
+
+        Understanding of the concept of operating system
+        and release.  Product instance selection based 
+        upon OS and release.
+
+        Inter-product dependencies.
+
+        Automatic product startup at boot.
+
+
+Ups provides the following basic command line interfaces:
+
+        setup           Make a product instance available for use by
+                        the current shell.  Perform any 
+                        product specific initialization.
+
+        unsetup         Perform the product specific 
+                        de-initialization.
+
+        ups list        List the available products.
+
+        ups declare     Add product instance to set of ups known
+                        products.
+
+        ups undeclare   Remove a product instance from a set of
+                        ups known products.
+
+        ups modify      Modify the ups known information about
+                        a product instance.
+
+
+Environment Variables
+---------------------
+
+   The following environment variables are expected by all ups commands:
+
+        PRODUCTS        A colon-delimited list of ups databases.
+
+        UPS_SHELL       The shell family (sh or csh).
+
+        UPS_DIR         The path to the ups product itself.
+
+
+Documentation
+-------------
+All documentation for UPS is available at
+
+       http://www.fnal.gov/docs/products/ups/
+
+including the "UPS and UPD v4 Reference Manual" and instructions 
+for installation and configuration.
+
+Product Installation
+--------------------
+Instructions for installing ups can be found at
+
+       http://www.fnal.gov/docs/products/ups/
+
+In particular, in most cases we recommend installing the
+bootstrap_coreFUE package, which includes ups, upd and perl.
+
+
+Recompiling Ups
+---------------
+You will need to recompile ups if the binaries in the ups tar file 
+cannot run on your system (for example, if you are running an operating
+system that we do not support at Fermilab).
+
+To rebuild ups, you should first look at the file
+
+   ${UPS_DIR}/bin/upspremake 
+
+and make any necessary changes/additions for your operating system.  Then,
+make sure you have the UPS_DIR environmental variable set properly and
+invoke "make": 
+
+   % UPS_DIR=/path/to/ups; export UPS_DIR
+   % cd UPS_DIR
+   % make clean
+   % make all
+
+You may also wish to
+
+   % make test
+
+------------------------------------------------------------------------
+
+                        SUPPORT
+                        =======
+
+Help with the installation or use of UPS is available by sending 
+mail to
+
+                     ups_support@fnal.gov
+
+which is auto-forwarded to the group in charge of UPS support at 
+Fermilab.
+
+This software is furnished by Fermilab on an "as is" basis as a service 
+to the wider community with the goal of stimulating collaborative use 
+and further development.
+
+Provision of the software implies no commitment of support by Fermilab.
+
+The Fermilab Computing Division is open to discussing other levels of 
+support for use of the software with responsible and committed users and 
+collaborators.
+
+Use of the software in experiments at Fermilab will be assured of a 
+level of support as agreed to through the standard Memorandum Of 
+Understanding process.
+
+Users may send mail to the mail address given above, with the 
+expectation that it will be read and noted.
+
+
+------------------------------------------------------------------------
+
+                        TERMS AND CONDITIONS IN FULL
+                        ============================
+
+------------------------------------------------------------------------
+    Fermitools Software Legal Information - October 16, 1997
+------------------------------------------------------------------------
+
+COPYRIGHT STATUS:  Fermi National Accelerator Laboratory (FNAL) 
+documents are sponsored by the U.S. Department of Energy under Contract 
+No. DE-AC02-76CH03000. Therefore, the U.S. Government retains a 
+non-exclusive, royalty-free license to publish or reproduce these 
+documents or software for U.S. Government purposes.  All documents 
+and software available from this server are protected under the U.S. 
+and Foreign Copyright Laws, and FNAL reserves all rights.
+
+Terms and Conditions
+--------------------
+When a User distributes or otherwise obtains a software package included 
+in the Fermilab Software Tools Program, the user agrees to abide by the 
+Terms and Conditions of the Program below:
+
+o   Any redistribution of the software shall be accompanied by this
+    README file.
+
+o   The User shall acknowledge the origin of the software as set forth 
+    below:
+
+     "This work was performed at Fermi National Accelerator 
+      Laboratory, operated by Universities Research Association, 
+      Inc., under contract DE-AC02-76CH03000 with the U.S. Department 
+      of Energy."
+
+o   The user is asked to feed back problems, benefits, and/or 
+    suggestions about the software to the Fermilab Software Providers 
+    and/or Fermitools management.
+
+o   Any distribution of the software available from this server shall 
+    be at no charge except for nominal media and distribution costs.  
+    To obtain a license to commercialize any of the software programs 
+    available from this server, contact FNAL's Office of Research and 
+    Technology Applications, P.O. Box 500, MS-200, 
+    Batavia, IL  60510-0500.
+
+
+Indemnification by User of Third Party Claims and Disclaimer of Liability
+-----------------------------------------------------------------------
+The User, his/her directors, officers, employees, and agents hereby 
+release and waive all claims against Universities Research Association, 
+Inc. (URA) operator of Fermi National Accelerator Laboratory, its 
+trustees, overseers, directors, officers, employees, agents, 
+subcontractors, successors and assigns, for any and all liability and 
+damages arising from the reproduction, use or other disposition of the 
+software.  The User shall indemnify URA and the U.S. Government for all 
+damages, costs or expenses, including attorney's fees, arising from the 
+utilization of the software, including, but not limited to, the making, 
+using, selling or exporting of products, processes or services derived 
+from the Software.  The User agrees to indemnify, hold harmless and
+defend URA, its trustees, overseers, directors, officers, employees, 
+agents, subcontractors, successors and assigns, against any and all 
+liability, damage, loss, cost, charge, claim, demand, fee or expense 
+of every nature and kind which may at any time hereafter, be sustained 
+by URA by reason of claims of third parties arising out of alleged acts 
+or omissions of the User in the reproduction, use or other disposition 
+of the Software.  
+
+The User agrees that URA, its trustees, overseers, directors, officers,
+employees, agents, subcontractors, successors and assigns shall not be 
+liable under any claim, charge, or demand, whether in contract, tort, 
+criminal law, or otherwise, for any and all loss, cost, charge, claim,
+demand, fee, expense,or damage of every nature and kind arising out of, 
+connected with, resulting from or sustained as a result of the use of 
+the software programs available from this server.  In no event shall 
+URA be liable for special, direct, indirect or consequential damages, 
+losses, costs, charges, claims, demands, fees or expenses of any nature 
+or kind.
+
+Disclaimer of Warranties
+------------------------
+The software is provided on an "as is" basis only.  URA makes no
+representations, express or implied.  URA MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE, or
+assumes any legal liability or responsibility for the accuracy, 
+completeness, or usefulness of any information, apparatus, product or 
+process disclosed, or represents that the Software will not infringe 
+any privately held patent, copyright, or trademark.  The entire risk 
+as to the results and the performance of this software is assumed by 
+the User.
+
+Disclaimer of Endorsement
+-------------------------
+Reference herein to any specific commercial products, process, or 
+service by tradename, trademark, manufacturer or otherwise, does not 
+constitute or imply its endorsement, recommendation, or favoring by 
+the United States Government, U.S. Department of Energy or URA.  The 
+views and opinions of individuals expressed herein do not necessarily 
+state or reflect those of the United States Government, U.S. Department 
+of Energy or URA and shall not be used for advertising or product 
+endorsement purposes.
+
+Liabilities of the Government
+-----------------------------
+This software is provided by URA, independent from its Prime Contract 
+with the U.S. Department of Energy.  URA is acting independently from 
+the Government and in its own private capacity and is not acting on 
+behalf of the U.S. Government, nor as its contractor nor its agent.  
+Correspondingly, it is understood and agreed that the U.S. Government 
+has no connection to this software and in no manner whatsoever shall be 
+liable for nor assume any responsibility or obligation for any claim, 
+cost, or damages arising out of or resulting from the use of the 
+software available from this server.
