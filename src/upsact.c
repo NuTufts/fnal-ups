@@ -2643,7 +2643,7 @@ static void f_envremove( ACTION_PARAMS)
 	 argument, it could contain some code there has to be executed, which
 	 we don't want to put into the dropit command */
 
-      if (fprintf((FILE *)a_stream, "setenv upstmp %s\n", a_cmd->argv[1] ) < 0) {
+      if (fprintf((FILE *)a_stream, "setenv upstmp \"%s\"\n", a_cmd->argv[1] ) < 0) {
 	FPRINTF_ERROR();
       }
 
@@ -3090,7 +3090,7 @@ static void f_pathremove( ACTION_PARAMS)
 	 it could contain some code there has to be executed, which we don't
 	 want to put into the dropit command */
 
-      if (fprintf((FILE *)a_stream, "setenv upstmp %s\n", a_cmd->argv[1] ) < 0) {
+      if (fprintf((FILE *)a_stream, "setenv upstmp \"%s\"\n", a_cmd->argv[1] ) < 0) {
 	FPRINTF_ERROR();
       }
 
