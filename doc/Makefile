@@ -22,6 +22,5 @@ help_file :
 # Now standard targets
 #
 spotless clean :
-	@ rm ups_help.dat
 	@ upsClean
 
