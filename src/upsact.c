@@ -1065,7 +1065,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
   return act_item;
 }
 
-t_upstyp_action *new_default_action( const char *act_name, int iact )
+t_upstyp_action *new_default_action( const char *act_name, const int iact )
 {
   t_upstyp_action *new_act = 0;
 
