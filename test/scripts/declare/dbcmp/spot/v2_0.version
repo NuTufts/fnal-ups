@@ -14,3 +14,4 @@ QUALIFIERS = ""
   UPS_DIR = ups
   TABLE_DIR = ups
   TABLE_FILE = spot.table
+  ARCHIVE_FILE = ${UPS_DIR}/test/scripts/declare/products/spot/archive.file

@@ -7,6 +7,8 @@ rm -rf $PRODUCTS
 cp -r $UPS_DIR/test/scripts/undeclare/dbcmp $PRODUCTS
 rm -rf $UPS_DIR/test/scripts/undeclare/products/spot
 mkdir $UPS_DIR/test/scripts/undeclare/products/spot 
+# note: in declare archive_file..
+touch $UPS_DIR/test/scripts/declare/products/spot/archive.file
 cd $UPS_DIR/test/scripts/undeclare/log
 $UPS_DIR/test/ups_test << EOD
 #
