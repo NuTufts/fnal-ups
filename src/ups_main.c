@@ -142,7 +142,8 @@ int main(int argc, char *argv[])
 	    /* See if we can open the file (rw) to write to. */
 	    old_umask = umask(g_umask);
 
-	    if ((temp_file = fopen(g_temp_file_name,"w")) == NULL) {
+	    if ((temp_file = fopen(g_temp_file_name,"w")) == NULL)
+	    {
 	      /* error in open */
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fopen",
 			 strerror(errno));
@@ -274,7 +275,7 @@ int main(int argc, char *argv[])
      its name if necessary.  Also flush the journal files. */
   {
     int tstatus;
-    tstatus = upsutl_finish_up(temp_file, temp_shell, i, g_simulate);
+    tstatus = upsutl_finish_up(temp_file, temp_shell, ((need_help == 0) ? i : e_help), g_simulate);
     rstatus = rstatus ? rstatus : tstatus;
   }
 
