@@ -35,12 +35,12 @@ CFLAGScia = $(INCDIRS)
 #
 #
 OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.o \
-	  ups_files.o ups_ugo.o ups_match.o
+	  ups_files.o ups_ugo.o ups_match.o ups_action.o
 
 COMMAND_OBJECTS = ups_c_list.o
 
 CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a ups_types.a \
-	     ups_files.a ups_ugo.a ups_match.a ups_c_list.a
+	     ups_files.a ups_ugo.a ups_match.a ups_c_list.a ups_action.a
 
 LDFLAGS = $(LLIBS)
 
@@ -83,16 +83,6 @@ $(LIB)/libups.a : $(OBJECTS) $(COMMAND_OBJECTS)
 	@echo
 
 #
-# Main programs.
-#
-
-$(BIN)/Setup :  setupMain.c $(LIB)/libups.a
-	$(CC) -o $@ $(CFLAGS) $(CCCHK) setupMain.c $(LDFLAGS)
-
-$(BIN)/Unsetup :  unsetupMain.c $(LIB)/libups.a
-	$(CC) -o $@ $(CFLAGS) $(CCCHK) unsetupMain.c $(LDFLAGS)
-
-#
 # Now standard targets
 #
 clean :
@@ -125,6 +115,15 @@ make :
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
 # src DIRECTORY TO GENERATE IT
 #START_DEPEND
+ups_action.o:	ups_action.c
+ups_action.o:	$(ERUPT_DIR)/inc/ups_action.h
+ups_action.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_action.o:	$(ERUPT_DIR)/inc/ups_utils.h
+ups_action.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_action.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_action.o:	$(ERUPT_DIR)/inc/ups_memory.h
 ups_c_list.o:	ups_c_list.c
 ups_c_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_c_list.o:	$(ERUPT_DIR)/inc/ups_memory.h
@@ -199,11 +198,3 @@ ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_memory.h
-upsugo.o:	upsugo.c
-upsugo.o:	$(ERUPT_DIR)/inc/ups_types.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_list.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_error.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_memory.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_utils.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_types.h
-upsugo.o:	$(ERUPT_DIR)/inc/ups_list.h
