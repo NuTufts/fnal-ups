@@ -43,4 +43,6 @@ ups copy command now uses -G in order to pass options to the declare.  -O is
 no longer used.
 <li>
 The 'ups create' command had been removed.
+<li>
+Added qualifier information to the error message that is output when an instance does exist.
 </ul>
