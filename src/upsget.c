@@ -245,8 +245,13 @@ void upsget_allout(const FILE * const stream,
                pdefault, upsget_version(db,instance,command_line));
     (void) fprintf((FILE *)stream,"%sUPS_PROD_DIR=\"%s\";export UPS_PROD_DIR\n",
                pdefault, upsget_prod_dir(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%sUPS_UPS_DIR=\"%s\";export UPS_UPS_DIR\n",
-               pdefault, upsget_ups_dir(db,instance,command_line));
+    addr=upsget_ups_dir(db,instance,command_line);
+    if (strlen(addr))
+    { (void) fprintf((FILE *)stream,"%sUPS_UPS_DIR=\"%s\";export UPS_UPS_DIR\n",
+                 pdefault, addr);
+    } else {
+      (void) fprintf((FILE *)stream,"%sunset UPS_UPS_DIR\n", pdefault);
+    }
     addr=upsget_verbose(db,instance,command_line);
     if (strlen(addr)) 
     { (void) fprintf((FILE *)stream,"%sUPS_VERBOSE=%s;export UPS_VERBOSE\n",
@@ -283,8 +288,12 @@ void upsget_allout(const FILE * const stream,
                upsget_version(db,instance,command_line));
     (void) fprintf((FILE *)stream,"%ssetenv UPS_PROD_DIR \"%s\"\n",pdefault,
                upsget_prod_dir(db,instance,command_line));
-    (void) fprintf((FILE *)stream,"%ssetenv UPS_UPS_DIR \"%s\"\n",pdefault,
-               upsget_ups_dir(db,instance,command_line));
+    addr=upsget_ups_dir(db,instance,command_line);
+    if (strlen(addr))
+    { (void) fprintf((FILE *)stream,"%ssetenv UPS_UPS_DIR \"%s\"\n",pdefault,addr);
+    } else {
+    (void) fprintf((FILE *)stream,"%sunsetenv UPS_UPS_DIR\n",pdefault);
+    }
     addr=upsget_verbose(db,instance,command_line);
     if (strlen(addr))
     { (void) fprintf((FILE *)stream,"%ssetenv UPS_VERBOSE %s\n",pdefault,addr);
