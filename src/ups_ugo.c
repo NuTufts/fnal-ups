@@ -853,10 +853,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'t');
+                  addr=upsutl_str_create(addr,'p');
                   uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                 }
-                addr=upsutl_str_create(*argbuf,'t');
+                addr=upsutl_str_create(*argbuf,'p');
                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                 *argbuf = 0;
                 break;
@@ -866,14 +866,15 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                  { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "g" );
                    break;
                  }
+                 addr=arg_str; /* in case no commas ... */
                  while((loc=strchr(arg_str,','))!=0) {
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=upsutl_str_create(addr,'t');
+                    addr=upsutl_str_create(addr,'p');
 		    uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  }
-                    addr=upsutl_str_create(addr,'t');
+                 addr=upsutl_str_create(addr,'p');
                  uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  break;
                }
@@ -886,10 +887,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'t');
+                  addr=upsutl_str_create(addr,'p');
                   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                 }
-                addr=upsutl_str_create(*argbuf,'t');
+                addr=upsutl_str_create(*argbuf,'p');
                 uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                 *argbuf = 0;
                 break;
@@ -903,10 +904,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=upsutl_str_create(addr,'t');
+                    addr=upsutl_str_create(addr,'p');
 		    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                  }
-                    addr=upsutl_str_create(arg_str,'t');
+                    addr=upsutl_str_create(arg_str,'p');
                  uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                  break;
                }
@@ -919,10 +920,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'t');
+                  addr=upsutl_str_create(addr,'p');
                   uc->ugo_host = upslst_add(uc->ugo_host,addr);
                 }
-                addr=upsutl_str_create(*argbuf,'t');
+                addr=upsutl_str_create(*argbuf,'p');
                 uc->ugo_host = upslst_add(uc->ugo_host,addr);
                 *argbuf = 0;
                 break;
@@ -936,10 +937,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=upsutl_str_create(addr,'t');
+                    addr=upsutl_str_create(addr,'p');
 		    uc->ugo_host = upslst_add(uc->ugo_host,addr);
                  }
-                 addr=upsutl_str_create(arg_str,'t');
+                 addr=upsutl_str_create(arg_str,'p');
                  uc->ugo_host = upslst_add(uc->ugo_host,addr);
                  break;
                }
@@ -952,10 +953,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'t');
+                  addr=upsutl_str_create(addr,'p');
                   uc->ugo_key = upslst_add(uc->ugo_key,addr);
                 }
-                addr=upsutl_str_create(*argbuf,'t');
+                addr=upsutl_str_create(*argbuf,'p');
                 uc->ugo_key = upslst_add(uc->ugo_key,addr);
                 *argbuf = 0;
                 break;
@@ -969,10 +970,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=upsutl_str_create(addr,'t');
+                    addr=upsutl_str_create(addr,'p');
 		    uc->ugo_key = upslst_add(uc->ugo_key,addr);
                  }
-                    addr=upsutl_str_create(arg_str,'t');
+                    addr=upsutl_str_create(arg_str,'p');
                  uc->ugo_key = upslst_add(uc->ugo_key,addr);
                  break;
                }
@@ -981,7 +982,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'm':
               uc->ugo_m = 1;
               if ( *argbuf ) 
-              {  uc->ugo_tablefiledir = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_tablefiledir = addr;
                  *argbuf = 0;
                  break;
               }
@@ -998,7 +1000,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'M':
               uc->ugo_M = 1;
               if ( *argbuf ) 
-              {  uc->ugo_tablefile = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_tablefile = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1015,7 +1018,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'N':
               uc->ugo_N = 1;
               if ( *argbuf ) 
-              {  uc->ugo_anyfile = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_anyfile = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1032,7 +1036,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'O':
               uc->ugo_O = 1;
               if ( *argbuf ) 
-              {  uc->ugo_options = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_options = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1049,7 +1054,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'p':
               uc->ugo_p = 1;
               if ( *argbuf ) 
-              {  uc->ugo_description = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'t');
+                 uc->ugo_description = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1058,7 +1064,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                 { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "p" );
                   break;
                 }
-		uc->ugo_description = arg_str;
+                addr=upsutl_str_create(arg_str,'t');
+		uc->ugo_description = addr;
                 break;
               }
               errflg = 1;
@@ -1066,7 +1073,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'P':
               uc->ugo_P = 1;
               if ( *argbuf ) 
-              {  uc->ugo_override = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_override = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1084,23 +1092,11 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
               uc->ugo_q = 1;
               if ( *argbuf ) 
               { test=upsugo_bldqual(uc,*argbuf); *argbuf=0; break; }
-/*
-              { addr=upsutl_str_create(*argbuf,'t');
-                uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-                *argbuf = 0;
-                break;
-               }
-*/
                if((arg_str = upsugo_getarg(ups_argc,ups_argv,argbuf)) != 0)
                { if(*arg_str == '-')
                  { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, "q" );
                    break;
                  }
-/*
-                 addr=upsutl_str_create(arg_str,'t');
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
-                 break;
-*/
                  test=upsugo_bldqual(uc,arg_str); break;
                }
                errflg = 1;
@@ -1108,7 +1104,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'r':
               uc->ugo_r = 1;
               if ( *argbuf ) 
-              {  uc->ugo_productdir = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_productdir = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1125,7 +1122,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'T':
               uc->ugo_T = 1;
               if ( *argbuf ) 
-              {  uc->ugo_archivefile = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_archivefile = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1142,7 +1140,8 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
          case 'U':
               uc->ugo_U = 1;
               if ( *argbuf ) 
-              {  uc->ugo_upsdir = *argbuf;
+              {  addr=upsutl_str_create(*argbuf,'p');
+                 uc->ugo_upsdir = addr;
                  *argbuf = 0;
                  break;
               }
@@ -1163,10 +1162,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'t');
+                  addr=upsutl_str_create(addr,'p');
                   uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                 }
-                addr=upsutl_str_create(*argbuf,'t');
+                addr=upsutl_str_create(*argbuf,'p');
                 uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                 *argbuf = 0;
                 break;
@@ -1180,10 +1179,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=upsutl_str_create(addr,'t');
+                    addr=upsutl_str_create(addr,'p');
 		    uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                  }
-                    addr=upsutl_str_create(arg_str,'t');
+                    addr=upsutl_str_create(arg_str,'p');
                  uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                  break;
                }
@@ -1196,10 +1195,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                   addr=*argbuf; 
                   *argbuf=loc+1;
                   *loc = 0;		/* replace "," terminate the string */
-                  addr=upsutl_str_create(addr,'t');
+                  addr=upsutl_str_create(addr,'p');
                   uc->ugo_db = upslst_add(uc->ugo_db,addr);
                 }
-                addr=upsutl_str_create(*argbuf,'t');
+                addr=upsutl_str_create(*argbuf,'p');
                 uc->ugo_db = upslst_add(uc->ugo_db,addr);
                 *argbuf = 0;
                 break;
@@ -1213,10 +1212,10 @@ t_ups_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const vali
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
-                    addr=upsutl_str_create(addr,'t');
+                    addr=upsutl_str_create(addr,'p');
 		    uc->ugo_db = upslst_add(uc->ugo_db,addr);
                  }
-                    addr=upsutl_str_create(arg_str,'t');
+                    addr=upsutl_str_create(arg_str,'p');
                  uc->ugo_db = upslst_add(uc->ugo_db,addr);
                  break;
                }
