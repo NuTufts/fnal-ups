@@ -92,6 +92,6 @@ while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
           (void) upsugo_free(uc); 
         }
         uc=0;
-	exit(status);
+	return status;
 
 }
