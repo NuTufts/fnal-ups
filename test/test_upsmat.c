@@ -141,9 +141,9 @@ static void test_match(int argc, char *argv[])
 	mproduct = (t_upstyp_match_product *)mproduct_item->data;
 	printf("\nChain Instances:\n");
 	print_inst(mproduct->chain_list);
-	printf("\nVersion Instances:\n");
+	printf("Version Instances:\n");
 	print_inst(mproduct->version_list);
-	printf("\nTable Instances:\n");
+	printf("Table Instances:\n");
 	print_inst(mproduct->table_list);
       }
     } else {
