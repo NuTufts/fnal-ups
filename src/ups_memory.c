@@ -44,7 +44,7 @@ typedef struct upsmem_header {
 } t_upsmem_header;
 
 /* linked list of allocated memory blocks */
-static t_ups_list_item *g_memory_list = 0;
+static t_upslst_item *g_memory_list = 0;
 
 /*
  * Declaration of private functions.
@@ -87,9 +87,9 @@ void *upsmem_malloc(const int a_bytes)
       /* Add the memory to the linked list of stuff */
       if (g_memory_list == 0) {
 	/* First time through - create the list */
-	g_memory_list = ups_list_new((void *)memory);
+	g_memory_list = upslst_new((void *)memory);
       } else {
-	g_memory_list = ups_list_insert(g_memory_list, (void *)memory);
+	g_memory_list = upslst_insert(g_memory_list, (void *)memory);
       }
 
       /* Now make sure there was not an error mallocing the list element */
@@ -125,7 +125,7 @@ void upsmem_free(void *a_data)
        nothing */
     if (memory->reference_counter <= 0) {
       /* okay, remove this item from the list and free it */
-      g_memory_list = ups_list_delete(g_memory_list, (void *)memory, ' ');
+      g_memory_list = upslst_delete(g_memory_list, (void *)memory, ' ');
       free(memory);
       a_data = 0;
     }
@@ -193,7 +193,7 @@ void upsmem_dec_refctr(const void * const a_data)
 void upsmem_print(void)
 {
   int i;
-  t_ups_list_item *tempItem = 0;
+  t_upslst_item *tempItem = 0;
   t_upsmem_header *memItem;
 
   tempItem = g_memory_list;
@@ -226,7 +226,7 @@ void upsmem_print(void)
  */
 static t_upsmem_header *find_saved_data(const void * const a_data)
 {
-  t_ups_list_item *list_item;
+  t_upslst_item *list_item;
   t_upsmem_header *data_item;
   t_upsmem_header *data_header = 0;
 
