@@ -782,8 +782,8 @@ int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *
 	char		*temp;
 	char	*string;
 
-        string = (char *) malloc(sizeof(char *));
-        string = ",";
+        string = (char *) malloc(sizeof(char) + 1);
+        string[0] = ','; string[1] = '\0';
 
 	lcv_old = lcv_new = 0;
 
@@ -948,7 +948,7 @@ int upsugo_dump (struct ups_command * const uc,
       if ( uc->ugo_chain ) 
          upsugo_prtlst(uc->ugo_chain,"Chains:           ",prnt_ptr); 
       if ( uc->ugo_help )
-         printf("--- HELP !!! ---\n",uc->ugo_help); 
+         printf("--- HELP !!! ---\n"); 
       printf("ugo_v %d and UPS_VERBOSE %d\n",uc->ugo_v,UPS_VERBOSE); 
     } return (0);
 }
