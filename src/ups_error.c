@@ -61,6 +61,7 @@ static char *g_error_messages[] = {
   "%s: File name and path too long, must be less than %d bytes.\n",
   "%s: No statistics directory specified.\n",
   "%s: Unable to write file %s.\n"
+  "%s: Invalid argument specified \"%s\"\n"
 };
 
 static int g_buf_counter = G_ERROR_INIT;   /* pointer to current message */
