@@ -34,7 +34,7 @@ CFLAGScia = $(INCDIRS)
 
 #
 #
-OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.c
+OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.o
 
 CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a ups_types.a
 
@@ -129,6 +129,8 @@ ups_types.o:    $(ERUPT_DIR)/inc/ups_memory.h
 ups_utils.o:	ups_utils.c
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_utils.h
 ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
+ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
 upsugo_utils.o:	upsugo_utils.c
 upsugo_utils.o:	./../inc/ups_types.h
 upsugo_utils.o:	./../inc/ups_list.h
