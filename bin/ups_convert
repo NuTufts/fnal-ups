@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 #!/usr/local/bin/perl
 #
 # Known problems:
@@ -48,13 +49,7 @@
 #   actions base on that version and the last flavor.
 
 
-use Getopt::Std;
-
-#  Define valid options (only the option 'f' takes an argument)
-$validOptions = "vf:";
-
 $errorMsg = "Error:";
-$usage = "USAGE:\ups_convert [-v -f <flavor>] <releaseName> [releaseVersion]\n";
 
 # Get the UPS database we will be using
 $dbs = $ENV{'OLD_PRODUCTS'};
@@ -74,13 +69,6 @@ if (! "$ndbs") {
 # Separate out all individual databases.
 @dbs = split(/ /, $dbs);
 
-# Parse through any command line parameters.  Invalid syntax if user specified
-#  an invlid parameter or did not specify a releaseName.
-if (! getopts("$validOptions")) {
-  print "$errorMsg Invalid syntax. $usage";
-  exit 1;
-}
-print $opt_f;
 $GetoptName = $ARGV[0];
 if (! "$ARGV[0]") { $GetoptName = "*"; }
 $releaseVersion = $ARGV[1];
@@ -109,8 +97,6 @@ $opt_v=1;
 NEXTDB:
 
 foreach $db (@dbs) {
-#   print (glob ( "$db/$GetoptName" ));
-#   print <$db/$GetoptName>;
 #   @files = glob ( "$db/$GetoptName" );
 # I don't see another answer around a glob link problem
 #   @files = <$db/$GetoptName>;
@@ -751,35 +737,51 @@ sub add_misactions {
     if ($tud) { $uud=$tud; } else { $uud="${basedir}/ups"; }
     if (checkfor("${uud}/tailor")) {
        $value.="   Action=Tailor\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/tailor,UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     if (checkfor("${uud}/tailor.sh}")) {
        $value.="   Action=Tailor\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/tailor.\${UPS_SHELL},UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     if (checkfor("${uud}/configure")) {
        $value.="   Action=Configure\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/configure,UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     if (checkfor("${uud}/configure.sh")) {
        $value.="   Action=Configure\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/configure.\${UPS_SHELL},UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     if (checkfor("${uud}/unconfigure")) {
        $value.="   Action=unConfigure\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/unconfigure,UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     if (checkfor("${uud}/unconfigure.sh")) {
        $value.="   Action=unConfigure\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/unconfigure.\${UPS_SHELL},UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     if (checkfor("${uud}/start")) {
        $value.="   Action=start\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/start,UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     if (checkfor("${uud}/stop")) {
        $value.="   Action=stop\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/stop,UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
 # This is REAL BS ...
 # If there is a current put it out and check again for configure
@@ -789,26 +791,34 @@ sub add_misactions {
 # they might see an action=current execute configure
     if (checkfor("${uud}/current")) {
        $value.="   Action=Current\n";
-       $value.="      execute(\${UPS_UPS_DIR}/current,UPS_ENV)\n";
+       $value.="      ProdDir()\n";
        if (checkfor("${uud}/configure")) {
           $value.="      execute(\${UPS_UPS_DIR}/configure,UPS_ENV)\n";
        }
        if (checkfor("${uud}/configure.sh")) {
           $value.="      execute(\${UPS_UPS_DIR}/configure.\${UPS_SHELL},UPS_ENV)\n";
        }
+       $value.="      execute(\${UPS_UPS_DIR}/current,UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     } else {
        if (checkfor("${uud}/configure")) {
           $value.="   Action=Current\n";
+          $value.="      ProdDir()\n";
           $value.="      execute(\${UPS_UPS_DIR}/configure,UPS_ENV)\n";
+          $value.="      UnProdDir()\n";
        }
        if (checkfor("${uud}/configure.sh")) {
           $value.="   Action=Current\n";
+          $value.="      ProdDir()\n";
           $value.="      execute(\${UPS_UPS_DIR}/configure.\${UPS_SHELL},UPS_ENV)\n";
+          $value.="      UnProdDir()\n";
        }
     }
     if (checkfor("${uud}/uncurrent")) {
        $value.="   Action=unCurrent\n";
+       $value.="      ProdDir()\n";
        $value.="      execute(\${UPS_UPS_DIR}/uncurrent,UPS_ENV)\n";
+       $value.="      UnProdDir()\n";
     }
     return $value
 }

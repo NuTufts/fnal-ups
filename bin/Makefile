@@ -8,7 +8,7 @@ SHELL = /bin/sh
 #=============================================================================
 
 default:	
-	@echo Please invoke this makefile using premake. >&2
+	@echo Please invoke this makefile using upspremake. >&2
 	@exit 1
 
 all :
@@ -22,5 +22,6 @@ clean :
 
 spotless :
 	@upsClean
-	@/bin/rm -f ups
+	@/bin/rm -f up
+
 
