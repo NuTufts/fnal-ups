@@ -22,6 +22,8 @@ clean :
 
 spotless :
 	@upsClean
-	@/bin/rm -f up
+	@/bin/rm -f ups
+	@/bin/rm -f dropit
+	@/bin/rm -f funame
 
 
