@@ -139,8 +139,8 @@ ups_append_release(char *buf)
      if(0 != tpoint)
        (void)strcpy(baseuname.release, tpoint+1);
    }
-#if defined(__GLIBC_PREREQ)			
-#if __GLIBC_PREREQ(2,0)				/* on linux, need glibc ver */
+#if defined(__GLIBC__) && defined(__GLIBC_MINOR__)
+#if __GLIBC__ * 10 + __GLIBC_MINOR__ > 20
     {
       char *tpoint;
       extern char *gnu_get_libc_version(void);
