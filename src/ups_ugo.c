@@ -351,9 +351,18 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
       { naddr=upsutl_str_crecat(addr,",");
         naddr=upsutl_str_crecat(naddr,waddr);
       } else { 
-        naddr=waddr;
+/*        naddr=waddr; 
       }
-      test=upsutl_str_sort(naddr,',');
+*/
+/* if there is optionals with no required last one but be "" */
+        if ( waddr != 0 ) 
+          { naddr=waddr;
+          } else { 
+/*            naddr=upsutl_str_create(" ",'p'); */
+            naddr=addr; /* should be a null string yes? */
+          }
+      }
+      test=upsutl_str_sort(naddr,','); 
       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
     }
  }
