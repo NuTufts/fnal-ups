@@ -83,18 +83,18 @@ BootStrap_Dir=$Ups_DB_Path/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FL
 # Make an advanced shell for the products initialization script,
 # if we can.
 #
-if [ -x /bin/bash ]
+if [ -x /usr/bin/ksh ]
 then
-    Name_Of_Sh=/bin/bash
-elif [ -x /usr/bin/bash ]
-then
-    Name_Of_Sh=/usr/bin/bash
+    Name_Of_Sh=/usr/bin/ksh
 elif [ -x /bin/ksh ]
 then
     Name_Of_Sh=/bin/ksh
-elif [ -x /usr/bin/ksh ]
+elif [ -x /usr/bin/bash ]
 then
-    Name_Of_Sh=/usr/bin/ksh
+    Name_Of_Sh=/usr/bin/bash
+elif [ -x /bin/bash ]
+then
+    Name_Of_Sh=/bin/bash
 else
     Name_Of_Sh=/bin/sh
 fi
@@ -108,8 +108,8 @@ fi
 if [ x${Setups_Home:-} = x ]
 then
     echo '**' $Setups_Flag not defined in $Ups_DB_Path/.upsfiles/dbconfig
-    echo '**' Using /usr/local/etc
-    Setups_Home=/usr/local/etc
+    echo '**' Using /fnal/ups/etc
+    Setups_Home=/fnal/ups/etc
 else
     echo '**' $Setups_Flag defined as $Setups_Home in 
     echo '**' $Ups_DB_Path/.upsfiles/dbconfig
@@ -140,7 +140,7 @@ fi
 rm -f $BootStrap_Dir/*
 if [ -x /usr/local/bin/funame ] 
 then
-    echo '**' WARNING: /usr/local/bin/funame exixts.
+    echo '**' WARNING: /usr/local/bin/funame exists.
     echo '**           Please remove this file before declaring ups current'
     echo '**           It has the same name as a file in ups.'
 fi
@@ -232,9 +232,9 @@ Setups_Products_Init_Default="$Setups_Products_Init_Default"
 
 # =====  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE  =====
 
-Setups_Is_Current_Flag=0
+Setups_Current=0
 
-if [ \$Setups_Is_Current_Flag = 0 ]
+if [ \$Setups_Current = 0 ]
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -366,9 +366,9 @@ set BootStrap_Dir=$BootStrap_Dir
 # =====  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE =====
 
 
-set Setups_Is_Current_Flag=0
+set Setups_Current=0
 
-if ( \$Setups_Is_Current_Flag == 0 ) then
+if ( \$Setups_Current == 0 ) then
     set Setups_Home=\$BootStrap_Dir
 endif
 
@@ -430,8 +430,8 @@ endif
 if ( ! \$?UPS_DIR ) then
     if ( -x \$Setups_Home/${Script_Prefix}.common ) then
 	eval \`\$Setups_Home/${Script_Prefix}.common\`
-    else if ( -x /usr/local/etc/${Script_Prefix}.common ) then
-	eval \`/usr/local/etc/${Script_Prefix}.common\`
+#    else if ( -x /usr/local/etc/${Script_Prefix}.common ) then
+#	eval \`/usr/local/etc/${Script_Prefix}.common\`
     endif
 endif
 #
@@ -465,12 +465,15 @@ endif
 #
 unset NODE
 unset node
+unset BootStrap_Dir
+unset Setups_Current
 
 unset mach
+unset fl
 unset Flavor
 unset Setups_Home
 unset Name_Of_Ups
-unsetenv $Setups_Home
+unsetenv Setups_Home
 XEoF
 fi
 #
@@ -558,9 +561,9 @@ fi
 
 export Setups_Home
 
-Setups_Is_Current_Flag=0
+Setups_Current=0
 
-if [ \$Setups_Is_Current_Flag = 0 ]
+if [ \$Setups_Current = 0 ]
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -653,9 +656,9 @@ then
     if [ -x \$Setups_Home/${Script_Prefix}.common ]
     then
         eval \`(unset ENV;\$Setups_Home/${Script_Prefix}.common sh)\`
-    elif [ -x /usr/local/etc/${Script_Prefix}.common ]
-    then
-        eval \`(unset ENV;/usr/local/etc/${Script_Prefix}.common sh)\`
+#    elif [ -x /usr/local/etc/${Script_Prefix}.common ]
+#   then
+#       eval \`(unset ENV;/usr/local/etc/${Script_Prefix}.common sh)\`
     fi
 fi
 if [ x\${UPS_DIR:-} != x ]
@@ -688,6 +691,9 @@ fi
 # variables.
 #
 unset Node
+unset BootStrap_Dir
+unset Setups_Current
+unset fl
 unset Flavor
 unset Setups_Home
 unset BootStrap_Dir
@@ -752,9 +758,9 @@ Setup_List=${Ups_DB_Path}/.upsfiles/${Start_Or_Stop}
 
 # ===== DO NOT EDIT BELOW THIS LINE  ====  DO NOT REMOVE THIS LINE ====
 
-Setups_Is_Current_Flag=0
+Setups_Current=0
 
-if [ \$Setups_Is_Current_Flag = 0 ]
+if [ \$Setups_Current = 0 ]
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -762,12 +768,18 @@ fi
 # 
 # set the appropriate environmental variables for root 
 # 
-if [ ! -f /usr/local/etc/setpath.sh ]
+#if [ ! -f /usr/local/etc/setpath.sh ]
+#then
+#    PATH=\${PATH}:/usr/local/bin; export PATH 
+#else 
+#    . /usr/local/etc/setpath.sh 
+#fi 
+if [ x\${PATH:-} != x ]
 then
-    PATH=\${PATH}:/usr/local/bin; export PATH 
-else 
-    . /usr/local/etc/setpath.sh 
-fi 
+    PATH=\$PATH:/bin:/usr/bin
+else
+    PATH=/bin:/usr/bin
+fi
 if [ ! -f \$Setups_Home/\${Script_Prefix}.sh ]
 then
     echo '****' \$Name_Of_Ups initialization file 
@@ -924,9 +936,9 @@ Product_String="$Setups_Products_Init_Default"
 #
 # === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
 
-Setups_Is_Current_Flag=0
+Setups_Current=0
 
-if [ \$Setups_Is_Current_Flag = 0 ]
+if [ \$Setups_Current = 0 ]
 then
     Setups_Home=\$BootStrap_Dir
 fi
@@ -938,9 +950,9 @@ Node=\`uname -n|cut -f1 -d'.'\`
 if [ -r \$Setups_Home_Dir/\$Setups_Product_Init_File ]
 then
 	Product_String=\`cat \$Setups_Home_Dir/\$Setups_Product_Init_File|grep -v '^#'\`
-elif [ -r /usr/local/etc/\$Setups_Product_Init_File ]
-then
-	Product_String=\`cat /usr/local/etc/\$Setups_Product_Init_File|grep -v '^#'\`
+#elif [ -r /usr/local/etc/\$Setups_Product_Init_File ]
+#then
+#	Product_String=\`cat /usr/local/etc/\$Setups_Product_Init_File|grep -v '^#'\`
 fi
 #
 # Determine a likely flavor to search for.  The actual search 
@@ -1183,8 +1195,8 @@ fi
 #
 rm -f \$BootStrap_Dir/zzzzzzzzzz
 cat << EoFed >\$BootStrap_Dir/zzzzzzzzzz
-/Setups_Is_Current/
-s/Setups_Is_Current_Flag=0/Setups_Is_Current_Flag=1/
+/Setups_Current/
+s/Setups_Current=0/Setups_Current=1/
 w
 q
 EoFed
@@ -1198,11 +1210,11 @@ rm -f \$BootStrap_Dir/zzzzzzzzzz
 # /usr/local/etc.  Just in case everything else
 # fails
 #
-if [ -w /usr/local/etc ]
-then
-    echo '**' Copying ${Script_Prefix}.common to /usr/local/etc
-    cp \$BootStrap_Dir/${Script_Prefix}.common /usr/local/etc
-fi
+#if [ -w /usr/local/etc ]
+#then
+#    echo '**' Copying ${Script_Prefix}.common to /usr/local/etc
+#    cp \$BootStrap_Dir/${Script_Prefix}.common /usr/local/etc
+#fi
 #
 # Move all the files from the bootstrap directory to 
 # $Setups_Home.
@@ -1234,6 +1246,7 @@ fi
 		echo '****' \$BootStrap_Dir/\$file to 
 		echo '****' \$Setups_Home
 	    fi
+	    chmod +x \$Setups_Home/\$file
 	else
 	    echo '**' \$file identical to \$Setups_Home/\$file - not copied.
         fi
@@ -1264,11 +1277,12 @@ do
     	    cp \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}
             cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.sh       
             cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.csh
-
+	    chmod +x \$Startup_Home/\${Start_Or_Stop}/ups_*
 	else
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}.sh 
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}.csh 
+	    chmod +x \$Startup_Home/ups_*
 	fi     
    fi
 done
@@ -1331,9 +1345,9 @@ Setups_Home=$Setups_Home
 
 # ===  DO NOT EDIT BELOW THIS LINE  =====  DO NOT REMOVE THIS LINE  =====
 
-Setups_Is_Current_Flag=0
+Setups_Current=0
 
-if [ \$Setups_Is_Current_Flag = 0 ]
+if [ \$Setups_Current = 0 ]
 then
     echo '****' \$Name_Of_Ups \$UPS_PROD_VERSION \$UPS_PROD_FLAVOR
     echo '****' is not current.
