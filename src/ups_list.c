@@ -204,7 +204,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define defaults(INSTANCE) \
-{   printf("\tVersion=%s", instance->INSTANCE->version);            \
+{   printf("\tVersion=%s",                                          \
+           (instance->INSTANCE->version ? instance->INSTANCE->version : "")); \
     printf("\tFlavor=%s\n", instance->INSTANCE->flavor);            \
     if (instance->INSTANCE->qualifiers)                             \
     { if(strlen(instance->INSTANCE->qualifiers))                    \
