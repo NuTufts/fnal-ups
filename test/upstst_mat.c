@@ -168,15 +168,17 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
          }
       if (inst->version)
          {
-         printf("V:PRODUCT=%15s, VERSION=%10s, ", inst->version->product,
-             inst->version->version);
+         printf("V:PRODUCT=%15s, VERSION=%10s, ", 
+		inst->version->product ? inst->version->product : "(null)" ,
+		inst->version->version ? inst->version->version : "(null)" );
          printf("FLAVOR=%12s, QUALIFIERS=%s\n", inst->version->flavor,
              inst->version->qualifiers);
          }
       if (inst->table)
          {
-         printf("T:PRODUCT=%15s, VERSION=%10s, ", inst->table->product,
-             inst->table->version?inst->table->version:"(null)");
+         printf("T:PRODUCT=%15s, VERSION=%10s, ", 
+		inst->table->product ? inst->table->product : "(null)",
+		inst->table->version ? inst->table->version : "(null)");
          printf("FLAVOR=%12s, QUALIFIERS=%s\n", inst->table->flavor,
              inst->table->qualifiers);
          }
