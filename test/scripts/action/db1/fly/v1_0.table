@@ -6,10 +6,7 @@ QUALIFIERS = ""
 INFO_FILES = ${UPS_DIR}/test/scripts/action/info
 HTML_FILES = ${UPS_DIR}/test/scripts/action/html
 MAN_FILES = ${UPS_DIR}/test/scripts/action
-CATMAN_FILES = ${UPS_DIR}/test/scripts/action
-#MAN_FILES = ${UPS_DIR}/test/scripts/action/man
-#CATMAN_FILES = ${UPS_DIR}/test/scripts/action/catman
-
+CATMAN_FILES = ${UPS_DIR}/test/scripts/action/catman
 
 ACTION = SETUP
    doDefaults()

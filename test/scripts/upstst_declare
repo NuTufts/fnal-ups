@@ -12,10 +12,14 @@ $UPS_DIR/test/ups_test << EOD
 declare rover -status UPS_INVALID_SPECIFICATION 
 declare rover v1_0 -f NULL -r /tmp
 declare rover v1_0 -f NULL -r /tmp -status UPS_INVALID_SPECIFICATION
+declare rover v1_0 -f IRIX -g leash -r /tmp
+ups_echo "redeclare a chain"
 declare rover v1_0 -f IRIX -g leash
+upserr_clear
 #
 # test most switches
 #
+ups_echo "try all switches"
 declare rover v2_0 -f NULL -A backyard -b mycompile -D akc@kennel -g leash -L -m tablefile -M /tabledir -O "-blah" -q"red" -r /dog/house -T ftp:/tarfile -u /tmp -U /ups 
 #
 # make sure actions are executed
@@ -25,4 +29,4 @@ declare rover v2_0 -f NULL -A backyard -b mycompile -D akc@kennel -g leash -L -m
 #declare spot v2_0 -C -r $UPS_DIR/test/scripts/declare/spot -m spot.table
 quit
 EOD
-diff dbclean/rover dbcmp/rover
+diff dbclean/rover dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 

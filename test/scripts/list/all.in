@@ -1,9 +1,9 @@
 DATABASE=db1 
 	Product=lassie	Version=v1_0	Flavor=NULL
-		Qualifiers=nodbg:opt	Chain=""
+		Qualifiers="nodbg:opt"	Chain=""
 
 	Product=lassie	Version=v1_0	Flavor=IRIX+5.3
-		Qualifiers=nodbg:opt	Chain=""
+		Qualifiers="nodbg:opt"	Chain=""
 
 	Product=lassie	Version=v1_0	Flavor=IRIX+6.2
 		Qualifiers=""	Chain=""
@@ -12,13 +12,13 @@ DATABASE=db1
 		Qualifiers=""	Chain=current
 
 	Product=lassie	Version=v2_0	Flavor=NULL
-		Qualifiers=nodbg:opt	Chains=current,mydog,test
+		Qualifiers="nodbg:opt"	Chains=current,mydog,test
 
 	Product=lassie	Version=v2_0	Flavor=IRIX+5.3
-		Qualifiers=nodbg:opt	Chain=""
+		Qualifiers="nodbg:opt"	Chain=""
 
 	Product=lassie	Version=v2_0	Flavor=IRIX+5
-		Qualifiers=nodbg:opt	Chain=current
+		Qualifiers="nodbg:opt"	Chain=current
 
 	Product=lassie	Version=v2_0	Flavor=IRIX+6.2
 		Qualifiers=""	Chain=""
@@ -27,13 +27,13 @@ DATABASE=db1
 		Qualifiers=""	Chain=test
 
 	Product=rover	Version=v2_0	Flavor=NULL
-		Qualifiers=nodbg:opt	Chain=""
+		Qualifiers="nodbg:opt"	Chain=""
 
 	Product=rover	Version=v2_0	Flavor=IRIX+5.3
-		Qualifiers=nodbg:opt	Chain=""
+		Qualifiers="nodbg:opt"	Chain=""
 
 	Product=rover	Version=v2_0	Flavor=IRIX+5
-		Qualifiers=nodbg:opt	Chain=""
+		Qualifiers="nodbg:opt"	Chain=""
 
 	Product=rover	Version=v2_0	Flavor=IRIX+6.2
 		Qualifiers=""	Chain=""
@@ -42,20 +42,20 @@ DATABASE=db1
 		Qualifiers=""	Chain=""
 
 	Product=snoopy	Version=v1_0	Flavor=NULL
-		Qualifiers=charlie:linus:lucy:pigpen:violet	Chain=""
+		Qualifiers="charlie:linus:lucy:pigpen:violet"	Chain=""
 
 	Product=snoopy	Version=v1_0	Flavor=NULL
-		Qualifiers=linus:lucy:pigpen:violet	Chain=""
+		Qualifiers="linus:lucy:pigpen:violet"	Chain=""
 
 	Product=snoopy	Version=v1_0	Flavor=NULL
 		Qualifiers=""	Chain=""
 
 	Product=snoopy	Version=v1_0	Flavor=NULL
-		Qualifiers=pigpen	Chain=""
+		Qualifiers="pigpen"	Chain=""
 
 	Product=spot	Version=v2_0	Flavor=NULL
 		Qualifiers=""	Chain=""
 
 	Product=spot	Version=v2_0	Flavor=NULL
-		Qualifiers=long	Chain=""
+		Qualifiers="long"	Chain=""
 

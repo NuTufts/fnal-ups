@@ -1,0 +1,2 @@
+#! /bin/sh
+cd $UPS_DIR/test/scripts; upstst_all

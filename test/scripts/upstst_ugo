@@ -1,6 +1,6 @@
 #!/bin/sh
 # ============================================================================
-# test the file routines
+# test the ugo routines
 # ============================================================================
 PRODUCTS="/thunder 	   /lightening"; export PRODUCTS
 SETUP_TITANIC="doomed -H IRIX+5" ; export SETUP_TITANIC
@@ -18,6 +18,8 @@ upserr_clear
 upsugo_next -out /dev/null -a -c -d 
 upserr_clear
 upsugo_next -out /dev/null -encmds 3 -a -c -d one, -a -c -d two, -a -c -d three 
+upserr_clear
+upsugo_next -out /dev/null myprod myversion junk -status UPS_INVALID_ARGUMENT
 upserr_clear
 #
 # testing qualifiers

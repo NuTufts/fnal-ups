@@ -91,6 +91,9 @@ alias rambo "SlyStalone !*"
 #
 unalias rambo
 #
+# copy man,catman,html,info should
+# go here
+#
 if (-e reqfile1) then
   source reqfile1
 else

@@ -1,10 +1,10 @@
 unsetenv TMPDIR
 #
-setenv upstmp "`dropit -p "'"$OPERA"'" -i'' -d'' FIDELIO`"
+setenv upstmp "`dropit -p "'"$OPERA"'" -i' ' -d' ' FIDELIO`"
 if ($status == 0 && "$upstmp" != "") setenv OPERA "$upstmp"
 unsetenv upstmp
 #
-setenv upstmp "`dropit -p "'"$OPERA"'" -i'' -d'' MADAM_BUTTERFLY CARMEN`"
+setenv upstmp "`dropit -p "'"$OPERA"'" -i' ' -d' ' 'MADAM_BUTTERFLY CARMEN'`"
 if ($status == 0 && "$upstmp" != "") setenv OPERA "$upstmp"
 unsetenv upstmp
 #

@@ -42,8 +42,8 @@ int		stdout_dup;			/* dup of stdout */
 
 outfile = NULL; difffile = NULL; estatus_str = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
-UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
+UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 if (outfile) 					/* don't use stdout */
    {
    if (!(ofd = fopen(outfile,"w")))		/* open file */
@@ -69,8 +69,16 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))/* for all commands */
       return (0);
       }
    (*myfunc)(uc,stdout,calledby);
-   UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
-   if (UPS_ERROR != UPS_SUCCESS) continue;
+   if (UPS_ERROR != estatus)                            
+      {                                                 
+      fprintf(stderr,"function: %s\n",funcname);       
+      fprintf(stderr,"%s: %s, %s: %s\n","actual status",
+         g_error_ascii[UPS_ERROR],"expected status",    
+         g_error_ascii[estatus]);                       
+      if (UPS_ERROR) upserr_output();                  
+      }                                                
+   if (UPS_ERROR) { upserr_clear(); continue;}
+   upserr_clear();                                   
    upsfil_flush();
    UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    }
