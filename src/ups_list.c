@@ -191,7 +191,26 @@ void list_K(const t_upstyp_matched_instance * const instance,
     }                                                   \
   }                                                     \
 }
-
+#define defaults(INSTANCE) \
+{   printf("	VERSION=%s", minst_ptr->INSTANCE->version);          \
+    printf("	FLAVOR=%s\n", minst_ptr->INSTANCE->flavor);          \
+    if (minst_ptr->INSTANCE->qualifiers &&                           \
+       strlen(minst_ptr->INSTANCE->qualifiers))                      \
+    { printf("	QUALIFIERS=%s", minst_ptr->INSTANCE->qualifiers);    \
+    } else {                                                         \
+      printf("	QUALIFIERS=\"\"");                                   \
+    }                                                                \
+    if (minst_ptr->xtra_chains)                                      \
+    { printf("	CHAINS=%s", minst_ptr->INSTANCE->chain);             \
+      for (clist = minst_ptr->xtra_chains ;                          \
+           clist ; clist = clist->next)                              \
+      { cinst_ptr = (t_upstyp_instance *)clist->data;                \
+        printf(",%s", cinst_ptr->chain );                            \
+      }                                                              \
+    } else {                                                         \
+      printf("	CHAIN=%s", minst_ptr->INSTANCE->chain);              \
+    } printf("\n");                                                  \
+}
 /*
  * Definition of public functions.
  */
@@ -280,6 +299,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upslst_item *tmp_minst_list = NULL, *clist = NULL;
   t_upstyp_instance *cinst_ptr = NULL;
   t_upstyp_matched_instance *minst_ptr = NULL;
+  t_upstyp_config  *config_ptr = 0;
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) 
@@ -301,53 +321,46 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         } printf("\n");
         printf("	PRODUCT=%s",mproduct->product);
         if (minst_ptr->chain) 
-        { printf ("	VERSION=%s", minst_ptr->chain->version);
-          printf("	FLAVOR=%s\n", minst_ptr->chain->flavor);
-          if (minst_ptr->chain->qualifiers && 
-             strlen(minst_ptr->chain->qualifiers))
-          { printf("	QUALIFIERS=%s", minst_ptr->chain->qualifiers); 
-          } else {
-            printf("	QUALIFIERS=\"\""); 
-          }
-          if (minst_ptr->xtra_chains) 
-          { printf("	CHAINS=%s", minst_ptr->chain->chain);
-            for (clist = minst_ptr->xtra_chains ; clist ; clist = clist->next)
-            { cinst_ptr = (t_upstyp_instance *)clist->data;
-              printf(",%s", cinst_ptr->chain );
-            }
-          } else { 
-            printf("	CHAIN=%s", minst_ptr->chain->chain);
-          } printf("\n");
+        { defaults(chain)
         } else { 
           if (minst_ptr->version )
-          {  printf("	VERSION=%s", minst_ptr->version->version);
-             printf("	FLAVOR=%s\n", minst_ptr->version->flavor);
-             if (minst_ptr->version->qualifiers &&
-                strlen(minst_ptr->version->qualifiers))
-             { printf("	QUALIFIERS=%s", minst_ptr->version->qualifiers); 
-             } else {
-               printf("	QUALIFIERS=\"\""); 
-             }
-             printf("	CHAIN=\"\"\n");
+          {  defaults(version) 
           } else { 
             if (minst_ptr->table )
-            {  printf("	VERSION=%s", minst_ptr->table->version);
-               printf("	FLAVOR=%s\n", minst_ptr->table->flavor);
-               if (minst_ptr->table->qualifiers &&
-                  strlen(minst_ptr->table->qualifiers))
-               { printf("	QUALIFIERS=%s", minst_ptr->table->qualifiers); 
-               } else {
-                 printf("	QUALIFIERS=\"\""); 
-               }
-               printf("	CHAIN=\"\"\n");
+            {  defaults(table)
             } /* else what in the hell are we doing here ?? */
           }
         }
         if (a_command_line->ugo_l && minst_ptr->version )
-        { printf("	HOME=%s\n", minst_ptr->version->prod_dir);
-          printf("	UPS=%s\n", minst_ptr->version->ups_dir);
-          printf("	TABLE_DIR=%s\n", minst_ptr->version->table_dir);
-          printf("	TABLE_FILE=%s\n", minst_ptr->version->table_file);
+        { printf("	HOME=");
+          if (mproduct->db_info) 
+          { config_ptr = mproduct->db_info->config;
+            if (config_ptr) 
+            { if (config_ptr->prod_dir_prefix) 
+              { printf("%s",config_ptr->prod_dir_prefix); }
+            }
+          }
+          printf("%s\n", minst_ptr->version->prod_dir);
+          if (minst_ptr->version->ups_dir)
+          { printf("	UPS=%s\n", minst_ptr->version->ups_dir);
+          } else {
+            printf("	UPS=\"\"\n");
+          }
+          if (minst_ptr->version->table_dir)
+          { printf("	TABLE_DIR=%s\n", minst_ptr->version->table_dir);
+          } else {
+            printf("	TABLE_DIR=\"\"\n");
+          }
+          if (minst_ptr->version->table_file)
+          { printf("	TABLE_FILE=%s\n", minst_ptr->version->table_file);
+          } else {
+            printf("	TABLE_FILE=\"\"\n");
+          }
+          if (minst_ptr->version->description)
+          { printf("	DESCRIPTION=%s\n", minst_ptr->version->description);
+          } else {
+            printf("	DESCRIPTION=\"\"\n");
+          }
         }
         printf("\n\n");
       } else { 
@@ -367,7 +380,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
   int count=0;
-  char * hold;
   if (product->db_info) 
   { config_ptr = product->db_info->config;
   }
@@ -378,7 +390,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(prod_dir)
     FromVersion(archive_file)
     FromVersion(description)
-    FromVersion(db_dir)
+/*    FromVersion(db_dir) */
 /* DO NOT CHANGE ORDER here it's the default !!! */
     FromAny(product) 
     FromAny(version) 
