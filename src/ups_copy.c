@@ -54,12 +54,15 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
 static t_upsugo_command *fill_ugo_struct( 
                                const t_upstyp_instance * const a_instance,
 			       const t_upsugo_command * const a_command_line);
+static t_upsugo_command *free_ugo_struct(
+			       t_upsugo_command * const a_command_line);
 
 /*
  * Definition of global variables.
  */
 
 extern t_cmd_info g_cmd_info[];
+extern t_cmd_map g_cmd_maps[];
 
 #define TRUE 1
 #define FALSE 0
@@ -68,11 +71,11 @@ extern t_cmd_info g_cmd_info[];
  * Definition of public functions.
  */
 
-#define COPY_TO_INSTANCE(ugo_elem, inst_elem)  \
+#define COPY_TO_INSTANCE(ugo_elem, old_inst, inst_elem)  \
   if (new_command_line && new_command_line->ugo_elem) {                 \
     new_instance->inst_elem = (char *)new_command_line->ugo_elem;       \
-  } else if (old_table_instance->inst_elem) {                           \
-    new_instance->inst_elem = old_table_instance->inst_elem;            \
+  } else if (old_inst->inst_elem) {                                     \
+    new_instance->inst_elem = old_inst->inst_elem;                      \
   } else {                                                              \
     new_instance->inst_elem = 0;                                        \
   }
@@ -98,21 +101,21 @@ extern t_cmd_info g_cmd_info[];
    }
 
 #define SET_DCLR_LINE(ugo_elem, inst_elem, ugo_flag)  \
-   if (a_instance->inst_elem) {                              \
-     new_command_line.ugo_flag = TRUE;                       \
-     new_command_line.ugo_elem = a_instance->inst_elem;      \
-   } else {                                                  \
-     new_command_line.ugo_flag = FALSE;                      \
-     new_command_line.ugo_elem = NULL;                       \
+   if (a_instance->inst_elem) {                               \
+     new_command_line->ugo_flag = TRUE;                       \
+     new_command_line->ugo_elem = a_instance->inst_elem;      \
+   } else {                                                   \
+     new_command_line->ugo_flag = FALSE;                      \
+     new_command_line->ugo_elem = NULL;                       \
    }
 
 #define SET_DCLR_LINE_LIST(ugo_elem, inst_elem, ugo_flag)            \
    if (a_instance->inst_elem) {                                      \
-     new_command_line.ugo_flag = TRUE;                               \
-     new_command_line.ugo_elem = upslst_new(a_instance->inst_elem);  \
+     new_command_line->ugo_flag = TRUE;                               \
+     new_command_line->ugo_elem = upslst_new(a_instance->inst_elem);  \
    } else {                                                          \
-     new_command_line.ugo_flag = FALSE;                              \
-     new_command_line.ugo_elem = NULL;                               \
+     new_command_line->ugo_flag = FALSE;                              \
+     new_command_line->ugo_elem = NULL;                               \
    }
 
 
@@ -256,10 +259,10 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
 		 the info valid in a table file */
 	new_instance = ups_new_instance();
 
-	COPY_TO_INSTANCE(ugo_product, product);
+	COPY_TO_INSTANCE(ugo_product, old_table_instance, product);
 	COPY_TO_INSTANCE_CHECK(ugo_f, ugo_flavor->data, flavor);
 	COPY_TO_INSTANCE_CHECK(ugo_q, ugo_qualifiers->data, qualifiers);
-	COPY_TO_INSTANCE(ugo_description, description);
+	COPY_TO_INSTANCE(ugo_description, old_table_instance, description);
 
 	if (old_table_instance && old_table_instance->action_list) {
 	  new_instance->action_list = old_table_instance->action_list;
@@ -297,23 +300,42 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
 		case e_unsetuprequired:
 		  dep_command_line = upsugo_bldcmd(command->argv[0], 
 					 g_cmd_info[e_unsetup].valid_opts);
+
+		  /* hopefully, the unsetup arguments are only the product
+		     name to unsetup and no other instance options. 
+		     (otherwise, unsetup will not look at SETUP_ENV in order
+		     to do the unsetup) if however there are other instance
+		     options, then we need to replace the string with the
+		     new information */
+		  if (!dep_command_line->ugo_version && 
+		      !dep_command_line->ugo_c && !dep_command_line->ugo_o &&
+		      !dep_command_line->ugo_n && !dep_command_line->ugo_d &&
+		      !dep_command_line->ugo_t && !dep_command_line->ugo_g &&
+		      !dep_command_line->ugo_q &&
+		      !dep_command_line->ugo_f && !dep_command_line->ugo_H) {
+		    /* there were no other instance options, we can leave the
+		       original string alone */
+		    dep_command_line = 
+		      (t_upsugo_command *)upsugo_free(dep_command_line);
+		  }
 		  break;
 		}
 		  /* get SETUP_<prod> translated */
 		if (dep_command_line && dep_command_line->ugo_product) {
 		  sprintf(tmp_buf, "%s%s", SETUPENV,
-			  dep_command_line->ugo_product);
+			  upsutl_upcase(dep_command_line->ugo_product));
 		  if ((tmp_buf2 = (char *)getenv(tmp_buf)) != NULL) {
 		    /* we got it, free the current string and replace it with
 		       the new one */
 		    upsmem_free(command_item->data);
 		    sprintf(tmp_buf, "%s(\"%s\")", 
-			    g_cmd_info[command->icmd].cmd, tmp_buf2);
+			    g_cmd_maps[command->icmd].cmd, tmp_buf2);
 		    command_item->data = (void *)upsutl_str_create(tmp_buf,
 							   STR_TRIM_DEFAULT);
 		  }
 		  /* clean up clean up... */
-		  (void )upsugo_free(dep_command_line);
+		  dep_command_line = 
+		    (t_upsugo_command *)upsugo_free(dep_command_line);
 		}
 	      }
 	    }
@@ -392,30 +414,36 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
 	}
 	/* if there is no write_product_ptr yet, the table file does not
 	   exist yet so we must create one. */
-	if (! write_product_ptr) {
+	if (! write_product_ptr->instance_list) {
 	  write_product_ptr->instance_list = upslst_new(new_instance);
 	  write_product_ptr->product = new_instance->product;
 	}
 
 	/*     write out the table file instance(s) */
 	if (tmp_buf2) {
-	  upsfil_write_file(write_product_ptr, tmp_buf, ' ');
+	  write_product_ptr->file = upsutl_str_create("TABLE",
+						      STR_TRIM_DEFAULT);
+	  upsfil_write_file(write_product_ptr, tmp_buf2, ' ');
 	}
       	/* STEP 2: if we are echoing only, construct a declare command string
 	        and echo it to the user.  if we are doing the declare,
 		call the appropriate declare routine. first, fill in the
 		new instance with the rest of the information. first point to
 		the version instance from the matched product */
-	old_table_instance = minst->version;
-	COPY_TO_INSTANCE(ugo_version, version);
-	COPY_TO_INSTANCE(ugo_origin, origin);
+	COPY_TO_INSTANCE(ugo_version, old_version_instance, version);
+	COPY_TO_INSTANCE(ugo_origin, old_version_instance, origin);
 	new_instance->prod_dir = new_prod_dir;
 	new_instance->ups_dir = new_ups_dir;
 	new_instance->table_dir = new_table_dir;
 	new_instance->table_file = new_table_file;
-	COPY_TO_INSTANCE(ugo_archivefile, archive_file);
-	COPY_TO_INSTANCE(ugo_auth, authorized_nodes);
-	COPY_TO_INSTANCE(ugo_db->data, db_dir);
+	COPY_TO_INSTANCE(ugo_archivefile, old_version_instance, archive_file);
+	COPY_TO_INSTANCE(ugo_compile_file, old_version_instance, compile_file);
+	COPY_TO_INSTANCE(ugo_compile_dir, old_version_instance, compile_dir);
+	if (new_command_line->ugo_auth) {
+	  COPY_TO_INSTANCE(ugo_auth->data, old_version_instance,
+			   authorized_nodes);
+	}
+	COPY_TO_INSTANCE(ugo_db->data, old_version_instance, db_dir);
 	
 	new_instance->declarer = new_instance->modifier;
 	new_instance->declared = new_instance->modified;
@@ -438,6 +466,11 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
 	  ADD_TO_ECHO(table_dir, "%s -M \"%s\" ");
 	  ADD_TO_ECHO(archive_file, "%s -T \"%s\" ");
 	  ADD_TO_ECHO(origin, "%s -D \"%s\" ");
+	  ADD_TO_ECHO(compile_file, "%s -b \"%s\" ");
+	  ADD_TO_ECHO(compile_dir, "%s -u \"%s\" ");
+	  if (new_command_line->ugo_C) {
+	    sprintf(tmp_buf, "%s -C ", tmp_buf);
+	  }
 	  if (new_command_line) {
 	    for (chain_item = new_command_line->ugo_chain ; chain_item ;
 		 chain_item = chain_item->next) {
@@ -465,6 +498,8 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
 
 	  /* now do the declare */
 	  ups_declare(dclr_command_line, a_temp_file, e_declare);
+
+	  dclr_command_line = free_ugo_struct(dclr_command_line);
 	}
       } else {
 	/* could not get information for new instance.  punt!! */
@@ -482,17 +517,23 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
     if (new_command_line) {
       (void )upsugo_free(new_command_line);
     }
+    if (write_product_ptr != &write_product) {
+      /* we read in a file and did not just fill out this structure. */
+      write_product_ptr = (t_upstyp_product *)ups_free_product(
+							    write_product_ptr);
+    }
   }
   return(mproduct_list);
 }
 
 /*-----------------------------------------------------------------------
- * copy_core
+ * fill_ugo_structure
  *
- * Cycle through the actions for copy, translate them,
- * and write them to the temp file.
+ * fill in the new_command_line with info to send to declare.  we are
+ * pretending that this info came from the command line even though it
+ * really came from a variety of places.
  *
- * Input : information from the command line, a stream.
+ * Input : an instance, information from the command line
  * Output: <output>
  * Return: matched product of the original product
  */
@@ -500,43 +541,78 @@ static t_upsugo_command *fill_ugo_struct(
                                const t_upstyp_instance * const a_instance,
 			       const t_upsugo_command * const a_command_line)
 {
-  static t_upsugo_command new_command_line;
-  
-  new_command_line.ugo_product = a_instance->product;
-  new_command_line.ugo_version = a_instance->version;
-  new_command_line.ugo_f = TRUE;
-  new_command_line.ugo_flavor = upslst_new(a_instance->flavor);
-  new_command_line.ugo_q = TRUE;
-  new_command_line.ugo_qualifiers = upslst_new(a_instance->qualifiers);
-  new_command_line.ugo_r = TRUE;
-  new_command_line.ugo_productdir = a_instance->prod_dir;
-  new_command_line.ugo_z = TRUE;
-  new_command_line.ugo_db = upslst_new(a_instance->db_dir);
+  t_upsugo_command *new_command_line;
+  t_upstyp_db *new_db;
+
+  new_command_line = (t_upsugo_command *)upsmem_malloc(
+						     sizeof(t_upsugo_command));
+  memset(new_command_line, 0, sizeof(t_upsugo_command));
+
+  new_command_line->ugo_product = a_instance->product;
+  new_command_line->ugo_version = a_instance->version;
+  new_command_line->ugo_f = TRUE;
+  new_command_line->ugo_flavor = upslst_new(a_instance->flavor);
+  new_command_line->ugo_q = TRUE;
+  new_command_line->ugo_qualifiers = upslst_new(a_instance->qualifiers);
+  new_command_line->ugo_r = TRUE;
+  new_command_line->ugo_productdir = a_instance->prod_dir;
+  new_command_line->ugo_z = TRUE;
+  new_db = (t_upstyp_db *)upsmem_malloc(sizeof(t_upstyp_db));
+  new_db->name = a_instance->db_dir;
+  new_db->config = NULL;
+  new_command_line->ugo_db = upslst_new(new_db);
 
   if (a_command_line) {
-    new_command_line.ugo_c = a_command_line->ugo_c;
-    new_command_line.ugo_C = a_command_line->ugo_C;
-    new_command_line.ugo_d = a_command_line->ugo_d;
-    new_command_line.ugo_g = a_command_line->ugo_g;
-    new_command_line.ugo_n = a_command_line->ugo_n;
-    new_command_line.ugo_o = a_command_line->ugo_o;
-    new_command_line.ugo_t = a_command_line->ugo_t;
-    new_command_line.ugo_u = a_command_line->ugo_u;
-    new_command_line.ugo_v = a_command_line->ugo_v;
-    new_command_line.ugo_V = a_command_line->ugo_V;
-    new_command_line.ugo_Z = a_command_line->ugo_Z;
+    new_command_line->ugo_c = a_command_line->ugo_c;
+    new_command_line->ugo_C = a_command_line->ugo_C;
+    new_command_line->ugo_d = a_command_line->ugo_d;
+    new_command_line->ugo_g = a_command_line->ugo_g;
+    new_command_line->ugo_n = a_command_line->ugo_n;
+    new_command_line->ugo_o = a_command_line->ugo_o;
+    new_command_line->ugo_t = a_command_line->ugo_t;
+    new_command_line->ugo_u = a_command_line->ugo_u;
+    new_command_line->ugo_v = a_command_line->ugo_v;
+    new_command_line->ugo_V = a_command_line->ugo_V;
+    new_command_line->ugo_Z = a_command_line->ugo_Z;
     
-    new_command_line.ugo_chain = a_command_line->ugo_chain;
-    new_command_line.ugo_shell = a_command_line->ugo_shell;
-    new_command_line.ugo_number = a_command_line->ugo_number;
+    new_command_line->ugo_chain = a_command_line->ugo_chain;
+    new_command_line->ugo_shell = a_command_line->ugo_shell;
+    new_command_line->ugo_number = a_command_line->ugo_number;
   }
   SET_DCLR_LINE_LIST(ugo_auth, authorized_nodes, ugo_A);
-  /*	  SET_DCLR_LINE(ugo_compilefile, compile_file, ugo_b);*/
+  SET_DCLR_LINE(ugo_compile_file, compile_file, ugo_b);
+  SET_DCLR_LINE(ugo_compile_dir, compile_dir, ugo_u);
   SET_DCLR_LINE(ugo_origin, origin, ugo_D);
   SET_DCLR_LINE(ugo_tablefile, table_file, ugo_m);
   SET_DCLR_LINE(ugo_tablefiledir, table_dir, ugo_M);
   SET_DCLR_LINE(ugo_archivefile, archive_file, ugo_T);
   SET_DCLR_LINE(ugo_upsdir, ups_dir, ugo_U);
   
-  return(&new_command_line);
+  return(new_command_line);
+}
+/*-----------------------------------------------------------------------
+ * free_ugo_structure
+ *
+ * free the ugo structure we used for the declare.  we only malloced
+ * pieces of it which is why we cannot go thru the normal channels to do
+ * this.
+ *
+ * Input : a ugo structure
+ * Output: <output>
+ * Return: NULL
+ */
+static t_upsugo_command *free_ugo_struct( 
+			       t_upsugo_command * const a_command_line)
+{
+  a_command_line->ugo_flavor = upslst_free(a_command_line->ugo_flavor, ' ');
+  a_command_line->ugo_qualifiers = upslst_free(a_command_line->ugo_qualifiers,
+					       ' ');
+  if (a_command_line->ugo_auth) {
+    a_command_line->ugo_auth = upslst_free(a_command_line->ugo_auth, 'd');
+  }
+  upsmem_free(a_command_line->ugo_db->data);
+  a_command_line->ugo_db = upslst_free(a_command_line->ugo_db, ' ');
+  upsmem_free(a_command_line);
+  
+  return(NULL);
 }
