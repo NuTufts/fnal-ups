@@ -271,8 +271,8 @@ void upsutl_stop_timing(void)
  * Output: none
  * Return: none
  */
-int upsutl_statistics(t_ups_instance const * const a_instance,
-		      char const * const a_dir, char const * const a_command)
+void upsutl_statistics(t_ups_instance const * const a_instance,
+		       char const * const a_dir, char const * const a_command)
 { 
   char stat_file[FILENAME_MAX+1];
   int dir_s, stat_s, file_s;
