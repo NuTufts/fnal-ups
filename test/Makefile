@@ -39,7 +39,7 @@ default:
 	@echo Please invoke this makefile using premake. >&2
 	@exit 1
 
-all : test_ups_error
+all : test_ups_error test_ups_list
 
 #
 # Main programs.
@@ -48,12 +48,16 @@ all : test_ups_error
 test_ups_error : $$@.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
+test_ups_list : test_ups_list.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
+
 #
 # Now standard targets
 #
 clean :
 	@ upsClean
-	@ rm test_ups_error
+	@ rm -f test_ups_error
+	@ rm -f test_ups_list
 
 install :
 	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
@@ -78,5 +82,6 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
-test_ups_error.o:	test_ups_error.c
-test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
+test_ups_error.o: test_ups_error.c $(ERUPT_DIR)/inc/ups_error.h
+test_ups_list.o: test_ups_list.c $(ERUPT_DIR)/inc/ups_list.h
+
