@@ -110,9 +110,10 @@ static char g_buffer[FILENAME_MAX+1];
  *    say - ups_dir - then that step is skipped.  NOTE: there is no default for
  *    the table file name. if the prod_dir_prefix is missing that step is
  *    still done with the prefix just left off.  if tablefiledir exists then
- *    only that location is checked.
+ *    only locations relative to it are checked.
  *
  *         tablefiledir/tablefile
+ *         prod_dir_prefix/prod_dir/tablefiledir/tablefile
  *         ups_dir/tablefile
  *         prod_dir_prefix/prod_dir/ups_dir/tablefile
  *         db/prodname/tablefile
@@ -130,6 +131,11 @@ static char g_buffer[FILENAME_MAX+1];
  * Output: none
  * Return: table file location
  */
+#define LOOK_FOR_FILE()   \
+   if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {  \
+     G_SAVE_PATH(total_chars);        /* found it */                     \
+   }
+
 char *upsutl_get_table_file_path( const char * const a_prodname,
 				  const char * const a_tablefile,
 				  const char * const a_tablefiledir,
@@ -151,12 +157,35 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       if ((total_chars = file_chars + (int )strlen(a_tablefiledir))
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s", a_tablefiledir, a_tablefile);
-	if ((! a_exist_flag) || (upsutl_is_a_file(buffer) == UPS_SUCCESS)) {
-	  G_SAVE_PATH(total_chars);      /* found it - save it */
-	}
+	LOOK_FOR_FILE();
       } else {
 	upserr_vplace();
 	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+      }
+      /* try prod_dir/table_file_dir/tablefile */
+      if ((found == 0) && (a_productdir != NULL)) {
+	if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
+	  if ((total_chars += (int )strlen(a_productdir) + 
+	       (int )strlen(a_db_info->config->prod_dir_prefix) +
+	       1) <= FILENAME_MAX) {
+	    sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
+		    a_productdir, a_tablefiledir, a_tablefile);
+	    LOOK_FOR_FILE();
+	  } else {
+	    upserr_vplace();
+	    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	  }
+	} else {
+	  if ((total_chars += (int )strlen(a_productdir) + 1)
+	      <= FILENAME_MAX) {
+	    sprintf(buffer, "%s/%s/%s", a_productdir, a_tablefiledir,
+		    a_tablefile);
+	    LOOK_FOR_FILE();
+	  } else {
+	    upserr_vplace();
+	    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	  }
+	}
       }
     } else {
       /* try ups_dir/tablefile */
@@ -164,9 +193,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	if ((total_chars = file_chars + (int )strlen(a_upsdir))
 	    <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s", a_upsdir, a_tablefile);
-	  if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
-	    G_SAVE_PATH(total_chars);         /* found it */
-	  }
+	  LOOK_FOR_FILE();
 	} else {
 	  upserr_vplace();
 	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
@@ -180,10 +207,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	       1) <= FILENAME_MAX) {
 	    sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
 		    a_productdir, a_upsdir, a_tablefile);
-	    if ((! a_exist_flag) || (upsutl_is_a_file(buffer))
-		== UPS_SUCCESS) {
-	      G_SAVE_PATH(total_chars);        /* found it */
-	    }
+	    LOOK_FOR_FILE();
 	  } else {
 	    upserr_vplace();
 	    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
@@ -192,10 +216,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	  if ((total_chars += (int )strlen(a_productdir) + 1)
 	      <= FILENAME_MAX) {
 	    sprintf(buffer, "%s/%s/%s", a_productdir, a_upsdir, a_tablefile);
-	    if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) 
-		== UPS_SUCCESS) {
-	      G_SAVE_PATH(total_chars);        /* found it */
-	    }
+	    LOOK_FOR_FILE();
 	  } else {
 	    upserr_vplace();
 	    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
@@ -209,9 +230,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	    <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname,
 		  a_tablefile);
-	  if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
-	    G_SAVE_PATH(total_chars);        /* found it */
-	  }
+	  LOOK_FOR_FILE();
 	} else {
 	  upserr_vplace();
 	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
@@ -221,10 +240,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       if (found == 0) {
 	if ((total_chars = file_chars) <= FILENAME_MAX) {
 	  sprintf(buffer, "%s", a_tablefile);
-	  if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {
-	    G_SAVE_PATH(file_chars);            /* found it */
-	    found = 1;
-	  }
+	  LOOK_FOR_FILE();
 	} else {
 	  upserr_vplace();
 	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
