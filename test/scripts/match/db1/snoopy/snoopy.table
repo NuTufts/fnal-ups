@@ -4,15 +4,16 @@ PRODUCT = snoopy
 GROUP:
 
 FLAVOR = NULL
+QUALIFIERS = "charlie:lucy:linus:pigpen:violet"
+
+FLAVOR = NULL
+QUALIFIERS = "lucy:linus:pigpen:violet"
+
+FLAVOR = NULL
 QUALIFIERS = ""
 
+FLAVOR = NULL
+QUALIFIERS = "pigpen"
 
 COMMON:
-  ACTION=SETUP
-  doDefaults()
-  setupRequired("lassie v2_0 -f OSF1")
-  setupOptional("test vvv")
- 
-
 END:
-
