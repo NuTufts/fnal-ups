@@ -127,7 +127,7 @@ static int g_ugo_version = 0;
 /* we will use temporary lists in order to pass exactly what we want to the
    matching routines.  */
 #define TMP_LISTS_SET()	\
-     tmp_flavor_list.data = (void *)(inst->flavor);                     \
+     tmp_flavor_list.data = (void *)(inst->flavor);                  \
      tmp_quals_list.data = (void *)(inst->qualifiers);
 
 /* if ups directory and prod directory were entered on the command line then
@@ -1019,7 +1019,7 @@ return num_matches;
 /*-----------------------------------------------------------------------
  * match_from_version
  *
- * Given the the command line inputs, return the matched instances read in
+ * Given the command line inputs, return the matched instances read in
  * from the version file and the table file.
  *
  * Input : product name, product version, 
@@ -1047,12 +1047,17 @@ static int match_from_version( const char * const a_product,
   char buffer[FILENAME_MAX+1];
   t_upstyp_product *read_product;
   t_upslst_item *vinst;
+  t_upslst_item tmp_any_flavor_list = {NULL, ANY_FLAVOR, NULL};
   t_upslst_item tmp_flavor_list = {NULL, NULL, NULL};
   t_upslst_item tmp_quals_list = {NULL, NULL, NULL};
   t_upstyp_instance *inst;
   t_upstyp_matched_instance *tmp_minst_ptr = NULL;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
+
+  tmp_any_flavor_list.prev = &tmp_flavor_list;
+  tmp_flavor_list.next = &tmp_any_flavor_list;
+
 
   /* Get total length of version file name including path */
   file_chars = (int )(strlen(a_version) + strlen(a_product) +
