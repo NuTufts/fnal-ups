@@ -107,7 +107,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 46 */  "%s: Found no match for product \'%s\'\n",
 /* 47 */  "%s: Unexpected key word \'%s\' in \'%s\', line %d\n",
 /* 48 */  "%s: File cache is corrupt\n",
-/* 49 */  "%s: No qualifiers found - in \'%s\', line %d\n"
+/* 49 */  "%s: No qualifiers found - in \'%s\', line %d\n",
+/* 50 */  "%s: No \'PROD_DIR\' keyword for product \'%s\'\n"
 };
 
 char *g_error_ascii[] = {
@@ -140,7 +141,7 @@ char *g_error_ascii[] = {
    /* UPS_ACTION_WRITE_ERROR  26 */ "UPS_ACTION_WRITE_ERROR",
    /* UPS_INVALID_ACTION_PARAMS 27 */ "UPS_INVALID_ACTION_PARAMS",
    /* UPS_NOSHELL             28 */ "UPS_NOSHELL",
-   /* UPS_UNSETUP_FAILED      29 */ "UPS_UNSETUP_FIALED",
+   /* UPS_UNSETUP_FAILED      29 */ "UPS_UNSETUP_FAILED",
    /* UPS_FILE_EXISTS         30 */ "UPS_FILE_EXISTS",
    /* UPS_NO_TABLE_FILE       31 */ "UPS_NO_TABLE_FILE",
    /* UPS_VERSION_EXISTS      32 */ "UPS_NO_TABLE_FILE",
@@ -161,7 +162,8 @@ char *g_error_ascii[] = {
    /* UPS_UNEXPECTED_KEYWORD  47 */ "UPS_UNEXPECTED_KEYWORD",
    /* UPS_FILEMAP_CORRUPT     48 */ "UPS_FILEMAP_CORRUPT",
    /* UPS_NO_QUALIFIER        49 */ "UPS_NO_QUALIFIER",
-   /* UPS_NERR                50 */ "UPS_NERR",
+   /* UPS_NO_PROD_DIR         50 */ "UPS_NO_PROD_DIR",
+   /* UPS_NERR                51 */ "UPS_NERR",
    0 };
 
 /*

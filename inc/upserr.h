@@ -90,7 +90,8 @@
 #define UPS_UNEXPECTED_KEYWORD  47
 #define UPS_FILEMAP_CORRUPT     48
 #define UPS_NO_QUALIFIER        49
-#define UPS_NERR                50      /*  this one must always be last */
+#define UPS_NO_PROD_DIR         50
+#define UPS_NERR                51      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
