@@ -333,7 +333,7 @@ t_cmd_info g_cmd_info[] = {
   {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z", 0x00000001, e_setup},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z", 0x00000000, e_invalid_action},
+  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVWXz:Z", 0x00000000, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z", 0x00000000, e_invalid_action},
   {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
@@ -348,10 +348,10 @@ t_cmd_info g_cmd_info[] = {
   {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:l0123", 0x00000000, e_invalid_action},
   {e_help,        "help",
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
+            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
+            "a?A:b:B:cCdD:eEf:Fg:h:H:jkK:lm:M:nNoO:p:q:r:StT:u:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
 };
 
 enum {
