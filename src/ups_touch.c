@@ -120,7 +120,7 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
   }
   if (!mproduct_list)
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Touch", 
-               "Product specified doesn't exists");
+               "Product specified doesn't exist");
     return 0;
   }
   username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
