@@ -31,7 +31,8 @@ OBJECTS =
 
 LDFLAGS = $(LLIBS)
 UPS_TEST_OBJECTS = upstst_cmdline.o upstst_cmdloop.o upstst_cmdproc.o \
-	upstst_misc.o upstst_parse.o upstst_error.o upstst_files.o
+	upstst_misc.o upstst_parse.o upstst_error.o upstst_files.o	\
+	upstst_ugo.o
 #=============================================================================
 # TARGETS
 #=============================================================================
@@ -87,6 +88,9 @@ upstst_error.o : upstst_error.c
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
 upstst_files.o : upstst_files.c
+	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
+
+upstst_ugo.o : upstst_ugo.c
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
 #
@@ -181,9 +185,25 @@ upstst_error.o:	upstst_error.c
 upstst_error.o:	./upstst_parse.h
 upstst_error.o:	./upstst_macros.h
 upstst_error.o:	$(ERUPT_DIR)/inc/ups_error.h
+upstst_files.o:	upstst_files.c
+upstst_files.o:	$(ERUPT_DIR)/inc/ups_files.h
+upstst_files.o:	$(ERUPT_DIR)/inc/ups_types.h
+upstst_files.o:	$(ERUPT_DIR)/inc/ups_list.h
+upstst_files.o:	$(ERUPT_DIR)/inc/ups_types.h
+upstst_files.o:	$(ERUPT_DIR)/inc/ups_error.h
+upstst_files.o:	./upstst_parse.h
+upstst_files.o:	./upstst_macros.h
+upstst_files.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_misc.o:	upstst_misc.c
 upstst_misc.o:	./upstst_parse.h
 upstst_misc.o:	./upstst_macros.h
 upstst_misc.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_parse.o:	upstst_parse.c
 upstst_parse.o:	./upstst_parse.h
+upstst_ugo.o:	upstst_ugo.c
+upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_types.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_list.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_error.h
+upstst_ugo.o:	./upstst_parse.h
+upstst_ugo.o:	./upstst_macros.h
+upstst_ugo.o:	$(ERUPT_DIR)/inc/ups_error.h
