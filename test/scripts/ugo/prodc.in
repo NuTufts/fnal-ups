@@ -3,6 +3,6 @@ Flavor:           IRIX
                   AIX
 Qualifiers:       
 DB:               /thunder
-                  	
                   /lightening
 Chains:           current
+ugo_v 0 and UPS_VERBOSE 0

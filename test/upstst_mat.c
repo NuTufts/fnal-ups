@@ -117,10 +117,13 @@ for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    for (inst_ptr = prod->minst_list; inst_ptr; inst_ptr = inst_ptr->next)
       {
       inst = (t_upstyp_matched_instance *) inst_ptr->data;
-      fprintf(fd,"C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", inst->chain->product,
+      if (inst->chain)
+         {
+         fprintf(fd,"C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", inst->chain->product,
              inst->chain->chain, inst->chain->version);
-      fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->chain->flavor,
+         fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->chain->flavor,
              inst->chain->qualifiers);
+         }
       fprintf(fd,"V:PRODUCT=%s, VERSION=%s, ", inst->version->product,
              inst->version->version);
       fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->version->flavor,

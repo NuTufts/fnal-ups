@@ -3,9 +3,9 @@ Flavor:           IRIX+5.3
                   IRIX+5
                   IRIX
                   NULL
-Qualifiers:       cat,dog
+Qualifiers:       cat:dog
                   dog
 DB:               /thunder
-                  	
                   /lightening
 Chains:           current
+ugo_v 0 and UPS_VERBOSE 0

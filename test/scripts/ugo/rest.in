@@ -9,17 +9,18 @@ Host:             levinworth
 Key:              west
                   largo
                   limepie
-Tablefiledir:     /jupiter,/mars
+Tablefiledir:     /jupiter:/mars
 Tablefile:        titan
-Anyfile:          sam,shameful
-Options:          power_steering,ac,abs
+Anyfile:          sam:shameful
+Options:          power_steering:ac:abs
 Description:      It was a dark and stormy night.
-Override:         valhalla,xanadu
+Override:         valhalla:xanadu
 Qualifiers:       *
-Productdir:       /myprod,/yourprod
-Archivefile:      a.tar,b.tar
-Upsdir:           /fred,/barney
+Productdir:       /myprod:/yourprod
+Archivefile:      a.tar:b.tar
+Upsdir:           /fred:/barney
 DB:               popeye
                   sinbad
                   ahab
 Chains:           *
+ugo_v 1 and UPS_VERBOSE 1

@@ -6,6 +6,6 @@ Flavor:           IRIX+5.3
 Qualifiers:       cat
                   
 DB:               /thunder
-                  	
                   /lightening
 Chains:           current
+ugo_v 0 and UPS_VERBOSE 0
