@@ -193,11 +193,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upstyp_instance *new_cinst;             /* new chain instance  */
   t_upstyp_instance *tinst;                 /*   table instance      */
   t_upstyp_instance *new_vinst;             /* new version instance  */
-  struct tm *mytime;
   char *unchain;
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
-  time_t seconds=0;
   t_upslst_item *save_flavor;
   t_upslst_item *save_qualifiers;
   t_upslst_item *save_chain;
@@ -262,13 +260,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   }
   if(!username) /* static may allready be set */
   { username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
-    seconds=time(0);
-    mytime = localtime(&seconds);
-    mytime->tm_mon++; /* correct jan=0 */
     declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
                                       STR_TRIM_DEFAULT);
-    sprintf(declared_date,"%d-%d-%d",
-            mytime->tm_mon,mytime->tm_mday,mytime->tm_year);
   }
 
 /************************************************************************
@@ -360,8 +353,10 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
              minst_list = (t_upslst_item *)mproduct->minst_list;
              minst = (t_upstyp_matched_instance *)(minst_list->data);
              cinst = (t_upstyp_instance *)minst->chain;
-/* there's a better flavor match */
-             if(the_flavor && strstr(cinst->flavor,the_flavor)) 
+             /* there's a better flavor match */
+             if(!the_flavor)
+             { the_flavor=cinst->flavor; }
+             if(!strcmp(cinst->flavor,the_flavor)) 
              { the_flavor=cinst->flavor;
                product = upsget_chain_file(db_info->name,
                                            uc->ugo_product,
