@@ -1167,10 +1167,10 @@ static int match_from_table( const char * const a_product,
  *    still done with the prefix just left off.
  *
  *         tablefiledir/tablefile
- *         tablefile
  *         ups_dir/tablefile
  *         prod_dir_prefix/prod_dir/ups_dir/tablefile
  *         db/prodname/tablefile
+ *         tablefile
  * 
  *
  * Input : product name
@@ -1210,17 +1210,6 @@ static char *get_table_file_path( const char * const a_prodname,
 	upserr_vplace();
 	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
-    }
-    /* try ./tablefile */
-    if ((found == 0) && ((total_chars = file_chars) <= FILENAME_MAX)) {
-      sprintf(buffer, "%s", a_tablefile);
-      if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
-	G_SAVE_PATH(file_chars);            /* found it */
-	found = 1;
-      }
-    } else {
-      upserr_vplace();
-      upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
     }
     /* try ups_dir/tablefile */
     if ((found == 0) && (a_upsdir != NULL)) {
@@ -1278,6 +1267,17 @@ static char *get_table_file_path( const char * const a_prodname,
 	upserr_vplace();
 	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
       }
+    }
+    /* try ./tablefile */
+    if ((found == 0) && ((total_chars = file_chars) <= FILENAME_MAX)) {
+      sprintf(buffer, "%s", a_tablefile);
+      if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
+	G_SAVE_PATH(file_chars);            /* found it */
+	found = 1;
+      }
+    } else {
+      upserr_vplace();
+      upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
     }
   }
 
