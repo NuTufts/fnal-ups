@@ -33,6 +33,7 @@
 #include "ups_types.h"
 #include "ups_list.h"
 #include "ups_memory.h"
+#include "ups_error.h"
 
 /*
  * Definition of public variables
@@ -152,10 +153,13 @@ static int            g_imargin = 0;
 t_ups_product *upsfil_read_file( const char * const ups_file )
 {
   g_fh = fopen ( ups_file, "r" );
-  if ( ! g_fh ) { fprintf( stderr, "Error opening file %s\n", ups_file ); return 0; }
+  if ( ! g_fh ) {
+    upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
+    return 0;
+  }
   
   g_pd = ups_new_product();
-  if ( !g_pd ) { fprintf( stderr, "Buy more memory !!!\n"); return 0; }
+  if ( !g_pd ) return 0;
        
   read_file();
   
@@ -185,7 +189,10 @@ int upsfil_write_file( t_ups_product * const prod_ptr,
   if ( strlen( ups_file ) <= 0 )
     return 0;
   g_fh = fopen ( ups_file, "w" );
-  if ( ! g_fh ) { fprintf( stderr, "Error opening file %s\n", ups_file ); return 0; }
+  if ( ! g_fh ) {
+    upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
+    return 0;
+  }    
 
   g_imargin = 0;
   
@@ -200,11 +207,12 @@ int upsfil_write_file( t_ups_product * const prod_ptr,
   
   if ( g_pd->file ) {
     put_key( "FILE", g_pd->file );
-    cfilei();
-    /* check for valid file type !!! */
   }
-  else {
-    fprintf( stderr, "No file type specified\n" );
+  cfilei();
+
+  if ( g_ifile == e_file_unknown ) {
+    upserr_vplace();
+    upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, g_pd->file ? g_pd->file : "(null)" );
     return 0;
   }
     
@@ -395,10 +403,8 @@ int read_file( void )
   
   /* read file descriptor */
 
-  if ( ! read_file_desc() ) {
-    fprintf( stderr, "Could not read file desciptor\n" );
+  if ( ! read_file_desc() )
     return 0;
-  }
 
   /* here, we expect only to see FLAVOR or GROUP: */
 
@@ -466,11 +472,20 @@ t_upslst_item *read_comments( void )
  */
 int read_file_desc( void )
 {
-  if ( g_ikey != e_key_file )
+  if ( g_ikey != e_key_file ) {
+    upserr_vplace();
+    upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, "(null)" );    
     return 0;
+  }
   
   g_pd->file = upsutl_str_create( g_val );
-  cfilei(); /* translate file type to an enum */
+  
+  /* translate file type to an enum */
+  
+  if ( cfilei() == e_file_unknown ) {
+    upserr_vplace();
+    upserr_add( UPS_UNKNOWN_FILETYPE, UPS_WARNING, g_pd->file );
+  }
   
   while ( next_key() != e_key_eof ) {
 
@@ -1018,6 +1033,8 @@ int cfilei( void )
 
   int i;
   g_ifile = e_file_unknown;
+
+  if ( !g_pd->file ) return g_ifile;
 
   /* for now, just a linear search */
 

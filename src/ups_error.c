@@ -71,28 +71,30 @@ static char *g_error_messages[UPS_NERR] = {
   "%s: The passed filename was longer than the allowed system maximum (%d)\n",
   "%s: No instance matches were made between the version file (%s) and the table file (%s)\n",
   "%s: File not found - %s\n",
-  "%s: Cound not malloc %d bytes\n",
-  "%s: MAX_LINE_LEN exceeded in \"%s\"\n"
+  "%s: Could not malloc %d bytes\n",
+  "%s: MAX_LINE_LEN exceeded in \"%s\"\n",
+  "%s: Unknown file type \"%s\"\n"
 };
 
 char *g_error_ascii[] = {
-   /* UPS_SUCCESS           0 */ "UPS_SUCCESS",
-   /* UPS_OPEN_FILE         1 */ "UPS_OPEN_FILE",
-   /* UPS_READ_FILE         2 */ "UPS_READ_FILE",
-   /* UPS_INVALID_KEYWORD   3 */ "UPS_INVALID_KEYWORD",
-   /* UPS_NO_DATABASE       4 */ "UPS_NO_DATABASE",
-   /* UPS_TIME              5 */ "UPS_TIME",
-   /* UPS_NAME_TOO_LONG     6 */ "UPS_NAME_TOO_LONG",
-   /* UPS_NO_STAT_DIR       7 */ "UPS_NO_STAT_DIR",
-   /* UPS_WRITE_FILE        8 */ "UPS_WRITE_FAIL",
-   /* UPS_INVALID_ARGUMENT  9 */ "UPS_INVALID_ARGUMENT",
+   /* UPS_SUCCESS           0  */ "UPS_SUCCESS",
+   /* UPS_OPEN_FILE         1  */ "UPS_OPEN_FILE",
+   /* UPS_READ_FILE         2  */ "UPS_READ_FILE",
+   /* UPS_INVALID_KEYWORD   3  */ "UPS_INVALID_KEYWORD",
+   /* UPS_NO_DATABASE       4  */ "UPS_NO_DATABASE",
+   /* UPS_TIME              5  */ "UPS_TIME",
+   /* UPS_NAME_TOO_LONG     6  */ "UPS_NAME_TOO_LONG",
+   /* UPS_NO_STAT_DIR       7  */ "UPS_NO_STAT_DIR",
+   /* UPS_WRITE_FILE        8  */ "UPS_WRITE_FAIL",
+   /* UPS_INVALID_ARGUMENT  9  */ "UPS_INVALID_ARGUMENT",
    /* UPS_NO_VERSION_MATCH  10 */ "UPS_NO_VERSION_MATCH",
    /* UPS_FILENAME_TOO_LONG 11 */ "UPS_FILENAME_TOO_LONG",
    /* UPS_NO_TABLE_MATCH    12 */ "UPS_NO_TABLE_MATCH",
    /* UPS_NO_FILE           13 */ "UPS_NO_FILE",
    /* UPS_NO_MEMORY         14 */ "UPS_NO_MEMORY",
    /* UPS_LINE_TOO_LONG     15 */ "UPS_LINE_TOO_LONG",
-   /* UPS_NERR              16    */ "UPS_NERR",
+   /* UPS_UNKNOWN_FILETYPE  16 */ "UPS_UNKNOWN_FILETYPE",
+   /* UPS_NERR              17 */ "UPS_NERR",
    0 };
 
 /*

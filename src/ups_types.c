@@ -58,8 +58,14 @@ t_ups_product *ups_new_product( void )
 {
   t_ups_product *prod_ptr =
     (t_ups_product *)upsmem_malloc( sizeof( t_ups_product ) );
-  
-  memset( prod_ptr, 0, sizeof( t_ups_product ) );
+
+  if ( prod_ptr ) {
+    memset( prod_ptr, 0, sizeof( t_ups_product ) );
+  }
+  else {
+    upserr_vplace();
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_product ) );
+  }
   return prod_ptr;
 }
 
@@ -118,7 +124,13 @@ t_ups_instance *ups_new_instance( void )
   t_ups_instance *inst_ptr =
     (t_ups_instance *)upsmem_malloc( sizeof( t_ups_instance ) );
   
-  memset( inst_ptr, 0, sizeof( t_ups_instance ) );
+  if ( inst_ptr ) {
+    memset( inst_ptr, 0, sizeof( t_ups_instance ) );
+  }
+  else {
+    upserr_vplace();
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_instance ) );
+  }
   return inst_ptr;
 }
 
@@ -191,7 +203,13 @@ t_ups_action *ups_new_action( void )
   t_ups_action *act_ptr =
     (t_ups_action *)upsmem_malloc( sizeof( t_ups_action ) );
   
-  memset( act_ptr, 0, sizeof( t_ups_action ) );
+  if ( act_ptr ) {
+    memset( act_ptr, 0, sizeof( t_ups_action ) );
+  }
+  else {
+    upserr_vplace();
+    upserr_add( UPS_NO_MEMORY, UPS_FATAL, sizeof( t_ups_action ) );
+  }
   return act_ptr;
 }
 
