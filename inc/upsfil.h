@@ -41,7 +41,7 @@ int               upsfil_write_file( t_upstyp_product * const prod_ptr,
 int               upsfil_exist( const char * const ups_file );
 void              upsfil_flush( void );
 void              upsfil_stat( const int iopt );
-int               upsfil_is_in_cache( const char * const ups_file );
+t_upstyp_product  *upsfil_is_in_cache( const char * const ups_file );
 void              g_print_product( t_upstyp_product * const prod_ptr );
 
 /*
