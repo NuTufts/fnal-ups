@@ -897,7 +897,9 @@ t_upslst_item *upsact_check_files(
   
   if (a_cmd) {
     /* translate any ${UPS...} variables */
-    trans_cmd = upsget_translation(a_mproduct, a_command_line, a_cmd);
+    trans_cmd = upsget_translation(
+                    (t_upstyp_matched_instance *)a_mproduct->minst_list->data,
+		    a_mproduct->db_info, a_command_line, a_cmd);
 
     /* parse the command */
     parsed_cmd = upsact_parse_cmd(trans_cmd);
@@ -1018,8 +1020,10 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
   }
 
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
-    p_line = upsget_translation( p_act_itm->mat, p_act_itm->ugo,
-				 (char *)l_cmd->data );
+    p_line = upsget_translation(
+		 (t_upstyp_matched_instance *)p_act_itm->mat->minst_list->data,
+		 p_act_itm->mat->db_info, p_act_itm->ugo,
+		 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
     i_cmd = p_cmd ? p_cmd->icmd : e_invalid_cmd;
 
@@ -1173,8 +1177,10 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
     /* translate and parse command */
 
-    p_line = upsget_translation( p_act_itm->mat, p_act_itm->ugo,
-				 (char *)l_cmd->data );
+    p_line = upsget_translation(
+		 (t_upstyp_matched_instance *)p_act_itm->mat->minst_list->data,
+		 p_act_itm->mat->db_info, p_act_itm->ugo,
+		 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
 
     if ( !p_cmd || p_cmd->icmd == e_invalid_cmd ) {
@@ -1942,8 +1948,10 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 
     /* translate and parse command */
 
-    p_line = upsget_translation( p_act_itm->mat, p_act_itm->ugo,
-				 (char *)l_cmd->data );
+    p_line = upsget_translation(
+		 (t_upstyp_matched_instance *)p_act_itm->mat->minst_list->data,
+		 p_act_itm->mat->db_info, p_act_itm->ugo,
+		 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
     if ( p_cmd && ((i_cmd = p_cmd->icmd) != e_invalid_cmd) ) {
       if ( (i_uncmd = g_cmd_maps[p_cmd->icmd].icmd_undo) != e_invalid_cmd ) {
@@ -2112,6 +2120,8 @@ static void f_copyhtml( ACTION_PARAMS)
 
 static void f_copyinfo( ACTION_PARAMS)
 {
+  struct stat file_stat;
+
   CHECK_NUM_PARAM("copyInfo");
 
   OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
@@ -2126,10 +2136,16 @@ static void f_copyinfo( ACTION_PARAMS)
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
-		    a_minst->table->info_files,
-		    a_db_info->config->info_path) < 0) {
-	  FPRINTF_ERROR();
+	/* first check to see if the directory where the info files are
+	   located exists and is a directory */
+	if (! stat(a_minst->table->info_files, &file_stat)) {
+	  if (S_ISDIR(file_stat.st_mode)) {
+	    if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
+			a_minst->table->info_files,
+			a_db_info->config->info_path) < 0) {
+	      FPRINTF_ERROR();
+	    }
+	  }
 	}
 	break;
       default:
@@ -2174,17 +2190,12 @@ static void f_copyinfo( ACTION_PARAMS)
     if (!a_minst->table || !a_minst->table->keyword) {                     \
       source = upsutl_find_manpages(a_minst, a_db_info);                   \
     } else {                                                               \
-      t_upstyp_matched_product mproduct;                                   \
-      t_upslst_item minst_list = {NULL, NULL, NULL};                       \
       /* the *MAN_FILES keyword must have been specified, use it but we    \
-	 must translate any local ups environment variables in it. since   \
-	 upsget_translation takes a matched product structure, we must     \
-	 cobble that together first */                                     \
-      minst_list.data = (void *)a_minst;                                   \
-      mproduct.minst_list = &minst_list;                                   \
-      mproduct.db_info = (t_upstyp_db *)a_db_info;                         \
-      source = upsget_translation(&mproduct, a_command_line,               \
-	  			  a_minst->table->keyword);                \
+	 must translate any local ups environment variables in it. */      \
+      if (a_minst->version) {                                              \
+        source = upsget_translation(a_minst, a_db_info, a_command_line,    \
+	  			    a_minst->table->keyword);              \
+      }                                                                    \
     }
       
 #define PROCESS_DIR(dir_name, dir_size, type, keyword)   \
@@ -2666,7 +2677,7 @@ static void f_envremove( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		"upstmp=\"`dropit -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		"upstmp=\"`dropit -p \"$%s\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"%s\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  a_cmd->argv[0], delimiter, delimiter, a_cmd->argv[1],
 		  delimiter, a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();

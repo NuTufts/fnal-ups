@@ -179,8 +179,10 @@ static void get_files(const t_upstyp_matched_product * const a_mproduct,
     /* now check the product description field, it may be a file name too */
     if (minst->table->description) {
       /* first translate any ups local environment variables */
-      file = upsget_translation(a_mproduct, a_command_line, 
-				minst->table->description);
+      file = upsget_translation(
+		     (t_upstyp_matched_instance *)a_mproduct->minst_list->data,
+		     a_mproduct->db_info, a_command_line, 
+		     minst->table->description);
       
       /* now see if the resulting string is a file */
       if(upsutl_is_a_file(file) == UPS_SUCCESS) {
