@@ -52,6 +52,12 @@ then
     error=1
 fi
 
+if [ x${Name_Of_Ups:-} = x ]
+then
+    echo UPS_PROD_NAME not set. Configure exiting.
+    error=1
+fi
+
 if [ x${UPS_PROD_FLAVOR:-} = x ]
 then
     echo UPS_PROD_FLAVOR not set. Configure exiting.
@@ -93,11 +99,20 @@ fi
 #
 if [ -f $Ups_DB_Path/.upsfiles/dbconfig ]
 then
-    Setups_Home=`grep -i $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '^#'|cut -f2 -d'='|sed 's% %%'`
+    Setups_Home=`grep -i $Setups_Flag $Ups_DB_Path/.upsfiles/dbconfig|grep -v '#'|cut -f2 -d'='|sed 's% %%'`
 fi
 if [ x${Setups_Home:-} = x ]
 then
+    echo '**'
+    echo '**' $Setups_Flag not defined in $Ups_DB_Path/.upsfiles/dbconfig
+    echo '**' Using /usr/local/etc
+    echo '**'
     Setups_Home=/usr/local/etc
+else
+    echo '**'
+    echo '**' $Setups_Flag defined as $Setups_Home in 
+    echo '**' $Ups_DB_Path/.upsfiles/dbconfig
+    echo '**'
 fi
 
 
@@ -207,6 +222,9 @@ fi
 #
 if [ ! -x $Ups_Dir/bootstrap/$Setups_Products_Script ]
 then
+echo '**'
+echo '**' Creating $Ups_Dir/bootstrap/$Setups_Products_Script
+echo '**'
 #
 # Create the script to create PRODUCTS.  NOTE: This script is 
 # preferably a korn shell, but may, with slight loss of 
@@ -324,8 +342,12 @@ fi
 #
 # Create the setups.csh file in the bootstrap directory.
 #
+rm -f $Ups_Dir/bootstrap/${Script_Prefix}.csh
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.csh ]
 then
+echo '**'
+echo '**' Creating $Ups_Dir/bootstrap/${Script_Prefix}.csh
+echo '**'
 cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.csh
 #!/bin/csh
 #
@@ -475,8 +497,12 @@ fi
 #
 # Create, if necessary, the setups.sh script
 #
+rm -f $Ups_Dir/bootstrap/${Script_Prefix}.sh
 if [ ! -f $Ups_Dir/bootstrap/${Script_Prefix}.sh ]
 then
+echo '**'
+echo '**' Creating $Ups_Dir/bootstrap/${Script_Prefix}.sh
+echo '**'
 cat <<XEoF >$Ups_Dir/bootstrap/${Script_Prefix}.sh
 #!/bin/sh
 #
@@ -681,6 +707,10 @@ then
 
 for Start_Or_Stop in startup shutdown
 do
+rm -f $Ups_Dir/ups/ups_${Start_Or_Stop}
+echo '**'
+echo '**' Creating $Ups_Dir/ups/ups_${Start_Or_Stop}
+echo '**'
 cat <<XEoF >$Ups_Dir/ups/ups_${Start_Or_Stop}
 #!/bin/sh 
 #
@@ -816,8 +846,12 @@ fi
 #
 # IT IS  V E R  Y    S   L    O     W
 #
+rm -f $Ups_Dir/bootstrap/${Script_Prefix}.common
 if [ ! -r $Ups_Dir/bootstrap/${Script_Prefix}.common ]
 then
+    echo '**'
+    echo '**' Creating $Ups_Dir/bootstrap/${Script_Prefix}.common
+    echo '**'
     cat <<XEoF > $Ups_Dir/bootstrap/${Script_Prefix}.common 
 #!/bin/sh 
 # Copyright (c) 1998 Universities Research Association, Inc.
@@ -1068,6 +1102,9 @@ if [ -r $Ups_Dir/ups/current ]
 then
     rm -f $Ups_Dir/ups/current
 fi
+echo '**'
+echo '**' Creating $Ups_Dir/ups/current
+echo '**'
 cat <<XEoF >$Ups_Dir/ups/current
 #!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
@@ -1255,6 +1292,9 @@ if [ -w $Ups_Dir/ups/uncurrent ]
 then
     rm -f $Ups_Dir/ups/uncurrent
 fi
+echo '**'
+echo '**' Creating $Ups_Dir/ups/uncurrent
+echo '**'
 cat <<XEoF >$Ups_Dir/ups/uncurrent
 #!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
