@@ -119,7 +119,7 @@ static char 			*tostring;
    your call marge...                                                   */
 static char 			*string = 
 	 "Name         = ${UPS_PROD_NAME}\
-	\ntilde        = ~root/dir/filename\
+	\nTilde        = ~root/dir/filename\
 	\nVersion      = ${UPS_PROD_VERSION}\
 	\nFlavor       = ${UPS_PROD_FLAVOR}\
 	\nQualifiers   = ${UPS_PROD_QUALIFIERS}\
