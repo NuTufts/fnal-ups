@@ -42,6 +42,7 @@
 #include "upserr.h"
 #include "upsutl.h"
 #include "upshlp.h"
+#include "upsget.h"
 
 /*
  * Definition of public variables.
@@ -196,6 +197,12 @@ int main(int argc, char *argv[])
 	upsutl_stop_timing();
       }
 
+      /* write any closing info to the file */
+      if (g_LOCAL_VARS_DEF) {
+	/* undefine the local env variables */
+	(void )upsget_remall(temp_file, command_line);
+      }
+
       if (UPS_ERROR != UPS_SUCCESS) {
 	rstatus = 1;                   /* return an error to the user */
 	break;
@@ -212,12 +219,7 @@ int main(int argc, char *argv[])
     if (ftell(temp_file) == 0L) {
       /* we are at the beginning of the file, nothing was written to it */
       empty_temp_file = 1;
-    } else {
-      /* write any closing info to the file */
-      if (g_LOCAL_VARS_DEF) {
-	/* ??? call dave's routine to undefine the local env variables */
-      }
-      
+    } else {      
       /* we usually tell the file to delete itself.  however the user may
 	 override this */
       if (! keep_temp_file) {
