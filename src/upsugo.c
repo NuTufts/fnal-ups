@@ -1035,7 +1035,7 @@ int upsugo_dump (struct ups_command * const uc,
       if ( uc->ugo_flavor ) 
          upsugo_prtlst(uc->ugo_flavor,"Flavor:           ",prnt_ptr); 
       if ( uc->ugo_osname) 
-         printf("Osname:           %s\n",uc->ugo_osname); 
+         upsugo_prtlst(uc->ugo_osname,"Osname:           ",prnt_ptr); 
       if ( uc->ugo_host ) 
          upsugo_prtlst(uc->ugo_host,  "Host:             ",prnt_ptr); 
       if ( uc->ugo_key ) 
