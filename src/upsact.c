@@ -198,11 +198,6 @@ static void f_filetest( const t_upstyp_matched_instance * const a_inst,
 			const t_upsugo_command * const a_command_line,
 			const FILE * const a_stream,
 			const t_upsact_cmd * const a_cmd);
-static void f_makedir( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd);
 static void f_pathappend( const t_upstyp_matched_instance * const a_inst,
 			  const t_upstyp_db * const a_db_info,
 			  const t_upsugo_command * const a_command_line,
@@ -445,7 +440,6 @@ static t_cmd_map g_cmd_maps[] = {
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
   { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
-  { "makedir", e_makedir, f_makedir, 1, 1, e_invalid_cmd },
   { "copyhtml", e_copyhtml, f_copyhtml, 1, 1, e_invalid_cmd },
   { "copyinfo", e_copyinfo, f_copyinfo, 1, 1, e_invalid_cmd },
   { "copyman", e_copyman, f_copyman, 0, 1, e_uncopyman },
@@ -2411,36 +2405,6 @@ static void f_filetest( const t_upstyp_matched_instance * const a_inst,
       if (fprintf((FILE *)a_stream,
 		  "if ( ! %s %s ) then\necho \"%s\"\nexit 1\nendif\n#\n", 
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
-	FPRINTF_ERROR();
-      }
-      break;
-    default:
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
-    }
-  }
-}
-
-static void f_makedir( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd)
-{
-  CHECK_NUM_PARAM("makeDir");
-
-  /* only proceed if we have a valid number of parameters and a stream to write
-     them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-    switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-    case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "mkdir %s\n#\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
