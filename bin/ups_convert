@@ -100,6 +100,7 @@ $#SOURCE=5;    # Source directory ( vary rare )   - instanceHash
 $#ORIGIN=6;    # tarfiledirectory ( seldom used ) - instanceHash
 $#AUTHNDS=7;   # Authorizes nodes                 - instanceHash
 $#DISTRIB=8;   # Distribution, never seen not used- instanceHash
+$#UPSDIR=9;
 $#VERSION=0;   # Version specification            - reqHash,flvrchnHash
 $#FLAVOR=1;    # Flavor                           - reqHash
 $#FLAGS=2;     # flags                            - reqHash
@@ -215,6 +216,10 @@ LINE:
 # This is what the ups listed as the tarfiledirectory ( I called origin )
           if ((/^\s*[aA-zZ]:*/o) && ( split == 1 )) { 
              $instanceHash{$opKey}{$verKey}[$#ORIGIN] = $_[0]; 
+          }
+# This is ups_dir - didn't know about this bad boy... (Mar 24 CST 1998)
+          if (/^\s*ups_dir:\s*.*/o) {
+             $instanceHash{$opKey}{$verKey}[$#UPSDIR] = $_[1]; 
           }
 # This is Authorized nodes..
           if (/^\s*Authorized_Nodes:\s*.*/o) {
@@ -585,7 +590,11 @@ sub WriteVersionRecs {
     print VersionFile "   DECLARED=$instanceHash{$flvr}{$version}[$#WHEN]\n";
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
-    print VersionFile "   UPS_DIR=ups\n";
+    if ( &upsdir ) {
+     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
+    } else {  
+     print VersionFile "   UPS_DIR=ups\n";
+    }
     if ( &source ) {
        print VersionFile "   SOURCE=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
     }
@@ -619,18 +628,22 @@ sub WriteVersionRecs {
     print VersionFile "   DECLARED=$instanceHash{$flvr}{$version}[$#WHEN]\n";
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
-    print VersionFile "   UPS_DIR=ups\n";
+    if ( &upsdir ) {
+     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
+    } else {  
+     print VersionFile "   UPS_DIR=ups\n";
+    }
     if ( &source ) {
-       print VersionFile "   SOURCE=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
+     print VersionFile "   SOURCE=$instanceHash{$flvr}{$version}[$#SOURCE]\n";
     }
     if ( &origin ) {
-       print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
+     print VersionFile "   ORIGIN=$instanceHash{$flvr}{$version}[$#ORIGIN]\n";
     }
     if ( &auth_nodes ) {
-       print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
+     print VersionFile "   AUTHORIZED_NODES=$instanceHash{$flvr}{$version}[$#AUTHNDS]\n";
     }
     if ( &distribution ) {
-       print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
+     print VersionFile "   DISTRIBUTION=$instanceHash{$flvr}{$version}[$#DISTRIB]\n";
     }
     if ( &table_file  ("BUILD") ) {
 #       print VersionFile "   TABLE_DIR=$ndbs/$PRODUCT\n";
@@ -679,6 +692,7 @@ sub source { return $instanceHash{$flvr}{$version}[$#SOURCE] }
 sub origin { return $instanceHash{$flvr}{$version}[$#ORIGIN] }
 sub auth_nodes { return $instanceHash{$flvr}{$version}[$#AUTHNDS] }
 sub distribution { return $instanceHash{$flvr}{$version}[$#DISTRIB] }
+sub upsdir { return $instanceHash{$flvr}{$version}[$#UPSDIR] }
 
 sub build_version { return $reqHash{"BUILD"}{$reqCat}{$reqName}[$#VERSION] }
 sub use_version { return $reqHash{"USE"}{$reqCat}{$reqName}[$#VERSION] }
@@ -706,14 +720,14 @@ sub add_misactions {
     $value="";
     if (checkfor("${basedir}/ups/tailor")) {
        $value.="   Action=Tailor\n";
-       $value.="      proddir()\n"
+       $value.="      proddir()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/tailor)\n";
        $value.="      doDefaults()\n";
        $value.="      unproddir()\n"
     }
     if (checkfor("${basedir}/ups/configure")) {
        $value.="   Action=Configure\n";
-       $value.="      proddir()\n"
+       $value.="      proddir()\n";
        $value.="      sourceRequired(\${UPS_PROD_DIR}/ups/configure)\n";
        $value.="      doDefaults()\n";
        $value.="      unproddir()\n"
