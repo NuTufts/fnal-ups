@@ -174,11 +174,14 @@
 &fe ('IRIX64' , undef, undef, 'W', 1552 , 0,  "ups_list.c", 'variable "valid" was set but never used');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "ups_create.c", 'parameter "a_ups_command" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "ups_touch.c", 'parameter "tmpfile|ups_command" was declared');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upscpy.c", 'parameter \"a_minst|a_db_info|a_command_line|a_stream\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsget.c", 'parameter \"command_line\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsget.c", 'parameter \"instance\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsget.c", 'parameter \"db_info_ptr\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "ups_depend.c", 'parameter \"s_cmd\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "ups_verify.c", 'parameter \"a_command_line|a_product_name|a_db|a_minst\" was declared');
+&fe ('IRIX64' , undef, undef, 'W', 1209 , 0,  "ups_verify.c", 'controlling expression is constant');
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "ups_modify.c", 'parameter \"ups_command|tmpfile\" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1552 , 0,  "upsact.c", 'variable "delimiter" was set but never');
 &fe ('IRIX64' , undef, undef, 'W', 1174 , 0,  "upsact.c", 'parameter "a_db_info" was declared');
 &fe ('IRIX64' , undef, undef, 'W', 1209 , 0,  "upsact.c", 'controlling expression is constant');
