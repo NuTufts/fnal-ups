@@ -929,7 +929,7 @@ char *upsget_man_source_dir( const t_upstyp_matched_instance * const a_inst,
 
   g_buffer[0] = '\0';                      /* we want to fill this anew      */
  
-  if (tinst = a_inst->table)               /* See if we have a table file    */
+  if ((tinst = a_inst->table))             /* See if we have a table file    */
   { if (tinst->man_source_dir)             /* Is the source in the table file*/
     { man_source =                         /* will return value translated   */
          upsget_translation(a_inst, a_db_info,               /* if necessary */
@@ -977,7 +977,7 @@ char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
 
   g_buffer[0] = '\0';                      /* we want to fill this anew      */
  
-  if (tinst = a_inst->table)               /* See if we have a table file    */
+  if ((tinst = a_inst->table))             /* See if we have a table file    */
   { if (tinst->info_source_dir)            /* Is the source in the table file*/
     { info_source =                        /* will return value translated   */
          upsget_translation(a_inst, a_db_info,               /* if necessary */
