@@ -361,6 +361,8 @@ sub addReq {
               $reqName = sprintf "%2d,%s", $reqOrder, $ReqProd[0];
               $reqVer = "$ReqProd[1]";
               $reqOS = "$ReqProd[2]";
+# need to change the -b to -q build 
+              $reqFlag =~ s/-b /-q build /g;
               if ( $flavor eq $reqOS ) { $reqOS = "\${UPS_PROD_FLAVOR}"; }
               $reqHash{$reqType}{$reqCat}{$reqName} = [ $reqVer, $reqOS, $reqFlag ];
              }
