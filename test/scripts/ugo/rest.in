@@ -19,6 +19,9 @@ Qualifiers:       *
 Productdir:       /myprod:/yourprod
 Archivefile:      a.tar:b.tar
 Upsdir:           /fred:/barney
+Origin:           origin
+Compile Dir:           command_file_dir
+Compile File:           command_fish
 DB:               popeye
                   sinbad
                   ahab

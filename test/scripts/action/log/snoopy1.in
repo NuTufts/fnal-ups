@@ -1,3 +1,3 @@
-   1:asta v1_0 -f NULL:dodefaults()
-      2:lassie v5_0 -f NULL:dodefaults()
-      2:lassie v5_0 -f NULL:sourcerequired( lassie_v5_0 )
+   1:sr:asta v1_0 -f NULL -z ../db2:dodefaults()
+      2:sr:lassie v5_0 -f NULL -z ../db1:dodefaults()
+      2:sr:lassie v5_0 -f NULL -z ../db1:sourcerequired(lassie_v5_0)

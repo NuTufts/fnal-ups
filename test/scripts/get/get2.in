@@ -11,5 +11,6 @@ Extended     =
 This Db      = ../list/db1	
 Setup        = lassie v2_0 -f NULL -z ../list/db1 -q nodbg:opt -r /dog/house	
 Origin       = roddy@village.england	
+Compile      = /products/compiled/lassie.collar	
 PRODUCTS     = ../list/db1	
 Junk         = ${JUNK}	

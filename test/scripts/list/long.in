@@ -6,6 +6,7 @@ DATABASE=db1
 		Modified=""
 		Modifier=""
 		Home=/NULL/spot
+		No Compile Directive
 		Authorized, Nodes=*
 		UPS=ups
 		Table_Dir=""
@@ -25,6 +26,7 @@ DATABASE=db1
 		Modified=1-12-98
 		Modifier=astro
 		Home=/NULL/spot
+		No Compile Directive
 		NOT Authorized, Nodes=backyard
 		UPS=ups
 		Table_Dir=.

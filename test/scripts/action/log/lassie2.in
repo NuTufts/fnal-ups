@@ -1,4 +1,4 @@
-0:lassie v2_0 -f NULL:dodefaults()
-   1:spot v1_0 -f NULL:dodefaults()
-   1:spot v1_0 -f NULL:sourcerequired( spot_v1_0 )
-0:lassie v2_0 -f NULL:sourcerequired( lassie_v2_0 )
+0:sr:lassie v2_0 -f NULL -z ../db1:dodefaults()
+   1:so:spot v1_0 -f NULL -z ../db1:dodefaults()
+   1:so:spot v1_0 -f NULL -z ../db1:sourcerequired(spot_v1_0)
+0:sr:lassie v2_0 -f NULL -z ../db1:sourcerequired(lassie_v2_0)
