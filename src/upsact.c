@@ -56,7 +56,6 @@
  * Private types
  */
 
-
 /* this one is the type of a action command handler */
 typedef void (*tpf_cmd)( const t_upstyp_matched_instance * const a_inst,
 			 const t_upstyp_db * const a_db_info,
@@ -73,15 +72,17 @@ typedef struct s_cmd_map {
   int  max_params;
 } t_cmd_map;
 
+/*typedef int (*tpf_cmd)( const t_upsact_cmd * const cmd_ptr, const char copt );*/
 /*
  * Declaration of private functions.
  */
 
 int parse_params( const char * const a_params,
 		   char *argv[] );
-t_upslst_item *next_cmd( t_upstyp_action * const action,
-			 t_upslst_item *dep_list,
-			 t_upsact_item *const p_cur, 
+
+t_upslst_item *next_cmd( t_upslst_item *dep_list,
+			 t_upstyp_action * const action,
+			 t_upsact_item * const p_cur,
 			 const char * const act_name );
 t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 			  t_upstyp_matched_product * mat_prod,
@@ -347,11 +348,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 			       t_upstyp_matched_product *mat_prod,
 			       const char * const act_name )
 {
-  static char * valid_switch = "AacCdfghKtmMNoOPqrTuUv";
-  
   t_upsact_item *new_cur;
-  t_upstyp_matched_instance *mat_inst;
-  t_upslst_item *l_item;
   t_upstyp_action *p_act;
   t_upslst_item *dep_list = 0;
 
@@ -377,7 +374,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 
   /* get setup for top level product */
 
-  dep_list = next_cmd( p_act, dep_list, new_cur, act_name );
+  dep_list = next_cmd( dep_list, p_act, new_cur, act_name );
 
   return upslst_first( dep_list );
 }
@@ -522,7 +519,6 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 			  const char * const act_name )
 {
   t_upstyp_matched_instance *mat_inst;
-  t_upsugo_command *u_cmd;
 
   if ( !ugo_cmd || !act_name )
     return 0;
@@ -548,17 +544,21 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
  * Output: none
  * Return: t_upsact_cmd *,
  */
-t_upslst_item *next_cmd( t_upstyp_action * const action,
-			 t_upslst_item *dep_list,
-			 t_upsact_item * const p_cur,
-			 const char * const act_name )
+t_upslst_item *next_cmd( t_upslst_item *dep_list,
+			 t_upstyp_action *const action,			 
+			 t_upsact_item *const p_cur,
+			 const char *const act_name )
 {
-  static char * valid_switch = "AacCdfghKtmMNoOPqrTuUv";
+  static char *valid_switch = "AacCdfghKtmMNoOPqrTuUv";
   t_upslst_item *l_cmd = action->command_list;
   t_upsact_cmd *p_cmd = 0;
+  char *p_line = 0;
 
-  for ( ; l_cmd; l_cmd = l_cmd->next ) {
-    p_cmd = upsact_parse_cmd( (char *)l_cmd->data );
+  for ( ; l_cmd; l_cmd = l_cmd->next ) {    
+    /* translate and parse command */    
+    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
+				 (char *)l_cmd->data );
+    p_cmd = upsact_parse_cmd( p_line );
     if ( p_cmd ) {
       if ( p_cmd->icmd > e_unsetuprequired ) {
 	t_upsact_item *new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
@@ -576,7 +576,7 @@ t_upslst_item *next_cmd( t_upstyp_action * const action,
 	t_upsact_item *new_cur = 0;
 	t_upsugo_command *new_ugo = upsugo_bldcmd( p_cmd->argv[0], valid_switch );
 	if ( !new_ugo ) {
-	  printf( "???? no new ugo\n" );
+	  printf( "???? no new ugo on %s\n", p_line );
 	  continue;
 	}
 
@@ -591,13 +591,13 @@ t_upslst_item *next_cmd( t_upstyp_action * const action,
 	
 	l_mproduct = upsmat_instance( new_ugo, 1 );
 	if ( !l_mproduct || !l_mproduct->data ) {
-	  printf( "???? no product\n" );
+	  printf( "???? no product on %s\n", p_line );
 	  continue;
 	}
 	new_mat = (t_upstyp_matched_product *)l_mproduct->data;
 	new_act = get_act( new_ugo, new_mat, act_name );
 	if ( !new_act ) {
-	  printf( "???? no new act\n" );
+	  printf( "???? no new act on %s\n", p_line );
 	  continue;
 	}
 	new_cur = (t_upsact_item *)malloc( sizeof( t_upsact_item ) );
@@ -605,9 +605,12 @@ t_upslst_item *next_cmd( t_upstyp_action * const action,
 	new_cur->ugo = new_ugo;
 	new_cur->mat = new_mat;
 	new_cur->cmd = 0;
-	dep_list = next_cmd( new_act, dep_list, new_cur, act_name );
+	dep_list = next_cmd( dep_list, new_act, new_cur, act_name );
 	continue;
       }
+    }
+    else {
+      printf( "parse_cmd failed on %s\n", p_line );
     }
   }
   
@@ -1306,7 +1309,8 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "if ( ! %s %s ) return 1\n", 
+      if (fprintf((FILE *)a_stream,
+		  "if ( ! %s %s ) then\necho %s\nreturn 1\nendif\n", 
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
 	upserr_vplace();
 	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
