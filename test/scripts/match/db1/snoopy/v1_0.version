@@ -8,7 +8,6 @@ QUALIFIERS = "charlie:lucy:linus:pigpen:violet"
   DECLARER = jetson
   PROD_DIR = /NULL/snoopy
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = snoopy.table
 
 FLAVOR = NULL
@@ -17,7 +16,6 @@ QUALIFIERS = "lucy:linus:pigpen:violet"
   DECLARER = jetson
   PROD_DIR = /NULL/snoopy
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = snoopy.table
 
 FLAVOR = NULL
@@ -26,7 +24,6 @@ QUALIFIERS = ""
   DECLARER = jetson
   PROD_DIR = /NULL/snoopy
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = snoopy.table
 
 FLAVOR = NULL
@@ -35,6 +32,5 @@ QUALIFIERS = "pigpen"
   DECLARER = jetson
   PROD_DIR = /NULL/snoopy
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = snoopy.table
 

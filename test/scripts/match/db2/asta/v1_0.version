@@ -8,7 +8,6 @@ QUALIFIERS = "nick:nora"
   DECLARER = jetson
   PROD_DIR = /NULL/asta
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = asta.table
 
 FLAVOR = NULL
@@ -17,6 +16,5 @@ QUALIFIERS = ""
   DECLARER = jetson
   PROD_DIR = /NULL/asta
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = asta.table
 

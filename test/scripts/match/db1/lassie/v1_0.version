@@ -8,7 +8,6 @@ QUALIFIERS = "nodbg:opt"
   DECLARER = jetson
   PROD_DIR = /NULL/lassie
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = lassie.table
 
 
@@ -18,7 +17,6 @@ QUALIFIERS = "nodbg:opt"
   DECLARER = jetson
   PROD_DIR = /IRIX+5.3/lassie
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = lassie.table
 
 FLAVOR = IRIX+6.2
@@ -27,7 +25,6 @@ QUALIFIERS = ""
   DECLARER = jetson
   PROD_DIR = /IRIX+6.2/lassie
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = lassie.table
 
 FLAVOR = OSF1
@@ -36,5 +33,4 @@ QUALIFIERS = ""
   DECLARER = jetson
   PROD_DIR = /OSF1/lassie/
   UPS_DIR = ups
-  TABLE_DIR = ups
   TABLE_FILE = lassie.table
