@@ -299,7 +299,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     db_info = (t_upstyp_db *)db_list->data;
   } 
 /* restore everything */
-  uc->ugo_version=save_version;
+/*  uc->ugo_version=save_version; */
   uc->ugo_flavor=upslst_free(uc->ugo_flavor,'d');
   uc->ugo_flavor=save_flavor;
   uc->ugo_qualifiers=upslst_free(uc->ugo_qualifiers,'d');
@@ -321,7 +321,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  db_info->name,
                  uc->ugo_product,
                  the_chain,CHAIN_SUFFIX);
-         if (upsfil_exist(file))        /* does chain file exist at all */
+         if (upsfil_exist(buffer))        /* does chain file exist at all */
          { upsver_mes(1,"%sChain %s currently exist\n",UPS_DECLARE,the_chain);
            uc->ugo_flavor=save_flavor;
            uc->ugo_qualifiers=save_qualifiers;
