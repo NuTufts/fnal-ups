@@ -513,9 +513,9 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
   }
 
   else {
-    t_upstyp_matched_product *mat_prod;
-    t_upstyp_matched_instance *mat_inst;
-    t_upslst_item *l_mproduct;
+    t_upstyp_matched_product *mat_prod = 0;
+    t_upstyp_matched_instance *mat_inst = 0;
+    t_upslst_item *l_mproduct = 0, *l_hlp;
     t_upslst_item *old_ugo_key;
     t_upsact_item dep_act_itm;
     int i;
@@ -534,8 +534,8 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
       }
 
       mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
-      mat_inst = 
-	(t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
+      l_hlp = upslst_first( mat_prod->minst_list );
+      mat_inst = l_hlp ? (t_upstyp_matched_instance *)(l_hlp->data) : 0;
       
       if ( strchr( sopt, 'K' ) ) {
 	
@@ -1703,11 +1703,13 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 
   /* we are expecting one match, else the above should fail */
 
-  mat_inst = (t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
-  if ( mat_inst->table ) 
-    return upskey_inst_getaction( mat_inst->table, act_name );
-  else
-    return 0;
+  if ( mat_prod->minst_list ) { 
+    mat_inst = (t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
+    if ( mat_inst && mat_inst->table ) 
+      return upskey_inst_getaction( mat_inst->table, act_name );
+  }
+
+  return 0;
 }
 
 t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd )
