@@ -71,6 +71,7 @@ enum e_upskey_key {
   e_key_info_path,
   e_key_news_path,
   e_key_html_path,
+  e_key_upd_usercode,
   
   e_key_group,
   e_key_common,

@@ -93,15 +93,16 @@ static t_upskey_map g_key_map[] =
   { 26, "MAN_PATH",         NO,   NO,    4, 0x00001000 },
   { 27, "CATMAN_PATH",      NO,   NO,    5, 0x00001000 },
   { 28, "INFO_PATH",        NO,   NO,    6, 0x00001000 },
-  { 29, "NEWS_PATH",        NO,   NO,    7, 0x00001000 },
-  { 30, "HTML_PATH",        NO,   NO,    8, 0x00001000 },
+  { 29, "HTML_PATH",        NO,   NO,    7, 0x00001000 },
+  { 30, "NEWS_PATH",        NO,   NO,    8, 0x00001000 },
+  { 31, "UPD_USERCODE",     NO,   NO,    9, 0x00001000 },
   
 
-  { 31, "GROUP:",           NO,   NO,   NO, 0x00000010 },
-  { 32, "COMMON:",          NO,   NO,   NO, 0x00000010 },
-  { 33, "END:",             NO,   NO,   NO, 0x00000010 },
+  { 32, "GROUP:",           NO,   NO,   NO, 0x00000010 },
+  { 33, "COMMON:",          NO,   NO,   NO, 0x00000010 },
+  { 34, "END:",             NO,   NO,   NO, 0x00000010 },
 
-  { 34,0,0,0,0 },
+  { 35,0,0,0,0 },
 };
 
 /*
