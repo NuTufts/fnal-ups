@@ -34,7 +34,7 @@ upserr_clear
 # note that -a changes the output of Flavor. Do not specify a "-f" in the
 # test because we want to make sure it Flavor is '*'.
 #
-upsugo_next -out rest.out -diff rest.in -a -A hercules:neptune:zeus -B -C -D -e -E -F -h "  levinworth :alcatraz" -j -k -K west:largo:limepie -l -m /jupiter:/mars -M titan -N sam:shameful -O power_steering:ac:abs -p "It was a dark and stormy night." -P valhalla:xanadu -r /myprod:/yourprod -S -T a.tar:b.tar -u -U /fred:/barney -v -V -w -W -x -X -y -Y -z"popeye:sinbad:   ahab"   -Z
+upsugo_next -out rest.out -diff rest.in -a -A hercules:neptune:zeus -B -C -D -e -E -F -h "  levinworth :alcatraz" -j -k -K west:largo:limepie -l -M /jupiter:/mars -m titan -N sam:shameful -O power_steering:ac:abs -p "It was a dark and stormy night." -P valhalla:xanadu -r /myprod:/yourprod -S -T a.tar:b.tar -u -U /fred:/barney -v -V -w -W -x -X -y -Y -z"popeye:sinbad:   ahab"   -Z
 #
 upsugo_next -out proda.out -diff proda.in -fIRIX:AIX ProdA
 upsugo_next -out prodb.out -diff prodb.in -f"IRIX:AIX" ProdB
