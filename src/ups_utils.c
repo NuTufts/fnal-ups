@@ -15,8 +15,11 @@
  *       Batavia, Il 60510, U.S.A.
  *
  * MODIFICATIONS:
- *       28-Jul-1997, EB, first
- *       13-Aug-1997, LR, added string handling upsutl_str_*
+ *       28-Jul-1997, EB, first.
+ *       13-Aug-1997, LR, added string handling upsutl_str_*.
+ *       26-Aug-1997, LR, fixed bug in str_sort.
+ *                        added option 'p' to str_create.
+ *                        added function str_crecat.
  *
  ***********************************************************************/
 
@@ -402,6 +405,7 @@ char *upsutl_user(void)
  *
  * Input : char *, string to be copied.
  *         char, options, 't' will trim edges of passed string.
+ *             , options, 'p' will trim full string (packing).
  * Output: none
  * Return: char *, new string.
  */
@@ -411,9 +415,9 @@ char *upsutl_str_create( char * const str, const char copt )
   
   if ( ! str ) return 0;
 
-  if ( copt == 't' ) {
+  if ( copt == 't' || copt == 'p' ) {
     
-    /* copy overhead only when option 't' is passed */
+    /* copy overhead only when option 't' or 'p' is passed */
     
     static char buf[MAX_LINE_LEN];
     if ( strlen( str ) >= MAX_LINE_LEN ) {    
@@ -421,7 +425,10 @@ char *upsutl_str_create( char * const str, const char copt )
       return 0;
     }    
     strcpy( buf, str );
-    upsutl_str_remove_edges( buf, " \t\n\r\f\"" );
+    if ( copt == 'p' )
+      upsutl_str_remove( buf, " \t\n\r\f\"" );
+    else
+      upsutl_str_remove_edges( buf, " \t\n\r\f\"" );
     
     new_str = (char *)upsmem_malloc( (int)strlen( buf ) + 1 );
     strcpy( new_str, buf );      
@@ -429,6 +436,34 @@ char *upsutl_str_create( char * const str, const char copt )
   else {      
     new_str = (char *)upsmem_malloc( (int)strlen( str ) + 1 );
     strcpy( new_str, str );      
+  }
+  
+  return new_str;
+}
+
+/*-----------------------------------------------------------------------
+ * upsutl_str_crecat
+ *
+ * It will concatenate the two passed string into a new created string.
+ *
+ * Input : char *, string to be copied.
+ *         char *, string to be concatenate.
+ * Output: none
+ * Return: char *, new string.
+ */
+char *upsutl_str_crecat( char * const str1, char * const str2 )
+{
+  char *new_str = 0;
+  
+  if ( !str1 ) return 0;
+
+  if ( !str2 ) {
+    new_str = upsutl_str_create( str1, ' ' );
+  }
+  else {
+    new_str = (char *)malloc( (int)strlen( str1 ) + (int)strlen( str2 ) + 1 );
+    strcpy( new_str, str1 );
+    strcat( new_str, str2 );
   }
   
   return new_str;
@@ -466,6 +501,7 @@ int upsutl_str_sort( char * const str, const char c )
     cp0 = cp+1;
     count++;
   }
+  if ( (i=strlen( cp0 )) > max_len ) max_len = i;
   ++max_len;
   ++count;
 

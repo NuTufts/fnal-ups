@@ -17,6 +17,9 @@
  * MODIFICATIONS:
  *       28-Jul-1997, EB, first
  *       13-Aug-1997, LR, added string handling upsutl_str_*
+ *       26-Aug-1997, LR, fixed bug in str_sort.
+ *                        added option 'p' to str_create.
+ *                        added function str_crecat.
  *
  ***********************************************************************/
 
@@ -56,6 +59,7 @@ char *upsutl_user(void);
 
 char  *upsutl_strstr( const char * const a_str, const char * const a_pattern);
 char  *upsutl_str_create( char * const str, const char copt );
+char  *upsutl_str_crecat( char * const str1, char * const str2 );
 int    upsutl_str_sort( char * const, const char );
 size_t upsutl_str_remove( char * const str, const char * const ct );
 size_t upsutl_str_remove_edges( char * const str, const char * const ct );
