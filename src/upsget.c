@@ -430,6 +430,11 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
     strncat(newstr,upto,(unsigned int )count);
     upto += count;
     eaddr =strchr(upto,'}');
+    if ( !eaddr ) {
+      upserr_vplace();
+      upserr_add( UPS_NO_TRANSLATION, UPS_FATAL, oldstr );
+      return oldstr;
+    }
     *eaddr = '\0';
     found=0;
     for ( idx=0; g_var_subs[idx].string!=0; idx++) 
