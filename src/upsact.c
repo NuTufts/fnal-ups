@@ -437,7 +437,7 @@ t_cmd_map g_func_info[] = {
   { "envremove", e_envremove, f_envremove, 2, 3, e_invalid_cmd, 0x00000001 },
   { "envprepend", e_envprepend, f_envprepend, 2, 3, e_envremove, 0x00000001 },
   { "envset", e_envset, f_envset, 2, 2, e_envunset, 0x00000001 },
-  { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_envremove, 0x00000001 },
+  { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_invalid_cmd, 0x00000001 },
   { "envunset", e_envunset, f_envunset, 1, 1, e_invalid_cmd, 0x00000001 },
   { "pathappend", e_pathappend, f_pathappend, 2, 3, e_pathremove, 0x00000001 },
   { "pathremove", e_pathremove, f_pathremove, 2, 3, e_pathappend, 0x00000001 },
@@ -1408,7 +1408,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	/* SPECIAL case, if we are in compile mode, we should ignore
 	   the source compile function */
 
-	if ( g_COMPILE_FLAG &&
+	if ( g_COMPILE_FLAG && 
 	     (i_cmd == e_sourcecompilereq || i_cmd == e_sourcecompileopt) ) {
 
 	  /* if this is the very top product, we should remove all functions above
@@ -1830,7 +1830,7 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
      product actually setup and get the instance from $SETUP_<prodname>.
      currently only 'ups depend' will not use the current environment. */
 
-  if ( (i_cmd & 2) && g_ups_cmd != e_depend ) {
+  if ( (i_cmd & 2) && (g_ups_cmd != e_depend) && !g_COMPILE_FLAG ) {
 
     if ( (a_ugo = get_SETUP_prod( p_cmd, i_act, is_act_build )) )
       *unsetup_flag = 1;
@@ -1921,7 +1921,9 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
       strcpy( s_pname, the_ugo_cmd->ugo_product );
       pname = upsutl_upcase( s_pname );
 
-      setup_ugo_cmd = upsugo_env( pname, g_cmd_info[e_unsetup].valid_opts );
+      if ( !g_COMPILE_FLAG && (g_ups_cmd != e_depend) )
+	setup_ugo_cmd = upsugo_env( pname, g_cmd_info[e_unsetup].valid_opts );
+
       if ( setup_ugo_cmd ) {
 	if ( !setup_ugo_cmd->ugo_j )
 	  setup_ugo_cmd->ugo_j = ugo_cmd->ugo_j; 
@@ -2612,20 +2614,47 @@ static void f_envremove( ACTION_PARAMS)
     GET_DELIMITER();
 
     switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
+    case e_BOURNE:      
+
+      /* here we are using an extra tmp variable to evaluate the passed
+	 argument, it could contain some code there has to be executed, which
+	 we don't want to put into the dropit command */
+
+      if ( fprintf((FILE *)a_stream, "upstmp=%s\n", a_cmd->argv[1] ) < 0) {
+	FPRINTF_ERROR();
+      }
+
       if (fprintf((FILE *)a_stream,
-		  "%s=\"`%s -p \"$%s\" -i'%s' -d'%s' %s`\";\nif [ \"x${%s:-}\" = \"x\" ]; then unset %s; fi\n#\n", 
+		  "%s=\"`%s -p \"$%s\" -i'%s' -d'%s' \"$upstmp\"`\";\nif [ \"x${%s:-}\" = \"x\" ]; then unset %s; fi\n#\n", 
 		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter,
-		  delimiter, a_cmd->argv[1], a_cmd->argv[0],
+		  delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
+
+      if (fprintf((FILE *)a_stream, "unset upstmp\n" ) < 0 ) {
+	FPRINTF_ERROR();
+      }
+
       break;
     case e_CSHELL:
+
+      /* here we are using an extra tmp variable to evaluate the passed
+	 argument, it could contain some code there has to be executed, which
+	 we don't want to put into the dropit command */
+
+      if (fprintf((FILE *)a_stream, "setenv upstmp %s\n", a_cmd->argv[1] ) < 0) {
+	FPRINTF_ERROR();
+      }
+
       if (fprintf((FILE *)a_stream,
-		 "setenv %s \"`%s -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif (\"x${%s}\" == \"x\") unsetenv %s\n#\n",
+		 "setenv %s \"`%s -p \"\'\"$%s\"\'\" -i'%s' -d'%s' \"\'\"$upstmp\"\'\"`\"\nif (\"x${%s}\" == \"x\") unsetenv %s\n#\n",
 		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter, delimiter,
-		  a_cmd->argv[1], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
+		  a_cmd->argv[0], a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
+      }
+
+      if (fprintf((FILE *)a_stream, "unsetenv upstmp\n" ) < 0 ) {
 	FPRINTF_ERROR();
       }
       break;
@@ -2767,17 +2796,29 @@ static void f_exeaccess( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "hash %s;\nif [ $? -eq 1 ]; then return 1; fi\n#\n",
+		  "type %s 2>&1 | grep -i \"not found\" > /dev/null\nif [ $? -eq 0 ]\n", 
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
+      if (fprintf((FILE *)a_stream,
+		  "then\n  echo \"exeAccess failed for %s\"\n  return 1\nfi\n", 
+		  a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
+      }
+      
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "which %s\nif ($status == 1) exit 1\n#\n",
+		  "which %s |& grep %s > /dev/null\nif ($status == 1) then\n",
+		  a_cmd->argv[0], a_cmd->argv[0] ) < 0) {
+	FPRINTF_ERROR();
+      }
+      if (fprintf((FILE *)a_stream,
+		  "  echo \"exeAccess failed for %s\"\n  exit 1\nendif\n", 
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
+      
       break;
     default:
       OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
@@ -3028,19 +3069,34 @@ static void f_pathremove( ACTION_PARAMS)
     case e_BOURNE:
       CHECK_FOR_PATH(g_shPath, g_shDelimiter);
 
+      /* here we are using a tmp variable to evaluate the passed argument,
+	 it could contain some code there has to be executed, which we don't
+	 want to put into the dropit command */
+
+      if ( fprintf((FILE *)a_stream, "upstmp=%s\n", a_cmd->argv[1] ) < 0) {
+	FPRINTF_ERROR();
+      }
+
       if (fprintf((FILE *)a_stream,
-	        "upstmp=\"`%s -S -p \"$%s\" -i'%s' -d'%s' %s`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
-		  DROPIT, pathPtr, delimiter, delimiter, a_cmd->argv[1],
-		  pathPtr) < 0) {
+	        "upstmp=\"`%s -S -p \"$%s\" -i'%s' -d'%s' \"$upstmp\"`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
+		  DROPIT, pathPtr, delimiter, delimiter, pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
       CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
+
+      /* here we are using a tmp variable to evaluate the passed argument,
+	 it could contain some code there has to be executed, which we don't
+	 want to put into the dropit command */
+
+      if (fprintf((FILE *)a_stream, "setenv upstmp %s\n", a_cmd->argv[1] ) < 0) {
+	FPRINTF_ERROR();
+      }
+
       if (fprintf((FILE *)a_stream,
-          "setenv upstmp \"`%s -S -p \"\'\"$%s\"\'\" -i'%s' -d'%s' %s`\"\nif ($status == 0 && \"$upstmp\" != \"\") set %s=($upstmp)\nrehash\nunsetenv upstmp\n#\n",
-		  DROPIT, pathPtr, delimiter, delimiter, a_cmd->argv[1],
-		  pathPtr) < 0) {
+          "setenv upstmp \"`%s -S -p \"\'\"$%s\"\'\" -i'%s' -d'%s' \"$upstmp\"`\"\nif ($status == 0 && \"$upstmp\" != \"\") set %s=($upstmp)\nrehash\nunsetenv upstmp\n#\n",
+		  DROPIT, pathPtr, delimiter, delimiter, pathPtr) < 0) {
 	FPRINTF_ERROR();
       }
       break;

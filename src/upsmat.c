@@ -1123,7 +1123,7 @@ static int match_from_version( const char * const a_product,
 	  if ((inst = tmp_minst_ptr->version) != NULL) {
 	    /* It is ok if we do not have a table file.  then we just do
 	       whatever the default action is */
-	    if (inst->table_file) {
+	    if (inst->table_file || a_command_line->ugo_m) {
 	      /* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
 		 desired flavor and one of the desired qualifier to match */
 	      TMP_LISTS_SET();
@@ -1153,7 +1153,7 @@ static int match_from_version( const char * const a_product,
 
 	      upsver_mes(MATVLEVEL, 
 			 "%sMatching with Version %s in Product %s using Table file %s\n",
-			 VPREFIX, inst->version, a_product, inst->table_file);
+			 VPREFIX, inst->version, a_product, tmp_tablefile);
 	      upsver_mes(MATVLEVEL, "%sUsing Flavor %s and Qualifiers %s\n",
 			 VPREFIX, (char *)(tmp_flavor_list.data),
 			 (char *)(tmp_quals_list.data));
@@ -1167,7 +1167,7 @@ static int match_from_version( const char * const a_product,
 		/* We should have had a match, this is an error */
 		upserr_vplace();
 		upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer,
-			   inst->table_file, inst->flavor, inst->qualifiers);
+			   tmp_tablefile, inst->flavor, inst->qualifiers);
 		upserr_add(UPS_DB_CORRUPTION, UPS_FATAL, a_db_info->name,
 			   a_product);
 
