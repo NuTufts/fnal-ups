@@ -18,12 +18,17 @@ else
 fi
 export OPERA
 #
-OPERA="`$UPS_DIR/bin/dropit -e -p "$OPERA" -i' ' -d' ' FAUST`";
-if [ "x${OPERA:-}" = "x" ]; then unset OPERA; fi
+if [ "${OPERA:-}" != "" ]
+then
+  upstmp=FAUST
+  OPERA="`$UPS_DIR/bin/dropit -e -p "$OPERA" -i' ' -d' ' "$upstmp"`";
+  if [ "${OPERA:-}" = "" ]; then unset OPERA; fi
+  unset upstmp
+fi
 #
 unset OPERA
 #
-if [ "x${TMPDIR:-}" = "x" ]; then TMPDIR="/tmp";export TMPDIR;fi;
+if [ "${TMPDIR:-}" = "" ]; then TMPDIR="/tmp";export TMPDIR;fi;
 #
 PATH="/bin:/usr/local/bin:/local/etc:/mybin";export PATH
 #
@@ -31,11 +36,13 @@ PATH="${PATH-}:emacs/bin";export PATH
 #
 PATH="emacs/test:${PATH-}";export PATH
 #
-upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' emacs`";
+upstmp=emacs
+upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' "$upstmp"`";
 if [ $? -eq 0 -a "$upstmp" != "" ]; then PATH=$upstmp; fi
 unset upstmp;
 #
-upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' bin`";
+upstmp=bin
+upstmp="`$UPS_DIR/bin/dropit -e -S -p "$PATH" -i':' -d':' "$upstmp"`";
 if [ $? -eq 0 -a "$upstmp" != "" ]; then PATH=$upstmp; fi
 unset upstmp;
 #
@@ -44,9 +51,12 @@ echo "can't read file";
 return 1;
 fi;
 #
-hash ls;
-if [ $? -eq 1 ]; then return 1; fi
-#
+type ls 2>&1 | grep -i "not found" > /dev/null
+if [ $? -eq 0 ]
+then
+  echo "exeAccess failed for ls"
+  return 1
+fi
 mystatus=`ls -l`;export mystatus
 #
 echo "from extra1"
