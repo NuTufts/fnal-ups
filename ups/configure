@@ -45,9 +45,34 @@ then
     Ups_Dir=$Test_Prod_Dir
 fi
 
+error=0
 if [ x${Ups_Dir:-} = x ]
 then
-    exit
+    echo UPS_PROD_DIR not set.  Configure exiting.
+    error=1
+fi
+
+if [ x${UPS_PROD_FLAVOR:-} = x ]
+then
+    echo UPS_PROD_FLAVOR not set. Configure exiting.
+    error=1
+fi
+
+if [ x${UPS_PROD_VERSION:-} = x ]
+then
+    echo UPS_PROD_VERION not set.  Configure exiting.
+    error=1
+fi
+
+if [ x${Ups_DB_Path:-} = x ]
+then
+    echo Ups_DB_Path not set. Configure exiting.
+    error=1
+fi
+
+if [ $error = 1 ]
+then
+    exit 1
 fi
 Node=`uname -n|cut -f1 -d'.'`
 #
