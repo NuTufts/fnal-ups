@@ -639,6 +639,14 @@ XEoF
 chmod +x $BootStrap_Dir/$Setups_Products_Script
 #
 #======================================================================
+# Create the setups.pl file in the bootstrap directory.
+#======================================================================
+# This is done differently, since it only needs ${Setups_Home} 
+# replaced, and uses setups.sh...
+sed -e "s/\${Setups_Home}/${Setups_Home}/g" < $UPS_UPS_DIR/${Script_Prefix}.pl > ${BootStrap_Dir}/${Script_Prefix}.pl
+
+#
+#======================================================================
 # Create the setups.csh file in the bootstrap directory.
 #======================================================================
 $rm  -f $BootStrap_Dir/${Script_Prefix}.csh
