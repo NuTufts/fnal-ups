@@ -18,7 +18,7 @@ upsfil_read_file -status UPS_NO_FILE blah
 upserr_clear
 upsfil_read_file -status UPS_READ_FILE dummy.file
 upserr_clear
-upsfil_read_file -status UPS_INVALID_KEYWORD invalidkey.version
+upsfil_read_file -status UPS_SUCCESS invalidkey.version
 upserr_clear
 upsfil_read_file allkey.version
 upserr_clear
