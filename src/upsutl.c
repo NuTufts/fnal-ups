@@ -757,6 +757,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 		/* Error opening file */
 		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
 			   strerror(errno));
+		upserr_add(UPS_OPEN_FILE, UPS_WARNING, stat_file);
 	      }
 	    }
 	  } else {
