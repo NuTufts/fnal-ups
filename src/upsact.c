@@ -404,7 +404,7 @@ t_cmd_info g_cmd_info[] = {
   {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000010, e_undeclare},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000010, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:lvZ0123", 0x00000000, e_invalid_action},
-  {e_verify,      "verify",      "?acdf:g:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_verify,      "verify",      "?acdf:g:H:m:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_help,        "help",        "?v", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,          "?aA:b:B:cCdD:eE:f:Fg:G:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:x:XyYz:Z0123",
