@@ -133,7 +133,7 @@ void upsmem_free(void *a_data)
  *
  * Input : address of data whose reference counter is to be returned
  * Output: none
- * Return: none
+ * Return: reference counter
  */
 int upsmem_get_refctr(const void * const a_data)
 {
