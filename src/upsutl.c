@@ -867,7 +867,7 @@ char *upsutl_str_crecat( char * const str1, char * const str2 )
  *
  * Input : char *, string to be sorted
  *         char, delimeting character
- * Output: none
+ * Output: char *, sorted string
  * Return: int, number if items sorted
  */
 int upsutl_str_sort( char * const str, const char c )

@@ -459,6 +459,8 @@ int upslst_count( t_upslst_item * const list_ptr )
  * something better if we need to sort large (>20 items) lists.
  *
  * Input : t_upslst_item *, pointer to a list
+ *         int *, pointer to a function to be called for
+ *                comparing list items.
  * Output: none
  * Return: t_upslst_item *, pointer to first element in list.
  */
