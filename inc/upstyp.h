@@ -173,7 +173,7 @@ typedef struct upstyp_product
 #define JOURNAL 1
 #define NOJOURNAL 0
 
-#define UPSRELATIVE(dir) ((dir[0] != '/'))
+#define UPSRELATIVE(dir) ((dir && (dir[0] != '/')))
 
 /*
  * Declaration of public functions.
