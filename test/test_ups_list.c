@@ -48,12 +48,7 @@ int main (argc,argv)
 {
 
 	struct ups_command * uc;
-/* (void) printf("string = %s\n",upsget_translation_env("${PRODUCTS}"));
-upserr_output();
-upserr_clear();
-(void) printf("string = %s\n",upsget_translation_env("${PRODUCTS"));  /* }, just for balance */
-upserr_output();
-*/
+
 (void) printf("string = %s<\n",upsget_translation_env("~fagan/spit"));
 upserr_output();
 (void) printf("string = %s<\n",upsget_translation_env("~fagan "));
