@@ -84,10 +84,12 @@ static char *g_error_messages[UPS_NERR] = {
 /* 24 */  "%s: \"%s\" is not authorized for use on this node\n",
 /* 25 */  "%s: No destination was specified in the UPS Database Configuration file for where to copy the %s files\n",
 /* 26 */  "%s: Error when writing to temp file while processing %s action\n",
-/* 27 */  "%s: Invalid number of parameters for action %s, must be between %i and %i (found %i)\n"
+/* 27 */  "%s: Invalid number of parameters for action %s, must be between %i and %i (found %i)\n",
 /* 28 */  "%s: Unable to determine user shell, value = %s\n",
 /* 29 */  "%s: Unsetup of %s failed, continuing with setup\n",
-/* 30 this is the last */
+/* 30 */  "%s: Cannot create file %s, it already exists\n",
+/* 31 */  "%s: No table file name was specified on the command line\n"
+/* 32 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -121,7 +123,9 @@ char *g_error_ascii[] = {
    /* UPS_INVALID_ACTION_PARAMS 27 */ "UPS_INVALID_ACTION_PARAMS",
    /* UPS_NOSHELL             28 */ "UPS_NOSHELL",
    /* UPS_UNSETUP_FAILED      29 */ "UPS_UNSETUP_FIALED",
-   /* UPS_NERR                30 */ "UPS_NERR",
+   /* UPS_FILE_EXISTS         30 */ "UPS_FILE_EXISTS",
+   /* UPS_NO_TABLE_FILE       31 */ "UPS_NO_TABLE_FILE",
+   /* UPS_NERR                32 */ "UPS_NERR",
    0 };
 
 /*

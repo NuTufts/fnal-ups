@@ -70,7 +70,9 @@
 #define UPS_INVALID_ACTION_PARAMS 27
 #define UPS_NOSHELL             28
 #define UPS_UNSETUP_FAILED      29
-#define UPS_NERR                30      /*  this one must always be last */
+#define UPS_FILE_EXISTS         30
+#define UPS_NO_TABLE_FILE       31
+#define UPS_NERR                32      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
