@@ -209,5 +209,7 @@ t_ups_command     *upsugo_next(const int ups_argc,
 t_ups_command     *upsugo_env(char * const product,
 			       char * const validopts);
 int                upsugo_free(struct ups_command * const uc);
+void               upsugo_prtlst( t_upslst_item *list_ptr, char * const title );
+int                upsugo_dump (struct ups_command * const uc);
 #endif /* _UPS_TYPES_H_ */
 
