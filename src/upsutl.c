@@ -683,15 +683,15 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	global_yes = 0;
 	len = strlen(mproduct->product);
 	ptr = strstr(tmp_stat, mproduct->product);
-	/*	if (((tmp_stat == ptr) && 
-	     (((ptr + len) ==  '\0') || ((ptr + len) == UPS_SEPARATOR ))) ||
-	    (((ptr - 1) == UPS_SEPARATOR) && (((ptr + 1) == UPS_SEPARATOR) ||
-	     ((ptr + 1) == '\0')))) {*/
-	if (tmp_stat == ptr) {
+	/* first check if the product is at the beginning of the list of is
+	   the only element in the list of products */
+	if (ptr && (tmp_stat == ptr)) {
 	  if (((ptr + len)[0] ==  '\0') || ((int )(ptr + len)[0] == ':')) {
 	    global_yes = 1;
 	  }
-	} else if ((int )(ptr - 1)[0] == ':') {
+	  /* now check if the product is at the end of the list or in the
+	     middle */
+	} else if (ptr && ((int )(ptr - 1)[0] == ':')) {
 	  if (((int )(ptr + len)[0] == ':') || ((ptr + len)[0] == '\0')) {
 	    global_yes = 1;
 	  }
