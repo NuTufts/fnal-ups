@@ -128,7 +128,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 67 */  "%s: Ups command \'%s\' failed when processing temp file.\n",
 /* 68 */  "%s: Possible UPS database (%s) corruption in product \'%s\'.\n",
 /* 69 */  "%s: Unable to write statistics for product \'%s\'.\n",
-/* 70 */  "%s: Error occurred for product \'%s\' \'%s\' \'%s\' \'%s\'.\n"
+/* 70 */  "%s: Error occurred for product \'%s\' \'%s\' \'%s\' \'%s\'.\n",
+/* 71 */  "%s: \'VERSION\' keyword not allowed in Table file for product \'%s\'\n"
 };
 
 char *g_error_ascii[] = {
@@ -203,7 +204,8 @@ char *g_error_ascii[] = {
    /* UPS_DB_CORRUPTION       68 */ "UPS_DB_CORRUPTION",
    /* UPS_STATISTICS          69 */ "UPS_STATISTICS",
    /* UPS_PRODUCT_INFO        70 */ "UPS_PRODUCT_INFO",
-   /* UPS_NERR                71 */ "UPS_NERR",
+   /* UPS_NO_VERSION          71 */ "UPS_NO_VERSION",
+   /* UPS_NERR                72 */ "UPS_NERR",
    0 };
 
 /*

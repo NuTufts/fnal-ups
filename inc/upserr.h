@@ -111,7 +111,8 @@
 #define UPS_DB_CORRUPTION       68
 #define UPS_STATISTICS          69
 #define UPS_PRODUCT_INFO        70
-#define UPS_NERR                71      /*  this one must always be last */
+#define UPS_NO_VERSION          71
+#define UPS_NERR                72      /*  this one must always be last */
 
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
