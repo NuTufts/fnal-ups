@@ -107,7 +107,7 @@ $#VERSION=0;   # Version specification            - reqHash,flvrchnHash
 $#FLAVOR=1;    # Flavor                           - reqHash
 $#FLAGS=2;     # flags                            - reqHash
 
-
+$opt_v=1;
 NEXTDB:
 
 foreach $db (@dbs) {
@@ -446,15 +446,23 @@ sub MakeParentDir {
 sub OpenChainFile {
     my ( $chain ) = @_;
     $ChainHeaderInfo=1;
-    if ( !-e "$ndbs/$PRODUCT/$chain" ) {
+    if ( !-e "$ndbs/$PRODUCT/$chain.chain" ) {
+       if ("$opt_v") { 
+           print "Opening chain file for $PRODUCT chain $chain \n"; 
+       }
        $ChainHeaderInfo=0;
        if ( !open(ChainFile, ">$ndbs/$PRODUCT/$chain.chain") ) {
           print "$errorMsg cannot make $pc $PRODUCT $chain chain file";
           exit 1;
        }
-    } elsif ( !open( ChainFile, ">>$ndbs/$PRODUCT/$chain.chain" ) ) {
+    } else { 
+       if ("$opt_v") { 
+           print "Appending chain file for $PRODUCT chain $chain \n"; 
+       }
+       if ( !open( ChainFile, ">>$ndbs/$PRODUCT/$chain.chain" ) ) {
             print  "$errorMsg cannot append in $pc $PRODUCT $chain chain file";
             exit 1;
+       }
     }
 }
 sub AddChainRec { 
@@ -502,7 +510,7 @@ sub AddChainRec {
 }
 sub OpenVersionFile {
     my ( $version ) = @_;
-    if ( !-e "$ndbs/$PRODUCT/$version" ) {
+    if ( !-e "$ndbs/$PRODUCT/$version.version" ) {
        if ( !open(VersionFile, ">$ndbs/$PRODUCT/$version.version") ) {
           print "$errorMsg cannot make $pc $PRODUCT $version version file";
           exit 1;
