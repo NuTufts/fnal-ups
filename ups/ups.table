@@ -9,10 +9,10 @@ Qualifiers=""
 Common:
    Action=configure
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
-      execute(${UPS_PROD_DIR}/ups/configure, UPS_ENV)
+     execute(${UPS_PROD_DIR}/ups/configure, UPS_ENV)
    Action=current
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
-      execute(${UPS_PROD_DIR}/ups/current, UPS_ENV)
+     execute(${UPS_THIS_DB}/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/current, UPS_ENV)
    Action=setup
      setupenv()
      proddir()
