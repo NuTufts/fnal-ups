@@ -42,8 +42,11 @@
 #include "ups.h"
 
 #ifdef UPS_ID
-	char	UPS_UGO_ID[] = "@(#)upsugo.c	1.00";
+	char	UPS_UGO_ID[] = "@(#)upsugo.c	4.00";
 #endif
+
+int UPS_NEED_DB=1;
+
 #define MAX_ARGS 1000
 #define UPSUGO "UPSUGO: "
 #define FREE( X )	{			\
@@ -560,7 +563,9 @@ int upsugo_ifornota(struct ups_command * const uc)
    if (!uc->ugo_db) {
      if((PRODUCTS = (char *)getenv("PRODUCTS")) == 0)
      { if (!uc->ugo_m) /* no table file either, I'm dead */
-       { upserr_add(UPS_NO_DATABASE, UPS_FATAL); 
+       { if(UPS_NEED_DB)
+         { upserr_add(UPS_NO_DATABASE, UPS_FATAL); 
+         }
        }
      } else {
         /* addr = (char *) malloc((size_t)(strlen(PRODUCTS) +1)); */
