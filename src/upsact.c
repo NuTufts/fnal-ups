@@ -2130,7 +2130,7 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
-		    "if [ ! -r %s -o ! -x %s]; then\n  echo File to be optionally sourced (%s) is not readable or not executable;\nelse\n",
+		    "  if [ ! -r %s -o ! -x %s]; then\n  echo File to be optionally sourced (%s) is not readable or not executable;\nelse\n",
 		    a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  FPRINTF_ERROR();
 	} else {
@@ -2140,20 +2140,17 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	  }
 	  if (UPS_ERROR == UPS_SUCCESS) {
-	    if (fprintf((FILE *)a_stream, "  . %s;\n", 
+	    if (fprintf((FILE *)a_stream, "    . %s;\n", 
 			a_cmd->argv[0]) < 0) {
 	      FPRINTF_ERROR();
 	    } else {
 	      if (exit_flag) {
-		if (g_LOCAL_VARS_DEF) {
-		  /* undefine the local env variables */
-		  (void )upsget_remall(a_stream, a_command_line);
-		}
-		if (fprintf((FILE *)a_stream, "  return\n") < 0) {
+		upsutl_finish_temp_file(a_stream, a_command_line);
+		if (fprintf((FILE *)a_stream, "    return\n") < 0) {
 		  FPRINTF_ERROR();
 		}
 	      }
-	      if (fprintf((FILE *)a_stream, "fi;\nfi;\n#\n") < 0) {
+	      if (fprintf((FILE *)a_stream, "  fi;\nfi;\n#\n") < 0) {
 		FPRINTF_ERROR();
 	      }
 	    }
@@ -2169,7 +2166,7 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
-		    "if (! -r %s || ! -x %s) then\n  echo File to be optionally sourced (%s) is not readable or not executable\nelse\n", 
+		    "  if (! -r %s || ! -x %s) then\n  echo File to be optionally sourced (%s) is not readable or not executable\nelse\n", 
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	  FPRINTF_ERROR();
 	} else {
@@ -2179,20 +2176,17 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	  }
 	  if (UPS_ERROR == UPS_SUCCESS) {
-	    if (fprintf((FILE *)a_stream, "  source %s\n", 
+	    if (fprintf((FILE *)a_stream, "    source %s\n", 
 			a_cmd->argv[0]) < 0) {
 	      FPRINTF_ERROR();
 	    } else {
 	      if (exit_flag) {
-		if (g_LOCAL_VARS_DEF) {
-		  /* undefine the local env variables */
-		  (void )upsget_remall(a_stream, a_command_line);
-		}
-		if (fprintf((FILE *)a_stream, "  return\n") < 0) {
+		upsutl_finish_temp_file(a_stream, a_command_line);
+		if (fprintf((FILE *)a_stream, "    return\n") < 0) {
 		  FPRINTF_ERROR();
 		}
 	      }
-	      if (fprintf((FILE *)a_stream, "endif\nendif\n#\n") < 0) {
+	      if (fprintf((FILE *)a_stream, "  endif\nendif\n#\n") < 0) {
 		FPRINTF_ERROR();
 	      }
 	    }
@@ -2308,10 +2302,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	    } else {
 	      /* write out the rest of the if statement and don't worry about
 		 write errors, will catch them further down */
-	      if (g_LOCAL_VARS_DEF) {
-		/* undefine the local env variables */
-		(void )upsget_remall(a_stream, a_command_line);
-	      }
+	      upsutl_finish_temp_file(a_stream, a_command_lne);
 	      (void )fprintf((FILE *)a_stream,
 			     "    if [ $UPS_STATUS -eq 1 ]; then\n      unset UPS_STATUS\n      return 1;\n    fi;\n");
 	      if (exit_flag) {
@@ -2353,10 +2344,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	    } else {
 	      /* write out the rest of the if statement and don't worry about
 		 write errors, will catch them further down */
-	      if (g_LOCAL_VARS_DEF) {
-		/* undefine the local env variables */
-		(void )upsget_remall(a_stream, a_command_line);
-	      }
+	      upsutl_finish_temp_file(a_stream, a_command_lne);
 	      (void )fprintf((FILE *)a_stream,
 			     "    if ($UPS_STATUS == 1) then\n      unsetenv UPS_STATUS\n      return 1\n    endif\n");
 
