@@ -398,8 +398,6 @@ Make_AFS_ReadWrite() {
    eval ${1}_Read=\"\$$1\"
    eval $1=\"`eval echo $_x |
 		sed -e 's;/afs/fnal.gov;/afs/.fnal.gov/;'`\"
-   eval echo \"$1 is \$$1\"
-   eval echo \"${1}_Read is \${${1}_Read}\"
 }
 
 Make_AFS_ReadWrite Ups_DB_Path
