@@ -173,7 +173,8 @@ char *upskey_inst_getval( t_upstyp_instance * const inst, const char * const ske
   if ( key && key->i_index != NO )
     return UPSKEY_INST2ARR( inst )[key->i_index];
   else
-    return 0;  
+    ;
+  return 0;  
 }
 
 /*-----------------------------------------------------------------------
@@ -197,7 +198,8 @@ char *upskey_inst_setval( t_upstyp_instance * const inst,
     return ( UPSKEY_INST2ARR( inst )[key->i_index] = new_val );
   }
   else
-    return 0;  
+    ;
+  return 0;  
 }
 
 /*-----------------------------------------------------------------------
@@ -307,7 +309,8 @@ char *upskey_prod_getval( t_upstyp_product * const prod, const char * const skey
   if ( key && key->p_index != NO )
     return UPSKEY_PROD2ARR( prod )[key->p_index];
   else
-    return 0;  
+    ;
+  return 0;  
 }
 
 /*-----------------------------------------------------------------------
@@ -331,7 +334,8 @@ char *upskey_prod_setval( t_upstyp_product * const prod,
     return ( UPSKEY_PROD2ARR( prod )[key->p_index] = new_val );
   }
   else
-    return 0;  
+    ;
+  return 0;  
 }
 
 /*
