@@ -141,7 +141,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
     file_chars = (int )strlen(a_tablefile) + 2;  /* length plus trailing null 
 						    and leading '/' */
     /* try tablefiledir/tablefile */
-    if ((a_tablefiledir != NULL) && (a_tablefiledir[0] == '/')) {
+    if (a_tablefiledir != NULL) {
       if ((total_chars = file_chars + (int )strlen(a_tablefiledir))
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s", a_tablefiledir, a_tablefile);
@@ -175,9 +175,9 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	  }
 	}
       }
-    } else { /* if ((a_tablefiledir != NULL) && (a_tablefiledir[0] == '/')) */
+    } else { /* if (a_tablefiledir != NULL) */
       /* try ups_dir/tablefile */
-      if ((a_upsdir != NULL) && (a_upsdir[0] == '/')) {
+      if (a_upsdir != NULL) {
 	if ((total_chars = file_chars + (int )strlen(a_upsdir))
 	    <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s", a_upsdir, a_tablefile);
