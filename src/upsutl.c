@@ -267,6 +267,36 @@ char * upsutl_environment(const char * const a_env_var)
 }
 
 /*-----------------------------------------------------------------------
+ * upsutl_free_matched_product_list
+ *
+ * Free a matched product list.
+ *
+ * Input : pointer to matched product list
+ * Output: none
+ * Return: NULL
+ */
+t_upslst_item *upsutl_free_matched_product_list(
+			            t_upslst_item ** const a_mproduct_list)
+{
+  t_upslst_item *mproduct_item;
+  t_upstyp_matched_product *mproduct;
+
+
+  /* make sure we are at the beginning of the list */
+  *a_mproduct_list = upslst_first(*a_mproduct_list);
+
+  for (mproduct_item = *a_mproduct_list ; mproduct_item ; 
+       mproduct_item = mproduct_item->next) {
+    mproduct = (t_upstyp_matched_product *)mproduct_item->data;
+    (void )ups_free_matched_product(mproduct);
+  }
+
+  /* Now free the list */
+  *a_mproduct_list = upslst_free(*a_mproduct_list, ' ');
+
+  return NULL;
+}
+/*-----------------------------------------------------------------------
  * upsutl_free_matched_instance_list
  *
  * Given a matched instance list, free all the matched instances and the
@@ -705,6 +735,32 @@ int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
 }
 
 /*-----------------------------------------------------------------------
+ * upsutl_stricmp
+ *
+ * A case insensitive version of strcmp. It's a directly copy of
+ * strcasecmp (found e.g in gnu's libc), which is normaly not
+ * supported in ANSI C.
+ *
+ * Input : char *, string to upcase.
+ * Output: none
+ * Return: upcased string.
+ */
+char *upsutl_upcase(const char * const a_str)
+{
+  char dum_str[MAX_LINE_LEN];
+  int i, len = (int )strlen(a_str);
+
+  for (i = 0 ; i < len ; ++i ) {
+    dum_str[i] = (char )toupper((int )a_str[i]);
+  }
+  
+  /* NULL terminate the string */
+  dum_str[i] = '\0';
+  
+  return (char *)(&dum_str[0]);
+  
+}
+/*-----------------------------------------------------------------------
  * upsutl_strstr
  *
  * Search for the specified pattern in the string.  If it is not there,
@@ -1023,4 +1079,8 @@ int qsort_cmp_string( const void * c1, const void * c2 )
 {
   return strcmp( (const char *)c1, (const char *)c2 );
 }
+
+
+
+
 
