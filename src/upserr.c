@@ -127,7 +127,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 66 */  "%s: Qualifiers=ANY is not allowed in a %s file\n",
 /* 67 */  "%s: Ups command \'%s\' failed when processing temp file.\n",
 /* 68 */  "%s: Possible UPS database (%s) corruption in product \'%s\'.\n",
-/* 69 */  "%s: Unable to write statistics for product \'%s\'.\n"
+/* 69 */  "%s: Unable to write statistics for product \'%s\'.\n",
+/* 70 */  "%s: Error occurred for product \'%s\' \'%s\' \'%s\' \'%s\'.\n"
 };
 
 char *g_error_ascii[] = {
@@ -201,7 +202,8 @@ char *g_error_ascii[] = {
    /* UPS_COMMAND_FAILED      67 */ "UPS_COMMAND_FAILED",
    /* UPS_DB_CORRUPTION       68 */ "UPS_DB_CORRUPTION",
    /* UPS_STATISTICS          69 */ "UPS_STATISTICS",
-   /* UPS_NERR                70 */ "UPS_NERR",
+   /* UPS_PRODUCT_INFO        70 */ "UPS_PRODUCT_INFO",
+   /* UPS_NERR                71 */ "UPS_NERR",
    0 };
 
 /*
