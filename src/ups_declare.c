@@ -103,7 +103,7 @@ void ups_declare( t_upsugo_command * const uc ,
   { printf("To Declare a product you must specify a product and a version \n");
     exit(1);
   }
-  if (!uc->ugo_f || (int)(upslst_count(uc->ugo_flavor) > 1) )
+  if ((int)(upslst_count(uc->ugo_flavor) == 0) )
   { printf("To Declare a product you must specify A flavor \n");
     exit(1);
   }
@@ -165,7 +165,6 @@ void ups_declare( t_upsugo_command * const uc ,
   uc->ugo_flavor=save_flavor;
   uc->ugo_qualifiers=upslst_free(uc->ugo_qualifiers,'d');
   uc->ugo_qualifiers=save_qualifiers;
-  upsugo_dump(uc,1);
 /************************************************************************
  *
  * If there was any chain specified at all we need to look at chain files
@@ -269,44 +268,25 @@ void ups_declare( t_upsugo_command * const uc ,
  *
  ***********************************************************************/
 /* We want NOTHING to do with chains at this point - it is out of sync */
-/*    if(uc->ugo_chain) 
-    { uc->ugo_chain=upslst_free(uc->ugo_chain,'d'); }
-*/
     uc->ugo_chain=0;
     uc->ugo_version=save_version;  /* we must match of version now */
-/*    if(uc->ugo_flavor) 
-    { uc->ugo_flavor=upslst_free(uc->ugo_flavor,'d'); }
-*/
     uc->ugo_flavor = upslst_new(upsutl_str_create(ANY_MATCH,' '));
-/*    if(uc->ugo_qualifiers) 
-    { uc->ugo_qualifiers=upslst_free(uc->ugo_qualifiers,'d'); }
-*/
     uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
     mproduct_list = upsmat_instance(uc, db_list , not_unique);
     if (mproduct_list) 
     {  uc->ugo_flavor=save_flavor;
        uc->ugo_qualifiers=save_qualifiers;
        mproduct_list = upsmat_instance(uc, db_list , need_unique);
-       if (mproduct_list) 
-       { 
-/*       { mproduct_list = upslst_first(mproduct_list);
-         mproduct = (t_upstyp_matched_product *)mproduct_list->data;
-         minst_list = (t_upslst_item *)mproduct->minst_list;
-         minst = (t_upstyp_matched_instance *)(minst_list->data);
-         vinst = (t_upstyp_instance *)minst->version;
+       if (!mproduct_list) 
+       { upsver_mes(1,"Version exists adding additional instance\n");
          product = upsget_version_file(db_info->name,
                                        uc->ugo_product,
-                                       uc->ugo_version, 
+                                       uc->ugo_version,
                                        &file);
-         if ((UPS_ERROR == UPS_SUCCESS) && product )
-         { printf("found version too!!!\n");
-         } 
-*/
+       } else { 
+         upsver_mes(1,"Instance in version file allready exists");
+         *file='\0'; /* don't do create instance */
        }
-/*       product = upsget_version_file(db_info->name,
-                                     uc->ugo_product,
-                                     uc->ugo_version, 
-                                     &file); */
     } else { /* new version does NOT exist at all */
       product = ups_new_product();
       sprintf(file,"%s/%s/%s%s",
@@ -316,35 +296,36 @@ void ups_declare( t_upsugo_command * const uc ,
       product->file = VERSION;
       product->product=uc->ugo_product;
       product->version = uc->ugo_version;
-/*    } */
+    }
     /* build new version instance */
-    new_vinst=ups_new_instance();
-    new_vinst->version=save_version;
-    the_flavor=save_flavor->data;
-    new_vinst->flavor=the_flavor;
-    the_qualifiers=save_qualifiers->data;
-    new_vinst->qualifiers=the_qualifiers;
-    new_vinst->declarer=username;
-    new_vinst->declared=declared_date;
-    new_vinst->prod_dir=uc->ugo_productdir;
-    new_vinst->table_dir=uc->ugo_tablefiledir;
-    new_vinst->table_file=uc->ugo_tablefile;
-    new_vinst->ups_dir=uc->ugo_upsdir;
-    new_vinst->origin=uc->ugo_origin;
-    new_vinst->compile_file=uc->ugo_compile_file;
-    new_vinst->compile_file_dir=uc->ugo_compile_file_dir;
-    if (uc->ugo_O) /* single value quicky must seperate by : lines */
-    { new_vinst->user_list = upslst_add(new_vinst->user_list,uc->ugo_options);
-    }
-    if (uc->ugo_L)
-    { new_vinst->statistics=upsutl_str_create("",' '); }
-    product->instance_list = 
-        upslst_add(product->instance_list,new_vinst);
-    upsver_mes(1,"Adding version %s to %s\n",
-               new_vinst->version,
-               file);
-    (void )upsfil_write_file(product, file, 'd');  
-    }
+    if (*file) /* instance doesn't exist */
+    { new_vinst=ups_new_instance();
+      new_vinst->version=save_version;
+      the_flavor=save_flavor->data;
+      new_vinst->flavor=the_flavor;
+      the_qualifiers=save_qualifiers->data;
+      new_vinst->qualifiers=the_qualifiers;
+      new_vinst->declarer=username;
+      new_vinst->declared=declared_date;
+      new_vinst->prod_dir=uc->ugo_productdir;
+      new_vinst->table_dir=uc->ugo_tablefiledir;
+      new_vinst->table_file=uc->ugo_tablefile;
+      new_vinst->ups_dir=uc->ugo_upsdir;
+      new_vinst->origin=uc->ugo_origin;
+      new_vinst->compile_file=uc->ugo_compile_file;
+      new_vinst->compile_file_dir=uc->ugo_compile_file_dir;
+      if (uc->ugo_O) /* single value quicky must seperate by : lines */
+      { new_vinst->user_list = upslst_add(new_vinst->user_list,uc->ugo_options);
+      }
+      if (uc->ugo_L)
+      { new_vinst->statistics=upsutl_str_create("",' '); }
+      product->instance_list = 
+          upslst_add(product->instance_list,new_vinst);
+      upsver_mes(1,"Adding version %s to %s\n",
+                 new_vinst->version,
+                 file);
+      (void )upsfil_write_file(product, file, 'd');  
+    } 
     if (uc->ugo_chain)
     { uc->ugo_flavor=save_flavor;
       uc->ugo_qualifiers=save_qualifiers;
