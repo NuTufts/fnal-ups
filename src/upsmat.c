@@ -128,6 +128,24 @@ static int g_ugo_version = 0;
      tmp_flavor_list.data = (void *)(inst->flavor);                  \
      tmp_quals_list.data = (void *)(inst->qualifiers);
 
+/* we are doing an instance match only on a table file.  no database is
+   involved */
+#define TABLE_FILE_ONLY() \
+     if (!a_command_line->ugo_version &&                                   \
+	 (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {         \
+       /* We have a table file and no db, that is ok */                    \
+       upsver_mes(MATVLEVEL, "%sNo UPS Database, using Table File - %s\n", \
+		  VPREFIX, (char *)a_command_line->ugo_tablefile);         \
+       mproduct = match_instance_core(a_command_line, db_info,             \
+				      a_command_line->ugo_product, NULL,   \
+				      NULL, a_need_unique, any_version,    \
+				      any_chain);                          \
+       /* update the mproduct_list structure with the new info */          \
+       ADD_TO_MPRODUCT_LIST();                                             \
+     } else {                                                              \
+       upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);                   \
+     }
+
 /* check the list with the a_need_unique flag.  report an error if we need
    a unique instance and there is more than one on the list. */
 #define CHECK_UNIQUE(a_list, type) \
@@ -337,14 +355,12 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
       db_list = a_command_line->ugo_db;
     }
     
-    if (db_list) {
+    if (db_list || a_command_line->ugo_P) {
       if (a_command_line->ugo_m && a_command_line->ugo_product &&
 	  !a_command_line->ugo_version &&
 	  (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
-	/* We have a table file  and we have a product name, we do not need a
-	   db. */
-	upsver_mes(MATVLEVEL, "%sUsing Table File - %s\n", VPREFIX,
-		   (char *)a_command_line->ugo_tablefile);
+	/* We have a table file  and we have a db, use the table file as an 
+	   override to what is in the db. */
 	for (db_item = db_list ; db_item ; db_item = db_item->next) {
 	  db_info = (t_upstyp_db *)db_item->data;
 	  
@@ -392,7 +408,13 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 	      break;
 	    }
 	  } else {
-	    upserr_add(UPS_NOT_A_DIR, UPS_WARNING, db_info->name);
+	    /* we have a table file, so see if the db is "".  if so, ignore any
+	       db information and just open the table file */
+	    if (db_info->name[0] == '\0') {
+	      TABLE_FILE_ONLY();
+	    } else {
+	      upserr_add(UPS_NOT_A_DIR, UPS_WARNING, db_info->name);
+	    }
 	  }
 	}
       } else {
@@ -552,19 +574,7 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
     } else if (a_command_line->ugo_m && a_command_line->ugo_product) {
       /* since a specific table file was entered, we need to check if a
 	 version or chain was also specified.  if yes then this is an error */
-      if (!a_command_line->ugo_version &&
-	  (!a_command_line->ugo_chain || !a_command_line->ugo_c)) {
-	/* We have a table file and no db, that is ok */
-	upsver_mes(MATVLEVEL, "%sNo UPS Database, using Table File - %s\n",
-		   VPREFIX, (char *)a_command_line->ugo_tablefile);
-	mproduct = match_instance_core(a_command_line, db_info,
-				       a_command_line->ugo_product, NULL, NULL,
-				       a_need_unique, any_version, any_chain);
-	/* update the mproduct_list structure with the new info */
-	ADD_TO_MPRODUCT_LIST();
-      } else {
-	upserr_add(UPS_TABLEFILE_AND_VERSION, UPS_FATAL);
-      }
+      TABLE_FILE_ONLY();
     } else {
       /* we have no db and no table file or no product name, this is an 
 	 error */
