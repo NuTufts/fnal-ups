@@ -30,6 +30,7 @@ int upstst_err_add(int, char**);
 int upstst_fil_read_file(int, char**);  int upstst_fil_write_file(int, char**);
 int upstst_ugo_env(int, char**);  	int upstst_ugo_next(int, char**);
 int upstst_mat_instance(int, char**);
+int upstst_get_translation(int, char**);
 
 /*=============================================================================
 Routine:
@@ -55,6 +56,7 @@ upstst_cmd_table_t upstst_my_cmds[] = {
 	"upsugo_env",		upstst_ugo_env,
 	"upsugo_next",		upstst_ugo_next,
 	"upsmat_instance",	upstst_mat_instance,
+	"upsget_translation",	upstst_get_translation,
 	NULL,			0};
 
 upstst_commandloop ("ups_test> ", upstst_my_cmds);

@@ -66,7 +66,7 @@ int main (argc,argv)
           upsugo_free(uc);
         }
         uc=0;
-while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuUv?")) != 0 )
+while ((uc = upsugo_next(argc,argv,"AacCdfghHKtmMNoOpPqrTuUv?z")) != 0 )
       { upsugo_dump(uc,TRUE,stdout); 
         upserr_output();
         fprintf(stderr, "-------------------------------------------------\n");
