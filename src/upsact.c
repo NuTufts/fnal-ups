@@ -35,7 +35,7 @@
 #include "upskey.h"
 #include "upsugo.h"
 #include "upsget.h"
-#include "ups_main.c"
+#include "ups_main.h"
 
 /*
  * Definition of public variables.
@@ -376,7 +376,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command *ugo_cmd,
     return 0;
 
   if ( !mat_prod ) {
-    l_mproduct = upsmat_match_instance( ugo_cmd, 1 );
+    l_mproduct = upsmat_instance( ugo_cmd, 1 );
     if ( !l_mproduct || !l_mproduct->data )
       return 0;
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
@@ -551,7 +551,7 @@ t_upstyp_action *get_act( t_upsugo_command *ugo_cmd,
     return 0;
 
   if ( !mat_prod ) {
-    t_upslst_item *l_mproduct = upsmat_match_instance( ugo_cmd, 1 );
+    t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, 1 );
     if ( !l_mproduct || !l_mproduct->data )
       return 0;
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
@@ -612,7 +612,7 @@ int next_cmd( t_upstyp_action *action,
 	  continue;
 	}
 	
-	l_mproduct = upsmat_match_instance( new_ugo, 1 );
+	l_mproduct = upsmat_instance( new_ugo, 1 );
 	if ( !l_mproduct || !l_mproduct->data ) {
 	  printf( "???? no product\n" );
 	  continue;
