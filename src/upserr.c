@@ -93,8 +93,9 @@ static char *g_error_messages[UPS_NERR] = {
 /* 33 */  "%s: Version/Chain and Table file both cannot be specified on the command line \n",
 /* 34 */  "%s: Cannot do unsetup, SETUP_%s is not defined\n",
 /* 35 */  "%s: Cannot do %s, no product specified on command line\n",
-/* 36 */  "%s: Action parsing failed on \"%s\"\n"
-/* 37 this is the last */
+/* 36 */  "%s: Action parsing failed on \"%s\"\n",
+/* 37 */  "%s: Mismatch in unsetup and SETUP_ env. variable for %s\n"
+/* 38 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -135,7 +136,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_SETUP_ENV        34 */ "UPS_NO_SETUP_ENV",
    /* UPS_NO_PRODUCT          35 */ "UPS_NO_PRODUCT",
    /* UPS_ACTION_PARSE        36 */ "UPS_ACTION_PARSE",
-   /* UPS_NERR                37 */ "UPS_NERR",
+   /* UPS_UNSETUP_CLASH       37 */ "UPS_UNSETUP_CLASH",		    
+   /* UPS_NERR                38 */ "UPS_NERR",
    0 };
 
 /*

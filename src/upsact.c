@@ -121,6 +121,8 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
 int actname2enum( const char * const act_name );
 char *action2inst( const t_upsact_item *const p_cur );
 int dbl2dbs( char * const db_name, t_upslst_item * const l_db );
+t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act );
+int lst_cmp_str( t_upslst_item * const l1, t_upslst_item * const l2 );
 
 /* functions to handle specific action commands */
 
@@ -883,8 +885,9 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 const char *const act_name,
 			 const char copt )
 {
-  static char current_act_line[MAX_LINE_LEN] = "";
-  static char current_db[MAX_LINE_LEN] = "";
+  static char s_current_act_line[MAX_LINE_LEN] = "";
+  static char s_current_db[MAX_LINE_LEN] = "";
+
   t_upslst_item *l_cmd = 0;
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
@@ -925,16 +928,24 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	continue;
       }
       else if ( copt != 't' && !p_cur->ugo->ugo_j ) { /* here we go again */
-	t_upsact_item *new_cur = 0;
+	t_upsact_item *new_act = 0;
 	t_upsugo_command *new_ugo = 0;
+
+	/* handle unsetup ... that's special */
+
+	if ( p_cmd->icmd == e_unsetuprequired ||
+	     p_cmd->icmd == e_unsetupoptional ) {
+	  if ( !(new_ugo = get_SETUP_prod( p_cmd, i_act )) )
+	    continue;
+	}
 
 	/* set/get current db */
 
-	if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
-	     dbl2dbs( current_db, p_cur->ugo->ugo_db ) > 0 ) {
-	  strcpy( current_act_line, p_cmd->argv[0] ); 
-	  strcat( current_act_line, current_db );
-	  new_ugo = upsugo_bldcmd( current_act_line, g_cmd_info[i_act].valid_opts );
+	else if ( !strstr( p_cmd->argv[0], "-z" ) && p_cur->ugo->ugo_z && 
+	     dbl2dbs( s_current_db, p_cur->ugo->ugo_db ) > 0 ) {
+	  strcpy( s_current_act_line, p_cmd->argv[0] ); 
+	  strcat( s_current_act_line, s_current_db );
+	  new_ugo = upsugo_bldcmd( s_current_act_line, g_cmd_info[i_act].valid_opts );
 	}
 	else {
 	  new_ugo = upsugo_bldcmd( p_cmd->argv[0], g_cmd_info[i_act].valid_opts );
@@ -943,7 +954,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	/* check if product is already at top level */
 
 	if ( new_ugo && p_cur->level > 0 ) {
-	  new_cur = find_product( top_list, new_ugo->ugo_product );
+	  new_act = find_product( top_list, new_ugo->ugo_product );
 	}
 
 	/* check if product is already in setup list */
@@ -953,21 +964,21 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  continue;
 	}
 	
-	if ( !new_cur ) {
+	if ( !new_act ) {
 	  switch ( p_cmd->icmd ) 
 	  {
 	  case e_setupoptional:
 	    ignore_errors = 1;
 	  case e_setuprequired:	    
-	    new_cur = new_act_item( new_ugo, 0, 0, "SETUP");
+	    new_act = new_act_item( new_ugo, 0, 0, "SETUP");
 	    break;	
 	  case e_unsetupoptional:
 	    ignore_errors = 1;
 	  case e_unsetuprequired: 
-	    new_cur = new_act_item( new_ugo, 0, 0, "UNSETUP");
+	    new_act = new_act_item( new_ugo, 0, 0, "UNSETUP");
 	    break;
 	  }
-	  if ( !new_cur ) {
+	  if ( !new_act ) {
 	    if ( ignore_errors )
 	      upserr_clear();
 	    else {
@@ -976,8 +987,8 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	    continue;
 	  }
 	}
-	new_cur->level = p_cur->level + 1;
-	dep_list = next_cmd( top_list, dep_list, new_cur, act_name, copt );
+	new_act->level = p_cur->level + 1;
+	dep_list = next_cmd( top_list, dep_list, new_act, act_name, copt );
 	P_VERB_s_s( 3, "Adding dependcy:", p_line );
 	continue;
       }
@@ -988,6 +999,95 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
   }
   
   return dep_list;
+}
+
+t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, const int i_act )
+{
+  static char s_pname[256];
+  char *pname = 0;
+  t_upsugo_command *a_cmd_ugo = 0;
+  t_upsugo_command *a_setup_ugo = 0;
+  int i_cmd = 0;
+  char *cmd_line = 0;
+
+  if ( !p_cmd )
+    return 0;
+
+  i_cmd = p_cmd->icmd;
+  cmd_line = p_cmd->argv[0];
+
+  /* if it's not a simple command, let ugo do it */
+  
+  if ( ! strchr( cmd_line, ' ' ) ) {
+    strcpy( s_pname, cmd_line );
+  }
+  else {
+    a_cmd_ugo = upsugo_bldcmd( cmd_line, g_cmd_info[e_unsetup].valid_opts );
+    strcpy( s_pname, a_cmd_ugo->ugo_product );
+  }
+  pname = upsutl_upcase( s_pname );
+
+  /* make the corresponding ugo_command, using $SETUP_prod */
+
+  a_setup_ugo = upsugo_env( pname, g_cmd_info[e_unsetup].valid_opts );
+
+  /* check if instance is the same */
+
+  if ( a_cmd_ugo && a_setup_ugo ) {
+    int ohoh = 0;
+    if ( a_cmd_ugo->ugo_qualifiers &&
+	 lst_cmp_str( a_cmd_ugo->ugo_qualifiers, a_setup_ugo->ugo_qualifiers ) ) {
+      ohoh = 1;
+    }
+    else if ( a_cmd_ugo->ugo_version  &&
+	      strcmp( a_cmd_ugo->ugo_version, a_setup_ugo->ugo_version ) ) {
+	ohoh = 1;
+    }
+    /* more work to do here ...
+    else if ( a_cmd_ugo->ugo_chain ) {
+      if ( lst_cmp_str( a_cmd_ugo->ugo_chain, a_setup_ugo->ugo_chain ) )
+	ohoh = 1;
+    }
+    */
+
+    if ( ohoh )
+      upserr_add( UPS_UNSETUP_CLASH, UPS_WARNING, pname );
+
+    upsugo_free( a_cmd_ugo ); 
+  }
+  
+  /* if there is nothing to unsetup, do something ... maybe */
+  
+  if ( ! a_setup_ugo ) {
+
+    switch ( i_cmd ) {
+    case e_unsetuprequired:      
+      upserr_add( UPS_NO_SETUP_ENV, UPS_WARNING, pname );
+      break;
+    case e_unsetupoptional:
+      break;
+    }
+  }
+
+  return a_setup_ugo;
+}
+
+int lst_cmp_str( t_upslst_item * const l1, 
+		 t_upslst_item * const l2 )
+{
+  int dc = 0;
+  t_upslst_item *l_1 = upslst_first( l1 );
+  t_upslst_item *l_2 = upslst_first( l2 );
+
+  if ( (dc = (upslst_count( l_1 ) - upslst_count( l_2 )) != 0 ) )    
+    return dc;
+
+  for ( ; l_1; l_1 = l_1->next, l_2 = l_2->next ) {
+    if ( (dc = strcmp( (char *)l_1->data, (char *)l_2->data )) )
+      return dc;
+  }
+
+  return 0;
 }
 
 t_upsact_item *find_product( t_upslst_item* const dep_list,
