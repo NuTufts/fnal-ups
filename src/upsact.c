@@ -414,7 +414,7 @@ t_cmd_info g_cmd_info[] = {
   {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:stU:vVz:Z", 0x00000001, e_setup},
   {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:stU:vVz:Z", 0x00000000, e_invalid_action},
-  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVWXz:Z", 0x00000000, e_invalid_action},
+  {e_copy,        "copy",        "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000000, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000000, e_invalid_action},
   {e_depend,      "depend",      "?cdotg:f:H:K:lm:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
   {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
@@ -443,7 +443,7 @@ t_cmd_info g_cmd_info[] = {
  * the 4th and 5th parameters are the minimum and maximum parameters expected
  * by the action. The six parameter is the corresponding 'undo' command.
  */
-static t_cmd_map g_cmd_maps[] = {
+t_cmd_map g_cmd_maps[] = {
   { "setupoptional", e_setupoptional, NULL, 0, 0, e_unsetupoptional },
   { "setuprequired", e_setuprequired, NULL, 0, 0, e_unsetuprequired },
   { "unsetupoptional", e_unsetupoptional, NULL, 0, 0, e_setupoptional },
