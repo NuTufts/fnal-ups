@@ -621,6 +621,55 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 }
 
 /*-----------------------------------------------------------------------
+ * upsmat_version
+ *
+ * Given a version instance, find the appropriate match in the associated
+ * table file.  This routine is really just an interface to match_from_table.
+ *
+ * Input : version instance,
+ *         flag indicating if we only want one instance,
+ * Output: None
+ * Return: a list of matched products
+ */
+t_upstyp_instance *upsmat_version(t_upstyp_matched_instance * const a_minst,
+				  const t_upstyp_db * const a_db_info)
+{
+  t_upslst_item *minst_list = NULL;
+  t_upslst_item flavor_list = {NULL, NULL, NULL};
+  t_upslst_item quals_list = {NULL, NULL, NULL};
+  t_upstyp_matched_instance *minst = NULL;
+  t_upstyp_instance *tinst = NULL;
+  int num_matches;
+  int need_unique = 1;
+
+  if (a_minst->version) {
+    /* fill in the flavor list and the qualifer list */
+    if (a_minst->version->flavor) {
+      flavor_list.data = (void *)a_minst->version->flavor;
+    }
+    if (a_minst->version->qualifiers) {
+      quals_list.data = (void *)a_minst->version->qualifiers;
+    }
+
+    /* go get the table file */
+    num_matches = match_from_table(a_minst->version->product,
+				   a_minst->version->table_file,
+				   a_minst->version->table_dir,
+				   a_minst->version->ups_dir,
+				   a_minst->version->prod_dir,
+				   a_db_info, need_unique,
+				   &flavor_list, &quals_list, &minst_list);
+    if (num_matches > 0) {
+      minst = (t_upstyp_matched_instance *)minst_list->data;
+      tinst = minst->table;
+      upsmem_free(minst);
+      upslst_free(minst_list, ' ');
+    }
+  }
+  return(tinst);
+}
+
+/*-----------------------------------------------------------------------
  * upsmat_match_with_instance
  *
  * Given an instance and a read in product structure, return a pointer
@@ -878,7 +927,7 @@ static int match_from_chain( const char * const a_product,
   t_upslst_item *cinst;
   t_upstyp_instance *inst = NULL;
   t_upstyp_matched_instance *tmp_minst_ptr = NULL;
-  char *first_flavor, *first_quals, *buffer = NULL;
+  char *buffer = NULL;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
   t_upslst_item tmp_flavor_list = {NULL, NULL, NULL};
@@ -1005,7 +1054,6 @@ static int match_from_version( const char * const a_product,
   t_upslst_item tmp_quals_list = {NULL, NULL, NULL};
   t_upstyp_instance *inst;
   t_upstyp_matched_instance *tmp_minst_ptr = NULL;
-  char *first_flavor, *first_quals;
   char *tmp_upsdir, *tmp_productdir;
   int do_need_unique = 1;
 

@@ -42,6 +42,8 @@
 t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 			       const t_upslst_item * const a_db_info,
 			       const int a_need_unique);
+t_upstyp_instance *upsmat_version(t_upstyp_matched_instance * const a_minst,
+				  const t_upstyp_db * const a_db_info);
 t_upslst_item *upsmat_match_with_instance(
 				    const t_upstyp_instance * const a_instance,
 				    const t_upstyp_product * const a_product);
