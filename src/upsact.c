@@ -1982,7 +1982,7 @@ t_upsact_item *find_prod_name( t_upslst_item* const dep_list,
 
 int cmp_ugo_db( const void * const d1, const void * const d2 )
 {
-  /* a littel helper for prepend_ugo_db and merge_ugo_db */
+  /* a little helper for prepend_ugo_db and merge_ugo_db */
 
   t_upstyp_db *db1 = (t_upstyp_db *)d1;
   t_upstyp_db *db2 = (t_upstyp_db *)d2;
@@ -2647,7 +2647,7 @@ static void f_envremove( ACTION_PARAMS)
 	 argument, it could contain some code there has to be executed, which
 	 we don't want to put into the dropit command */
 
-      if (fprintf((FILE *)a_stream, "if (${?%s}) then\n", a_cmd->argv[1]) < 0) {
+      if (fprintf((FILE *)a_stream, "if (${?%s}) then\n", a_cmd->argv[0]) < 0) {
         FPRINTF_ERROR();
       }
 
