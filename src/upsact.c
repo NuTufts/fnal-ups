@@ -3486,7 +3486,7 @@ static void f_sourceoptcheck( ACTION_PARAMS)
 
 static void f_writecompilescript(ACTION_PARAMS)
 {
-  t_upstyp_matched_product *mproduct = 0;
+  t_upstyp_matched_product *mproduct = NULL;
   t_upslst_item *cmd_list = NULL;
   char *time_ptr;
   int moved_to_old = 0, moved_to_timedate = 0, i, save_shell, save_g_shell;
@@ -3497,9 +3497,12 @@ static void f_writecompilescript(ACTION_PARAMS)
   if (! g_COMPILE_FLAG) {
 
     /* let everybody know we are in compile mode */
-
     g_COMPILE_FLAG = 1;
 
+    /* save the initial shell that we came in with.  we will need to generate
+       a file of each supported shell type.  to do this we will need to reset
+       the cached value that upsugo uses.  but we want to set it back to the
+       original value before we exit. */
     save_g_shell = g_UPS_SHELL;
     save_shell = a_command_line->ugo_shell;
 
@@ -3527,16 +3530,19 @@ static void f_writecompilescript(ACTION_PARAMS)
 	   4. open compile file
 	   5. process actions and write them to the compile file.
 	   6. close compile file */
-	/* 1     first, setup the matched product */
-	mproduct = (t_upstyp_matched_product *)upsmem_malloc(
+	/* 1     first, setup the matched product (if this is the first time
+	         through */
+	if (! mproduct) {
+	  mproduct = (t_upstyp_matched_product *)upsmem_malloc(
 					    sizeof(t_upstyp_matched_product));
-	mproduct->db_info = (t_upstyp_db *)a_db_info;
-	upsmem_inc_refctr(a_db_info);
-	mproduct->minst_list = upslst_new((void *)a_minst);
+	  mproduct->db_info = (t_upstyp_db *)a_db_info;
+	  upsmem_inc_refctr(a_db_info);
+	  mproduct->minst_list = upslst_new((void *)a_minst);
+	}
     
 	/*       get the action command list */
-	cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, mproduct,
-				  a_cmd->argv[1], a_cmd->icmd );
+	cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line,
+				  mproduct, a_cmd->argv[1], a_cmd->icmd );
 	if (UPS_ERROR == UPS_SUCCESS) {
 	  /* 2      now that we have the list, locate the current compile file
 	            if there is one, first we must add in the appropriate file
@@ -3605,12 +3611,6 @@ static void f_writecompilescript(ACTION_PARAMS)
 	/* since we are at end, it does not matter which flag we use here */
 	DO_SYSTEM_MOVE(moved_to_old);
       }
-      /* release any memory we acquired */
-      if (mproduct && mproduct->minst_list) {
-	(void )upslst_free(mproduct->minst_list, ' ');
-	upsmem_free(mproduct);
-	upsmem_dec_refctr(a_db_info);
-      }
       if (cmd_list) {
 	upsact_cleanup(cmd_list);
       }
@@ -3620,9 +3620,14 @@ static void f_writecompilescript(ACTION_PARAMS)
     g_UPS_SHELL = save_g_shell;
 
     /* let everybody know we are out of compile mode */
-
     g_COMPILE_FLAG = 0;
 
+  }
+  /* release any memory we acquired */
+  if (mproduct && mproduct->minst_list) {
+    (void )upslst_free(mproduct->minst_list, ' ');
+    upsmem_free(mproduct);
+    upsmem_dec_refctr(a_db_info);
   }
 }
 
