@@ -874,6 +874,7 @@ char *upsget_shell(const t_upstyp_db * const db_info_ptr,
     return (CSH);
     break;
   default:
+    break;
   }
   return (0);
 }
@@ -890,6 +891,7 @@ char *upsget_source(const t_upstyp_db * const db_info_ptr,
     return (CSH);
     break;
   default:
+    break;
   }
   return (0);
 }
