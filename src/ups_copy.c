@@ -468,20 +468,13 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
       }
     }
 
-  /* memory clean up time still needs to be done */
+  /* memory clean up time still needs to be done do not free anything that
+     is a result of reading a file in. that file is in the cache too.*/
     if (new_instance) {
       new_instance = (t_upstyp_instance *)ups_free_instance(new_instance);
     }
-    if (dum_product) {
-      dum_product = (t_upstyp_product *)ups_free_product(dum_product);
-    }
     if (new_command_line) {
       (void )upsugo_free(new_command_line);
-    }
-    if (write_product_ptr != &write_product) {
-      /* we read in a file and did not just fill out this structure. */
-      write_product_ptr = (t_upstyp_product *)ups_free_product(
-							    write_product_ptr);
     }
   }
   return(mproduct_list);
