@@ -142,7 +142,9 @@ if(!mp) return;
 for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
    prod = (t_upstyp_matched_product *) prod_ptr->data;
-   tostring=upsget_translation(prod,uc,string);
+   tostring=upsget_translation(
+			  (t_upstyp_matched_instance *)prod->minst_list->data,
+			  prod->db_info,uc,string);
    if (tostring)
       printf("%s\n",tostring); 
    else 
