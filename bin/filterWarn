@@ -310,7 +310,7 @@ sub filtParse_IRIX {
    return (undef);
 }
 
-sub filtParse_IRIX6
+sub filtParse_IRIX64
 {
    #
    # cc compiler.
