@@ -1198,7 +1198,7 @@ fi
 # Mark ALL BootStrap files current.
 #
 rm -f /tmp/ups_cur_\$$
-for filex in \$BootStrap_Dir/*
+for filex in \$BootStrap_Dir/set* \$BootStrap_Dir/ups*
 do
 #    ed -  \$filex <\$BootStrap_Dir/zzzzzzzzzz >/dev/null
     sed -e 's/Setups_Current=0/Setups_Current=1/' \$filex >/tmp/ups_cur_\$$
