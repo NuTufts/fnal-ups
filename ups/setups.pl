@@ -76,5 +76,14 @@ EOF
 	die("unsetup failed $@");
     };
 }
+
+sub use_perl {
+    my $v = $_[0];
+    if ( ! defined($::ENV{SETUP_PERL}) || $::ENV{SETUP_PERL} !~ m/perl $v / ) {
+	setup("perl $v");
+	exec "$::ENV{PERL_DIR}/bin/perl", "-wS", $::0, @::ARGV;
+	die( "cannot exec $::ENV{PERL_DIR}/bin/perl" );
+    }
+}
  
 1;
