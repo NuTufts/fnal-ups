@@ -42,7 +42,7 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
 	          ups_configure.o ups_unconfigure.o ups_unsetup.o \
 	          ups_tailor.o ups_create.o ups_unk.o ups_declare.o \
-                  ups_depend.o ups_get.o ups_undeclare.o ups_flavor.o
+	          ups_depend.o ups_get.o ups_undeclare.o ups_flavor.o
 
 CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsfil.A upsugo.A upsmat.A ups_list.A  \
@@ -50,7 +50,8 @@ CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upsver.A upsact.A upsget.A ups_start.A \
 	     ups_stop.A ups_configure.A ups_unconfigure.A \
 	     ups_unsetup.A ups_tailor.A ups_create.A upstbl.A \
-             ups_list.A ups_depend.A ups_get.A
+             ups_list.A ups_depend.A ups_get.A ups_declare.A \
+	     ups_undeclare.A ups_flavor.A ups_copy.A
 
 LDFLAGS = $(LLIBS)
 
@@ -117,6 +118,7 @@ ups_configure.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_configure.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -126,6 +128,24 @@ ups_configure.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_configure.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_configure.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_copy.o:	ups_copy.c
+ups_copy.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_copy.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_copy.o:	$(ERUPT_DIR)/inc/ups_main.h
 ups_create.o:	ups_create.c
 ups_create.o:	$(ERUPT_DIR)/inc/upserr.h
 ups_create.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -134,6 +154,7 @@ ups_create.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_create.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_create.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_create.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_create.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_create.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_create.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_create.o:	$(ERUPT_DIR)/inc/upsfil.h
@@ -165,6 +186,7 @@ ups_declare.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_declare.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_declare.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_declare.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_declare.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_declare.o:	$(ERUPT_DIR)/inc/upsver.h
 ups_declare.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_declare.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -194,6 +216,10 @@ ups_declare.o:	$(ERUPT_DIR)/inc/ups_unk.h
 ups_declare.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_declare.o:	$(ERUPT_DIR)/inc/ups_unsetup.h
 ups_declare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_declare.o:	$(ERUPT_DIR)/inc/ups_undeclare.h
+ups_declare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_declare.o:	$(ERUPT_DIR)/inc/ups_flavor.h
+ups_declare.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_depend.o:	ups_depend.c
 ups_depend.o:	$(ERUPT_DIR)/inc/ups_depend.h
 ups_depend.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -209,6 +235,67 @@ ups_depend.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_depend.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_depend.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_depend.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_flavor.o:	ups_flavor.c
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsfil.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsget.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upshlp.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upskey.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsmem.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upstbl.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsver.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_configure.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_create.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_declare.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_depend.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_get.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_setup.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_start.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_stop.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_tailor.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_unconfigure.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_unk.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_unsetup.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_undeclare.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/ups_flavor.h
+ups_flavor.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_get.o:	ups_get.c
 ups_get.o:	$(ERUPT_DIR)/inc/upserr.h
 ups_get.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -217,6 +304,7 @@ ups_get.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_get.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_get.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_get.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_get.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_get.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_get.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_get.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -225,6 +313,7 @@ ups_get.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_get.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_get.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_get.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_get.o:	$(ERUPT_DIR)/inc/upsmem.h
 ups_get.o:	$(ERUPT_DIR)/inc/ups_main.h
 ups_list.o:	ups_list.c
 ups_list.o:	$(ERUPT_DIR)/inc/ups.h
@@ -253,6 +342,7 @@ ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_list.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_list.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsver.h
 ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -281,6 +371,10 @@ ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_list.o:	$(ERUPT_DIR)/inc/ups_unk.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_list.o:	$(ERUPT_DIR)/inc/ups_unsetup.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_list.o:	$(ERUPT_DIR)/inc/ups_undeclare.h
+ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_list.o:	$(ERUPT_DIR)/inc/ups_flavor.h
 ups_list.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	ups_main.c
 ups_main.o:	$(ERUPT_DIR)/inc/ups_main.h
@@ -314,9 +408,16 @@ ups_main.o:	$(ERUPT_DIR)/inc/upserr.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_main.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_main.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_main.o:	$(ERUPT_DIR)/inc/upshlp.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsget.h
 ups_main.o:	$(ERUPT_DIR)/inc/ups_declare.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_undeclare.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_flavor.h
+ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_main.o:	$(ERUPT_DIR)/inc/ups_get.h
 ups_main.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_setup.o:	ups_setup.c
 ups_setup.o:	$(ERUPT_DIR)/inc/upserr.h
@@ -326,6 +427,7 @@ ups_setup.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_setup.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_setup.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_setup.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_setup.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_setup.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_setup.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_setup.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -343,6 +445,7 @@ ups_start.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_start.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_start.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_start.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_start.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_start.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_start.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_start.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -360,6 +463,7 @@ ups_stop.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_stop.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_stop.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -379,6 +483,7 @@ ups_tailor.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_tailor.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_tailor.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_tailor.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_tailor.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_tailor.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_tailor.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_tailor.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -397,6 +502,7 @@ ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -406,9 +512,86 @@ ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_unconfigure.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_undeclare.o:	ups_undeclare.c
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsfil.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsget.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upshlp.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upskey.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsmem.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upstbl.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsver.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_configure.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_create.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_declare.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_depend.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_get.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_list.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_main.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_setup.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_start.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_stop.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_tailor.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_unconfigure.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_unk.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_unsetup.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_undeclare.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/ups_flavor.h
+ups_undeclare.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_unk.o:	ups_unk.c
 ups_unk.o:	$(ERUPT_DIR)/inc/ups_unk.h
 ups_unk.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upserr.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsutl.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsmat.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsact.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upstyp.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsugo.h
+ups_unk.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_unk.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_unsetup.o:	ups_unsetup.c
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upserr.h
@@ -418,6 +601,7 @@ ups_unsetup.o:	$(ERUPT_DIR)/inc/upsutl.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upstyp.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upslst.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upslst.h
+ups_unsetup.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upsmat.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upsugo.h
 ups_unsetup.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -438,10 +622,12 @@ upsact.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsact.o:	$(ERUPT_DIR)/inc/upslst.h
 upsact.o:	$(ERUPT_DIR)/inc/upserr.h
+upsact.o:	$(ERUPT_DIR)/inc/upsver.h
 upsact.o:	$(ERUPT_DIR)/inc/upslst.h
 upsact.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsact.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsact.o:	$(ERUPT_DIR)/inc/upslst.h
+upsact.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsact.o:	$(ERUPT_DIR)/inc/upsmem.h
 upsact.o:	$(ERUPT_DIR)/inc/upskey.h
 upsact.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -454,6 +640,8 @@ upsfil.o:	upsfil.c
 upsfil.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
+upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
+upsfil.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
 upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
@@ -492,6 +680,7 @@ upsget.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsget.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsget.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsget.o:	$(ERUPT_DIR)/inc/upslst.h
+upsget.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsget.o:	$(ERUPT_DIR)/inc/upsver.h
 upsget.o:	$(ERUPT_DIR)/inc/ups_list.h
 upsget.o:	$(ERUPT_DIR)/inc/upsugo.h
@@ -521,11 +710,17 @@ upsget.o:	$(ERUPT_DIR)/inc/ups_unk.h
 upsget.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsget.o:	$(ERUPT_DIR)/inc/ups_unsetup.h
 upsget.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsget.o:	$(ERUPT_DIR)/inc/ups_undeclare.h
+upsget.o:	$(ERUPT_DIR)/inc/upsugo.h
+upsget.o:	$(ERUPT_DIR)/inc/ups_flavor.h
+upsget.o:	$(ERUPT_DIR)/inc/upsugo.h
 upshlp.o:	upshlp.c
 upshlp.o:	$(ERUPT_DIR)/inc/upstyp.h
 upshlp.o:	$(ERUPT_DIR)/inc/upslst.h
 upshlp.o:	$(ERUPT_DIR)/inc/upsutl.h
 upshlp.o:	$(ERUPT_DIR)/inc/upstyp.h
+upshlp.o:	$(ERUPT_DIR)/inc/upslst.h
+upshlp.o:	$(ERUPT_DIR)/inc/upsugo.h
 upshlp.o:	$(ERUPT_DIR)/inc/upslst.h
 upskey.o:	upskey.c
 upskey.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -533,6 +728,8 @@ upskey.o:	$(ERUPT_DIR)/inc/upslst.h
 upskey.o:	$(ERUPT_DIR)/inc/upsmem.h
 upskey.o:	$(ERUPT_DIR)/inc/upsutl.h
 upskey.o:	$(ERUPT_DIR)/inc/upstyp.h
+upskey.o:	$(ERUPT_DIR)/inc/upslst.h
+upskey.o:	$(ERUPT_DIR)/inc/upsugo.h
 upskey.o:	$(ERUPT_DIR)/inc/upslst.h
 upskey.o:	$(ERUPT_DIR)/inc/upskey.h
 upskey.o:	$(ERUPT_DIR)/inc/upstyp.h
@@ -554,6 +751,7 @@ upsmat.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsmat.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsmat.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsmat.o:	$(ERUPT_DIR)/inc/upslst.h
+upsmat.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsmat.o:	$(ERUPT_DIR)/inc/upsget.h
 upsmem.o:	upsmem.c
 upsmem.o:	$(ERUPT_DIR)/inc/upserr.h
@@ -564,6 +762,8 @@ upstyp.o:	upstyp.c
 upstyp.o:	$(ERUPT_DIR)/inc/upsutl.h
 upstyp.o:	$(ERUPT_DIR)/inc/upstyp.h
 upstyp.o:	$(ERUPT_DIR)/inc/upslst.h
+upstyp.o:	$(ERUPT_DIR)/inc/upslst.h
+upstyp.o:	$(ERUPT_DIR)/inc/upsugo.h
 upstyp.o:	$(ERUPT_DIR)/inc/upslst.h
 upstyp.o:	$(ERUPT_DIR)/inc/upstyp.h
 upstyp.o:	$(ERUPT_DIR)/inc/upsmem.h
@@ -579,16 +779,20 @@ upsugo.o:	$(ERUPT_DIR)/inc/upsmem.h
 upsugo.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsugo.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsugo.o:	$(ERUPT_DIR)/inc/upslst.h
+upsugo.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsutl.o:	upsutl.c
 upsutl.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsutl.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsutl.o:	$(ERUPT_DIR)/inc/upslst.h
+upsutl.o:	$(ERUPT_DIR)/inc/upslst.h
+upsutl.o:	$(ERUPT_DIR)/inc/upsugo.h
 upsutl.o:	$(ERUPT_DIR)/inc/upslst.h
 upsutl.o:	$(ERUPT_DIR)/inc/upserr.h
 upsutl.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsutl.o:	$(ERUPT_DIR)/inc/upsmem.h
 upsutl.o:	$(ERUPT_DIR)/inc/upsfil.h
 upsutl.o:	$(ERUPT_DIR)/inc/upstyp.h
+upsutl.o:	$(ERUPT_DIR)/inc/upsget.h
 upsver.o:	upsver.c
 upsver.o:	$(ERUPT_DIR)/inc/upserr.h
 upsver.o:	$(ERUPT_DIR)/inc/upsver.h
