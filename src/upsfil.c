@@ -129,6 +129,9 @@ static int               g_call_cache_count = 0;     /* # times cache is used */
 static int               g_call_count = 0;           /* # times read_file is called */
 
 
+#define P_VERB( iver, str ) \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s\n", \
+			        (str))
 #define P_VERB_s( iver, str ) \
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s\n", \
 			       g_filename, (str))
@@ -259,7 +262,7 @@ int upsfil_write_journal_files( void )
 {
 
   if ( g_ft ) {
-    P_VERB_s( 1, "Writing journal files" );
+    P_VERB( 1, "Writing ALL journal files" );
     upstbl_map( g_ft, write_journal_file, NULL );
     upstbl_free( &g_ft );
     g_ft = 0;
