@@ -25,7 +25,7 @@ DIR=$(DEFAULT_DIR)
 # this section may change in later ups|addproduct incarnations
             PROD=ups
      PRODUCT_DIR=UPS_DIR
-            VERS=v4_4b
+            VERS=v4_5
            CHAIN=development
       UPS_SUBDIR=ups
        UPS_STYLE=new
@@ -98,12 +98,12 @@ insure:
 	make INSURE=-i UPSDBG=-debug all
 
 clean:
-	for subdir in src inc test doc bin lib; do \
+	for subdir in src inc test doc bin lib man ups; do \
 	   ( cd $$subdir; echo "cleaning $$subdir"; ../bin/upspremake clean ); \
 	done
 
 spotless:
-	for subdir in src inc test doc bin lib; do \
+	for subdir in src inc test doc bin lib man ups; do \
 	   ( cd $$subdir; echo "cleaning $$subdir"; ../bin/upspremake spotless ); \
 	done
 
