@@ -32,6 +32,7 @@
 #include "upsutl.h"
 #include "upstyp.h"
 #include "upslst.h"
+#include "upstbl.h"
 #include "upsmem.h"
 #include "upserr.h"
 #include "upskey.h"
@@ -106,6 +107,11 @@ static int               g_ifile = e_file_unknown;   /* current file type as enu
 static int               g_imargin = 0;
 static const char        *g_filename = 0;
 
+static t_upstbl g_ft = 0;
+static int g_call_cache_count = 0;
+static int g_call_count = 0;
+
+
 /*
  * Definition of public functions
  */
@@ -121,6 +127,10 @@ static const char        *g_filename = 0;
  */
 t_upstyp_product *upsfil_read_file( const char * const ups_file )
 {
+  const char *key;
+
+  if ( !g_ft )
+    g_ft = upstbl_new( 300 );
 
   UPS_ERROR = UPS_SUCCESS;
   g_filename = ups_file;
@@ -129,6 +139,19 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, "" );
     return 0;
   }
+
+  key = upstbl_atom_string( ups_file );
+  g_pd = upstbl_get( g_ft, key );
+
+  /* product was in table */
+
+  g_call_count++;
+  if ( g_pd ) {
+    g_call_cache_count++;
+    return g_pd;
+  }
+
+  /* product was not in table */
 
   g_fh = fopen ( ups_file, "r" );
   if ( ! g_fh ) {
@@ -154,7 +177,12 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   }
   
   fclose( g_fh );
-  
+
+  /* add product to table */
+
+  if ( g_pd )
+    upstbl_put( g_ft, key, g_pd );
+
   return g_pd;
 }
 
@@ -238,6 +266,13 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   return UPS_SUCCESS;
 }
      
+void upsfil_flush( void )
+{
+  printf( "total calls = %d, cache calls = %d\n", g_call_count, g_call_cache_count );
+  upstbl_dump( g_ft );
+}
+
+
 /*
  * Definition of private functions
  */

@@ -37,7 +37,7 @@ CFLAGScia = $(INCDIRS)
 
 OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 	  upsfil.o upsugo.o upsmat.o upskey.o upshlp.o \
-	  upsver.o upsact.o upsget.o
+	  upsver.o upsact.o upsget.o upstbl.o
 
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
 	          ups_configure.o ups_unconfigure.o ups_unsetup.o \
@@ -48,7 +48,7 @@ CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upskey.A upshlp.A ups_unk.A ups_setup.A \
 	     upsver.A upsact.A upsget.A ups_start.A \
 	     ups_stop.A ups_configure.A ups_unconfigure.A \
-	     ups_unsetup.A ups_tailor.A ups_create.A
+	     ups_unsetup.A ups_tailor.A ups_create.A upstbl.A
 
 LDFLAGS = $(LLIBS)
 
@@ -372,7 +372,7 @@ upsfil.o:	upsfil.c
 upsfil.o:	$(ERUPT_DIR)/inc/upsutl.h
 upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
-upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
+upsfil.o:	$(ERUPT_DIR)/inc/upstbl.h
 upsfil.o:	$(ERUPT_DIR)/inc/upstyp.h
 upsfil.o:	$(ERUPT_DIR)/inc/upslst.h
 upsfil.o:	$(ERUPT_DIR)/inc/upsmem.h
@@ -421,6 +421,8 @@ upskey.o:	$(ERUPT_DIR)/inc/upstyp.h
 upslst.o:	upslst.c
 upslst.o:	$(ERUPT_DIR)/inc/upslst.h
 upslst.o:	$(ERUPT_DIR)/inc/upsmem.h
+upstbl.o:	upstbl.c
+upstbl.o:	$(ERUPT_DIR)/inc/upstbl.h
 upsmat.o:	upsmat.c
 upsmat.o:	$(ERUPT_DIR)/inc/upsmat.h
 upsmat.o:	$(ERUPT_DIR)/inc/upsugo.h

@@ -607,7 +607,7 @@ static t_upstyp_matched_product *match_instance_core(
 	}
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the a_minst_list */
-      ups_free_product(read_product);
+	/* ups_free_product(read_product); ??? for table */
       }
 
       /* return the xtra chain lists to the first list element */
@@ -714,7 +714,7 @@ static int match_from_chain( const char * const a_product,
 
     /* we do not need the info read from the file.  we have taken what we
        want and put it on the a_cinst_list */
-    ups_free_product(read_product);
+    /* ups_free_product(read_product); ??? for table */
 
     if (tmp_num_matches > 0) {
       /* for each instance that was matched, open the version file, and only
@@ -855,7 +855,7 @@ static int match_from_version( const char * const a_product,
 
       /* we do not need the info read from the file.  we have taken what we
 	 want and put it on the a_minst_list */
-      ups_free_product(read_product);
+      /* ups_free_product(read_product); ??? for table */
 
       if (tmp_num_matches > 0) {
 	/* for each instance that was matched, open the table file, and only
@@ -982,7 +982,7 @@ static int match_from_table( const char * const a_product,
 
       /* we do not need the info read from the file.  we have taken what we
 	 want */
-      ups_free_product(read_product);
+       /* ups_free_product(read_product); ??? for table */
 
       /* free the table_file_path */
       upsmem_free(full_table_file);
