@@ -8,7 +8,14 @@ QUALIFIERS =""
 
 COMMON:
 
-ACTION=setupRequired("bee5 v1_0", no_ups_env)
+ACTION=SETUP
+
+setupRequired("bee5 v1_0", no_ups_env)
+
+
+ACTION=SETUP
+
+setupRequired("bee5 v2_0", no_ups_env)
 
 END:
 

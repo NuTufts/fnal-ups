@@ -5,7 +5,13 @@
 cd $UPS_DIR/test/scripts/copy/log
 $UPS_DIR/test/ups_test << EOD
 
-copy bee1 v1_0 -O "bee3 v4_0" -z ../db2 -f NULL -X
+ups_echo "=====testing without -X"
+copy bee1 v1_0 -O "bee3 v4_1" -z ../db2 -f NULL 
+ups_echo "=====testing with -X and incorrect ups directory"
+copy bee1 v1_0 -O "bee3 v4_1" -z ../db2 -f NULL -X -v
+ups_echo "=====testing with -X and correct ups directory"
+copy bee1 v1_0 -O "bee3 v4_0" -z ../db2 -f PIGPEN -X
+ups_echo "======this current core dumps - it has no -O option"
 copy bee1 v1_0 -f NULL -z ../db2 
 
 quit
