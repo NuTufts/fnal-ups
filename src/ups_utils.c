@@ -34,6 +34,7 @@
 #include "ups_utils.h"
 #include "ups_error.h"
 #include "ups_types.h"
+#include "ups_memory.h"
 
 /*
  * Definition of public variables.
@@ -258,6 +259,27 @@ char *upsutl_user(void)
   return (username);
 }
 
+
+/*-----------------------------------------------------------------------
+ * upsutl_str_create
+ *
+ * Will create a sring on the heap, using upsmem. 
+ *
+ * Input : char *, string to be copied.
+ * Output: none
+ * Return: char *, new string.
+ */
+char *upsutl_str_create( char * const str )
+{
+  char *new_str = 0;
+    
+  if ( str ) {
+    new_str = (char *)upsmem_malloc( (int)strlen( str ) + 1 );
+    strcpy( new_str, str );
+  }
+  
+  return new_str;
+}
 
 /*-----------------------------------------------------------------------
  * upsutl_str_sort

@@ -49,6 +49,7 @@ int upsutl_statistics(t_ups_instance const * const a_instance,
 char *upsutl_time_date(void);
 char *upsutl_user(void);
 
+char       *upsutl_str_create( char * const str );
 int        upsutl_str_sort( char * const, const char );
 size_t     upsutl_str_remove( char * const str, const char * const ct );
 size_t     upsutl_str_remove_edges( char * const str, const char * const ct );
