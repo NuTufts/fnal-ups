@@ -53,39 +53,6 @@ extern t_cmd_info g_cmd_info[];
  * Definition of public functions.
  */
 
-void print_action( t_upstyp_action * const act_ptr )
-{
-  t_upslst_item *l_ptr = 0;
- 
-  if ( !act_ptr ) return;
-
-  printf ( "action = %s\n", act_ptr->action );
- 
-  if ( act_ptr->command_list ) {
-    printf( "Command list = \n" );
-    l_ptr = upslst_first( act_ptr->command_list );
-    for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      printf( "   %s\n", (char*)l_ptr->data );
-    }
-  }
-  else {
-    printf( "Command list = %s\n", (char*)0 );
-  }
-}
-
-void abc(t_upstyp_instance * const inst_ptr)
-{
- t_upslst_item *l_ptr=0;
-
- if ( inst_ptr->action_list ) 
- {
-    printf( "Actions = \n" );
-    l_ptr = upslst_first( inst_ptr->action_list );
-    for ( ; l_ptr; l_ptr = l_ptr->next ) {
-      print_action( l_ptr->data );
-    }
- }
-}
 
 /*-----------------------------------------------------------------------
  * ups_declare
@@ -478,10 +445,22 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       upserr_vplace();
       return 0;
     } 
+/* Process the configure action */
+    cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                               mproduct, g_cmd_info[e_configure].cmd,
+                               ups_command);
+    if (UPS_ERROR == UPS_SUCCESS) 
+    { upsact_process_commands(cmd_list, tmpfile); 
+      upsact_cleanup(cmd_list);
+    } else {
+      upsfil_clear_journal_files();
+      upserr_vplace();
+      return 0;
+    } 
 /* Let them know if there is a tailor action for this product */
     cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                mproduct, g_cmd_info[e_tailor].cmd,
-                               e_tailor);
+                               ups_command);
     if (UPS_ERROR == UPS_SUCCESS) 
     { if (cmd_list)
       { upsver_mes(0,"A UPS tailor exists for this product\n");
@@ -515,11 +494,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         if (strstr(the_chain,"current"))
         { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                      mproduct, g_cmd_info[e_start].cmd,
-                                     e_start);
+                                     ups_command);
           if (!cmd_list)
           { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                        mproduct, g_cmd_info[e_stop].cmd,
-                                       e_stop);
+                                       ups_command);
           }
           /*          if (UPS_ERROR == UPS_SUCCESS)  */
           if (cmd_list)
