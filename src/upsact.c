@@ -359,7 +359,11 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 
 #define SET_PARSE_ERROR( str ) \
     upserr_vplace(); \
-    upserr_add(UPS_ACTION_PARSE, UPS_FATAL, str );
+    upserr_add( UPS_ACTION_PARSE, UPS_FATAL, str );
+
+#define SET_NO_ACTION_ERROR( str ) \
+    upserr_vplace(); \
+    upserr_add( UPS_NO_ACTION, UPS_FATAL, str );
 
 #define P_VERB_s( iver, str ) \
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSACT: %s\n", \
@@ -1095,12 +1099,14 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
       /* ignore errors if optional exeaction */
 
       if ( !new_act_itm || !new_act_itm->act ) {
-	if ( i_cmd & 1 ) {
+	if ( i_cmd & 1 ) {	  
+	  SET_NO_ACTION_ERROR( p_cmd->argv[0] );
 	  SET_PARSE_ERROR( p_line );
 	}
 	else {
 	  upserr_clear();
 	}
+	upsact_free_act_item( new_act_itm );
 	continue;
       }
 
@@ -1249,15 +1255,18 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       new_act_itm = new_act_item( p_act_itm->ugo, p_act_itm->mat,  
 				  p_act_itm->level, i_cmd, p_cmd->argv[0] );
 
+
       /* ignore errors if optional exeaction */
 
       if ( !new_act_itm || !new_act_itm->act ) {
 	if ( i_cmd & 1 ) {
+	  SET_NO_ACTION_ERROR( p_cmd->argv[0] );
 	  SET_PARSE_ERROR( p_line );
 	}
 	else {
 	  upserr_clear();
 	}
+	upsact_free_act_item( new_act_itm );
 	continue;
       }
 
