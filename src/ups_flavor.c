@@ -58,9 +58,9 @@ void ups_flavor( t_upsugo_command * const uc )
   int count=0;
   l_ptr=uc->ugo_flavor;
   if(!uc->ugo_l)
-  { printf("%s\n",l_ptr->data);
+  { printf("%s\n",(char *)l_ptr->data);
   } else {
     for ( l_ptr = upslst_first(uc->ugo_flavor); l_ptr; 
           l_ptr = l_ptr->next, count++ )
-    { printf("%s\n",l_ptr->data);
+    { printf("%s\n",(char *)l_ptr->data);
 } } }

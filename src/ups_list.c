@@ -453,7 +453,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           }
           for ( ul_ptr = upslst_first( minst_ptr->version->user_list ); 
                 ul_ptr; ul_ptr = ul_ptr->next, count++ )
-          { printf("\t\t%s \n",ul_ptr->data); /* Give keys and values */
+          { printf("\t\t%s \n",(char *)ul_ptr->data); /* Give keys and values */
           }
         }
         if (a_command_line->ugo_l) 
@@ -525,7 +525,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { for ( ul_ptr = upslst_first( instance->version->user_list ); 
             ul_ptr; ul_ptr = ul_ptr->next, count++ )
       { if (strlen(l_ptr->data) == 7) /* no specific key give all */
-        { printf("\"%s\" ",ul_ptr->data); /* Give keys and values */
+        { printf("\"%s\" ",(char *)ul_ptr->data); /* Give keys and values */
         } else {
           str_ptr=l_ptr->data;
           str_ptr+=8;
@@ -542,7 +542,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
             if (strlen(str_val))
             { printf("\"%s\" ",str_val);
             } else { 
-              printf("\"%s\" ",l_ptr->data);
+              printf("\"%s\" ",(char *)l_ptr->data);
             }
           } 
         } 
@@ -562,7 +562,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
         if (strlen(str_val))
         { printf("\"%s\" ",str_val);
         } else { 
-          printf("\"%s\" ",l_ptr->data);
+          printf("\"%s\" ",(char *)l_ptr->data);
         }
       } 
     }

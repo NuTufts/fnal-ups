@@ -115,7 +115,7 @@ static t_var_sub g_var_subs[] = {
 /*
  * Definition of public functions.
  */
-char *upsget_remall(const FILE * const stream, 
+void upsget_remall(const FILE * const stream, 
                     const t_upsugo_command * const command_line )
 {
   if (command_line->ugo_shell == e_INVALID_SHELL)
@@ -146,10 +146,10 @@ char *upsget_remall(const FILE * const stream,
       fprintf((FILE *)stream,"unsetenv UPS_SHELL\n");
       fprintf((FILE *)stream,"unsetenv UPS_OPTIONS\n");
     }
-  }
+  } 
 }
 
-char *upsget_envout(const FILE * const stream, 
+void upsget_envout(const FILE * const stream, 
                     const t_upstyp_db * const db,
                     const t_upstyp_matched_instance * const instance,
                     const t_upsugo_command * const command_line )
@@ -164,7 +164,7 @@ char *upsget_envout(const FILE * const stream,
   }
 }
  
-char *upsget_allout(const FILE * const stream, 
+void upsget_allout(const FILE * const stream, 
                     const t_upstyp_db * const db,
                     const t_upstyp_matched_instance * const instance,
                     const t_upsugo_command * const command_line )
@@ -240,7 +240,7 @@ char *upsget_allout(const FILE * const stream,
       if (addr) 
       { fprintf((FILE *)stream,"setenv UPS_OPTIONS=\"%s\"\n",addr); }
     }
-  } return 0;
+  } 
 }
 
 char *upsget_translation( const t_upstyp_matched_product * const product,
@@ -528,9 +528,9 @@ char *upsget_tilde_dir(char * addr)
     name=addr+1;
     pdp = getpwnam(name);
     if (pdp)
-    { strcpy(buffer,pdp->pw_dir); }
+    { strcpy(buffer,pdp->pw_dir);
+    }
   }
-  strcat(buffer,"/");
   return(buffer);
 }
 
@@ -540,16 +540,20 @@ char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
 { t_upslst_item *db_list;
   static char NOT[]="";
   static char *string;
-  if (command_line->ugo_z) 
+/*  if (command_line->ugo_z) 
   { db_list=upslst_first(command_line->ugo_db);
-    string=db_list->data;
+    string=db_list->data-;
   } else {
+*/
+/* If there is no db_info_ptr they must have specified a -M table_file
+   on the command line - or match is broken..;)
+*/
     if ( db_info_ptr )
     { string=db_info_ptr->name;
     } else {
       string=NOT;
     }
-  } return(string);
+  return(string);
 }
 char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
                        const t_upstyp_matched_instance * const instance,

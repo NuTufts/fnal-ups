@@ -167,6 +167,7 @@
          case 'c':                                       \
          uc->ugo_c = 1;                                  \
          addr=upsutl_str_create("current",' ');          \
+         printf("current chain value before add = %d",uc->ugo_chain); \
          uc->ugo_chain = upslst_add(uc->ugo_chain,addr); \
          break;
 #define case_d \
@@ -691,8 +692,12 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
         }
       }
       if ( *addr != 0 ) /* required as well as optional */
-      { naddr=upsutl_str_crecat(addr,":");
-        naddr=upsutl_str_crecat(naddr,waddr);
+      { if (waddr) /* Added 30-Jan-1998 didn't think this could happen.. */ 
+        { naddr=upsutl_str_crecat(addr,":");
+          naddr=upsutl_str_crecat(naddr,waddr);
+        } else {
+          naddr=addr;
+        }
       } else { 
 /* if there is optionals with no required last one but be "" */
         if ( waddr != 0 ) 
@@ -1249,13 +1254,11 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
     -------------------------------- */
    struct ups_command * uc;
    struct ups_command * luc=0;
-   uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-   memset (uc, 0, sizeof(struct ups_command));
   if ( ugo_commands ) { /* subsequent call */ 
      /* dealloc your brain out */ 
      upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
      last_command=ugo_commands;      /* need pointer to drop & remove struct */
-     if (( ugo_commands=ugo_commands->next )) {
+     if (( ugo_commands=ugo_commands->next )!=0) {
         upslst_delete( last_command, last_command->data, 'd');
         luc = ugo_commands->data;
         upsugo_setfixed(luc);
@@ -1270,6 +1273,8 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
 /* if there is a subsequent call to upsugo_next for a WHOLE NEW command
 ** line to be parsed the index must be reset!!!
 */
+   uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
+   memset (uc, 0, sizeof(struct ups_command));
    argindx=0;
    argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
    *argbuf = 0;
@@ -1330,6 +1335,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        { upsugo_ifornota(uc);
          ugo_commands = upslst_add(ugo_commands,uc);
          uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
+         memset (uc, 0, sizeof(struct ups_command));
        } else { 
          addr=upsutl_str_create(arg_str,' ');
          if ( !uc->ugo_product ) 
@@ -1351,7 +1357,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
    upsugo_setfixed(luc);
    UPS_VERBOSE=luc->ugo_v;
 /* don't want to change now but I don't think this is right??? */
-   upsugo_liststart(luc);       /* move all lists to first element */
+   upsugo_liststart(luc);      /* move all lists to first element */
    return (t_upsugo_command *)ugo_commands->data; 
    }
 }

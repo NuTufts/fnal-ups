@@ -2302,7 +2302,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	    } else {
 	      /* write out the rest of the if statement and don't worry about
 		 write errors, will catch them further down */
-	      upsutl_finish_temp_file(a_stream, a_command_lne);
+	      upsutl_finish_temp_file(a_stream, a_command_line);
 	      (void )fprintf((FILE *)a_stream,
 			     "    if [ $UPS_STATUS -eq 1 ]; then\n      unset UPS_STATUS\n      return 1;\n    fi;\n");
 	      if (exit_flag) {
@@ -2344,7 +2344,7 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
 	    } else {
 	      /* write out the rest of the if statement and don't worry about
 		 write errors, will catch them further down */
-	      upsutl_finish_temp_file(a_stream, a_command_lne);
+	      upsutl_finish_temp_file(a_stream, a_command_line);
 	      (void )fprintf((FILE *)a_stream,
 			     "    if ($UPS_STATUS == 1) then\n      unsetenv UPS_STATUS\n      return 1\n    endif\n");
 
