@@ -81,8 +81,10 @@ static char *g_error_messages[UPS_NERR] = {
 /* 21 */  "%s: Invalid shell - %s\n",
 /* 22 */  "%s: Need unique instance but multiple \"%s\" found \n",
 /* 23 */  "%s: Error in call to %s: %s\n",
-/* 24 */  "%s: \"%s\" is not authorized for use on this node\n"
-/* 25 this is the last */
+/* 24 */  "%s: \"%s\" is not authorized for use on this node\n",
+/* 25 */  "%s: No destination was specified in the UPS Database Configuration file for where to copy the %s files\n",
+/* 26 */  "%s: Error when writing to temp file while processing %s action\n"
+/* 27 this is the last */
 };
 
 char *g_error_ascii[] = {
@@ -111,7 +113,9 @@ char *g_error_ascii[] = {
    /* UPS_NEED_UNIQUE         22 */ "UPS_NEED_UNIQUE",
    /* UPS_SYSTEM_ERROR        23 */ "UPS_SYSTEM_ERROR",
    /* UPS_NOT_AUTH            24 */ "UPS_NOT_AUTH",
-   /* UPS_NERR                25 */ "UPS_NERR",
+   /* UPS_NO_DESTINATION      25 */ "UPS_NO_DESTINATION",		    
+   /* UPS_ACTION_WRITE_ERROR  26 */ "UPS_ACTION_WRITE_ERROR",
+   /* UPS_NERR                27 */ "UPS_NERR",
    0 };
 
 /*
