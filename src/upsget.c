@@ -1122,13 +1122,15 @@ char *upsget_table_file( const char * const a_prodname,
       /* first translate any environmental variables */
       TRANSLATE_ENV(tmp_tfd, a_tablefiledir);
 
-      if (((total_chars = file_chars + (int )strlen(tmp_tfd))
-	  <= FILENAME_MAX) && (!UPSRELATIVE(tmp_tfd))) {
-	sprintf(buffer, "%s/%s", tmp_tfd, a_tablefile);
-	LOOK_FOR_FILE();
-      } else {
-	upserr_vplace();
-	upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+      if (!UPSRELATIVE(tmp_tfd)) {
+	if ((total_chars = file_chars + (int )strlen(tmp_tfd))
+	    <= FILENAME_MAX) {
+	  sprintf(buffer, "%s/%s", tmp_tfd, a_tablefile);
+	  LOOK_FOR_FILE();
+	} else {
+	  upserr_vplace();
+	  upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
+	}
       }
       /* try prod_dir/table_file_dir/tablefile */
       if ((found == 0) && (a_productdir != NULL) && UPSRELATIVE(tmp_tfd)) {
