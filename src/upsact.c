@@ -364,8 +364,6 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 		  const char * const sopt )
 {
   t_upslst_item *dep_list = 0;
-  t_upsugo_command *cur_ugo = 0;
-  t_upslst_item *didit_list = 0;
   int doact = strchr( sopt, 'a' ) ? 1 : 0;
 
   if ( !ugo_cmd || !act_name )
@@ -373,12 +371,23 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 
   dep_list = upsact_get_cmd( ugo_cmd, mat_prod, act_name );
 
-  for ( ; dep_list; dep_list = dep_list->next ) {
-    t_upsact_item *act_ptr = dep_list->data;
-    if ( doact ) {
-      upsact_print_item( act_ptr, sopt );
-    }
-    else {
+  /* print all actions */
+  if ( doact ) {
+    for ( ; dep_list; dep_list = dep_list->next )
+      upsact_print_item( (t_upsact_item *)dep_list->data, sopt );
+  }
+
+  /* print only instances */
+  else {
+    t_upsugo_command *cur_ugo = 0;
+    t_upslst_item *didit_list = 0;
+    t_upsact_item *act0 = find_product( dep_list, ugo_cmd->ugo_product );
+
+    /* add parent product to 'already done list' */
+    didit_list = upslst_add( didit_list, act0 );
+
+    for ( ; dep_list; dep_list = dep_list->next ) {
+      t_upsact_item *act_ptr = (t_upsact_item *)dep_list->data;
       if ( act_ptr->ugo == cur_ugo )
 	continue;
       if ( ! find_product_ptr( didit_list, act_ptr ) ) {
@@ -386,8 +395,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 	upsact_print_item( act_ptr, sopt );
 	cur_ugo = act_ptr->ugo;
       }
-    }
-    
+    }    
   }
 
   return 1;
@@ -415,8 +423,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 
   if ( !(new_cur = new_act_item( ugo_cmd, mat_prod, 0, act_name )) ) 
     return 0;
-  if ( !(top_list = get_top_prod( new_cur, act_name )) )
-    return 0;
+  top_list = get_top_prod( new_cur, act_name );
 
   dep_list = next_cmd( top_list, dep_list, new_cur, act_name, ' ' );
 
