@@ -62,8 +62,12 @@ int main (argc,argv)
           upsugo_free(uc);
         }
         uc=0;
-while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
-      { upsugo_dump(uc); }
+while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuUv?")) != 0 )
+      { upsugo_dump(uc); 
+        upserr_output();
+        fprintf(stderr, "-------------------------------------------------\n");
+        upserr_clear();
+      }
 /* prove to myself subsequent calls with new arguments will work 
 ** for Margrets regression testing
 */
@@ -80,7 +84,7 @@ while ((uc = upsugo_next(argc,argv,"AacCdfghKtmMNoOPqrTuU")) != 0 )
         uc=upsugo_bldcmd(cmdline,"AacCdfghKtmMNoOPqrTuU");
         if (uc) 
 	{ upsugo_dump(uc);
-          upsugo_free(uc);
+          upsugo_free(uc); 
         }
         uc=0;
 	exit(status);
