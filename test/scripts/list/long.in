@@ -1,3 +1,4 @@
+
 DATABASE=db1 
 	Product=spot	Version=v2_0	Flavor=NULL
 		Qualifiers=""	Chain=""
