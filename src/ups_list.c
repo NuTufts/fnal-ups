@@ -66,6 +66,19 @@ void list_K(const t_upstyp_matched_instance * const instance,
     }                                                   \
   }                                                     \
 }
+#define FromVersionWQ(ELEMENT) \
+{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
+  { if(instance->version)                               \
+    { if (instance->version->ELEMENT)                   \
+      { printf("\"%s\" ",instance->version->ELEMENT);   \
+      } else {                                          \
+        printf("\"\" ");                                \
+      }                                                 \
+    } else {                                            \
+      printf("\"\" ");                                  \
+    }                                                   \
+  }                                                     \
+}
 #define FromDatabase(ELEMENT,STRING) \
 { if (!upsutl_stricmp((l_ptr->data),STRING))            \
   { if(product->db_info)                                \
@@ -170,7 +183,11 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { for (clist = instance->xtra_chains ;              \
            clist ; clist = clist->next)                 \
       { cinst_ptr = (t_upstyp_instance *)clist->data;   \
-        printf("%s:", cinst_ptr->ELEMENT);              \
+        if(cinst_ptr->ELEMENT)                          \
+        { printf("%s:", cinst_ptr->ELEMENT);            \
+        } else {                                        \
+          printf("\"\" ");                              \
+        }                                               \
       }                                                 \
     }                                                   \
     if(instance->version)                               \
@@ -413,7 +430,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(ups_dir)
     FromVersion(prod_dir)
     FromVersion(archive_file)
-    FromVersion(description)
+    FromVersionWQ(description)
 /*    FromVersion(db_dir) */
 /* DO NOT CHANGE ORDER here it's the default !!! */
     FromAny(product) 
@@ -424,6 +441,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
     if(upsutl_stricmp(l_ptr->data,"+"))
     { FromBoth(declarer)
       FromBoth(declared)
+      FromBoth(modifier)
+      FromBoth(modified)
     }
 /* to HERE */
     FromDatabase(name,"DATABASE")
@@ -435,7 +454,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { for ( ul_ptr = upslst_first( instance->version->user_list ); 
             ul_ptr; ul_ptr = ul_ptr->next, count++ )
       { if (strlen(l_ptr->data) == 7) /* no specific key give all */
-        { printf("%s ",ul_ptr->data); /* Give keys and values */
+        { printf("\"%s\" ",ul_ptr->data); /* Give keys and values */
         } else {
           str_ptr=l_ptr->data;
           str_ptr+=8;
@@ -449,7 +468,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
           if (!str_val) 
           { printf("\"\" ");
           } else {
-            printf("%s ",str_val);
+            printf("\"%s\" ",str_val);
           } 
         } 
       }
@@ -465,7 +484,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
       if (!str_val) 
       { printf("\"\" ");
       } else {
-        printf("%s ",str_val);
+        printf("\"%s\" ",str_val);
       } 
     }
   }
