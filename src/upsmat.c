@@ -22,8 +22,6 @@
 
 /* standard include files */
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
 
 /* ups specific include files */
@@ -88,7 +86,6 @@ static char *get_table_file_path( const char * const a_prodname,
 				  const char * const a_upsdir,
 				  const char * const a_productdir,
 				  const t_upstyp_db * const a_db_info);
-static int is_a_file(const char * const a_filename);
 static t_upstyp_product *read_chain(const char * const a_db,
 				    const char * const a_prod,
 				    const char * const a_chain,
@@ -970,7 +967,7 @@ static char *get_table_file_path( const char * const a_prodname,
       if ((total_chars = file_chars + (int )strlen(a_tablefiledir))
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s", a_tablefiledir, a_tablefile);
-	if (is_a_file(buffer) == UPS_SUCCESS) {
+	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
 	  G_SAVE_PATH(total_chars);      /* found it - save it */
 	  found = 1;
 	}
@@ -982,7 +979,7 @@ static char *get_table_file_path( const char * const a_prodname,
     /* try ./tablefile */
     if ((found == 0) && ((total_chars = file_chars) <= FILENAME_MAX)) {
       sprintf(buffer, "%s", a_tablefile);
-      if (is_a_file(buffer) == UPS_SUCCESS) {
+      if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
 	G_SAVE_PATH(file_chars);            /* found it */
 	found = 1;
       }
@@ -995,7 +992,7 @@ static char *get_table_file_path( const char * const a_prodname,
       if ((total_chars = file_chars + (int )strlen(a_upsdir))
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s", a_upsdir, a_tablefile);
-	if (is_a_file(buffer) == UPS_SUCCESS) {
+	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
 	  G_SAVE_PATH(total_chars);         /* found it */
 	  found = 1;
 	}
@@ -1012,7 +1009,7 @@ static char *get_table_file_path( const char * const a_prodname,
 	                    1) <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
 		                         a_productdir, a_upsdir, a_tablefile);
-	  if (is_a_file(buffer) == UPS_SUCCESS) {
+	  if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
 	    G_SAVE_PATH(total_chars);        /* found it */
 	    found = 1;
 	  }
@@ -1023,7 +1020,7 @@ static char *get_table_file_path( const char * const a_prodname,
       } else {
 	if ((total_chars += (int )strlen(a_productdir) + 1) <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s/%s", a_productdir, a_upsdir, a_tablefile);
-	  if (is_a_file(buffer) == UPS_SUCCESS) {
+	  if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
 	    G_SAVE_PATH(total_chars);        /* found it */
 	    found = 1;
 	  }
@@ -1039,7 +1036,7 @@ static char *get_table_file_path( const char * const a_prodname,
 					     strlen(a_db_info->name)) + 1)
 	  <= FILENAME_MAX) {
 	sprintf(buffer, "%s/%s/%s", a_db_info->name, a_prodname, a_tablefile);
-	if (is_a_file(buffer) == UPS_SUCCESS) {
+	if (upsutl_is_a_file(buffer) == UPS_SUCCESS) {
 	  G_SAVE_PATH(total_chars);        /* found it */
 	}
       } else {
@@ -1052,28 +1049,6 @@ static char *get_table_file_path( const char * const a_prodname,
 return path_ptr;
 }
 
-
-/*-----------------------------------------------------------------------
- * is_a_file
- *
- * Given a filename including path, see if the named file exists.
- *
- * Input : file name and path
- * Output: none
- * Return: UPS_SUCCESS if file exists, else UPS_NO_FILE
- */
-static int is_a_file(const char * const a_filename)
-{
-  int status = UPS_SUCCESS;
-  struct stat buf;
-
-  if (stat(a_filename, &buf) == -1) {
-    status = UPS_NO_FILE;
-  }
-
-  return(status);
-  
-}
 
 /*-----------------------------------------------------------------------
  * read_chain
