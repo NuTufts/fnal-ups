@@ -19,3 +19,7 @@ Things to remember to verify when reading a ups file.
   the file as ${UPS_blaablaa} and not just $UPS_blaablaa.
   This decision to force this was based on time constraints
   of setup.  DjF
+
+- Check for dublicate instances in ups files.
+  e.g (FLAVOR=IRIX, QUALIFIERS=a:b) and (FLAVOR=IRIX, QUALIFIERS=b:a)
+  is a dublicate.
