@@ -47,14 +47,13 @@
 
 /* a matched ups product. a list of all the instances that could pertain to
    the product/ */
-typedef struct upstyp_match_product
+typedef struct upstyp_matched_product
 {
   char             *db;
+  char             *product;
   
-  t_upslst_item    *chain_list;
-  t_upslst_item    *version_list;
-  t_upslst_item    *table_list;
-} t_upstyp_match_product;
+  t_upslst_item    *minst_list;
+} t_upstyp_matched_product;
 
 /* a db config file */
 typedef struct upstyp_config {
@@ -95,6 +94,15 @@ typedef struct upstyp_instance
 
 } t_upstyp_instance;
 
+/* a matched instance */
+typedef struct upstyp_matched_instance
+{
+  t_upstyp_instance *chain;
+  t_upstyp_instance *version;
+  t_upstyp_instance *table;
+
+} t_upstyp_matched_instance;
+
 /* an action */
 typedef struct upstyp_action
 {
@@ -126,6 +134,10 @@ typedef struct upstyp_product
 /*
  * Declaration of public functions.
  */
+t_upstyp_matched_product *ups_new_matched_product(const char * const a_db,
+			  	     const char * const a_prod_name,
+			             const t_upslst_item * const a_minst_list);
+t_upstyp_matched_instance *ups_new_matched_instance( void );
 t_upstyp_product     *ups_new_product( void );
 int               ups_free_product( t_upstyp_product * const prod_ptr );
 t_upstyp_instance    *ups_new_instance( void );
@@ -134,12 +146,8 @@ t_upstyp_action      *ups_new_action( void );
 int               ups_free_action( t_upstyp_action * const act_ptr );
 t_upstyp_config      *ups_new_config( void );
 int               ups_free_config( t_upstyp_config * const conf_ptr );
-t_upstyp_match_product *ups_new_mp(const char * const a_db,
-				t_upslst_item * const a_chain_list,
-				t_upslst_item * const a_vers_list,
-				t_upslst_item * const a_table_list);
-t_upstyp_match_product *ups_free_mp(t_upstyp_match_product * const a_mproduct);
+t_upstyp_matched_product *ups_free_mp(
+				  t_upstyp_matched_product * const a_mproduct);
 
 
 #endif /* _UPSTYP_H_ */
-
