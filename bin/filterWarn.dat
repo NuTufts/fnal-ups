@@ -140,22 +140,27 @@
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   821, 2,  "upsact.c", 	'\'exit_flag\' set but unused in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsact.c", 	'width of octal constant is smaller than size of type (int)');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "ups_touch.c", 	'function parameter \'ups_command|tmpfile\' is not used in function');
-&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_argc\' is not used in function');
-&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_stream\' is not used in function \'f_writecompilescript\'');
-&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_argv\' is not used in function');
-&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsact.c", 	'width of octal constant is smaller than size of type (int)');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_argc|a_command_line|a_stream\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   821, 2,  "upsact.c", 	'\'delimiter\' set but unused in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_argv|i_act\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   852, 2,  "upsact.c", 	'\'mat_prod|dep_list\' can be const qualified, since');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsact.c", 	'width of octal|hex constant is smaller than size of type');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsget.c", 	'function parameter \'db_info_ptr\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsget.c", 	'function parameter \'instance\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsget.c", 	'function parameter \'command_line\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsmem.c", 	'function parameter \'a_bytes\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   835, 4,  "upsutl.c", 	'No prototype for the call to an anonymous function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   824, 2,  "upsutl.c", 	'function \'upsutl_stricmp\' may return random value to place of invocation');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsutl.c", 	'width of octal constant is smaller than size of type');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   824, 2,  "upsutl.c", 	'function \'upsutl_strincmp\' may return random value to place of invocatio');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   827, 2,  "upsutl.c", 	'implicit conversion from \'int\' to \'long\'');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   852, 2,  "upsutl.c", 	'\'c1\' can be const qualified,');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   852, 2,  "upsutl.c", 	'\'c2\' can be const qualified,');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upskey.c", 	'width of hex constant is smaller than size of type');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsfil.c", 	'width of octal|hex constant is smaller than size of type');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsfil.c", 	'function parameter \'key\' is not used in function');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsfil.c", 	'function parameter \'cl\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsugo.c", 	'width of octal constant is smaller than size of type');
 &fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   821, 2,  "ups_list.c", 	'\valid\' set but unused in function');
 #
 #
