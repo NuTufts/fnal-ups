@@ -26,6 +26,7 @@
  *                         from the product environment variable given
  *                         product name.
  *       08-Sep-1997, LR, Added constant INVALID_INDEX.
+ *       28-Oct-1997, EB, Add t_upstyp_db
  *
  ***********************************************************************/
 
@@ -65,6 +66,15 @@ typedef struct upstyp_config {
   char             *info_path;
   char             *html_path;
 } t_upstyp_config;
+
+/* database information.  this includes the name (location) of the database
+   as returned by the upsugo routines and a place for the read in configuration
+   information (filled in by upsmat) */
+typedef struct upstyp_db
+{
+  char             *name;
+  t_upstyp_config  *config;
+} t_upstyp_db;
 
 /* a product instance */
 typedef struct upstyp_instance
