@@ -23,6 +23,7 @@
 /* standard include files */
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>   /* toupper */
 
 /* ups specific include files */
 #include "upslst.h"
@@ -48,7 +49,9 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 		 const t_upsugo_command * const a_command_line);
 
 void list_K(const t_upstyp_matched_instance * const instance,
-            const t_upsugo_command * const a_command_line, const int headers);
+            const t_upsugo_command * const a_command_line, 
+            const int headers,
+            const t_upstyp_matched_product * const product);
 /*
  * Definition of global variables.
  */
@@ -60,7 +63,10 @@ void list_K(const t_upstyp_matched_instance * const instance,
 
 #define FromVersion(ELEMENT) \
 { if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if (headers) { printf("%s=","" #ELEMENT ""); }      \
+  { if (headers)                                        \
+    { for (hold=l_ptr->data;*hold!=0;*hold=(char)toupper((int)*hold),hold++); \
+      printf("%s=","" #ELEMENT "");                     \
+    }                                                   \
     if(instance->version)                               \
     { if (instance->version->ELEMENT)                   \
       { printf("%s ",instance->version->ELEMENT);       \
@@ -73,9 +79,46 @@ void list_K(const t_upstyp_matched_instance * const instance,
     if (headers) { printf("\n"); }                      \
   }                                                     \
 }
-#define FromEither(ELEMENT) \
-{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if (headers) { printf("%s=","" #ELEMENT ""); }      \
+#define FromDatabase(ELEMENT,STRING) \
+{ if (!upsutl_stricmp((l_ptr->data),STRING))            \
+  { if (headers) { printf("%s=",STRING); }              \
+    if(product->db_info)                                \
+    { if (product->db_info->ELEMENT)                    \
+      { printf("%s ",product->db_info->ELEMENT);        \
+      } else {                                          \
+        printf("\"\" ");                                \
+      }                                                 \
+    } else {                                            \
+      printf("\"\" ");                                  \
+    }                                                   \
+    if (headers) { printf("\n"); }                      \
+  }                                                     \
+}
+#define FromConfig(ELEMENT,STRING) \
+{ if (!upsutl_stricmp((l_ptr->data),STRING))            \
+  { if (headers)                                        \
+    { for (hold=l_ptr->data;*hold!=0;*hold=(char)toupper((int)*hold),hold++); \
+      printf("%s=","" #ELEMENT "");                     \
+    }                                                   \
+    if(config_ptr)                                      \
+    { if (config_ptr->ELEMENT)                          \
+      { printf("%s ",config_ptr->ELEMENT);              \
+      } else {                                          \
+        printf("\"\" ");                                \
+      }                                                 \
+    } else {                                            \
+      printf("\"\" ");                                  \
+    }                                                   \
+    if (headers) { printf("\n"); }                      \
+  }                                                     \
+}
+#define FromAny(ELEMENT) \
+{ if (!upsutl_stricmp(l_ptr->data,"" #ELEMENT "") ||    \
+      !upsutl_stricmp(l_ptr->data,"+"))                 \
+  { if (headers)                                        \
+    { for (hold=l_ptr->data;*hold!=0;*hold=(char)toupper((int)*hold),hold++); \
+      printf("%s=","" #ELEMENT "");                     \
+    }                                                   \
     if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
       { printf("%s ",instance->chain->ELEMENT);         \
@@ -84,10 +127,26 @@ void list_K(const t_upstyp_matched_instance * const instance,
         { if (instance->version->ELEMENT)               \
           { printf("%s ",instance->version->ELEMENT);   \
           } else {                                      \
-            printf("\"\" ");                            \
+            if (instance->table)                        \
+            { if (instance->table->ELEMENT)             \
+              { printf("%s ",instance->table->ELEMENT); \
+              } else {                                  \
+                printf("\"\" ");                        \
+              }                                         \
+            } else {                                    \
+              printf("\"\" ");                          \
+            }                                           \
           }                                             \
         } else {                                        \
-          printf("\"\" ");                              \
+          if (instance->table)                          \
+          { if (instance->table->ELEMENT)               \
+            { printf("%s ",instance->table->ELEMENT);   \
+            } else {                                    \
+              printf("\"\" ");                          \
+            }                                           \
+          } else {                                      \
+            printf("\"\" ");                            \
+          }                                             \
         }                                               \
       }                                                 \
     } else {                                            \
@@ -95,18 +154,38 @@ void list_K(const t_upstyp_matched_instance * const instance,
       { if (instance->version->ELEMENT)                 \
         { printf("%s ",instance->version->ELEMENT);     \
         } else {                                        \
-          printf("\"\" ");                              \
+          if (instance->table)                          \
+          { if (instance->table->ELEMENT)               \
+            { printf("%s ",instance->table->ELEMENT);   \
+            } else {                                    \
+              printf("\"\" ");                          \
+            }                                           \
+          } else {                                      \
+            printf("\"\" ");                            \
+          }                                             \
         }                                               \
       } else {                                          \
-        printf("\"\" ");                                \
+        if (instance->table)                            \
+        { if (instance->table->ELEMENT)                 \
+          { printf("%s ",instance->table->ELEMENT);     \
+          } else {                                      \
+            printf("\"\" ");                            \
+          }                                             \
+        } else {                                        \
+          printf("\"\" ");                              \
+        }                                               \
       }                                                 \
     }                                                   \
     if (headers) { printf("\n"); }                      \
   }                                                     \
 }
 #define FromBoth(ELEMENT) \
-{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if (headers) { printf("%s=","" #ELEMENT ""); }      \
+{ if (!upsutl_stricmp(l_ptr->data,"" #ELEMENT "") ||    \
+      !upsutl_stricmp(l_ptr->data,"+"))                 \
+  { if (headers)                                        \
+    { for (hold=l_ptr->data;*hold!=0;*hold=(char)toupper((int)*hold),hold++); \
+      printf("%s=","" #ELEMENT "");                     \
+    }                                                   \
     if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
       { printf("%s:",instance->chain->ELEMENT);         \
@@ -224,7 +303,6 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upslst_item *tmp_minst_list = NULL, *clist = NULL;
   t_upstyp_instance *cinst_ptr = NULL;
   t_upstyp_matched_instance *minst_ptr = NULL;
-  t_upslst_item *l_ptr = 0;
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) 
@@ -233,82 +311,106 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 	 tmp_minst_list = tmp_minst_list->next) 
     { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
 /* A as in a single product loop */
-/*      if (!a_command_line->ugo_K) keywords is a whole different animal */ 
-      if (a_command_line->ugo_K)
-      { l_ptr=upslst_first(a_command_line->ugo_key); } 
-      if (!a_command_line->ugo_K || !strncmp(l_ptr->data,"+",1))
-      { printf("DATABASE: %s\n",mproduct->db_info->name);
-        printf("PRODUCT: %s\n",mproduct->product);
+      if (!a_command_line->ugo_K)
+      { printf("PRODUCT=%s	",mproduct->product);
         if (minst_ptr->chain) 
-        { printf ("VERSION: %s\n", minst_ptr->chain->version);
-          printf("FLAVOR: %s\n", minst_ptr->chain->flavor);
-          printf("QUALIFIERS: %s\n", minst_ptr->chain->qualifiers);
+        { printf("FLAVOR=%s	", minst_ptr->chain->flavor);
+          printf ("VERSION=%s\n", minst_ptr->chain->version);
+          if (minst_ptr->chain->qualifiers && 
+             strlen(minst_ptr->chain->qualifiers))
+          { printf("QUALIFIERS=%s	", minst_ptr->chain->qualifiers); 
+          } else {
+            printf("QUALIFIERS=\"\"	"); 
+          }
           if (minst_ptr->xtra_chains) 
-          { printf("CHAINS: %s", minst_ptr->chain->chain);
+          { printf("CHAINS=%s", minst_ptr->chain->chain);
             for (clist = minst_ptr->xtra_chains ; clist ; clist = clist->next)
             { cinst_ptr = (t_upstyp_instance *)clist->data;
               printf(",%s", cinst_ptr->chain );
             }
           } else { 
-            printf("CHAIN: %s", minst_ptr->chain->chain);
+            printf("CHAIN=%s", minst_ptr->chain->chain);
           } printf("\n");
         } else { 
           if (minst_ptr->version )
-          {  printf("VERSION: %s\n", minst_ptr->version->version);
-             printf("FLAVOR: %s\n", minst_ptr->version->flavor);
-	     printf("QUALIFIERS: %s\n", minst_ptr->version->qualifiers);
-             printf("CHAIN:\n");
+          {  printf("FLAVOR=%s	", minst_ptr->version->flavor);
+             printf("VERSION=%s\n", minst_ptr->version->version);
+             if (minst_ptr->version->qualifiers &&
+                strlen(minst_ptr->version->qualifiers))
+             { printf("QUALIFIERS=%s	", minst_ptr->version->qualifiers); 
+             } else {
+               printf("QUALIFIERS=\"\"	"); 
+             }
+             printf("CHAIN=\"\"\n");
           } else { 
-            printf("No chain or version WHAT???\n");
+            if (minst_ptr->table )
+            {  printf("FLAVOR=%s	", minst_ptr->table->flavor);
+               printf("VERSION=%s\n", minst_ptr->table->version);
+               if (minst_ptr->table->qualifiers &&
+                  strlen(minst_ptr->table->qualifiers))
+               { printf("QUALIFIERS=%s	", minst_ptr->table->qualifiers); 
+               } else {
+                 printf("QUALIFIERS=\"\"	"); 
+               }
+               printf("CHAIN=\"\"\n");
+            } /* else what in the hell are we doing here ?? */
           }
         }
         if (a_command_line->ugo_l && minst_ptr->version )
-        { printf("HOME: %s\n", minst_ptr->version->prod_dir);
-          printf("UPS: %s\n", minst_ptr->version->ups_dir);
-          printf("TABLE_DIR: %s\n", minst_ptr->version->table_dir);
-          printf("TABLE_FILE: %s\n", minst_ptr->version->table_file);
+        { printf("HOME=%s\n", minst_ptr->version->prod_dir);
+          printf("UPS=%s\n", minst_ptr->version->ups_dir);
+          printf("TABLE_DIR=%s\n", minst_ptr->version->table_dir);
+          printf("TABLE_FILE=%s\n", minst_ptr->version->table_file);
         }
-        if (a_command_line->ugo_K) 
-        {  list_K(minst_ptr,a_command_line,1); } 
         printf("\n\n");
       } else { 
-          list_K(minst_ptr,a_command_line,0);
+          list_K(minst_ptr,a_command_line,0,mproduct);
       }
     }
 /* end product loop */
   }
 }
-/*
-      if (minst_ptr->table) {
-	printf("T:PRODUCT=%s, ", minst_ptr->table->product);
-	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->table->flavor,
-	       minst_ptr->table->qualifiers);
-      }
-*/
 
 void list_K(const t_upstyp_matched_instance * const instance, 
-            const t_upsugo_command * const command, const int headers)
+            const t_upsugo_command * const command, 
+            const int headers,
+            const t_upstyp_matched_product * const product)
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
+  t_upstyp_config  *config_ptr = 0;
   int count=0;
+  char * hold;
+  if (product->db_info) 
+  { config_ptr = product->db_info->config;
+  }
   for ( l_ptr = upslst_first( command->ugo_key ); 
         l_ptr; l_ptr = l_ptr->next, count++ )
-  { FromBoth(declarer)
-    FromBoth(declared)
-    FromBoth(chain)
-    FromVersion(table_file)
+  { FromVersion(table_file)
     FromVersion(table_dir)
     FromVersion(ups_dir)
     FromVersion(prod_dir)
     FromVersion(archive_file)
     FromVersion(description)
     FromVersion(db_dir)
-    FromEither(flavor)
-    FromEither(product)
-    FromEither(version)
-    FromEither(qualifiers)
+/* DO NOT CHANGE ORDER here it's the default !!! */
+    FromAny(product) 
+    FromAny(version) 
+    FromAny(flavor) 
+    FromAny(qualifiers)
+    if(!upsutl_stricmp(l_ptr->data,"+"))
+    { FromBoth(chain)
+    } else {
+      FromBoth(declarer)
+      FromBoth(declared)
+    }
+/* to HERE */
+    FromDatabase(name,"DATABASE")
+    FromConfig(ups_db_version,"DB_VERSION")
+    FromConfig(man_path,"MAN_PATH")
+    FromConfig(html_path,"HTML_PATH")
+    FromConfig(info_path,"INFO_PATH")
   }
   printf("\n");
 }
