@@ -29,6 +29,8 @@ Name_Of_Ups=$UPS_PROD_NAME
 
 Script_Prefix=set${Name_Of_Ups}
 
+Setups_Advanced_Sh_Str="bash ksh ash sh"
+
 Setups_Products_Init_Default="\${Node}/products/ups_database \
 				/usr/products/ups_database \
 				/afs/fnal/ups/db"
@@ -157,11 +159,7 @@ if test ! -x $BootStrap_Dir/$Setups_Products_Script
 then
 echo '**' Creating $BootStrap_Dir/$Setups_Products_Script
 #
-# Create the script to create PRODUCTS.  NOTE: This script is 
-# preferably a korn shell, but may, with slight loss of 
-# functionality, be a bash script.  If it is forced, because 
-# neither of these exist, to run as a bourne shell, the results
-# are likely to be less than desired.
+# Create the script to create PRODUCTS.  
 #
 cat <<XEoF >$BootStrap_Dir/$Setups_Products_Script 
 #!/bin/sh
@@ -211,12 +209,7 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
-    cygsh=''
-    if test x`uname -s|grep CYG` != x
-    then
-	cygsh=ash
-    fi
-    for sh in \${cygsh} bash ksh sh
+    for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
 	then
@@ -281,12 +274,7 @@ do
 
 if test \`echo \$Prod|cut -c1\` != '/'
 then
-    cygsh=''
-    if test x`uname -s|grep CYG` != x
-    then
-	cygsh=ash
-    fi
-    for sh in \${cygsh} bash ksh sh
+    for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
 	then
@@ -608,12 +596,7 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
-    cygsh=''
-    if test x`uname -s|grep CYG` != x
-    then
-	cygsh=ash
-    fi
-    for sh in \${cygsh} bash ksh sh
+    for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
 	then
@@ -843,12 +826,7 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
-    cygsh=''
-    if test x`uname -s|grep CYG` != x
-    then
-	cygsh=ash
-    fi
-    for sh in \${cygsh} bash ksh sh
+    for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
 	then
@@ -1308,12 +1286,7 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
-    cygsh=''
-    if test x`uname -s|grep CYG` != x
-    then
-	cygsh=ash
-    fi
-    for sh in \${cygsh} bash ksh sh
+    for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
 	then
@@ -1544,12 +1517,7 @@ fi
 
 if test \`echo \$Setups_Home|cut -c1\` != '/'
 then
-    cygsh=''
-    if test x`uname -s|grep CYG` != x
-    then
-	cygsh=ash
-    fi
-    for sh in \${cygsh} bash ksh sh
+    for sh in $Setups_Advanced_Sh_Str
     do
 	if test -x /usr/bin/\${sh}
 	then
