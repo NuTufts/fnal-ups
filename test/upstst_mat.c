@@ -104,43 +104,31 @@ return (0);
 static void upstst_match_dump (const t_upslst_item * const mp, 
    FILE * const fd)
 {
-t_upslst_item 		*prod_ptr;		/* product ptr */
-t_upslst_item 		*chain_ptr;		/* chain ptr */
-t_upslst_item 		*version_ptr;		/* version ptr */
-t_upslst_item 		*table_ptr;		/* table ptr */
-t_upstyp_matched_product	*product;		/* product match */
-t_upstyp_instance		*instance;		/* instance match */
-#define upstst_dump_instance()	{					\
-   fprintf(fd,"PRODUCT=%s, CHAIN=%s, VERSION=%s, ", instance->product,\
-     instance->chain, instance->version);				\
-   fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n",instance->flavor,		\
-      instance->qualifiers);						\
-   }
+t_upslst_item 			*prod_ptr;		/* product ptr */
+t_upslst_item 			*inst_ptr;		/* instance ptr */
+t_upstyp_matched_product 	*prod;			/* product match */
+t_upstyp_matched_instance	*inst;			/* instance match */
 
 
 if(!mp) return;
 for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
-   product = (t_upstyp_matched_product *) prod_ptr->data;
-   fprintf(fd,"CHAIN:\n");
-   for (chain_ptr = product->chain_list; chain_ptr; chain_ptr = chain_ptr->next)
+   prod = (t_upstyp_matched_product *) prod_ptr->data;
+   for (inst_ptr = prod->minst_list; inst_ptr; inst_ptr = inst_ptr->next)
       {
-      instance = (t_upstyp_instance *) chain_ptr->data;
-      upstst_dump_instance();
-      }
-   fprintf(fd,"VERSION:\n");
-   for (version_ptr = product->version_list; 
-        version_ptr; 
-        version_ptr = version_ptr->next)
-      {
-      instance = (t_upstyp_instance *) version_ptr->data;
-      upstst_dump_instance();
-      }
-   fprintf(fd,"TABLE:\n");
-   for (table_ptr = product->table_list; table_ptr; table_ptr = table_ptr->next)
-      {
-      instance = (t_upstyp_instance *) table_ptr->data;
-      upstst_dump_instance();
+      inst = (t_upstyp_matched_instance *) inst_ptr->data;
+      fprintf(fd,"C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ", inst->chain->product,
+             inst->chain->chain, inst->chain->version);
+      fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->chain->flavor,
+             inst->chain->qualifiers);
+      fprintf(fd,"V:PRODUCT=%s, VERSION=%s, ", inst->version->product,
+             inst->version->version);
+      fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->version->flavor,
+             inst->version->qualifiers);
+      fprintf(fd,"T:PRODUCT=%s, VERSION=%s, ", inst->table->product,
+             inst->table->version);
+      fprintf(fd,"FLAVOR=%s, QUALIFIERS=%s\n", inst->table->flavor,
+             inst->table->qualifiers);
       }
    }
 }
