@@ -9,6 +9,9 @@ rm -rf $UPS_DIR/test/scripts/declare/tostuff
 touch $UPS_DIR/test/scripts/declare/products/spot/ups/toinfo
 rm -r  $UPS_DIR/test/scripts/declare/products/spot/ups/toinfo
 mkdir $UPS_DIR/test/scripts/declare/products/spot/ups/toinfo
+touch $UPS_DIR/test/scripts/declare/tostuff
+rm -r  $UPS_DIR/test/scripts/declare/tostuff
+# should make full path for tostuff..
 cp $UPS_DIR/test/scripts/declare/products/spot/ups/source_info/info.file \
    $UPS_DIR/test/scripts/declare/products/spot/ups/toinfo 
 mkdir $PRODUCTS
