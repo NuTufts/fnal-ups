@@ -1009,7 +1009,7 @@ void upsact_free_act_item( t_upsact_item * const act_itm )
       if ( upsmem_get_refctr( act_itm->mat ) <= 0 ) {
 	/* (void) printf( "*** deleting a act_item %d, mat pointer %x\n",
 		(unsigned long)act_itm, (unsigned long)act_itm->mat ); */
-	ups_free_matched_product( act_itm->mat );
+	(void) ups_free_matched_product( act_itm->mat );
       }
     }
 
