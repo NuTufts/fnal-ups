@@ -82,6 +82,7 @@
 void upserr_clear(void);
 void upserr_add (const int a_error_id, ...);
 void upserr_output (void);
+void upserr_backup (void);
 
 /*
  * Declaration of private globals.

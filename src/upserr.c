@@ -185,6 +185,40 @@ void upserr_add (const int a_error_index, ...)
 }
 
 /*-----------------------------------------------------------------------
+ * upserr_backup
+ *
+ * Backup over the last error added to the buffer
+ *
+ * Input : none
+ * Output: none
+ * Return: none
+ */
+void upserr_backup (void)
+{
+  /* only do something if there are messages in the buffer */
+  if (g_buf_start != G_ERROR_INIT) {
+    /* free the current message */
+    free(g_error_buf[g_buf_counter]);
+    g_error_buf[g_buf_counter] = NULL;
+
+    /* adjust the current message counter */
+    --g_buf_counter;
+    if (g_buf_counter < 0) {
+      /* if the oldest msg is the first one, then that was the only one */
+      if (g_buf_start == 0) {
+	g_buf_start = G_ERROR_INIT;
+	g_buf_counter = G_ERROR_INIT;
+      } else {
+	/* reset to the last entry in the buffer */
+	g_buf_counter = G_ERROR_BUF_MAX - 1;
+      }
+    }
+  }
+
+  UPS_ERROR = UPS_SUCCESS;
+  
+}
+/*-----------------------------------------------------------------------
  * upserr_clear
  *
  * Clear out the error buf.  All messages currently in the buf are lost.
@@ -238,14 +272,18 @@ void upserr_output (void)
   if (g_buf_start != G_ERROR_INIT) {
     for (i = g_buf_start; i != g_buf_counter; ++i) {
       if (i < G_ERROR_BUF_MAX) {
-	fputs(g_error_buf[i], stderr);
+	if (g_error_buf[i]) {
+	  fputs(g_error_buf[i], stderr);
+	}
       } else {
 	i = G_ERROR_INIT;
       }
     }
 
     /* catch the last one we missed */
-    fputs(g_error_buf[g_buf_counter], stderr);
+    if (g_error_buf[g_buf_counter]) {
+      fputs(g_error_buf[g_buf_counter], stderr);
+    }
   }
 }
 
