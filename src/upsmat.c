@@ -142,7 +142,7 @@ static int g_ugo_version = 0;
 	tmp_productdir = (char *)a_productdir;       \
       } else {                                       \
 	tmp_productdir = inst->prod_dir;             \
-      }
+      }                                              
 
 /* check the list with the a_need_unique flag.  report an error if we need
    a unique instance and there is more than one on the list. */

@@ -264,13 +264,11 @@ void upsget_allout(const FILE * const stream,
   } 
 }
 
-char *upsget_translation( const t_upstyp_matched_product * const product,
+char *upsget_translation( const t_upstyp_matched_instance * const minstance,
+			  const t_upstyp_db *db_info_ptr,
                   const t_upsugo_command * const command_line,
                   char * const oldstr )
 {
-  t_upslst_item *inst_list;
-  t_upstyp_matched_instance *instance;
-  t_upstyp_db *db_info_ptr;
   static char newstr[4096];
   static char holdstr[4096];
   char * loc;
@@ -283,11 +281,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   char * value;
   char * work;
   newstr[0] = '\0';
-  if (!product) { return(oldstr); }
-  if (!product->minst_list) { return(oldstr); }
-  inst_list = product->minst_list;
-  db_info_ptr = product->db_info;
-  instance = (t_upstyp_matched_instance *)(inst_list->data);
+  if (!minstance) { return(oldstr); }
   /* work = (char *) malloc((size_t)(strlen(oldstr) +1)); */
   work=holdstr;
   strcpy(work,oldstr);
@@ -302,7 +296,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
     for ( idx=0; g_var_subs[idx].string!=0; idx++) 
     { if (!strcmp(g_var_subs[idx].string,upto)) 
       { if (g_var_subs[idx].func)
-        {  value=g_var_subs[idx].func(db_info_ptr,instance,command_line);
+        {  value=g_var_subs[idx].func(db_info_ptr,minstance,command_line);
            if(value) { strcat(newstr,value); }
         }
         found=1;
@@ -333,7 +327,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
     *eaddr = '\0';
     found=0;
     if (!strcmp("${PRODUCTS",upto)) 
-    { value=upsget_database(db_info_ptr,instance,command_line);
+    { value=upsget_database(db_info_ptr,minstance,command_line);
       if(value) { strcat(newstr,value); }
       found=1;
       any++;
