@@ -284,11 +284,11 @@
 #define case_m \
          case 'm':       \
          uc->ugo_m = 1;  \
-         set_value (uc->ugo_tablefiledir , "m") 
+         set_value (uc->ugo_tablefile , "m") 
 #define case_M \
          case 'M':       \
          uc->ugo_M = 1;  \
-         set_value (uc->ugo_tablefile , "M")    
+         set_value (uc->ugo_tablefiledir, "M")    
 #define case_N \
          case 'N':       \
          uc->ugo_N = 1;  \
@@ -452,7 +452,9 @@ int upsugo_ifornota(struct ups_command * const uc)
 /* If they didn't specify a database pull the environment variable */
    if (!uc->ugo_db) {
      if((PRODUCTS = (char *)getenv("PRODUCTS")) == 0)
-     { upserr_add(UPS_NO_DATABASE, UPS_FATAL); 
+     { if (!uc->ugo_m) /* no table file either, I'm dead */
+       { upserr_add(UPS_NO_DATABASE, UPS_FATAL); 
+       }
      } else {
         addr = (char *) malloc((size_t)(strlen(PRODUCTS) +1));
         strcpy(addr,PRODUCTS);

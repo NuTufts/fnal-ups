@@ -66,9 +66,9 @@ typedef struct ups_command
     t_upslst_item *ugo_key;
     int     ugo_l;           /* long (listing)                       */
 /*  int     ugo_L;           UNDEFINED                               */
-    int     ugo_m;           /* Table file directory                 */
+    int     ugo_m;           /* Table file                           */
     char    *ugo_tablefiledir;  
-    int     ugo_M;           /* Table file                           */
+    int     ugo_M;           /* Table file directory                 */
     char    *ugo_tablefile; 
     int     ugo_n;           /* new chain                            */
     int     ugo_N;           /* and N file                           */
