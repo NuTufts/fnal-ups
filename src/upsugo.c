@@ -37,7 +37,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
-#include <bstring.h>
 #include <sys/utsname.h>
 
 #include "upstyp.h"
@@ -493,13 +492,13 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
    *loc = 0;
    db=upsutl_str_create(db,'p');
    addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
-   bzero (addr,sizeof(struct upstyp_db));
+   memset (addr,0,sizeof(struct upstyp_db));
    addr->name = db;
    uc->ugo_db = upslst_add(uc->ugo_db,addr);
  }
  db=upsutl_str_create(inaddr,'p');
  addr=(struct upstyp_db *)upsmem_malloc( sizeof(struct upstyp_db));
- bzero (addr,sizeof(struct upstyp_db));
+ memset (addr, 0, sizeof(struct upstyp_db));
  addr->name = db;
  uc->ugo_db = upslst_add(uc->ugo_db,addr);
  *inaddr = 0;
@@ -1186,7 +1185,7 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
    struct ups_command * uc;
    struct ups_command * luc=0;
    uc=(struct ups_command *)upsmem_malloc( sizeof(struct ups_command));
-   bzero (uc,sizeof(struct ups_command));
+   memset (uc, 0, sizeof(struct ups_command));
   if ( ugo_commands ) { /* subsequent call */ 
      /* dealloc your brain out */ 
      upsugo_free(ugo_commands->data);	/* free all lists etc in struct */
