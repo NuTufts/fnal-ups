@@ -83,9 +83,9 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 
 #define KEEP_OR_REMOVE_FILE()   \
    if (! g_keep_temp_file) {                  \
-     (void )remove(g_temp_file_name);         \
+     (void) remove(g_temp_file_name);         \
    } else {                                 \
-     (void )printf("%s\n", g_temp_file_name); \
+     (void) printf("%s\n", g_temp_file_name); \
    }
 
 static clock_t g_start_cpu, g_finish_cpu;
@@ -128,20 +128,20 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
       upsver_mes(1,"%sEmpty temp file deleted %s\n",VPREFIX,g_temp_file_name);
     } else {      
       /* write any closing info to the file */
-      (void )upsutl_finish_temp_file(a_stream, &command_line, "");
+      (void) upsutl_finish_temp_file(a_stream, &command_line, "");
     }
     if (fclose((FILE *)a_stream) == EOF) {
       upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));
     }
     /* if nothing was written to the file, delete it, */
     if (empty_stream) {
-      (void )remove(g_temp_file_name);
+      (void) remove(g_temp_file_name);
       switch (g_cmd_info[a_command_index].cmd_index) {
       case e_setup: 
       case e_unsetup: 
 	/* output the name of the a null file so the automatic sourcing does
 	   not give an error */
-	(void )printf("/dev/null\n");
+	(void) printf("/dev/null\n");
 	break;
       }
       /* flush the journaling cache of files so the changes made internally are
@@ -157,12 +157,12 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	  /* see if this is only a simulation first */
 	  if (a_simulate_flag) {
 	    /* yes, output this to short circuit the automatic sourcing */
-	    printf("/dev/null\n");
+	    (void) printf("/dev/null\n");
 	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
 	  } else {
 	    /* output the name of the temp file that was created */
 	    upsver_mes(1,"%sSourcing file %s\n",VPREFIX,g_temp_file_name);
-	    (void )printf("%s\n", g_temp_file_name);
+	    (void) printf("%s\n", g_temp_file_name);
 	  }
 	  /* if we were asked to save the file, output the name again so the
 	     user can see it. the first output was eaten by the sourcing */
@@ -190,7 +190,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	    /* make sure the file is executable */
 	    if (! chmod(g_temp_file_name, mode)) {
               char sourced_temp_file[L_tmpnam+3] = ". ";
-              strcat(sourced_temp_file, g_temp_file_name);
+              (void) strcat(sourced_temp_file, g_temp_file_name);
 	      upsver_mes(1,"%sExecuting file %s\n",VPREFIX,g_temp_file_name);
               errno = system (sourced_temp_file);
               errno = WEXITSTATUS (errno);
@@ -220,9 +220,9 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	  /* we must remove the file because otherwise the setup/unsetup 
 	     command will try and source it and only half change the user's
 	     environment */
-	  (void )remove(g_temp_file_name);
+	  (void) remove(g_temp_file_name);
 	  /* print the following so automatic sourcing does'nt give an error */
-	  printf("/dev/null\n");
+	  (void) printf("/dev/null\n");
 	  break;
 	default:
 	  /* keep the file if we were asked to */
@@ -241,7 +241,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
     switch (g_cmd_info[a_command_index].cmd_index) {
     case e_setup:
     case e_unsetup:
-      printf("/dev/null\n");
+      (void) printf("/dev/null\n");
       break;
     }
   }
@@ -263,7 +263,7 @@ void upsutl_unset_upsvars( const FILE * const a_stream,
 {
   if (g_LOCAL_VARS_DEF) {
     /* undefine the local env variables */
-    (void )upsget_remall(a_stream, a_command_line, a_prefix);
+    (void) upsget_remall(a_stream, a_command_line, a_prefix);
   }
 }
 /*-----------------------------------------------------------------------
@@ -284,13 +284,13 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
   if (g_DID_COPY_MAN) {
     /* make sure that the status returned after copying man/catman/info files
        is success.  it does not matter if they could not be copied */
-    fprintf((FILE *)a_stream, "echo > /dev/null\n");
+    (void) fprintf((FILE *)a_stream, "echo > /dev/null\n");
   }
 
   /* we usually tell the file to delete itself.  however the user may
      override this */
   if (g_temp_file_name && ! g_COMPILE_FLAG && ! g_keep_temp_file) {
-    fprintf((FILE *)a_stream, "%s/bin/rm -f %s\n", a_prefix, g_temp_file_name);
+    (void) fprintf((FILE *)a_stream, "%s/bin/rm -f %s\n", a_prefix, g_temp_file_name);
   }
 }
 
@@ -404,7 +404,7 @@ t_upstyp_product *upsutl_get_config( const char * const a_db)
   
   if ((strlen(a_db) + (unsigned int )CONFIG_SIZE + (unsigned int ) 2) <=
       MAX_LINE_LEN) {
-    sprintf(&buffer[0], "%s/%s/%s", a_db, UPS_FILES, CONFIG_FILE);
+    (void) sprintf(&buffer[0], "%s/%s/%s", a_db, UPS_FILES, CONFIG_FILE);
     read_product = upsfil_read_file(buffer);
     if (UPS_ERROR == UPS_NO_FILE) {
       upserr_backup();
@@ -458,7 +458,7 @@ t_upslst_item *upsutl_free_matched_product_list(
   for (mproduct_item = *a_mproduct_list ; mproduct_item ; 
        mproduct_item = mproduct_item->next) {
     mproduct = (t_upstyp_matched_product *)mproduct_item->data;
-    (void )ups_free_matched_product(mproduct);
+    (void) ups_free_matched_product(mproduct);
   }
 
   /* Now free the list */
@@ -488,7 +488,7 @@ t_upslst_item *upsutl_free_matched_instance_list(
   /* free the instances */
   for (list_item = *a_minst_list; list_item; list_item = list_item->next) {
     minst_ptr = (t_upstyp_matched_instance *)(list_item->data);
-    (void )ups_free_matched_instance(minst_ptr);
+    (void) ups_free_matched_instance(minst_ptr);
   }
 
   /* Now free the list */
@@ -515,7 +515,7 @@ t_upslst_item *upsutl_free_inst_list( t_upslst_item ** const a_inst_list)
   /* free the instances */
   tmp_inst_list = *a_inst_list;
   for (list_item = tmp_inst_list; list_item; list_item = list_item->next) {
-    ups_free_instance((t_upstyp_instance *)(list_item->data));
+    (void) ups_free_instance((t_upstyp_instance *)(list_item->data));
   }
 
   /* Now free the list */
@@ -584,7 +584,7 @@ void upsutl_get_files(const char * const a_dir,
       }
     }
     /* this guy will free 'dir' */
-    closedir(dir);
+    (void) closedir(dir);
 
     /* return the first element in the list */
     if (*a_file_list) {
@@ -617,11 +617,11 @@ char *upsutl_get_prod_dir(const char * const a_db,
   if (a_prod_name) {
     if (a_db) {
       if (((int )strlen(a_db) + (int )strlen(a_prod_name)) < MAX_LINE_LEN) {
-	sprintf(prod_ptr, "%s/%s", a_db, a_prod_name);
+	(void) sprintf(prod_ptr, "%s/%s", a_db, a_prod_name);
       }
     } else {
       if ((int )strlen(a_prod_name) < MAX_LINE_LEN) {
-	strcpy(prod_ptr, a_prod_name);
+	(void) strcpy(prod_ptr, a_prod_name);
       }
     }
   } else {
@@ -751,7 +751,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	    if ( (dir_s + UPS_FILES_LEN + stat_s + file_s + 4) <
 		 FILENAME_MAX) {
 	      /* Construct filename where the statistics are to be stored. */
-	      sprintf(stat_file, "%s/%s/%s", mproduct->db_info->name,
+	      (void) sprintf(stat_file, "%s/%s/%s", mproduct->db_info->name,
 		      UPS_FILES, g_stat_dir);
 
 	      /* check to make sure the statistics directory exists first */
@@ -759,7 +759,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 		/* no statistics directory, this is a warning error */
 		upserr_add(UPS_NO_FILE, UPS_WARNING, stat_file);
 	      } else {
-		strcat(stat_file, mproduct->product);         /* filename */
+		(void) strcat(stat_file, mproduct->product);         /* filename */
 		
 		/* See if we can open the file (rw) to write to. */
 		old_umask = umask(g_umask);
@@ -772,7 +772,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 		  upserr_add(UPS_STATISTICS, UPS_WARNING, mproduct->product);
 		}
 		/* set this back to what it was */
-		(void )umask(old_umask);
+		(void) umask(old_umask);
 	      }
 	    } else {
 	      /* Error size of directory path to file is too long */
@@ -784,11 +784,11 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	       ups list -K+, with the extra information added on at the end */
 	    if (fprintf(file_stream, "\"%s\" ", mproduct->product)) {
 	      if (minst->version) {
-		(void )fprintf(file_stream, "\"%s\" \"%s\" \"%s\" \"\" ",
+		(void) fprintf(file_stream, "\"%s\" \"%s\" \"%s\" \"\" ",
 			       minst->version->version, minst->version->flavor,
 			       minst->version->qualifiers);
 	      } else if (minst->table) {
-		(void )fprintf(file_stream, "\"\" \"%s\" \"%s\" \"\" ",
+		(void) fprintf(file_stream, "\"\" \"%s\" \"%s\" \"\" ",
 			       minst->table->flavor,
 			       minst->table->qualifiers);
 	      }
@@ -810,7 +810,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 
       /* Close the file if it was opened */
       if (file_stream != NULL) {
-	fclose(file_stream);
+	(void) fclose(file_stream);
 	file_stream = NULL;
       }
     }
@@ -1068,18 +1068,18 @@ char *upsutl_str_create( char * const str, const char copt )
       upserr_add( UPS_LINE_TOO_LONG, UPS_FATAL, "upsutl_str_create" );
       return 0;
     }    
-    strcpy( buf, str );
+    (void) strcpy( buf, str );
     if ( copt == STR_TRIM_PACK )
-      upsutl_str_remove( buf, bad_chars );
+      (void) upsutl_str_remove( buf, bad_chars );
     else
-      upsutl_str_remove_edges( buf, bad_chars );
+      (void) upsutl_str_remove_edges( buf, bad_chars );
     
     new_str = (char *)upsmem_malloc( (int)strlen( buf ) + 1 );
-    strcpy( new_str, buf );      
+    (void) strcpy( new_str, buf );      
   }
   else {      
     new_str = (char *)upsmem_malloc( (int)strlen( str ) + 1 );
-    strcpy( new_str, str );      
+    (void) strcpy( new_str, str );      
   }
   
   return new_str;
@@ -1107,8 +1107,8 @@ char *upsutl_str_crecat( char * const str1, char * const str2 )
   else {
     new_str = (char *)upsmem_malloc( (int )(strlen( str1 ) + strlen( str2 ) +
 			      (unsigned int )1) );
-    strcpy( new_str, str1 );
-    strcat( new_str, str2 );
+    (void) strcpy( new_str, str1 );
+    (void) strcat( new_str, str2 );
   }
   
   return new_str;
@@ -1136,7 +1136,7 @@ int upsutl_str_sort( char * const str, const char c )
   if ( !str || strlen( str ) <= 0 ) return 0;
   
   ct[0] = c;
-  memset( buf, 0, MAX_LINE_LEN );
+  (void) memset( buf, 0, MAX_LINE_LEN );
   
   /* get max len of an item */
 
@@ -1162,7 +1162,7 @@ int upsutl_str_sort( char * const str, const char c )
   count = 0;
   cp = strtok( str, ct );
   do {
-    strcpy( &buf[count*max_len], cp );
+    (void) strcpy( &buf[count*max_len], cp );
     count++;
   } while( (cp=strtok( 0, ct )) );
 
@@ -1172,10 +1172,10 @@ int upsutl_str_sort( char * const str, const char c )
 
   /* merge, write back to input */
 
-  strcpy( str, &buf[0] );
+  (void) strcpy( str, &buf[0] );
   for ( i=1; i<count; i++ ) {
-    strcat( str, ct );
-    strcat( str, &buf[i*max_len] );
+    (void) strcat( str, ct );
+    (void) strcat( str, &buf[i*max_len] );
   }
 
   return (int)count;
@@ -1237,7 +1237,7 @@ size_t upsutl_str_remove_edges( char * const str, const char * const str_remove 
 
   if ( cend >= cstart && cstart >= str ) {
     count = (size_t)(cend-cstart) + 1;
-    memmove( str, cstart, count );
+    (void) memmove( str, cstart, count );
     str[count] = 0;
   }
   else {
@@ -1271,7 +1271,7 @@ size_t upsutl_str_remove_end_quotes( char * str,
     return (size_t )len;
 
   if ( spaces )
-    upsutl_str_remove_edges( str, spaces );
+    (void) upsutl_str_remove_edges( str, spaces );
 
   len = (int)strlen( str );
   if ( !quotes || len < 2 )
@@ -1319,8 +1319,3 @@ int qsort_cmp_string( const void * c1, const void * c2 )
 {
   return strcmp( (const char *)c1, (const char *)c2 );
 }
-
-
-
-
-
