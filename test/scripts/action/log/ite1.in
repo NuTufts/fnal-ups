@@ -6,9 +6,11 @@ echo "start"
 #
 test "$FOO" = "a"
 if ($status == 0) then
+:
 echo "if case"
 #
 else
+:
 echo "else case"
 #
 endif
