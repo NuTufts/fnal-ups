@@ -754,6 +754,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 		  upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
 			     strerror(errno));
 		  upserr_add(UPS_OPEN_FILE, UPS_WARNING, stat_file);
+		  upserr_add(UPS_STATISTICS, UPS_WARNING, mproduct->product);
 		}
 		/* set this back to what it was */
 		(void )umask(old_umask);
@@ -803,7 +804,6 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   /* reset UPS_ERROR because we do not want any errors here to cause
      damage anywhere else. */
   UPS_ERROR = UPS_SUCCESS;
-
 }
 
 /*
