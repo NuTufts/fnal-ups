@@ -1,4 +1,6 @@
-Priority: Low
-State: Unverified
+Priority: High
+State: Verified
 
 Qualifiers=ANY and Product=ANY matching.  12 days (optimistic?).  Really nice.
+
+should be easy(?!?)
