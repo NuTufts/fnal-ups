@@ -86,7 +86,8 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   uc->ugo_tablefile=0;
   uc->ugo_tablefiledir=0;
   if (!uc->ugo_anyfile)
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "modify", 
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL,
+	       g_cmd_info[ups_command].cmd, 
                "Specification must include a file specification with -N");
     return(mproduct_list);
   }
