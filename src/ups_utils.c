@@ -528,7 +528,9 @@ size_t upsutl_str_remove_edges( char * const str, const char * const str_remove 
   char *cstart = 0, *cend = 0;
   size_t count = 0;
   
-  while ( cp && strchr( str_remove, (int)*cp ) ){ cp++; }
+  if ( !str || strlen( str ) <= 0 ) return 0;
+  
+  while ( *cp && strchr( str_remove, (int)*cp ) ){ cp++; }
   cstart = cp;
   count = strlen( str );
   cp = &str[count - 1];
@@ -556,3 +558,9 @@ int qsort_cmp_string( const void * c1, const void * c2 )
 {
   return strcmp( (const char *)c1, (const char *)c2 );
 }
+
+
+
+
+
+
