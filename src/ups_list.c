@@ -304,7 +304,6 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upstyp_instance *cinst_ptr = NULL;
   t_upstyp_matched_instance *minst_ptr = NULL;
   t_upstyp_config  *config_ptr = 0;
-  char *test="This is a test ${UPS_PROD_DIR} blaa ${UPS_PROD_NAME}";
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) 
@@ -369,7 +368,6 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         }
         printf("\n\n");
       } else { 
-          upstra_str(mproduct,test);
           list_K(minst_ptr,a_command_line,mproduct);
       }
     }
