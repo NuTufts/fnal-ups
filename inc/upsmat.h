@@ -25,6 +25,7 @@
 /* standard include files, if needed for .h file */
 
 /* ups specific include files, if needed for .h file */
+#include "upsugo.h"
 #include "upstyp.h"
 
 /*
@@ -38,13 +39,9 @@
 /*
  * Declaration of public functions.
  */
-t_ups_match_product *upsmat_match_instance( 
+t_upslst_item *upsmat_match_instance(
 				    const t_ups_command * const a_command_line,
-				    const char * const a_db,
-				    const char * const a_prod_name,
-				    const t_upslst_item * const a_chain_list,
-				    const t_upslst_item * const a_version,
-				    const int a_need_unique );
+				    const int a_need_unique);
 
 /*
  * Declaration of private globals.
