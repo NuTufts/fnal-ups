@@ -6,8 +6,7 @@ import sys
 class setups:
     def __init__(self):
 	os.environ['UPS_SHELL'] = "sh"
-	# f = os.popen( '. ${Setups_Home}/setups.sh; echo os.environ\\[\\"UPS_DIR\\"\\]=\\"$UPS_DIR\\"; echo os.environ\\[\\"PRODUCTS\\"\\]=\\"$PRODUCTS\\"; echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"$SETUP_UPS\\"')
-	f = os.popen( '. /usr/local/etc/setups.sh; echo os.environ\\[\\"UPS_DIR\\"\\]=\\"$UPS_DIR\\"; echo os.environ\\[\\"PRODUCTS\\"\\]=\\"$PRODUCTS\\"; echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"$SETUP_UPS\\"')
+	f = os.popen( '. ${Setups_Home}/setups.sh; echo os.environ\\[\\"UPS_DIR\\"\\]=\\"$UPS_DIR\\"; echo os.environ\\[\\"PRODUCTS\\"\\]=\\"$PRODUCTS\\"; echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"$SETUP_UPS\\"')
 	exec f.read()
 	f.close()
 

@@ -639,11 +639,12 @@ XEoF
 chmod +x $BootStrap_Dir/$Setups_Products_Script
 #
 #======================================================================
-# Create the setups.pl file in the bootstrap directory.
+# Create the setups.pl, setups.py files in the bootstrap directory.
 #======================================================================
-# This is done differently, since it only needs ${Setups_Home} 
-# replaced, and uses setups.sh...
+# These are done differently, since they only needs ${Setups_Home} 
+# replaced, and use setups.sh...
 sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/${Script_Prefix}.pl > ${BootStrap_Dir}/${Script_Prefix}.pl
+sed -e "s;\${Setups_Home};${Setups_Home};g" < $UPS_UPS_DIR/${Script_Prefix}.py > ${BootStrap_Dir}/${Script_Prefix}.py
 
 #
 #======================================================================
