@@ -370,7 +370,7 @@ fi
 echo "make $flags $target\n"
 
 if [ "$filter" != "" ]; then
-	makeCmd="$makeCmd 2>&1 | filterWarn -filter $UPS_DIR/bin/filterWarn.dat"
+	makeCmd="$makeCmd 2>&1 | upsfilterWarn -filter $UPS_DIR/bin/upsfilterWarn.dat"
 fi
 
 eval $makeCmd ${logPipe:-}
