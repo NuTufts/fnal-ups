@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
@@ -234,7 +235,18 @@ int main(int argc, char *argv[])
 
 	  /* write out statistics info */
 	  if ((UPS_ERROR == UPS_SUCCESS) && mproduct_list) {
-	    upsutl_statistics(mproduct_list, g_cmd_info[i].cmd);
+            char *p;
+            if (g_cmd_info[i].cmd_index >= e_unk)
+            {
+              p = argv[1];
+              while (*p)
+              {
+                *p = (char) tolower ((int) *p);   /* We're done with argv[1] anyway */
+                ++p;
+              }
+            }
+	    upsutl_statistics(mproduct_list,
+                              ((g_cmd_info[i].cmd_index >= e_unk) ? argv[1] : g_cmd_info[i].cmd));
 	  }
 	}
       } else {
