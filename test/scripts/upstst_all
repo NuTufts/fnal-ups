@@ -36,8 +36,19 @@ echo "======================================================================"
 echo "Testing compile routines"
 upstst_compile
 echo "======================================================================"
-echo "Testing ups start"
+echo "Testing configure routines"
+upstst_configure
+echo "======================================================================"
+echo "Testing unconfigure routines"
+upstst_unconfigure
+echo "======================================================================"
+echo "Testing tailor routines"
+upstst_tailor
+echo "======================================================================"
+echo "Testing start routines"
 upstst_start
 echo "======================================================================"
-echo "Testing ups stop routines"
+echo "Testing stop routines"
 upstst_stop
+
+

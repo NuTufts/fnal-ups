@@ -1,0 +1,11 @@
+FILE=TABLE
+PRODUCT=flute
+#*************************************************
+FLAVOR = NULL
+QUALIFIERS = "song"
+
+COMMON:
+   ACTION = TAILOR
+        execute("echo start music", NO_UPS_ENV)
+END:
+#*************************************************

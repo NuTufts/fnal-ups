@@ -2,8 +2,37 @@
 # ============================================================================
 # test ups tailor
 # ============================================================================
-cd $UPS_DIR/test/scripts/tailor
-$UPS_DIR/test/ups_test << EOD
-
+cd $UPS_DIR/test/scripts/tailor/log
+Shell=sh;export SHELL;
+UPS_SHELL=${SHELL};export UPS_SHELL;
+env PRODUCTS=../db1 $UPS_DIR/test/ups_test << EOD
+#ups_echo "=================================================================="
+#
+#	Old	c,n,r,t,v
+#	New	H,s
+#
+#	clarinet	flute		oboe
+#
+tailor clarinet v1_0 -K "FLAVOR"
+tailor clarinet v2_0 -K "PRODUCT"
+tailor clarinet -g current -M ../db1/clarinet -m clarinet.table -s -t
+tailor clarinet v2_0 -q woodwinds -s -n
+#
+#
+tailor flute -g current -M ../db1/flute -m flute.table -z ../db1 -actout temp 
+tailor -f Irix+6.2 -q debug -d -o "music" flute 
+tailor flute v1_0 -c
+tailor flute -U ../db1 -s
+#
+#
+#tailor oboe v1_0 -f NULL -z ../db1 -f PLUM -q flute
+#tailor oboe -z ../db1 -f NULL -G "oboe v1_0 -m oboe.table" -s -t 
+#
+#
+tailor junk v1_0 -q debug -s -n
+#
+#There is no v1_0; should complain
+#
+tailor junk v3_0 -q debug -s -n
 quit
 EOD
