@@ -2532,24 +2532,10 @@ static int sh_output_first_check(const FILE * const a_stream,
 {
   int status;
 
-  if ((status = fprintf((FILE *)a_stream,
-	      "if [ -s %s ]; then\n  if [ ! -r %s -o ! -x %s ]; then\n    echo \"File to source (%s) is not readable or not executable\"\n", a_data,
-			a_data, a_data, a_data)) < 0) {
+  if ((status = fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_data))
+      < 0) {
     FPRINTF_ERROR();
-  } else {
-    /* check if we should put out the info we usually do when we exit */
-    if (a_exit_flag == DO_EXIT) {
-      upsutl_finish_temp_file(a_stream, a_command_line);
-      if ((status = fprintf((FILE *)a_stream, "    return 1\n")) < 0) {
-	FPRINTF_ERROR();
-      }
-    }
-    
-    if ((status >= 0) && (status = fprintf((FILE *)a_stream, "  else\n"))
-	< 0) {
-      FPRINTF_ERROR();
-    }
-  }
+  } 
   return (status);
 }
 
@@ -2570,30 +2556,25 @@ static int sh_output_next_part(const FILE * const a_stream,
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
   }
   if (UPS_ERROR == UPS_SUCCESS) {
-    if ((status = fprintf((FILE *)a_stream, "    . %s\n", a_data)) < 0) {
+    if ((status = fprintf((FILE *)a_stream, "  . %s\n", a_data)) < 0) {
       FPRINTF_ERROR();
     } else {
       if (a_check_flag == DO_CHECK) {
 	if ((status = fprintf((FILE *)a_stream,
-	      "    UPS_STATUS=$?\n    if [ \"$UPS_STATUS\" != \"0\" ]; then\n      echo \"Error $UPS_STATUS while sourcing %s\"\n      unset UPS_STATUS\n",
+	      "  UPS_STATUS=$?\n  if [ \"$UPS_STATUS\" != \"0\" ]; then\n    echo \"Error $UPS_STATUS while sourcing %s\"\n    unset UPS_STATUS\n",
 		    a_data)) < 0) {
 	  FPRINTF_ERROR();
 	} else {
 	  upsutl_finish_temp_file(a_stream, a_command_line);
 	  if ((status = fprintf((FILE *)a_stream,
-		      "      return 1\n    fi\n    unset UPS_STATUS\n") < 0)) {
+		      "    return 1\n  fi\n  unset UPS_STATUS\n") < 0)) {
 	      FPRINTF_ERROR();
 	  } 
 	}
       }
       if ((status >= 0) && (a_exit_flag == DO_EXIT)) {
 	upsutl_finish_temp_file(a_stream, a_command_line);
-	if ((status = fprintf((FILE *)a_stream, "    return\n") < 0)) {
-	  FPRINTF_ERROR();
-	}
-      }
-      if (status >= 0) {
-	if ((status = fprintf((FILE *)a_stream, "  fi\n") < 0)) {
+	if ((status = fprintf((FILE *)a_stream, "  return\n") < 0)) {
 	  FPRINTF_ERROR();
 	}
       }
@@ -2609,23 +2590,9 @@ static int csh_output_first_check(const FILE * const a_stream,
 {
   int status;
 
-  if ((status = fprintf((FILE *)a_stream,
-	      "if (-e %s) then\n  if (! -r %s || ! -x %s) then\n    echo \"File to source (%s) is not readable or not executable\"\n", a_data,
-			a_data, a_data, a_data)) < 0) {
+  if ((status = fprintf((FILE *)a_stream, "if (-e %s) then\n", a_data))
+       < 0) {
     FPRINTF_ERROR();
-  } else {
-    /* check if we should put out the info we usually do when we exit */
-    if (a_exit_flag == DO_EXIT) {
-      upsutl_finish_temp_file(a_stream, a_command_line);
-      if ((status = fprintf((FILE *)a_stream, "    return 1\n")) < 0) {
-	FPRINTF_ERROR();
-      }
-    }
-    
-    if ((status >= 0) && (status = fprintf((FILE *)a_stream, "  else\n"))
-	< 0) {
-      FPRINTF_ERROR();
-    }
   }
   return (status);
 }
@@ -2647,30 +2614,25 @@ static int csh_output_next_part(const FILE * const a_stream,
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
   }
   if (UPS_ERROR == UPS_SUCCESS) {
-    if ((status = fprintf((FILE *)a_stream, "    source %s\n", a_data)) < 0) {
+    if ((status = fprintf((FILE *)a_stream, "  source %s\n", a_data)) < 0) {
       FPRINTF_ERROR();
     } else {
       if (a_check_flag == DO_CHECK) {
 	if ((status = fprintf((FILE *)a_stream,
-	      "    setenv UPS_STATUS $status\n    if (\"$UPS_STATUS\" != \"0\") then\n      echo \"Error $UPS_STATUS while sourcing %s\n      unsetenv UPS_STATUS\n",
+	      "  setenv UPS_STATUS $status\n  if (\"$UPS_STATUS\" != \"0\") then\n    echo \"Error $UPS_STATUS while sourcing %s\n    unsetenv UPS_STATUS\n",
 		    a_data)) < 0) {
 	  FPRINTF_ERROR();
 	} else {
 	  upsutl_finish_temp_file(a_stream, a_command_line);
 	  if ((status = fprintf((FILE *)a_stream,
-		      "      return 1\n    endif\n    unsetenv UPS_STATUS\n") < 0)) {
+		      "    return 1\n  endif\n  unsetenv UPS_STATUS\n") < 0)) {
 	      FPRINTF_ERROR();
 	  } 
 	}
       }
       if ((status >= 0) && (a_exit_flag == DO_EXIT)) {
 	upsutl_finish_temp_file(a_stream, a_command_line);
-	if ((status = fprintf((FILE *)a_stream, "    return\n") < 0)) {
-	  FPRINTF_ERROR();
-	}
-      }
-      if (status >= 0) {
-	if ((status = fprintf((FILE *)a_stream, "  endif\n") < 0)) {
+	if ((status = fprintf((FILE *)a_stream, "  return\n") < 0)) {
 	  FPRINTF_ERROR();
 	}
       }
