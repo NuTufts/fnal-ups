@@ -278,7 +278,7 @@ int ups_free_instance( t_upstyp_instance * const inst_ptr )
     
     if ( inst_ptr->db_dir ) { upsmem_free( inst_ptr->db_dir ); }
   
-    if ( inst_ptr->unknown_list ) { upslst_free( inst_ptr->unknown_list, 'd' ); }
+    if ( inst_ptr->user_list ) { upslst_free( inst_ptr->user_list, 'd' ); }
     
     l_ptr = upslst_first( inst_ptr->action_list );
     while( l_ptr ) {

@@ -639,7 +639,7 @@ t_upstyp_instance *read_instance( void )
       
     case e_key_unknown:
       if ( g_line[0] == '_' ) {	
-	inst_ptr->unknown_list = upslst_add( inst_ptr->unknown_list,
+	inst_ptr->user_list = upslst_add( inst_ptr->user_list,
 					     upsutl_str_create( g_line, ' ' ) );
       }
       else {
@@ -1109,9 +1109,9 @@ void print_instance( t_upstyp_instance * const inst_ptr )
     printf( "Actions = %s\n", (char*)0 );
   }
   
-  if ( inst_ptr->unknown_list ) {
+  if ( inst_ptr->user_list ) {
     printf( "User Defined = \n" );
-    l_ptr = upslst_first( inst_ptr->unknown_list );
+    l_ptr = upslst_first( inst_ptr->user_list );
     for ( ; l_ptr; l_ptr = l_ptr->next ) {
       printf( "%s\n", (char *) l_ptr->data );
     }

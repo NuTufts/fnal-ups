@@ -99,9 +99,9 @@ typedef struct upstyp_instance
   
   char             *db_dir;  
   
-  t_upslst_item    *unknown_list;
-
   t_upslst_item    *action_list;
+
+  t_upslst_item    *user_list;
 
 } t_upstyp_instance;
 
