@@ -34,24 +34,24 @@
 /*
  * Types.
  */
-typedef struct ups_list_item
+typedef struct upslst_item
 {
-  struct ups_list_item    *prev;
+  struct upslst_item    *prev;
   void                    *data;
-  struct ups_list_item    *next;
-} t_ups_list_item;
+  struct upslst_item    *next;
+} t_upslst_item;
 
 /*
  * Declaration of public functions.
  */
-t_ups_list_item *upslst_new( void *data_ptr );
-t_ups_list_item *upslst_free( t_ups_list_item *list_ptr, char copt );
-t_ups_list_item *upslst_insert( t_ups_list_item *list_ptr, void *data_ptr );
-t_ups_list_item *upslst_add( t_ups_list_item *list_ptr, void *data_ptr );
-t_ups_list_item *upslst_delete( t_ups_list_item *list_ptr, void *data_ptr, char copt );
+t_upslst_item *upslst_new( void *data_ptr );
+t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt );
+t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr );
+t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr );
+t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt );
 
-t_ups_list_item *upslst_first( t_ups_list_item *list_ptr );
-t_ups_list_item *upslst_last( t_ups_list_item *list_ptr );
+t_upslst_item *upslst_first( t_upslst_item *list_ptr );
+t_upslst_item *upslst_last( t_upslst_item *list_ptr );
 
 /*
  * Declaration of private globals.

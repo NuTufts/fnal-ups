@@ -54,13 +54,13 @@
  *
  * Input : void *, a data element
  * Output: none
- * Return: t_ups_list_item *, pointer to top of list or NULL
+ * Return: t_upslst_item *, pointer to top of list or NULL
  */
-t_ups_list_item *upslst_new( void *data_ptr )
+t_upslst_item *upslst_new( void *data_ptr )
 {
-  t_ups_list_item *l_first = NULL;
+  t_upslst_item *l_first = NULL;
 
-  l_first = (t_ups_list_item *)malloc( sizeof( t_ups_list_item ) );
+  l_first = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
   if ( !l_first ) return NULL;
   
@@ -77,16 +77,16 @@ t_ups_list_item *upslst_new( void *data_ptr )
  * Will free up all memory for ups list.
  * If option 'd' is passed the data elements are also freed.
  *
- * Input : t_ups_list_item *, pointer to a list.
+ * Input : t_upslst_item *, pointer to a list.
  *         char, copt = 'd', will also delete data elements.
  * Output: none
- * Return: t_ups_list_item *, NULL
+ * Return: t_upslst_item *, NULL
  */
-t_ups_list_item *upslst_free( t_ups_list_item *list_ptr, char copt )
+t_upslst_item *upslst_free( t_upslst_item *list_ptr, char copt )
 {
-  t_ups_list_item *l_ptr = NULL;
-  t_ups_list_item *l_tmp = NULL;
-  t_ups_list_item *l_first = upslst_first( list_ptr );
+  t_upslst_item *l_ptr = NULL;
+  t_upslst_item *l_tmp = NULL;
+  t_upslst_item *l_first = upslst_first( list_ptr );
 
   if ( !l_first ) return NULL;
 
@@ -107,18 +107,18 @@ t_ups_list_item *upslst_free( t_ups_list_item *list_ptr, char copt )
  *
  * Will add an item as the first item to the list.
  *
- * Input : t_ups_list_item *, pointer to a list, if NULL a new list will
+ * Input : t_upslst_item *, pointer to a list, if NULL a new list will
  *         be created.
  * Output: none
- * Return: t_ups_list_item *, pointer to the first item of the list or NULL
+ * Return: t_upslst_item *, pointer to the first item of the list or NULL
  *
  * NOTE: if passed list pointer, in successive calls, is the first item,
  * it should be pretty fast.
  */
-t_ups_list_item *upslst_insert( t_ups_list_item *list_ptr, void *data_ptr )
+t_upslst_item *upslst_insert( t_upslst_item *list_ptr, void *data_ptr )
 {
-  t_ups_list_item *l_first = NULL;
-  t_ups_list_item *l_new = NULL;
+  t_upslst_item *l_first = NULL;
+  t_upslst_item *l_new = NULL;
 
   if ( ! list_ptr ) {
     list_ptr = upslst_new( data_ptr );
@@ -129,7 +129,7 @@ t_ups_list_item *upslst_insert( t_ups_list_item *list_ptr, void *data_ptr )
 
   if ( !l_first ) return NULL;
   
-  l_new = (t_ups_list_item *)malloc( sizeof( t_ups_list_item ) );
+  l_new = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
   if ( !l_new ) return NULL;
 
@@ -146,18 +146,18 @@ t_ups_list_item *upslst_insert( t_ups_list_item *list_ptr, void *data_ptr )
  *
  * Will add an item as the last item to the list.
  *
- * Input : t_ups_list_item *, pointer to a list, if NULL a new list will
+ * Input : t_upslst_item *, pointer to a list, if NULL a new list will
  *         be created.
  * Output: none
- * Return: t_ups_list_item *, pointer to the last item of the list or NULL
+ * Return: t_upslst_item *, pointer to the last item of the list or NULL
  *
  * NOTE: if passed list pointer, in successive calls, is the last item,
  * it should be pretty fast.
  */
-t_ups_list_item *upslst_add( t_ups_list_item *list_ptr, void *data_ptr )
+t_upslst_item *upslst_add( t_upslst_item *list_ptr, void *data_ptr )
 {
-  t_ups_list_item *l_last = NULL;
-  t_ups_list_item *l_new = NULL;
+  t_upslst_item *l_last = NULL;
+  t_upslst_item *l_new = NULL;
 
   if ( ! list_ptr ) {
     list_ptr = upslst_new( data_ptr );
@@ -168,7 +168,7 @@ t_ups_list_item *upslst_add( t_ups_list_item *list_ptr, void *data_ptr )
 
   if ( !l_last ) return NULL;
   
-  l_new = (t_ups_list_item *)malloc( sizeof( t_ups_list_item ) );
+  l_new = (t_upslst_item *)malloc( sizeof( t_upslst_item ) );
 
   if ( !l_new ) return NULL;
 
@@ -186,17 +186,17 @@ t_ups_list_item *upslst_add( t_ups_list_item *list_ptr, void *data_ptr )
  * Will delete item from list.
  * If option 'd' is passed the data elements are also freed.
  *
- * Input : t_ups_list_item *, pointer to a list
+ * Input : t_upslst_item *, pointer to a list
  *         void *, data element of item to be deletet.
  *         char, copt = 'd', will also delete data elements.
  * Output: none
- * Return: t_ups_list_item *, pointer to top of list
+ * Return: t_upslst_item *, pointer to top of list
  */
-t_ups_list_item *upslst_delete( t_ups_list_item *list_ptr, void *data_ptr, char copt )
+t_upslst_item *upslst_delete( t_upslst_item *list_ptr, void *data_ptr, char copt )
 {
-  t_ups_list_item *l_ptr = NULL;
-  t_ups_list_item *l_prev = NULL;
-  t_ups_list_item *l_first = NULL;
+  t_upslst_item *l_ptr = NULL;
+  t_upslst_item *l_prev = NULL;
+  t_upslst_item *l_first = NULL;
 
   l_first = upslst_first( list_ptr );
   
@@ -229,13 +229,13 @@ t_ups_list_item *upslst_delete( t_ups_list_item *list_ptr, void *data_ptr, char 
  *
  * Will return first item of passed list.
  *
- * Input : t_ups_list_item *, pointer to a list
+ * Input : t_upslst_item *, pointer to a list
  * Output: none
- * Return: t_ups_list_item *, pointer to first item of list
+ * Return: t_upslst_item *, pointer to first item of list
  */
-t_ups_list_item *upslst_first( t_ups_list_item *list_ptr )
+t_upslst_item *upslst_first( t_upslst_item *list_ptr )
 {
-  t_ups_list_item *l_ptr = NULL;
+  t_upslst_item *l_ptr = NULL;
   
   if ( !list_ptr ) return NULL;
 
@@ -249,13 +249,13 @@ t_ups_list_item *upslst_first( t_ups_list_item *list_ptr )
  *
  * Will return last item of passed list.
  *
- * Input : t_ups_list_item *, pointer to a list
+ * Input : t_upslst_item *, pointer to a list
  * Output: none
- * Return: t_ups_list_item *, pointer to last item of list
+ * Return: t_upslst_item *, pointer to last item of list
  */
-t_ups_list_item *upslst_last( t_ups_list_item *list_ptr )
+t_upslst_item *upslst_last( t_upslst_item *list_ptr )
 {
-  t_ups_list_item *l_ptr = NULL;
+  t_upslst_item *l_ptr = NULL;
   
   if ( !list_ptr ) return NULL;
 

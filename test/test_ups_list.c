@@ -2,11 +2,11 @@
 
 #include "../inc/ups_list.h"
 
-void print_list( t_ups_list_item *list_ptr );
+void print_list( t_upslst_item *list_ptr );
 
 void main( void )
 {
-  t_ups_list_item *l_ptr;
+  t_upslst_item *l_ptr;
   
   /*
    * Note:
@@ -68,13 +68,13 @@ void main( void )
   print_list( l_ptr );
 }
 
-void print_list( t_ups_list_item *list_ptr )
+void print_list( t_upslst_item *list_ptr )
 {
-  t_ups_list_item *l_ptr;
+  t_upslst_item *l_ptr;
   int count = 0;
 
   /*
-   * Note use of ups_list_first(), to be sure to start from first item
+   * Note use of upslst_first(), to be sure to start from first item
    */
   
   for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ ) {
