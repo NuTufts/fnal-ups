@@ -21,6 +21,8 @@ help_file :
 #
 # Now standard targets
 #
-spotless clean :
+clean :
 	@ ../bin/upsClean
+
+spotless : clean
 	@ rm -f ./ups_help.dat
