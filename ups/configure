@@ -359,7 +359,7 @@ cat <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 #    is used to determine the UPS_DIR variable.
 #
 
-setenv Setups_Home $Setups_Home
+set Setups_Home=$Setups_Home
 
 set BootStrap_Dir=$BootStrap_Dir
 
@@ -371,6 +371,8 @@ set Setups_Current=0
 if ( \$Setups_Current == 0 ) then
     set Setups_Home=\$BootStrap_Dir
 endif
+
+setenv SETUPS_DIR \$Setups_Home
 
 set Name_Of_Ups=$Name_Of_Ups
 setenv UPS_SHELL csh
@@ -567,6 +569,8 @@ if [ \$Setups_Current = 0 ]
 then
     Setups_Home=\$BootStrap_Dir
 fi
+
+SETUPS_DIR=\$Setups_Home; export SETUPS_DIR
 
 UPS_SHELL=sh; export UPS_SHELL
 #
@@ -1277,12 +1281,16 @@ do
     	    cp \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}
             cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.sh       
             cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.csh
-	    chmod +x \$Startup_Home/\${Start_Or_Stop}/ups_*
+	    chmod +x \$Startup_Home/\${Start_Or_Stop}/\${Start_Or_Stop}
+	    chmod +x \$Startup_Home/\${Start_Or_Stop}/\${Start_Or_Stop}.csh
+	    chmod +x \$Startup_Home/\${Start_Or_Stop}/\${Start_Or_Stop}.sh
 	else
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}.sh 
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}.csh 
-	    chmod +x \$Startup_Home/ups_*
+	    chmod +x \$Startup_Home/ups_\${Start_Or_Stop}
+	    chmod +x \$Startup_Home/ups_\${Start_Or_Stop}.csh
+	    chmod +x \$Startup_Home/ups_\${Start_Or_Stop}.sh
 	fi     
    fi
 done
