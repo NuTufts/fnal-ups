@@ -393,6 +393,17 @@ then
     error=1
 fi
 
+Make_AFS_ReadWrite() {
+   eval _x=\"\$$1\"
+   eval ${1}_Read=\"\$$1\"
+   eval $1=\"`eval echo $_x |
+		sed -e 's;/afs/fnal.gov;/afs/.fnal.gov/;'`\"
+   eval echo \"$1 is \$$1\"
+   eval echo \"${1}_Read is \${${1}_Read}\"
+}
+
+Make_AFS_ReadWrite Ups_DB_Path
+
 if test $error = 1
 then
     exit 1
@@ -417,6 +428,8 @@ else
     echo '**' $Setups_Flag defined as $Setups_Home in 
     echo '**' $Ups_DB_Path/.upsfiles/dbconfig
 fi
+
+Make_AFS_ReadWrite Setups_Home
 
 Setups_Products_List_Home=$Setups_Home
 
@@ -524,7 +537,7 @@ $sed 's%	%%' <<XEoF >$BootStrap_Dir/$Setups_Products_Script
 	#
 # 	Setups_Commands=$Setups_Commands
 
-	BootStrap_Dir=$BootStrap_Dir
+	BootStrap_Dir=$BootStrap_Dir_Read
 
 	Products_String_File=$Setups_Products_Init_File
 
@@ -662,9 +675,9 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	#    is used to determine the UPS_DIR variable.
 	#======================================================================
 
-	set Setups_Home=$Setups_Home
+	set Setups_Home=$Setups_Home_Read
 
-	set BootStrap_Dir=$BootStrap_Dir
+	set BootStrap_Dir=$BootStrap_Dir_Read
 
 	# =====  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE =====
 
@@ -728,12 +741,24 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	#======================================================================
 	set Node=\`uname -n|cut -f1 -d'.'\`
 	unset MACH_OS
-	setenv MACH_OS \`uname -s\`
-	set mach=\`echo \$MACH_OS|cut -c1-4\`
-	if ( \$mach == IRIX ) setenv MACH_OS IRIX
-	set Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
-	if ( \$MACH_OS == AIX ) set Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
-	if ( \$MACH_OS == Linux ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	if ( \$?UPS_OVERRIDE ) then
+	    setenv MACH_OS "\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ +]*\\)+.*/\\1/'\`"
+	    set Full_Flavor="\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ ]*\\).*/\\1/'\`"
+
+	else if ( -r \$SETUPS_DIR/ups_override.\$Node ) then
+	    setenv UPS_OVERRIDE "\`cat \$SETUPS_DIR/ups_override.\$Node\`"
+	    setenv MACH_OS "\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ +]*\\)+.*/\\1/'\`"
+	    set Full_Flavor="\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ ]*\\).*/\\1/'\`"
+
+	else
+	    setenv MACH_OS \`uname -s\`
+	    set mach=\`echo \$MACH_OS|cut -c1-4\`
+	    if ( \$mach == IRIX ) setenv MACH_OS IRIX
+	    set Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
+	    if ( \$MACH_OS == AIX ) set Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
+	    if ( \$MACH_OS == Linux ) set Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	endif
+
 	#======================================================================
 	# Determine the unique set of possible flavors
 	#======================================================================
@@ -920,7 +945,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	# machines.  Change this to the directory in which the
 	# setups.* scripts live.
 	#======================================================================
-	Setups_Home=$Setups_Home
+	Setups_Home=$Setups_Home_Read
 	#======================================================================
 	# Name_Of_Ups should always be ups at Fermilab, unless in beta test
 	#======================================================================
@@ -928,7 +953,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 
 #	Setups_Commands=$Setups_Commands
 	
-	BootStrap_Dir=$BootStrap_Dir
+	BootStrap_Dir=$BootStrap_Dir_Read
  	 
 	# === DO NOT EDIT BELOW THIS LINE === DO NOT REMOVE THIS LINE ===
 
@@ -992,19 +1017,34 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	#======================================================================
 	Node=\`uname -n|cut -f1 -d'.'\`
 	MACH_OS=\`uname -s\`
-	if test \`echo \$MACH_OS|cut -c1-4\` = IRIX
+
+	if test "x\$UPS_OVERRIDE" != x
 	then
-	    MACH_OS=IRIX
-	fi
-	export MACH_OS
-	Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
-	if test \$MACH_OS = AIX
+	    MACH_OS=\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ +]*\\)+.*/\\1/'\`
+	    Full_Flavor=\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ ]*\\).*/\\1/'\`
+
+	elif test -r \$SETUPS_DIR/ups_override.\$Node
 	then
-	    Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
-	fi
-	if test \$MACH_OS = Linux
-	then
-	    Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	    UPS_OVERRIDE=\`cat \$SETUPS_DIR/ups_override.\$Node\`
+	    export UPS_OVERRIDE
+	    MACH_OS=\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ +]*\\)+.*/\\1/'\`
+	    Full_Flavor=\`echo \$UPS_OVERRIDE | sed -e 's/.*-H \\([^ ]*\\).*/\\1/'\`
+
+	else
+	    if test \`echo \$MACH_OS|cut -c1-4\` = IRIX
+	    then
+		MACH_OS=IRIX
+	    fi
+	    export MACH_OS
+	    Full_Flavor=\$MACH_OS'+'\`uname -r\`'.'\`uname -v\`
+	    if test \$MACH_OS = AIX
+	    then
+		Full_Flavor=\$MACH_OS'+'\`uname -v\`'.'\`uname -r\`
+	    fi
+	    if test \$MACH_OS = Linux
+	    then
+		Full_Flavor=\$MACH_OS'+'\`uname -r\`
+	    fi
 	fi
 	for level in 2 3 4 5 6 7 8 9
 	do
@@ -1183,13 +1223,13 @@ for Start_Or_Stop in startup shutdown
 
 	Script_Prefix=$Script_Prefix
 
-	Setups_Home=$Setups_Home
+	Setups_Home=$Setups_Home_Read
 
-	Ups_DB_Path=$Ups_DB_Path
+	Ups_DB_Path=$Ups_DB_Path_Read
 
 #	Setups_Commands=$Setups_Commands
 
-	BootStrap_Dir=$BootStrap_Dir
+	BootStrap_Dir=$BootStrap_Dir_Read
 
 	Setup_List=${Ups_DB_Path}/.upsfiles/${Start_Or_Stop}
 
@@ -1528,7 +1568,7 @@ $sed 's%^	%%' <<XEoF > $BootStrap_Dir/${Script_Prefix}.common
 	        				\$echo UPS_DIR=\$UPS_DIR; export UPS_DIR;
 	    				    elif test \$Shell = 'csh'
 	    				    then
-	        				\$echo setenv PRODUCTS "\${Pstr_new}";
+	        				\$echo setenv PRODUCTS "\${Pstr_new};"
 	        				\$echo setenv UPS_DIR \$UPS_DIR;
 	    				    else
 	        				\$echo echo '**';
