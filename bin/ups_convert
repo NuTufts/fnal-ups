@@ -374,6 +374,7 @@ sub WriteTableFile {
     @reqType = split ( / /, "USE BUILD" );
     foreach $reqType ( @reqType ) {
     foreach $flvr (@flavor) {
+    if ( &prod_dir ) {
 	if ( &table_file ("$reqType") ) {
            if ("$opt_v") { 
               print "Writing Table File entry for $flvr $PRODUCT $version $reqType\n"; 
@@ -391,6 +392,7 @@ sub WriteTableFile {
                 $ReqHash{$flvr} = &add_setup;
              }
         }
+    }
     }
     if ( ! $TableFileInfo ) { 
        print TableFile "File=Table\n";
