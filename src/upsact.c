@@ -2629,7 +2629,7 @@ static void f_envremove( ACTION_PARAMS)
       }
 
       if (fprintf((FILE *)a_stream,
-		  "  %s=\"`%s -p \"$%s\" -i'%s' -d'%s' \"$upstmp\"`\";\n  if [ \"x${%s:-}\" = \"x\" ]; then unset %s; fi\n", 
+		  "  %s=\"`%s -p \"$%s\" -i'%s' -d'%s' \"$upstmp\"`\";\n  if [ \"${%s:-}\" = \"\" ]; then unset %s; fi\n", 
 		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter,
 		  delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
@@ -2656,7 +2656,7 @@ static void f_envremove( ACTION_PARAMS)
       }
 
       if (fprintf((FILE *)a_stream,
-		 "  setenv %s \"`%s -p \"\'\"$%s\"\'\" -i'%s' -d'%s' \"\'\"$upstmp\"\'\"`\"\n  if (\"x${%s}\" == \"x\") unsetenv %s\n",
+		 "  setenv %s \"`%s -p \"\'\"$%s\"\'\" -i'%s' -d'%s' \"\'\"$upstmp\"\'\"`\"\n  if (\"${%s}\" == \"\") unsetenv %s\n",
 		  a_cmd->argv[0], DROPIT, a_cmd->argv[0], delimiter, delimiter,
 		  a_cmd->argv[0], a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
@@ -2730,7 +2730,7 @@ static void f_envsetifnotset( ACTION_PARAMS)
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "if [ \"x${%s:-}\" = \"x\" ]; then %s=\"%s\";export %s;fi;\n#\n",
+		  "if [ \"${%s:-}\" = \"\" ]; then %s=\"%s\";export %s;fi;\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0],
 		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
