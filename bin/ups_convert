@@ -422,26 +422,18 @@ sub WriteTableFile {
 #       print TableFile "     doDefaults()\n";
        $key=~s/DaSeTuP/      doDefaults()\n      sourceRequired(\${UPS_PROD_DIR}\/ups\/setup.\${UPS_SHELL})\n/;
        $key=~s/DaSeTuP//g;
-#       if (open(TMPFILE,"${basedir}/ups/setup.sh")) {
-#          close TMPFILE;
-#          print TableFile "$key";
-#       }
        if (checkfor("${basedir}/ups/setup.sh")) {
            print TableFile "$key";
        }
-       $key=~s/setup/unsetup/g;
-       $key=~s/     doDefaults\(\)//g;
-       print TableFile "   Action=unsetup\n";
-       if (checkfor("${basedir}/ups/unsetup.sh")) {
-           print TableFile "$key";
-       }
-#       if (open(TMPFILE,"${basedir}/ups/unsetup.sh")) {
-#          close TMPFILE;
-#          print TableFile "$key";
+# remove unsetup all together...
+#       $key=~s/setup/unsetup/g;
+#       $key=~s/     doDefaults\(\)\n//g;
+#       print TableFile "   Action=unsetup\n";
+#       if (checkfor("${basedir}/ups/unsetup.sh")) {
+#           print TableFile "$key";
 #       }
-#
 # and back to last...
-       print TableFile "      doDefaults()\n";
+#       print TableFile "      doDefaults()\n";
        $baseactions=&add_misactions;
        print TableFile "${baseactions}";
        print TableFile "End:\n";
