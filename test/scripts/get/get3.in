@@ -5,7 +5,7 @@ setenv UPS_UPS_DIR '/NULL/lassie/ups'
 unsetenv UPS_VERBOSE
 unsetenv UPS_EXTENDED
 setenv UPS_THIS_DB '../list/db1'
-setenv UPS_OS_FLAVOR 'OSF1+V4.0'
+setenv UPS_OS_FLAVOR '__YOUR_FLAVOR_HERE__'
 setenv UPS_PROD_FLAVOR 'NULL'
 setenv UPS_PROD_QUALIFIERS 'nodbg:opt'
 setenv UPS_OPTIONS ''
