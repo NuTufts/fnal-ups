@@ -234,6 +234,24 @@ void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 }
 
 /*-----------------------------------------------------------------------
+ * upsutl_unset_upsvars
+ *
+ * If needed, add the unsetting if the ups variables to the file.
+ *
+ * Input : an open file stream and a command line structure
+ * Output: none
+ * Return: none
+ */
+void upsutl_unset_upsvars( const FILE * const a_stream,
+			   const t_upsugo_command * const a_command_line,
+			   const char * const a_prefix)
+{
+  if (g_LOCAL_VARS_DEF) {
+    /* undefine the local env variables */
+    (void )upsget_remall(a_stream, a_command_line, a_prefix);
+  }
+}
+/*-----------------------------------------------------------------------
  * upsutl_finish_temp_file
  *
  * Write any closing information to the temp file.
@@ -246,10 +264,7 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
 			      const t_upsugo_command * const a_command_line,
 			      const char * const a_prefix)
 {
-  if (g_LOCAL_VARS_DEF) {
-    /* undefine the local env variables */
-    (void )upsget_remall(a_stream, a_command_line, a_prefix);
-  }
+  upsutl_unset_upsvars(a_stream, a_command_line, a_prefix);
 
   if (g_DID_COPY_MAN) {
     /* make sure that the status returned after copying man/catman/info files

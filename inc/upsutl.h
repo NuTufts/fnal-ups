@@ -58,6 +58,9 @@
  * Declaration of public functions.
  */
 
+void upsutl_unset_upsvars( const FILE * const a_stream,
+			   const t_upsugo_command * const a_command_line,
+			   const char * const a_prefix);
 void upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 		      const int a_command_index, const int a_simulate_flag);
 void upsutl_finish_temp_file( const FILE * const a_stream,
