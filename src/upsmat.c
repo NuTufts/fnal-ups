@@ -977,7 +977,7 @@ static int match_from_chain( const char * const a_product,
 	  upserr_vplace();
 	  upserr_add(UPS_NO_VERSION_MATCH, UPS_FATAL, buffer,
 		     inst->version);
-	  
+	  upserr_add(UPS_DB_CORRUPTION, UPS_FATAL, a_db_info->name, a_product);
 	  /* mark this item to be deleted */
 	  tmp_minst_ptr->invalid_instance = 1;
 	} else {
@@ -1131,6 +1131,8 @@ static int match_from_version( const char * const a_product,
 		upserr_vplace();
 		upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer,
 			   inst->table_file, inst->flavor, inst->qualifiers);
+		upserr_add(UPS_DB_CORRUPTION, UPS_FATAL, a_db_info->name,
+			   a_product);
 
 		/* mark this item to be deleted */
 		tmp_minst_ptr->invalid_instance = 1;
