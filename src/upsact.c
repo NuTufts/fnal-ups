@@ -134,167 +134,47 @@ int do_exit_action( const t_upsact_cmd * const a_cmd );
 
 /* functions to handle specific action commands */
 
-static void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd);
-static void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd);
-static void f_copyman( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd);
-static void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd);
-static void f_copycatman( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd);
-static void f_uncopycatman( const t_upstyp_matched_instance * const a_inst,
-			    const t_upstyp_db * const a_db_info,
-			    const t_upsugo_command * const a_command_line,
-			    const FILE * const a_stream,
-			    const t_upsact_cmd * const a_cmd);
-static void f_copynews( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd);
-static void f_envappend( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd);
-static void f_envprepend( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd);
-static void f_envremove( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd);
-static void f_envset( const t_upstyp_matched_instance * const a_inst,
-		      const t_upstyp_db * const a_db_info,
-		      const t_upsugo_command * const a_command_line,
-		      const FILE * const a_stream,
-		      const t_upsact_cmd * const a_cmd);
-static void f_envsetifnotset( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd);
-static void f_envunset( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd);
-static void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd);
-static void f_execute( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd);
-static void f_filetest( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd);
-static void f_pathappend( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd);
-static void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
-			   const t_upstyp_db * const a_db_info,
-			   const t_upsugo_command * const a_command_line,
-			   const FILE * const a_stream,
-			   const t_upsact_cmd * const a_cmd);
-static void f_pathremove( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd);
-static void f_pathset( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd);
-static void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd);
-static void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd);
-static void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd);
-static void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd);
-static void f_sourcecompilereq( const t_upstyp_matched_instance * const a_inst,
-				const t_upstyp_db * const a_db_info,
-				const t_upsugo_command * const a_command_line,
-				const FILE * const a_stream,
-				const t_upsact_cmd * const a_cmd);
-static void f_sourcecompileopt( const t_upstyp_matched_instance * const a_inst,
-				const t_upstyp_db * const a_db_info,
-				const t_upsugo_command * const a_command_line,
-				const FILE * const a_stream,
-				const t_upsact_cmd * const a_cmd);
-static void f_writecompilescript(
-			       const t_upstyp_matched_instance * const a_inst,
-			       const t_upstyp_db * const a_db_info,
-			       const t_upsugo_command * const a_command_line,
-			       const FILE * const a_stream,
-			       const t_upsact_cmd * const a_cmd);
-static void f_setupenv( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd);
-static void f_proddir( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd);
-static void f_unsetupenv( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd);
-static void f_unproddir( const t_upstyp_matched_instance * const a_inst,
-		         const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd);
-static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd);
+#define ACTION_PARAMS \
+  const t_upstyp_matched_instance * const a_inst,  \
+  const t_upstyp_db * const a_db_info,             \
+  const t_upsugo_command * const a_command_line,   \
+  const FILE * const a_stream,                     \
+  const t_upsact_cmd * const a_cmd
+
+static void f_copyhtml( ACTION_PARAMS);
+static void f_copyinfo( ACTION_PARAMS);
+static void f_copyman( ACTION_PARAMS);
+static void f_uncopyman( ACTION_PARAMS);
+static void f_copycatman( ACTION_PARAMS);
+static void f_uncopycatman( ACTION_PARAMS);
+static void f_copynews( ACTION_PARAMS);
+static void f_envappend( ACTION_PARAMS);
+static void f_envprepend( ACTION_PARAMS);
+static void f_envremove( ACTION_PARAMS);
+static void f_envset( ACTION_PARAMS);
+static void f_envsetifnotset( ACTION_PARAMS);
+static void f_envunset( ACTION_PARAMS);
+static void f_exeaccess( ACTION_PARAMS);
+static void f_execute( ACTION_PARAMS);
+static void f_filetest( ACTION_PARAMS);
+static void f_pathappend( ACTION_PARAMS);
+static void f_pathprepend( ACTION_PARAMS);
+static void f_pathremove( ACTION_PARAMS);
+static void f_pathset( ACTION_PARAMS);
+static void f_addalias( ACTION_PARAMS);
+static void f_unalias( ACTION_PARAMS);
+static void f_sourcerequired( ACTION_PARAMS);
+static void f_sourceoptional( ACTION_PARAMS);
+static void f_sourcereqcheck( ACTION_PARAMS);
+static void f_sourceoptcheck( ACTION_PARAMS);
+static void f_sourcecompilereq( ACTION_PARAMS);
+static void f_sourcecompileopt( ACTION_PARAMS);
+static void f_writecompilescript( ACTION_PARAMS);
+static void f_setupenv( ACTION_PARAMS);
+static void f_proddir( ACTION_PARAMS);
+static void f_unsetupenv( ACTION_PARAMS);
+static void f_unproddir( ACTION_PARAMS);
+static void f_dodefaults( ACTION_PARAMS);
 
 #define CHECK_NUM_PARAM(action) \
     if ((a_cmd->argc < g_cmd_maps[a_cmd->icmd].min_params) ||   \
@@ -478,6 +358,8 @@ t_cmd_map g_cmd_maps[] = {
   { "pathremove", e_pathremove, f_pathremove, 2, 3, e_invalid_cmd },
   { "pathprepend", e_pathprepend, f_pathprepend, 2, 3, e_pathremove },
   { "pathset", e_pathset, f_pathset, 2, 2, e_envunset },
+  { "addalias", e_addalias, f_addalias, 2, 2, e_unalias },
+  { "unalias", e_unalias, f_unalias, 1, 1, e_invalid_cmd },
   { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 3, e_invalid_cmd },
   { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 3, e_invalid_cmd },
   { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 3, e_invalid_cmd },
@@ -992,6 +874,8 @@ t_upslst_item *upsact_check_files(
 	case e_pathremove:
 	case e_pathprepend:
 	case e_pathset:
+	case e_addalias:
+	case e_unalias:
 	case e_filetest:
 	case e_dodefaults:
 	case e_setupenv:
@@ -2083,11 +1967,7 @@ void upsact_process_commands( const t_upslst_item * const a_cmd_list,
  *   specific code for each action supported by UPS
  */
 
-static void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd)
+static void f_copyhtml( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyHtml");
 
@@ -2121,11 +2001,7 @@ static void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd)
+static void f_copyinfo( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyInfo");
 
@@ -2159,11 +2035,7 @@ static void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_copyman( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd)
+static void f_copyman( ACTION_PARAMS)
 {
   char *buf = NULL;
 
@@ -2200,11 +2072,7 @@ static void f_copyman( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_copycatman( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd)
+static void f_copycatman( ACTION_PARAMS)
 {
   char *buf = NULL;
 
@@ -2241,11 +2109,7 @@ static void f_copycatman( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd)
+static void f_uncopyman( ACTION_PARAMS)
 {
   char *buf = NULL;
   t_upslst_item *man_item, *man_list = NULL;
@@ -2295,11 +2159,7 @@ static void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_uncopycatman( const t_upstyp_matched_instance * const a_inst,
-			    const t_upstyp_db * const a_db_info,
-			    const t_upsugo_command * const a_command_line,
-			    const FILE * const a_stream,
-			    const t_upsact_cmd * const a_cmd)
+static void f_uncopycatman( ACTION_PARAMS)
 {
   char *buf = NULL;
   t_upslst_item *man_item, *man_list = NULL;
@@ -2349,11 +2209,7 @@ static void f_uncopycatman( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_copynews( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd)
+static void f_copynews( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyNews");
 
@@ -2387,11 +2243,7 @@ static void f_copynews( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_envappend( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd)
+static void f_envappend( ACTION_PARAMS)
 {
   char *delimiter;
   
@@ -2441,11 +2293,7 @@ static void f_envappend( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_envprepend( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd)
+static void f_envprepend( ACTION_PARAMS)
 {
   char *delimiter;
   
@@ -2496,11 +2344,7 @@ static void f_envprepend( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_envremove( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd)
+static void f_envremove( ACTION_PARAMS)
 {
   char *delimiter;
   
@@ -2543,11 +2387,7 @@ static void f_envremove( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_envset( const t_upstyp_matched_instance * const a_inst,
-		      const t_upstyp_db * const a_db_info,
-		      const t_upsugo_command * const a_command_line,
-		      const FILE * const a_stream,
-		      const t_upsact_cmd * const a_cmd)
+static void f_envset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envSet");
 
@@ -2580,11 +2420,7 @@ static void f_envset( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_envsetifnotset( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd)
+static void f_envsetifnotset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envSetIfNotSet");
 
@@ -2619,11 +2455,7 @@ static void f_envsetifnotset( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_envunset( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd)
+static void f_envunset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envUnset");
 
@@ -2654,11 +2486,7 @@ static void f_envunset( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd)
+static void f_exeaccess( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("exeAccess");
 
@@ -2693,11 +2521,7 @@ static void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_execute( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd)
+static void f_execute( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("execute");
 
@@ -2742,11 +2566,7 @@ static void f_execute( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_filetest( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd)
+static void f_filetest( ACTION_PARAMS)
 {
   char *err_message;
   
@@ -2786,11 +2606,7 @@ static void f_filetest( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_pathappend( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd)
+static void f_pathappend( ACTION_PARAMS)
 {
   char *delimiter;
   
@@ -2839,11 +2655,7 @@ static void f_pathappend( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
-			   const t_upstyp_db * const a_db_info,
-			   const t_upsugo_command * const a_command_line,
-			   const FILE * const a_stream,
-			   const t_upsact_cmd * const a_cmd)
+static void f_pathprepend( ACTION_PARAMS)
 {
   char *delimiter;
   
@@ -2893,11 +2705,7 @@ static void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_pathremove( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd)
+static void f_pathremove( ACTION_PARAMS)
 {
   char *delimiter;
   
@@ -2940,11 +2748,7 @@ static void f_pathremove( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_pathset( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd)
+static void f_pathset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("pathSet");
 
@@ -2962,6 +2766,90 @@ static void f_pathset( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1]) < 0) {
+	FPRINTF_ERROR();
+      }
+      break;
+    default:
+      upserr_vplace();
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
+    }
+  }
+}
+
+#define g_SHPARAM "$@"
+#define g_CSHPARAM "\!*"
+#define g_ACTPARAM "%s"
+
+static void f_addalias( ACTION_PARAMS)
+{
+  CHECK_NUM_PARAM("addAlias");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      sprintf(g_buff, "%s () { %s }\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
+      if (strstr(g_buff, g_ACTPARAM)) {
+	/* the string is already in there, add the parameter string */
+	if (fprintf((FILE *)a_stream, g_buff, g_SHPARAM) < 0) {
+	  FPRINTF_ERROR();
+	}
+      } else {
+	/* the string is not there */
+	if (fprintf((FILE *)a_stream, "%s", g_buff) < 0) {
+	  FPRINTF_ERROR();
+	}
+      }
+      break;
+    case e_CSHELL:
+      sprintf(g_buff, "alias %s \"%s\"\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
+      if (strstr(g_buff, g_ACTPARAM)) {
+	/* the string is already in there, add the parameter string */
+	if (fprintf((FILE *)a_stream, g_buff, g_CSHPARAM) < 0) {
+	  FPRINTF_ERROR();
+	}
+      } else {
+	/* the string is not there */
+	if (fprintf((FILE *)a_stream, "%s", g_buff) < 0) {
+	  FPRINTF_ERROR();
+	}
+      }
+      break;
+    default:
+      upserr_vplace();
+      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
+    }
+  }
+}
+
+static void f_unalias( ACTION_PARAMS)
+{
+  CHECK_NUM_PARAM("unAlias");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+  
+    switch ( a_command_line->ugo_shell ) {
+    case e_BOURNE:
+      if (fprintf((FILE *)a_stream, "unset %s\n\n", a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
+      }
+      break;
+    case e_CSHELL:
+      if (fprintf((FILE *)a_stream, "unalias %s\n#\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -3129,11 +3017,7 @@ static int csh_output_last_part_req(const FILE * const a_stream,
   return(status);
 }
 
-static void f_sourcecompilereq( const t_upstyp_matched_instance * const a_inst,
-				const t_upstyp_db * const a_db_info,
-				const t_upsugo_command * const a_command_line,
-				const FILE * const a_stream,
-				const t_upsact_cmd * const a_cmd)
+static void f_sourcecompilereq( ACTION_PARAMS)
 {
   /* skip this whole action if we are being called while compiling */
   if (! g_COMPILE_FLAG) {
@@ -3183,11 +3067,7 @@ static void f_sourcecompilereq( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_sourcecompileopt( const t_upstyp_matched_instance * const a_inst,
-				const t_upstyp_db * const a_db_info,
-				const t_upsugo_command * const a_command_line,
-				const FILE * const a_stream,
-				const t_upsact_cmd * const a_cmd)
+static void f_sourcecompileopt( ACTION_PARAMS)
 {
   /* skip this whole action if we are being called while compiling */
   if (! g_COMPILE_FLAG) {
@@ -3234,11 +3114,7 @@ static void f_sourcecompileopt( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd)
+static void f_sourcerequired( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
   int no_ups_env_flag = DO_UPS_ENV;
@@ -3295,11 +3171,7 @@ static void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd)
+static void f_sourceoptional( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
   int no_ups_env_flag = DO_UPS_ENV;
@@ -3350,11 +3222,7 @@ static void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd)
+static void f_sourcereqcheck( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
   int no_ups_env_flag = DO_UPS_ENV;
@@ -3411,11 +3279,7 @@ static void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
-			      const t_upstyp_db * const a_db_info,
-			      const t_upsugo_command * const a_command_line,
-			      const FILE * const a_stream,
-			      const t_upsact_cmd * const a_cmd)
+static void f_sourceoptcheck( ACTION_PARAMS)
 {
   int exit_flag = NO_EXIT;
   int no_ups_env_flag = DO_UPS_ENV;
@@ -3465,12 +3329,7 @@ static void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_writecompilescript(
-			       const t_upstyp_matched_instance * const a_inst,
-			       const t_upstyp_db * const a_db_info,
-			       const t_upsugo_command * const a_command_line,
-			       const FILE * const a_stream,
-			       const t_upsact_cmd * const a_cmd)
+static void f_writecompilescript(ACTION_PARAMS)
 {
   t_upstyp_matched_product mproduct = {NULL, NULL, NULL};
   t_upslst_item *cmd_list = NULL;
@@ -3591,11 +3450,7 @@ static void f_writecompilescript(
   }
 }
 
-static void f_setupenv( const t_upstyp_matched_instance * const a_inst,
-			const t_upstyp_db * const a_db_info,
-			const t_upsugo_command * const a_command_line,
-			const FILE * const a_stream,
-			const t_upsact_cmd * const a_cmd)
+static void f_setupenv( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("setupEnv");
 
@@ -3606,11 +3461,7 @@ static void f_setupenv( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_unsetupenv( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd)
+static void f_unsetupenv( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
   char *uprod_name;
@@ -3636,11 +3487,7 @@ static void f_unsetupenv( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_proddir( const t_upstyp_matched_instance * const a_inst,
-		       const t_upstyp_db * const a_db_info,
-		       const t_upsugo_command * const a_command_line,
-		       const FILE * const a_stream,
-		       const t_upsact_cmd * const a_cmd)
+static void f_proddir( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
   char *tmp_prod_dir = NULL;
@@ -3677,11 +3524,7 @@ static void f_proddir( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_unproddir( const t_upstyp_matched_instance * const a_inst,
-			 const t_upstyp_db * const a_db_info,
-			 const t_upsugo_command * const a_command_line,
-			 const FILE * const a_stream,
-			 const t_upsact_cmd * const a_cmd)
+static void f_unproddir( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
   char *uprod_name;
@@ -3707,11 +3550,7 @@ static void f_unproddir( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
-static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
-			  const t_upstyp_db * const a_db_info,
-			  const t_upsugo_command * const a_command_line,
-			  const FILE * const a_stream,
-			  const t_upsact_cmd * const a_cmd)
+static void f_dodefaults( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
   char *uprod_name;
