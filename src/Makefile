@@ -35,12 +35,13 @@ CFLAGScia = $(INCDIRS)
 #
 #
 OBJECTS = ups_error.o ups_list.o ups_memory.o ups_utils.o ups_types.o \
-	  ups_files.o ups_ugo.o ups_match.o ups_action.o
+	  ups_files.o ups_ugo.o ups_match.o ups_action.o ups_keys.o
 
 COMMAND_OBJECTS = ups_c_list.o
 
 CIAOBJECTS = ups_error.a  ups_list.a ups_memory.o ups_utils.a ups_types.a \
-	     ups_files.a ups_ugo.a ups_match.a ups_c_list.a ups_action.a
+	     ups_files.a ups_ugo.a ups_match.a ups_c_list.a ups_action.a \
+             ups_keys.a
 
 LDFLAGS = $(LLIBS)
 
@@ -151,6 +152,10 @@ ups_files.o:	$(ERUPT_DIR)/inc/ups_types.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_memory.h
 ups_files.o:	$(ERUPT_DIR)/inc/ups_error.h
+ups_keys.o:     ups_keys.c
+ups_keys.o:     $(ERUPT_DIR)/inc/ups_keys.h
+ups_keys.o:     $(ERUPT_DIR)/inc/ups_types.h
+ups_keys.o:     $(ERUPT_DIR)/inc/ups_memory.h
 ups_list.o:	ups_list.c
 ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 ups_list.o:	$(ERUPT_DIR)/inc/ups_memory.h
