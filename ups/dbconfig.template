@@ -4,7 +4,7 @@ FILE = DBCONFIG
 AUTHORIZED_NODES = *
 
 # all product roots are under /usr/products:
-PROD_DIR_PREFIX = /usr/products
+PROD_DIR_PREFIX = /fnal/ups
 
 # keep statistics about the following products:
 #   (uncomment to get stats!)
@@ -12,19 +12,20 @@ PROD_DIR_PREFIX = /usr/products
 
 #
 # manpages, info files, get copied here:
-MAN_TARGET_DIR = /usr/products/man
-CATMAN_TARGET_DIR = /usr/products/catman
-INFO_TARGET_DIR = /usr/products/Info
+MAN_TARGET_DIR = /fnal/ups/man
+CATMAN_TARGET_DIR = /fnal/ups/catman
+INFO_TARGET_DIR = /fnal/ups/Info
 
 #
 #  automatic html and news processing not yet supported
-HTML_TARGET_DIR = /dev/null
-NEWS_TARGET_DIR = /dev/null
+#  HTML_TARGET_DIR = /dev/null
+#  NEWS_TARGET_DIR = /dev/null
 
 # this db contains the ups product; 
 #   copy the setups.[c]sh and cached files to this directory:
-SETUPS_DIR = /usr/local/etc
+SETUPS_DIR = /fnal/ups/etc
 
 # this db contains the upd product; 
 #   look for the upd configuration and user callouts here:
-UPD_USERCODE_DIR = /usr/products/ups_database/.updfiles
+UPD_USERCODE_DIR = /fnal/ups/db/.updfiles
+

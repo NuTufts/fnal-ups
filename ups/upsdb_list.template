@@ -24,9 +24,16 @@
 # Tilde (~) expansion is supported as the
 # home directory of a user name.
 #
-${Node}/products/ups_database
-/usr/products/ups_database 
-/afs/fnal/ups/db 
+${Node}/products/db
+/fnal/ups/db
+~products/db
+
+#
+# Uncomment the following IF you have AFS installed
+# AND you want products from AFS space
+#/afs/fnal/ups/db 
+
+
 #  Additional documentation:
 #
 # Example of a database relative to a specific user's $HOME
