@@ -113,13 +113,13 @@ static void upstst_trans_dump (const t_upslst_item * const mp,
 t_upslst_item 			*prod_ptr;		/* product ptr */
 t_upstyp_matched_product 	*prod;			/* product match */
 static char 			*tostring;
-/* I used lp since I knew the account atleast existed on all systems 
+/* I used lp since I knew the account at least existed on all systems 
    but location may be a problem.  root I guess could be used but that
    would effectively return nothing to tell if it really worked 
    your call marge...                                                   */
 static char 			*string = 
 	 "Name         = ${UPS_PROD_NAME}\
-	\nTilde        = ~root/dir/filename\
+	\nTilde        = ~lp/dir/filename\
 	\nVersion      = ${UPS_PROD_VERSION}\
 	\nFlavor       = ${UPS_PROD_FLAVOR}\
 	\nQualifiers   = ${UPS_PROD_QUALIFIERS}\
