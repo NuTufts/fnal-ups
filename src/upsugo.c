@@ -1212,9 +1212,8 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      char ** argv;
      t_upslst_item *hold = 0;
      /* setup_prod = (char *) malloc((size_t)(strlen(product) +7));*/
-     if((setup_env = (char *)upsugo_getenv(product)) == 0)
-     { return (uc);
-     } else {
+     if((setup_env = (char *)upsugo_getenv(product)) != 0)
+     {
 /* I'm going to count the number of spaces in the environment variable
 ** there cannot be more arguments than spaces...
 */
@@ -1239,15 +1238,15 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
                   for( ; (*waddr == ' ') ; waddr++ ) ;
                 }
            }
-     hold=ugo_commands;
-     ugo_commands=0;
-     verbose=UPS_VERBOSE;
-     uc=upsugo_next(argc,argv,validopts);
-     (void) upslst_free(ugo_commands,' '); /* do NOT delete data */
-     ugo_commands=hold;
-     UPS_VERBOSE=verbose;
-     return(uc);
+       hold=ugo_commands;
+       ugo_commands=0;
+       verbose=UPS_VERBOSE;
+       uc=upsugo_next(argc,argv,validopts);
+       (void) upslst_free(ugo_commands,' '); /* do NOT delete data */
+       ugo_commands=hold;
+       UPS_VERBOSE=verbose;
      }
+     return(uc);
 }
 
 /* ==========================================================================
@@ -1419,6 +1418,6 @@ t_upsugo_command *upsugo_next(const int old_argc,
    UPS_VERBOSE=luc->ugo_v;
 /* don't want to change now but I don't think this is right??? */
    upsugo_liststart(luc);      /* move all lists to first element */
-   return (t_upsugo_command *)ugo_commands->data; 
    }
+   return (t_upsugo_command *)ugo_commands->data; 
 }
