@@ -122,29 +122,55 @@ autokits: $(UPS_STYLE)_autokits
 #
 #---------------------------------------------------------------------------
 # Standard Product Distribution/Declaration Targets
-#    $Id$
+#   x$Id$
 #---------------------------------------------------------------------------
-#
-# only new UPS style stuff is now supported
+
+#=================================================================
+# this is the usual target for manually rebuilding the software if it's just
+# been checked out of the repository.  We declare it, set it up, and 
+# build and regression test it.  Note that the make test will indirectly
+# make clean (see above).
+# 
+build:
+	@echo "\
+	UPS_SHELL=sh; export UPS_SHELL; . \`ups setup ups\` ;\
+	$(SETUP_BUILD)					;\
+	echo make all; make all " | /bin/sh
+
+build_n_test:
+	@echo "\
+	UPS_SHELL=sh; export UPS_SHELL; . \`ups setup ups\` ;\
+	$(SETUP_BUILD)					;\
+	echo make $(MAKEFLAGS) all; make $(MAKEFLAGS) all 			;\
+	$(SETUP_PLAIN)					;\
+	echo make $(MAKEFLAGS) test; make $(MAKEFLAGS) test " | /bin/sh
+
+
+regression: 
+	@echo "\
+	UPS_SHELL=sh; export UPS_SHELL; . \`ups setup ups\` ;\
+	$(SETUP_PLAIN)					;\
+	echo make $(MAKEFLAGS) clean test; make $(MAKEFLAGS) clean test " | /bin/sh
+
+build_or_all:
+	@if [  x$$$(PRODUCT_DIR) != x$(DIR) ] ; then  \
+	    (echo make $(MAKEFLAGS) build; make $(MAKEFLAGS) build); \
+	else \
+	    (echo make $(MAKEFLAGS) all; make $(MAKEFLAGS) all) ;\
+	fi
 
 # distribution -- currently makes tarfiles
 #
 # The invocation looks weird here; we need to make a tarfile from a (long)
-# file list on stdin, but something obvious like:
-#     $(LISTALL) | xargs -n25 tar cvf - 
-# doesn't work on all the platforms; tar thinks its done when it hits
-# the end of the first one, and "tar rvf" doesn't work right on OSF1, so:
+# file list on stdin, So mostly we use "pax -w", but on Linux there 
+# isn't one, so we use GNU Tar and "tar -c -T - -f -".
 # * make an empty file .header
 # * make an initial tarfile by adding .header
-# * then go through $(LISTALL) output and add files to the tarfile a few dozen
-# 	at a time with "xargs tar uf..."
 # * Finally echo the filename and do a table of contents to show it worked
 #
 distribution: clean .manifest.$(PROD)
 	@echo "creating $(DISTRIBUTIONFILE)..."
-	@: > .header
-	@tar cf $(DISTRIBUTIONFILE) .header
-	@$(LISTALL) | xargs -n25 tar uf $(DISTRIBUTIONFILE)
+	@$(LISTALL) | (pax -w || tar -c -T - -f -) > $(DISTRIBUTIONFILE)
 	@echo $(DISTRIBUTIONFILE):
 	@tar tvf $(DISTRIBUTIONFILE)
 
@@ -159,14 +185,14 @@ unkits: delproduct
 local: clean .manifest.$(PROD)
 	test -d $(LOCAL) || mkdir -p $(LOCAL)
 	$(LISTALL) | cpio -dumpv $(LOCAL)
-	cd $(LOCAL); make check_manifest
+	cd $(LOCAL); make $(MAKEFLAGS) check_manifest
 
 autolocal: distribution
 	@/bin/echo "Press enter to update database? \c"
 	@read line
 	test -d $(LOCAL) || mkdir -p $(LOCAL)
 	@$(LISTALL) | cpio -dumpv $(LOCAL)
-	cd $(LOCAL); make check_manifest
+	cd $(LOCAL); make $(MAKEFLAGS) check_manifest
 
 install: local
 
@@ -192,7 +218,8 @@ new_autokits: distribution
 #	one without.  Easiest with recursive calls...
 #
 new_declare: dproducts_is_set new_declare_one
-	@make "QUALS=build:$(QUALS)" new_declare_one
+	@make $(MAKEFLAGS) "QUALS=build:$(QUALS)" new_declare_one
+	@make $(MAKEFLAGS) new_declare_one
 
 new_declare_one:
 	@($(NEW_UPS_EXIST) && $(NEW_UPS_UNDECLARE)) || true
@@ -200,7 +227,8 @@ new_declare_one:
 	@$(NEW_UPS_LIST)
 
 new_undeclare: dproducts_is_set  new_undeclare_one
-	@make "QUALS=build:$(QUALS)" new_undeclare_one
+	@make $(MAKEFLAGS) "QUALS=build:$(QUALS)" new_undeclare_one
+	@make $(MAKEFLAGS) new_undeclare_one
 
 new_undeclare_one:
 	@$(NEW_UPS_UNDECLARE)
@@ -209,24 +237,15 @@ new_delproduct:
 	@$(NEW_DELPRODUCT)
 
 #=================================================================
-# this is the usual target for manually rebuilding the software if it's just
-# been checked out of the repository.  We declare it, set it up, and 
-# build and regression test it.  Note that the make test will indirectly
-# make clean (see above).
+# Setup variables for setting up the product variously
 # 
 SETUP_BUILD= echo $(SETUP_BUILD1); $(SETUP_BUILD1)
-SETUP_BUILD1=setup -P -q ?build:$(QUALS) -f $(FLAVOR) $(PROD) 	\
+SETUP_BUILD1=setup -P -q \"?build:\"$(QUALS) -f $(FLAVOR) $(PROD) 	\
 		-r $(DIR) -M $(TABLE_FILE_DIR) -m $(TABLE_FILE)	
 
 SETUP_PLAIN= echo $(SETUP_PLAIN1); $(SETUP_PLAIN1)
-SETUP_PLAIN1=setup -P -f $(FLAVOR) -q $(QUALS) $(PROD) 		\
+SETUP_PLAIN1=setup -P -f $(FLAVOR) -q \"$(QUALS)\" $(PROD) 		\
 		-r $(DIR) -M $(TABLE_FILE_DIR) -m $(TABLE_FILE)
-build_n_test:
-	@UPS_SHELL=sh; export UPS_SHELL; . `ups setup ups` ;\
-	$(SETUP_BUILD)					;\
-	echo make all; make all 			;\
-	$(SETUP_PLAIN)					;\
-	echo make test; make test
 
 #
 #---------------------------------------------------------------------------
@@ -276,7 +295,8 @@ check_new_vars:
 #
 MANIFEST = $(LISTALL) | 				\
 		grep -v .manifest |			\
-		xargs -n25 sum -r | 				\
+		$(QUOTE) | 				\
+		xargs -n25 sum -r | 			\
 		sed -e 's/[ 	].*[ 	]/	/' | 	\
 		sort +1
 
@@ -326,20 +346,20 @@ LISTALL =  ( \
     test -z "$(ADDCMD)" || sh -c "$(ADDCMD)" \
     )
 
+#
+# xargs gets it wrong unless you escape the whitespace
+#
+QUOTE = sed -e 's/[ 	]/\\&/g'
+
 #---------------------------------------------------------------------------
 # Ugly Definitions for ups
 #---------------------------------------------------------------------------
 #
 
 # Default names for things
-DEFAULT_DISTRIBFILE="$(DIR)/../$(PROD)$(OS)$(QUALS)$(VERS).tar"
-DEFAULT_FLAVOR=$(OS)
+DEFAULT_DISTRIBFILE="$(DIR)/../$(PROD)$(FLAVOR)$(QUALS)$(VERS).tar"
+DEFAULT_FLAVOR=`ups flavor -2`
 DEFAULT_NULL_FLAVOR=NULL
-
-# note the plus sign in DEFAULT_CUST is really part of the string, not
-# appending to some other value or anything.
-DEFAULT_CUST=+`((uname -s | grep AIX >/dev/null && uname -v)||uname -r) | \
-		sed -e 's|\..*||'`
 
 # We try to undo common automount name munging here,
 # and correct afs paths to read-only volume paths, etc.   This way we get a
@@ -358,13 +378,6 @@ build_prefix: proddir_is_set $(PREFIX)
 
 $(PREFIX):
 	ln -s $$$(PRODUCT_DIR) $(PREFIX)
-
-
-# In old ups, we need "-f IRIX+6+qual1+qual2"
-# in new ups, we need "-f IRIX+6 -q qual1+qual2"
-# if no qualifiers, we want *nothing*
-#
-QUALSEP=`echo test -z '$(QUALS)'||echo ' -q '`# 
 
 # These are all basic ups commands with loads of options.
 
@@ -394,6 +407,7 @@ NEW_UPS_UNDECLARE=\
 
 NEW_UPS_DECLARE= \
 	echo $(UPS_DIR)/bin/ups declare \
+		`test -z '$(CHAIN)'  || echo -g $(CHAIN)` \
 		-M $(TABLE_FILE_DIR) \
 		-m $(TABLE_FILE) \
 		-z $(DPRODUCTS) \
@@ -403,6 +417,7 @@ NEW_UPS_DECLARE= \
 		-q $(QUALS) \
 		$(PROD) $(VERS);\
 	$(UPS_DIR)/bin/ups declare \
+		`test -z '$(CHAIN)'  || echo -g $(CHAIN)` \
 		-M $(TABLE_FILE_DIR) \
 		-m $(TABLE_FILE) \
 		-z $(DPRODUCTS) \
@@ -430,6 +445,7 @@ NEW_ADDPRODUCT = \
 
 NEW_ADDPRODUCT_1 = \
 	upd addproduct \
+		`test -z '$(CHAIN)'  || echo -g $(CHAIN)` \
 	        -h $(ADDPRODUCT_HOST) \
 		-T $(DISTRIBUTIONFILE) \
 		-M $(TABLE_FILE_DIR) \
@@ -461,21 +477,21 @@ FORCE:
 # software tends to stuff unformatted man pages in $PREFIX/man...
 #
 $(UPS_SUBDIR)/toman:
-	mkdir $(UPS_SUBDIR)/toman
-	mkdir $(UPS_SUBDIR)/toman/man
-	mkdir $(UPS_SUBDIR)/toman/catman
+	- mkdir $(UPS_SUBDIR)/toman
+	- mkdir $(UPS_SUBDIR)/toman/man
+	- mkdir $(UPS_SUBDIR)/toman/catman
 	cd man                                                          ;\
 	for d in man?                                                   ;\
 	do                                                               \
-	    (cd $$d                                                 	;\
-	    for f in *                                              	;\
-	    do                                                       	 \
-		echo $$d/$$f                                    	;\
+	    (cd $$d                                                     ;\
+	    for f in * .??*                                             ;\
+	    do                                                           \
+		test -r $$f || continue                                 ;\
+		echo $$d/$$f                                            ;\
 		cp $$f ../../$(UPS_SUBDIR)/toman/man                    ;\
 		nroff -man $$f > ../../$(UPS_SUBDIR)/toman/catman/$$f   ;\
-	    done)                                                   	;\
+	    done)                                                       ;\
 	done
-
 
 #
 # targets to install html manpages,etc.  in afs docs/products area
