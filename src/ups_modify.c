@@ -90,10 +90,10 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
 
   /* make a list of files to be edited */
 
-  make_file_list();
+  (void) make_file_list();
 
   if ( g_file_count <= 0 ) {
-    fprintf( stdout, "No file matched argument.\n" );
+    (void) fprintf( stdout, "No file matched argument.\n" );
     return g_mp_list;
   }
 
@@ -102,7 +102,7 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   do {
     file_no = choose_file();
     if ( file_no >= 0 )
-      edit_file( g_file_list[ file_no ] );
+      (void) edit_file( g_file_list[ file_no ] );
     else if ( file_no == QUIT ) 
       break;
   } while ( g_file_count > 1 );
@@ -132,19 +132,19 @@ int choose_file( void )
 
   /* more than one file */
 
-  fprintf( stdout, "\n" );
+  (void) fprintf( stdout, "\n" );
   for ( i=0; i<g_file_count; i++ )
-    fprintf( stdout, "[%d] %s\n", i, g_file_list[i] );
+    (void) fprintf( stdout, "[%d] %s\n", i, g_file_list[i] );
 
   for (;;) {
-    fprintf( stdout,"Choose file to edit [%d-%d] or 'q' to quit: ", 
+    (void) fprintf( stdout,"Choose file to edit [%d-%d] or 'q' to quit: ", 
 	     0, g_file_count - 1 );
-    fgets( str, 79, stdin );
+    (void) fgets( str, 79, stdin );
 
     if ( strchr( str, 'q' ) || strchr( str, 'Q' ) )
       return QUIT;
 
-    sscanf( str, "%d", &num );
+    (void) sscanf( str, "%d", &num );
 
     if ( num >= 0 && num < g_file_count )
       return num;
@@ -188,14 +188,14 @@ int make_file_list( void )
     /* we were passed an existing file, that will be the one */
 
     g_file_list[ g_file_count ] = malloc( strlen( file_name ) + 1 );
-    strcpy( g_file_list[ g_file_count ], file_name );
+    (void) strcpy( g_file_list[ g_file_count ], file_name );
     g_file_count++;
 
     /* if file is not in cache, warn user */
 
     if ( !upsfil_is_in_cache( file_name  ) ) { 
-      fprintf( stdout, "WARNING - File specified is not in instance specified\n" );
-      fprintf( stdout, "can only check file format, not validity of instance.\n" );
+      (void) fprintf( stdout, "WARNING - File specified is not in instance specified\n" );
+      (void) fprintf( stdout, "can only check file format, not validity of instance.\n" );
     }
   }
   else {
@@ -209,7 +209,7 @@ int make_file_list( void )
 
       if ( !file_name || strstr( (char *)(*p_fc), file_name ) ) { 
 	g_file_list[ g_file_count ] = malloc( strlen( (char *)(*p_fc) ) + 1 );
-	strcpy( g_file_list[ g_file_count ], (char *)(*p_fc) );
+	(void) strcpy( g_file_list[ g_file_count ], (char *)(*p_fc) );
 	g_file_count++;
       }
     }
@@ -249,13 +249,13 @@ int edit_file( char * const file_name )
 
   /* verify file, before modifications */
 
-  verify_file( file_name );
+  (void) verify_file( file_name );
 
-  fprintf( stdout, "Pre modification verification pass complete.\n" );
+  (void) fprintf( stdout, "Pre modification verification pass complete.\n" );
 
   if ( (file_org = tmpnam(0)) != 0 ) {
 
-    sprintf( buf,"cp %s %s", file_name, file_org );
+    (void) sprintf( buf,"cp %s %s", file_name, file_org );
 
     /* make a backup */
 
@@ -268,7 +268,7 @@ int edit_file( char * const file_name )
 
       /* edit file */
       
-      sprintf( buf, "%s %s", s_editor, file_name );
+      (void) sprintf( buf, "%s %s", s_editor, file_name );
 
       if ( !system( buf ) ) {
  
@@ -276,7 +276,7 @@ int edit_file( char * const file_name )
 
 	if ( (stat( file_name, &fstat ) == 0) && 
 	     (fstat.st_mtime == mtime) ) {
-	  fprintf( stdout, "No modifications, nothing to save.\n" );
+	  (void) fprintf( stdout, "No modifications, nothing to save.\n" );
 	  return 1;
 	}
 
@@ -284,24 +284,24 @@ int edit_file( char * const file_name )
 
 	/* verify file, after modifications */
 
-	verify_file( file_name );
+	(void) verify_file( file_name );
 	 
-	fprintf( stdout, "Post modification verification pass complete.\n" );
+	(void) fprintf( stdout, "Post modification verification pass complete.\n" );
 
-	fprintf( stdout, "Do you wish to save this modification [y/n] ? " );
+	(void) fprintf( stdout, "Do you wish to save this modification [y/n] ? " );
 	(void)fgets( input, 3, stdin );
 
 	if ( !upsutl_strincmp( input, "y", 1 ) ) { 
 
 	  /* save modifications, make a date stamped backup file */
 
-	  sprintf( buf, "cp %s %s.%s",
+	  (void) sprintf( buf, "cp %s %s.%s",
 		   file_org,
 		   file_name,
 		   bckup_ext);
 
 	  if ( system( buf ) ) { 
-	    fprintf(stdout,"Cannot save dated file copy of %s.\n",
+	    (void) fprintf(stdout,"Cannot save dated file copy of %s.\n",
 		    file_name);
 	  }
 	} 
@@ -309,10 +309,10 @@ int edit_file( char * const file_name )
 	  
 	  /* don't save modifications, restore file */
 
-	  sprintf( buf, "cp %s %s", file_org, file_name );
+	  (void) sprintf( buf, "cp %s %s", file_org, file_name );
 
 	  if ( system( buf ) ) { 
-	    fprintf(stdout,"Cannot restore original file %s copy in %s.\n",
+	    (void) fprintf(stdout,"Cannot restore original file %s copy in %s.\n",
 		    file_name, file_org);
 	    return -1;
 	  }
@@ -322,7 +322,7 @@ int edit_file( char * const file_name )
 
 	/* starting editor failed */
 
-	fprintf( stdout, "Unable to edit file, check $EDITOR.\n" );
+	(void) fprintf( stdout, "Unable to edit file, check $EDITOR.\n" );
 	return -1;
       }
     } 
@@ -330,7 +330,7 @@ int edit_file( char * const file_name )
 
       /* making backup failed */
 
-      fprintf(stdout,"Unable to create temporary work space.\n");
+      (void) fprintf(stdout,"Unable to create temporary work space.\n");
       return -1;
     }
   } 
@@ -338,7 +338,7 @@ int edit_file( char * const file_name )
 
     /* creating tmp file failed */
 
-    fprintf(stdout,"Unable to generate temporary file name(tmpnam).\n");
+    (void) fprintf(stdout,"Unable to generate temporary file name(tmpnam).\n");
     return -1;
  }
 
@@ -390,7 +390,7 @@ int verify_file( char * const file_name )
   upserr_output();
   upserr_clear();
 
-  upsutl_free_matched_product_list( &l_mp );
+  (void) upsutl_free_matched_product_list( &l_mp );
 
   return ( UPS_ERROR == UPS_SUCCESS );
 }
