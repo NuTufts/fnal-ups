@@ -112,11 +112,12 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
   t_upslst_item *all_products = NULL, *all_versions = NULL;
   t_upslst_item *all_chains = NULL;
   t_upslst_item *tmp_products = NULL, *tmp_versions = NULL;
+  t_upslst_item *tmp_chain_item = NULL, *bogus_chain_item = NULL;
   t_upslst_item *mproduct_list = NULL;
   t_ups_match_product *mproduct = NULL;
 
   char *prod_name = NULL, *prod_dir = NULL;
-  char *new_string = NULL;
+  char *new_string = NULL, *tmp_chain = NULL;
   char do_delete = 'd';
   int need_unique = 0;
 
@@ -144,7 +145,7 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
       /* If all versions were specified get them all */
       if (a_command_line->ugo_version && 
 	  (! strcmp(a_command_line->ugo_version, ANY_MATCH))) {
-	prod_dir = get_prod_dir(a_db, prod_name);
+	prod_dir = upsutl_get_prod_dir(a_db, prod_name);
 
 	/* get 2 lists, one with all the chains and one with all the
 	   versions (minus any suffix (e.g. - .chain and .version) */
@@ -169,17 +170,18 @@ t_upslst_item *upsc_list_core(t_ups_command * const a_command_line,
 	     we have already gotten this list, do this, else get the list */
 	  if (! all_chains) {
 	    /* get the list */
-	    prod_dir = get_prod_dir(a_db, prod_name);
+	    prod_dir = upsutl_get_prod_dir(a_db, prod_name);
 	    all_chains = upsutl_get_files(prod_dir, (char *)CHAIN_SUFFIX);
 	    upsmem_free(prod_dir);
 	  }
 	  bogus_chain_item = tmp_chain_item;   /* save for later delete */
 
 	  /* add chain list in place */
-	  tmp_chain_item = upslst_????(tmp_chain_item, all_chains);
+	  tmp_chain_item = upslst_insert_list(tmp_chain_item, all_chains);
 
 	  /* remove the "*" element from the chain list */
-	  bogus_chain_item = upslst_delete(bogus_chain_item, 'd')
+	  bogus_chain_item = upslst_delete(tmp_chain_item,
+					   bogus_chain_item->data, 'd');
 	}
       }
 
