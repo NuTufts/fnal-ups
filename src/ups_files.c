@@ -57,6 +57,7 @@ static int            write_version_file( void );
 static int            write_chain_file( void );
 static int            write_table_file( void );
 static int            write_action( t_ups_action * const act );
+t_upslst_item         *find_group( t_upslst_item * const list_ptr, const char copt );
 
 /* Line parsing */
 static int            get_key( void );
@@ -68,6 +69,7 @@ static int            put_key( const char * const key, const char * const val );
 /* Utils */
 static int            trim_qualifiers( char * const str );
 static int            cfilei( void );
+t_upslst_item         *copy_action_list( t_upslst_item *list_ptr );
 
 /* Print stuff */
 static void           print_instance( t_ups_instance * const inst_ptr );
@@ -199,8 +201,6 @@ int upsfil_write_file( t_ups_product * const prod_ptr,
     return UPS_UNKNOWN_FILETYPE;
   }
     
-  /* make groups !!! */
-  
   /* write instances */
 
   switch ( g_ifile ) {
@@ -325,15 +325,53 @@ int write_table_file( void )
   t_ups_instance *inst_ptr = 0;
   t_ups_action *act_ptr = 0;
 
+  t_upslst_item *l_copy, *l_ptr;
+
   /* write file descriptor */
   
   put_key( "PRODUCT", g_pd->product );
   put_key( "VERSION", g_pd->version );
   put_key( "UPS_DB_VERSION", g_pd->ups_db_version );
+  put_key( 0, "" );
+
+  /* write groups */
+
+  l_copy = upslst_copy( g_pd->instance_list );
+  find_group( l_copy, 's' );
+  while( (l_ptr = find_group( 0, ' ' )) ) {
+    put_key( 0, "GROUP:");
+    g_imargin += 2;
+    for ( l_ptr = upslst_first( l_ptr ); l_ptr; l_ptr = l_ptr->next ) {
+      inst_ptr = (t_ups_instance *)l_ptr->data;
+      put_key( "FLAVOR", inst_ptr->flavor );
+    
+      /* qualifiers are special */
+  
+      if ( inst_ptr->qualifiers )
+	put_key( "QUALIFIERS", inst_ptr->qualifiers );
+      else 
+        put_key( "QUALIFIERS", "\"\"" );
+      put_key( 0, "" );
+      
+    }
+    g_imargin -= 2;
+    put_key( 0, "COMMON:" );    
+    g_imargin += 2;
+    l_act = upslst_first( inst_ptr->action_list );
+    for( ; l_act; l_act = l_act->next ) {
+      act_ptr = (t_ups_action *)l_act->data;
+      write_action( act_ptr );
+    }
+    g_imargin -= 2;      
+    put_key( 0, "" );
+    put_key( 0, "END:" );
+    put_key( 0, "" );
+  }
+  l_copy = find_group( 0, 'e' );
 
   /* write instances */
   
-  l_inst = upslst_first( g_pd->instance_list );
+  l_inst = upslst_first( l_copy );
   for( ; l_inst; l_inst = l_inst->next ) {
     inst_ptr = (t_ups_instance *)l_inst->data;
     if ( !inst_ptr || !inst_ptr->flavor ) {
@@ -341,7 +379,6 @@ int write_table_file( void )
       return 0;
     }
 
-    put_key( 0, "" );
     put_key( "FLAVOR", inst_ptr->flavor );
     
     /* qualifiers are special */
@@ -359,6 +396,7 @@ int write_table_file( void )
       write_action( act_ptr );
     }
     g_imargin -= 2;
+    put_key( 0, "" );    
   }  
 
   return 1;
@@ -558,13 +596,14 @@ t_ups_instance *read_instance( void )
     
   while ( next_key() != e_key_eof ) {
 
+    /* the world are full of special cases */
+
+    if ( g_ikey == e_key_action )
+      inst_ptr->action_list = read_actions();
+      
     if ( is_stop_key() ) break;
     
     switch( g_ikey ) {
-
-    case e_key_action:
-      inst_ptr->action_list = read_actions();
-      break;
 
     case e_key_qualifiers:
       trim_qualifiers( g_val );
@@ -727,12 +766,14 @@ t_upslst_item *read_group( void )
       inst_ptr->action_list = l_act_ptr;
       l_ptr = l_ptr->next;
 
-      /* make a reference for all other instances, */
-      /* not to the list but to list data elements */
+      /* make a reference for all other instances,  */
+      /* not to the list but to list data elements. */
+      /* can not call upslist_copy directly, since  */
+      /* the command list would then be shared.     */
       
       for ( ; l_ptr; l_ptr = l_ptr->next ) {
-	inst_ptr = (t_ups_instance *)l_ptr->data;
-	inst_ptr->action_list = upslst_copy( l_act_ptr );
+	inst_ptr = (t_ups_instance *)l_ptr->data;	
+	inst_ptr->action_list = copy_action_list( l_act_ptr );
       }
     }
 
@@ -814,7 +855,7 @@ int get_key( void )
   
     while( cp && *cp && *cp != '=' ) { cp++; }
     cp++;
-    while( cp && *cp && isspace( *cp ) ) { cp++; }
+    while( cp && *cp && (isspace( *cp ) || *cp == '"') ) { cp++; }
     count = 0;
     while( cp && *cp && *cp != '\n' ) {
       g_val[count] = *cp;
@@ -891,29 +932,13 @@ int is_stop_key( void )
   return 0;
 }
 
-int trim_qualifiers( char * const str )
-{
-  int i, len;
-  
-  if ( !str || strlen( str ) <= 0 ) return 0;
-
-  len = (int)strlen( str );
-  for ( i=0; i<len; i++ )
-    str[i] = (char)tolower( (int)str[i] );
-  
-  upsutl_str_remove( str, CHAR_REMOVE );  
-  upsutl_str_sort( str, ',' );
-
-  return (int)strlen( str );
-}
-
 /*
  * Utils
  */
 
 int cfilei( void )
 {
-  /* strings of known file types ... we need a map */
+  /* strings of known file types */
   static char *s_ups_files[e_file_count] = {
     "VERSION",
     "TABLE",
@@ -930,13 +955,50 @@ int cfilei( void )
   /* for now, just a linear search */
 
   for( i=0; i<e_file_count; i++ ) {    
-    if ( !strcmp( g_pd->file, s_ups_files[i] ) ) {
+    if ( !upsutl_stricmp( g_pd->file, s_ups_files[i] ) ) {
       g_ifile = i;
       break;
     }
   }
 
   return g_ifile;
+}
+
+int trim_qualifiers( char * const str )
+{
+  int i, len;
+  
+  if ( !str || strlen( str ) <= 0 ) return 0;
+
+  len = (int)strlen( str );
+  for ( i=0; i<len; i++ )
+    str[i] = (char)tolower( (int)str[i] );
+  
+  upsutl_str_remove( str, CHAR_REMOVE );  
+  upsutl_str_sort( str, ',' );
+
+  return (int)strlen( str );
+}
+
+t_upslst_item *copy_action_list( t_upslst_item *list_ptr )
+{
+  t_upslst_item *l_ptr1 = upslst_first( list_ptr );
+  t_upslst_item *l_ptr2 = 0;
+
+  if( !list_ptr )
+    return 0;
+
+  for ( ; l_ptr1; l_ptr1 = l_ptr1->next ) {
+    t_ups_action *a_ptr1 = (t_ups_action *)l_ptr1->data;
+    t_ups_action *a_ptr2 = ups_new_action();
+    
+    upsmem_inc_refctr( a_ptr1->action );
+    a_ptr2->action = a_ptr1->action;
+    a_ptr2->command_list = upslst_copy( a_ptr1->command_list );
+    l_ptr2 = upslst_add( l_ptr2, a_ptr2 );
+  }
+
+  return upslst_first( l_ptr2 );
 }
 
 /*
@@ -1032,4 +1094,121 @@ void g_print_product( t_ups_product * const prod_ptr )
   }     
 }
 
+int action_cmp ( const void *d1, const void *d2 )
+{
+  t_ups_action *a1 = (t_ups_action *)d1;
+  t_ups_action *a2 = (t_ups_action *)d2;
 
+  return upsutl_stricmp( a1->action, a2->action );
+}
+
+int cmp_actions( t_upslst_item *l_ptr1, t_upslst_item *l_ptr2 )
+{
+  l_ptr1 = upslst_first( l_ptr1 );
+  l_ptr2 = upslst_first( l_ptr2 );
+  
+  if ( l_ptr1 == l_ptr2 )
+    return 0;
+  
+  if ( l_ptr1 == 0 || l_ptr2 == 0 )
+    return 1;
+
+  if ( upslst_count( l_ptr1 ) != upslst_count( l_ptr2 ) )
+    return 1;
+
+  /* sort actions, so it's easier to compare */
+  
+  l_ptr1 = upslst_sort0( l_ptr1, action_cmp );
+  l_ptr2 = upslst_sort0( l_ptr2, action_cmp );
+
+  for ( ; l_ptr1 && l_ptr2; l_ptr1 = l_ptr1->next, l_ptr2 = l_ptr2->next ) {
+    t_ups_action *a1 = (t_ups_action *)l_ptr1->data;
+    t_ups_action *a2 = (t_ups_action *)l_ptr2->data;
+    t_upslst_item *c1, *c2;
+
+    /* same action name ? */
+    
+    if ( upsutl_stricmp( a1->action, a2->action ) )
+      return 1;
+
+    /* compare list of commands */
+    
+    c1 = upslst_first( a1->command_list );
+    c2 = upslst_first( a2->command_list );
+    
+    if ( c1 == c2 )
+      continue;
+  
+    if ( c1 == 0 || c2 == 0 )      
+      return 1;
+
+    if ( upslst_count( c1 ) != upslst_count( c2 ) )
+      return 1;
+
+    for ( ; c1 && c2; c1 = c1->next, c2 = c2->next ) {
+      if ( strcmp( (char *)c1->data, (char *)c2->data ) )
+	return 1;    
+    }
+  }
+
+  /* if we came so far, they match */
+  
+  return 0;
+}
+
+t_upslst_item *find_group( t_upslst_item * const list_ptr, const char copt )
+{
+  t_upslst_item *l_grp = 0;
+  t_upslst_item *l_itm = 0;
+  t_ups_instance *inst = 0;
+  static t_upslst_item* l_orig = 0;
+
+  switch ( copt ) {
+    
+  case 's':
+    l_orig = list_ptr;
+    return 0;
+    
+  case 'e':
+    l_itm = upslst_first( l_orig );
+    l_orig = 0;
+    return l_itm;
+  }
+  
+  if ( !l_orig ) 
+    return 0;
+
+  /* find a group */
+
+  l_itm = l_orig;
+  while ( !l_grp && l_itm && l_itm->next ) {
+    inst = (t_ups_instance *)l_itm->data;
+    l_itm = l_itm->next;
+    
+    printf( "prope (%s, %s)\n", inst->flavor, inst->qualifiers );
+    while ( l_itm ) {
+      t_ups_instance *is = (t_ups_instance *)l_itm->data;
+      if ( !cmp_actions( inst->action_list, is->action_list ) ) {
+	printf( "adding (%s, %s)\n", is->flavor, is->qualifiers );
+	l_grp = upslst_add( l_grp, is );
+	l_itm = upslst_delete_safe( l_itm, is, ' ' );
+      }
+      else {
+	l_itm = l_itm->next;
+      }
+    }
+  }
+
+  /* if any group, insert first instance in group */
+  /* and remove it from original list.            */
+  
+  if ( l_grp ) {
+    l_grp = upslst_insert( l_grp, inst );
+    l_orig = upslst_delete( l_orig, inst, ' ' );
+  }
+
+  printf( "group count = %d\n", upslst_count( l_grp ) );
+  printf( "list count = %d\n", upslst_count( l_itm ) );
+
+  return l_grp;    
+}
