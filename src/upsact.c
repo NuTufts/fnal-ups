@@ -106,7 +106,11 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     t_upstyp_matched_product *mat_prod,
 			     const int level,
 			     const char * const act_name );
-t_upstyp_action *new_default_action( const char *act_name, const int iact );
+t_upstyp_action *new_default_action( t_upsact_item *const p_cur, 
+				     const char * const act_name, 
+				     const int iact );
+t_upslst_item *reverse_command_list( t_upsact_item *const p_cur,
+				     t_upslst_item *const cmd_list );
 int actname2enum( const char * const act_name );
 char *action2inst( const t_upsact_item *const p_cur );
 
@@ -242,10 +246,10 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
     if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].max_params) {            \
       /* remember arrays start at 0, so subtract one here */            \
       delimiter =                                                       \
-	(char *)&(a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);   \
+	(a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);            \
     } else {                                                            \
       /* use the default, nothing was entered */                        \
-      delimiter = &g_default_delimiter[0];                              \
+      delimiter = g_default_delimiter;                                  \
     }
 
 #define GET_ERR_MESSAGE(msg_ptr) \
@@ -263,7 +267,7 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
  * Definition of global variables.
  */
 
-static char g_default_delimiter[2] = ":";
+static char *g_default_delimiter = ":";
 
 /* 
  * Note: This array should in princip be in ups_main.c, but since
@@ -275,40 +279,40 @@ static char g_default_delimiter[2] = ":";
  *   0   : specify if that action has a default set of commands
  */
 t_cmd_info g_cmd_info[] = {
-  {e_current,       "current", 0, 0x00000001},
-  {e_development,   "development", 0, 0x00000000},
-  {e_new,           "new", 0, 0x00000000},
-  {e_old,           "old", 0, 0x00000000},
-  {e_test,          "test", 0, 0x00000000},
-  {e_chain,         "chain", 0, 0x00000000},
-  {e_uncurrent,     "uncurrent", 0, 0x00000001},
-  {e_undevelopment, "undevelopment", 0, 0x00000000},
-  {e_unnew,         "unnew", 0, 0x00000000},
-  {e_unold,         "unold", 0, 0x00000000},
-  {e_untest,        "untest", 0, 0x00000000},
-  {e_unchain,       "unchain", 0, 0x00000000},
-  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z", 0x00000001},
-  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z", 0x00000001},
-  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z", 0x00000000},
-  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
-  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z", 0x00000000},
-  {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z", 0x00000000},
-  {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z", 0x00000000},
-  {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000},
-  {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z", 0x00000000},
-  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z", 0x00000000},
-  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
-  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
-  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
-  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z", 0x00000000},
-  {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000},
-  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000},
-  {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000},
+  {e_current,       "current", 0, 0x00000001, e_invalid_action},
+  {e_development,   "development", 0, 0x00000000, e_invalid_action},
+  {e_new,           "new", 0, 0x00000000, e_invalid_action},
+  {e_old,           "old", 0, 0x00000000, e_invalid_action},
+  {e_test,          "test", 0, 0x00000000, e_invalid_action},
+  {e_chain,         "chain", 0, 0x00000000, e_invalid_action},
+  {e_uncurrent,     "uncurrent", 0, 0x00000001, e_invalid_action},
+  {e_undevelopment, "undevelopment", 0, 0x00000000, e_invalid_action},
+  {e_unnew,         "unnew", 0, 0x00000000, e_invalid_action},
+  {e_unold,         "unold", 0, 0x00000000, e_invalid_action},
+  {e_untest,        "untest", 0, 0x00000000, e_invalid_action},
+  {e_unchain,       "unchain", 0, 0x00000000, e_invalid_action},
+  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z", 0x00000001, e_invalid_action},
+  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z", 0x00000001, e_setup},
+  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z", 0x00000000, e_invalid_action},
+  {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z", 0x00000000, e_invalid_action},
+  {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z", 0x00000000, e_invalid_action},
+  {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z", 0x00000000, e_invalid_action},
+  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z", 0x00000000, e_invalid_action},
+  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z", 0x00000000, e_invalid_action},
+  {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000, e_invalid_action},
+  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000, e_invalid_action},
+  {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000, e_invalid_action},
   {e_help,        "help",
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000},
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,
-            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000}
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000, e_invalid_action}
 };
 
 enum {
@@ -353,36 +357,36 @@ enum {
  * by the action.
  */
 static t_cmd_map g_cmd_maps[] = {
-  { "setupoptional", e_setupoptional, NULL, 0, 0 },
-  { "setuprequired", e_setuprequired, NULL, 0, 0 },
-  { "unsetupoptional", e_unsetupoptional, NULL, 0, 0 },
-  { "unsetuprequired", e_unsetuprequired, NULL, 0, 0 },
-  { "envappend", e_envappend, f_envappend, 2, 3 },
-  { "envremove", e_envremove, f_envremove, 2, 3 },
-  { "envprepend", e_envprepend, f_envprepend, 2, 3 },
-  { "envset", e_envset, f_envset, 2, 2 },
-  { "envunset", e_envunset, f_envunset, 1, 1 },
-  { "pathappend", e_pathappend, f_pathappend, 2, 3 },
-  { "pathremove", e_pathremove, f_pathremove, 2, 3 },
-  { "pathprepend", e_pathprepend, f_pathprepend, 2, 3 },
-  { "pathset", e_pathset, f_pathset, 2, 2 },
-  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 1 },
-  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 1 },
-  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 1 },
-  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 1 },
-  { "exeaccess", e_exeaccess, f_exeaccess, 1, 1 },
-  { "execute", e_execute, f_execute, 1, 2 },
-  { "filetest", e_filetest, f_filetest, 2, 3 },
-  { "makedir", e_makedir, f_makedir, 1, 1 },
-  { "copyhtml", e_copyhtml, f_copyhtml, 1, 1 },
-  { "copyinfo", e_copyinfo, f_copyinfo, 1, 1 },
-  { "copyman", e_copyman, f_copyman, 0, 1 },
-  { "uncopyman", e_uncopyman, f_uncopyman, 0, 1 },
-  { "copynews", e_copynews, f_copynews, 1, 1 },
-  { "dodefaults", e_dodefaults, f_dodefaults, 0, 0 },
-  { "nodefaults", e_nodefaults, NULL, 0, 0 },
-  { "nosetupenv", e_nosetupenv, NULL, 0, 0 },
-  { "noproddir", e_noproddir, NULL, 0, 0 },
+  { "setupoptional", e_setupoptional, NULL, 0, 0, e_unsetupoptional },
+  { "setuprequired", e_setuprequired, NULL, 0, 0, e_unsetuprequired },
+  { "unsetupoptional", e_unsetupoptional, NULL, 0, 0, e_setupoptional },
+  { "unsetuprequired", e_unsetuprequired, NULL, 0, 0, e_setuprequired },
+  { "envappend", e_envappend, f_envappend, 2, 3, e_envremove },
+  { "envremove", e_envremove, f_envremove, 2, 3, e_invalid_cmd },
+  { "envprepend", e_envprepend, f_envprepend, 2, 3, e_envremove },
+  { "envset", e_envset, f_envset, 2, 2, e_envunset },
+  { "envunset", e_envunset, f_envunset, 1, 1, e_invalid_cmd },
+  { "pathappend", e_pathappend, f_pathappend, 2, 3, e_pathremove },
+  { "pathremove", e_pathremove, f_pathremove, 2, 3, e_invalid_cmd },
+  { "pathprepend", e_pathprepend, f_pathprepend, 2, 3, e_pathremove },
+  { "pathset", e_pathset, f_pathset, 2, 2, e_envunset },
+  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 1, e_invalid_cmd },
+  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 1, e_invalid_cmd },
+  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 1, e_invalid_cmd },
+  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 1, e_invalid_cmd },
+  { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
+  { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
+  { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
+  { "makedir", e_makedir, f_makedir, 1, 1, e_invalid_cmd },
+  { "copyhtml", e_copyhtml, f_copyhtml, 1, 1, e_invalid_cmd },
+  { "copyinfo", e_copyinfo, f_copyinfo, 1, 1, e_invalid_cmd },
+  { "copyman", e_copyman, f_copyman, 0, 1, e_uncopyman },
+  { "uncopyman", e_uncopyman, f_uncopyman, 0, 1, e_copyman},
+  { "copynews", e_copynews, f_copynews, 1, 1, e_invalid_cmd },
+  { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults },
+  { "nodefaults", e_nodefaults, NULL, 0, 0, e_nodefaults },
+  { "nosetupenv", e_nosetupenv, NULL, 0, 0, e_invalid_cmd },
+  { "noproddir", e_noproddir, NULL, 0, 0, e_invalid_cmd },
   { 0,0,0,0,0 }
 };
 
@@ -812,10 +816,10 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
   /* take care of defaults cases */
 
   if ( !p_cur->act ) {
-    if ( !(p_cur->act = new_default_action( act_name, i_act )) ) 
+    if ( !(p_cur->act = new_default_action( p_cur, act_name, i_act )) )
       return dep_list;
   }
-
+  
   l_cmd = p_cur->act->command_list;
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
 
@@ -1065,11 +1069,25 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
   return act_item;
 }
 
-t_upstyp_action *new_default_action( const char *act_name, const int iact )
+t_upstyp_action *new_default_action( t_upsact_item *const p_cur, 
+				     const char * const act_name, 
+				     const int iact )
 {
   t_upstyp_action *new_act = 0;
+  int i_uncmd = 0;
 
-  if ( iact > e_invalid_action && (g_cmd_info[iact].flags)&0x00000001 ) {
+  if ( iact == e_invalid_action )
+    return 0;
+
+  if ( (i_uncmd = g_cmd_info[iact].uncmd_index) != e_invalid_action ) {
+    t_upstyp_action* act_p = get_act( p_cur->ugo, p_cur->mat, g_cmd_info[i_uncmd].cmd );
+
+    new_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
+    new_act->action = (char *)malloc( strlen( act_name ) + 1 );
+    strcpy( new_act->action, act_name );
+    new_act->command_list = reverse_command_list( p_cur, act_p->command_list );
+  }      
+  else if ( (g_cmd_info[iact].flags)&0x00000001 ) {
     new_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
     new_act->action = (char *)malloc( strlen( act_name ) + 1 );
     strcpy( new_act->action, act_name );
@@ -1079,6 +1097,51 @@ t_upstyp_action *new_default_action( const char *act_name, const int iact )
   }
 
   return new_act;
+}
+
+t_upslst_item *reverse_command_list( t_upsact_item *const p_cur, 
+				     t_upslst_item *const cmd_list )
+{
+  static char buf[MAX_LINE_LEN];
+  t_upslst_item *l_ucmd = 0;
+  t_upslst_item *l_cmd = upslst_first( cmd_list );
+  int i_uncmd = e_invalid_cmd;
+  int i_cmd = e_invalid_cmd;
+  int argc = 0;
+  char *p_line;
+  t_upsact_cmd *p_cmd;
+  int i;
+
+  for ( ; l_cmd; l_cmd = l_cmd->next ) {
+    /* translate and parse command */    
+    p_line = upsget_translation( p_cur->mat, p_cur->ugo,
+				 (char *)l_cmd->data );
+    p_cmd = upsact_parse_cmd( p_line );
+    if ( p_cmd && ((i_cmd = p_cmd->icmd) != e_invalid_cmd) ) {
+      if ( (i_uncmd = g_cmd_maps[p_cmd->icmd].icmd_undo) != e_invalid_cmd ) {
+	strcpy( buf,  g_cmd_maps[i_uncmd].cmd );
+
+	argc = g_cmd_maps[i_cmd].max_params;
+	if ( argc > g_cmd_maps[i_uncmd].max_params )
+	  argc = g_cmd_maps[i_uncmd].max_params;
+	if ( argc > p_cmd->argc )
+	  argc = p_cmd->argc;
+
+	strcat( buf, "(" );
+	for ( i=0; i<argc; i++ ) {
+	  if ( i > 0 ) strcat( buf, ", " );	    
+	  strcat( buf, p_cmd->argv[i] );
+	}
+	strcat( buf, ")" );
+
+	l_ucmd = upslst_add( l_ucmd, 
+			     upsutl_str_create( buf, ' ' ) );
+      }
+      free( p_cmd );      
+    }    
+  }
+
+  return upslst_first( l_ucmd );
 }
 
 /*-----------------------------------------------------------------------
