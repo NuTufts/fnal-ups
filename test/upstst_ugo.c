@@ -39,10 +39,11 @@ t_ups_command	*uc;				/* ups command */
 /* parse command line
    ------------------ */
 
-estatus_str = NULL; options = "AacCdfghKtmMNoOPqrTuU";
+estatus_str = NULL; options = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_NOLEFTOVERS);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
+if (!options) options = "AaBbCcDdEdFfFgHhIiJjKtLlMmNnOoOPQqRrSsTtUuVvWwXxYyZz";
 
 /* call the real routine
    --------------------- */
@@ -84,10 +85,11 @@ char            diffcmd[132];                   /* diff command */
    ------------------ */
 
 estatus_str = NULL; encmds = 1; outfile = NULL; difffile = NULL;
-options = "AacCdfghKtmMNoOPqrTuU";
+options = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
 UPSTST_CHECK_ESTATUS (estatus_str, estatus);
+if (!options) options = "AaBbCcDdEdFfFgHhIiJjKtLlMmNnOoOPQqRrSsTtUuVvWwXxYyZz";
 if (outfile) 					/* don't use stdout */
    {
    ofd = fopen(outfile,"w");
