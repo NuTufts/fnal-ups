@@ -31,6 +31,7 @@
 #include "upsmat.h"
 #include "upsact.h"
 #include "upsmem.h"
+#include "upsget.h"
 #include "ups_main.h"
 /*
  * Definition of public variables.
@@ -55,6 +56,16 @@ extern t_cmd_info g_cmd_info[];
 /*
  * Definition of public functions.
  */
+
+#define IS_IN_PROD_DIR()   \
+   if (minst->version && minst->version->prod_dir) {  \
+     if (! strstr(file, minst->version->prod_dir)) {  \
+       /* no it is not, print it out */               \
+       printf("%s\n", (char *)file);                  \
+     }                                                \
+   }
+
+
 
 /*-----------------------------------------------------------------------
  * ups_get
@@ -190,19 +201,27 @@ static void get_files(const t_upstyp_matched_product * const a_mproduct,
 	    file = all_file_list->data;
 	    
 	    /* check if the file is in the product root directory */
-	    if (minst->version && minst->version->prod_dir) {
-	      if (! strstr(file, minst->version->prod_dir)) {
-		/* no it is not, print it out */
-		printf("%s\n", (char *)file);
-	      }
-	    }
+	    IS_IN_PROD_DIR();
 	  }
 
 	  /* free up the list and the data elements too */
 	  all_file_list = upslst_free(all_file_list, 'd');
 	}
       }
-    }    
+    }
+
+    /* now check the product description field, it may be a file name too */
+    if (minst->table->description) {
+      /* first translate any ups local environment variables */
+      file = upsget_translation(a_mproduct, a_command_line, 
+				minst->table->description);
+      
+      /* now see if the resulting string is a file */
+      if(upsutl_is_a_file(file) == UPS_SUCCESS) {
+	/* now see if it is under the product root directory or not */
+	IS_IN_PROD_DIR();
+      }
+    }
   }
 }
 
