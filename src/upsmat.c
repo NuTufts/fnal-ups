@@ -904,7 +904,7 @@ static int match_from_table( const char * const a_product,
        }
 
       /* we do not need the info read from the file.  we have taken what we
-	 want and put it on the tinst_list */
+	 want */
       ups_free_product(read_product);
 
       /* free the table_file_path */
@@ -1120,17 +1120,17 @@ static int get_instance(const t_upslst_item * const a_read_instances,
     got_match = 0;
     want_all_f = (! strcmp(flavor, ANY_MATCH));   /* true if flavor = *  */
 
-    /* Check to see if the flavors match or want any flavor */
-    for (tmp_list = (t_upslst_item *)a_read_instances; tmp_list ;
-	 tmp_list = tmp_list->next) {
-      instance = (t_upstyp_instance *)(tmp_list->data);
-      if (want_all_f || (! strcmp(instance->flavor, flavor))) {
-	/* They do - now compare the qualifiers */
-	for (tmp_quals_list = (t_upslst_item *)a_quals_list; tmp_quals_list ;
-	     tmp_quals_list = tmp_quals_list->next) {
-	  quals = (char *)tmp_quals_list->data;
-	  if ((! strcmp(instance->qualifiers, quals)) ||
-	      (want_all_q = (!strcmp(quals, ANY_MATCH)))) {
+    for (tmp_quals_list = (t_upslst_item *)a_quals_list; tmp_quals_list ;
+	 tmp_quals_list = tmp_quals_list->next) {
+      quals = (char *)tmp_quals_list->data;
+      want_all_q = (! strcmp(quals, ANY_MATCH));   /* true if quals = *  */
+      /* Check to see if the flavors match or want any flavor */
+      for (tmp_list = (t_upslst_item *)a_read_instances; tmp_list ;
+	   tmp_list = tmp_list->next) {
+	instance = (t_upstyp_instance *)(tmp_list->data);
+	if (want_all_f || (! strcmp(instance->flavor, flavor))) {
+	  /* They do - now compare the qualifiers */
+	  if (want_all_q || (! strcmp(instance->qualifiers, quals))) {
 	    /* They do. Save the instances in the order they came in. */
 	    if (a_file_type == e_file_chain) {
 	      /* this instance was read in from a chain file, create a new
@@ -1151,14 +1151,16 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	    }
 	    ++num_matches;
 	    got_match = 1;
-	    break;
+	    if ((!want_all_q && !want_all_f) || a_need_unique) {
+	      break;
+	    }
   	  }
 	}
-	/* if we got a match and we only want one, break. */
-	if (got_match && a_need_unique) {
-	  /* go get the next flavor */
-	  break;
-	}
+      }
+      /* if we got a match and we only want one, break. */
+      if (got_match && a_need_unique) {
+	/* go get the next flavor */
+	break;
       }
     }
     /* If we only want one instance - we got it, leave now */
