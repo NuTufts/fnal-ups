@@ -79,10 +79,6 @@
          case 'C':      \
          uc->ugo_C = 1; \
          break;
-#define case_D \
-         case 'D':      \
-         uc->ugo_D = 1; \
-         break;
 #define case_e \
          case 'e':      \
          uc->ugo_e = 1; \
@@ -106,6 +102,10 @@
 #define case_l \
          case 'l':      \
          uc->ugo_l = 1; \
+         break;
+#define case_L \
+         case 'L':      \
+         uc->ugo_L = 1; \
          break;
 #define case_S \
          case 'S':      \
@@ -310,6 +310,10 @@
          case 'A':       \
          uc->ugo_A = 1;  \
          build_list (uc->ugo_auth , "A") 
+#define case_D \
+         case 'D':       \
+         uc->ugo_D = 1;  \
+         set_value (uc->ugo_origin , "D") 
 #define case_m \
          case 'm':       \
          uc->ugo_m = 1;  \
@@ -1262,8 +1266,8 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
        }
        switch(*(arg_str+1))      /* which flag was specified */
        { /* Single flag cases */
-         case_a case_C case_D case_e case_E
-         case_F case_j case_k case_l case_S
+         case_a case_C case_e case_E case_F 
+         case_j case_k case_l case_L case_S
          case_u case_v case_V case_w case_W
          case_x case_y case_Y case_Z case_help
          /* Chain cases */ 
@@ -1272,8 +1276,8 @@ t_upsugo_command *upsugo_next(const int old_argc,char *old_argv[],char * const v
          case_g            /* also a chain */
          case_f case_K case_A case_h case_H
          /* single values */ 
-         case_m case_M case_N case_O case_p
-         case_P case_r case_T case_U
+         case_D case_m case_M case_N case_O 
+         case_p case_P case_r case_T case_U
          case_0 case_1 case_2 case_3
          case 'q':
               uc->ugo_q = 1;

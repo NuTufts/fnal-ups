@@ -1,4 +1,4 @@
-/************************************************************************
+/*
  *
  * FILE:
  *       upsget.c
@@ -24,6 +24,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/utsname.h>
+#include <malloc.h>
+#include <pwd.h>
 
 /* ups specific include files */
 
@@ -290,8 +292,8 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   { strcat(newstr,upto);
   } else {
     strcpy(newstr,work);
+    free(work);
   }
-  free(work);
   work = (char *) malloc((size_t)(strlen(newstr) +1));
   strcpy(work,newstr);
   upto = work;
@@ -320,8 +322,8 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
   { strcat(newstr,upto);
   } else {
     strcpy(newstr,work);
+    free(work);
   }
-  free(work);
   work = (char *) malloc((size_t)(strlen(newstr) +1));
   strcpy(work,newstr);
   upto = work;
@@ -335,7 +337,7 @@ char *upsget_translation( const t_upstyp_matched_product * const product,
     eaddr =strchr(upto,'/');
     *eaddr = '\0';
     found=0;
-    if (!strcmp(TILDE,upto)) 
+    if (strchr(upto,'~')) 
     { value=upsget_tilde_dir(upto);
       if(value) { strcat(newstr,value); }
       found=1;
@@ -513,10 +515,23 @@ char *upsget_database(const t_upstyp_db * const db_info_ptr,
     strcpy(string,db->name);
   } return(string);     
 } 
-char *upsget_tilde_dir(const char * const addr)
+char *upsget_tilde_dir(char * addr)
 {
-  static char *string="TEST";
-  return(string);
+  struct passwd *pdp;
+  static char buffer[FILENAME_MAX+1];
+  char *name;
+  buffer[0]='\0';
+  if(strlen(addr)==1)
+  { pdp = getpwuid(getuid());
+    strcpy(buffer,pdp->pw_dir);
+  } else { 
+    name=addr+1;
+    pdp = getpwnam(name);
+    if (pdp)
+    { strcpy(buffer,pdp->pw_dir); }
+  }
+  strcat(buffer,"/");
+  return(buffer);
 }
 
 char *upsget_this_db(const t_upstyp_db * const db_info_ptr,

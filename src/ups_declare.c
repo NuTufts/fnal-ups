@@ -306,6 +306,9 @@ void ups_declare( t_upsugo_command * const uc ,
     new_vinst->table_dir=uc->ugo_tablefiledir;
     new_vinst->table_file=uc->ugo_tablefile;
     new_vinst->ups_dir=uc->ugo_upsdir;
+    new_vinst->origin=uc->ugo_origin;
+    if (uc->ugo_L)
+    { new_vinst->statistics=upsutl_str_create("",' '); }
     product->instance_list = 
         upslst_add(product->instance_list,new_vinst);
     upsver_mes(1,"Adding version %s to %s\n",
