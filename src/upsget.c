@@ -34,6 +34,23 @@
 #include "ups.h"
  
 /*
+ * Declaration of private functions.
+ */
+
+static void shutup (const t_upstyp_db * const db_info_ptr,
+                    const t_upstyp_matched_instance * const instance,
+                    const t_upsugo_command * const command_line);
+
+#define SHUTUP \
+  if ((&bit_bucket == 0) && 0) shutup (db_info_ptr, instance, command_line);
+
+/*
+ * Definition of global variables.
+ */
+
+static long bit_bucket = 0;
+
+/*
  * Definition of public variables.
  */
 
@@ -673,6 +690,7 @@ char *upsget_archive_file(const t_upstyp_db * const db_info_ptr,
       string=upsutl_str_create(string,' ');
     }
   }
+  SHUTUP;
   return ( string ? string : nostring ) ;
 }
 
@@ -826,6 +844,7 @@ char *upsget_origin(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   get_element(string,origin);
+  SHUTUP;
   return string;
 }
 char *upsget_product(const t_upstyp_db * const db_info_ptr,
@@ -833,6 +852,7 @@ char *upsget_product(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   get_element(string,product);
+  SHUTUP;
   return string;
 }
 char *upsget_version(const t_upstyp_db * const db_info_ptr,
@@ -841,6 +861,7 @@ char *upsget_version(const t_upstyp_db * const db_info_ptr,
 { static char *string;
   static char *nostring="";
   get_element(string,version);
+  SHUTUP;
   return ( string ? string : nostring ) ;
 }
 char *upsget_flavor(const t_upstyp_db * const db_info_ptr,
@@ -848,6 +869,7 @@ char *upsget_flavor(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   get_element(string,flavor);
+  SHUTUP;
   return string;
 }
 char *upsget_qualifiers(const t_upstyp_db * const db_info_ptr,
@@ -855,6 +877,7 @@ char *upsget_qualifiers(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   get_element(string,qualifiers);
+  SHUTUP;
   return string;
 }
 char *upsget_shell(const t_upstyp_db * const db_info_ptr,
@@ -874,6 +897,7 @@ char *upsget_shell(const t_upstyp_db * const db_info_ptr,
     answer = 0;
     break;
   }
+  SHUTUP;
   return (answer);
 }
 char *upsget_source(const t_upstyp_db * const db_info_ptr,
@@ -893,6 +917,7 @@ char *upsget_source(const t_upstyp_db * const db_info_ptr,
     answer = 0;
     break;
   }
+  SHUTUP;
   return (answer);
 }
 char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
@@ -904,6 +929,7 @@ char *upsget_verbose(const t_upstyp_db * const db_info_ptr,
   { (void) sprintf(string,"%.1d",command_line->ugo_v);
     return (string);
   } 
+  SHUTUP;
   return(NOT);
 }
 char *upsget_extended(const t_upstyp_db * const db_info_ptr,
@@ -913,8 +939,9 @@ char *upsget_extended(const t_upstyp_db * const db_info_ptr,
   static char NOT[]="";
   if (command_line->ugo_e)
   { return(EXTENDED);
-  } else {
-  } return(NOT);
+  }
+  SHUTUP;
+  return(NOT);
 }
 char *upsget_options(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
@@ -926,6 +953,7 @@ char *upsget_options(const t_upstyp_db * const db_info_ptr,
   } else {
     string=NOT;
   }
+  SHUTUP;     
   return(string);
 }
 char *upsget_database(const t_upstyp_db * const db_info_ptr,
@@ -942,7 +970,9 @@ char *upsget_database(const t_upstyp_db * const db_info_ptr,
   { db=db_list->data;
     if(count) (void) strcpy(string,":");
     (void) strcpy(string,db->name);
-  } return(string);     
+  }
+  SHUTUP;     
+  return(string);     
 } 
 char *upsget_tilde_dir(char * const addr)
 {
@@ -981,6 +1011,7 @@ char *upsget_this_db(const t_upstyp_db * const db_info_ptr,
     } else {
       string=NOT;
     }
+  SHUTUP;
   return(string);
 }
 char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
@@ -1001,6 +1032,7 @@ char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
      (void) strcat(flavor,".");
    }
    (void) strcat(flavor,baseuname.release);     /* add in release */
+   SHUTUP;
    return flavor;
 }
 
@@ -1442,4 +1474,13 @@ char *upsget_table_file( const char * const a_prodname,
     upsmem_free(tmp_tfd);
   }
 return path_ptr;
+}
+
+static void shutup (const t_upstyp_db * const db_info_ptr,
+                    const t_upstyp_matched_instance * const instance,
+                    const t_upsugo_command * const command_line)
+{
+      bit_bucket ^= (long) db_info_ptr;
+      bit_bucket ^= (long) instance;
+      bit_bucket ^= (long) command_line;
 }
