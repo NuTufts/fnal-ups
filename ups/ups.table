@@ -10,6 +10,9 @@ MAN_SOURCE_DIR=${UPS_PROD_DIR}/man/man
 CATMAN_SOURCE_DIR=${UPS_PROD_DIR}/man/catman
 
 Common:
+   Action=install_init_d
+     Execute(${UPS_UPS_DIR}/install_init_d.sh, UPS_ENV)
+
    Action=configure
      envSet(Ups_DB_Path, ${UPS_THIS_DB})
      execute(${UPS_UPS_DIR}/configure, UPS_ENV)
@@ -55,3 +58,4 @@ action=setup
   addAlias(unsetup,'${UPS_SOURCE} `${UPS_PROD_DIR}/bin/ups unsetup %s`')
   setupOptional (egcs)
   setupOptional (upd)
+
