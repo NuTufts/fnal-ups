@@ -26,6 +26,7 @@
 
 /* ups specific include files */
 #include "upslst.h"
+#include "upstyp.h"
 #include "upsmem.h"
 #include "upstyp.h"
 #include "upserr.h"
@@ -134,7 +135,8 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 {
   t_upstyp_matched_product *mproduct = NULL;
   t_upslst_item *tmp_mprod_list = NULL;
-  t_upslst_item *tmp_minst_list = NULL;
+  t_upslst_item *tmp_minst_list = NULL, *clist = NULL;
+  t_upstyp_instance *cinst_ptr = NULL;
   t_upstyp_matched_instance *minst_ptr = NULL;
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
@@ -149,6 +151,15 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 	       minst_ptr->chain->chain, minst_ptr->chain->version);
 	printf("FLAVOR=%s, QUALIFIERS=%s\n", minst_ptr->chain->flavor,
 	       minst_ptr->chain->qualifiers);
+      }
+      if (minst_ptr->xtra_chains) {
+	for (clist = minst_ptr->xtra_chains ; clist ; clist = clist->next) {
+	  cinst_ptr = (t_upstyp_instance *)clist->data;
+	  printf("C:PRODUCT=%s, CHAIN=%s, VERSION=%s, ",
+		 cinst_ptr->product, cinst_ptr->chain, cinst_ptr->version);
+	  printf("FLAVOR=%s, QUALIFIERS=%s\n", cinst_ptr->flavor,
+		 cinst_ptr->qualifiers);
+	}
       }
       if (minst_ptr->version ) {
 	printf("V:PRODUCT=%s, VERSION=%s, ", minst_ptr->version->product,
