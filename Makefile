@@ -2,7 +2,6 @@
 #  CVS/Build standard makefile template
 #  $Id$
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#yat
 
 # run commands with bourne shell!
 SHELL=/bin/sh
