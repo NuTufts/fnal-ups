@@ -22,6 +22,9 @@
  *                        and destroying common types.
  *       30-Jul-1997, LR, Added 'char *db_dir' to instance structure.
  *       13-Aug-1997, LR, Added MAX_LINE_LENGTH.
+ *       28-Aug-1997, DjF, added upsugo_env - Build ups_command structure
+ *                         from the product environment variable given
+ *                         product name.
  *
  ***********************************************************************/
 
@@ -201,6 +204,8 @@ t_ups_match_product *ups_free_mp(t_ups_match_product *a_mproduct);
 t_ups_command     *upsugo_next(const int ups_argc,
 			       char *ups_argv[],
 			       char * const validopts);
+
+t_ups_command     *upsugo_env(char * const product);
 
 #endif /* _UPS_TYPES_H_ */
 
