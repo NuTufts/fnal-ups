@@ -146,7 +146,7 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 {
   char buffer[FILENAME_MAX+1];   /* max size of file name and path on system */
   char *path_ptr = NULL;
-  int file_chars, total_chars;
+  int file_chars = 0, total_chars = 0;
   int found = 0;
 
   if (a_tablefile != NULL) {
@@ -1251,6 +1251,44 @@ size_t upsutl_str_remove_edges( char * const str, const char * const str_remove 
     str[0] = 0;
   }
 
+  return strlen( str );
+}
+
+/*-----------------------------------------------------------------------
+ * upsutl_str_remove_quotes
+ *
+ * Will erase trailing and starting quotes, defined in quotes.
+ * If passed 'spaces' is defined it will first remove trailing
+ * white spaces
+ *
+ * Input : char *, string to be trimmed
+ *         char *, string of quotes to remove
+ *         char *, string of spaces to remove (can be null)
+ * Output: none
+ * Return: int, length of trimmed string
+ */
+size_t upsutl_str_remove_end_quotes( char * str, 
+				     char * const quotes, 
+				     char * const spaces )
+{
+  int len = 0;
+  char *qu = 0;
+
+  if ( spaces )
+    upsutl_str_remove_edges( str, spaces );
+
+  len = (int)strlen( str );
+  if ( !quotes || len < 2 )
+    return;
+
+  for ( qu = quotes; qu && *qu; qu++ ) {
+    if ( (str[0] == *qu && str[len-1] == *qu) ) {
+      char *sp1 = &str[1], *sp2 = &str[len-1];
+      for ( ; sp1 < sp2; str++, sp1++ ) *str = *sp1;
+      *str = 0;
+      break;
+    }
+  }
   return strlen( str );
 }
 
