@@ -1197,18 +1197,14 @@ fi
 #
 # Mark ALL BootStrap files current.
 #
-rm -f \$BootStrap_Dir/zzzzzzzzzz
-cat << EoFed >\$BootStrap_Dir/zzzzzzzzzz
-/Setups_Current/
-s/Setups_Current=0/Setups_Current=1/
-w
-q
-EoFed
+rm -f /tmp/ups_cur_\$$
 for filex in \$BootStrap_Dir/*
 do
-    ed -  \$filex <\$BootStrap_Dir/zzzzzzzzzz >/dev/null
+#    ed -  \$filex <\$BootStrap_Dir/zzzzzzzzzz >/dev/null
+    sed -e 's/Setups_Current=0/Setups_Current=1/' \$filex >/tmp/ups_cur_\$$
+    cp /tmp/ups_cur_\$$ \$filex
+    rm /tmp/ups_cur_\$$
 done
-rm -f \$BootStrap_Dir/zzzzzzzzzz
 #
 # Don't forget to copy the ${Script_Prefix}.common script to
 # /usr/local/etc.  Just in case everything else
@@ -1281,9 +1277,9 @@ do
     	    cp \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}
             cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.sh       
             cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.csh
-	    chmod +x \$Startup_Home/\${Start_Or_Stop}/\${Start_Or_Stop}
-	    chmod +x \$Startup_Home/\${Start_Or_Stop}/\${Start_Or_Stop}.csh
-	    chmod +x \$Startup_Home/\${Start_Or_Stop}/\${Start_Or_Stop}.sh
+	    chmod +x \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}
+	    chmod +x \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.csh
+	    chmod +x \$Startup_Home/\${Start_Or_Stop}/ups_\${Start_Or_Stop}.sh
 	else
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}
 	    cp  \$BootStrap_Dir/ups_\${Start_Or_Stop} \$Startup_Home/ups_\${Start_Or_Stop}.sh 
