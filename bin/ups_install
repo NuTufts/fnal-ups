@@ -607,7 +607,7 @@ if ($error == 0) {
   if (($userHash{$userArray[$PERL_VERSION][0]} ne "") && ($perldir ne "")) {
     $prod_dir = `$upsdir/bin/ups list -K PROD_DIR -z $userHash{$userArray[$UPS_DB][0]} -2 perl $userHash{$userArray[$PERL_VERSION][0]}`;
     if ($prod_dir eq "") {
-      `csh -fc "sh -c 'UPS_SHELL=sh;export UPS_SHELL;$upsdir/bin/ups declare -r $new_perldir -2 -m perl.table perl $userHash{$userArray[$PERL_VERSION][0]} -z $userHash{$userArray[$UPS_DB][0]}'"`;
+      `csh -fc "sh -c 'UPS_SHELL=sh;export UPS_SHELL;$upsdir/bin/ups declare -r $new_perldir -2 -U ups -m perl.table perl $userHash{$userArray[$PERL_VERSION][0]} -z $userHash{$userArray[$UPS_DB][0]}'"`;
     print STDOUT "DONE: Declared perl $userHash{$userArray[$PERL_VERSION][0]} to $userHash{$userArray[$UPS_DB][0]}.\n";
     }
   }
@@ -621,13 +621,13 @@ if ($error == 0) {
   print STDOUT "\n";
   print STDOUT "  UPS_SHELL=sh;export UPS_SHELL\n";
   print STDOUT "  UPS_DIR=$upsdir;export UPS_DIR\n";
-  print STDOUT "  PRODUCTS=$userHash{$userArray[$UPS_DB][0]}\n";
-  print STDOUT "  ups declare -c -2 ups $userHash{$userArray[$UPS_VERSION][0]}\n";
+  print STDOUT "  PRODUCTS=$userHash{$userArray[$UPS_DB][0]};export PRODUCTS\n";
+  print STDOUT "  $UPS_DIR/bin/ups declare -c -2 ups $userHash{$userArray[$UPS_VERSION][0]}\n";
   if ($perldir ne "") {
-   print STDOUT "  ups declare -c -2 perl $userHash{$userArray[$PERL_VERSION][0]}\n";
+   print STDOUT "  $UPS_DIR/bin/ups declare -c -2 perl $userHash{$userArray[$PERL_VERSION][0]}\n";
   }
   if ($upddir ne "") {
-    print STDOUT "  ups declare -c -0 upd $userHash{$userArray[$UPD_VERSION][0]}\n";
+    print STDOUT "  $UPS_DIR/bin/ups declare -c -0 upd $userHash{$userArray[$UPD_VERSION][0]}\n";
   }
   print STDOUT "\n";
   print STDOUT "               You must change the fermi.[c]shrc files to source\n";
