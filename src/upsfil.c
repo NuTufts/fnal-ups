@@ -1003,7 +1003,7 @@ void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
           }
           upserr_add(UPS_DUPLICATE_INSTANCE, UPS_INFORMATIONAL, 
                      file , g_filename, 
-                     (vinst_ptr->product ? vinst-ptr->product : nostring),
+                     (vinst_ptr->product ? vinst_ptr->product : nostring),
 		     (vinst_ptr->version ? vinst_ptr->version : nostring), 
                      vinst_ptr->flavor,vinst_ptr->qualifiers,
                      verify_key);
