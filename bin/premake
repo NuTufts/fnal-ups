@@ -278,7 +278,7 @@ case $ccenv in
 				cflags="$cflags -g3" 
 			fi
 		fi
-		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -migrate -check\""
+		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -D_OSF_SOURCE -migrate -check\""
 		llibs="-lots"
 		;;
 # Don't muck with AIX unless YOU test it, DjF
@@ -287,7 +287,7 @@ case $ccenv in
 		cc="cc"
  		cflags="$cflags"
 		if [ "$opt" != "" ]; then
-			cflags="$cflags -O3" 
+			cflags="$cflags " 
 		fi
 		if [ "$dbg" != "" ]; then 
 			cflags="$cflags -g" 
@@ -299,7 +299,7 @@ defs="$defs CCCHK=\"-D_POSIX_SOURCE -D_NETINET_IN_H_ -D_H_NETDB\""
 
 	*)
 		echo \
-	"Please supply one of ACC IRIX GCC OSF1 instead of $ccenv" >&2
+	"Please supply one of ACC IRIX GCC OSF1 AIX instead of $ccenv" >&2
 		exit 1;;
 esac
 #------------------------------------------------------------------------------
