@@ -53,5 +53,9 @@ upsmat_instance -out asta1.out -diff asta1.in -z ../db1:../db2 -f NULL -a asta
 upsmat_instance -out asta2.out -diff asta2.in -z ../db1:../db2 -f NULL -a 
 upsmat_instance -out asta3.out -diff asta3.in -z ../db1:../db2 -f NULL -a -db ../db2
 upsmat_instance -out asta4.out -diff asta4.in -z ../db0:../db1:../db2 -f NULL -a -status UPS_NO_TABLE_MATCH
+#
+# test a nonexistent database
+#
+upsmat_instance -z dummy dog -status UPS_NOT_A_DIR
 quit
 EOD
