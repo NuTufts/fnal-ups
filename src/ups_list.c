@@ -48,7 +48,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 		 const t_upsugo_command * const a_command_line);
 
 void list_K(const t_upstyp_matched_instance * const instance,
-            const t_upsugo_command * const a_command_line);
+            const t_upsugo_command * const a_command_line, const int headers);
 /*
  * Definition of global variables.
  */
@@ -60,7 +60,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
 
 #define FromVersion(ELEMENT) \
 { if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if(instance->version)                               \
+  { if (headers) { printf("%s=","" #ELEMENT ""); }      \
+    if(instance->version)                               \
     { if (instance->version->ELEMENT)                   \
       { printf("%s ",instance->version->ELEMENT);       \
       } else {                                          \
@@ -69,11 +70,13 @@ void list_K(const t_upstyp_matched_instance * const instance,
     } else {                                            \
       printf("\"\" ");                                  \
     }                                                   \
+    if (headers) { printf("\n"); }                      \
   }                                                     \
 }
 #define FromEither(ELEMENT) \
 { if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if(instance->chain)                                 \
+  { if (headers) { printf("%s=","" #ELEMENT ""); }      \
+    if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
       { printf("%s ",instance->chain->ELEMENT);         \
       } else {                                          \
@@ -98,11 +101,13 @@ void list_K(const t_upstyp_matched_instance * const instance,
         printf("\"\" ");                                \
       }                                                 \
     }                                                   \
+    if (headers) { printf("\n"); }                      \
   }                                                     \
 }
 #define FromBoth(ELEMENT) \
 { if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
-  { if(instance->chain)                                 \
+  { if (headers) { printf("%s=","" #ELEMENT ""); }      \
+    if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
       { printf("%s:",instance->chain->ELEMENT);         \
       } else {                                          \
@@ -127,6 +132,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     } else {                                            \
       printf(" ");                                      \
     }                                                   \
+    if (headers) { printf("\n"); }                      \
   }                                                     \
 }
 
@@ -218,6 +224,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upslst_item *tmp_minst_list = NULL, *clist = NULL;
   t_upstyp_instance *cinst_ptr = NULL;
   t_upstyp_matched_instance *minst_ptr = NULL;
+  t_upslst_item *l_ptr = 0;
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) 
@@ -226,7 +233,10 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 	 tmp_minst_list = tmp_minst_list->next) 
     { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
 /* A as in a single product loop */
-      if (!a_command_line->ugo_K) /* keywords is a whole different animal */ 
+/*      if (!a_command_line->ugo_K) keywords is a whole different animal */ 
+      if (a_command_line->ugo_K)
+      { l_ptr=upslst_first(a_command_line->ugo_key); } 
+      if (!a_command_line->ugo_K || !strncmp(l_ptr->data,"+",1))
       { printf("DATABASE: %s\n",mproduct->db_info->name);
         printf("PRODUCT: %s\n",mproduct->product);
         if (minst_ptr->chain) 
@@ -258,9 +268,11 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           printf("TABLE_DIR: %s\n", minst_ptr->version->table_dir);
           printf("TABLE_FILE: %s\n", minst_ptr->version->table_file);
         }
+        if (a_command_line->ugo_K) 
+        {  list_K(minst_ptr,a_command_line,1); } 
         printf("\n\n");
       } else { 
-          list_K(minst_ptr,a_command_line);
+          list_K(minst_ptr,a_command_line,0);
       }
     }
 /* end product loop */
@@ -275,7 +287,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
 */
 
 void list_K(const t_upstyp_matched_instance * const instance, 
-            const t_upsugo_command * const command)
+            const t_upsugo_command * const command, const int headers)
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *cinst_ptr = 0;
