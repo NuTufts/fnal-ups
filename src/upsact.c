@@ -3707,6 +3707,7 @@ static void f_writecompilescript(ACTION_PARAMS)
       }
       if (cmd_list) {
 	upsact_cleanup(cmd_list);
+	cmd_list = 0;
       }
     }
     /* reset the shell back to its original value. */
