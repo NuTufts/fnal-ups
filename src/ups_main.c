@@ -58,6 +58,7 @@ extern int g_LOCAL_VARS_DEF;
 extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
+int g_simulate;
 
 /*
  * Declaration of private functions.
@@ -113,6 +114,10 @@ int main(int argc, char *argv[])
       if (! g_keep_temp_file ) {
 	g_keep_temp_file = command_line->ugo_V;
       }
+      if (! g_simulate) {
+	g_simulate = command_line->ugo_s;
+      }
+
 
       if (!command_line->ugo_help && (g_cmd_info[i].cmd_index != e_help)) {
 	/* no help requested - do the command */
@@ -235,8 +240,19 @@ int main(int argc, char *argv[])
 	switch (g_cmd_info[i].cmd_index) {
 	case e_setup: 
 	case e_unsetup: 
+	  /* see if this is only a simulation first */
+	  if (g_simulate) {
+	    /* yes, output this to short circuit the automatic sourcing */
+	    printf("/dev/null\n");
+	  }
 	  /* output the name of the temp file that was created */
 	  (void )printf("%s\n", g_temp_file_name);
+	  
+	  /* if we were asked to save the file, output the name again so the
+	     user can see it. the first output was eaten by the sourcing */
+	  if (g_keep_temp_file) {
+	    (void )printf("%s\n", g_temp_file_name);
+	  }
 	  break;
 	case e_exist:
 	  /* just get rid of the file. (unless asked not to) we do not need it,
@@ -244,13 +260,19 @@ int main(int argc, char *argv[])
 	  KEEP_OR_REMOVE_FILE();
 	  break;
 	default:
-	  /* source the file within the current process context */
-	  (void )printf("(to be sourced) %s\n", g_temp_file_name); /* temp */
-	  /*if (system(g_temp_file_name) <= 0) {
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
-		       strerror(errno));
-	    KEEP_OR_REMOVE_FILE();
-	  }*/
+	  /* check to see if we are supposed to execute the file or just
+	     report that it is there. */
+	  if (g_simulate) {
+	    /* simulation only, print the file name */
+	    (void )printf("%s\n", g_temp_file_name);
+	  } else {	
+	    (void )printf("(to be sourced) %s\n", g_temp_file_name); /* temp */
+	    /*if (system(g_temp_file_name) <= 0) {
+	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "system",
+			 strerror(errno));
+	      KEEP_OR_REMOVE_FILE();
+	    }*/
+	  }
 	  
 	}
       } else {  /* there was an error while doing the command */
@@ -274,7 +296,6 @@ int main(int argc, char *argv[])
 
   /* output any errors and the timing information */
   upserr_output();
-
 
   return rstatus;
 }
