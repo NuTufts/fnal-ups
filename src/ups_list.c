@@ -322,7 +322,6 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
-  int verify_db_done = 0;
   int new_db;
   t_upslst_item *all_products = 0;
   t_upslst_item *name=0;
@@ -372,49 +371,43 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
          }
        } else {
          /* now we must do the extra verify things - 
-   	 o verify the info in the dbconfig file
-   	 o verify the information in the instances
+	    o verify the info in the dbconfig file
+	    o verify the information in the instances
          */
          for (mproduct_item = mproduct_list ; mproduct_item ; 
    	   mproduct_item = mproduct_item->next) 
          { mproduct = (t_upstyp_matched_product *)mproduct_item->data;
-           if (! verify_db_done) 
-           { if (mproduct->db_info && mproduct->db_info->name)
-   	     { if(new_db)
-               { PRINT_DB(mproduct->db_info->name);
-                 new_db=0;
-               }
-   	     }
-   	  ups_verify_dbconfig(mproduct->db_info, 
+           if (new_db && mproduct->db_info && mproduct->db_info->name)
+   	   { PRINT_DB(mproduct->db_info->name);
+	     new_db=0;
+	     ups_verify_dbconfig(mproduct->db_info, 
    		       (t_upstyp_matched_instance *)mproduct->minst_list->data,
    		       a_command_line);
-   	  ++verify_db_done;
-   	  /* there may be lots of messages so output them on a per product
-   	     basis */
-   	  upserr_output();
-   	  upserr_clear();
-   	}
-   	for (minst_item = mproduct->minst_list ; minst_item ;
+	     /* there may be lots of messages so output them on a per product
+		basis */
+	     upserr_output();
+	     upserr_clear();
+	   }
+	   upserr_add(UPS_VERIFY_PRODUCT, UPS_INFORMATIONAL,
+		      mproduct->product);
+
+	   for (minst_item = mproduct->minst_list ; minst_item ;
    	     minst_item = minst_item->next)
-   	{ upserr_add(UPS_VERIFY_PRODUCT, UPS_INFORMATIONAL,
-   		     mproduct->product);
-   	  ups_verify_matched_instance(mproduct->db_info,
+	   { ups_verify_matched_instance(mproduct->db_info,
    				 (t_upstyp_matched_instance *)minst_item->data,
    				 a_command_line, mproduct->product);
-   	}
-   	/* there may be lots of messages so output them on a per product
-   	   basis */
-   	upserr_output();
-   	upserr_clear();
+	   }
+	   /* there may be lots of messages so output them on a per product
+	      basis */
+	   upserr_output();
+	   upserr_clear();
          }
-         /* reset for the next time around the loop */
-         verify_db_done = 0;
        }
        /* free the matched products */
        (void )upsutl_free_matched_product_list(&mproduct_list);
 
        /* if we were just looking for dbconfig keywords, we got them, no need
-	  to print them for every product in thei database. */
+	  to print them for every product in the  database. */
        if (! g_MATCH_DONE) {
 	 break;
        }
@@ -807,7 +800,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
       { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
       }
     }
-  } else {
+  } else { /* if (match_done) */
     /* just have the dbconfig info */
     for ( l_ptr = upslst_first( command->ugo_key ); 
 	  l_ptr; l_ptr = l_ptr->next, count++ )

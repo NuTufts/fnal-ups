@@ -232,7 +232,7 @@ static void ups_verify_chain_instance(VERIFY_INST_PARAMS)
  */
 static void ups_verify_version_instance(VERIFY_INST_PARAMS)
 {
-  char *bufPtr;
+  char *bufPtr, *noftp_archive_file;
 
   /* the following elements of an instance structure are verified here -
 	       table_dir
@@ -261,7 +261,14 @@ static void ups_verify_version_instance(VERIFY_INST_PARAMS)
   /* if we are checking syntax only, do not look for external files */
   if (! a_command_line->ugo_S) {
     /* Make sure the following files exist */
-    VERIFY_FILE_SPEC(a_inst->archive_file);
+    noftp_archive_file = upsget_archive_file(a_db, a_minst, a_command_line, 1);
+      
+    if (noftp_archive_file[0] != '\0') {
+      if (upsutl_is_a_file(noftp_archive_file) == UPS_NO_FILE) {
+	upserr_add(UPS_NO_FILE, UPS_WARNING, noftp_archive_file);
+      }
+      upsmem_free(noftp_archive_file);
+    }
     VERIFY_DIR_SPEC(a_inst->compile_dir, a_minst);
     bufPtr = upsget_prod_dir(a_db, a_minst, a_command_line);
     VERIFY_DIR_SPEC(bufPtr, (0));
