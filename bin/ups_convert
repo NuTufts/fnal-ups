@@ -324,6 +324,8 @@ sub writeflvrReqs {
 }
 sub addReq {
     my ( $flavor, $reqType, $Req, $reqOrder ) = @_;
+    my $check_os = "";
+    my $check_qual = "";
       $Req =~ tr/\(//d;
       $Req =~ tr/\)//d;
       @RequireLine = split ( / / , $Req ) ; 
@@ -347,6 +349,14 @@ sub addReq {
               $reqName = sprintf "%2d,%s", $reqOrder, $ReqProd[0];
               $reqVer = "$ReqProd[1]";
               $reqOS = "$ReqProd[2]";
+# This is added to check the requirements for a extended flavor that needs
+# to be fixed i.e. if something requires IRIX+6+n32 ...
+              ( $check_os, $check_qual ) = &split_os ( $reqOS );
+              if ( $check_qual ) {
+                  $reqOS = $check_os;
+                  $reqFlag = "-q $check_qual";
+# humm... what about -b, need to do something?
+              }
 # need to change the -b to -q build 
               $reqFlag =~ s/-b /-q build /g;
               if ( $flavor eq $reqOS ) { $reqOS = "\${UPS_PROD_FLAVOR}"; }
