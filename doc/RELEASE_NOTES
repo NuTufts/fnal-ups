@@ -15,6 +15,10 @@ Fixed envSetIfNotSet so now when the product is getting unsetup, the opposite
 of this function is envRemove, not envUnset.
 <li>
 improved output of errors from ups verify.
+<li>
+Modifications to unsetup rules: I will only try to unsetup a product if
+SETUP_prodname is defined.
+</li>
 </ul>
 
 <h1>UPS v4_2</h1>
