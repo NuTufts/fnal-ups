@@ -40,6 +40,17 @@
  * Public typdef's
  */
 
+/* a matched ups product. a list of all the instances that could pertain to
+   the product/ */
+typedef struct ups_match_product
+{
+  char             *db;
+  
+  t_upslst_item    *chain_list;
+  t_upslst_item    *version_list;
+  t_upslst_item    *table_list;
+} t_ups_match_product;
+
 /* a ups file, chaver will be chain name if file == CHAIN, else version */
 typedef struct ups_product
 {
@@ -158,6 +169,12 @@ typedef struct ups_command
 /* these are associated with n,o,d,c,t,and g chains                  */
     t_upslst_item *ugo_chain;
 } t_ups_command;
+
+/* 
+ * Public variables
+ */
+#define ANY_MATCH "*"
+
 
 /*
  * Declaration of public functions.
