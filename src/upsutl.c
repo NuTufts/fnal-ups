@@ -876,25 +876,24 @@ static unsigned char stricmp_charmap[] = {
  */
 int upsutl_stricmp( const char *s1, const char *s2 )
 {
-  register unsigned char u1, u2;
+  register unsigned int u1, u2;
+  register int result;
 
   for (;;) {
     u1 = (unsigned char) *s1++;
     u2 = (unsigned char) *s2++;
-    if (stricmp_charmap[u1] != stricmp_charmap[u2]) {
-      return stricmp_charmap[u1] - stricmp_charmap[u2];
-    }
-    if (u1 == '\0') {
+    result = (int) stricmp_charmap[u1] - (int) stricmp_charmap[u2];
+    if (result != 0 || u1 == '\0') {
       break;
     }
   }
-  return 0;
+  return result;
 }
 
 /*-----------------------------------------------------------------------
  * upsutl_strincmp
  *
- * A case insencitive version of strncmp. It's based on 
+ * A case insensitive version of strncmp. It's based on 
  * strcasecmp (found e.g in gnu's libc), which is normaly not
  * supported in ANSI C.
  *
@@ -906,20 +905,19 @@ int upsutl_stricmp( const char *s1, const char *s2 )
  */
 int upsutl_strincmp( const char *s1, const char *s2, const size_t n )
 {
-  register unsigned char u1, u2;
+  register unsigned int u1, u2;
   register int i = 0;
+  register int result;
 
   for (;;) {
     u1 = (unsigned char) *s1++;
     u2 = (unsigned char) *s2++;
-    if (stricmp_charmap[u1] != stricmp_charmap[u2]) {
-      return stricmp_charmap[u1] - stricmp_charmap[u2];
-    }
-    if (++i == (int) n || u1 == '\0') {
+    result = (int) stricmp_charmap[u1] - (int) stricmp_charmap[u2];
+    if (result != 0 || u1 == '\0' || ++i == (int) n) {
       break;
     }
   }
-  return 0;
+  return result;
 }
 
 /*-----------------------------------------------------------------------
