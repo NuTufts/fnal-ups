@@ -3282,7 +3282,7 @@ static void f_pathset( ACTION_PARAMS)
 
 #define g_SHPARAM "$@"
 #define g_ACTPARAM "%s"
-#define g_CSHPARAM "\!*"
+#define g_CSHPARAM "\\!*" /* DjF added another \ need \ too! */
 
 static void f_addalias( ACTION_PARAMS)
 {
@@ -3295,8 +3295,8 @@ static void f_addalias( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
     switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      sprintf(g_buff, "%s () { %s }\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
+    case e_BOURNE:      /* DjF added ; before } */
+      sprintf(g_buff, "%s () { %s ;}\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
       if (strstr(g_buff, g_ACTPARAM)) {
 	/* the string is already in there, add the parameter string */
 	if (fprintf((FILE *)a_stream, g_buff, g_SHPARAM) < 0) {
@@ -3309,8 +3309,8 @@ static void f_addalias( ACTION_PARAMS)
 	}
       }
       break;
-    case e_CSHELL:
-      sprintf(g_buff, "alias %s \"%s\"\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
+    case e_CSHELL:         /* DjF changed " to ' */
+      sprintf(g_buff, "alias %s \'%s\'\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
       if (strstr(g_buff, g_ACTPARAM)) {
 	/* the string is already in there, add the parameter string */
 	if (fprintf((FILE *)a_stream, g_buff, g_CSHPARAM) < 0) {
