@@ -1124,8 +1124,16 @@ fi
 if test "x\`echo \${PRODUCTS:-}|cut -c1\`" = "x/"
 then
     PRODUCTS=\`echo \$PRODUCTS|tr ':' ' '\`
+    prodset=no
     for Prod in \${PRODUCTS}
     do
+	if test \$prodset = no
+	then
+	    Pstr_new=\$Prod
+	    prodset=yes
+	else
+	    Pstr_new="\${Pstr_new}':'\${Prod}"
+	fi
 #
 # It is legal to declare ups to its database with a relative chain
 # On the off chance that this was done, parse out the PROD_DIR_PREFIX
@@ -1190,13 +1198,13 @@ then
     				    if test \$Shell = 'sh'
     				    then
         				cat <<EoF
-        				PRODUCTS="\${PRODUCTS}"; export PRODUCTS;
+        				PRODUCTS="\${Pstr_new}"; export PRODUCTS;
         				UPS_DIR=\$UPS_DIR; export UPS_DIR;
 EoF
     				    elif test \$Shell = 'csh'
     				    then
         				cat <<EoF
-        				setenv PRODUCTS "\${PRODUCTS}";
+        				setenv PRODUCTS "\${Pstr_new}";
         				setenv UPS_DIR \$UPS_DIR;
 EoF
     				    else
