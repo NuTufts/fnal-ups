@@ -33,13 +33,16 @@
 
 /* Error Messages */
 #define UPS_INVALID         -1
-#define UPS_OPEN_FILE       0
-#define UPS_READ_FILE       1
-#define UPS_INVALID_KEYWORD 2
-#define UPS_NO_DATABASE     3
-#define UPS_TIME            4
-#define UPS_NERR            5
-
+#define UPS_SUCCESS         0
+#define UPS_OPEN_FILE       1
+#define UPS_READ_FILE       2
+#define UPS_INVALID_KEYWORD 3
+#define UPS_NO_DATABASE     4
+#define UPS_TIME            5
+#define UPS_NAME_TOO_LONG   6
+#define UPS_NO_STAT_DIR     7
+#define UPS_WRITE_FILE      8
+#define UPS_NERR            9
 
 #define UPS_ERROR           1
 #define UPS_FATAL           "ERROR"
@@ -68,6 +71,11 @@ void upserr_output (void);
 /*
  * Declarations of public variables.
  */
+
+extern int UPS_VERBOSE;
+extern int g_ups_line;
+extern char *g_ups_file;
+
 
 #define upserr_place() g_ups_line=__LINE__; g_ups_file=(char *)__FILE__;
 

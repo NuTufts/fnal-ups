@@ -32,9 +32,9 @@
  * Definition of public variables.
  */
 
-extern int UPS_VERBOSE = 0;     /* start out not verbose */
-extern int g_ups_line = 0;
-extern char *g_ups_file = '\0';
+int UPS_VERBOSE = 0;     /* start out not verbose */
+int g_ups_line = 0;
+char *g_ups_file = '\0';
 
 /*
  * Declaration of private functions.
@@ -52,11 +52,15 @@ static char *g_error_buf[G_ERROR_BUF_MAX];
 
 /* And now the error messages */
 static char *g_error_messages[] = {
+  "%s: Success.\n",
   "%s: Unable to open file %s.\n",
   "%s: Unable to read file %s.\n",
   "%s: Invalid keyword - %s, in %s found.\n",
   "%s: No database specified on command line or in \$PRODUCTS.\n",
-  "%s: CPU time used - %f, Wall clock time used %f.\n"
+  "%s: CPU time used - %f, Wall clock time used %f.\n",
+  "%s: File name and path too long, must be less than %d bytes.\n",
+  "%s: No statistics directory specified.\n",
+  "%s: Unable to write file %s.\n"
 };
 
 static int g_buf_counter = G_ERROR_INIT;   /* pointer to current message */
