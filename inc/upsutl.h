@@ -54,6 +54,7 @@
  * Declaration of public functions.
  */
 
+t_upstyp_product *upsutl_get_config( const char * const a_db);
 char *upsutl_environment(const char * const a_env_var);
 t_upslst_item *upsutl_free_matched_instance_list(
 					   t_upslst_item ** const a_inst_list);
@@ -64,8 +65,8 @@ char *upsutl_get_prod_dir(const char * const a_db,
 			  const char * const a_prod_name);
 void upsutl_start_timing(void);
 void upsutl_stop_timing(void);
-void upsutl_statistics(t_upstyp_instance const * const a_instance,
-		       char const * const a_dir, char const * const a_command);
+void upsutl_statistics(t_upslst_item const * const a_mproduct,
+		       char const * const a_command);
 char *upsutl_time_date(void);
 char *upsutl_user(void);
 
