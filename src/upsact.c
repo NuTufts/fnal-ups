@@ -136,7 +136,7 @@ static t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 					    t_upslst_item *const cmd_list );
 static char *actitem2str( const t_upsact_item *const p_act_itm );
 static t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
-					 const int i_act,
+					 /* const int i_act, */
 					 const int i_build );
 static int do_exit_action( const t_upsact_cmd * const a_cmd );
 
@@ -183,6 +183,11 @@ static void f_proddir( ACTION_PARAMS);
 static void f_unsetupenv( ACTION_PARAMS);
 static void f_unproddir( ACTION_PARAMS);
 static void f_dodefaults( ACTION_PARAMS);
+
+static void shutup( ACTION_PARAMS);
+/* pretend to use all of the parameters we've defined */
+#define SHUTUP \
+  if ((&bit_bucket == 0) && 0) shutup (a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
 #define OUTPUT_ACTION_INFO(severity, minst) \
     if (minst->version && minst->version->product &&                  \
@@ -349,6 +354,7 @@ static char *g_shPath = "PATH";
 static char *g_cshPath = "path";
 static char *g_shDelimiter = ":";
 static char *g_cshDelimiter = " ";
+static long bit_bucket = 0;
 
 /* this one, is a pointer to the ugo_command from the command line */
 static t_upsugo_command *g_ugo_cmd = 0;
@@ -1692,7 +1698,7 @@ int parse_params( const char * const a_params, char **argv )
  * Return: t_upsugo_command *, a ugo command
  */
 t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd, 
-				  const int i_act,
+				  /* const int i_act, */
 				  const int i_build )
 {
   static char s_pname[256];
@@ -1809,7 +1815,7 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
 
   if ( (i_cmd & 2) && (g_ups_cmd != e_depend) && !g_COMPILE_FLAG ) {
 
-    if ( (a_ugo = get_SETUP_prod( p_cmd, i_act, is_act_build )) )
+    if ( (a_ugo = get_SETUP_prod( p_cmd, /* i_act, */ is_act_build )) )
       *unsetup_flag = 1;
   }
 
@@ -1892,8 +1898,7 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 
   if ( i_act == e_unsetup ) {
 
-    if ( 1 ) {
-      /*     if ( ! TOO_MUCH_FOR_UNSETUP( the_ugo_cmd ) ) { */
+      /* if ( ! TOO_MUCH_FOR_UNSETUP( the_ugo_cmd ) ) */ {
 
       (void) strcpy( s_pname, the_ugo_cmd->ugo_product );
       pname = upsutl_upcase( s_pname );
@@ -1914,9 +1919,9 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 	unsetup_flag = 1;
       }
     }
-    else {
-      unsetup_flag = 1;
-    }
+/*    else {                   */
+/*      unsetup_flag = 1;      */
+/*    }                        */
   }
 
   /* create a partial action structure for top product */
@@ -2386,6 +2391,7 @@ static void f_copyhtml( ACTION_PARAMS)
   CHECK_NUM_PARAM("copyHtml");
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
   upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
+  SHUTUP;
 }
 
 static void f_copyinfo( ACTION_PARAMS)
@@ -2393,6 +2399,7 @@ static void f_copyinfo( ACTION_PARAMS)
   CHECK_NUM_PARAM("copyInfo");
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
   upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
+  SHUTUP;
 }
 
 static void f_copyman( ACTION_PARAMS)
@@ -2400,6 +2407,7 @@ static void f_copyman( ACTION_PARAMS)
   CHECK_NUM_PARAM("copyMan");
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
   upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
+  SHUTUP;
 }
 
 static void f_copycatman( ACTION_PARAMS)
@@ -2407,6 +2415,7 @@ static void f_copycatman( ACTION_PARAMS)
   CHECK_NUM_PARAM("copyCatMan");
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
   upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
+  SHUTUP;
 }
 
 static void f_uncopyman( ACTION_PARAMS)
@@ -2414,6 +2423,7 @@ static void f_uncopyman( ACTION_PARAMS)
   CHECK_NUM_PARAM("uncopyMan");
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
   upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
+  SHUTUP;
 }
 
 static void f_uncopycatman( ACTION_PARAMS)
@@ -2421,6 +2431,7 @@ static void f_uncopycatman( ACTION_PARAMS)
   CHECK_NUM_PARAM("uncopyCatMan");
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
   upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
+  SHUTUP;
 }
 
 static void f_copynews( ACTION_PARAMS)
@@ -2428,6 +2439,7 @@ static void f_copynews( ACTION_PARAMS)
   CHECK_NUM_PARAM("copyNews");
   OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
   upsver_mes(1, "%sThis action is not supported yet.\n", ACT_PREFIX);
+  SHUTUP;
 }
 
 static void f_envappend( ACTION_PARAMS)
@@ -2484,6 +2496,7 @@ static void f_envappend( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_envprepend( ACTION_PARAMS)
@@ -2541,6 +2554,7 @@ static void f_envprepend( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_envremove( ACTION_PARAMS)
@@ -2623,6 +2637,7 @@ static void f_envremove( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_envset( ACTION_PARAMS)
@@ -2660,6 +2675,7 @@ static void f_envset( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_envsetifnotset( ACTION_PARAMS)
@@ -2699,6 +2715,7 @@ static void f_envsetifnotset( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_envunset( ACTION_PARAMS)
@@ -2734,6 +2751,7 @@ static void f_envunset( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_exeaccess( ACTION_PARAMS)
@@ -2785,6 +2803,7 @@ static void f_exeaccess( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_execute( ACTION_PARAMS)
@@ -2845,6 +2864,7 @@ static void f_execute( ACTION_PARAMS)
       }
     }
   }
+  SHUTUP;
 }
 
 static void f_filetest( ACTION_PARAMS)
@@ -2889,6 +2909,7 @@ static void f_filetest( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_pathappend( ACTION_PARAMS)
@@ -2944,6 +2965,7 @@ static void f_pathappend( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_pathprepend( ACTION_PARAMS)
@@ -3000,6 +3022,7 @@ static void f_pathprepend( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_pathremove( ACTION_PARAMS)
@@ -3065,6 +3088,7 @@ static void f_pathremove( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_pathset( ACTION_PARAMS)
@@ -3107,6 +3131,8 @@ static void f_pathset( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
+  if ((&bit_bucket == 0) && 0) bit_bucket ^= (long) delimiter;
 }
 
 #define g_SHPARAM "\"$@\""
@@ -3164,6 +3190,7 @@ static void f_addalias( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_unalias( ACTION_PARAMS)
@@ -3199,6 +3226,7 @@ static void f_unalias( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static int sh_output_first_check(const FILE * const a_stream,
@@ -3255,6 +3283,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 /*      } */
     }
   }
+  if ((&bit_bucket == 0) && 0) bit_bucket ^= (long) a_exit_flag;
   return(status);
 }
 
@@ -3312,6 +3341,7 @@ static int csh_output_next_part(const FILE * const a_stream,
 /*       } */
     }
   }
+  if ((&bit_bucket == 0) && 0) bit_bucket ^= (long) a_exit_flag;
   return(status);
 }
 
@@ -3401,6 +3431,7 @@ static void f_sourcecompilereq( ACTION_PARAMS)
       }
     }
   }
+  SHUTUP;
 }
 
 static void f_sourcecompileopt( ACTION_PARAMS)
@@ -3450,6 +3481,7 @@ static void f_sourcecompileopt( ACTION_PARAMS)
       }
     }
   }
+  SHUTUP;
 }
 
 static void f_sourcerequired( ACTION_PARAMS)
@@ -3509,6 +3541,7 @@ static void f_sourcerequired( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_sourceoptional( ACTION_PARAMS)
@@ -3565,6 +3598,7 @@ static void f_sourceoptional( ACTION_PARAMS)
       }
     }
   }
+  SHUTUP;
 }
 
 static void f_sourcereqcheck( ACTION_PARAMS)
@@ -3625,6 +3659,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
 }
 
 static void f_sourceoptcheck( ACTION_PARAMS)
@@ -3680,6 +3715,7 @@ static void f_sourceoptcheck( ACTION_PARAMS)
       }
     }
   }
+  SHUTUP;
 }
 
 static void f_writecompilescript(ACTION_PARAMS)
@@ -3834,6 +3870,7 @@ static void f_writecompilescript(ACTION_PARAMS)
     upsmem_free(mproduct);
     upsmem_dec_refctr(a_db_info);
   }
+  SHUTUP;
 }
 
 static void f_setupenv( ACTION_PARAMS)
@@ -3847,6 +3884,7 @@ static void f_setupenv( ACTION_PARAMS)
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
     SET_SETUP_PROD();
   }
+  SHUTUP;
 }
 
 static void f_unsetupenv( ACTION_PARAMS)
@@ -3875,6 +3913,7 @@ static void f_unsetupenv( ACTION_PARAMS)
       }
     }
   }
+  SHUTUP;
 }
 
 static void f_proddir( ACTION_PARAMS)
@@ -3945,6 +3984,7 @@ static void f_proddir( ACTION_PARAMS)
       }
     } 
   }
+  SHUTUP;
 }
 
 static void f_unproddir( ACTION_PARAMS)
@@ -3973,6 +4013,7 @@ static void f_unproddir( ACTION_PARAMS)
       }
     }
   }
+  SHUTUP;
 }
 
 static void f_dodefaults( ACTION_PARAMS)
@@ -4081,4 +4122,14 @@ static void f_dodefaults( ACTION_PARAMS)
 		 g_func_info[a_cmd->icmd].cmd);
     }
   }
+  SHUTUP;
+}
+
+static void shutup( ACTION_PARAMS)
+{
+  bit_bucket ^= (long) a_minst;
+  bit_bucket ^= (long) a_db_info;
+  bit_bucket ^= (long) a_command_line;
+  bit_bucket ^= (long) a_stream;
+  bit_bucket ^= (long) a_cmd;
 }
