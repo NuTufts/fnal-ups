@@ -41,7 +41,7 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
 	          ups_configure.o ups_unconfigure.o ups_unsetup.o \
-	          ups_tailor.o ups_create.o ups_unk.o ups_declare.o \
+	          ups_tailor.o ups_unk.o ups_declare.o \
 	          ups_depend.o ups_get.o ups_undeclare.o ups_flavor.o \
 	          ups_copy.o ups_modify.o ups_touch.o ups_verify.o
 
@@ -50,7 +50,7 @@ CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
 	     upskey.A upshlp.A ups_unk.A ups_setup.A \
 	     upsver.A upsact.A upsget.A ups_start.A \
 	     ups_stop.A ups_configure.A ups_unconfigure.A \
-	     ups_unsetup.A ups_tailor.A ups_create.A upstbl.A \
+	     ups_unsetup.A ups_tailor.A upstbl.A \
              ups_list.A ups_depend.A ups_get.A ups_declare.A \
 	     ups_undeclare.A ups_flavor.A ups_copy.A ups_modify.A \
              ups_unk.A ups_touch.A ups_verify.A upscpy.A
@@ -150,14 +150,6 @@ ups_copy.o: $(UPS_DIR)/inc/upstbl.h
 ups_copy.o: $(UPS_DIR)/inc/ups_main.h
 ups_copy.o: $(UPS_DIR)/inc/ups_declare.h
 ups_copy.o: $(UPS_DIR)/inc/ups_copy.h
-ups_create.o: ups_create.c
-ups_create.o: $(UPS_DIR)/inc/upserr.h
-ups_create.o: $(UPS_DIR)/inc/upsugo.h
-ups_create.o: $(UPS_DIR)/inc/upslst.h
-ups_create.o: $(UPS_DIR)/inc/upstyp.h
-ups_create.o: $(UPS_DIR)/inc/upsutl.h
-ups_create.o: $(UPS_DIR)/inc/upsfil.h
-ups_create.o: $(UPS_DIR)/inc/upstbl.h
 ups_declare.o: ups_declare.c
 ups_declare.o: $(UPS_DIR)/inc/ups.h
 ups_declare.o: $(UPS_DIR)/inc/upsact.h
@@ -178,7 +170,6 @@ ups_declare.o: $(UPS_DIR)/inc/upsver.h
 ups_declare.o: $(UPS_DIR)/inc/ups_list.h
 ups_declare.o: $(UPS_DIR)/inc/ups_configure.h
 ups_declare.o: $(UPS_DIR)/inc/ups_copy.h
-ups_declare.o: $(UPS_DIR)/inc/ups_create.h
 ups_declare.o: $(UPS_DIR)/inc/ups_declare.h
 ups_declare.o: $(UPS_DIR)/inc/ups_depend.h
 ups_declare.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -224,7 +215,6 @@ ups_flavor.o: $(UPS_DIR)/inc/upsver.h
 ups_flavor.o: $(UPS_DIR)/inc/ups_list.h
 ups_flavor.o: $(UPS_DIR)/inc/ups_configure.h
 ups_flavor.o: $(UPS_DIR)/inc/ups_copy.h
-ups_flavor.o: $(UPS_DIR)/inc/ups_create.h
 ups_flavor.o: $(UPS_DIR)/inc/ups_declare.h
 ups_flavor.o: $(UPS_DIR)/inc/ups_depend.h
 ups_flavor.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -272,7 +262,6 @@ ups_list.o: $(UPS_DIR)/inc/upsver.h
 ups_list.o: $(UPS_DIR)/inc/ups_list.h
 ups_list.o: $(UPS_DIR)/inc/ups_configure.h
 ups_list.o: $(UPS_DIR)/inc/ups_copy.h
-ups_list.o: $(UPS_DIR)/inc/ups_create.h
 ups_list.o: $(UPS_DIR)/inc/ups_declare.h
 ups_list.o: $(UPS_DIR)/inc/ups_depend.h
 ups_list.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -301,26 +290,6 @@ ups_main.o: $(UPS_DIR)/inc/ups_stop.h
 ups_main.o: $(UPS_DIR)/inc/ups_configure.h
 ups_main.o: $(UPS_DIR)/inc/ups_unconfigure.h
 ups_main.o: $(UPS_DIR)/inc/ups_list.h
-ups_main.o: $(UPS_DIR)/inc/ups_create.h
-ups_main.o: $(UPS_DIR)/inc/ups_tailor.h
-ups_main.o: $(UPS_DIR)/inc/ups_unk.h
-ups_main.o: $(UPS_DIR)/inc/ups_depend.h
-ups_main.o: $(UPS_DIR)/inc/ups_touch.h
-ups_main.o: $(UPS_DIR)/inc/upserr.h
-ups_main.o: $(UPS_DIR)/inc/upsutl.h
-ups_main.o: $(UPS_DIR)/inc/upshlp.h
-ups_main.o: $(UPS_DIR)/inc/upsget.h
-ups_main.o: $(UPS_DIR)/inc/upsact.h
-ups_main.o: $(UPS_DIR)/inc/upsmat.h
-ups_main.o: $(UPS_DIR)/inc/upsver.h
-ups_main.o: $(UPS_DIR)/inc/upsfil.h
-ups_main.o: $(UPS_DIR)/inc/upstbl.h
-ups_main.o: $(UPS_DIR)/inc/ups_declare.h
-ups_main.o: $(UPS_DIR)/inc/ups_undeclare.h
-ups_main.o: $(UPS_DIR)/inc/ups_flavor.h
-ups_main.o: $(UPS_DIR)/inc/ups_get.h
-ups_main.o: $(UPS_DIR)/inc/ups_copy.h
-ups_main.o: $(UPS_DIR)/inc/ups_modify.h
 ups_modify.o: ups_modify.c
 ups_modify.o: $(UPS_DIR)/inc/ups.h
 ups_modify.o: $(UPS_DIR)/inc/upsact.h
@@ -341,7 +310,6 @@ ups_modify.o: $(UPS_DIR)/inc/upsver.h
 ups_modify.o: $(UPS_DIR)/inc/ups_list.h
 ups_modify.o: $(UPS_DIR)/inc/ups_configure.h
 ups_modify.o: $(UPS_DIR)/inc/ups_copy.h
-ups_modify.o: $(UPS_DIR)/inc/ups_create.h
 ups_modify.o: $(UPS_DIR)/inc/ups_declare.h
 ups_modify.o: $(UPS_DIR)/inc/ups_depend.h
 ups_modify.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -417,7 +385,6 @@ ups_touch.o: $(UPS_DIR)/inc/upsver.h
 ups_touch.o: $(UPS_DIR)/inc/ups_list.h
 ups_touch.o: $(UPS_DIR)/inc/ups_configure.h
 ups_touch.o: $(UPS_DIR)/inc/ups_copy.h
-ups_touch.o: $(UPS_DIR)/inc/ups_create.h
 ups_touch.o: $(UPS_DIR)/inc/ups_declare.h
 ups_touch.o: $(UPS_DIR)/inc/ups_depend.h
 ups_touch.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -463,7 +430,6 @@ ups_undeclare.o: $(UPS_DIR)/inc/upsver.h
 ups_undeclare.o: $(UPS_DIR)/inc/ups_list.h
 ups_undeclare.o: $(UPS_DIR)/inc/ups_configure.h
 ups_undeclare.o: $(UPS_DIR)/inc/ups_copy.h
-ups_undeclare.o: $(UPS_DIR)/inc/ups_create.h
 ups_undeclare.o: $(UPS_DIR)/inc/ups_declare.h
 ups_undeclare.o: $(UPS_DIR)/inc/ups_depend.h
 ups_undeclare.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -542,7 +508,6 @@ upscpy.o: $(UPS_DIR)/inc/upsver.h
 upscpy.o: $(UPS_DIR)/inc/ups_list.h
 upscpy.o: $(UPS_DIR)/inc/ups_configure.h
 upscpy.o: $(UPS_DIR)/inc/ups_copy.h
-upscpy.o: $(UPS_DIR)/inc/ups_create.h
 upscpy.o: $(UPS_DIR)/inc/ups_declare.h
 upscpy.o: $(UPS_DIR)/inc/ups_depend.h
 upscpy.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -593,7 +558,6 @@ upsget.o: $(UPS_DIR)/inc/upsver.h
 upsget.o: $(UPS_DIR)/inc/ups_list.h
 upsget.o: $(UPS_DIR)/inc/ups_configure.h
 upsget.o: $(UPS_DIR)/inc/ups_copy.h
-upsget.o: $(UPS_DIR)/inc/ups_create.h
 upsget.o: $(UPS_DIR)/inc/ups_declare.h
 upsget.o: $(UPS_DIR)/inc/ups_depend.h
 upsget.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -670,7 +634,6 @@ upsugo.o: $(UPS_DIR)/inc/upsver.h
 upsugo.o: $(UPS_DIR)/inc/ups_list.h
 upsugo.o: $(UPS_DIR)/inc/ups_configure.h
 upsugo.o: $(UPS_DIR)/inc/ups_copy.h
-upsugo.o: $(UPS_DIR)/inc/ups_create.h
 upsugo.o: $(UPS_DIR)/inc/ups_declare.h
 upsugo.o: $(UPS_DIR)/inc/ups_depend.h
 upsugo.o: $(UPS_DIR)/inc/ups_flavor.h
@@ -700,19 +663,6 @@ upsutl.o: $(UPS_DIR)/inc/upsget.h
 upsutl.o: $(UPS_DIR)/inc/upsact.h
 upsutl.o: $(UPS_DIR)/inc/upsmat.h
 upsutl.o: $(UPS_DIR)/inc/upsver.h
-upsutl_save.o: upsutl_save.c
-upsutl_save.o: $(UPS_DIR)/inc/upsutl.h
-upsutl_save.o: $(UPS_DIR)/inc/upstyp.h
-upsutl_save.o: $(UPS_DIR)/inc/upslst.h
-upsutl_save.o: $(UPS_DIR)/inc/upsugo.h
-upsutl_save.o: $(UPS_DIR)/inc/upserr.h
-upsutl_save.o: $(UPS_DIR)/inc/upsmem.h
-upsutl_save.o: $(UPS_DIR)/inc/upsfil.h
-upsutl_save.o: $(UPS_DIR)/inc/upstbl.h
-upsutl_save.o: $(UPS_DIR)/inc/upsget.h
-upsutl_save.o: $(UPS_DIR)/inc/upsact.h
-upsutl_save.o: $(UPS_DIR)/inc/upsmat.h
-upsutl_save.o: $(UPS_DIR)/inc/upsver.h
 upsver.o: upsver.c
 upsver.o: $(UPS_DIR)/inc/upserr.h
 upsver.o: $(UPS_DIR)/inc/upsver.h
