@@ -47,25 +47,28 @@ typedef struct ups_command
     int     ugo_c;           /* current specified                    */
     int     ugo_C;           /* Don't do Configure                   */
     int     ugo_d;           /* development chain                    */
-    int     ugo_D;           /* list all versions with archive file  */
+    int     ugo_D;           /* origin file                          */
+    char    *ugo_origin;
     int     ugo_e;           /* Define ups_extended                  */
     int     ugo_E;           /* Run Editor                           */
     int     ugo_f;           /* Flavor(s) specified                  */
     t_upslst_item *ugo_flavor;
     int     ugo_F;           /* Return list of files not in product  */
-/*  int     ugo_G;           UNDEFINED                               */
+/*  int     ugo_G;           UPD-RESERVE */
     int     ugo_g;           /* Did they request a "special" chain?  */
     int     ugo_h;           /* Host(s) specified                    */
     t_upslst_item *ugo_host;
     int     ugo_H;           /* Gen flavor match list from -f no OS  */
     t_upslst_item *ugo_osname; /* user specified os name             */
+/*  int     ugo_i;           UPD-RESERVE */
+/*  int     ugo_I;           UPD-RESERVE */
     int     ugo_j;           /* applies to top level product         */
-/*  int     ugo_J;           UNDEFINED                               */
+/*  int     ugo_J;           UPD-RESERVE */
     int     ugo_k;           /* Don't do unsetup first               */
     int     ugo_K;           /* Keywords                             */
     t_upslst_item *ugo_key;
     int     ugo_l;           /* long (listing)                       */
-/*  int     ugo_L;           UNDEFINED                               */
+    int     ugo_L;           /* statistics add in verson on declare  */
     int     ugo_m;           /* Table file                           */
     char    *ugo_tablefiledir;  
     int     ugo_M;           /* Table file directory                 */
@@ -82,12 +85,12 @@ typedef struct ups_command
     char    *ugo_override; 
     int     ugo_q;           /* CODE INCOMPLETE                      */
     t_upslst_item *ugo_qualifiers;
-/*  int     ugo_Q;           UNDEFINED                               */
+/*  int     ugo_Q;           UPD-RESERVE */
     int     ugo_r;           /* set product dir to value             */
     char    *ugo_productdir; 
-/*  int     ugo_R;           UNDEFINED                               */
+/*  int     ugo_R;           UPD-RESERVE */
+/*  int     ugo_s;           UPD-RESERVE */
     int     ugo_S;           /* Syntax Checking                      */
-/*  int     ugo_s;           UNDEFINED                               */
     int     ugo_t;           /* test chain                           */
     int     ugo_T;           /* archive file name                    */
     char    *ugo_archivefile; 

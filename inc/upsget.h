@@ -83,5 +83,5 @@ t_upstyp_product *upsget_version_file (const char * const,
 char *upsget_database(const t_upstyp_db * const,
                       const t_upstyp_matched_instance * const ,
                       const t_upsugo_command * const );
-char *upsget_tilde_dir(const char * const );
+char *upsget_tilde_dir(char *);
 #endif /* _UPSGET_H_ */
