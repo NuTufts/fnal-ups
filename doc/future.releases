@@ -9,57 +9,28 @@ version of the reconstructed UPS and needs to be added in a subsequent version.
 	- allow releases with no parents to be located
 	- all reports have an option to be generated in html
 4. When doing a declare, warn user if the UPS required products do not exist.
-5. support an execute-sh and an execute-csh variety.  see following -
 
-Right now in the actions we have
-
-        execute("COMMAND" [,variable])
-
-I think we also need
-
-        execute-if-sh("SH-COMMAND" [,variable])
-and
-        execute-if-csh("CSH-COMMAND" [,variable])
-
-which translate into 
-
-        if ( ${UPS_SHELL} eq "sh" ) then
-          execute-if-sh("SH-COMMAND" [,variable])
-        else
-          execute-if-csh("CSH-COMMAND" [,variable])
-
-
-Otherwise, we'll have to go through nasty gyrations (as I was doing
-late last week) to simulate this inside the command itself (or
-resort to sourcing setup.${UPS_SHELL} in many cases where it
-shouldn't be required).
-
-Cases where this is important: we have several products which need
-to do something the FIRST time you set it up (e.g., www browsers
-need to initialize your .mailcap file; exmh/mh needs to initialize
-your .mh_profile; pine needs to initialize your .pinerc, etc.).  Or
-cases where you're setting aliases (csh) or shell functions (sh).
-
-A typical first-time-through test is
-
-        if ( whatever-file does not exist ) then
-          do the first time stuff
-
-The problem here:  IF statements are VERY different in csh and sh
-families.  Without the higher-level execute-if-sh/execute-if-csh
-construct, I'd need to do something like:
-  execute("test "$UPS_SHELL" = "sh" && eval 'if [ ! -r whatever-file ] then; do-the-stuff; fi'")
-
-  execute("test "$UPS_SHELL" = "csh" && eval 'if ( ! -r whatever-file ) then; do-the-stuff; endif'")
-
-
-which is more complicated than
-
-  execute-if-sh("if [ ! -r whatever-file ] then; do-the-stuff; fi")
-  execute-if-csh("if ( ! -r whatever-file ) then; do-the-stuff; endif")
-
-6. When creating the temp file, first define a function that undefined all
+5. When creating the temp file, first define a function that undefined all
 	the UPS local environment variables and removes the temp file.  Then
 	before each return/exit point, call this function.
+
+6. Allow specification in the dbconfig file of the order of the search path
+	when looking for the table file (i.e.
+	table_resorder=(database:product:ups:home)
+
+7. Support the -B comman line parameter.  This allows a user to override the
+	information in the table file for a specific ups dependent product.
+	For example - if a table file for product pearl had a line in it like -
+
+	setupRequired("bobo v2_0")
+
+	then the following command line would cause v1_0 of bobo to get set
+	up, not v2_0 -
+
+
+	setup pearl -B "bobo v1_0"
+
+8. Write and debug 'ups parent' command.  This is the command which will
+	list all the products that depend on the given instance.
 
 
