@@ -200,7 +200,7 @@ void upserr_clear (void)
   /* only do something if there are messages in the buffer */
   if (g_buf_start != G_ERROR_INIT) {
     /* free all of the error message bufs */
-    for (i = g_buf_start; i <= g_buf_counter; ++i) {
+    for (i = g_buf_start; i != g_buf_counter; ++i) {
       if (i < G_ERROR_BUF_MAX) {
 	free(g_error_buf[i]);
       } else {
