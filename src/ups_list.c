@@ -526,6 +526,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     }
     if (!strncmp(l_ptr->data,"_",1))
     { str_val=0;
+      valid=1;
       if (instance->chain) 
          str_val = upskey_inst_getuserval( instance->chain,l_ptr->data);
       if (instance->version && !str_val )
@@ -535,7 +536,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
       if (!str_val) 
       { printf("\"\" ");  /* this gives them "" for a invalid _key */
       } else {
-        valid=1;
         if (strlen(str_val))
         { printf("\"%s\" ",str_val);
         } else { 
