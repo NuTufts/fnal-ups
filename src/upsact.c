@@ -3932,12 +3932,12 @@ static void f_if( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s; if [ $? = 0 ]\nthen\n", a_cmd->argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s; if [ $? = 0 ]\nthen\n:\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "%s\nif ($status == 0) then\n", a_cmd->argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s\nif ($status == 0) then\n:\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -3970,12 +3970,12 @@ static void f_unless( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s; if [ $? != 0 ] \nthen\n", a_cmd->argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s; if [ $? != 0 ] \nthen\n:\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "%s\nif ($status != 0) then\n", a_cmd->argv[0]) < 0) {
+      if (fprintf((FILE *)a_stream, "%s\nif ($status != 0) then\n:\n", a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
       break;
@@ -4052,7 +4052,7 @@ static void f_else( ACTION_PARAMS)
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
-    if (fprintf((FILE *)a_stream, "else\n") < 0) {
+    if (fprintf((FILE *)a_stream, "else\n:\n") < 0) {
       FPRINTF_ERROR();
     }
     if (UPS_ERROR != UPS_SUCCESS) {
