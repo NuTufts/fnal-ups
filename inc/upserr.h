@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_error.h
+ *       upserr.h
  * 
  * DESCRIPTION: 
  *       This file includes definition of error messages and associated
@@ -21,8 +21,8 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_ERROR_H_
-#define _UPS_ERROR_H_
+#ifndef _UPSERR_H_
+#define _UPSERR_H_
 
 /* standard include files, if needed for .h file */
 
@@ -97,7 +97,7 @@ extern char *g_error_ascii[];
 #define upserr_place() g_ups_line=__LINE__; g_ups_file=(char *)__FILE__;
 #define upserr_vplace() if (UPS_VERBOSE) { upserr_place() }
 
-#endif /* _UPS_ERROR_H_ */
+#endif /* _UPSERR_H_ */
 
 
 

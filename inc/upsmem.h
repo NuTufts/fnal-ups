@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_memory.h
+ *       upsmem.h
  * 
  * DESCRIPTION: 
  *       The file prototypes all the UPS memory handline functions
@@ -19,8 +19,8 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_MEMORY_H_
-#define _UPS_MEMORY_H_
+#ifndef _UPSMEM_H_
+#define _UPSMEM_H_
 
 /* standard include files, if needed for .h file */
 
@@ -62,5 +62,5 @@ int upsmem_get_refctr(const void * const a_data);
 void upsmem_inc_refctr(const void * const a_data);
 void upsmem_dec_refctr(const void * const a_data);
 
-#endif /* _UPS_XYZ_H_ */
+#endif /* _UPSMEM_H_ */
 

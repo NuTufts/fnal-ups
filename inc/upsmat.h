@@ -1,7 +1,7 @@
 /************************************************************************
  *
  * FILE:
- *       ups_match.h
+ *       upsmat.h
  * 
  * DESCRIPTION: 
  *       Prototypes etc., for instance matching
@@ -19,8 +19,8 @@
  *
  ***********************************************************************/
 
-#ifndef _UPS_MATCH_H_
-#define _UPS_MATCH_H_
+#ifndef _UPSMAT_H_
+#define _UPSMAT_H_
 
 /* standard include files, if needed for .h file */
 
@@ -56,4 +56,4 @@ t_ups_match_product *upsmat_match_instance(
  */
 
 
-#endif /* _UPS_MATCH_H_ */
+#endif /* _UPSMAT_H_ */
