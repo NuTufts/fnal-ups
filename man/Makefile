@@ -13,26 +13,26 @@ default:
 
 all :
 	-rm catman/*.1
-	@../bin/ups -? > catman/ups.1
-	@../bin/ups configure -? > catman/ups_configure.1
-	@../bin/ups copy -? > catman/ups_copy.1
-	@../bin/ups create -? > catman/ups_create.1
-	@../bin/ups declare -? > catman/ups_declare.1
-	@../bin/ups depend -? > catman/ups_depend.1
-	@../bin/ups exist -? > catman/ups_exist.1
-	@../bin/ups flavor -? > catman/ups_flavor.1
-	@../bin/ups get -? > catman/ups_get.1
-	@../bin/ups list -? > catman/ups_list.1
-	@../bin/ups modify -? > catman/ups_modify.1
-	@../bin/ups setup -? > catman/ups_setup.1
-	@../bin/ups start -? > catman/ups_start.1
-	@../bin/ups stop -? > catman/ups_stop.1
-	@../bin/ups tailor -? > catman/ups_tailor.1
-	@../bin/ups touch -? > catman/ups_touch.1
-	@../bin/ups unconfigure -? > catman/ups_unconfigure.1
-	@../bin/ups undeclare -? > catman/ups_undeclare.1
-	@../bin/ups unsetup -? > catman/ups_unsetup.1
-	@../bin/ups verify -? > catman/ups_verify.1
+	@../bin/ups -? 2> catman/ups.1
+	@../bin/ups configure -? 2> catman/ups_configure.1
+	@../bin/ups copy -? 2> catman/ups_copy.1
+	@../bin/ups create -? 2> catman/ups_create.1
+	@../bin/ups declare -? 2> catman/ups_declare.1
+	@../bin/ups depend -? 2> catman/ups_depend.1
+	@../bin/ups exist -? 2> catman/ups_exist.1
+	@../bin/ups flavor -? 2> catman/ups_flavor.1
+	@../bin/ups get -? 2> catman/ups_get.1
+	@../bin/ups list -? 2> catman/ups_list.1
+	@../bin/ups modify -? 2> catman/ups_modify.1
+	@../bin/ups setup -? 2> catman/ups_setup.1
+	@../bin/ups start -? 2> catman/ups_start.1
+	@../bin/ups stop -? 2> catman/ups_stop.1
+	@../bin/ups tailor -? 2> catman/ups_tailor.1
+	@../bin/ups touch -? 2> catman/ups_touch.1
+	@../bin/ups unconfigure -? 2> catman/ups_unconfigure.1
+	@../bin/ups undeclare -? 2> catman/ups_undeclare.1
+	@../bin/ups unsetup -? 2> catman/ups_unsetup.1
+	@../bin/ups verify -? 2> catman/ups_verify.1
 
 #
 # Now standard targets
