@@ -879,7 +879,7 @@ static t_upstyp_matched_product *match_instance_core(
 
     /* We went thru the list of chain instances, get a matched product
        structure if we got any matches */
-    if (num_matches > 0) {
+    if ((num_matches > 0) && master_minst_list) {
       mproduct = ups_new_matched_product(a_db_info, a_prod_name,
 					 master_minst_list);
     }
@@ -995,7 +995,7 @@ static int match_from_chain( const char * const a_product,
 	  tmp_minst_ptr->invalid_instance = 1;
 	} else {
 	  /* keep a running total of the matches we found */
-	  ++num_matches;
+	  num_matches = num_matches + tmp_num_matches;
 	}
 	/* only point cinst to the next element on the list if there is one 
 	   and if there was no error in which case we are already pointing
@@ -1042,7 +1042,7 @@ static int match_from_version( const char * const a_product,
 {
 
   int file_chars, num_matches = 0, tmp_num_matches = 0;
-  char buffer[FILENAME_MAX+1];
+  char buffer[FILENAME_MAX+1], *tmp_version = "";
   t_upstyp_product *read_product;
   t_upslst_item *vinst, *minst_item;
   t_upslst_item tmp_any_flavor_list = {NULL, ANY_FLAVOR, NULL};
@@ -1055,13 +1055,15 @@ static int match_from_version( const char * const a_product,
 
   tmp_any_flavor_list.prev = &tmp_flavor_list;
   tmp_flavor_list.next = &tmp_any_flavor_list;
-
+  if (a_version) {
+    tmp_version = (char *)a_version;
+  }
 
   /* Get total length of version file name including path */
-  file_chars = (int )(strlen(a_version) + strlen(a_product) +
+  file_chars = (int )(strlen(tmp_version) + strlen(a_product) +
 		      strlen(a_db_info->name) + sizeof(VERSION_SUFFIX) + 4);
   if (file_chars <= FILENAME_MAX) {
-    sprintf(buffer, "%s/%s/%s%s", a_db_info->name, a_product, a_version,
+    sprintf(buffer, "%s/%s/%s%s", a_db_info->name, a_product, tmp_version,
 	    VERSION_SUFFIX);
     read_product = upsfil_read_file(&buffer[0]);
     if ((UPS_ERROR == UPS_SUCCESS) && read_product) {
@@ -1079,9 +1081,9 @@ static int match_from_version( const char * const a_product,
 	     minst_item = minst_item->next) {
 	  minst = (t_upstyp_matched_instance *)minst_item->data;
 	  if (minst->version && minst->version->version &&
-	      strcmp(minst->version->version, a_version)) {
+	      strcmp(minst->version->version, tmp_version)) {
 	    upserr_add(UPS_MISMATCH_VERSION, UPS_WARNING, 
-		       minst->version->version, a_version);
+		       minst->version->version, tmp_version);
 	  }
 	}
       }
