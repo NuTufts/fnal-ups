@@ -531,6 +531,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   t_upstyp_matched_product *mproduct = NULL;
   t_upstyp_matched_instance *minst = NULL;
   char *tmp_stat;
+  int stats; 
   char stat_file[FILENAME_MAX+1];
   int dir_s, stat_s, file_s, global_yes = 0;
   FILE *file_stream = 0;
@@ -558,9 +559,18 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 	 minst_item ; minst_item = minst_item->next) {
       minst = (t_upstyp_matched_instance *)minst_item->data;
       /* check to see if the instance indicates to keep statistics */
-      if (global_yes || minst->chain->statistics ||
+/* DjF quick fix ok??? */
+      if (minst->chain) 
+         if (minst->chain->statistics) stats++; 
+      if (minst->version) 
+         if (minst->version->statistics) stats++; 
+      if (minst->table) 
+         if (minst->table->statistics) stats++; 
+/*      if (global_yes || minst->chain->statistics ||
 	                minst->version->statistics ||
 	                minst->table->statistics) {
+*/
+      if (global_yes || stats) { 
 	if (! file_stream ) {       /* we need to still open the stream */
 	  dir_s = (int )strlen(mproduct->db_info->name);
 	  stat_s = (int )strlen(g_stat_dir);
