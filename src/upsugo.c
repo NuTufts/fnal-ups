@@ -1067,7 +1067,7 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      t_upslst_item *hold = 0;
      
      setup_prod = (char *) malloc((size_t)(strlen(product) +7));
-     (void) strcpy(setup_prod,"SETUP_");
+     (void) strcpy(setup_prod,SETUPENV);
      (void) strcat(setup_prod,product);
      if((setup_env = (char *)getenv(setup_prod)) == 0)
      { return (uc);
