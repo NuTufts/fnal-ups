@@ -111,14 +111,14 @@ $(LIB)/libups.a : $(OBJECTS) $(COMMAND_OBJECTS)
 # Now standard targets
 #
 clean spotless :
-	@ upsClean
+	@ ../bin/upsClean
 
 make :
 	@if [ "$(CCENV)" = "" ]; then ccenv=`uname`; else ccenv=$(CCENV); fi; \
 	echo \
 	"upsmake_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile" \
                                                         "-env $$ccenv *.c"; \
-	upsmake_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
+	../bin/upsmake_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 
 # DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "upspremake make" IN THE

@@ -107,19 +107,19 @@ upstst_match.o : upstst_match.c $(LIB)/libups.a
 # Now standard targets
 #
 clean :
-	@ upsClean
+	@ ../bin/upsClean
 
 spotless :
-	@ upsClean
+	@ ../bin/upsClean
 	@ rm -f $(UNIT_TESTS)
 	@ rm -f ups_test libups_test.a
 
 make :
 	@if [ "$(CCENV)" = "" ]; then ccenv=`uname`; else ccenv=$(CCENV); fi; \
 	echo \
-	"make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile" \
+	"../bin/upsmake_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile" \
                                                         "-env $$ccenv *.c"; \
-	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
+	../bin/upsmake_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 #START_DEPEND
 test_ups_list.o:	test_ups_list.c

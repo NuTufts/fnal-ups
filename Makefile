@@ -75,10 +75,10 @@ UPSDBG=
 INSURE=
 
 all: 	proddir_is_set
-	cd src; upspremake $(UPSDBG) $(INSURE)
-	cd test; upspremake $(UPSDBG) $(INSURE)
-	cd doc; upspremake $(UPSDBG) $(INSURE)
-	cd man; upspremake $(UPSDBG) $(INSURE)
+	cd src; ../bin/upspremake $(UPSDBG) $(INSURE)
+	cd test; ../bin/upspremake $(UPSDBG) $(INSURE)
+	cd doc; ../bin/upspremake $(UPSDBG) $(INSURE)
+	cd man; ../bin/upspremake $(UPSDBG) $(INSURE)
 
 test: FORCE
 	cd test/scripts; upstst_all
@@ -94,12 +94,12 @@ insure:
 
 clean:
 	for subdir in src inc test doc bin lib; do \
-	   ( cd $$subdir; echo "cleaning $$subdir"; upspremake clean ); \
+	   ( cd $$subdir; echo "cleaning $$subdir"; ../bin/upspremake clean ); \
 	done
 
 spotless:
 	for subdir in src inc test doc bin lib; do \
-	   ( cd $$subdir; echo "cleaning $$subdir"; upspremake spotless ); \
+	   ( cd $$subdir; echo "cleaning $$subdir"; ../bin/upspremake spotless ); \
 	done
 
 # we indirect this a level so we can customize it for bundle products

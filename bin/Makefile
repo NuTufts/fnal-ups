@@ -18,10 +18,10 @@ all :
 # Now standard targets
 #
 clean :
-	@upsClean
+	@../bin/upsClean
 
 spotless :
-	@upsClean
+	@../bin/upsClean
 	@/bin/rm -f ups
 	@/bin/rm -f dropit
 	@/bin/rm -f funame

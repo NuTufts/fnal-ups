@@ -18,9 +18,9 @@ all :
 # Now standard targets
 #
 clean :
-	@ upsClean
+	@ ../bin/upsClean
 
 spotless :
-	@ upsClean
+	@ ../bin/upsClean
 	@ /bin/rm -f libups.a
 

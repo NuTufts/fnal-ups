@@ -16,11 +16,11 @@ all :	help_file
 
 help_file : 
 	@rm -f  ups_help.dat
-	@${UPS_DIR}/doc/build_help_file.pl > ups_help.dat
+	@./build_help_file.pl > ups_help.dat
 
 #
 # Now standard targets
 #
 spotless clean :
-	@ upsClean
+	@ ../bin/upsClean
 
