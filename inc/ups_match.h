@@ -41,6 +41,9 @@
 t_ups_match_product *upsmat_match_instance( 
 				    const t_ups_command * const a_command_line,
 				    const char * const a_db,
+				    const char * const a_prod_name,
+				    const t_upslst_item * const a_chain_list,
+				    const t_upslst_item * const a_version,
 				    const int a_need_unique );
 
 /*

@@ -199,7 +199,7 @@ t_ups_match_product *ups_new_mp(const char * const a_db,
 				t_upslst_item * const a_chain_list,
 				t_upslst_item * const a_vers_list,
 				t_upslst_item * const a_table_list);
-t_ups_match_product *ups_free_mp(t_ups_match_product *a_mproduct);
+t_ups_match_product *ups_free_mp(t_ups_match_product * const a_mproduct);
 
 
 t_ups_command     *upsugo_next(const int ups_argc,
