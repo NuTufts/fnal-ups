@@ -40,7 +40,7 @@ depend      :?cdotgfHKmMqrUvVzZ:
 exist       :?BcdefgHjkmMoOqrtUvVzZ:
 : Determine if a setup command with the same options would likely succeed.
 get         :?cdfFgHmMnoqrtUvVzZ:
-: Return a list of all files that are needed by a product instance and do not live either in the UPS Database or under the product root directory.
+: Return a list of all files that are needed by a product instance and do not live under the product root directory.
 help        :?:This is sort of a special case since it will accept commands
 : Output help information for all UPS commands
 list        :a?cdfghHKlmMnoqrtUvVzZ:
