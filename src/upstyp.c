@@ -134,6 +134,15 @@ t_upstyp_matched_instance *ups_free_matched_instance(
     if (minst_ptr->table) {
       ups_free_instance(minst_ptr->table);
     }
+    if (minst_ptr->xtra_chains) {
+      t_upslst_item * xchain_item = NULL;
+  
+      for (xchain_item = minst_ptr->xtra_chains ; xchain_item ;
+	   xchain_item = xchain_item->next); {
+	ups_free_instance((t_upstyp_instance *)xchain_item->data);
+      }
+    upslst_free(minst_ptr->xtra_chains, ' ');
+    }
 
     upsmem_free(minst_ptr);
   }
