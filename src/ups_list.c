@@ -684,6 +684,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
   int count=0;
   int exists=1;
   int valid=0;
+/* if action=someaction and there is no match must know and put out "" */
+  int found=0; 
   if (product->db_info) 
   { db_ptr = product->db_info;
     config_ptr = db_ptr->config;
@@ -737,14 +739,19 @@ void list_K(const t_upstyp_matched_instance * const instance,
         valid=1;
       }
       if(!upsutl_strincmp(buffer,"action",6))
-      { valid=1;
+      { valid=1; 
+        found=0;
         if (instance->table)
         { for ( al_ptr = upslst_first( instance->table->action_list ); 
                   al_ptr; al_ptr = al_ptr->next, count++ )
           { ac_ptr=al_ptr->data;
             if(!upsutl_stricmp(buffer,"actions"))
             { printf("\"%s\" ",ac_ptr->action);
+              found=1;
             } else { 
+              if(strlen(buffer)<8) /* action only or action= (nothing) */
+              { valid=0;
+              }
               sprintf(actbuf1,"action=%s",ac_ptr->action);
               sprintf(actbuf2,"action=\"%s\"",ac_ptr->action);
               if(!upsutl_stricmp(actbuf1,buffer) ||
@@ -753,10 +760,14 @@ void list_K(const t_upstyp_matched_instance * const instance,
                 { ald_ptr = upslst_first( ac_ptr->command_list );
                   for ( ; ald_ptr; ald_ptr = ald_ptr->next )
                   { printf( "\"%s\" ", (char*)ald_ptr->data );
+                    found=1;
                   }
                 }
               }
             }
+          }
+          if (!found) /* action=something but no something */
+          { printf( "\"\" ");
           }
         }
       }
