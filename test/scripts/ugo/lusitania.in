@@ -1,6 +1,7 @@
 Product:          lusitania
 Version:          v1_0
 Flavor:           CHERRY
+                  ANY
 Qualifiers:       
 DB:               /thunder
                   /lightening

@@ -1,5 +1,6 @@
 Product:          bismark
 Flavor:           RUM_RAISIN
+                  ANY
 Qualifiers:       a:b:c
                   a:b
                   a:c

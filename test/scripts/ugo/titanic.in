@@ -2,6 +2,7 @@ Product:          doomed
 Flavor:           IRIX+5
                   IRIX
                   NULL
+                  ANY
 Qualifiers:       
 DB:               /thunder
                   /lightening

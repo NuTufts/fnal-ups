@@ -2,6 +2,7 @@ Product:          *
 Flavor:           CHOCOLATE
                   VANILLA
                   ROCKYROAD
+                  ANY
 Qualifiers:       a:aardvark
                   123:Bear:Canary:___:big-dog:dog
                   cat:fat-cat
