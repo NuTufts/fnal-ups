@@ -59,7 +59,7 @@
  * Definition of public variables.
  */
 extern int g_LOCAL_VARS_DEF;
-extern int g_temp_file_name;
+extern char *g_temp_file_name;
 extern int g_keep_temp_file;
 
 /*
