@@ -76,6 +76,7 @@ typedef struct s_cmd_info {
   char *cmd;
   char *valid_opts;
   unsigned int flags;
+  int uncmd_index;
 } t_cmd_info;
 
 /*
