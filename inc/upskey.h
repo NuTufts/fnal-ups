@@ -150,14 +150,14 @@ t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
 				     const char * const action_name );
 char         *upskey_inst_getuserval(t_upstyp_instance * const inst,
 				  const char * const skey );
-int          *upskey_verhead_arr();
-int          *upskey_verinst_arr();
-int          *upskey_tblhead_arr();
-int          *upskey_tblinst_arr();
-int          *upskey_chnhead_arr();
-int          *upskey_chninst_arr();
-int          *upskey_inst_arr();
-int          *upskey_prod_arr();
+int          *upskey_verhead_arr(void);
+int          *upskey_verinst_arr(void);
+int          *upskey_tblhead_arr(void);
+int          *upskey_tblinst_arr(void);
+int          *upskey_chnhead_arr(void);
+int          *upskey_chninst_arr(void);
+int          *upskey_inst_arr(void);
+int          *upskey_prod_arr(void);
 void         upskey_inst_print( const t_upstyp_instance * const prod );
 
 char         *upskey_prod_getval( t_upstyp_product * const prod,

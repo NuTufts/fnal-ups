@@ -69,7 +69,6 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *minst_list = NULL;
   t_upslst_item *chain_list = NULL;
-  t_upslst_item *cmd_list = NULL;
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
@@ -89,7 +88,6 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
   t_upslst_item *vinst_list;                /* version instance list */
   t_upstyp_instance *vinst;                 /* version instance      */
   char *username;
-  struct tm *mytime;
   char *declared_date;
   t_upslst_item *save_next;
   t_upslst_item *save_prev;

@@ -336,7 +336,7 @@ char *upskey_prod_setval( t_upstyp_product * const prod,
  * (version, table, chain). Mainly used by the upsfil writing routines.
  */
 
-int *upskey_prod_arr()
+int *upskey_prod_arr(void)
 {
   t_upskey_map *keys = &g_key_map[ 0 ];
   int i = 0;
@@ -350,7 +350,7 @@ int *upskey_prod_arr()
   return g_ikeys;
 }
 
-int *upskey_inst_arr()
+int *upskey_inst_arr(void)
 {
   t_upskey_map *keys = &g_key_map[ 0 ];
   int i = 0;
@@ -364,7 +364,7 @@ int *upskey_inst_arr()
   return g_ikeys;
 }
 
-int *upskey_verhead_arr()
+int *upskey_verhead_arr(void)
 {
   
   /* tsk, tsk */
@@ -380,7 +380,7 @@ int *upskey_verhead_arr()
   return g_ikeys;
 }
 
-int *upskey_verinst_arr()
+int *upskey_verinst_arr(void)
 {
   t_upskey_map *keys = &g_key_map[ e_key_flavor ];
   int i = 0;
@@ -394,7 +394,7 @@ int *upskey_verinst_arr()
   return g_ikeys;
 }
 
-int *upskey_tblhead_arr()
+int *upskey_tblhead_arr(void)
 {
 
   /* tsk, tsk */
@@ -410,7 +410,7 @@ int *upskey_tblhead_arr()
   return g_ikeys;
 }
 
-int *upskey_tblinst_arr()
+int *upskey_tblinst_arr(void)
 {
   t_upskey_map *keys = &g_key_map[ e_key_flavor ];
   int i = 0;
@@ -424,7 +424,7 @@ int *upskey_tblinst_arr()
   return g_ikeys;
 }
 
-int *upskey_chnhead_arr()
+int *upskey_chnhead_arr(void)
 {
 
   /* tsk, tsk */
@@ -440,7 +440,7 @@ int *upskey_chnhead_arr()
   return g_ikeys;
 }
 
-int *upskey_chninst_arr()
+int *upskey_chninst_arr(void)
 {
   t_upskey_map *keys = &g_key_map[ e_key_flavor + 1];
   int i = 0;
