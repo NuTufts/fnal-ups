@@ -140,6 +140,7 @@ t_upsugo_command     *upsugo_next(const int ups_argc,
 			       char *ups_argv[],
 			       char * const validopts);
 
+char                 *upsugo_getenv(char * const prod_name);
 t_upsugo_command     *upsugo_env(char * const product,
 			       char * const validopts);
 t_upsugo_command     *upsugo_bldcmd(char * const cmdstr,

@@ -1162,6 +1162,29 @@ void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title ,
   }
 }
 
+/* ==========================================================================
+**                                                                           
+** ROUTINE: upsugo_getenv
+**                                                                           
+** DESCRIPTION                                                               
+**
+** This routine get the value of the environment SETUP_<PRODUCT_NAME>.
+**                                                                           
+** VALUES RETURNED                                                           
+**      +++                                                                  
+**                                                                           
+** ==========================================================================
+*/                                                                           
+
+char *upsugo_getenv( char * const prod_name )
+{
+  static char buf[256];
+  
+  (void) strcpy( buf, SETUPENV );
+  (void) strcat( buf, upsutl_upcase( prod_name ) );
+
+  return (char *)getenv( buf ); 
+}
 
 /* ==========================================================================
 **                                                                           
@@ -1179,10 +1202,8 @@ void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title ,
 */                                                                           
 t_upsugo_command *upsugo_env(char * const product,char * const validopts)
 {
-     char * setup_prod;                          /* SETUP_PROD name */
      char * setup_env;                           /* SETUP_PROD value */
      char * waddr;                               /* work address */
-     static char temp[256];
      struct ups_command * uc=0;
      int argc=0;
      int    count=0;
@@ -1190,11 +1211,8 @@ t_upsugo_command *upsugo_env(char * const product,char * const validopts)
      int    verbose=0;
      char ** argv;
      t_upslst_item *hold = 0;
-     setup_prod=temp;
      /* setup_prod = (char *) malloc((size_t)(strlen(product) +7));*/
-     (void) strcpy(setup_prod,SETUPENV);
-     (void) strcat(setup_prod,upsutl_upcase(product));
-     if((setup_env = (char *)getenv(setup_prod)) == 0)
+     if((setup_env = (char *)upsugo_getenv(product)) == 0)
      { return (uc);
      } else {
 /* I'm going to count the number of spaces in the environment variable
