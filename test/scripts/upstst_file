@@ -1,0 +1,12 @@
+#!/bin/ksh
+# ============================================================================
+# test the file routines
+# ============================================================================
+touch dummy.file
+$ERUPT_DIR/test/ups_test << EOD
+#ups_echo "================================================================="
+upsfil_read_file -status UPS_OPEN_FILE blah
+upsfil_read_file -status UPS_READ_FILE dummy.file
+quit
+EOD
+rm dummy.file
