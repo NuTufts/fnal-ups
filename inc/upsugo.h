@@ -56,8 +56,9 @@ typedef struct ups_command
     int     ugo_f;           /* Flavor(s) specified                  */
     t_upslst_item *ugo_flavor;
     int     ugo_F;           /* Return list of files not in product  */
-/*  int     ugo_G;           UPD-RESERVE */
     int     ugo_g;           /* Did they request a "special" chain?  */
+    int     ugo_G;           /* command line option like O no parse  */
+    char    *ugo_passed;     /* options passed                       */
     int     ugo_h;           /* Host(s) specified                    */
     t_upslst_item *ugo_host;
     int     ugo_H;           /* Gen flavor match list from -f no OS  */
