@@ -211,6 +211,9 @@ int upsugo_bldfvr(struct ups_command * const uc)
 int upsugo_ifornota(struct ups_command * const uc)
 {
    char   * addr;
+   char   * PRODUCTS;                           /* PRODUCTS value */
+   char   * loc;
+ 
    added_current=0;
    if (uc->ugo_a)                           /* did the user specify -a */
    { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
@@ -239,6 +242,23 @@ int upsugo_ifornota(struct ups_command * const uc)
      uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
      }
    }
+/* If they didn't specify a database pull the environment variable */
+   if (!uc->ugo_db) {
+     if((PRODUCTS = (char *)getenv("PRODUCTS")) == 0)
+     { upserr_add(UPS_NO_DATABASE, UPS_FATAL); 
+     } else {
+        addr = (char *) malloc((size_t)(strlen(PRODUCTS) +1));
+        strcpy(addr,PRODUCTS);
+        while ((loc=strchr(addr,' '))!=0) {
+                *loc = 0;
+                PRODUCTS = upsutl_str_create(addr,' ');
+                addr=loc+1;
+                uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS);
+        }
+        PRODUCTS = upsutl_str_create(addr,' ');
+        uc->ugo_db = upslst_add(uc->ugo_db,PRODUCTS);
+     }
+   } 
    return(0);
 }
 /* ===========================================================================
