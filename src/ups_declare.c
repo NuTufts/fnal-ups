@@ -273,13 +273,14 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            { product = upsget_chain_file(db_info->name,
                                        uc->ugo_product,
                                        the_chain, &file);
-           strcpy(buffer,file);
+           /* allready there  strcpy(buffer,file); */
            /* if(!product) Chain deleted was all only one */ 
            } else { 
              product = ups_new_product();
-             product->file = CHAIN;
-             product->product=uc->ugo_product;
-             product->chain = the_chain;
+             product->file = upsutl_str_create( CHAIN, ' ' );
+             product->product=upsutl_str_create( uc->ugo_product, ' ' );
+             product->chain = upsutl_str_create( the_chain, ' ' );
+             product->version = upsutl_str_create( save_version, ' ' );
            }
          } else { /* new chain does NOT exist at all */
            product = ups_new_product();
@@ -294,15 +295,15 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          }
          /* build new chain instance */
          new_cinst=ups_new_instance();
-         new_cinst->version=save_version;
+         new_cinst->version=upsutl_str_create(save_version,' ');
          the_flavor=save_flavor->data;
-         new_cinst->flavor=the_flavor;
+         new_cinst->flavor=upsutl_str_create(the_flavor,' ');
          the_qualifiers=save_qualifiers->data;
-         new_cinst->qualifiers=the_qualifiers;
-         new_cinst->declarer=username;
-         new_cinst->declared=declared_date;
-         new_cinst->modifier=username;
-         new_cinst->modified=declared_date;
+         new_cinst->qualifiers=upsutl_str_create(the_qualifiers,' ');
+         new_cinst->declarer=upsutl_str_create(username,' ');
+         new_cinst->declared=upsutl_str_create(declared_date,' ');
+         new_cinst->modifier=upsutl_str_create(username,' ');
+         new_cinst->modified=upsutl_str_create(declared_date,' ');
          product->instance_list = 
             upslst_add(product->instance_list,new_cinst);
          upsver_mes(1,"Adding %s chain version %s to %s\n",
@@ -345,7 +346,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                        &file);
          strcpy(buffer,file);
        } else { 
-         upsver_mes(1,"Instance in version file allready exists");
+         upsver_mes(1,"Instance in version file allready exists\n");
          *file='\0'; /* don't do create instance */
          buffer[0]='\0';
        }
@@ -355,31 +356,31 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
               db_info->name,
               uc->ugo_product,
               uc->ugo_version,VERSION_SUFFIX);
-      product->file = VERSION;
-      product->product=uc->ugo_product;
-      product->version = uc->ugo_version;
+      product->file = upsutl_str_create(VERSION,' ');
+      product->product=upsutl_str_create(uc->ugo_product,' ');
+      product->version = upsutl_str_create(uc->ugo_version,' ');
     }
     /* build new version instance */
     if (*file) /* instance doesn't exist */
     { new_vinst=ups_new_instance();
-      new_vinst->version=save_version;
+      new_vinst->version=upsutl_str_create(save_version,' ');
       the_flavor=save_flavor->data;
-      new_vinst->flavor=the_flavor;
+      new_vinst->flavor=upsutl_str_create(the_flavor,' ');
       the_qualifiers=save_qualifiers->data;
-      new_vinst->qualifiers=the_qualifiers;
-      new_vinst->declarer=username;
-      new_vinst->declared=declared_date;
-      new_vinst->modifier=username;
-      new_vinst->modified=declared_date;
-      new_vinst->prod_dir=uc->ugo_productdir;
+      new_vinst->qualifiers=upsutl_str_create(the_qualifiers,' ');
+      new_vinst->declarer=upsutl_str_create(username,' ');
+      new_vinst->declared=upsutl_str_create(declared_date,' ');
+      new_vinst->modifier=upsutl_str_create(username,' ');
+      new_vinst->modified=upsutl_str_create(declared_date,' ');
+      new_vinst->prod_dir=upsutl_str_create(uc->ugo_productdir,' ');
 /*      new_vinst->table_dir=uc->ugo_tablefiledir;
         new_vinst->table_file=uc->ugo_tablefile;   */
-      new_vinst->table_dir=save_table_dir;
-      new_vinst->table_file=save_table_file;
-      new_vinst->ups_dir=uc->ugo_upsdir;
-      new_vinst->origin=uc->ugo_origin;
-      new_vinst->compile_file=uc->ugo_compile_file;
-      new_vinst->compile_dir=uc->ugo_compile_dir;
+      new_vinst->table_dir=upsutl_str_create(save_table_dir,' ');
+      new_vinst->table_file=upsutl_str_create(save_table_file,' ');
+      new_vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' ');
+      new_vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
+      new_vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
+      new_vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
       if (!uc->ugo_r )
       { upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL, 
                uc->ugo_product, "product home", 
@@ -388,7 +389,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       if (uc->ugo_O)
       { if ( strchr(uc->ugo_options,':') == 0)
         { new_vinst->user_list = 
-             upslst_add(new_vinst->user_list,uc->ugo_options);
+             upslst_add(new_vinst->user_list,upsutl_str_create(uc->ugo_options,' '));
         } else {
           saddr=uc->ugo_options;
           while ((eaddr = strchr(saddr,':')) != 0 )
@@ -412,11 +413,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  new_vinst->version,
                  buffer);
       (void )upsfil_write_file(product, buffer, ' ', JOURNAL);  
-/*      if (new_vinst->user_list)
-      { new_vinst->user_list=upslst_free(new_vinst->user_list,'d');
-      }
-      product->instance_list=upslst_free(product->instance_list,'d');
-*/
     } 
     uc->ugo_chain=save_chain;
     if (uc->ugo_chain)
@@ -431,6 +427,10 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         chain_list->next=0;
         chain_list->prev=0;
         uc->ugo_chain=chain_list;
+/* upsugo_dump(uc,1); */
+        upsfil_stat(1);
+upsfil_write_journal_files();
+(void)system("ls $PRODUCTS/dog");
         mproduct_list = upsmat_instance(uc, db_list , need_unique);
         if (UPS_ERROR != UPS_SUCCESS) 
         { upsfil_clear_journal_files();

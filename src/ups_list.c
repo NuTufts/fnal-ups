@@ -56,7 +56,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
 #endif
 
 #define FromVersion(ELEMENT) \
-{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
+{ if (!upsutl_stricmp((buffer),"" #ELEMENT ""))    \
   { valid=1; \
     if(instance->version)                               \
     { if (instance->version->ELEMENT)                   \
@@ -70,7 +70,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define FromTable(ELEMENT) \
-{ if (!upsutl_stricmp((l_ptr->data),"" #ELEMENT ""))    \
+{ if (!upsutl_stricmp((buffer),"" #ELEMENT ""))    \
   { valid=1; \
     if(instance->table)                                 \
     { if (instance->table->ELEMENT)                     \
@@ -84,7 +84,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define FromDatabase(ELEMENT,STRING) \
-{ if (!upsutl_stricmp((l_ptr->data),STRING))            \
+{ if (!upsutl_stricmp((buffer),STRING))            \
   { valid=1; \
     if(product->db_info)                                \
     { if (product->db_info->ELEMENT)                    \
@@ -98,7 +98,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define FromConfig(ELEMENT,STRING) \
-{ if (!upsutl_stricmp((l_ptr->data),STRING))            \
+{ if (!upsutl_stricmp((buffer),STRING))            \
   { valid=1; \
     if(config_ptr)                                      \
     { if (config_ptr->ELEMENT)                          \
@@ -112,9 +112,8 @@ void print_chain(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define FromAny(ELEMENT) \
-{ if (!upsutl_stricmp(l_ptr->data,"" #ELEMENT "") ||    \
-      !upsutl_stricmp(l_ptr->data,"+"))                 \
-  { valid=1; \
+{ if (!upsutl_stricmp(buffer,"" #ELEMENT ""))           \
+  { valid=1;                                            \
     if(instance->chain)                                 \
     { if (instance->chain->ELEMENT)                     \
       { printf("\"%s\" ",instance->chain->ELEMENT);         \
@@ -175,8 +174,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define FromBoth(ELEMENT) \
-{ if (!upsutl_stricmp(l_ptr->data,"" #ELEMENT "") ||    \
-      !upsutl_stricmp(l_ptr->data,"+"))                 \
+{ if (!upsutl_stricmp(buffer,"" #ELEMENT ""))    \
   { valid=1; \
     printf("\"");                                       \
     if(instance->chain)                                 \
@@ -210,7 +208,7 @@ void print_chain(const t_upstyp_matched_instance * const instance,
     printf("\tFlavor=%s\n", instance->INSTANCE->flavor);            \
     if (instance->INSTANCE->qualifiers)                             \
     { if(strlen(instance->INSTANCE->qualifiers))                    \
-      { printf("\t\tQualifiers=%s", instance->INSTANCE->qualifiers);  \
+      { printf("\t\tQualifiers=\"%s\"", instance->INSTANCE->qualifiers);  \
       } else {      /* damn inconsistant if you ask me */              \
         printf("\t\tQualifiers=\"\"");                                 \
       }                                                                \
@@ -386,6 +384,8 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upstyp_action *ac_ptr = 0;
   char *nodes=0;
   int count=0;
+  static char buffer[20];
+  int valid; /* bogus for macros */
 
   for (tmp_mprod_list = (t_upslst_item *)a_mproduct_list ; tmp_mprod_list ;
        tmp_mprod_list = tmp_mprod_list->next) 
@@ -408,10 +408,22 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           }
         }
         if (a_command_line->ugo_l && instance->version )
-        { printf("\t\tDeclared="); WAW(declared)
-          printf("\t\tDeclarer="); WAW(declarer)
-          printf("\t\tModified="); WAW(modified)
-          printf("\t\tModifier="); WAW(modifier)
+        { printf("\t\tDeclared=");
+          strcpy(buffer,"declared");
+          FromVersion(declared);
+          printf("\n");
+          printf("\t\tDeclarer=");
+          strcpy(buffer,"declarer");
+          FromVersion(declarer);
+          printf("\n");
+          printf("\t\tModified=");
+          strcpy(buffer,"modified");
+          FromVersion(modified);
+          printf("\n");
+          printf("\t\tModifier=");
+          strcpy(buffer,"modifier");
+          FromVersion(modifier);
+          printf("\n");
           printf("\t\tHome=");
           if (mproduct->db_info) 
           { config_ptr = mproduct->db_info->config;
@@ -441,75 +453,21 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           } else {
             printf("\t\tNOT Authorized, Nodes=%s\n",nodes);
           }
-          if (instance->version->ups_dir)
-          { printf("\t\tUPS=%s\n", instance->version->ups_dir);
-          } else {
-            printf("\t\tUPS=\"\"\n");
-          }
-          if (instance->version->table_dir)
-          { printf("\t\tTable_Dir=%s\n", instance->version->table_dir);
-          } else {
-            printf("\t\tTable_Dir=\"\"\n");
-          }
-          if (instance->version->table_file)
-          { printf("\t\tTable_File=%s\n", instance->version->table_file);
-          } else {
-            printf("\t\tTable_File=\"\"\n");
-          }
-/*          if (instance->table->description)
-          { printf("\t\tDescription=%s\n", instance->table->description);
-          } else {
-            printf("\t\tDescription=\"\"\n");
-          }
-*/
+          printf("\t\tUPS_Dir=");
+          strcpy(buffer,"ups_dir");
+          FromVersion(ups_dir);
+          printf("\n");
+          printf("\t\tTable_Dir=");
+          strcpy(buffer,"table_dir");
+          FromVersion(table_dir);
+          printf("\n");
+          printf("\t\tTable_File");
+          strcpy(buffer,"table_file");
+          FromVersion(table_file);
+          printf("\n");
           printf("\t\tDescription=");
-          if (instance->chain) 
-          { if (instance->chain->description)
-            { printf("%s",instance->chain->description);
-            } else { 
-              if (instance->version )
-              { if (instance->version->description)
-                { printf("%s",instance->version->description);
-                } else { 
-                  if (instance->table )
-                  { if (instance->table->description)
-                    { printf("%s",instance->table->description);
-                    } else {
-                      printf("\"\"");
-                    }
-                  } else {
-                    printf("\"\"");
-                  }
-                }
-              }
-            }
-          } else {
-            if (instance->version )
-            { if (instance->version->description)
-              { printf("%s",instance->version->description);
-              } else { 
-                if (instance->table )
-                { if (instance->table->description)
-                  { printf("%s",instance->table->description);
-                  } else {
-                    printf("\"\"");
-                  }
-                } else {
-                  printf("\"\"");
-                }
-              } 
-            } else {
-              if (instance->table )
-              { if (instance->table->description)
-                { printf("%s",instance->table->description);
-                } else {
-                  printf("\"\"");
-                }
-              } else {
-                printf("\"\"");
-              } 
-            }
-          } 
+          strcpy(buffer,"description");
+          FromAny(description);
           printf("\n");
           for ( ul_ptr = upslst_first( instance->version->user_list ); 
                 ul_ptr; ul_ptr = ul_ptr->next, count++ )
@@ -534,7 +492,11 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         printf("\n");
       } else { 
           list_K(instance,a_command_line,mproduct);
-          if (UPS_ERROR!=UPS_SUCCESS) { upserr_output(); upserr_clear(); return; }
+          if (UPS_ERROR!=UPS_SUCCESS) 
+          { upserr_output(); 
+            upserr_clear(); 
+            return; 
+          }
       }
     }
 /* end product loop */
@@ -550,6 +512,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
+  static char buffer[20];
   char *nodes=0;
   char *str_val;
   char *addr;
@@ -562,6 +525,22 @@ void list_K(const t_upstyp_matched_instance * const instance,
   for ( l_ptr = upslst_first( command->ugo_key ); 
         l_ptr; l_ptr = l_ptr->next, count++ )
   { valid=0;
+    strcpy(buffer,l_ptr->data);
+    if(!upsutl_stricmp(l_ptr->data,"+"))
+    { strcpy(buffer,"product");
+      FromAny(product) 
+      strcpy(buffer,"version");
+      FromAny(version) 
+      strcpy(buffer,"flavor");
+      FromAny(flavor) 
+      strcpy(buffer,"qualifiers");
+      FromAny(qualifiers)
+    } else {
+      FromAny(product) 
+      FromAny(version) 
+      FromAny(flavor) 
+      FromAny(qualifiers)
+    }
     FromVersion(table_file)
     FromVersion(table_dir)
     FromVersion(ups_dir)
@@ -576,31 +555,19 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromTable(news_files)
     FromTable(info_files)
     FromVersion(origin)
-/*    FromVersion(db_dir) */
-/* DO NOT CHANGE ORDER here it's the default !!! */
-    FromAny(product) 
-    FromAny(version) 
-    FromAny(flavor) 
-    FromAny(qualifiers)
     /* FromChain(chain) */
-    if (!upsutl_stricmp(l_ptr->data,"chain")) { valid=1; }
-    print_chain(instance,l_ptr->data);
-    if(upsutl_stricmp(l_ptr->data,"+"))
-    { FromBoth(declarer)
-      FromBoth(declared)
-      FromBoth(modifier)
-      FromBoth(modified)
-    }
-/* to HERE */
-    if (!upsutl_stricmp(l_ptr->data,"authorized_nodes")) 
-    { if (upsutl_is_authorized(instance, product->db_info,&nodes))
-      { printf("\"%s\" ",nodes);
-      } else { 
-        printf("\"\" ");
-      }
+    if (!upsutl_stricmp(buffer,"chain")) { valid=1; }
+    print_chain(instance,buffer);
+    FromBoth(declarer)
+    FromBoth(declared)
+    FromBoth(modifier)
+    FromBoth(modified)
+    if (!upsutl_stricmp(buffer,"authorized_nodes")) 
+    { (void)(upsutl_is_authorized(instance, product->db_info,&nodes));
+      printf("\"%s\" ",nodes);
       valid=1;
     }
-    if (!upsutl_stricmp(l_ptr->data,"statistics")) 
+    if (!upsutl_stricmp(buffer,"statistics")) 
     { if (config_ptr)
       { if (config_ptr->statistics)
         { if (strstr(config_ptr->statistics,product->product))
