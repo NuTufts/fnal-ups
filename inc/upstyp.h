@@ -141,15 +141,5 @@ t_ups_match_product *ups_new_mp(const char * const a_db,
 t_ups_match_product *ups_free_mp(t_ups_match_product * const a_mproduct);
 
 
-t_ups_command     *upsugo_next(const int ups_argc,
-			       char *ups_argv[],
-			       char * const validopts);
-
-t_ups_command     *upsugo_env(char * const product,
-			       char * const validopts);
-int         upsugo_free(struct ups_command * const uc);
-void        upsugo_prtlst( t_upslst_item * const list_ptr, char * const title );
-int         upsugo_dump (struct ups_command * const uc);
-int         upshlp_command(const char * const what);
 #endif /* _UPSTYP_H_ */
 
