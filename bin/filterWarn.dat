@@ -1,0 +1,263 @@
+#!/usr/local/bin/perl
+#++
+# FACILITY:	Building utility
+#
+# ABSTRACT:	Filter messages, usually from compilers and loaders, and excise
+#		those which can be (deemed to be) safely ignored.  This file
+#		contains Perl code to define the filtration.
+#
+# ENVIRONMENT:	Perl.
+#		filterWarn.dat
+#
+#		This is the default filterWarn filter file for sdssmake.
+#
+# AUTHOR:	Tom Nicinski, Creation date: 14-Sep-1995
+#--
+#*******************************************************************************
+#
+# Define what's acceptable and what's not.
+#
+# Filtering of messages is controlled with one or more filter files (specified
+# with the -filter option).  Filter files are essentially Perl scripts that
+# declare how messages are to be filtered.  Each line consists of various
+# criteria that select messages for filtering:
+#
+# Various rules need to be followed in order to successfully declare filtering
+# criteria:
+#
+#   o	Filtering criteria entries are defined with calls to the Perl subroutine
+#	&fe (for "filter entry"). Therefore, Perl will interpret all code in the
+#	filter file.
+#
+#   o	Omitted criteria (arguments) must be passed as undef, unless they the
+#	trailing arguments to &fe.
+#
+#   o	String arguments must be quoted.  Whether single (') or double (")
+#	quotes are used depends on whether the string contents are to be
+#	interpreted at the time fe is called.
+#
+#   o	Criteria which expect Perl regular expressions should be handled
+#	carefully.  Characters which are to be matched explicitly, but are also
+#	Perl regular expression metacharacters must be quoted (with a backslash
+#	(\)).
+#
+# The above example shows how these rules are put to use.  The following
+# criteria can be used to select messages for filtering.  All specified
+# criteria must be met for a message to be filtered out:
+#
+#   OS	Only filter entries with an OS that matches specified -uname options are
+#	used by filterWarn to filter messages. If no OS is specified, the filter
+#	entry is used.
+#
+#   compiler
+#	Only filter entries with a compiler than matches specified -cc options
+#	are used by filterWarn to filter messages.  If no compiler is specified
+#	and no -cc option was specified, then the filter entry is used. compiler
+#	is treated in a case-insensitive manner.
+#
+#   source
+#	Some compilers and utilities indicate a "source" of the message.  This
+#	is not necessarily the same as the compiler;  The source may actually
+#	be the same between different compilers or utilities.
+#
+#   sev
+#	The severity of the message can be:
+#
+#	   'I'	for informational messages
+#	   'W'	for warnings
+#	   'E'	for error messages
+#	   'F'	for fatal error messages
+#
+#   number
+#	Some messages have a number associated with them to identify the
+#	message.
+#
+#   xtra
+#	Some messages have extra lines following the message which are to be
+#	filtered out also if the message is filtered out.
+#
+#   fileRE
+#	Messages can be filtered out from selected files (rather than all files
+#	if undef is specified). fileRE is a Perl regular expression, so dots (.)
+#	and other Perl regular expression metacharacters in a file name need to
+#	be quoted.  Furthermore, fileRE is bounded with additional regular
+#	expression elements:
+#
+#	   (^|/)fileRE$
+#
+#	These guarantee that the fileRE regular expression contains complete
+#	directory names and a file name (even if it's a regular expression of
+#	".*" to match any file).
+#
+#   textRE
+#	Portions of the message text can be used as a filtering criteria. textRE
+#	is a Perl regular expression.
+#
+#   parseExpr
+#	A Perl expression to evaluate (with eval) to determine whether the line
+#	should be filtered out. If the result is undef or null (''), the line is
+#	NOT filtered out; otherwise, it remains a candidate for filtration.
+#
+#	Any xtra lines associated with the message are available in the Perl
+#	0-indexed array @filtXtra.  For example, $filtXtra[0] refers to the
+#	line immediately after the line under consideration (for filtration).
+#
+#	Since the parseExpr is evaluated twice by Perl, when the filter file is
+#	read in and when the parseExpr is evaluated during filtering, quoting
+#	the parseExpr properly is very important towards attaining the best
+#	possible performance.
+#
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#*******************************************************************************
+
+#*******************************************************************************
+#
+# IRIX.
+#
+# -wlint	813	struct/union/enum 'xxx' is used, but not defined.
+# -wlint	819	Function parameter is needed, even if not used.
+# -wlint	821	'xxx' set but unused.
+#		822	Allow 'control may fall through case-labeled statement'.
+# -wlint        824     function 'xxx' may return random value to place of invocation (missing return along some control path).
+# -wlint	826	Width of octal constant is smaller than size of type.
+# -wlint	827	Implicit convertion from 'xxx' to 'yyy'.
+# -wlint	828	'xxxyyy' may be indistinguishable from 'xxxzzz'.
+# -wlint	831	No prototype ... 'xxx' (use 'void' for no parameters).
+# -wlint	852	'xxx' can be const qualified, since it is not set.
+#
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  undef, 	'function parameter \'a_inst\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  undef, 	'function parameter \'a_db_info\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_argc\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsact.c", 	'function parameter \'a_argv\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   826, 2,  "upsact.c", 	'width of octal constant is smaller than size of type (int)');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsget.c", 	'function parameter \'db_info_ptr\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsget.c", 	'function parameter \'instance\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsget.c", 	'function parameter \'command_line\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   819, 2,  "upsmem.c", 	'function parameter \'a_bytes\' is not used in function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   835, 4,  "upsutl.c", 	'No prototype for the call to an anonymous function');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   824, 2,  "upsutl.c", 	'function \'upsutl_stricmp\' may return random value to place of invocation');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   824, 2,  "upsutl.c", 	'function \'upsutl_strincmp\' may return random value to place of invocatio');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   827, 2,  "upsutl.c", 	'implicit conversion from \'int\' to \'long\'');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   852, 2,  "upsutl.c", 	'\'c1\' can be const qualified,');
+&fe ('IRIX'	, undef		, 'cfe'	, 'W'	,   852, 2,  "upsutl.c", 	'\'c2\' can be const qualified,');
+
+#
+#
+
+#
+# Now for IRIX64
+#
+#   | OS       | cc  |source| sev  |number|xtra|fileRE:textRE:parseExpr
+
+&fe ('IRIX64' , undef, undef, 'W', undef, 0, "(X11/Xlib|unistd)\.h\$");
+&fe ('IRIX64' , undef, undef, 'W', 1164 , 0);
+# In the next pattern, "\*\*" rather than "[*][*]" confuses filterWarn
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 0, "^tcl", "(char\\s\\*\\*a(rg)?v|int\s+a(rg)?c|parameter \"a(rg)?[cv]\")");
+&fe ('IRIX64' , undef, undef, 'W', 1174 , 0, "", "parameter\\s+.*\\s+[cC]lientData");
+&fe ('IRIX64' , undef, undef, 'W', 1209 , 0, "", "(shAssert\\s*\\(|while\\s*\\(1\\)|(END_)?CATCH)" );
+&fe ('IRIX64' , undef, undef, 'W', 1209 , 0); # controlling expression is constant
+&fe ('IRIX64' , undef, undef, 'W', 1412 , 0, "", "\\s*==\\s*\\(TYPE\\)");
+&fe ('IRIX64' , undef, undef, 'W', 1413 , 0);
+&fe ('IRIX64' , undef, undef, 'W', 1429 , 0, "sys/time.h");
+&fe ('IRIX64' , undef, undef, 'W', 1506 , 0);
+&fe ('IRIX64', 'ld(32|64)', undef, 'W',   85 , 0, "", "definition of main in \\S+ preempts that definition in \\S+libftn\\.");
+&fe ('IRIX64' ,'ld(32|64)', undef, 'W',   84 , 0); # library not used for resolving any symbol
+
+
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#*******************************************************************************
+
+#*******************************************************************************
+#
+# OSF1.
+#
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+
+&fe ('OSF1'	, undef		, undef	, 'I'	, undef, 2, undef, 'of padding have been implicitly inserted prior to this member for proper');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef, 'is not used - if this is intended, it should be cast to');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/stdlib\.h',
+     'In this declaration, a storage class without a declarator is meaningless');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xlib\.h', 'The type of the function');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xresource\.h',
+     'The type of the function XrmQGetResource defaults to "int"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shFits.c',
+     'A comment is neither preceeded nor followed by white space');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
+     'In this statement, the enum variable ".*" is used in an arithmetic operation');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
+     'In the initializer for [^ ]* a level of braces was omitted');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
+     'The last statement in non-void function ".*" is not a return statement');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, '^/usr/include/X11/Xutil\.h',
+     'The type of the function [^ ]* defaults to');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, undef,
+     'the unsigned char or unsigned short value ".*" is being widened to int rather than unsigned int, which differs from unsigned preserving semantics');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
+     'The type of the function shSCHTRS_yy[^ ]* defaults to "int"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
+     'Non-void function "shSCHTRS_yy.*" with implicit return type int does not contain a return statement');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
+     'The type of the parameter [^ ]* defaults to "int"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
+     'In this statement, the identifier ".*" is implicitly declared as a function');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSchemaTransLex.c',
+     'The declaration of the function shSCHTRS_yy[^ ]* has an empty parameter list');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
+     'The type of the function shSe_yy[^ ]* defaults to "int"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
+     'The declaration of the function shSe_yy[^ ]* has an empty parameter list');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
+     'Non-void function "shSe_yy.*" with implicit return type int does not contain a return statement');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
+     'The type of the parameter [^ ]* defaults to "int"');
+&fe ('OSF1'	, undef		, undef	, 'W'	, undef, 2, 'shSEvalLex.c',
+     'In this statement, the identifier "shSe_.*" is implicitly declared as a function');
+&fe ('OSF1'   , undef         , undef , 'I'   , undef, undef, undef,
+     'Inlining .* within .*');
+
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#*******************************************************************************
+
+#*******************************************************************************
+#
+# SunOS.
+#
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+
+&fe ('SunOS'	, 'acc'		, undef	, 'W'	, undef, 0, undef, 'implicitly declaring function to return int: gettimeofday');
+
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#*******************************************************************************
+
+#*******************************************************************************
+#
+# gcc.
+#
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+
+&fe ('gcc'	, undef		, undef	, 'W'	, undef, 0, undef, 'implicitly declaration of function `gettimeofday\'');
+&fe ('gcc'	, undef		, undef	, 'W'	, undef, 0, undef, '`rcsid\' defined but not used');
+
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#   | OS        | compiler      |source | sev   |number|xtra| fileRE : textRE : parseExpr
+#   +-----------+---------------+-------+-------+------+----+--------:--------:-----------
+#*******************************************************************************
+ssss
