@@ -1,5 +1,5 @@
 FILE = chain
-PRODUCT = oregano
+PRODUCT = penguin
 CHAIN = current
 
 #*************************************************
@@ -7,7 +7,7 @@ CHAIN = current
 FLAVOR = NULL
 VERSION = v1_0
 QUALIFIERS = ""
-  DECLARER = basil
+  DECLARER = rtokarek
   DECLARED = 1998-06-10
-  MODIFIER = rosemary
-  MODIFIED = 1998-06-10
+  MODIFIER = highpriest
+  MODIFIED = 1998-06-22
