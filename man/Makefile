@@ -12,7 +12,8 @@ default:
 	@exit 1
 
 all :
-	-rm catman/*.1
+	@touch catman/dummy.1
+	@rm catman/*.1
 	@../bin/ups -? 2> catman/ups.1
 	@../bin/ups configure -? 2> catman/ups_configure.1
 	@../bin/ups copy -? 2> catman/ups_copy.1
@@ -41,8 +42,5 @@ clean :
 	@../bin/upsClean
 	@/bin/rm -f catman/*.1
 
-spotless :
-	@../bin/upsClean
+spotless : clean
 	@/bin/rm -f up
-
-
