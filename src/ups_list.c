@@ -645,7 +645,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { if(!upsutl_stricmp(l_ptr->data,"@table_file"))
       { valid=1;
         if (instance->version)
-        { addr=upsutl_get_table_file_path(command->ugo_product,
+        { addr=upsutl_get_table_file_path(product->product,
                                           instance->version->table_file,
                                           instance->version->table_dir,
                                           instance->version->ups_dir,
