@@ -1097,9 +1097,9 @@ char *upsget_info_source_dir( const t_upstyp_matched_instance * const a_inst,
  *
  *         tablefiledir/tablefile
  *         prod_dir_prefix/prod_dir/tablefiledir/tablefile
+ *         db/prodname/tablefile
  *         ups_dir/tablefile
  *         prod_dir_prefix/prod_dir/ups_dir/tablefile
- *         db/prodname/tablefile
  *         tablefile
  * 
  *
