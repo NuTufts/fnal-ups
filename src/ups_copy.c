@@ -227,8 +227,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	  /* no -z was contained in the -O string. the db list must be a
 	     translation of $PRODUCTS.  use the database that the old product
 	     matched in instead. */
-	  new_command_line->ugo_db = upslst_free(new_command_line->ugo_db,
-						 'd');
+	  upsugo_free_ugo_db(new_command_line->ugo_db);
 	  new_command_line->ugo_db = upslst_new(mproduct->db_info->name);
 	  upsmem_inc_refctr(mproduct->db_info->name);
 	  new_db_info_ptr = mproduct->db_info;
