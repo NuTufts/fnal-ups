@@ -347,8 +347,8 @@ if (!uc->ugo_H)
        strcpy(flavor,l_ptr->data);
        flavor_sub()
    }
-   upslst_free(uc->ugo_osname,'d');
-   uc->ugo_osname=0;
+/*   upslst_free(uc->ugo_osname,'d');    need -f and -H
+   uc->ugo_osname=0; */
  } 
  if (uc->ugo_number)                       /* specified a specific os level  */
  { count = upslst_count(uc->ugo_flavor);   /* if they specified a level more */
