@@ -31,6 +31,16 @@ upserr_clear
 ups_echo "testing everything else"
 #
 upsugo_next -out rest.out -diff rest.in -a -A hercules,neptune,zeus -B -C -D -e -E -f CHOCOLATE,VANILLA,ROCKYROAD -F -h "  levinworth ,alcatraz" -j -k -K west,largo,limepie -l -m /jupiter,/mars -M titan -N sam,shameful -O power_steering,ac,abs -p "It was a dark and stormy night." -P valhalla,xanadu -r /myprod,/yourprod -S -T a.tar,b.tar -u -U /fred,/barney -v -V -w -W -x -X -y -Y -z"popeye,sinbad,   ahab"   -Z
+upsugo_next -out proda.out -diff proda.in -fIRIX,AIX ProdA
+upsugo_next -out prodb.out -diff prodb.in -f"IRIX,AIX" ProdB
+upsugo_next -out prodc.out -diff prodc.in -f "IRIX ,AIX" ProdC
+upsugo_next -out prodd.out -diff prodd.in -p"EEK, I haven't a clue scooby doo " ProdD
+upsugo_next -out prode.out -diff prode.in -q?cat ProdE
+upsugo_next -out prodf.out -diff prodf.in -q"?cat,dog" ProdF
+upsugo_next -out prodg.out -diff prodg.in -q"?mouse , ?cat ,dog" ProdG
+upsugo_next -out prodh.out -diff prodh.in -q"?no?comma?here" ProdH
+# should pack....
+upsugo_next -out prodi.out -diff prodi.in -q"But caption, you have spaces " ProdI
 
 quit
 EOD
