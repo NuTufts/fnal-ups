@@ -12,7 +12,7 @@ Key:              west
 Tablefiledir:     /jupiter:/mars
 Tablefile:        titan
 Anyfile:          sam:shameful
-Options:          power_steering:ac:abs
+Options:          -power_steering -ac -abs
 Description:      It was a dark and stormy night.
 Override:         valhalla:xanadu
 Qualifiers:       *
