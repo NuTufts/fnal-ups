@@ -347,8 +347,12 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
             }
           }
       }
-      naddr=upsutl_str_crecat(addr,",");
-      naddr=upsutl_str_crecat(naddr,waddr);
+      if ( *addr != 0 ) /* required as well as optional */
+      { naddr=upsutl_str_crecat(addr,",");
+        naddr=upsutl_str_crecat(naddr,waddr);
+      } else { 
+        naddr=waddr;
+      }
       test=upsutl_str_sort(naddr,',');
       uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,naddr);
     }
