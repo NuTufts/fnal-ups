@@ -184,7 +184,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
             product = upsget_chain_file(db_info->name,
                                         uc->ugo_product,
                                         the_chain, &file);
-            strcpy(buffer,file);
+            (void) strcpy(buffer,file);
             if ((UPS_ERROR == UPS_SUCCESS) && product )
             { cinst_list=upsmat_match_with_instance( cinst, product );
               cinst = cinst_list ? cinst_list->data : 0;
@@ -196,14 +196,14 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                             cinst ? cinst->version : "(null)" );
               (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
               unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
-              sprintf(unchain,"un%s",the_chain);
+              (void) sprintf(unchain,"un%s",the_chain);
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                          mproduct, unchain,ups_command);
               if (UPS_ERROR == UPS_SUCCESS) 
               { upsact_process_commands(cmd_list, tmpfile);
                 upsact_cleanup(cmd_list);
               } else {
-                upsfil_clear_journal_files();
+                (void) upsfil_clear_journal_files();
                 upserr_vplace();
                 return 0;
               }
@@ -215,14 +215,14 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
               { upsact_process_commands(cmd_list, tmpfile);
                 upsact_cleanup(cmd_list);
               } else {
-                upsfil_clear_journal_files();
+                (void) upsfil_clear_journal_files();
                 upserr_vplace();
                 return 0;
               }
 */
             } else {
               if (UPS_ERROR != UPS_SUCCESS) /* just an error */
-              { upsfil_clear_journal_files();
+              { (void) upsfil_clear_journal_files();
                 upserr_vplace();
                 return 0;
               }
@@ -252,7 +252,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
                                     uc->ugo_product,
                                     uc->ugo_version, 
                                     &file);
-      strcpy(buffer,file);
+      (void) strcpy(buffer,file);
       if ((UPS_ERROR == UPS_SUCCESS) && product )
       { vinst_list=upsmat_match_with_instance( vinst, product );
         vinst=vinst_list->data;
@@ -260,8 +260,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         { product_home=upsget_prod_dir(db_info,minst,uc);
           archive=upsget_archive_file(db_info,minst,uc,1); /* strip */
           if (uc->ugo_y && product_home)
-          { fprintf(stdout,"Product home directory - \n\t%s\n",product_home);
-            fprintf(stdout,"Delete this directory?");
+          { (void) fprintf(stdout,"Product home directory - \n\t%s\n",product_home);
+            (void) fprintf(stdout,"Delete this directory?");
             (void)fgets(input,3,stdin);
             if(!upsutl_strincmp(input,"y",1))
             { uc->ugo_Y=1;         /* set and leave for last thing... */
@@ -282,7 +282,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
           { upsact_process_commands(cmd_list, tmpfile);
             upsact_cleanup(cmd_list);
           } else {
-            upsfil_clear_journal_files();
+            (void) upsfil_clear_journal_files();
             upserr_vplace();
             return 0;
           }
@@ -294,21 +294,21 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         { upsact_process_commands(cmd_list, tmpfile);
           upsact_cleanup(cmd_list);
         } else {
-          upsfil_clear_journal_files();
+          (void) upsfil_clear_journal_files();
           upserr_vplace();
           return 0;
         }
         if (uc->ugo_Y && product_home) 
-        { fprintf((FILE *)tmpfile,"touch %s;rm -rf %s\n",
+        { (void) fprintf((FILE *)tmpfile,"touch %s;rm -rf %s\n",
                    product_home,product_home);
           if (archive[0] != '\0')
-          { fprintf((FILE *)tmpfile,"touch %s;rm %s\n",
+          { (void) fprintf((FILE *)tmpfile,"touch %s;rm %s\n",
                    archive,archive);
           }
         }
       } else {
         if (UPS_ERROR != UPS_SUCCESS) /* just an error */
-        { upsfil_clear_journal_files();
+        { (void) upsfil_clear_journal_files();
           upserr_vplace();
           return 0;
         }

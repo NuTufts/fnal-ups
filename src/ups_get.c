@@ -58,11 +58,11 @@ extern t_cmd_info g_cmd_info[];
    if (minst->version && minst->version->prod_dir) {  \
      if (! strstr(file, minst->version->prod_dir)) {  \
        /* no it is not, print it out */               \
-       printf("%s\n", (char *)file);                  \
+       (void) printf("%s\n", (char *)file);           \
      }                                                \
    } else {                                           \
      /* cannot get prod dir, output all the files */  \
-     printf("%s\n", (char *)file);                    \
+     (void) printf("%s\n", (char *)file);             \
    }
 
 /*-----------------------------------------------------------------------

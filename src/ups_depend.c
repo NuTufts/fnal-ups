@@ -64,20 +64,20 @@ t_upslst_item *ups_depend( t_upsugo_command * const u_cmd,
 
     /* use the K options */
 
-    upsact_print( u_cmd, 0, "setup", e_cmd, "K" );
+    (void) upsact_print( u_cmd, 0, "setup", e_cmd, "K" );
 
   }
   else if ( u_cmd->ugo_l > 0 )
 
     /* normal listing, long */
 
-    upsact_print( u_cmd, 0, "setup", e_cmd, "l" );
+    (void) upsact_print( u_cmd, 0, "setup", e_cmd, "l" );
 
   else
 
     /* normal listing */
 
-    upsact_print( u_cmd, 0, "setup", e_cmd, "" );
+    (void) upsact_print( u_cmd, 0, "setup", e_cmd, "" );
 
   return NULL;
 }
