@@ -86,7 +86,7 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
      is relevant to the passed instance */
 
   upsfil_flush();
-  g_mp_list = upsmat_instance( g_uc, g_uc->ugo_db , NOT_UNIQUE );
+  g_mp_list = upsmat_instance( g_uc, NULL , NOT_UNIQUE );
 
   /* make a list of files to be edited */
 
@@ -361,7 +361,7 @@ int verify_file( char * const file_name )
 
   if ( upsfil_read_file( file_name ) ) {
 
-    l_mp = upsmat_instance( g_uc, g_uc->ugo_db , 0 );
+    l_mp = upsmat_instance( g_uc, NULL , 0 );
 
     for ( ; l_mp; l_mp = l_mp->next) {
 
