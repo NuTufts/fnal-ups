@@ -108,11 +108,17 @@ typedef struct ups_command
 /* these are associated with n,o,d,c,t,and g chains                  */
     t_upslst_item *ugo_chain;
     int     ugo_help;        /* Help flag                            */
+    int     ugo_shell;       /* shell variant that the user has      */
 } t_upsugo_command;
 
 /* 
  * Public variables
  */
+enum e_shell_type {
+  e_INVALID_SHELL = -1,
+  e_BOURNE = 0,
+  e_CSHELL
+};
 
 /*
  * Declaration of public functions.
