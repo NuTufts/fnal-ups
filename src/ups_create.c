@@ -81,7 +81,8 @@ t_upslst_item *ups_create(const t_upsugo_command * const a_command_line,
       /* if no qualifiers were entered, use "" */
       if (! (qualifier_list = a_command_line->ugo_qualifiers)) {
 	/* we have no qualifiers on the command line */
-	qualifier_list = upslst_insert(qualifier_list, "");
+	qualifier_list = upslst_insert(qualifier_list, 
+				       upsutl_str_create("",' '));
       }
       product = ups_new_product();
 
