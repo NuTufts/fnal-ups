@@ -209,7 +209,7 @@ t_upslst_item *l_dep;
   mproduct_list = upsmat_instance( ugo_cmd, NULL, 1 );
   list_output( upslst_first( mproduct_list ), ugo_cmd);
 
-  upsact_print( ugo_cmd, 0, "setup", "tl" );
+  upsact_print( ugo_cmd, 0, "setup", e_setup, "tl" );
 }
 
 /*-----------------------------------------------------------------------
