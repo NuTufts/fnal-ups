@@ -260,6 +260,7 @@ if ("$releaseVersion") { @Versions = "$releaseVersion"; }
 }
 sub writeflvrReqs {
     my ( $flavor, $version) = @_;
+    $basedir=&prod_dir;
     $ccheck="";
     $CatFlag=0;
     @reqCat = split ( / /, "PREREQ POSTREQ" );
@@ -278,8 +279,6 @@ sub writeflvrReqs {
                 $CatFlaq=1;
                    $flvrverHash{$flavor}{$version}{$reqType}.=&add_setup;
              }
-# always set basedir
-                   $basedir=&prod_dir;
           }
           @use = sort keys %{ $reqHash{$reqType}{$reqCat} };
           foreach $reqName ( @use ) {
