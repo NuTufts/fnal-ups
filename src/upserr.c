@@ -120,7 +120,8 @@ static char *g_error_messages[UPS_NERR] = {
 /* 59 */  "%s: Product keyword \'%s\' must match name of product it is in \'%s\'\n",
 /* 60 */  "%s: Unable to translate or evaluate \'%s\'\n",
 /* 61 */  "%s: Name of created temp file is %s\n",
-/* 62 */  "%s: File %s must have %s keyword equal to %s in it\n"
+/* 62 */  "%s: File %s must have %s keyword equal to %s in it\n",
+/* 63 */  "%s: Action function \'%s\' is not supported in %s\n"
 };
 
 char *g_error_ascii[] = {
@@ -187,7 +188,8 @@ char *g_error_ascii[] = {
    /* UPS_NO_TRANSLATION      60 */ "UPS_NO_TRANSLATION",
    /* UPS_TEMP_FILE           61 */ "UPS_TEMP_FILE",
    /* UPS_NO_KEYWORD          62 */ "UPS_NO_KEYWORD",
-   /* UPS_NERR                63 */ "UPS_NERR",
+   /* UPS_ACTION_PARSE_INVALID 63 */ "UPS_ACTION_PARSE_INVALID",
+   /* UPS_NERR                64 */ "UPS_NERR",
    0 };
 
 /*

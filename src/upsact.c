@@ -10,7 +10,7 @@
  *       Steps in order to add a new action -
  *           1. add a f_<action> prototype at the top of the file
  *           2. add an e_<action> to the enum in upsact.h
- *           3. add a line to the g_cmd_maps structure
+ *           3. add a line to the g_func_infos structure
  *           4. add the code for the f_<action> function
  *           5. check if you have to add anything to upsact_check_files
  *
@@ -189,12 +189,12 @@ static void f_unproddir( ACTION_PARAMS);
 static void f_dodefaults( ACTION_PARAMS);
 
 #define CHECK_NUM_PARAM(action) \
-    if ((a_cmd->argc < g_cmd_maps[a_cmd->icmd].min_params) ||   \
-        (a_cmd->argc > g_cmd_maps[a_cmd->icmd].max_params)) {   \
+    if ((a_cmd->argc < g_func_info[a_cmd->icmd].min_params) ||   \
+        (a_cmd->argc > g_func_info[a_cmd->icmd].max_params)) {   \
       upserr_vplace();                                          \
       upserr_add(UPS_INVALID_ACTION_PARAMS, UPS_FATAL,          \
-                 action, g_cmd_maps[a_cmd->icmd].min_params,    \
-                 g_cmd_maps[a_cmd->icmd].max_params,            \
+                 action, g_func_info[a_cmd->icmd].min_params,    \
+                 g_func_info[a_cmd->icmd].max_params,            \
 		 a_cmd->argc);                                  \
     }
 
@@ -209,10 +209,10 @@ static void f_dodefaults( ACTION_PARAMS);
     }
 
 #define GET_DELIMITER() \
-    if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].max_params) {            \
+    if (a_cmd->argc == g_func_info[a_cmd->icmd].max_params) {            \
       /* remember arrays start at 0, so subtract one here */            \
       delimiter =                                                       \
-	(a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);            \
+	(a_cmd->argv[g_func_info[a_cmd->icmd].max_params-1]);            \
       /* trim delimiter for quotes */                                   \
       upsutl_str_remove_end_quotes( delimiter, "\"\'", 0 );             \
       /* if the delimiter is 0 length, then use a space */              \
@@ -258,7 +258,7 @@ static void f_dodefaults( ACTION_PARAMS);
     upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
 
 #define GET_FLAGS() \
-    if (a_cmd->argc > g_cmd_maps[a_cmd->icmd].min_params) {                \
+    if (a_cmd->argc > g_func_info[a_cmd->icmd].min_params) {                \
       int i;                                                               \
       /* we have more than the minimum number of params, must be flags */  \
       for (i = 1 ; i < a_cmd->argc ; ++i) {                                \
@@ -402,52 +402,57 @@ t_cmd_info g_cmd_info[] = {
  * the 4th and 5th parameters are the minimum and maximum parameters expected
  * by the action. The six parameter is the corresponding 'undo' command.
  *
- * name, enum, command_handler, min argc, max argc, enum of opposite
+ * name, enum, command_handler, min argc, max argc, enum of opposite, flags
+ *
+ * where flags:
+ * <byte>: <description>
+ *   0   : specify if that action function is valid in a table file
+ *
  */
-t_cmd_map g_cmd_maps[] = {
-  { "setupoptional", e_setupoptional, NULL, 1, 1, e_unsetupoptional },
-  { "setuprequired", e_setuprequired, NULL, 1, 1, e_unsetuprequired },
-  { "unsetupoptional", e_unsetupoptional, NULL, 1, 1, e_setupoptional },
-  { "unsetuprequired", e_unsetuprequired, NULL, 1, 1, e_setuprequired },
-  { "exeactionoptional", e_exeactionoptional, NULL, 1, 1, e_rev_exeactionoptional },
-  { "exeactionrequired", e_exeactionrequired, NULL, 1, 1, e_rev_exeactionrequired },
-  { "rev_exeactionoptional", e_rev_exeactionoptional, NULL, 1, 1, e_invalid_cmd },
-  { "rev_exeactionrequired", e_rev_exeactionrequired, NULL, 1, 1, e_invalid_cmd },
-  { "sourcecompilereq", e_sourcecompilereq, f_sourcecompilereq, 1, 1, e_invalid_cmd },
-  { "sourcecompileopt", e_sourcecompileopt, f_sourcecompileopt, 1, 1, e_invalid_cmd },
-  { "envappend", e_envappend, f_envappend, 2, 3, e_envremove },
-  { "envremove", e_envremove, f_envremove, 2, 3, e_invalid_cmd },
-  { "envprepend", e_envprepend, f_envprepend, 2, 3, e_envremove },
-  { "envset", e_envset, f_envset, 2, 2, e_envunset },
-  { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_envunset },
-  { "envunset", e_envunset, f_envunset, 1, 1, e_invalid_cmd },
-  { "pathappend", e_pathappend, f_pathappend, 2, 3, e_pathremove },
-  { "pathremove", e_pathremove, f_pathremove, 2, 3, e_pathappend},
-  { "pathprepend", e_pathprepend, f_pathprepend, 2, 3, e_pathremove },
-  { "pathset", e_pathset, f_pathset, 2, 2, e_envunset },
-  { "addalias", e_addalias, f_addalias, 2, 2, e_unalias },
-  { "unalias", e_unalias, f_unalias, 1, 1, e_invalid_cmd },
-  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 3, e_sourceoptional },
-  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 3, e_sourceoptional },
-  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 3, e_sourceoptcheck },
-  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_sourceoptcheck },
-  { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
-  { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
-  { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
-  { "copyhtml", e_copyhtml, f_copyhtml, 0, 0, e_invalid_cmd },
-  { "copyinfo", e_copyinfo, f_copyinfo, 0, 0, e_invalid_cmd },
-  { "copyman", e_copyman, f_copyman, 0, 0, e_uncopyman },
-  { "uncopyman", e_uncopyman, f_uncopyman, 0, 0, e_copyman},
-  { "copycatman", e_copycatman, f_copycatman, 0, 0, e_uncopycatman },
-  { "uncopycatman", e_uncopycatman, f_uncopycatman, 0, 0, e_copycatman},
-  { "copynews", e_copynews, f_copynews, 0, 0, e_invalid_cmd },
-  { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd },
-  { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults },
-  { "setupenv", e_setupenv, f_setupenv, 0, 0, e_unsetupenv },
-  { "proddir", e_proddir, f_proddir, 0, 0, e_unproddir },
-  { "unsetupenv", e_unsetupenv, f_unsetupenv, 0, 0, e_setupenv },
-  { "unproddir", e_unproddir, f_unproddir, 0, 0, e_proddir },
-  { 0,0,0,0,0 }
+t_cmd_map g_func_info[] = {
+  { "setupoptional", e_setupoptional, NULL, 1, 1, e_unsetupoptional, 0x00000001 },
+  { "setuprequired", e_setuprequired, NULL, 1, 1, e_unsetuprequired, 0x00000001 },
+  { "unsetupoptional", e_unsetupoptional, NULL, 1, 1, e_setupoptional, 0x00000001 },
+  { "unsetuprequired", e_unsetuprequired, NULL, 1, 1, e_setuprequired, 0x00000001 },
+  { "exeactionoptional", e_exeactionoptional, NULL, 1, 1, e_rev_exeactionoptional, 0x00000001 },
+  { "exeactionrequired", e_exeactionrequired, NULL, 1, 1, e_rev_exeactionrequired, 0x00000001 },
+  { "rev_exeactionoptional", e_rev_exeactionoptional, NULL, 1, 1, e_invalid_cmd, 0x00000001 },
+  { "rev_exeactionrequired", e_rev_exeactionrequired, NULL, 1, 1, e_invalid_cmd, 0x00000001 },
+  { "sourcecompilereq", e_sourcecompilereq, f_sourcecompilereq, 1, 1, e_invalid_cmd, 0x00000001 },
+  { "sourcecompileopt", e_sourcecompileopt, f_sourcecompileopt, 1, 1, e_invalid_cmd, 0x00000001 },
+  { "envappend", e_envappend, f_envappend, 2, 3, e_envremove, 0x00000001 },
+  { "envremove", e_envremove, f_envremove, 2, 3, e_invalid_cmd, 0x00000001 },
+  { "envprepend", e_envprepend, f_envprepend, 2, 3, e_envremove, 0x00000001 },
+  { "envset", e_envset, f_envset, 2, 2, e_envunset, 0x00000001 },
+  { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_envunset, 0x00000001 },
+  { "envunset", e_envunset, f_envunset, 1, 1, e_invalid_cmd, 0x00000001 },
+  { "pathappend", e_pathappend, f_pathappend, 2, 3, e_pathremove, 0x00000001 },
+  { "pathremove", e_pathremove, f_pathremove, 2, 3, e_pathappend, 0x00000001 },
+  { "pathprepend", e_pathprepend, f_pathprepend, 2, 3, e_pathremove, 0x00000001 },
+  { "pathset", e_pathset, f_pathset, 2, 2, e_envunset, 0x00000001 },
+  { "addalias", e_addalias, f_addalias, 2, 2, e_unalias, 0x00000001 },
+  { "unalias", e_unalias, f_unalias, 1, 1, e_invalid_cmd, 0x00000001 },
+  { "sourcerequired", e_sourcerequired, f_sourcerequired, 1, 3, e_sourceoptional, 0x00000001 },
+  { "sourceoptional", e_sourceoptional, f_sourceoptional, 1, 3, e_sourceoptional, 0x00000001 },
+  { "sourcereqcheck", e_sourcereqcheck, f_sourcereqcheck, 1, 3, e_sourceoptcheck, 0x00000001 },
+  { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_sourceoptcheck, 0x00000001 },
+  { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd, 0x00000001 },
+  { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd, 0x00000001 },
+  { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd, 0x00000001 },
+  { "copyhtml", e_copyhtml, f_copyhtml, 0, 0, e_invalid_cmd, 0x00000000 },
+  { "copyinfo", e_copyinfo, f_copyinfo, 0, 0, e_invalid_cmd, 0x00000000 },
+  { "copyman", e_copyman, f_copyman, 0, 0, e_uncopyman, 0x00000000 },
+  { "uncopyman", e_uncopyman, f_uncopyman, 0, 0, e_copyman, 0x00000000 },
+  { "copycatman", e_copycatman, f_copycatman, 0, 0, e_uncopycatman, 0x00000000 },
+  { "uncopycatman", e_uncopycatman, f_uncopycatman, 0, 0, e_copycatman, 0x00000000 },
+  { "copynews", e_copynews, f_copynews, 0, 0, e_invalid_cmd, 0x00000000 },
+  { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd, 0x00000001 },
+  { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults, 0x00000001 },
+  { "setupenv", e_setupenv, f_setupenv, 0, 0, e_unsetupenv, 0x00000001 },
+  { "proddir", e_proddir, f_proddir, 0, 0, e_unproddir, 0x00000001 },
+  { "unsetupenv", e_unsetupenv, f_unsetupenv, 0, 0, e_setupenv, 0x00000001 },
+  { "unproddir", e_unproddir, f_unproddir, 0, 0, e_proddir, 0x00000001 },
+  { 0,0,0,0,0, 0x00000000 }
 };
 
 /*=======================================================================
@@ -742,14 +747,22 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 
     /* look for action command in the supported action array */
     
-    for ( i = 0; g_cmd_maps[i].cmd; ++i ) {
+    for ( i = 0; g_func_info[i].cmd; ++i ) {
 
-	if ( len != strlen(g_cmd_maps[i].cmd) )
+	if ( len != strlen(g_func_info[i].cmd) )
 	continue;
 
-      if ( !upsutl_strincmp( act_s, g_cmd_maps[i].cmd, (size_t)len ) ) {
-	
-	/* we found a match. create a pointer to a string with these parameters.
+      if ( !upsutl_strincmp( act_s, g_func_info[i].cmd, (size_t)len ) ) {
+
+	/* check if function is valid for this file */
+
+	if ( ! UPSACT_FUNC_ISIN_TABLE( g_func_info[i].flags ) ) {
+	  upserr_vplace();
+	  upserr_add( UPS_ACTION_PARSE_INVALID, UPS_FATAL, g_func_info[i].cmd, "table files" );
+	  break;
+	}
+
+	/* create a pointer to a string with these parameters.
 	   note - it does not include an open parenthesis */
 
 	act_s = act_p + 1;
@@ -761,7 +774,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 
         /* save the location in the array */
 
-	icmd = g_cmd_maps[i].icmd;
+	icmd = g_func_info[i].icmd;
 	
 	break;
       }
@@ -775,7 +788,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
     pcmd->argc = parse_params( act_s, pcmd->argv );
 
     if ( UPS_VERBOSE ) {
-      strcpy( g_buff, g_cmd_maps[icmd].cmd );
+      strcpy( g_buff, g_func_info[icmd].cmd );
       strcat( g_buff, "(" );
       for ( i = 0; i < pcmd->argc; i++ ) {
 	strcat( g_buff, pcmd->argv[i] );
@@ -867,7 +880,7 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
 
   icmd = cmd_cur->icmd;
   
-  printf( "%s(", g_cmd_maps[icmd].cmd );
+  printf( "%s(", g_func_info[icmd].cmd );
   for ( i = 0; i < cmd_cur->argc; i++ ) {
     if ( i == cmd_cur->argc - 1 ) 
       printf( "%s", cmd_cur->argv[i] );
@@ -1265,7 +1278,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
     else {
       
       /* if we don't have an action, take care of defaults cases, controlled by: 
-	 g_cmd_info.flags, g_cmd_info.uncmd_index and g_cmd_maps.icmd_undo */
+	 g_cmd_info.flags, g_cmd_info.uncmd_index and g_func_info.icmd_undo */
 
       if ( !(p_act_itm->act = new_default_action( p_act_itm, act_name, i_act )) ) {
 	P_VERB_s_s_s_s_s( 3, "Action(", act_name, ") for:", actitem2str( p_act_itm ),
@@ -1583,13 +1596,11 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
   t_upsugo_command *a_cmd_ugo = 0;
   t_upsugo_command *a_setup_ugo = 0;
   int use_cmd = 0;
-  int i_cmd = 0;
   char *cmd_line = 0;
 
   if ( !p_cmd )
     return 0;
 
-  i_cmd = p_cmd->icmd;
   cmd_line = p_cmd->argv[0];
 
   /* fetch product name,
@@ -2027,7 +2038,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 				     t_upslst_item *const cmd_list )
 {
   /* it will, given a list of action command lines, reverse each 
-     command line (if g_cmd_maps.icmd_undo is set), and return a 
+     command line (if g_func_info.icmd_undo is set), and return a 
      list of these. */ 
 
   static char buf[MAX_LINE_LEN];
@@ -2050,12 +2061,12 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 		 (char *)l_cmd->data );
     p_cmd = upsact_parse_cmd( p_line );
     if ( p_cmd && ((i_cmd = p_cmd->icmd) != e_invalid_cmd) ) {
-      if ( (i_uncmd = g_cmd_maps[p_cmd->icmd].icmd_undo) != e_invalid_cmd ) {
-	strcpy( buf,  g_cmd_maps[i_uncmd].cmd );
+      if ( (i_uncmd = g_func_info[p_cmd->icmd].icmd_undo) != e_invalid_cmd ) {
+	strcpy( buf,  g_func_info[i_uncmd].cmd );
 
-	argc = g_cmd_maps[i_cmd].max_params;
-	if ( argc > g_cmd_maps[i_uncmd].max_params )
-	  argc = g_cmd_maps[i_uncmd].max_params;
+	argc = g_func_info[i_cmd].max_params;
+	if ( argc > g_func_info[i_uncmd].max_params )
+	  argc = g_func_info[i_uncmd].max_params;
 	if ( argc > p_cmd->argc )
 	  argc = p_cmd->argc;
 
@@ -2228,8 +2239,8 @@ void upsact_process_commands( const t_upslst_item * const a_cmd_list,
     the_cmd = (t_upsact_item *)cmd_item->data;
     
     /* call the function associated with the command */
-    if (g_cmd_maps[the_cmd->cmd->icmd].func) {
-      g_cmd_maps[the_cmd->cmd->icmd].func(
+    if (g_func_info[the_cmd->cmd->icmd].func) {
+      g_func_info[the_cmd->cmd->icmd].func(
 		  (t_upstyp_matched_instance *)the_cmd->mat->minst_list->data,
 		  the_cmd->mat->db_info, the_cmd->ugo, a_stream, the_cmd->cmd);
       if (UPS_ERROR != UPS_SUCCESS) {
@@ -2248,7 +2259,7 @@ static void f_copyhtml( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyHtml");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2261,7 +2272,7 @@ static void f_copyinfo( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("copyInfo");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2292,7 +2303,7 @@ static void f_copyinfo( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     } else {
       if (a_minst->table && a_minst->table->info_source_dir) {
@@ -2375,7 +2386,7 @@ static void f_copyman( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("copyMan");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2424,7 +2435,7 @@ static void f_copyman( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     } else {
       upsver_mes(1, "%sNo destination in dbconfig file for man files\n",
@@ -2448,7 +2459,7 @@ static void f_copycatman( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("copyCatMan");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2498,7 +2509,7 @@ static void f_copycatman( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     } else {
       upsver_mes(1, "%sNo destination in dbconfig file for catman files\n",
@@ -2545,7 +2556,7 @@ static void f_uncopyman( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("uncopyMan");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2595,7 +2606,7 @@ static void f_uncopyman( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     } else {
       upsver_mes(1, "%sNo destination in dbconfig file for man files\n",
@@ -2617,7 +2628,7 @@ static void f_uncopycatman( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("uncopyCatMan");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2668,7 +2679,7 @@ static void f_uncopycatman( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     } else {
       upsver_mes(1, "%sNo destination in dbconfig file for man files\n",
@@ -2681,7 +2692,7 @@ static void f_copynews( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("copyNews");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2694,7 +2705,7 @@ static void f_envappend( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("envAppend");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2737,7 +2748,7 @@ static void f_envappend( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -2748,7 +2759,7 @@ static void f_envprepend( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("envPrepend");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2792,7 +2803,7 @@ static void f_envprepend( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -2803,7 +2814,7 @@ static void f_envremove( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("envRemove");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2837,7 +2848,7 @@ static void f_envremove( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     }
   }
@@ -2847,7 +2858,7 @@ static void f_envset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envSet");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2873,7 +2884,7 @@ static void f_envset( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -2882,7 +2893,7 @@ static void f_envsetifnotset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envSetIfNotSet");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2910,7 +2921,7 @@ static void f_envsetifnotset( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -2919,7 +2930,7 @@ static void f_envunset( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("envUnset");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2943,7 +2954,7 @@ static void f_envunset( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -2952,7 +2963,7 @@ static void f_exeaccess( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("exeAccess");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2980,7 +2991,7 @@ static void f_exeaccess( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -2989,7 +3000,7 @@ static void f_execute( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("execute");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -2997,7 +3008,7 @@ static void f_execute( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].min_params) {
+      if (a_cmd->argc == g_func_info[a_cmd->icmd].min_params) {
 	if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0]) < 0) {
 	  FPRINTF_ERROR();
 	}
@@ -3009,7 +3020,7 @@ static void f_execute( ACTION_PARAMS)
       }
       break;
     case e_CSHELL:
-      if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].min_params) {
+      if (a_cmd->argc == g_func_info[a_cmd->icmd].min_params) {
 	if (fprintf((FILE *)a_stream, "%s\n#\n", a_cmd->argv[0])< 0) {
 	  FPRINTF_ERROR();
 	}
@@ -3027,7 +3038,7 @@ static void f_execute( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3038,14 +3049,14 @@ static void f_filetest( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("fileTest");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
   
     /* get the correct error message */
-    GET_ERR_MESSAGE((char *)a_cmd->argv[g_cmd_maps[a_cmd->icmd].max_params-1]);
+    GET_ERR_MESSAGE((char *)a_cmd->argv[g_func_info[a_cmd->icmd].max_params-1]);
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
@@ -3069,7 +3080,7 @@ static void f_filetest( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3082,7 +3093,7 @@ static void f_pathappend( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("pathAppend");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3123,7 +3134,7 @@ static void f_pathappend( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3135,7 +3146,7 @@ static void f_pathprepend( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("pathPrepend");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3177,7 +3188,7 @@ static void f_pathprepend( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3189,7 +3200,7 @@ static void f_pathremove( ACTION_PARAMS)
   
   CHECK_NUM_PARAM("pathRemove");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3227,7 +3238,7 @@ static void f_pathremove( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     }
   }
@@ -3240,7 +3251,7 @@ static void f_pathset( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("pathSet");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3268,7 +3279,7 @@ static void f_pathset( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3281,7 +3292,7 @@ static void f_addalias( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("addAlias");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3323,7 +3334,7 @@ static void f_addalias( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3332,7 +3343,7 @@ static void f_unalias( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("unAlias");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3356,7 +3367,7 @@ static void f_unalias( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3515,7 +3526,7 @@ static void f_sourcecompilereq( ACTION_PARAMS)
   if (! g_COMPILE_FLAG) {
     CHECK_NUM_PARAM("sourceCompileReq");
 
-    OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+    OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
     /* only proceed if we have a valid number of parameters and a stream to
        write them to */
@@ -3553,7 +3564,7 @@ static void f_sourcecompilereq( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     }
   }
@@ -3565,7 +3576,7 @@ static void f_sourcecompileopt( ACTION_PARAMS)
   if (! g_COMPILE_FLAG) {
     CHECK_NUM_PARAM("sourceCompileOpt");
 
-    OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+    OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
     /* only proceed if we have a valid number of parameters and a stream to
        write them to */
@@ -3600,7 +3611,7 @@ static void f_sourcecompileopt( ACTION_PARAMS)
       if (UPS_ERROR != UPS_SUCCESS) {
 	upserr_vplace();
 	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		   g_cmd_maps[a_cmd->icmd].cmd);
+		   g_func_info[a_cmd->icmd].cmd);
       }
     }
   }
@@ -3613,7 +3624,7 @@ static void f_sourcerequired( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("sourceRequired");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3658,7 +3669,7 @@ static void f_sourcerequired( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3670,7 +3681,7 @@ static void f_sourceoptional( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("sourceOptional");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3709,7 +3720,7 @@ static void f_sourceoptional( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3721,7 +3732,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("sourceReqCheck");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3766,7 +3777,7 @@ static void f_sourcereqcheck( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3778,7 +3789,7 @@ static void f_sourceoptcheck( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("sourceOptCheck");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3816,7 +3827,7 @@ static void f_sourceoptcheck( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }
@@ -3833,7 +3844,7 @@ static void f_writecompilescript(ACTION_PARAMS)
   if (! g_COMPILE_FLAG) {
     CHECK_NUM_PARAM("writeCompileScript");
 
-    OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+    OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
     /* only proceed if we have a valid number of parameters */
     if (UPS_ERROR == UPS_SUCCESS) {
@@ -3868,7 +3879,7 @@ static void f_writecompilescript(ACTION_PARAMS)
 	  /* 3   the file exists. check argv[2] to see if we need to rename the
 	         file before writing the new one. if no flag was passed then
 	         just overwrite the file */
-	  if (a_cmd->argc == g_cmd_maps[a_cmd->icmd].max_params) {
+	  if (a_cmd->argc == g_func_info[a_cmd->icmd].max_params) {
 	    /* the flag was there, now see what it is */
 	    if (! strcmp(a_cmd->argv[a_cmd->argc - 1], OLD_FLAG)) {
 	      /* append ".OLD" to the file name */
@@ -3949,7 +3960,7 @@ static void f_setupenv( ACTION_PARAMS)
 {
   CHECK_NUM_PARAM("setupEnv");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
@@ -3965,14 +3976,14 @@ static void f_unsetupenv( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("unSetupEnv");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
     /* we will be calling the envunset action */
     lcl_cmd.iact = a_cmd->iact;
-    lcl_cmd.argc = g_cmd_maps[e_envunset].min_params;   /* # of args */
+    lcl_cmd.argc = g_func_info[e_envunset].min_params;   /* # of args */
     lcl_cmd.icmd = e_envunset;
     lcl_cmd.argv[0] = g_buff;
 
@@ -3994,14 +4005,14 @@ static void f_proddir( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("prodDir");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
     /* we will be calling the envset action */
     lcl_cmd.iact = a_cmd->iact;
-    lcl_cmd.argc = g_cmd_maps[e_envset].min_params;   /* # of args */
+    lcl_cmd.argc = g_func_info[e_envset].min_params;   /* # of args */
     lcl_cmd.icmd = e_envset;
     lcl_cmd.argv[0] = g_buff;
 
@@ -4039,14 +4050,14 @@ static void f_unproddir( ACTION_PARAMS)
 
   CHECK_NUM_PARAM("unProdDir");
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
     /* we will be calling the envunset action */
     lcl_cmd.iact = a_cmd->iact;
-    lcl_cmd.argc = g_cmd_maps[e_envunset].min_params;   /* # of args */
+    lcl_cmd.argc = g_func_info[e_envunset].min_params;   /* # of args */
     lcl_cmd.icmd = e_envunset;
     lcl_cmd.argv[0] = g_buff;
 
@@ -4064,7 +4075,7 @@ static void f_dodefaults( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
 
-  OUTPUT_VERBOSE_MESSAGE(g_cmd_maps[a_cmd->icmd].cmd);
+  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
 
   /* only proceed if we have a stream to write the output to */
   if (a_stream) {
@@ -4073,7 +4084,7 @@ static void f_dodefaults( ACTION_PARAMS)
       /* use our local copy since we have to change it - we will be calling
 	 the proddir action */
       lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_cmd_maps[e_proddir].min_params;   /* # of args */
+      lcl_cmd.argc = g_func_info[e_proddir].min_params;   /* # of args */
       lcl_cmd.icmd = e_proddir;
       f_proddir(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
 
@@ -4090,7 +4101,7 @@ static void f_dodefaults( ACTION_PARAMS)
     case e_current:     /* Copy man pages to man page area in dbconfig file */
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_cmd_maps[e_copyman].min_params;   /* # of args */
+      lcl_cmd.argc = g_func_info[e_copyman].min_params;   /* # of args */
       f_copyman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       f_copycatman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       f_copyinfo(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
@@ -4128,7 +4139,7 @@ static void f_dodefaults( ACTION_PARAMS)
     case e_uncurrent:   /* Remove the man pages from the man page area */
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_cmd_maps[e_uncopyman].min_params;   /* # of args */
+      lcl_cmd.argc = g_func_info[e_uncopyman].min_params;   /* # of args */
       f_uncopyman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       f_uncopycatman(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
@@ -4145,10 +4156,10 @@ static void f_dodefaults( ACTION_PARAMS)
     case e_unsetup:
       /* use our local copy since we have to change it */
       lcl_cmd.iact = a_cmd->iact;
-      lcl_cmd.argc = g_cmd_maps[e_unproddir].min_params;   /* # of args */
+      lcl_cmd.argc = g_func_info[e_unproddir].min_params;   /* # of args */
       lcl_cmd.icmd = e_unproddir;
       f_unproddir(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
-      lcl_cmd.argc = g_cmd_maps[e_unsetupenv].min_params;   /* # of args */
+      lcl_cmd.argc = g_func_info[e_unsetupenv].min_params;   /* # of args */
       lcl_cmd.icmd = e_unsetupenv;
       f_unsetupenv(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       break;
@@ -4163,7 +4174,7 @@ static void f_dodefaults( ACTION_PARAMS)
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
       upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_cmd_maps[a_cmd->icmd].cmd);
+		 g_func_info[a_cmd->icmd].cmd);
     }
   }
 }

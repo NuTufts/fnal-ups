@@ -164,7 +164,7 @@ typedef void (*tpf_cmd)( const t_upstyp_matched_instance * const a_inst,
                          const FILE * const a_stream,
                          const t_upsact_cmd * const a_cmd);
 
-/* this one is the type for a single action command */
+/* this one is the type for a single action function */
 typedef struct s_cmd_map {
   char *cmd;
   int  icmd;
@@ -172,7 +172,10 @@ typedef struct s_cmd_map {
   int  min_params;
   int  max_params;
   int  icmd_undo;
+  unsigned int flags;
 } t_cmd_map;
+
+#define UPSACT_FUNC_ISIN_TABLE( flag ) (flag&0x00000001 ? 1 : 0)
 
 /*
  * Declaration of public functions.
