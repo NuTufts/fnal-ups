@@ -42,10 +42,10 @@ OBJECTS = upserr.o upslst.o upsmem.o upsutl.o upstyp.o \
 COMMAND_OBJECTS = ups_list.o ups_setup.o ups_start.o ups_stop.o \
 	          ups_unk.o
 
-CIAOBJECTS = upserr.a upslst.a upsmem.a upsutl.a upstyp.a \
-	     upsfil.a upsugo.a upsmat.a ups_list.a  \
-	     upskey.a upshlp.a ups_unk.a ups_setup.a \
-	     upsver.a upsact.a upsget.a ups_start.a \
+CIAOBJECTS = upserr.A upslst.A upsmem.A upsutl.A upstyp.A \
+	     upsfil.A upsugo.A upsmat.A ups_list.A  \
+	     upskey.A upshlp.A ups_unk.A ups_setup.A \
+	     upsver.A upsact.A upsget.A ups_start.A \
 	     ups_stop.a
 
 LDFLAGS = $(LLIBS)
