@@ -1,4 +1,4 @@
-ROVER="ROCK AND ROLL";export ROVER
+ROVER="ROCK AND ROLL"; export ROVER
 #
 if [ -s $UPS_DIR/test/scripts/compile/log/rover.out.sh ]; then
   . $UPS_DIR/test/scripts/compile/log/rover.out.sh
