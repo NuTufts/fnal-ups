@@ -2,15 +2,15 @@
 <p>
 <ul>
 <li>
-fixed heading of help output
+Fixed heading of help output.
 <li>
-fixed -0, -1, -2, and -3 help text
+Fixed -0, -1, -2, and -3 help text.
 <li>
-upcased product name in error message
+Upcased product name in error message.
 <li>
-fix problem with 'setup -r ...' giving an error the second time it is done
+Fixed problem with 'setup -r ...' giving an error the second time it is done.
 <li>
-minor documentation fixes
+Minor documentation fixes
 <li>
 ups current action will now also do a configure
 </ul>
@@ -27,4 +27,7 @@ and -K action=ACTION or action="action"
 <li>
 Added a specific database check in declare, ugo can't determine that
 -m isn't good enough for declare but it is for other commands.
+<li>
+Added more error messages to the action processing code. Errors on actions 
+should now output more info as to the instance involved.
 </ul>
