@@ -26,7 +26,7 @@ makefile_file=""        # User supplied makefile name
 needEmacs=""            # used to check for EMACS_DIR if target is tag_file
 logFile=""		# Log make output?
 defs="$defs SHELL=/bin/sh"	# misc. definitions to pass to make
-insight=""              # compile with Insure (only on IRIX)
+insure=""              # compile with Insure (only on IRIX)
 
 #------------------------------------------------------------------------
 #  MAKE SURE WE ARE BUILDING ON A SUPPORTED ARCHITECTURE
@@ -93,7 +93,7 @@ for a in "$@" ; do
 	  -deb*|-DEB*)
 		dbg=1;;
 	  -i)
-	        insight=1;;
+	        insure=1;;
 	  -FULLOPT*|-fullopt*)
 		$opt=1
 		fullopt=1;;
@@ -222,9 +222,9 @@ case $ccenv in
 				cflags="$cflags -mips4";;
 			esac
 		fi
-                if [ "x$insight" != "x" ]
+                if [ "x$insure" != "x" ]
                 then
-	                cc="insight"
+	                cc="insure"
 		else
 		        cc="cc $size"
 		fi

@@ -71,11 +71,11 @@ VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 # "all" should probably depend on the product directory being set.
 
 UPSDBG=
-INSIGHT=
+INSURE=
 
 all: 	proddir_is_set
-	cd src; premake $(UPSDBG) $(INSIGHT)
-	cd test; premake $(UPSDBG) $(INSIGHT)
+	cd src; premake $(UPSDBG) $(INSURE)
+	cd test; premake $(UPSDBG) $(INSURE)
 
 test: FORCE
 	cd test/scripts; upstst_all
@@ -83,8 +83,8 @@ test: FORCE
 debug: 	
 	make UPSDBG="-debug -filter" all
 
-insight: 	
-	make INSIGHT=-i UPSDBG=-debug all
+insure: 	
+	make INSURE=-i UPSDBG=-debug all
 
 clean:
 	for subdir in src inc test doc bin lib; do \
