@@ -27,7 +27,7 @@
 #Information about command presented EXACTLY as typed line for
 #line until OPTIONS or a : not found 
 COMMANDS    :
-configure   :?cdfgHmMnoOqrtUvVzZ: < unprinted comments go here >
+configure   :?cdfgHmMnoOqrstUvVzZ: < unprinted comments go here >
 : Environmentally configure a product instance.
 copy        :?AcCdfgHmMnoOpqrtTUvVWXzZ:
 : Allow one instance of a product to be declared 
@@ -58,27 +58,27 @@ list        :a?cdfghHKlmMnoqrtUvVzZ:
 modify      :?AEfHmMopqrTUvVxzZ:
 : Allow editor modification of the UPS Database files.  
 : The altered files are verified before being rewritten.
-setup       :?BcdefgHjkmMnoOqrtUvVzZ:
+setup       :?BcdefgHjkmMnoOqrstUvVzZ:
 : Prepare the environment in order to be able 
 : to use a product instance.
-start       :?cdfgHmMnoOqrtUvVwzZ: 
+start       :?cdfgHmMnoOqrstUvVwzZ: 
 : Perform any necessary actions for a product 
 : instance at system boot.
-stop        :?cdfgHmMnoOqrtUvVzZ: 
+stop        :?cdfgHmMnoOqrstUvVzZ: 
 : Perform any necessary actions for a product 
 : instance at system shutdown.
-tailor      :?cdfghHKmMnoOqrtUvVzZ: 
+tailor      :?cdfghHKmMnoOqrstUvVzZ: 
 : Perform any product instance tailoring that needs 
 : to be done once (specify hardware device location)
 : or needs user input.
-unconfigure :?cdfgHmMnoOqrtUvVzZ: 
+unconfigure :?cdfgHmMnoOqrstUvVzZ: 
 : Undo any actions performed by the configure command.
 undeclare   :?cdfgHmMnoOqrtUvVyYzZ:
 : Remove a product instance from a UPS Database. 
 : if chain(s) are specified ONLY the chain(s) will 
 : be removed if a version is specified ALL chain and 
 : version will be removed
-unsetup     :?cdefgHjmMnoOqtUvVzZ:
+unsetup     :?cdefgHjmMnoOqstUvVzZ:
 : Return the environment to a pre-setup state.
 validate    :?cdfghHlmMnNoqrStUvVzZ:
 : Check the specified files for correct formatting 
@@ -116,6 +116,7 @@ OPTIONS     :
 -q :qualifiers : required or optional qualifiers that are 
 :to be part of the instance 
 -r :dir : set $PROD_DIR to dir 
+-s :create the temp file, but do not source it
 -S :check syntax only 
 -t :test chain 
 -T :archivefile : archive file 
