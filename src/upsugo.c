@@ -60,11 +60,20 @@ int UPS_NEED_DB=1;
         upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
         n = strlen(addr)-1;\
-	while(addr[n] > '0' && addr[n] <= '9') { \
-	     addr=upsutl_str_create(addr,' '); \
-	     addr[n]--; \
-             upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
-             uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
+	if(addr[n] >= '0' && addr[n] <= '9') { \
+	  int release; \
+	  while(addr[n] >= '0' && addr[n] <= '9') { \
+	    n--; \
+          } \
+	  n++; \
+          release=atoi(addr+n); \
+	  while( release > 0 ) { \
+	    release--; \
+	    addr=upsutl_str_create(addr,' '); \
+	    sprintf(addr + n, "%d", release); \
+	    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
+	    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
+          } \
         } \
       } \
    if ((loc = strrchr(flavor,'+'))) \
@@ -77,6 +86,7 @@ int UPS_NEED_DB=1;
    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); \
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr); \
 }
+
 /* Single flag set cases */
 #define case_help case '?': uc->ugo_help = 1; break;
 #define case_a case 'a': uc->ugo_a = 1; break;
