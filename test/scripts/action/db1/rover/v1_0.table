@@ -8,5 +8,5 @@ ACTION = SETUP
    doDefaults()
    setupRequired("snoopy v1_0")
    setupRequired("astro v1_0")
-   source(rover_v1_0)
+   sourceRequired(rover_v1_0)
 

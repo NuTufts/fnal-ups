@@ -22,7 +22,6 @@ upserr_clear
 #
 # testing qualifiers
 #
-ups_echo "hi there"
 upsugo_next -out simple.out -diff simple.in -a -c -d -f CHOCOLATE
 upsugo_next -out qualifier.out -diff qualifier.in -f CHOCOLATE -q "a:aardvark:Bear:Canary:?cat:dog:123:___big-dog:?fat-cat" 
 upserr_clear
@@ -54,14 +53,12 @@ upsugo_next -out prodi.out -diff prodi.in -H IRIX+5.3 -q"But caption: you have s
 #
 # test upsugo_env
 #
-ups_echo "env"
 upsugo_env -out titanic.out -diff titanic.in titanic
 upsugo_env -out lusitania.out -diff lusitania.in lusitania 
 upsugo_env -out bismark.out -diff bismark.in bismark 
 #
 # test upsugo_bldcmd
 #
-ups_echo bld
 upsugo_bldcmd -out titanic.out -diff titanic.in "doomed -H IRIX+5"
 upsugo_bldcmd -out lusitania.out -diff lusitania.in "lusitania -f CHERRY v1_0"
 upsugo_bldcmd -out bismark.out -diff bismark.in "bismark -g current -q a?b?c -f RUM_RAISIN"

@@ -6,7 +6,7 @@ QUALIFIERS = ""
    ACTION=SETUP
       doDefaults()
       setupOptional("spot v2_0")
-      source(lassie_v3_0)
+      sourceRequired (lassie_v3_0)
    ACTION=UNSETUP
       doDefaults()
 
