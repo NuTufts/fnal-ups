@@ -145,6 +145,7 @@ static t_var_sub g_var_subs[] = {
   { "${UPS_ORIGIN", upsget_origin, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_SOURCE", upsget_source, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${PRODUCTS", upsget_database, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
+  { "${UPS_REQ_CHAIN", upsget_reqchain, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
 /*  { "${UPS_ACTION", upsget_action, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
 /*  { "${UPS_ARCHIVE_FILE", upsget_archive_file, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
 /*  { "${UPS_AUTHORIZED_NODES", upsget_authorized_nodes, DO_NOT_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },  */
@@ -921,6 +922,17 @@ char *upsget_reqqualifiers(const t_upstyp_db * const db_info_ptr,
 { static char *string;
 
   string = command_line->ugo_reqqualifiers;
+
+  SHUTUP;
+  return string;
+}
+
+char *upsget_reqchain(const t_upstyp_db * const db_info_ptr,
+                      const t_upstyp_matched_instance * const instance,
+                      const t_upsugo_command * const command_line )
+{ static char *string;
+
+  string = command_line->ugo_reqchain;
 
   SHUTUP;
   return string;

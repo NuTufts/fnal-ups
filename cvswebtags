@@ -254,46 +254,47 @@ write_chain_file 743 src/upsfil.c     int write_chain_file(
 write_journal_file 324 src/upsfil.c     void write_journal_file(
 write_table_file 779 src/upsfil.c     int write_table_file(
 write_version_file 705 src/upsfil.c     int write_version_file(
-HASHATOM         1142 src/upsget.c     #define HASHATOM(
-LOOK_FOR_FILE    1358 src/upsget.c     #define LOOK_FOR_FILE(
-TRANSLATE_ENV    1368 src/upsget.c     #define TRANSLATE_ENV(
+HASHATOM         1154 src/upsget.c     #define HASHATOM(
+LOOK_FOR_FILE    1370 src/upsget.c     #define LOOK_FOR_FILE(
+TRANSLATE_ENV    1380 src/upsget.c     #define TRANSLATE_ENV(
 get_element       66 src/upsget.c     #define get_element(
 s_var_sub        114 src/upsget.c     typedef struct s_var_sub 
-shutup           1515 src/upsget.c     static void shutup 
+shutup           1527 src/upsget.c     static void shutup 
 t_var_sub        120 src/upsget.c     } t_var_sub;
-upsget_OS_flavor 1063 src/upsget.c     char *upsget_OS_flavor(
-upsget_allout    260 src/upsget.c     void upsget_allout(
-upsget_archive_file 684 src/upsget.c     char *upsget_archive_file(
-upsget_catman_source_dir 1228 src/upsget.c     char *upsget_catman_source_dir(
-upsget_chain_file 1085 src/upsget.c     t_upstyp_product *upsget_chain_file(
-upsget_compile   790 src/upsget.c     char *upsget_compile(
-upsget_database  1005 src/upsget.c     char *upsget_database(
-upsget_envout    232 src/upsget.c     void upsget_envout(
-upsget_envstr    625 src/upsget.c     char *upsget_envstr(
-upsget_extended  981 src/upsget.c     char *upsget_extended(
-upsget_flavor    901 src/upsget.c     char *upsget_flavor(
-upsget_info_source_dir 1276 src/upsget.c     char *upsget_info_source_dir(
-upsget_key       1144 src/upsget.c     int upsget_key(
-upsget_man_source_dir 1171 src/upsget.c     char *upsget_man_source_dir(
-upsget_options   992 src/upsget.c     char *upsget_options(
-upsget_origin    876 src/upsget.c     char *upsget_origin(
-upsget_prod_dir  721 src/upsget.c     char *upsget_prod_dir(
-upsget_product   884 src/upsget.c     char *upsget_product(
-upsget_qualifiers 909 src/upsget.c     char *upsget_qualifiers(
-upsget_remall    187 src/upsget.c     void upsget_remall(
-upsget_reqqualifiers 918 src/upsget.c     char *upsget_reqqualifiers(
-upsget_shell     929 src/upsget.c     char *upsget_shell(
-upsget_source    949 src/upsget.c     char *upsget_source(
-upsget_table_file 1372 src/upsget.c     char *upsget_table_file(
-upsget_this_db   1042 src/upsget.c     char *upsget_this_db(
-upsget_tilde_dir 1023 src/upsget.c     char *upsget_tilde_dir(
-upsget_translation 455 src/upsget.c     char *upsget_translation(
-upsget_translation_env 338 src/upsget.c     char *upsget_translation_env(
-upsget_translation_tilde 411 src/upsget.c     char *upsget_translation_tilde(
-upsget_ups_dir   755 src/upsget.c     char *upsget_ups_dir(
-upsget_verbose   969 src/upsget.c     char *upsget_verbose(
-upsget_version   892 src/upsget.c     char *upsget_version(
-upsget_version_file 1118 src/upsget.c     t_upstyp_product *upsget_version_file(
+upsget_OS_flavor 1075 src/upsget.c     char *upsget_OS_flavor(
+upsget_allout    261 src/upsget.c     void upsget_allout(
+upsget_archive_file 685 src/upsget.c     char *upsget_archive_file(
+upsget_catman_source_dir 1240 src/upsget.c     char *upsget_catman_source_dir(
+upsget_chain_file 1097 src/upsget.c     t_upstyp_product *upsget_chain_file(
+upsget_compile   791 src/upsget.c     char *upsget_compile(
+upsget_database  1017 src/upsget.c     char *upsget_database(
+upsget_envout    233 src/upsget.c     void upsget_envout(
+upsget_envstr    626 src/upsget.c     char *upsget_envstr(
+upsget_extended  993 src/upsget.c     char *upsget_extended(
+upsget_flavor    902 src/upsget.c     char *upsget_flavor(
+upsget_info_source_dir 1288 src/upsget.c     char *upsget_info_source_dir(
+upsget_key       1156 src/upsget.c     int upsget_key(
+upsget_man_source_dir 1183 src/upsget.c     char *upsget_man_source_dir(
+upsget_options   1004 src/upsget.c     char *upsget_options(
+upsget_origin    877 src/upsget.c     char *upsget_origin(
+upsget_prod_dir  722 src/upsget.c     char *upsget_prod_dir(
+upsget_product   885 src/upsget.c     char *upsget_product(
+upsget_qualifiers 910 src/upsget.c     char *upsget_qualifiers(
+upsget_remall    188 src/upsget.c     void upsget_remall(
+upsget_reqchain  930 src/upsget.c     char *upsget_reqchain(
+upsget_reqqualifiers 919 src/upsget.c     char *upsget_reqqualifiers(
+upsget_shell     941 src/upsget.c     char *upsget_shell(
+upsget_source    961 src/upsget.c     char *upsget_source(
+upsget_table_file 1384 src/upsget.c     char *upsget_table_file(
+upsget_this_db   1054 src/upsget.c     char *upsget_this_db(
+upsget_tilde_dir 1035 src/upsget.c     char *upsget_tilde_dir(
+upsget_translation 456 src/upsget.c     char *upsget_translation(
+upsget_translation_env 339 src/upsget.c     char *upsget_translation_env(
+upsget_translation_tilde 412 src/upsget.c     char *upsget_translation_tilde(
+upsget_ups_dir   756 src/upsget.c     char *upsget_ups_dir(
+upsget_verbose   981 src/upsget.c     char *upsget_verbose(
+upsget_version   893 src/upsget.c     char *upsget_version(
+upsget_version_file 1130 src/upsget.c     t_upstyp_product *upsget_version_file(
 var_func         110 src/upsget.c     typedef char * (*var_func)
 upshlp_command    53 src/upshlp.c     int upshlp_command(
 upskey_chnhead_arr 427 src/upskey.c     int *upskey_chnhead_arr(
@@ -385,30 +386,30 @@ ups_new_matched_product  58 src/upstyp.c     t_upstyp_matched_product *ups_new_m
 ups_new_product  216 src/upstyp.c     t_upstyp_product *ups_new_product(
 FREE              56 src/upsugo.c     #define FREE(
 add_chain        153 src/upsugo.c     #define add_chain(
-build_list       239 src/upsugo.c     #define build_list(
+build_list       241 src/upsugo.c     #define build_list(
 expand_flavorlist  59 src/upsugo.c     expand_flavorlist(
 flavor_sub        92 src/upsugo.c     flavor_sub(
 set_O_value      214 src/upsugo.c     #define set_O_value(
 set_value        170 src/upsugo.c     #define set_value(
 set_value_nop    190 src/upsugo.c     #define set_value_nop(
-ugo_old2newquals 621 src/upsugo.c     ugo_old2newquals(
-upsugo_bldcmd    1395 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(
-upsugo_blddb     558 src/upsugo.c     int upsugo_blddb(
-upsugo_bldfvr    360 src/upsugo.c     int upsugo_bldfvr(
-upsugo_bldqual   681 src/upsugo.c     int upsugo_bldqual(
-upsugo_dump      1129 src/upsugo.c     int upsugo_dump 
-upsugo_env       1318 src/upsugo.c     t_upsugo_command *upsugo_env(
-upsugo_free      1036 src/upsugo.c     int upsugo_free 
-upsugo_free_ugo_db 1099 src/upsugo.c     void upsugo_free_ugo_db(
-upsugo_getarg    865 src/upsugo.c     char * upsugo_getarg(
-upsugo_getenv    1292 src/upsugo.c     char *upsugo_getenv(
-upsugo_ifornota  460 src/upsugo.c     int upsugo_ifornota(
-upsugo_liststart 833 src/upsugo.c     void upsugo_liststart(
-upsugo_next      1449 src/upsugo.c     t_upsugo_command *upsugo_next(
-upsugo_prtdb     1244 src/upsugo.c     void upsugo_prtdb(
-upsugo_prtlst    1203 src/upsugo.c     void upsugo_prtlst(
-upsugo_rearg     957 src/upsugo.c     int upsugo_rearg(
-upsugo_setshell  423 src/upsugo.c     void upsugo_setshell(
+ugo_old2newquals 633 src/upsugo.c     ugo_old2newquals(
+upsugo_bldcmd    1406 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(
+upsugo_blddb     570 src/upsugo.c     int upsugo_blddb(
+upsugo_bldfvr    372 src/upsugo.c     int upsugo_bldfvr(
+upsugo_bldqual   693 src/upsugo.c     int upsugo_bldqual(
+upsugo_dump      1140 src/upsugo.c     int upsugo_dump 
+upsugo_env       1329 src/upsugo.c     t_upsugo_command *upsugo_env(
+upsugo_free      1047 src/upsugo.c     int upsugo_free 
+upsugo_free_ugo_db 1110 src/upsugo.c     void upsugo_free_ugo_db(
+upsugo_getarg    876 src/upsugo.c     char * upsugo_getarg(
+upsugo_getenv    1303 src/upsugo.c     char *upsugo_getenv(
+upsugo_ifornota  472 src/upsugo.c     int upsugo_ifornota(
+upsugo_liststart 844 src/upsugo.c     void upsugo_liststart(
+upsugo_next      1460 src/upsugo.c     t_upsugo_command *upsugo_next(
+upsugo_prtdb     1255 src/upsugo.c     void upsugo_prtdb(
+upsugo_prtlst    1214 src/upsugo.c     void upsugo_prtlst(
+upsugo_rearg     968 src/upsugo.c     int upsugo_rearg(
+upsugo_setshell  435 src/upsugo.c     void upsugo_setshell(
 ups_append_OS     84 src/upsuname.c   ups_append_OS(
 ups_append_default_quals 148 src/upsuname.c   ups_append_default_quals(
 ups_append_release 110 src/upsuname.c   ups_append_release(
@@ -497,5 +498,5 @@ upstyp_instance   84 inc/upstyp.h     typedef struct upstyp_instance
 upstyp_matched_instance 125 inc/upstyp.h     typedef struct upstyp_matched_instance
 upstyp_matched_product  75 inc/upstyp.h     typedef struct upstyp_matched_product
 upstyp_product   144 inc/upstyp.h     typedef struct upstyp_product
-t_upsugo_command 121 inc/upsugo.h     } t_upsugo_command;
+t_upsugo_command 122 inc/upsugo.h     } t_upsugo_command;
 ups_command       39 inc/upsugo.h     typedef struct ups_command

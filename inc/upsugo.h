@@ -118,6 +118,7 @@ typedef struct ups_command
     int     ugo_shell;       /* shell variant that the user has      */
     int     ugo_number;      /* -0,-1,-2,etc value offset by +1      */
     char   *ugo_reqqualifiers; /* original qualifier -q string */
+    char   *ugo_reqchain; /* original chain -g string -- with -g */
 } t_upsugo_command;
 
 /* 

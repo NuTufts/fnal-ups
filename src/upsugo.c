@@ -154,11 +154,11 @@ flavor_sub(char *flavor, struct ups_command * uc)
          addr=upsutl_str_create(CHAIN,' ');              \
          uc->ugo_chain = upslst_add(uc->ugo_chain,addr); 
 /* All "defined" chains given by a flag */
-#define case_c case 'c': uc->ugo_c = 1; add_chain("current"); break;
-#define case_d case 'd': uc->ugo_d = 1; add_chain("development"); break;
-#define case_n case 'n': uc->ugo_n = 1; add_chain("new"); break;
-#define case_t case 't': uc->ugo_t = 1; add_chain("test"); break;
-#define case_o case 'o': uc->ugo_o = 1; add_chain("old"); break;
+#define case_c case 'c': uc->ugo_c = 1; add_chain("current");     uc->ugo_reqchain = "-c"; break;
+#define case_d case 'd': uc->ugo_d = 1; add_chain("development"); uc->ugo_reqchain = "-d"; break;
+#define case_n case 'n': uc->ugo_n = 1; add_chain("new");         uc->ugo_reqchain = "-n"; break;
+#define case_t case 't': uc->ugo_t = 1; add_chain("test");        uc->ugo_reqchain = "-t"; break;
+#define case_o case 'o': uc->ugo_o = 1; add_chain("old");         uc->ugo_reqchain = "-o"; break;
 
 /* This routine set the element to the next arguement but it has to
    determine if the value is part of the same argument (argv) or a
@@ -236,9 +236,16 @@ flavor_sub(char *flavor, struct ups_command * uc)
    is the same a -f "OS1:MYOS:ANYOS:OSEND" of course with or wihout "'s
    NOTE: build list includes the BREAK
 */
+extern char *strdup();
+static char reqchainbuf[512];
 #define build_list( LIST_ELEMENT , ARG )                          \
 { if ( *argbuf )                                                  \
-  { while((loc=strchr(*argbuf,':'))!=0)                           \
+  { if( &LIST_ELEMENT == &uc->ugo_chain) 			  \
+    {								  \
+ 	sprintf(reqchainbuf,"-g %s", *argbuf );			  \
+	uc->ugo_reqchain = strdup(reqchainbuf);			  \
+    }								  \
+    while((loc=strchr(*argbuf,':'))!=0)                           \
     { addr=*argbuf;                                               \
       *argbuf=loc+1;                                              \
       *loc = 0;                                                   \
@@ -255,6 +262,11 @@ flavor_sub(char *flavor, struct ups_command * uc)
     { upserr_add(UPS_NOVALUE_ARGUMENT, UPS_FATAL, arg_str, ARG ); \
       break;                                                      \
     }                                                             \
+    if( &LIST_ELEMENT == &uc->ugo_chain) 			  \
+    {								  \
+ 	sprintf(reqchainbuf,"-g %s", arg_str );			  \
+	uc->ugo_reqchain = strdup(reqchainbuf);			  \
+    }								  \
     while((loc=strchr(arg_str,':'))!=0)                           \
     { addr=arg_str;                                               \
       arg_str=loc+1;                                              \
@@ -272,7 +284,7 @@ flavor_sub(char *flavor, struct ups_command * uc)
 /* list element options */
 #define case_A case 'A': uc->ugo_A = 1; build_list (uc->ugo_auth , "A") 
 #define case_f case 'f': uc->ugo_f = 1; build_list (uc->ugo_flavor , "f") 
-#define case_g case 'g': uc->ugo_g = 1; build_list (uc->ugo_chain , "g") 
+#define case_g case 'g': uc->ugo_g = 1; build_list (uc->ugo_chain , "g")
 #define case_H case 'H': uc->ugo_H = 1; build_list (uc->ugo_osname , "H") 
 #define case_h case 'h': uc->ugo_h = 1; build_list (uc->ugo_host , "h") 
 #define case_K case 'K': uc->ugo_K = 1; build_list (uc->ugo_key , "K") 
@@ -695,7 +707,6 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  char *optionals[10]; /* OH NO!! artifical limit of 10 optionals */
  char *fix_inaddr;
  int is_decl;
- extern char *strdup();
 
  uc->ugo_reqqualifiers = strdup(inaddr);
 
