@@ -1292,6 +1292,10 @@ static int get_instance(const t_upslst_item * const a_read_instances,
     for (tmp_quals_list = (t_upslst_item *)a_quals_list; tmp_quals_list ;
 	 tmp_quals_list = tmp_quals_list->next) {
       quals = (char *)tmp_quals_list->data;
+
+      upsver_mes(MATVLEVEL, "%s get_instance: flavor %s quals %s\n", VPREFIX,
+			flavor, quals);
+
       want_all_q = (! NOT_EQUAL_ANY_MATCH(quals));   /* true if quals = *  */
       /* Check to see if the flavors match or want any flavor */
       for (tmp_list = (t_upslst_item *)a_read_instances; tmp_list ;

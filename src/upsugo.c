@@ -638,6 +638,10 @@ ugo_old2newquals( const char *inaddr, int declflag ) {
     char *p2 = buf;
     const char *p1 = inaddr;
 
+    if (*inaddr == 0) {
+       return "";
+    }
+
     if (declflag) {
 	/* just remove + signs */
 	while( 0 != (*p2 = *p1 )) {
