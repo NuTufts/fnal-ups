@@ -485,13 +485,17 @@ t_upstyp_product  *upsfil_is_in_cache( const char * const ups_file )
 
 int upsfil_exist( const char * const ups_file )
 {
-  /* will just check if a file exist,
-    the main purpose is not to log/report any errors */
+  /* will return true if:
+     1) file is in cache
+     2) file is on disk */
+
+  if ( upsfil_is_in_cache( ups_file ) )
+    return 1;
 
   if ( upsutl_is_a_file( ups_file ) == UPS_SUCCESS ) 
     return 1;
-  else
-    return 0;
+
+  return 0;
 }
 
 void flush_product( const void *key, void ** prod, void *cl ) 
@@ -1148,7 +1152,6 @@ t_upstyp_action *read_action( void )
  */
 t_upstyp_config *read_config( void )
 {
-  int didit = 0;
   t_upstyp_config *conf_ptr = ups_new_config();
 
   while ( next_key() != e_key_eof ) {
@@ -1156,16 +1159,15 @@ t_upstyp_config *read_config( void )
     if ( g_ikey == e_key_statistics ) {
       upsutl_str_remove( g_val, WCHARSQ );  
       upsutl_str_sort( g_val, ':' );
-      didit = 1;
+      g_item_count++;
     }
       
     if ( g_mkey && g_mkey->c_index != INVALID_INDEX ) {
       UPSKEY_CONF2ARR( conf_ptr )[g_mkey->c_index] = upsutl_str_create( g_val, ' ' );
-      didit = 1;
+      g_item_count++;
     }
   }
 
-  g_item_count += didit;
   fclose( g_fh );  
   return conf_ptr;
 }
