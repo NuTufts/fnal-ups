@@ -399,7 +399,7 @@ t_cmd_info g_cmd_info[] = {
   {e_start,       "start",       "?cdf:g:H:m:M:noO:Pq:r:stU:vVwz:Z0123", 0x00000010, e_invalid_action},
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_tailor,      "tailor",      "?cdf:g:H:K:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
-  {e_touch,       "touch",       "?cdf:g:H:m:M:noq:tvz:Z0123", 0x00000010, e_invalid_action},
+  {e_touch,       "touch",       "?cdf:g:H:noq:tvz:Z0123", 0x00000010, e_invalid_action},
   {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_configure},
   {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000010, e_undeclare},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000010, e_invalid_action},
