@@ -2940,7 +2940,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 
   /* define all of the UPS local variables that the user may need. */
   if (a_ups_env_flag == DO_UPS_ENV) {
-    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
+    upsget_allout(a_stream, a_db_info, a_inst, a_command_line, "  ");
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
   }
   if (UPS_ERROR == UPS_SUCCESS) {
@@ -2953,7 +2953,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 		    a_data)) < 0) {
 	  FPRINTF_ERROR();
 	} else {
-	  upsutl_finish_temp_file(a_stream, a_command_line);
+	  upsutl_finish_temp_file(a_stream, a_command_line, "    ");
 	  if ((status = fprintf((FILE *)a_stream,
 		      "    return 1\n  fi\n  unset UPS_STATUS\n") < 0)) {
 	      FPRINTF_ERROR();
@@ -2961,7 +2961,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 	}
       }
       if ((status >= 0) && (a_exit_flag == DO_EXIT)) {
-	upsutl_finish_temp_file(a_stream, a_command_line);
+	upsutl_finish_temp_file(a_stream, a_command_line, "  ");
 	if ((status = fprintf((FILE *)a_stream, "  return\n") < 0)) {
 	  FPRINTF_ERROR();
 	}
@@ -2998,7 +2998,7 @@ static int csh_output_next_part(const FILE * const a_stream,
 
   /* define all of the UPS local variables that the user may need. */
   if (a_ups_env_flag == DO_UPS_ENV) {
-    upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
+    upsget_allout(a_stream, a_db_info, a_inst, a_command_line, "  ");
     g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
   }
   if (UPS_ERROR == UPS_SUCCESS) {
@@ -3011,7 +3011,7 @@ static int csh_output_next_part(const FILE * const a_stream,
 		    a_data)) < 0) {
 	  FPRINTF_ERROR();
 	} else {
-	  upsutl_finish_temp_file(a_stream, a_command_line);
+	  upsutl_finish_temp_file(a_stream, a_command_line, "    ");
 	  if ((status = fprintf((FILE *)a_stream,
 		      "    exit 1\n  endif\n  unsetenv UPS_STATUS\n") < 0)) {
 	      FPRINTF_ERROR();
@@ -3019,7 +3019,7 @@ static int csh_output_next_part(const FILE * const a_stream,
 	}
       }
       if ((status >= 0) && (a_exit_flag == DO_EXIT)) {
-	upsutl_finish_temp_file(a_stream, a_command_line);
+	upsutl_finish_temp_file(a_stream, a_command_line, "  ");
 	if ((status = fprintf((FILE *)a_stream, "  exit\n") < 0)) {
 	  FPRINTF_ERROR();
 	}
@@ -3039,7 +3039,7 @@ static int sh_output_last_part_req(const FILE * const a_stream,
 	      "else\n  echo \"File (%s)  not found\"\n", a_data) < 0)) {
     FPRINTF_ERROR();
   } else {
-    upsutl_finish_temp_file(a_stream, a_command_line);
+    upsutl_finish_temp_file(a_stream, a_command_line, "  ");
     if ((status = fprintf((FILE *)a_stream, "  return 1\nfi\n#\n") < 0)) {
       FPRINTF_ERROR();
     }
@@ -3057,7 +3057,7 @@ static int csh_output_last_part_req(const FILE * const a_stream,
 	      "else\n  echo \"File (%s)  not found\"\n", a_data) < 0)) {
     FPRINTF_ERROR();
   } else {
-    upsutl_finish_temp_file(a_stream, a_command_line);
+    upsutl_finish_temp_file(a_stream, a_command_line, "  ");
     if ((status = fprintf((FILE *)a_stream, "  exit 1\nendif\n#\n") < 0)) {
       FPRINTF_ERROR();
     }

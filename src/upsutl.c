@@ -262,17 +262,18 @@ return path_ptr;
  * Return: none
  */
 void upsutl_finish_temp_file( const FILE * const a_stream,
-			      const t_upsugo_command * const a_command_line)
+			      const t_upsugo_command * const a_command_line,
+			      const char * const a_prefix)
 {
   if (g_LOCAL_VARS_DEF) {
     /* undefine the local env variables */
-    (void )upsget_remall(a_stream, a_command_line);
+    (void )upsget_remall(a_stream, a_command_line, a_prefix);
   }
 
   /* we usually tell the file to delete itself.  however the user may
      override this */
   if (g_temp_file_name && ! g_COMPILE_FLAG && ! g_keep_temp_file) {
-    fprintf((FILE *)a_stream, "/bin/rm -f %s\n", g_temp_file_name);
+    fprintf((FILE *)a_stream, "%s/bin/rm -f %s\n", a_prefix, g_temp_file_name);
   }
 }
 

@@ -49,12 +49,12 @@
 #include "ups_undeclare.h"
 #include "ups_flavor.h"
 #include "ups_get.h"
+#include "ups_copy.h"
 
 /*
  * Definition of public variables.
  */
 extern int UPS_VERBOSE;
-extern int g_LOCAL_VARS_DEF;
 extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 	  case e_configure: ups_configure(command_line, temp_file,
 					  e_configure);
 	    break;
-	  case e_copy:
+	  case e_copy: ups_copy(command_line, temp_file, e_copy);
 	    break;
 	  case e_depend: ups_depend(command_line, argv[1], e_depend);
 	    break;
@@ -176,8 +176,6 @@ int main(int argc, char *argv[])
 	  case e_create: ups_create(command_line, e_create);
 	    break;
 	  case e_get: ups_get(command_line, temp_file, e_get);
-	    break;
-	  case e_validate:
 	    break;
 	  case e_declare: ups_declare(command_line, temp_file, e_declare);
 	    break;
@@ -222,7 +220,7 @@ int main(int argc, char *argv[])
       empty_temp_file = 1;
     } else {      
       /* write any closing info to the file */
-      (void )upsutl_finish_temp_file(temp_file, &temp_command_line);
+      (void )upsutl_finish_temp_file(temp_file, &temp_command_line, "");
     }
     if (fclose(temp_file) == EOF) {
       upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fclose", strerror(errno));

@@ -112,35 +112,45 @@ static t_var_sub g_var_subs[] = {
  * Definition of public functions.
  */
 void upsget_remall(const FILE * const stream, 
-                    const t_upsugo_command * const command_line )
+                    const t_upsugo_command * const command_line,
+		    const char * const prefix )
 {
+  char *pdefault;
+
+  if (prefix)
+  {
+    pdefault = (char *)prefix;
+  } else {
+    pdefault = "";
+  }
+
   if (command_line->ugo_shell == e_INVALID_SHELL)
   { upserr_add(UPS_NOSHELL, UPS_WARNING);
   } else {
     if (command_line->ugo_shell == e_BOURNE )
-    { fprintf((FILE *)stream,"unset UPS_PROD_NAME\n");
-      fprintf((FILE *)stream,"unset UPS_PROD_VERSION\n");
-      fprintf((FILE *)stream,"unset UPS_PROD_DIR\n");
-      fprintf((FILE *)stream,"unset UPS_VERBOSE\n");
-      fprintf((FILE *)stream,"unset UPS_EXTENDED\n");
-      fprintf((FILE *)stream,"unset UPS_THIS_DB\n");
-      fprintf((FILE *)stream,"unset UPS_OS_FLAVOR\n");
-      fprintf((FILE *)stream,"unset UPS_PROD_FLAVOR\n");
-      fprintf((FILE *)stream,"unset UPS_PROD_QUALIFIERS\n");
-      fprintf((FILE *)stream,"unset UPS_SHELL\n");
-      fprintf((FILE *)stream,"unset UPS_OPTIONS\n");
+    { fprintf((FILE *)stream,"%sunset UPS_PROD_NAME\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_PROD_VERSION\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_PROD_DIR\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_THIS_DB\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_OS_FLAVOR\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_PROD_FLAVOR\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_PROD_QUALIFIERS\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_SHELL\n", pdefault);
+      fprintf((FILE *)stream,"%sunset UPS_OPTIONS\n", pdefault);
     } else { 
-      fprintf((FILE *)stream,"unsetenv UPS_PROD_NAME\n");
-      fprintf((FILE *)stream,"unsetenv UPS_PROD_VERSION\n");
-      fprintf((FILE *)stream,"unsetenv UPS_PROD_DIR\n");
-      fprintf((FILE *)stream,"unsetenv UPS_VERBOSE\n");
-      fprintf((FILE *)stream,"unsetenv UPS_EXTENDED\n");
-      fprintf((FILE *)stream,"unsetenv UPS_THIS_DB\n");
-      fprintf((FILE *)stream,"unsetenv UPS_OS_FLAVOR\n");
-      fprintf((FILE *)stream,"unsetenv UPS_PROD_FLAVOR\n");
-      fprintf((FILE *)stream,"unsetenv UPS_PROD_QUALIFIERS\n");
-      fprintf((FILE *)stream,"unsetenv UPS_SHELL\n");
-      fprintf((FILE *)stream,"unsetenv UPS_OPTIONS\n");
+      fprintf((FILE *)stream,"%sunsetenv UPS_PROD_NAME\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_PROD_VERSION\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_PROD_DIR\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_THIS_DB\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_OS_FLAVOR\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_PROD_FLAVOR\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_PROD_QUALIFIERS\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_SHELL\n", pdefault);
+      fprintf((FILE *)stream,"%sunsetenv UPS_OPTIONS\n", pdefault);
     }
   } 
 }
@@ -164,9 +174,18 @@ void upsget_envout(const FILE * const stream,
 void upsget_allout(const FILE * const stream, 
                     const t_upstyp_db * const db,
                     const t_upstyp_matched_instance * const instance,
-                    const t_upsugo_command * const command_line )
+                    const t_upsugo_command * const command_line,
+		    const char * const prefix )
 { char *addr;
   char *name;
+  char *pdefault;
+  if (prefix)
+  { 
+    pdefault = (char *)prefix;
+  } else {
+    pdefault = "";
+  }
+
   if (command_line->ugo_shell == e_INVALID_SHELL)
   { upserr_add(UPS_NOSHELL, UPS_WARNING);
   } else {
@@ -175,67 +194,72 @@ void upsget_allout(const FILE * const stream,
     { name = " ";      /* no name in file, set to space */      
     }
     if (command_line->ugo_shell == e_BOURNE )
-    { fprintf((FILE *)stream,"UPS_PROD_NAME=%s;export UPS_PROD_NAME\n",name);
-      fprintf((FILE *)stream,"UPS_PROD_VERSION=%s;export UPS_PROD_VERSION\n",
-               upsget_version(db,instance,command_line));
-      fprintf((FILE *)stream,"UPS_PROD_DIR=%s;export UPS_PROD_DIR\n",
-               upsget_prod_dir(db,instance,command_line));
+    { fprintf((FILE *)stream,"%sUPS_PROD_NAME=%s;export UPS_PROD_NAME\n",
+	       pdefault, name);
+      fprintf((FILE *)stream,"%sUPS_PROD_VERSION=%s;export UPS_PROD_VERSION\n",
+               pdefault, upsget_version(db,instance,command_line));
+      fprintf((FILE *)stream,"%sUPS_PROD_DIR=%s;export UPS_PROD_DIR\n",
+               pdefault, upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (strlen(addr)) 
-      { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr);
+      { fprintf((FILE *)stream,"%sUPS_VERBOSE=%s;export UPS_VERBOSE\n",
+		 pdefault, addr);
       } else { 
-        fprintf((FILE *)stream,"unset UPS_VERBOSE\n");
+        fprintf((FILE *)stream,"%sunset UPS_VERBOSE\n", pdefault);
       }
       addr=upsget_extended(db,instance,command_line);
       if (strlen(addr))
-      { fprintf((FILE *)stream,"UPS_EXTENDED=%s;export UPS_EXTENDED\n",addr); 
+      { fprintf((FILE *)stream,"%sUPS_EXTENDED=%s;export UPS_EXTENDED\n",
+		 pdefault, addr); 
       } else { 
-        fprintf((FILE *)stream,"unset UPS_EXTENDED\n");
+        fprintf((FILE *)stream,"%sunset UPS_EXTENDED\n", pdefault);
       } 
-      fprintf((FILE *)stream,"UPS_THIS_DB=%s;export UPS_THIS_DB\n",
+      fprintf((FILE *)stream,"%sUPS_THIS_DB=%s;export UPS_THIS_DB\n",pdefault,
                upsget_this_db(db,instance,command_line));
-      fprintf((FILE *)stream,"UPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
-               upsget_OS_flavor(db,instance,command_line));
-      fprintf((FILE *)stream,"UPS_PROD_FLAVOR=%s;export UPS_PROD_FLAVOR\n",
-               upsget_flavor(db,instance,command_line));
-      fprintf((FILE *)stream,"UPS_PROD_QUALIFIERS=%s;export UPS_PROD_QUALIFIERS\n",
-               upsget_qualifiers(db,instance,command_line));
-      fprintf((FILE *)stream,"UPS_SHELL=%s;export UPS_SHELL\n",
-               upsget_shell(db,instance,command_line));
+      fprintf((FILE *)stream,"%sUPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
+	       pdefault, upsget_OS_flavor(db,instance,command_line));
+      fprintf((FILE *)stream,"%sUPS_PROD_FLAVOR=%s;export UPS_PROD_FLAVOR\n",
+               pdefault, upsget_flavor(db,instance,command_line));
+      fprintf((FILE *)stream,"%sUPS_PROD_QUALIFIERS=%s;export UPS_PROD_QUALIFIERS\n",
+               pdefault,upsget_qualifiers(db,instance,command_line));
+      fprintf((FILE *)stream,"%sUPS_SHELL=%s;export UPS_SHELL\n",
+               pdefault,upsget_shell(db,instance,command_line));
       addr=upsget_options(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"UPS_OPTIONS=\"%s\";export UPS_OPTIONS\n",addr); } 
+      { fprintf((FILE *)stream,"%sUPS_OPTIONS=\"%s\";export UPS_OPTIONS\n",
+		 pdefault,addr); } 
     } else { 
-      fprintf((FILE *)stream,"setenv UPS_PROD_NAME %s\n",name);
-      fprintf((FILE *)stream,"setenv UPS_PROD_VERSION %s\n",
+      fprintf((FILE *)stream,"%ssetenv UPS_PROD_NAME %s\n",pdefault,name);
+      fprintf((FILE *)stream,"%ssetenv UPS_PROD_VERSION %s\n",pdefault,
                upsget_version(db,instance,command_line));
-      fprintf((FILE *)stream,"setenv UPS_PROD_DIR %s\n",
+      fprintf((FILE *)stream,"%ssetenv UPS_PROD_DIR %s\n",pdefault,
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
       if (strlen(addr))
-      { fprintf((FILE *)stream,"setenv UPS_VERBOSE %s\n",addr);
+      { fprintf((FILE *)stream,"%ssetenv UPS_VERBOSE %s\n",pdefault,addr);
       } else { 
-        fprintf((FILE *)stream,"unsetenv UPS_VERBOSE\n");
+        fprintf((FILE *)stream,"%sunsetenv UPS_VERBOSE\n",pdefault);
       }
       addr=upsget_extended(db,instance,command_line);
       if (strlen(addr))
-      { fprintf((FILE *)stream,"setenv UPS_EXTENDED %s\n",addr); 
+      { fprintf((FILE *)stream,"%ssetenv UPS_EXTENDED %s\n",pdefault,addr); 
       } else { 
-        fprintf((FILE *)stream,"unsetenv UPS_EXTENDED\n");
+        fprintf((FILE *)stream,"%sunsetenv UPS_EXTENDED\n",pdefault);
       }
-      fprintf((FILE *)stream,"setenv UPS_THIS_DB %s\n",
+      fprintf((FILE *)stream,"%ssetenv UPS_THIS_DB %s\n",pdefault,
                upsget_this_db(db,instance,command_line));
-      fprintf((FILE *)stream,"setenv UPS_OS_FLAVOR %s\n",
+      fprintf((FILE *)stream,"%ssetenv UPS_OS_FLAVOR %s\n",pdefault,
                upsget_OS_flavor(db,instance,command_line));
-      fprintf((FILE *)stream,"setenv UPS_PROD_FLAVOR %s\n",
+      fprintf((FILE *)stream,"%ssetenv UPS_PROD_FLAVOR %s\n",pdefault,
                upsget_flavor(db,instance,command_line));
-      fprintf((FILE *)stream,"setenv UPS_PROD_QUALIFIERS %s\n",
+      fprintf((FILE *)stream,"%ssetenv UPS_PROD_QUALIFIERS %s\n",pdefault,
                upsget_qualifiers(db,instance,command_line));
-      fprintf((FILE *)stream,"setenv UPS_SHELL %s\n",
+      fprintf((FILE *)stream,"%ssetenv UPS_SHELL %s\n",pdefault,
                upsget_shell(db,instance,command_line));
       addr=upsget_options(db,instance,command_line);
       if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_OPTIONS \"%s\"\n",addr); }
+      { fprintf((FILE *)stream,"%ssetenv UPS_OPTIONS \"%s\"\n",pdefault,
+		 addr); }
     }
   } 
 }
