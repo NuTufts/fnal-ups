@@ -172,9 +172,9 @@ int main(int argc, char *argv[])
     } else {
       /* output help */
       switch (g_cmd_info[i].cmd_index) {
-      case e_unk: upshlp_command(NULL);              /* print out all help */
+      case e_unk: (void )upshlp_command(NULL);         /* print out all help */
 	break;
-      default:    upshlp_command(g_cmd_info[i].cmd); /* specific help only */
+      default:    (void )upshlp_command(g_cmd_info[i].cmd); /* specific help */
       }
     }
     if (command_line->ugo_Z) {
@@ -201,10 +201,10 @@ int main(int argc, char *argv[])
     }
     /* if nothing was written to the file, delete it, */
     if (empty_temp_file) {
-      remove(temp_file_name);
+      (void )remove(temp_file_name);
     } else {
       /* output the name of the temp file that was created */
-      printf("%s\n", temp_file_name);
+      (void )printf("%s\n", temp_file_name);
     }
   }
 
