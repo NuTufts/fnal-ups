@@ -128,6 +128,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   if (UPS_ERROR != UPS_SUCCESS) 
   {  return 0; 
   }
+/* if they are defining a version ONLY and it allready exists fail */
+  if ( !uc->ugo_chain && uc->ugo_version) 
+  if (mproduct_list)
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+               "Exact product definition exists");
+    return 0;
+  }
   if (mproduct_list)
   { if (uc->ugo_chain) { uc->ugo_version=0; }
     ups_undeclare(uc, tmpfile, e_undeclare);
@@ -243,7 +250,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                              the_chain,
                              cinst->version);
                (void )upsfil_write_file(product, buffer,' ',JOURNAL); 
-/*         product->instance_list=upslst_free(product->instance_list,'d'); */
+               product->instance_list=upslst_free(product->instance_list,'d'); 
                unchain = (char *) malloc((size_t)(strlen(the_chain)+3));
                sprintf(unchain,"un%s",the_chain);
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
@@ -302,7 +309,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                     new_cinst->version,
                     buffer);
          (void )upsfil_write_file(product, buffer,' ',JOURNAL);  
-/*         product->instance_list=upslst_free(product->instance_list,'d'); */
+         product->instance_list=upslst_free(product->instance_list,'d'); 
         }
       }
 /************************************************************************
@@ -436,8 +443,14 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                                   mproduct, the_chain,
 				  ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
-        { upsact_process_commands(cmd_list, tmpfile); }
-        upsact_cleanup(cmd_list);
+        { upsact_process_commands(cmd_list, tmpfile);
+          upsact_cleanup(cmd_list);
+        } else {
+printf("spit 1\n");
+          upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0;
+        } 
         cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
 				  mproduct, g_cmd_info[ups_command].cmd,
 				  ups_command);
@@ -445,6 +458,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         { upsact_process_commands(cmd_list, tmpfile); 
           upsact_cleanup(cmd_list);
         } else {
+printf("spit 2\n");
           upsfil_clear_journal_files();
           upserr_vplace();
           return 0;
@@ -459,6 +473,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
               upsact_cleanup(cmd_list);
             }
           } else {
+printf("spit 3\n");
             /* don't fail is start is junk do I care? */
             /* upsfil_clear_journal_files(); */
             /* upserr_vplace(); */

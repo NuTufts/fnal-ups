@@ -93,13 +93,12 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
   t_upstyp_instance *new_cinst;             /* new chain instance  */
-/*  t_upslst_item *vinst_list;                 version instance list */
-/*  t_upstyp_instance *vinst;                  version instance      */
   t_upstyp_instance *new_vinst;             /* new version instance  */
   char *username;
   char *loc;
   struct tm *mytime;
   char *declared_date;
+  char *file_stamp;
   char *unchain;
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
@@ -127,17 +126,13 @@ t_upslst_item *ups_modify( t_upsugo_command * const uc ,
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
   username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
-/*  seconds=time(0);
-  mytime = localtime(&seconds);
-  mytime->tm_mon++;  correct jan=0 */
   declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
 				    STR_TRIM_DEFAULT);
-  while((loc=strchr(declared_date,' '))!=0)
+  file_stamp = upsutl_str_create(upsutl_time_date(STR_TRIM_PACK),
+				    STR_TRIM_PACK);
+/*  while((loc=strchr(declared_date,' '))!=0)
   { *loc='_';
   }
-/* (char *) malloc((size_t)(9));
-  sprintf(declared_date,"%d-%d-%d",
-          mytime->tm_mon,mytime->tm_mday,mytime->tm_year);
 */
 
 /************************************************************************
@@ -210,7 +205,7 @@ if (strcmp(uc->ugo_product,"*"))
        if(!upsutl_strincmp(input,"y",1)) 
        { sprintf(buffer,"cp %s %s.%s",original_file,
                         uc->ugo_anyfile,
-                        declared_date);
+                        file_stamp);
          if (system(buffer))
          { fprintf(stdout,"Cannot save dated file copy of %s\n",
                    uc->ugo_anyfile);

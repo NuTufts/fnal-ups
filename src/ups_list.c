@@ -206,29 +206,29 @@ void print_chain(const t_upstyp_matched_instance * const instance,
   }                                                     \
 }
 #define defaults(INSTANCE) \
-{   printf("\tVersion=%s", minst_ptr->INSTANCE->version);            \
-    printf("\tFlavor=%s\n", minst_ptr->INSTANCE->flavor);            \
-    if (minst_ptr->INSTANCE->qualifiers)                             \
-    { if(strlen(minst_ptr->INSTANCE->qualifiers))                    \
-      { printf("\t\tQualifiers=%s", minst_ptr->INSTANCE->qualifiers);  \
+{   printf("\tVersion=%s", instance->INSTANCE->version);            \
+    printf("\tFlavor=%s\n", instance->INSTANCE->flavor);            \
+    if (instance->INSTANCE->qualifiers)                             \
+    { if(strlen(instance->INSTANCE->qualifiers))                    \
+      { printf("\t\tQualifiers=%s", instance->INSTANCE->qualifiers);  \
       } else {      /* damn inconsistant if you ask me */              \
         printf("\t\tQualifiers=\"\"");                                 \
       }                                                                \
     } else {                                                         \
       printf("\t\tQualifiers=\"\"");                                 \
     }                                                                \
-    if (minst_ptr->xtra_chains)                                      \
+    if (instance->xtra_chains)                                      \
     { printf("\tChains=");                                           \
     } else {                                                         \
       printf("\tChain=");                                            \
     }                                                                \
-    if ( minst_ptr->INSTANCE->chain )                                \
-    { printf("%s", minst_ptr->INSTANCE->chain);                      \
+    if ( instance->INSTANCE->chain )                                \
+    { printf("%s", instance->INSTANCE->chain);                      \
     } else {                                                         \
       printf("\"\"");                                                \
     }                                                                \
-    if (minst_ptr->xtra_chains)                                      \
-    { for (clist = minst_ptr->xtra_chains ;                          \
+    if (instance->xtra_chains)                                      \
+    { for (clist = instance->xtra_chains ;                          \
            clist ; clist = clist->next)                              \
       { cinst_ptr = (t_upstyp_instance *)clist->data;                \
         printf(",%s", cinst_ptr->chain );                            \
@@ -236,23 +236,23 @@ void print_chain(const t_upstyp_matched_instance * const instance,
     } printf("\n");                                                  \
 }
 #define WAW(WHAT) \
-{    if (minst_ptr->version)                                         \
-    { if (minst_ptr->version->WHAT)                                  \
-      { printf("%s", minst_ptr->version->WHAT);                      \
+{    if (instance->version)                                         \
+    { if (instance->version->WHAT)                                  \
+      { printf("%s", instance->version->WHAT);                      \
       } else {                                                       \
         printf("\"\"");                                              \
       }                                                              \
     } else {                                                         \
       printf("\"\"");                                                \
     }                                                                \
-    if (minst_ptr->chain)                                            \
-    { if (minst_ptr->chain->WHAT)                                    \
-      { printf(",%s", minst_ptr->chain->WHAT);                       \
+    if (instance->chain)                                            \
+    { if (instance->chain->WHAT)                                    \
+      { printf(",%s", instance->chain->WHAT);                       \
       } else {                                                       \
         printf(",\"\"");                                             \
       }                                                              \
-      if (minst_ptr->xtra_chains)                                    \
-      { for (clist = minst_ptr->xtra_chains ;                        \
+      if (instance->xtra_chains)                                    \
+      { for (clist = instance->xtra_chains ;                        \
              clist ; clist = clist->next)                            \
         { cinst_ptr = (t_upstyp_instance *)clist->data;              \
           if (cinst_ptr->WHAT)                                       \
@@ -378,7 +378,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   t_upslst_item *tmp_mprod_list = NULL;
   t_upslst_item *tmp_minst_list = NULL, *clist = NULL;
   t_upstyp_instance *cinst_ptr = NULL;
-  t_upstyp_matched_instance *minst_ptr = NULL;
+  t_upstyp_matched_instance *instance= NULL;
   t_upstyp_config  *config_ptr = 0;
   t_upslst_item *ul_ptr = 0;
   t_upslst_item *al_ptr = 0;
@@ -392,22 +392,22 @@ void list_output(const t_upslst_item * const a_mproduct_list,
   { mproduct = (t_upstyp_matched_product *)tmp_mprod_list->data;
     for (tmp_minst_list = mproduct->minst_list ; tmp_minst_list ;
 	 tmp_minst_list = tmp_minst_list->next) 
-    { minst_ptr = (t_upstyp_matched_instance *)(tmp_minst_list->data);
+    { instance = (t_upstyp_matched_instance *)(tmp_minst_list->data);
 /* A as in a single product loop */
       if (!a_command_line->ugo_K)
       { printf("\tProduct=%s",mproduct->product);
-        if (minst_ptr->chain) 
+        if (instance->chain) 
         { defaults(chain)
         } else { 
-          if (minst_ptr->version )
+          if (instance->version )
           {  defaults(version) 
           } else { 
-            if (minst_ptr->table )
+            if (instance->table )
             {  defaults(table)
             } /* else what in the hell are we doing here ?? */
           }
         }
-        if (a_command_line->ugo_l && minst_ptr->version )
+        if (a_command_line->ugo_l && instance->version )
         { printf("\t\tDeclared="); WAW(declared)
           printf("\t\tDeclarer="); WAW(declarer)
           printf("\t\tModified="); WAW(modified)
@@ -420,55 +420,105 @@ void list_output(const t_upslst_item * const a_mproduct_list,
               { printf("%s",config_ptr->prod_dir_prefix); }
             }
           }
-          if (minst_ptr->version->prod_dir)
-          { printf("%s", minst_ptr->version->prod_dir);
+          if (instance->version->prod_dir)
+          { printf("%s", instance->version->prod_dir);
           }
           printf("\n");
 
-          if (minst_ptr->version->compile_dir || 
-              minst_ptr->version->compile_file)
+          if (instance->version->compile_dir || 
+              instance->version->compile_file)
           { printf("\t\tCompile=");
-            if (minst_ptr->version->compile_dir)
-            { printf("%s",minst_ptr->version->compile_dir); }
-            if (minst_ptr->version->compile_file)
-            { printf("/%s",minst_ptr->version->compile_file); }
+            if (instance->version->compile_dir)
+            { printf("%s",instance->version->compile_dir); }
+            if (instance->version->compile_file)
+            { printf("/%s",instance->version->compile_file); }
             printf("\n");
           } else {
             printf("\t\tNo Compile Directive\n"); /* ;) */
           }
-          if (upsutl_is_authorized( minst_ptr, mproduct->db_info,&nodes))
+          if (upsutl_is_authorized( instance, mproduct->db_info,&nodes))
           { printf("\t\tAuthorized, Nodes=%s\n",nodes);
           } else {
             printf("\t\tNOT Authorized, Nodes=%s\n",nodes);
           }
-          if (minst_ptr->version->ups_dir)
-          { printf("\t\tUPS=%s\n", minst_ptr->version->ups_dir);
+          if (instance->version->ups_dir)
+          { printf("\t\tUPS=%s\n", instance->version->ups_dir);
           } else {
             printf("\t\tUPS=\"\"\n");
           }
-          if (minst_ptr->version->table_dir)
-          { printf("\t\tTable_Dir=%s\n", minst_ptr->version->table_dir);
+          if (instance->version->table_dir)
+          { printf("\t\tTable_Dir=%s\n", instance->version->table_dir);
           } else {
             printf("\t\tTable_Dir=\"\"\n");
           }
-          if (minst_ptr->version->table_file)
-          { printf("\t\tTable_File=%s\n", minst_ptr->version->table_file);
+          if (instance->version->table_file)
+          { printf("\t\tTable_File=%s\n", instance->version->table_file);
           } else {
             printf("\t\tTable_File=\"\"\n");
           }
-          if (minst_ptr->version->description)
-          { printf("\t\tDescription=%s\n", minst_ptr->version->description);
+/*          if (instance->table->description)
+          { printf("\t\tDescription=%s\n", instance->table->description);
           } else {
             printf("\t\tDescription=\"\"\n");
           }
-          for ( ul_ptr = upslst_first( minst_ptr->version->user_list ); 
+*/
+          printf("\t\tDescription=");
+          if (instance->chain) 
+          { if (instance->chain->description)
+            { printf("%s",instance->chain->description);
+            } else { 
+              if (instance->version )
+              { if (instance->version->description)
+                { printf("%s",instance->version->description);
+                } else { 
+                  if (instance->table )
+                  { if (instance->table->description)
+                    { printf("%s",instance->table->description);
+                    } else {
+                      printf("\"\"");
+                    }
+                  } else {
+                    printf("\"\"");
+                  }
+                }
+              }
+            }
+          } else {
+            if (instance->version )
+            { if (instance->version->description)
+              { printf("%s",instance->version->description);
+              } else { 
+                if (instance->table )
+                { if (instance->table->description)
+                  { printf("%s",instance->table->description);
+                  } else {
+                    printf("\"\"");
+                  }
+                } else {
+                  printf("\"\"");
+                }
+              } 
+            } else {
+              if (instance->table )
+              { if (instance->table->description)
+                { printf("%s",instance->table->description);
+                } else {
+                  printf("\"\"");
+                }
+              } else {
+                printf("\"\"");
+              } 
+            }
+          } 
+          printf("\n");
+          for ( ul_ptr = upslst_first( instance->version->user_list ); 
                 ul_ptr; ul_ptr = ul_ptr->next, count++ )
           { printf("\t\t%s \n",(char *)ul_ptr->data); /* Give keys and values */
           }
         }
         if (a_command_line->ugo_l) 
-        { if (minst_ptr->table)
-          { for ( al_ptr = upslst_first( minst_ptr->table->action_list ); 
+        { if (instance->table)
+          { for ( al_ptr = upslst_first( instance->table->action_list ); 
                   al_ptr; al_ptr = al_ptr->next, count++ )
             { ac_ptr=al_ptr->data;
               printf("\t\tAction=%s\n",ac_ptr->action);
@@ -483,7 +533,7 @@ void list_output(const t_upslst_item * const a_mproduct_list,
         }
         printf("\n");
       } else { 
-          list_K(minst_ptr,a_command_line,mproduct);
+          list_K(instance,a_command_line,mproduct);
           if (UPS_ERROR!=UPS_SUCCESS) { upserr_output(); upserr_clear(); return; }
       }
     }
@@ -519,7 +569,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(archive_file)
     FromVersion(compile_file)
     FromVersion(compile_dir)
-    FromTable(description)
+    FromAny(description)
     FromTable(man_files)
     FromTable(catman_files)
     FromTable(html_files)
