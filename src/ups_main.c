@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_depend: ups_depend(command_line, argv[1], e_depend);
 	    break;
-	  case e_exist: ups_setup(command_line, temp_file, e_exist);
+	  case e_exist: ups_setup(command_line, temp_file, e_setup);
 	    break;
 	  case e_modify:
 	    break;
