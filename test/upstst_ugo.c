@@ -99,16 +99,11 @@ else
 /* call the real routine
    --------------------- */
 
+UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,options))	/* for all commands */
    {
-   if (UPS_ERROR != estatus)			/* error? */
-       {
-       fprintf(stderr,"%s: %s, %s: %s\n","actual status",
-          g_error_ascii[UPS_ERROR],"expected status", g_error_ascii[estatus]);  
-       if (UPS_ERROR)                                       
-            { upserr_output(); upserr_clear(); }
-        }
-   upsugo_dump(uc,FALSE,ofd);		/* display */
+   UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
+   upsugo_dump(uc,FALSE,ofd);			/* display */
    ncmds++;					/* increment ncommands */
    }
 

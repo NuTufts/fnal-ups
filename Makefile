@@ -26,13 +26,13 @@ DIR=`pwd | sed	-e 's|^/tmp_mnt||' \
 # Qualifiers, and customization information, which is also used for 
 # "cmd addproduct", and finally the distribution file name.
 # this section may change in later ups|addproduct incarnations
-            PROD=template_product
-     PRODUCT_DIR=TEMPLATE_PRODUCT_DIR
-            VERS=v2_2
-          DEPEND=-b "< gcc current $(OS)$(CUST)"
+            PROD=erupt
+     PRODUCT_DIR=ERUPT_DIR
+            VERS=devel
+#          DEPEND=-b "< gcc current $(OS)$(CUST)"
            CHAIN=development
       UPS_SUBDIR=ups
- ADDPRODUCT_HOST=dcdsv0
+ ADDPRODUCT_HOST=fndaub
 DISTRIBUTIONFILE="$(DIR)/../$(FLAVOR).tar"
 
 # for Flavored products
@@ -40,13 +40,6 @@ DISTRIBUTIONFILE="$(DIR)/../$(FLAVOR).tar"
               OS=`funame -s`
            QUALS=
             CUST=+`funame -r | sed -e 's|\..*||'`
-
-# for NULL products
-#	  FLAVOR=NULL
-#             OS=GENERIC_UNIX
-#          QUALS=
-#           CUST=none
-
 
 #------------------------------------------------------------------
 # Files to include in Distribution
@@ -59,18 +52,12 @@ DISTRIBUTIONFILE="$(DIR)/../$(FLAVOR).tar"
 #	(one per line) (e.g. 'cd fnal/module; make distriblist')
 # LOCAL is destination for local: and install: target
 # DOCROOT is destination for html documentation targets
-ADDDIRS =.
-ADDFILES=
+ADDDIRS =
+ADDFILES= ! -name '*.out'
 ADDEMPTY=
   ADDCMD=
-   LOCAL=/usr/products/$(OS)$(CUST)/$(VERS)$(QUALS)
+   LOCAL=/usr/products/$(OS)/$(PROD)/$(VERS)$(QUALS)
  DOCROOT=/afs/fnal/files/docs/products/$(PROD)
-
-#------------------------------------------------------------------
-# --prefix=$(PREFIX) for gnu configure tools
-# if you use this, you should uncomment the appropriate sections
-# in the template ups/* scripts
-PREFIX=/usr/local/products/template_product/$(VERS)
 
 #
 #------------------------------------------------------------------
@@ -85,31 +72,36 @@ VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 # and a locally developed product that uses "premake"
 # "all" should probably depend on the product directory being set.
 
-all: proddir_is_set
+ERUPTDBG=
+
+all: 	proddir_is_set
+	cd src; premake $(ERUPTDBG)
+	cd test; premake $(ERUPTDBG)
+
+debug: 	
+	make ERUPTDBG=-debug all
 
 clean:
+	for subdir in src inc test doc bin lib; do \
+	   ( cd $$subdir; echo "cleaning $$subdir"; premake clean ); \
+	done
 
 spotless:
+	for subdir in src inc test doc bin lib; do \
+	   ( cd $$subdir; echo "cleaning $$subdir"; premake spotless ); \
+	done
 
-#---------------
-# examples:
-#all: proddir_is_set
-#	sh -c "cd imports/gnuproduct; \
-#	       test -f config.status || ./configure --prefix=$(PREFIX)"
-#	cd imports/diffutils ; make install
-#	sh -c "cd imports/xproduct; \
-#	       test -f Makefile || (xmkmf; make Makefiles)"
-#	cd imports/xproduct ; make DEST=$$$(PRODUCT_DIR) install
-#	cd fnal/premakedir ; premake -f $(FLAVOR) install
-#	make $(UPS_SUBDIR)/toman
-#
+
 #clean: 				# clean up unneeded files	#
 #	-cd imports/gnuproduct ; make clean; rm config.status
 #	-cd imports/xproduct ; make clean; rm Makefile
 #	-cd fnal/premakedir ; premake -f $(FLAVOR) clean
-#
-#spotless: clean
-#	rm -rf bin lib 
+
+spotless: clean
+	-rm lib/*.a 
+	-rm bin/ups
+	-rm test/ups_test test/test_upserr test/upslst test/upsmat
+	-rm test/upsugo   test/test_upstul 
 
 
 # we indirect this a level so we can customize it for bundle products
@@ -141,7 +133,7 @@ declare: real_declare
 # 	at a time with "xargs tar uf..."
 # * Finally echo the filename and do a table of contents to show it worked
 #
-distribution: clean $(UPS_SUBDIR)/declare.dat .manifest
+distribution: clean .manifest
 	@: > .header
 	@tar cf $(DISTRIBUTIONFILE) .header
 	@$(LISTALL) | xargs tar uf $(DISTRIBUTIONFILE)
@@ -164,7 +156,7 @@ addproduct: dproducts_is_set distribution
 # then we cd over there and do a check_manifest to make sure the copy 
 #      worked okay.
 #
-local: clean $(UPS_SUBDIR)/declare.dat .manifest
+local: clean .manifest
 	$(LISTALL) | cpio -dumpv $(LOCAL)
 	cd $(LOCAL); make check_manifest
 
@@ -247,9 +239,6 @@ check_template_vars:
 
 #---------------------------------------------------------------------------
 #
-$(UPS_SUBDIR)/declare.dat: FORCE
-	$(UPS_LIST) > $@
-
 $(UPS_SUBDIR)/Version:
 	echo $(VERS) > $(UPS_SUBDIR)/Version
 

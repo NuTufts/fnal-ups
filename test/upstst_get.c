@@ -22,7 +22,7 @@ static void upstst_trans_dump (const t_upslst_item * const , FILE * const,
 
 int upstst_get_translation (int argc, char ** const argv)
 {
-static char     	*myfunc = "upsmat_instance";
+static char     	*myfunc = "upsget_translation";
 int             	status;                         /* status of parse */
 int             	estatus = UPS_SUCCESS;          /* expected status */
 t_upsugo_command	*uc = 0;			/* ups command */
@@ -41,6 +41,7 @@ upstst_argt     	argt[] =
     {"-out",	  UPSTST_ARGV_STRING,NULL,		&outfile},
     {"-diff",     UPSTST_ARGV_STRING,NULL,		&difffile},
     {"-string",   UPSTST_ARGV_STRING,NULL,		&transstring},
+    {"-status",   UPSTST_ARGV_STRING,NULL,		&estatus_str},
     {NULL,        UPSTST_ARGV_END,NULL,			NULL}};
 
 
@@ -62,10 +63,10 @@ else
    {ofd = stdout;}
 
 
-
 /* call the real routine
    --------------------- */
 
+UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    {
    if (UPS_ERROR != UPS_SUCCESS)			/* error on ugo_next */
@@ -75,12 +76,7 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
        return (0);
        }
    mp = upsmat_instance(uc,unique);
-   if (UPS_ERROR != estatus)                    	/* error? */
-       {
-       fprintf(stderr,"%s: %s, %s: %s\n","actual status",
-          g_error_ascii[UPS_ERROR],"expected status", g_error_ascii[estatus]);
-       if (UPS_ERROR) { upserr_output(); upserr_clear(); }
-       }
+   UPSTST_CHECK_UPS_ERROR(estatus);
    upstst_trans_dump(mp,ofd,uc,transstring);
    }
 
@@ -108,26 +104,18 @@ static void upstst_trans_dump (const t_upslst_item * const mp,
    FILE * const fd, const t_upsugo_command * const uc,char * const string)
 {
 t_upslst_item 			*prod_ptr;		/* product ptr */
-/* t_upslst_item 			*inst_ptr;	 instance ptr */
 t_upstyp_matched_product 	*prod;			/* product match */
-/* t_upstyp_matched_instance	*inst;			 instance match */
-static char *tostring;
+static char 			*tostring;
 
 
 if(!mp) return;
 for (prod_ptr = (t_upslst_item *)mp; prod_ptr; prod_ptr = prod_ptr->next)
    {
    prod = (t_upstyp_matched_product *) prod_ptr->data;
-/*   for (inst_ptr = prod->minst_list; inst_ptr; inst_ptr = inst_ptr->next)
-      { inst = (t_upstyp_matched_instance *) inst_ptr->data; */
-        tostring=upsget_translation(prod,uc,string);
-        if (tostring)
-        { fprintf(fd,"Converted to >%s<\n",tostring);
-        } else {
-          fprintf(fd,"String >%s< NOT Converted\n",string);
-        }
-/*
-      }
-*/
+   tostring=upsget_translation(prod,uc,string);
+   if (tostring)
+      fprintf(fd,"Converted to >%s<\n",tostring); 
+   else 
+      fprintf(fd,"String >%s< NOT Converted\n",string);
    }
 }

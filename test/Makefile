@@ -108,23 +108,11 @@ upstst_match.o : upstst_match.c $(LIB)/libups.a
 #
 clean :
 	@ upsClean
+
+spotless :
+	@ upsClean
 	@ rm -f $(UNIT_TESTS)
 	@ rm -f ups_test libups_test.a
-
-install :
-	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
-		echo You have not specified a destination directory >&2; \
-		exit 1; \
-	fi
-	@ rm -rf $(UPS_INSTALL_DIR)/test
-	@ mkdir $(UPS_INSTALL_DIR)/test
-	cp -r Makefile $(UPS_INSTALL_DIR)/test
-	cp -r * $(UPS_INSTALL_DIR)/test
-	@( \
-		cd $(UPS_INSTALL_DIR)/test ;\
-		find . \( -type d -name CVS -prune -o \
-			-name Makefile -name \*~ \) -exec rm -rf {} \; \
-	)
 
 make :
 	@if [ "$(CCENV)" = "" ]; then ccenv=`uname`; else ccenv=$(CCENV); fi; \

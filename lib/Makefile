@@ -19,19 +19,8 @@ all :
 #
 clean :
 	@ upsClean
-	@ rm -f libups.a
 
-install :
-	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
-		echo You have not specified a destination directory >&2; \
-		exit 1; \
-	fi
-	@ rm -rf $(UPS_INSTALL_DIR)/lib
-	@ mkdir $(UPS_INSTALL_DIR)/lib
-	cp -r Makefile $(UPS_INSTALL_DIR)/lib
-	cp -r * $(UPS_INSTALL_DIR)/lib
-	@( \
-		cd $(UPS_INSTALL_DIR)/lib ;\
-		find . \( -type d -name CVS -prune -o \
-			-name Makefile -name \*~ \) -exec rm -rf {} \; \
-	)
+spotless :
+	@ upsClean
+	@ /bin/rm -f libups.a
+

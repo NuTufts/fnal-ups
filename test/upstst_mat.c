@@ -38,6 +38,7 @@ upstst_argt     	argt[] =
    {{"-unique",	  UPSTST_ARGV_CONSTANT,(char *)TRUE,	&unique},
     {"-out",	  UPSTST_ARGV_STRING,NULL,		&outfile},
     {"-diff",     UPSTST_ARGV_STRING,NULL,		&difffile},
+    {"-status",   UPSTST_ARGV_STRING,NULL,   		&estatus_str},
     {NULL,        UPSTST_ARGV_END,NULL,			NULL}};
 
 
@@ -63,6 +64,7 @@ else
 /* call the real routine
    --------------------- */
 
+UPS_ERROR = UPS_SUCCESS;
 while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    {
    if (UPS_ERROR != UPS_SUCCESS)			/* error on ugo_next */

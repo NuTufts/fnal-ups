@@ -18,20 +18,9 @@ all :
 # Now standard targets
 #
 clean :
-	@ upsClean
+	@upsClean
 
-install :
-	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
-		echo You have not specified a destination directory >&2; \
-		exit 1; \
-	fi
-	@ rm -rf $(UPS_INSTALL_DIR)/bin
-	@ mkdir $(UPS_INSTALL_DIR)/bin
-	cp -r Makefile $(UPS_INSTALL_DIR)/bin
-	cp -r * $(UPS_INSTALL_DIR)/bin
-	@chmod 755 $(UPS_INSTALL_DIR)/bin/*
-	@( \
-		cd $(UPS_INSTALL_DIR)/bin ;\
-		find . \( -type d -name CVS -prune -o \
-			-name Makefile -name \*~ \) -exec rm -rf {} \; \
-	)
+spotless :
+	@upsClean
+	@/bin/rm -f ups
+

@@ -92,22 +92,6 @@ $(LIB)/libups.a : $(OBJECTS) $(COMMAND_OBJECTS)
 clean :
 	@ upsClean
 
-install :
-	@if [ "$(UPS_INSTALL_DIR)" = "" ]; then \
-		echo You have not specified a destination directory >&2; \
-		exit 1; \
-	fi
-	@ rm -rf $(UPS_INSTALL_DIR)/src
-	@ mkdir $(UPS_INSTALL_DIR)/src
-	cp -r Makefile $(UPS_INSTALL_DIR)/src
-	cp -r *.c $(UPS_INSTALL_DIR)/src
-	@chmod 644 $(UPS_INSTALL_DIR)/src/*.c
-	@( \
-		cd $(UPS_INSTALL_DIR)/src ;\
-		find . \( -type d -name CVS -prune -o \
-			-name Makefile -name \*~ \) -exec rm -rf {} \; \
-	)
-
 make :
 	@if [ "$(CCENV)" = "" ]; then ccenv=`uname`; else ccenv=$(CCENV); fi; \
 	echo \
