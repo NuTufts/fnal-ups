@@ -72,6 +72,11 @@ static int not_yet_created(const int * const array, const int index,
                            const char element);
 static char get_man_subdir(char * const a_man_file);
 
+static void shutup(UPSCPY_PARAMS);
+
+#define SHUTUP \
+  if ((&bit_bucket == 0) && 0) shutup (a_minst, a_db_info, a_command_line, a_stream);
+
 /* functions to handle specific action commands */
 
 #define FPRINTF_ERROR() \
@@ -90,6 +95,7 @@ static char get_man_subdir(char * const a_man_file);
  */
 
 static char g_buff[MAX_LINE_LEN];
+static long bit_bucket = 0;
 
 /*=======================================================================
  *
@@ -107,6 +113,7 @@ void upscpy_html(UPSCPY_PARAMS)
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   upsver_mes(1, "%sThis action is not supported yet.\n", "UPSCPY");
+  SHUTUP;
 }
 
 void upscpy_info(UPSCPY_PARAMS)
@@ -496,6 +503,7 @@ void upscpy_news(UPSCPY_PARAMS)
   /* only proceed if we have a valid number of parameters and a stream to write
      them to */
   upsver_mes(1, "%sThis action is not supported yet.\n", "UPSCPY");
+  SHUTUP;
 }
 
 
@@ -578,3 +586,10 @@ static int not_yet_created(const int * const array, const int index,
   return(ret);
 }
 
+static void shutup (UPSCPY_PARAMS)
+{
+  bit_bucket ^= (long) a_minst;
+  bit_bucket ^= (long) a_db_info;
+  bit_bucket ^= (long) a_command_line;
+  bit_bucket ^= (long) a_stream;
+}
