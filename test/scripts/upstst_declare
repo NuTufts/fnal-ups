@@ -7,6 +7,10 @@ rm -rf $PRODUCTS
 rm -rf /tmp/man
 rm -rf /tmp/catman
 rm -rf /tmp/info
+rm -rf $UPS_DIR/test/scripts/declare/tostuff
+mkdir $UPS_DIR/test/scripts/declare/products/spot/ups/toinfo
+cp $UPS_DIR/test/scripts/declare/products/spot/ups/source_info/info.file \
+   $UPS_DIR/test/scripts/declare/products/spot/ups/toinfo 
 mkdir $PRODUCTS
 mkdir $PRODUCTS/.upsfiles
 cp $UPS_DIR/test/scripts/declare/dbcmp/.upsfiles/dbconfig $PRODUCTS/.upsfiles
@@ -32,6 +36,7 @@ declare spot v1_0 -f NULL -c -d -o -t -n -g leash -actout log/tmp.out -out log/s
 declare spot v2_0 -f IRIX -r \${UPS_DIR}/test/scripts/declare/products/spot -C -c -M ups -m spot.table 
 quit
 EOD
+ls tostuff/*/* > log/tostuff.out
 diff dbclean/rover/leash.chain dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
 diff dbclean/rover/v1_0.version dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
 diff dbclean/rover/v2_0.version dbcmp/rover | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
@@ -42,3 +47,4 @@ diff dbclean/spot/test.chain dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DEC
 diff dbclean/spot/leash.chain dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
 diff dbclean/spot/v1_0.version dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
 diff dbclean/spot/v2_0.version dbcmp/spot | egrep -i "<|>|diff" | egrep -i -v "DECLARE|MODIF" 
+diff log/tostuff.in log/tostuff.out
