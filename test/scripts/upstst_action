@@ -17,6 +17,7 @@ upsact_print -out rover1.out  -diff rover1.in  setup rover  v1_0
 upsact_print -out rover2.out  -diff rover2.in  setup rover  v2_0 
 upsact_print -out snoopy1.out -diff snoopy1.in setup snoopy v2_0 -z ../db1:../db2 
 upsact_print -out snoopy2.out -diff snoopy2.in setup snoopy v3_0 -z ../db1:../db2 
+upsact_print -options "" -out rabbit1.out -diff rabbit1.in setup rabbit v1_0 -z ../db1:../db2:../db3 
 upsact_process_commands -out fly1.out -diff fly1.in setup fly v1_0 
 upsact_process_commands setup fly v2_0 -status UPS_ACTION_PARSE 
 upsact_process_commands -out fly3.out -diff fly3.in setup fly v3_0 
