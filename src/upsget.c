@@ -21,6 +21,7 @@
 
 /* standard include files */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <sys/utsname.h>
