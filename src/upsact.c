@@ -2962,225 +2962,53 @@ static void f_filetest( ACTION_PARAMS)
 
 static void f_pathappend( ACTION_PARAMS)
 {
-  char *delimiter;
-  char *pathPtr;
-  
-  CHECK_NUM_PARAM("pathAppend");
-
-  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
-
-  /* only proceed if we have a valid number of parameters and a stream to write
-     them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-  
-    /* get the correct delimiter */
-    GET_DELIMITER();
+    f_envappend(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
     switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
-      if (g_COMPILE_FLAG) {
-	/* we are being called during a compile, we need to output extra
-	   stuff */
-	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
-      }
-      if (fprintf((FILE *)a_stream, "%s=\"${%s-}%s%s\"; export %s\n#\n",
-		  pathPtr, pathPtr, delimiter, a_cmd->argv[1], pathPtr) < 0) {
-	FPRINTF_ERROR();
-      }
-      break;
     case e_CSHELL:
-      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
-      if (g_COMPILE_FLAG) {
-	/* we are being called during a compile, we need to output extra
-	   stuff */
-	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
-      }
-      if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n#\n",
-		  pathPtr, pathPtr, a_cmd->argv[1]) < 0) {
+      if (fprintf((FILE *)a_stream, "rehash\n#\n") < 0) {
 	FPRINTF_ERROR();
       }
-      break;
-    default:
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_func_info[a_cmd->icmd].cmd);
-    }
-  }
+     }
   SHUTUP;
 }
 
 static void f_pathprepend( ACTION_PARAMS)
 {
-  char *delimiter;
-  char *pathPtr;
-  
-  CHECK_NUM_PARAM("pathPrepend");
-
-  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
-
-  /* only proceed if we have a valid number of parameters and a stream to write
-     them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-  
-    /* get the correct delimiter */
-    GET_DELIMITER();
+    f_envprepend(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
     switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
-      if (g_COMPILE_FLAG) {
-	/* we are being called during a compile, we need to output extra
-	   stuff */
-	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
-      }
-      if (fprintf((FILE *)a_stream, "%s=\"%s%s${%s-}\"; export %s\n#\n",
-		  pathPtr, a_cmd->argv[1], delimiter, pathPtr, pathPtr) < 0) {
-	FPRINTF_ERROR();
-      }
-      break;
     case e_CSHELL:
-      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
-      if (g_COMPILE_FLAG) {
-	/* we are being called during a compile, we need to output extra
-	   stuff */
-	f_pathremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
-      }
-      if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n#\n",
-		  pathPtr, a_cmd->argv[1], pathPtr) < 0) {
+      if (fprintf((FILE *)a_stream, "rehash\n#\n") < 0) {
 	FPRINTF_ERROR();
       }
-      break;
-    default:
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
-    }
-
-    if (UPS_ERROR != UPS_SUCCESS) {
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_func_info[a_cmd->icmd].cmd);
-    }
-  }
+     }
   SHUTUP;
 }
 
 static void f_pathremove( ACTION_PARAMS)
 {
-  char *delimiter;
-  char *pathPtr;
-  
-  CHECK_NUM_PARAM("pathRemove");
-
-  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
-
-  /* only proceed if we have a valid number of parameters and a stream to write
-     them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-  
-    /* get the correct delimiter */
-    GET_DELIMITER();
+    f_envremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
     switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
-
-      /* here we are using a tmp variable to evaluate the passed argument,
-	 it could contain some code there has to be executed, which we don't
-	 want to put into the dropit command */
-
-      if (fprintf((FILE *)a_stream, "upstmp=%s\n", a_cmd->argv[1] ) < 0) {
-	FPRINTF_ERROR();
-      }
-
-      if (fprintf((FILE *)a_stream,
-	        "upstmp=\"`%s -S -p \"$%s\" -i'%s' -d'%s' \"$upstmp\"`\";\nif [ $? -eq 0 -a \"$upstmp\" != \"\" ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
-		  DROPIT, pathPtr, delimiter, delimiter, pathPtr) < 0) {
-	FPRINTF_ERROR();
-      }
-      break;
     case e_CSHELL:
-      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
-
-      /* here we are using a tmp variable to evaluate the passed argument,
-	 it could contain some code there has to be executed, which we don't
-	 want to put into the dropit command */
-
-      if (fprintf((FILE *)a_stream, "setenv upstmp \"%s\"\n", a_cmd->argv[1] ) < 0) {
+      if (fprintf((FILE *)a_stream, "rehash\n#\n") < 0) {
 	FPRINTF_ERROR();
       }
-
-      if (fprintf((FILE *)a_stream,
-          "setenv upstmp \"`%s -S -p \"\'\"$%s\"\'\" -i'%s' -d'%s' \"$upstmp\"`\"\nif ($status == 0 && \"$upstmp\" != \"\") set %s=($upstmp)\nrehash\nunsetenv upstmp\n#\n",
-		  DROPIT, pathPtr, delimiter, delimiter, pathPtr) < 0) {
-	FPRINTF_ERROR();
-      }
-      break;
-    default:
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_func_info[a_cmd->icmd].cmd);
-    }
-  }
+     }
   SHUTUP;
 }
-
 static void f_pathset( ACTION_PARAMS)
 {
-  char *delimiter;
-  char *pathPtr;
+    f_envset(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
-  CHECK_NUM_PARAM("pathSet");
-
-  OUTPUT_VERBOSE_MESSAGE(g_func_info[a_cmd->icmd].cmd);
-
-  /* only proceed if we have a valid number of parameters and a stream to write
-     them to */
-  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
-  
     switch ( a_command_line->ugo_shell ) {
-    case e_BOURNE:
-      CHECK_FOR_PATH(g_shPath, g_shDelimiter);
-      if (fprintf((FILE *)a_stream, "%s=\"%s\"; export %s\n#\n", pathPtr,
-		  a_cmd->argv[1], pathPtr) < 0) {
-	FPRINTF_ERROR();
-      }
-      break;
     case e_CSHELL:
-      CHECK_FOR_PATH(g_cshPath, g_cshDelimiter);
-      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n#\n", pathPtr,
-		  a_cmd->argv[1]) < 0) {
+      if (fprintf((FILE *)a_stream, "rehash\n#\n") < 0) {
 	FPRINTF_ERROR();
       }
-      break;
-    default:
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_INVALID_SHELL, UPS_FATAL, UPS_UNKNOWN_TEXT);
-    }
-    if (UPS_ERROR != UPS_SUCCESS) {
-      OUTPUT_ACTION_INFO(UPS_FATAL, a_minst);
-      upserr_vplace();
-      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
-		 g_func_info[a_cmd->icmd].cmd);
-    }
-  }
+     }
   SHUTUP;
-  if ((&bit_bucket == 0) && 0) bit_bucket ^= (long) delimiter;
 }
 
 #define g_SHPARAM "\"$@\""
