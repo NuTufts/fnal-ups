@@ -538,6 +538,7 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upsugo_command * const command_line )
 { static char *string;
   static char *prefix_string;
+  static char *nostring = '\0';
   if (command_line->ugo_r)
   { string=command_line->ugo_productdir;
   } else { 
@@ -551,15 +552,16 @@ char *upsget_prod_dir(const t_upstyp_db * const db_info_ptr,
         prefix_string = upsutl_str_crecat(prefix_string,string); 
         return prefix_string;
       } else { 
-        return string;
+        return ( string ? string : nostring ) ;
       }
     } else { 
-      return string;
+      return ( string ? string : nostring ) ;
     }
   } else {
-    return string;
+    return ( string ? string : nostring ) ;
   }
 }
+
 char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
@@ -630,8 +632,9 @@ char *upsget_version(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
                       const t_upsugo_command * const command_line )
 { static char *string;
+  static char *nostring='\0';
   get_element(string,version);
-  return string;
+  return ( string ? string : nostring ) ;
 }
 char *upsget_flavor(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
