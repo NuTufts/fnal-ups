@@ -221,7 +221,12 @@ LINE:
           }
 # This is Authorized nodes..
           if (/^\s*Authorized_Nodes:\s*.*/o) {
-             $instanceHash{$opKey}{$verKey}[$#AUTHNDS] = $_[1]; 
+# 10/30/97 request...
+#             $instanceHash{$opKey}{$verKey}[$#AUTHNDS] = $_[1]; 
+             $temp = $_[1];
+             $temp =~ s/\]/\"/;
+             $temp =~ s/\[/\"/;
+             $instanceHash{$opKey}{$verKey}[$#AUTHNDS] = $temp; 
           }
 # Distribution, any arbitrary number... 
           if ((/^\s*[0-9]/o) && ( split == 1 )) { 
