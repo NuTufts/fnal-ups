@@ -323,6 +323,7 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
   int verify_db_done = 0;
+  int new_db;
   t_upslst_item *all_products = 0;
   t_upslst_item *name=0;
 
@@ -330,6 +331,7 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
   UPS_VERIFY=verify;		/* this is REALLY the ups verify command */ 
   for (db_list = a_command_line->ugo_db ; db_list ; db_list=db_list->next) 
   { db_info = (t_upstyp_db *)db_list->data;
+    new_db=1;
     if (NOT_EQUAL_ANY_MATCH(a_command_line->ugo_product)) 
     { all_products=upslst_add(all_products,a_command_line->ugo_product);
     } else {
@@ -351,8 +353,9 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
          /*  upsugo_dump(a_command_line);*/
          if (!a_command_line->ugo_K)
          { if (db_info && db_info->name)
-   	   { if (!name->prev)           /* only the first time !!! */
+   	   { if (new_db)           /* only the first time !!! */
              { PRINT_DB(db_info->name);
+               new_db=1;
              }
    	   }
          }
@@ -377,8 +380,9 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
          { mproduct = (t_upstyp_matched_product *)mproduct_item->data;
            if (! verify_db_done) 
            { if (mproduct->db_info && mproduct->db_info->name)
-   	     { if(!name->prev)
+   	     { if(new_db)
                { PRINT_DB(mproduct->db_info->name);
+                 new_db=0;
                }
    	     }
    	  ups_verify_dbconfig(mproduct->db_info, 
