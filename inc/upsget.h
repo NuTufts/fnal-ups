@@ -116,4 +116,8 @@ char *upsget_table_file( const char * const ,
                          const char * const ,
                          const t_upstyp_db * const ,
                          const int );
+char *upsget_archive_file(const t_upstyp_db * const ,
+                          const t_upstyp_matched_instance * const ,
+                          const t_upsugo_command * const ,
+                          const int );
 #endif /* _UPSGET_H_ */
