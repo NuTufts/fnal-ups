@@ -75,6 +75,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upslst_item *auth_list=0;
   char *allauthnodes=0;
   int count=0;
+  int chain=0; /* was a chain specified, trick on on info messages */
+  int version=0; /* version was defined */
   t_upstyp_db *db_info = 0;
   t_upslst_item *db_list = 0;
   t_upstyp_matched_product *mproduct = NULL;
@@ -212,7 +214,8 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
  ***********************************************************************/
 
      if (uc->ugo_chain)
-     { for (chain_list = uc->ugo_chain ; chain_list ;
+     { chain=1;
+       for (chain_list = uc->ugo_chain ; chain_list ;
          chain_list = chain_list->next) 
        { the_chain = (char *)(chain_list->data);
          uc->ugo_version=0;
@@ -368,7 +371,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                       "Specified product and version currently exists");
            return 0;
          }
-         upsver_mes(0,"INFORMATIONAL: Instance in version file already exists\n");
+         upsver_mes(chain,"INFORMATIONAL: Instance in version file already exists\n");
          buffer[0]=0; /* don't create instance */
          mproduct_list = upslst_first(mproduct_list);
          mproduct = (t_upstyp_matched_product *)mproduct_list->data;
@@ -504,24 +507,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                  new_vinst->version,
                  buffer);
       (void )upsfil_write_file(product, buffer, ' ', JOURNAL);  
-    } 
+      version=1;
 /* Process the declare action */
-    cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                               mproduct, g_cmd_info[ups_command].cmd,
-                               ups_command);
-    if (UPS_ERROR == UPS_SUCCESS) 
-    { upsact_process_commands(cmd_list, tmpfile); 
-      upsact_cleanup(cmd_list);
-    } else {
-      upsfil_clear_journal_files();
-      upserr_vplace();
-      return 0;
-    } 
-    if (!uc->ugo_C) /* Don't do anything but declare actions */
-                    /* Do configure actions                  */
-    { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                 mproduct, g_cmd_info[e_configure].cmd,
-                               ups_command);
+      cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                 mproduct, g_cmd_info[ups_command].cmd,
+                                 ups_command);
       if (UPS_ERROR == UPS_SUCCESS) 
       { upsact_process_commands(cmd_list, tmpfile); 
         upsact_cleanup(cmd_list);
@@ -529,17 +519,33 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         upsfil_clear_journal_files();
         upserr_vplace();
         return 0;
-      }
-/* Let them know if there is a tailor action for this product */
-      cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                 mproduct, g_cmd_info[e_tailor].cmd,
-                                 ups_command);
-      if (UPS_ERROR == UPS_SUCCESS) 
-      { if (cmd_list)
-        { upsver_mes(0,"A UPS tailor exists for this product\n");
-          upsact_cleanup(cmd_list);
-        }
       } 
+    } 
+      if (!uc->ugo_C) /* Don't do anything but declare actions */
+                      /* Do configure actions                  */
+      { if (version) /* only do configure if version was actually defined */
+        { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                     mproduct, g_cmd_info[e_configure].cmd,
+                                     ups_command);
+          if (UPS_ERROR == UPS_SUCCESS) 
+          { upsact_process_commands(cmd_list, tmpfile); 
+            upsact_cleanup(cmd_list);
+          } else {
+            upsfil_clear_journal_files();
+            upserr_vplace();
+            return 0;
+          }
+/* Let them know if there is a tailor action for this product */
+          cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                     mproduct, g_cmd_info[e_tailor].cmd,
+                                     ups_command);
+          if (UPS_ERROR == UPS_SUCCESS) 
+          { if (cmd_list)
+            { upsver_mes(0,"A UPS tailor exists for this product\n");
+              upsact_cleanup(cmd_list);
+            }
+          } 
+        }
       uc->ugo_chain=save_chain;
       if (uc->ugo_chain)
       { uc->ugo_flavor=save_flavor;
