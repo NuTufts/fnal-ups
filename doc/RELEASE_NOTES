@@ -20,3 +20,11 @@ Added -G flag (ugo_G and ugo_passed)
 <li>
 Fixed ups list -K with ONLY database specification
 </ul>
+<li>
+Added -K actions ( variable output use as last or only )
+and -K action=ACTION or action="action"
+</ul>
+<li>
+Added a specific database check in declare, ugo can't determine that
+-m isn't good enough for declare but it is for other commands.
+</ul>
