@@ -916,17 +916,26 @@ void upsact_free_act_cmd( t_upsact_cmd * const act_cmd )
 void upsact_free_act_item( t_upsact_item * const act_itm ) 
 {
 
-  if ( act_itm && upsmem_get_refctr( act_itm ) <= 0 ) {
+  if ( act_itm ) {
+
+    upsmem_dec_refctr( act_itm );
+
+    if ( upsmem_get_refctr( act_itm ) > 1 )
+      return;
+    
     if ( act_itm->ugo ) {
       upsmem_dec_refctr( act_itm->ugo );
       if ( upsmem_get_refctr( act_itm->ugo ) <= 0 )
 	upsugo_free( act_itm->ugo );
     }
        
-    if ( act_itm->mat && upsmem_get_refctr( act_itm->mat ) <= 1 ) {
+    if ( act_itm->mat ) {      
       upsmem_dec_refctr( act_itm->mat );
-      if ( upsmem_get_refctr( act_itm->mat ) <= 0 )
+      if ( upsmem_get_refctr( act_itm->mat ) <= 0 ) {
+	/* printf( "*** deleting a act_item %d, mat pointer %x\n",
+		(unsigned long)act_itm, (unsigned long)act_itm->mat ); */
 	ups_free_matched_product( act_itm->mat );
+      }
     }
 
     /* don't touch the t_upstyp_action */
@@ -1649,7 +1658,17 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
     t_upslst_item *l_mproduct = upsmat_instance( (t_upsugo_command *)ugo_cmd, NULL, 1 );
     if ( !l_mproduct || !l_mproduct->data )
       return 0;
+
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
+    
+    /*    printf( "*** get_act: creating and inc a mat pointer %x\n",
+	    (unsigned long)mat_prod ); */
+    
+    /* we keep the matched product */
+       
+    upsmem_inc_refctr( mat_prod );
+    
+    upsutl_free_matched_product_list( &l_mproduct );
   }
 
   /* we are expecting one match, else the above should fail */
@@ -1894,6 +1913,8 @@ t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
   upsmem_inc_refctr( act_itm->ugo );
 
   new_act_itm->mat = act_itm->mat;
+  /* printf( "*** copy_act_item: incrementing a mat pointer %x\n",
+	  (unsigned long)act_itm->mat ); */
   upsmem_inc_refctr( act_itm->mat );
 
   /* the action pointer is original from a t_upstyp_product */     
@@ -1927,12 +1948,25 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
       upserr_add( UPS_NO_MATCH, UPS_FATAL, ugo_cmd->ugo_product );
       return 0;
     }
+    
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
-    upslst_free( l_mproduct, ' ' );
+    
+    /* printf( "*** new_act_item: creating and inc a mat pointer %x\n",
+	    (unsigned long)mat_prod );*/
+    
+    /* we keep the matched product */
+       
+    upsmem_inc_refctr( mat_prod );
+    
+    upsutl_free_matched_product_list( &l_mproduct );
   }
   else {
-
+    
+    /* printf( "*** new_act_item: incrementing a mat pointer %x\n",
+	    (unsigned long)mat_prod ); */
+    
     upsmem_inc_refctr( mat_prod );
+    
   }
 
   act_itm = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
