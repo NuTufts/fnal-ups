@@ -208,7 +208,7 @@ void upsget_envout(const FILE * const stream,
   name = upsutl_upcase( name );
   switch (command_line->ugo_shell) {
   case e_BOURNE:
-    (void) fprintf((FILE *)stream,"SETUP_%s=\"%s\";export SETUP_%s\n#\n",
+    (void) fprintf((FILE *)stream,"SETUP_%s=\"%s\"; export SETUP_%s\n#\n",
       name,upsget_envstr(db,instance,command_line),name);
     break;
   case e_CSHELL:
@@ -267,7 +267,7 @@ void upsget_allout(const FILE * const stream,
         {
           switch (command_line->ugo_shell) {
           case e_BOURNE:
-            (void) fprintf((FILE *)stream,"%s%s=%s%s%s;export %s\n", pdefault, 
+            (void) fprintf((FILE *)stream,"%s%s=%s%s%s; export %s\n", pdefault, 
                            the_string, a_quote, the_value, a_quote, the_string);
             break;
       
