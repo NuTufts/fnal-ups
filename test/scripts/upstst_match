@@ -11,8 +11,8 @@ upsmat_instance -status UPS_OPEN_FILE
 #
 # see if things work without a table file specified
 #
-upsmat_instance -status UPS_NO_TABLE_MATCH -z ../db1 notable v2_0
-upsmat_instance -out notable.out -diff notable.in -z ../db1 notable v1_0
+upsmat_instance -status UPS_NO_TABLE_MATCH -z ../db0 notable v2_0
+upsmat_instance -out notable.out -diff notable.in -z ../db0 notable v1_0
 # 
 # simple tests with rover
 #
@@ -49,5 +49,7 @@ upsmat_instance -out snoopy5.out -diff snoopy5.in -z ../db1 -H IRIX+5 snoopy v1_
 #
 upsmat_instance -out lassie6.out -diff lassie6.in -z ../db1:../db2 -f NULL -a lassie v2_0
 upsmat_instance -out lassie7.out -diff lassie7.in -z ../db1:../db2 -f NULL -q nodbg:opt lassie v2_0 -unique
+upsmat_instance -out asta1.out -diff asta1.in -z ../db1:../db2 -f NULL -a asta
+upsmat_instance -out asta2.out -diff asta2.in -z ../db1:../db2 -f NULL -a 
 quit
 EOD
