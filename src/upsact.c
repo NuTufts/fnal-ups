@@ -9,7 +9,7 @@
  *
  *       Steps in order to add a new action -
  *           1. add a f_<action> prototype at the top of the file
- *           2. add an e_<action> to the enum below
+ *           2. add an e_<action> to the enum in upsact.h
  *           3. add a line to the g_cmd_maps structure
  *           4. add the code for the f_<action> function
  *           5. check if you have to add anything to upsact_check_files
@@ -75,7 +75,8 @@ int g_COMPILE_FLAG = 0;
 #define DO_UPS_ENV 0
 #define DATE_FLAG "DATE"
 #define OLD_FLAG "OLD"
-
+#define CATMANPAGES "catman"
+#define MANPAGES "man"
 
 /*
  * Private types
@@ -142,6 +143,16 @@ static void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
 			 const t_upsugo_command * const a_command_line,
 			 const FILE * const a_stream,
 			 const t_upsact_cmd * const a_cmd);
+static void f_copycatman( const t_upstyp_matched_instance * const a_inst,
+			  const t_upstyp_db * const a_db_info,
+			  const t_upsugo_command * const a_command_line,
+			  const FILE * const a_stream,
+			  const t_upsact_cmd * const a_cmd);
+static void f_uncopycatman( const t_upstyp_matched_instance * const a_inst,
+			    const t_upstyp_db * const a_db_info,
+			    const t_upsugo_command * const a_command_line,
+			    const FILE * const a_stream,
+			    const t_upsact_cmd * const a_cmd);
 static void f_copynews( const t_upstyp_matched_instance * const a_inst,
 			const t_upstyp_db * const a_db_info,
 			const t_upsugo_command * const a_command_line,
@@ -312,6 +323,15 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
      FPRINTF_ERROR();                                  \
    }
 
+#define GET_MAN_SOURCE(pages)      \
+   if (a_cmd->argc == 1) {                                  \
+     /* the user specified a source in the action */        \
+     buf = (char *)a_cmd->argv[0];                          \
+   } else {                                                 \
+     /* we have to construct a source */                    \
+     buf = upsutl_find_manpages(a_inst, a_db_info, pages);  \
+   }
+
 #define DO_SYSTEM_MOVE(move_flag)  \
    if (system(buff) != 0) {                                               \
      /* error from system call */                                         \
@@ -430,6 +450,8 @@ static t_cmd_map g_cmd_maps[] = {
   { "copyinfo", e_copyinfo, f_copyinfo, 1, 1, e_invalid_cmd },
   { "copyman", e_copyman, f_copyman, 0, 1, e_uncopyman },
   { "uncopyman", e_uncopyman, f_uncopyman, 0, 1, e_copyman},
+  { "copycatman", e_copycatman, f_copycatman, 0, 1, e_uncopycatman },
+  { "uncopycatman", e_uncopycatman, f_uncopycatman, 0, 1, e_copycatman},
   { "copynews", e_copynews, f_copynews, 1, 1, e_invalid_cmd },
   { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd },
   { "dodefaults", e_dodefaults, f_dodefaults, 0, 0, e_dodefaults },
@@ -1838,15 +1860,50 @@ static void f_copyman( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (a_cmd->argc == 1) {
-	  /* the user specified a source in the action */
-	  buf = (char *)a_cmd->argv[0];
-	} else {
-	  /* we have to construct a source */
-	  buf = upsutl_find_manpages(a_inst, a_db_info);
-	}
+	GET_MAN_SOURCE(MANPAGES);
 	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
 		    buf, a_db_info->config->man_path) < 0) {
+	  FPRINTF_ERROR();
+	}
+	break;
+      default:
+	upserr_vplace();
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      }
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_vplace();
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
+      }
+    }
+  }
+}
+
+static void f_copycatman( const t_upstyp_matched_instance * const a_inst,
+			  const t_upstyp_db * const a_db_info,
+			  const t_upsugo_command * const a_command_line,
+			  const FILE * const a_stream,
+			  const t_upsact_cmd * const a_cmd)
+{
+  char *buf = NULL;
+
+  CHECK_NUM_PARAM("copyCatMan");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+
+    /* Make sure we have somewhere to copy the files to. */
+    if (!a_db_info->config || !a_db_info->config->catman_path) {
+      upserr_vplace();
+      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "catman");
+    } else {  
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+      case e_CSHELL:
+	GET_MAN_SOURCE(CATMANPAGES);
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
+		    buf, a_db_info->config->catman_path) < 0) {
 	  FPRINTF_ERROR();
 	}
 	break;
@@ -1870,7 +1927,7 @@ static void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
 			 const t_upsact_cmd * const a_cmd)
 {
   char *buf = NULL;
-  t_upslst_item *man_item, *man_list;
+  t_upslst_item *man_item, *man_list = NULL;
 
   CHECK_NUM_PARAM("uncopyMan");
 
@@ -1886,14 +1943,7 @@ static void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (a_cmd->argc == 1) {
-	  /* the user specified a source in the action (gotten from current
-	     action */
-	  buf = (char *)a_cmd->argv[0];
-	} else {
-	  /* we have to construct a source */
-	  buf = upsutl_find_manpages(a_inst, a_db_info);
-	}
+	GET_MAN_SOURCE(MANPAGES);
 
 	/* Get a list of all the files in the specified directory */
 	upsutl_get_files(buf, ANY_MATCH, &man_list);
@@ -1906,6 +1956,63 @@ static void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
 	    break;
 	  }
 	}
+	/* cleanup memory */
+	man_list = upslst_free(man_list, 'd');
+
+	fprintf((FILE *)a_stream, "#\n");
+	break;
+      default:
+	upserr_vplace();
+	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
+      }
+      if (UPS_ERROR != UPS_SUCCESS) {
+	upserr_vplace();
+	upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		   g_cmd_maps[a_cmd->icmd].cmd);
+      }
+    }
+  }
+}
+
+static void f_uncopycatman( const t_upstyp_matched_instance * const a_inst,
+			    const t_upstyp_db * const a_db_info,
+			    const t_upsugo_command * const a_command_line,
+			    const FILE * const a_stream,
+			    const t_upsact_cmd * const a_cmd)
+{
+  char *buf = NULL;
+  t_upslst_item *man_item, *man_list = NULL;
+
+  CHECK_NUM_PARAM("uncopyCatMan");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+
+    /* Make sure we have somewhere to copy the files to. */
+    if (!a_db_info->config || !a_db_info->config->catman_path) {
+      upserr_vplace();
+      upserr_add(UPS_NO_DESTINATION, UPS_WARNING, "catman");
+    } else {  
+      switch ( a_command_line->ugo_shell ) {
+      case e_BOURNE:
+      case e_CSHELL:
+	GET_MAN_SOURCE(CATMANPAGES);
+
+	/* Get a list of all the files in the specified directory */
+	upsutl_get_files(buf, ANY_MATCH, &man_list);
+
+	for (man_item = man_list ; man_item ; man_item = man_item->next) {
+	  if (fprintf((FILE *)a_stream, "rm %s/%s\n", 
+		      a_db_info->config->catman_path, (char *)man_item->data)
+	      < 0) {
+	    FPRINTF_ERROR();
+	    break;
+	  }
+	}
+	/* cleanup memory */
+	man_list = upslst_free(man_list, 'd');
+
 	fprintf((FILE *)a_stream, "#\n");
 	break;
       default:

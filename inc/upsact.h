@@ -77,8 +77,8 @@ enum {
 };
 
 
-/* there must be one of these for each action command and they must be in the same
-   order as in the array in upsact.c */
+/* there must be one of these for each action command and they must be in the
+   same order as in the array in upsact.c */
 enum {
   e_invalid_cmd = -1,
   e_setupoptional = 0,
@@ -110,6 +110,8 @@ enum {
   e_copyinfo,
   e_copyman,
   e_uncopyman,
+  e_copycatman,
+  e_uncopycatman,
   e_copynews,
   e_writecompilescript,
   e_dodefaults,
