@@ -138,6 +138,29 @@ int upsugo_bldfvr(struct ups_command * uc)
      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
      return(0);
    }
+   if ((strncmp(baseuname->sysname,"SunOS",5)) == 0)
+   { (void) strcpy(baseuname->machine,"SunOS+");
+     (void) strcat(baseuname->machine,baseuname->release);
+     loc=strchr(baseuname->machine,'.');
+     *loc='-';
+     loc=strchr(baseuname->machine,'.');
+     *loc=0;				/* second dot not first */
+     loc=strchr(baseuname->machine,'-');
+     *loc='.';				/* return dot */
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'.');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     loc=strchr(baseuname->machine,'+');
+     *loc = 0;
+     addr=str_create(baseuname->machine);
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     addr=str_create("NULL");
+     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+     return(0);
+   }
 
    return(-1);
 }
@@ -281,7 +304,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 	uc->ugo_a = 0;	/* All include				*/
 	uc->ugo_A = 0;	/* Authorized Host(s) 			*/
 /*	uc->ugo_b = 0;	UNDEFINED				*/
-/*	uc->ugo_B = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_B = 0;	/* CODE INCOMPLETE			*/
 	uc->ugo_c = 0;	/* current specified			*/
 	uc->ugo_C = 0;	/* Don't do Configure			*/
 	uc->ugo_d = 0;	/* development chain			*/
@@ -306,7 +329,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 	uc->ugo_M = 0;	/* Table file name			*/
 	uc->ugo_o = 0;	/* old chain				*/
 	uc->ugo_O = 0;	/* set UPS_OPTIONS to value             */
-/*	uc->ugo_p = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_p = 0;	/* CODE INCOMPLETE			*/
 	uc->ugo_P = 0;	/* override product name                */
 	uc->ugo_q = 0;	/* CODE INCOMPLETE			*/
 /*	uc->ugo_Q = 0;	UNDEFINED				*/
