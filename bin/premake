@@ -207,7 +207,7 @@ case $ccenv in
 
 		case $os_version in
 		   5)
-			fullwarn="-fullwarn -wlint,-fp";;
+			fullwarn="-fullwarn -wlint,-f";;
 		   *)
 			fullwarn="-fullwarn";;
 		esac
