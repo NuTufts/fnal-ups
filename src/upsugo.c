@@ -1363,7 +1363,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
     (void) upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
     while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
     { if(*arg_str == '-')      /* is it an option */
-      { if (!strchr(validopts,(int)*(arg_str+1))) { 
+      { if (!strchr((validopts ? validopts : ""),(int)*(arg_str+1))) { 
            upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, arg_str+1);
         }
         switch(*(arg_str+1))      /* which flag was specified */
