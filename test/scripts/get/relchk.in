@@ -1,6 +1,6 @@
 UPS_PROD_NAME=jessie;export UPS_PROD_NAME
-UPS_PROD_VERSION=v2_0;export UPS_PROD_VERSION
-UPS_PROD_DIR=/usr/products/jessie_relative;export UPS_PROD_DIR
+UPS_PROD_VERSION="v2_0";export UPS_PROD_VERSION
+UPS_PROD_DIR="/usr/products/jessie_relative";export UPS_PROD_DIR
 unset UPS_VERBOSE
 unset UPS_EXTENDED
 UPS_THIS_DB=../list/db1;export UPS_THIS_DB
