@@ -42,7 +42,7 @@ default:
 
 all : unit_tests integration_tests
 
-unit_tests : test_ups_error test_ups_list test_ups_memory test_ups_utils test_upsugo
+unit_tests : test_ups_error test_ups_list test_ups_memory test_ups_utils test_upsugo test_ups_match
 
 integration_tests : ups_test
 
@@ -63,6 +63,9 @@ test_ups_memory : test_ups_memory.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
 
 test_ups_utils : test_ups_utils.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
+
+test_ups_match : test_ups_match.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(LDFLAGS)
 
 test_upsugo: test_upsugo.o $(LIB)/libups.a
@@ -122,6 +125,16 @@ test_ups_files.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_list.o:	test_ups_list.c
 test_ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_list.o:	$(ERUPT_DIR)/inc/ups_memory.h
+test_ups_match.o:	test_ups_match.c
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_match.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_list.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_error.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_list.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_files.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_types.h
+test_ups_match.o:	$(ERUPT_DIR)/inc/ups_memory.h
 test_ups_memory.o:	test_ups_memory.c
 test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_memory.h
 test_ups_memory.o:	$(ERUPT_DIR)/inc/ups_utils.h
@@ -134,10 +147,8 @@ test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_types.h
 test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_utils.o:	$(ERUPT_DIR)/inc/ups_error.h
 test_upsugo.o:	test_upsugo.c
-test_upsugo.o:	./../inc/ups_types.h
-test_upsugo.o:	./../inc/ups_list.h
-ups_test.o:	ups_test.c
-ups_test.o:	./upstst_cmdtable.h
+test_upsugo.o:	$(ERUPT_DIR)/inc/ups_types.h
+test_upsugo.o:	$(ERUPT_DIR)/inc/ups_list.h
 upstst_cmdline.o:	upstst_cmdline.c
 upstst_cmdline.o:	./upstst_cmdline.h
 upstst_cmdloop.o:	upstst_cmdloop.c
@@ -148,10 +159,6 @@ upstst_cmdproc.o:	upstst_cmdproc.c
 upstst_cmdproc.o:	./upstst_cmdline.h
 upstst_cmdproc.o:	./upstst_parse.h
 upstst_cmdproc.o:	./upstst_cmdtable.h
-upstst_error.o:	upstst_error.c
-upstst_error.o:	./upstst_parse.h
-upstst_error.o:	./upstst_macros.h
-upstst_error.o:	$(ERUPT_DIR)/inc/ups_error.h
 upstst_misc.o:	upstst_misc.c
 upstst_misc.o:	./upstst_parse.h
 upstst_misc.o:	./upstst_macros.h
