@@ -437,7 +437,7 @@ t_cmd_map g_func_info[] = {
   { "envremove", e_envremove, f_envremove, 2, 3, e_invalid_cmd, 0x00000001 },
   { "envprepend", e_envprepend, f_envprepend, 2, 3, e_envremove, 0x00000001 },
   { "envset", e_envset, f_envset, 2, 2, e_envunset, 0x00000001 },
-  { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_envunset, 0x00000001 },
+  { "envsetifnotset", e_envsetifnotset, f_envsetifnotset, 2, 2, e_envremove, 0x00000001 },
   { "envunset", e_envunset, f_envunset, 1, 1, e_invalid_cmd, 0x00000001 },
   { "pathappend", e_pathappend, f_pathappend, 2, 3, e_pathremove, 0x00000001 },
   { "pathremove", e_pathremove, f_pathremove, 2, 3, e_pathappend, 0x00000001 },
