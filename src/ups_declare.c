@@ -59,6 +59,7 @@ static char *save_version;
 static char *save_table_dir;		/* match won't work "how I want" */
 static char *save_table_file;		/* with table specifications     */
 static char *save_ups_dir;
+static char *save_prod_dir;
 static char *username=0;
 static char *declared_date=0;
 
@@ -107,10 +108,9 @@ t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
    vinst->declared=upsutl_str_create(declared_date,' ');
    vinst->modifier=upsutl_str_create(username,' ');
    vinst->modified=upsutl_str_create(declared_date,' ');
-   vinst->prod_dir=upsutl_str_create(uc->ugo_productdir,' ');
+   vinst->prod_dir=upsutl_str_create(save_prod_dir,' ');
    vinst->table_dir=upsutl_str_create(save_table_dir,' ');
    vinst->table_file=upsutl_str_create(save_table_file,' ');
-/*   vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' '); */
    vinst->ups_dir=upsutl_str_create(save_ups_dir,' ');
    vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
    vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
@@ -203,18 +203,24 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upslst_item *save_chain;
   int save_m=uc->ugo_m;
   int save_M=uc->ugo_M;
+  int save_U=uc->ugo_U;
+  int save_r=uc->ugo_r;
   the_flavor=0;
   the_qualifiers=0;
   the_chain=0;
   save_version=0;
   uc->ugo_m=0;
   uc->ugo_M=0;
+  uc->ugo_U=0;
+  uc->ugo_r=0;
   save_table_dir=uc->ugo_tablefiledir;
   save_table_file=uc->ugo_tablefile;
   save_ups_dir=uc->ugo_upsdir;
+  save_prod_dir=uc->ugo_productdir;
   uc->ugo_tablefile=0;
   uc->ugo_tablefiledir=0;
   uc->ugo_upsdir=0; 
+  uc->ugo_productdir=0; 
   save_flavor=uc->ugo_flavor;
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
@@ -483,8 +489,11 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     uc->ugo_tablefiledir=save_table_dir;
     uc->ugo_tablefile=save_table_file;
     uc->ugo_upsdir=save_ups_dir;
+    uc->ugo_productdir=save_prod_dir;
     uc->ugo_m=save_m;
     uc->ugo_M=save_M;
+    uc->ugo_U=save_U;
+    uc->ugo_r=save_r;
     /* build new version instance */
     if (buffer[0]!=0) /* instance doesn't exist */
     { the_flavor=save_flavor->data;
