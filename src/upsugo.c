@@ -674,17 +674,18 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  int i,j;
  int opinit=0;
  char * optionals[10]; /* OH NO!! artifical limit of 10 optionals */
+ char *fix_inaddr;
 
  uc->ugo_reqqualifiers = strdup(inaddr);
 
- inaddr = ugo_old2newquals( inaddr );
+ fix_inaddr = ugo_old2newquals( inaddr );
 
- if ( strchr(inaddr,'?') == 0) {       /* no optional qualifiers */
-  addr=upsutl_str_create(inaddr,'p');
+ if ( strchr(fix_inaddr,'?') == 0) {       /* no optional qualifiers */
+  addr=upsutl_str_create(fix_inaddr,'p');
   (void) upsutl_str_sort(addr,':');
   uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
  } else {
-  addr=upsutl_str_create(inaddr,'p');
+  addr=upsutl_str_create(fix_inaddr,'p');
 /* remove all ?qualifiers from required string */
   waddr=addr;				/* work address */
   while (*waddr)                      /* while not end of string */
@@ -713,7 +714,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
   waddr=upsutl_str_create(addr,'p');   /* new list trimed */
   upsmem_free(addr);                   /* disgard work string */
   addr=waddr;                          /* required string in addr */
-  oaddr=upsutl_str_create(inaddr,'p');
+  oaddr=upsutl_str_create(fix_inaddr,'p');
   onc=1;                               /* must assume first no spec is , */
   waddr=oaddr;				/* work address */
   while (*waddr)                       /* now we have build the optional */
