@@ -472,7 +472,7 @@ t_cmd_map g_cmd_maps[] = {
  * Return: t_upsact_tree *,
  */
 int upsact_print( t_upsugo_command * const ugo_cmd,
-		  t_upstyp_matched_product *mat_prod,
+		  t_upstyp_matched_product *mat_prod_in,
 		  const char * const act_name,
 		  int ups_cmd,
 		  char * sopt )
@@ -490,64 +490,102 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
   /* get depency list */
 
   if ( strchr( sopt, 'l' ) ) 
-    dep_list = upsact_get_cmd( ugo_cmd, mat_prod, act_name, ups_cmd );
+    dep_list = upsact_get_cmd( ugo_cmd, mat_prod_in, act_name, ups_cmd );
   else
-    dep_list = upsact_get_dep( ugo_cmd, mat_prod, act_name, ups_cmd );
+    dep_list = upsact_get_dep( ugo_cmd, mat_prod_in, act_name, ups_cmd );
 
-  /* option l: print all action commands for all instances */
+  /* option l: print all functions for all dependencies */
 
   if ( strchr( sopt, 'l' ) ) {
 
-    for ( dep_l = upslst_first( dep_list); dep_l; dep_l = dep_l->next ) {
+    for ( dep_l = upslst_first( dep_list); dep_l; dep_l = dep_l->next )
       upsact_print_item( (t_upsact_item *)dep_l->data, sopt );
-    }
+
   }
 
-  /* print only instances */
-
   else {
-
     t_upstyp_matched_product *mat_prod;
     t_upstyp_matched_instance *mat_inst;
     t_upslst_item *l_mproduct;
     t_upslst_item *old_ugo_key;
-    t_upsact_item dep_act_itm; 
+    t_upsact_item dep_act_itm;
+    int i;
+    int double_line = 0;
 
-    /* list dependencies in reverse order */
+    for ( dep_l = upslst_first( dep_list ); dep_l; dep_l = dep_l->next ) {
 
-    for ( dep_l = upslst_last( dep_list ); dep_l; dep_l = dep_l->prev ) {
       t_upsact_item *act_ptr = (t_upsact_item *)dep_l->data;
       t_upsugo_command *dep_ugo = act_ptr->dep_ugo;      
 
-      l_mproduct = upsmat_instance( dep_ugo, NULL, 1 );
-      if ( !l_mproduct || !l_mproduct->data )
-	continue;
+      l_mproduct = upsmat_instance( act_ptr->dep_ugo, NULL, 1 );
+
+      if ( !l_mproduct || !l_mproduct->data ) {
+	upsutl_free_matched_product_list( &l_mproduct );
+	continue;	
+      }
 
       mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
       mat_inst = 
 	(t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
-
+      
       if ( strchr( sopt, 'K' ) ) {
-
+	
+	/* option K shoule be easy to parse */
+	
 	old_ugo_key = dep_ugo->ugo_key;
 	dep_ugo->ugo_key = ugo_cmd->ugo_key;
-
+	
 	list_K( mat_inst, dep_ugo, mat_prod );
-
+	
 	dep_ugo->ugo_key = old_ugo_key;
       }
       else {
-
+	static char s_indent[MAX_LINE_LEN];
 	dep_act_itm.ugo = dep_ugo;
 	dep_act_itm.mat = mat_prod;
-
+	
+	
+	/* print indentations,
+	   since we are trying to be pretty we have to decide when to 
+	   print a '|   ' or a '    ' */
+	
+	s_indent[0] = '\0';
+	
+	for ( i=0; i<act_ptr->level - 1; i++ ) {
+	  
+	  t_upslst_item *l_h = dep_l->next;
+	  char *sc = "   ";
+	  
+	  for ( ; l_h; l_h = l_h->next ) {
+	    int lvl = ((t_upsact_item *)l_h->data)->level;
+	    if ( lvl == i + 1 ) {
+	      sc = "|  "; break;
+	    }
+	    else if ( lvl < i + 1 ) {
+	      sc = "   "; break;
+	    }
+	  }
+	  
+	  strcat( s_indent, sc );
+	}
+	
+	if ( act_ptr->level > 0 ) {
+	  if ( double_line ) {
+	    printf( "%s|  \n", s_indent );
+	    printf( "%s|__", s_indent );
+	  }
+	  else {
+	    printf( "%s|__", s_indent );
+	  }
+	}
+	
 	printf( "%s\n", actitem2str( &dep_act_itm) );
-      }
 
+      }
 
       upsutl_free_matched_product_list( &l_mproduct );
     }
-
+    
   }
 
   upsact_cleanup( upslst_first( dep_list ) );
@@ -1153,9 +1191,9 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
       /* get the action item */
 
       if ( i_cmd & 2 ) 
-	new_act_itm = new_act_item( new_ugo, 0, 0, i_cmd, "unsetup");
+	new_act_itm = new_act_item( new_ugo, 0, 1, i_cmd, "unsetup");
       else
-	new_act_itm = new_act_item( new_ugo, 0, 0, i_cmd, "setup");
+	new_act_itm = new_act_item( new_ugo, 0, 1, i_cmd, "setup");
 
       if ( !new_act_itm ) {
 	if ( i_cmd & 1 ) {
@@ -1376,6 +1414,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  upsmem_inc_refctr( new_ugo );
 	}
 
+	set_act_itm->level = p_act_itm->level + 1;
 	set_act_itm->dep_ugo = new_ugo;
 	dep_list = upslst_add( dep_list, set_act_itm );
       }
@@ -4125,7 +4164,7 @@ static char get_man_subdir(char * const a_man_file)
    char *sp;
    char ret_val = NO_EXTENSION;
 
-   for (sp = a_man_file; *sp != NULL; sp++) {
+   for (sp = a_man_file; *sp != '\0'; sp++) {
      if (*sp == '.')  {
        ret_val = *++sp;
        /* check to see if this file extension is of the possible man types -
