@@ -73,9 +73,30 @@ void *upsmem_malloc(const int a_bytes)
 
       /* return to the user a pointer pointing past the reference counter */
       dataPtr = (int *)UPSMEM_GET_USER(dataPtr);
+    } else {
+      /* we did not get the memory.  the following routine should not return
+	 here, but should exit */
+      upserr_add(UPS_NO_MEMORY, numBytes);
+      upsmem_malloc_error(numBytes);
     }
+    
   }
   return (void *)dataPtr;
+}
+
+/*-----------------------------------------------------------------------
+ * upsmem_malloc_error
+ *
+ * We were unable to malloc.  print out the error buffer and exit 
+ *
+ * Input : number of bytes that were used for the malloc
+ * Output: none
+ * Return: none
+ */
+void upsmem_malloc_error(int a_bytes)
+{
+  upserr_output();
+  abort();
 }
 
 /*-----------------------------------------------------------------------
