@@ -436,6 +436,11 @@ int upsugo_ifornota(struct ups_command * const uc)
      } else {
         addr = (char *) malloc((size_t)(strlen(PRODUCTS) +1));
         strcpy(addr,PRODUCTS);
+        loc=addr;
+        while ( loc && *loc ) 
+        { if (isspace( *(loc) ) ) { *loc=' '; }
+          ++loc; 
+        }
         while ((loc=strchr(addr,' '))!=0) {
                 *loc = 0;
                 PRODUCTS = upsutl_str_create(addr,' ');
