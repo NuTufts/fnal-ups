@@ -48,7 +48,7 @@ unset upstmp;
 #
 if [ ! r blah ]; then
 echo "can't read file";
-return 1;
+return 1
 fi;
 #
 type ls 2>&1 | grep -i "not found" > /dev/null
