@@ -427,10 +427,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         chain_list->next=0;
         chain_list->prev=0;
         uc->ugo_chain=chain_list;
-/* upsugo_dump(uc,1); */
-        upsfil_stat(1);
-upsfil_write_journal_files();
-(void)system("ls $PRODUCTS/dog");
         mproduct_list = upsmat_instance(uc, db_list , need_unique);
         if (UPS_ERROR != UPS_SUCCESS) 
         { upsfil_clear_journal_files();
@@ -446,7 +442,6 @@ upsfil_write_journal_files();
         { upsact_process_commands(cmd_list, tmpfile);
           upsact_cleanup(cmd_list);
         } else {
-printf("spit 1\n");
           upsfil_clear_journal_files();
           upserr_vplace();
           return 0;
@@ -458,27 +453,33 @@ printf("spit 1\n");
         { upsact_process_commands(cmd_list, tmpfile); 
           upsact_cleanup(cmd_list);
         } else {
-printf("spit 2\n");
           upsfil_clear_journal_files();
           upserr_vplace();
           return 0;
         } 
+        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                   mproduct, g_cmd_info[e_tailor].cmd,
+                                   e_tailor);
+        if (UPS_ERROR == UPS_SUCCESS) 
+        { if (cmd_list)
+          { upsver_mes(0,"A UPS tailor exists for this product\n");
+            upsact_cleanup(cmd_list);
+          }
+        } 
         if (strstr(the_chain,"current"))
         { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-				  mproduct, g_cmd_info[e_start].cmd,
-				  e_start);
-          if (UPS_ERROR == UPS_SUCCESS) 
-          { if (cmd_list)
-            { printf("theres a start...\n");
-              upsact_cleanup(cmd_list);
-            }
-          } else {
-printf("spit 3\n");
-            /* don't fail is start is junk do I care? */
-            /* upsfil_clear_journal_files(); */
-            /* upserr_vplace(); */
-            /* return 0; */
+                                     mproduct, g_cmd_info[e_start].cmd,
+                                     e_start);
+          if (!cmd_list)
+          { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                       mproduct, g_cmd_info[e_stop].cmd,
+                                       e_stop);
           }
+          /*          if (UPS_ERROR == UPS_SUCCESS)  */
+          if (cmd_list)
+          { upsver_mes(0,"A UPS start/stop exists for this product\n");
+            upsact_cleanup(cmd_list);
+          } 
         }
       }
     }
