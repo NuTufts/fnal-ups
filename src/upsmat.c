@@ -690,6 +690,7 @@ t_upslst_item *upsmat_match_with_instance(
     for (instance_list = a_product->instance_list ; instance_list ;
 	 instance_list = instance_list->next) {
       inst = (t_upstyp_instance *)instance_list->data;
+      inst->flag = 0;
       if (inst->version) {       /* make sure we have one */
 	if (! strcmp(a_instance->version, inst->version)) {
 	  /* they are the same version */
@@ -697,6 +698,7 @@ t_upslst_item *upsmat_match_with_instance(
 	    /* they have the same flavor */
 	    if (! strcmp(a_instance->qualifiers, inst->qualifiers)) {
 	      /* they have same qualifiers, we found a match, return it */
+	      inst->flag = 1;
 	      break;
 	    }
 	  }
@@ -741,6 +743,8 @@ static t_upstyp_matched_product *match_instance_core(
   t_upslst_item *chain_list = NULL, *version_list = NULL;
   t_upstyp_matched_instance *minst = NULL;
   t_upstyp_product *read_product = NULL;
+  t_upslst_item *item = NULL;
+  t_upstyp_instance *inst = NULL;
   int num_matches = 0, tmp_num_matches;
   char *chain, *version, *dummy;
 
@@ -820,6 +824,30 @@ static t_upstyp_matched_product *match_instance_core(
 		     chains */
 		  minst->xtra_chains = upslst_add(minst->xtra_chains,
 				      (t_upstyp_instance *)matched_item->data);
+		}
+	      }
+	    }
+	  }
+	  if (UPS_VERIFY) {
+	    /* see if we have a chain without a matching version.
+	       if we asked for all of everything, then this is wrong. */
+	    if (a_command_line->ugo_a &&
+		!(a_command_line->ugo_c || a_command_line->ugo_o ||
+		  a_command_line->ugo_n || a_command_line->ugo_d ||
+		  a_command_line->ugo_t || a_command_line->ugo_g ||
+		  a_command_line->ugo_f || a_command_line->ugo_H ||
+		  a_command_line->ugo_q || a_command_line->ugo_number) &&
+		(! NOT_EQUAL_ANY_MATCH(a_command_line->ugo_version))) {
+	      for (item = read_product->instance_list ; item ;
+		   item = item->next) {
+		inst = (t_upstyp_instance *)item->data;
+		if (! inst->flag) {
+		  /* no match was made for this instance */
+		  upserr_add(UPS_DANGLING_CHAIN, UPS_WARNING, chain);
+		  upserr_add(UPS_PRODUCT_INFO,UPS_WARNING, a_prod_name, 
+			     (inst->version    ? inst->version    : " "),
+			     (inst->flavor     ? inst->flavor     : " "),
+			     (inst->qualifiers ? inst->qualifiers : " "));
 		}
 	      }
 	    }
