@@ -867,7 +867,7 @@ int upsget_key(const t_upstyp_instance * const instance)
   static char buffer[MAX_LINE_LEN];
   char *skey=buffer;
   int i;
-  static char *nostring = '\0';
+  static char *nostring = "";
   sprintf(skey,"%s%s%s%s",(instance->product ? instance->product : nostring),
                           (instance->version ? instance->version : nostring),
                           instance->flavor,
