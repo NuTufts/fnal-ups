@@ -2316,7 +2316,7 @@ static void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "whereis %s\nif ($status == 1) return 1\n#\n",
+		  "whereis %s\nif ($status == 1) exit 1\n#\n",
 		  a_cmd->argv[0]) < 0) {
 	FPRINTF_ERROR();
       }
@@ -2397,7 +2397,7 @@ static void f_filetest( const t_upstyp_matched_instance * const a_inst,
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "if ( ! %s %s ) then\necho \"%s\"\nreturn 1\nendif\n#\n", 
+		  "if ( ! %s %s ) then\necho \"%s\"\nexit 1\nendif\n#\n", 
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
 	FPRINTF_ERROR();
       }
@@ -2735,14 +2735,14 @@ static int csh_output_next_part(const FILE * const a_stream,
 	} else {
 	  upsutl_finish_temp_file(a_stream, a_command_line);
 	  if ((status = fprintf((FILE *)a_stream,
-		      "    return 1\n  endif\n  unsetenv UPS_STATUS\n") < 0)) {
+		      "    exit 1\n  endif\n  unsetenv UPS_STATUS\n") < 0)) {
 	      FPRINTF_ERROR();
 	  } 
 	}
       }
       if ((status >= 0) && (a_exit_flag == DO_EXIT)) {
 	upsutl_finish_temp_file(a_stream, a_command_line);
-	if ((status = fprintf((FILE *)a_stream, "  return\n") < 0)) {
+	if ((status = fprintf((FILE *)a_stream, "  exit\n") < 0)) {
 	  FPRINTF_ERROR();
 	}
       }
@@ -2780,7 +2780,7 @@ static int csh_output_last_part_req(const FILE * const a_stream,
     FPRINTF_ERROR();
   } else {
     upsutl_finish_temp_file(a_stream, a_command_line);
-    if ((status = fprintf((FILE *)a_stream, "  return 1\nendif\n#\n") < 0)) {
+    if ((status = fprintf((FILE *)a_stream, "  exit 1\nendif\n#\n") < 0)) {
       FPRINTF_ERROR();
     }
   }
