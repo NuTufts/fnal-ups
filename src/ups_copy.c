@@ -120,7 +120,7 @@ static char buf[MAX_LINE_LEN];
 
 #define ADD_TO_ECHO(inst_elem, format)  \
    if (new_dclr_instance->inst_elem) {                                 \
-     sprintf(tmp_buf, format, tmp_buf, new_dclr_instance->inst_elem);  \
+     (void) sprintf(tmp_buf, format, tmp_buf, new_dclr_instance->inst_elem);  \
    }
 
 #define SET_DCLR_LINE(ugo_elem, inst_elem, ugo_flag)  \
@@ -333,13 +333,13 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 		}
 		  /* get SETUP_<prod> translated */
 		if (dep_command_line && dep_command_line->ugo_product) {
-		  sprintf(tmp_buf, "%s%s", SETUPENV,
+		  (void) sprintf(tmp_buf, "%s%s", SETUPENV,
 			  upsutl_upcase(dep_command_line->ugo_product));
 		  if ((tmp_buf2 = (char *)getenv(tmp_buf)) != NULL) {
 		    /* we got it, free the current string and replace it with
 		       the new one */
 		    upsmem_free(command_item->data);
-		    sprintf(tmp_buf, "%s(\"%s\")", 
+		    (void) sprintf(tmp_buf, "%s(\"%s\")", 
 			    g_func_info[command->icmd].cmd, tmp_buf2);
 		    command_item->data = (void *)upsutl_str_create(tmp_buf,
 							   STR_TRIM_DEFAULT);
@@ -370,11 +370,11 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	  /*   do not execute, if no table file entered, the table file goes
 	       to /usr/tmp , else use the one that was entered */
 	  if ((tmp_buf2 = tmpnam(tmp_file_buf)) != NULL) {
-	    sprintf(tmp_buf, "%s_table_%s", tmp_buf2, new_instance->product);
+	    (void) sprintf(tmp_buf, "%s_table_%s", tmp_buf2, new_instance->product);
 	    tmp_buf2 = tmp_buf;
 	    
 	    /* tell user the name of the temporary file */
-	    printf("UPS_COPY: Temporary table file is \'%s\'\n", tmp_buf);
+	    (void) printf("UPS_COPY: Temporary table file is \'%s\'\n", tmp_buf);
 	  } else {
 	    tmp_buf2 = NULL;
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam",
@@ -431,7 +431,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	if (tmp_buf2) {
 	  write_product_ptr->file = upsutl_str_create("TABLE",
 						      STR_TRIM_DEFAULT);
-	  upsfil_write_file(write_product_ptr, tmp_buf2, ' ', JOURNAL);
+	  (void) upsfil_write_file(write_product_ptr, tmp_buf2, ' ', JOURNAL);
 	}
       	/* STEP 2: if we are echoing only, construct a declare command string
 	        and echo it to the user.  if we are doing the declare,
@@ -447,7 +447,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 						   new_db_info_ptr);
 	if (! a_command_line->ugo_X) {
 	  /*    do not execute, just echo the command line */
-	  sprintf(tmp_buf,
+	  (void) sprintf(tmp_buf,
 		  "ups declare %s %s -f \"%s\" -q \"%s\" -r \"%s\" -z \"%s\" ",
 		  new_dclr_instance->product, new_dclr_instance->version,
 		  new_dclr_instance->flavor, new_dclr_instance->qualifiers,
@@ -461,31 +461,31 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	  ADD_TO_ECHO(compile_file, "%s -b \"%s\" ");
 	  ADD_TO_ECHO(compile_dir, "%s -u \"%s\" ");
 	  if (new_command_line->ugo_C) {
-	    sprintf(tmp_buf, "%s -C ", tmp_buf);
+	    (void) sprintf(tmp_buf, "%s -C ", tmp_buf);
 	  }
 	  if (new_dclr_instance->statistics) {
-	    sprintf(tmp_buf, "%s -L ", tmp_buf);
+	    (void) sprintf(tmp_buf, "%s -L ", tmp_buf);
 	  }
 	  if (new_command_line) {
 	    for (tmp_item = new_command_line->ugo_chain ; tmp_item ;
 		 tmp_item = tmp_item->next) {
 	      if (! strcmp((char *)tmp_item->data, "current")) {
-		sprintf(tmp_buf, "%s -c ", tmp_buf);
+		(void) sprintf(tmp_buf, "%s -c ", tmp_buf);
 	      } else if (! strcmp((char *)tmp_item->data, "old")) {
-		sprintf(tmp_buf, "%s -o ", tmp_buf);
+		(void) sprintf(tmp_buf, "%s -o ", tmp_buf);
 	      } else if (! strcmp((char *)tmp_item->data, "new")) {
-		sprintf(tmp_buf, "%s -n ", tmp_buf);
+		(void) sprintf(tmp_buf, "%s -n ", tmp_buf);
 	      } else if (! strcmp((char *)tmp_item->data, "development")) {
-		sprintf(tmp_buf, "%s -d ", tmp_buf);
+		(void) sprintf(tmp_buf, "%s -d ", tmp_buf);
 	      } else if (! strcmp((char *)tmp_item->data, "test")) {
-		sprintf(tmp_buf, "%s -t ", tmp_buf);
+		(void) sprintf(tmp_buf, "%s -t ", tmp_buf);
 	      } else {
-		sprintf(tmp_buf, "%s -g \"%s\"", tmp_buf,
+		(void) sprintf(tmp_buf, "%s -g \"%s\"", tmp_buf,
 			(char *)tmp_item->data);
 	      }
 	    }
 	  }
-	  printf("\n%s\n\n",tmp_buf);
+	  (void) printf("\n%s\n\n",tmp_buf);
 	} else {
 	  /*    do the real declare.  to do this, we must construct a ugo
 	        structure that can be passed to ups_declare. */	  
@@ -493,7 +493,7 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 					      new_command_line);
 
 	  /* now do the declare */
-	  ups_declare(dclr_command_line, a_temp_file, e_declare);
+	  (void) ups_declare(dclr_command_line, a_temp_file, e_declare);
 
 	  dclr_command_line = free_ugo_struct(dclr_command_line);
 	}
@@ -572,9 +572,9 @@ static t_upstyp_instance *fill_new_dclr_instance(
     for (tmp_item = new_command_line->ugo_auth ; tmp_item ;
 	 tmp_item = tmp_item->next) {
       if (buf[0] == '\0') {
-	sprintf(buf, "%s", (char *)tmp_item->data);
+	(void) sprintf(buf, "%s", (char *)tmp_item->data);
       } else {
-	sprintf(buf, "%s%s%s", buf, UPS_SEPARATOR,
+	(void) sprintf(buf, "%s%s%s", buf, UPS_SEPARATOR,
 		(char *)tmp_item->data);
       }
     }
@@ -634,7 +634,7 @@ static t_upsugo_command *fill_ugo_struct(
 
   new_command_line = (t_upsugo_command *)upsmem_malloc(
 						     sizeof(t_upsugo_command));
-  memset(new_command_line, 0, sizeof(t_upsugo_command));
+  (void) memset(new_command_line, 0, sizeof(t_upsugo_command));
 
   new_command_line->ugo_product = a_instance->product;
   new_command_line->ugo_version = a_instance->version;
