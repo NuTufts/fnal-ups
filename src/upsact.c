@@ -45,6 +45,10 @@
 #include "upsugo.h"
 #include "upsget.h"
 
+extern void list_K( const t_upstyp_matched_instance * const instance, 
+		    const t_upsugo_command * const command, 
+		    const t_upstyp_matched_product * const product);
+
 /*
  * Definition of public variables.
  */
@@ -432,6 +436,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
   /* option l: print all action commands for all instances */
 
   if ( strchr( sopt, 'l' ) ) {
+
     for ( dep_l = upslst_first( dep_list); dep_l; dep_l = dep_l->next ) {
       upsact_print_item( (t_upsact_item *)dep_l->data, sopt );
     }
@@ -440,7 +445,9 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
   /* print only instances */
 
   else {
-    t_upstyp_matched_product *matched;
+
+    t_upstyp_matched_product *mat_prod;
+    t_upstyp_matched_instance *mat_inst;
     t_upslst_item *l_mproduct;
     t_upsact_item dep_act_itm; 
 
@@ -454,12 +461,23 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
       if ( !l_mproduct || !l_mproduct->data )
 	continue;
 
-      matched = (t_upstyp_matched_product *)l_mproduct->data;
+      mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
+      mat_inst = 
+	(t_upstyp_matched_instance *)(upslst_first( mat_prod->minst_list ))->data;
 
-      dep_act_itm.ugo = dep_ugo;
-      dep_act_itm.mat = matched;
-      
-      printf( "%s\n", actitem2str( &dep_act_itm) );
+      if ( strchr( sopt, 'K' ) ) {
+
+	dep_ugo->ugo_key = ugo_cmd->ugo_key;      
+	list_K( mat_inst, dep_ugo, mat_prod );
+	dep_ugo->ugo_key = 0;
+      }
+      else {
+
+	dep_act_itm.ugo = dep_ugo;
+	dep_act_itm.mat = mat_prod;
+	printf( "%s\n", actitem2str( &dep_act_itm) );
+      }
+
 
       upsutl_free_matched_product_list( &l_mproduct );
     }

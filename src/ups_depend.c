@@ -28,6 +28,7 @@
 #include "upsugo.h"
 #include "upsact.h"
 #include "ups_main.h"
+
 /*
  * Definition of public variables.
  */
@@ -59,10 +60,25 @@ t_upslst_item *ups_depend( t_upsugo_command * const u_cmd,
 			   const char * const s_cmd,
 			   const int e_cmd )
 {
-  if ( u_cmd->ugo_l > 0 )
+  if ( u_cmd->ugo_K ) {
+
+    /* use the K options */
+
+    upsact_print( u_cmd, 0, "setup", e_cmd, "K" );
+
+  }
+  else if ( u_cmd->ugo_l > 0 )
+
+    /* normal listing, long */
+
     upsact_print( u_cmd, 0, "setup", e_cmd, "l" );
+
   else
+
+    /* normal listing */
+
     upsact_print( u_cmd, 0, "setup", e_cmd, "" );
+
   return NULL;
 }
 
