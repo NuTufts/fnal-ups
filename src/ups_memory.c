@@ -21,6 +21,7 @@
 
 /* standard include files */
 #include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 /* ups specific include files */
@@ -77,7 +78,7 @@ void *upsmem_malloc(const int a_bytes)
       /* we did not get the memory.  the following routine should not return
 	 here, but should exit */
       upserr_add(UPS_NO_MEMORY, numBytes);
-      upsmem_malloc_error(numBytes);
+      upsmem_malloc_error((int)numBytes);
     }
     
   }
@@ -93,7 +94,7 @@ void *upsmem_malloc(const int a_bytes)
  * Output: none
  * Return: none
  */
-void upsmem_malloc_error(int a_bytes)
+void upsmem_malloc_error(const int a_bytes )
 {
   upserr_output();
   abort();
