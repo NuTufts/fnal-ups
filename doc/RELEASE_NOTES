@@ -45,4 +45,11 @@ no longer used.
 The 'ups create' command had been removed.
 <li>
 Added qualifier information to the error message that is output when an instance does exist.
+<li>
+Added an informatinal message to ups start/stop/tailor/configure/unconfigure to
+let the user know when the instance was not matched.
+<li>
+Added support for -0123 to most of the commands.
+<li>
+Fixed problem with ups undeclare checking for the existence of an archive file.
 </ul>
