@@ -216,12 +216,12 @@ static void f_dodefaults( ACTION_PARAMS);
     }
 
 #define GET_DELIMITER() \
-    if (a_cmd->argc == g_func_info[a_cmd->icmd].max_params) {            \
+    if (a_cmd->argc == g_func_info[a_cmd->icmd].max_params) {           \
       /* remember arrays start at 0, so subtract one here */            \
       delimiter =                                                       \
-	(a_cmd->argv[g_func_info[a_cmd->icmd].max_params-1]);            \
+	(a_cmd->argv[g_func_info[a_cmd->icmd].max_params-1]);           \
       /* trim delimiter for quotes */                                   \
-      upsutl_str_remove_end_quotes( delimiter, "\"\'", 0 );             \
+      (void) upsutl_str_remove_end_quotes( delimiter, "\"\'", 0 );      \
       /* if the delimiter is 0 length, then use a space */              \
       if (*delimiter == '\0') {                                         \
 	delimiter = g_space_delimiter;                                  \
@@ -542,7 +542,7 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
       l_mproduct = upsmat_instance( act_ptr->dep_ugo, NULL, 1 );
 
       if ( !l_mproduct || !l_mproduct->data ) {
-	upsutl_free_matched_product_list( &l_mproduct );
+	(void) upsutl_free_matched_product_list( &l_mproduct );
 	continue;	
       }
 
@@ -588,24 +588,24 @@ int upsact_print( t_upsugo_command * const ugo_cmd,
 	    }
 	  }
 	  
-	  strcat( s_indent, sc );
+	  (void) strcat( s_indent, sc );
 	}
 	
 	if ( act_ptr->level > 0 ) {
 	  if ( double_line ) {
-	    printf( "%s|  \n", s_indent );
-	    printf( "%s|__", s_indent );
+	    (void) printf( "%s|  \n", s_indent );
+	    (void) printf( "%s|__", s_indent );
 	  }
 	  else {
-	    printf( "%s|__", s_indent );
+	    (void) printf( "%s|__", s_indent );
 	  }
 	}
 	
-	printf( "%s\n", actitem2str( &dep_act_itm) );
+	(void) printf( "%s\n", actitem2str( &dep_act_itm) );
 
       }
 
-      upsutl_free_matched_product_list( &l_mproduct );
+      (void) upsutl_free_matched_product_list( &l_mproduct );
     }
     
   }
@@ -669,7 +669,7 @@ t_upslst_item *upsact_get_dep( t_upsugo_command * const ugo_cmd,
 
   upsact_cleanup( top_list );
 
-  upslst_free( g_prod_done, ' ' );
+  (void) upslst_free( g_prod_done, ' ' );
 
   return upslst_first( dep_list );
 }
@@ -724,7 +724,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
 
   upsact_cleanup( top_list );
 
-  upslst_free( g_prod_done, ' ' );
+  (void) upslst_free( g_prod_done, ' ' );
 
   return upslst_first( dep_list );
 }
@@ -831,8 +831,8 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
 	/* trim off whitespace & the ending ")", we will also get rid
            of ending ';' */
 
-	upsutl_str_remove_edges( act_s, " ;" );
-	upsutl_str_remove_edges( act_s, trim_chars );
+	(void) upsutl_str_remove_edges( act_s, " ;" );
+	(void) upsutl_str_remove_edges( act_s, trim_chars );
 
         /* save the location in the array */
 
@@ -850,14 +850,14 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
     pcmd->argc = parse_params( act_s, pcmd->argv );
 
     if ( UPS_VERBOSE ) {
-      strcpy( g_buff, g_func_info[icmd].cmd );
-      strcat( g_buff, "(" );
+      (void) strcpy( g_buff, g_func_info[icmd].cmd );
+      (void) strcat( g_buff, "(" );
       for ( i = 0; i < pcmd->argc; i++ ) {
-	strcat( g_buff, pcmd->argv[i] );
+	(void) strcat( g_buff, pcmd->argv[i] );
 	if ( i < pcmd->argc-1 )
-	  strcat( g_buff, ", " );
+	  (void) strcat( g_buff, ", " );
       }
-      strcat( g_buff, ")" );
+      (void) strcat( g_buff, ")" );
       P_VERB_s_s( 3, "Parsed line:", g_buff );
     }
 
@@ -911,14 +911,14 @@ void upsact_print_item( const t_upsact_item *const act_itm,
   if ( !act_itm )
     return;
 
-  if ( strchr( sopt, 't' ) ) for ( i=0; i<act_itm->level; i++ ) { printf( "   " ); }
-  printf( "%s", actitem2str( act_itm ) );
+  if ( strchr( sopt, 't' ) ) for ( i=0; i<act_itm->level; i++ ) { (void) printf( "   " ); }
+  (void) printf( "%s", actitem2str( act_itm ) );
   if ( strchr( sopt, 'l' ) ) {
-    printf( ":" );
+    (void) printf( ":" );
     upsact_print_cmd( act_itm->cmd );
   }
   else 
-    printf( "\n" );
+    (void) printf( "\n" );
 }
 
 /*-----------------------------------------------------------------------
@@ -936,20 +936,20 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
   int icmd;
   
   if ( !cmd_cur ) {
-    printf( "\n" ); 
+    (void) printf( "\n" ); 
     return;
   }
 
   icmd = cmd_cur->icmd;
   
-  printf( "%s(", g_func_info[icmd].cmd );
+  (void) printf( "%s(", g_func_info[icmd].cmd );
   for ( i = 0; i < cmd_cur->argc; i++ ) {
     if ( i == cmd_cur->argc - 1 ) 
-      printf( "%s", cmd_cur->argv[i] );
+      (void) printf( "%s", cmd_cur->argv[i] );
     else
-      printf( "%s, ", cmd_cur->argv[i] );
+      (void) printf( "%s, ", cmd_cur->argv[i] );
   }
-  printf( ")\n" ); 
+  (void) printf( ")\n" ); 
 }
 
 /*-----------------------------------------------------------------------
@@ -968,7 +968,7 @@ t_upsact_cmd *upsact_new_upsact_cmd( const char * const act_str )
   cmd_ptr = (t_upsact_cmd *)upsmem_malloc( (int )(sizeof( t_upsact_cmd ) + strlen( act_str ) + 1) );
   cmd_ptr->pbuf = (char *)(cmd_ptr + 1);
   
-  strcpy( cmd_ptr->pbuf, act_str );
+  (void) strcpy( cmd_ptr->pbuf, act_str );
 
   return cmd_ptr;
 }
@@ -1001,13 +1001,13 @@ void upsact_free_act_item( t_upsact_item * const act_itm )
     if ( act_itm->ugo ) {
       upsmem_dec_refctr( act_itm->ugo );
       if ( upsmem_get_refctr( act_itm->ugo ) <= 0 )
-	upsugo_free( act_itm->ugo );
+	(void) upsugo_free( act_itm->ugo );
     }
        
     if ( act_itm->mat ) {      
       upsmem_dec_refctr( act_itm->mat );
       if ( upsmem_get_refctr( act_itm->mat ) <= 0 ) {
-	/* printf( "*** deleting a act_item %d, mat pointer %x\n",
+	/* (void) printf( "*** deleting a act_item %d, mat pointer %x\n",
 		(unsigned long)act_itm, (unsigned long)act_itm->mat ); */
 	ups_free_matched_product( act_itm->mat );
       }
@@ -1478,7 +1478,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
 	new_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
 	new_act->action = (char *)malloc( strlen( old_act->action ) + 1 );
-	strcpy( new_act->action, old_act->action );
+	(void) strcpy( new_act->action, old_act->action );
 	new_act->command_list = reverse_command_list( new_act_itm, old_act->command_list );
 
 	new_act_itm->act = new_act;
@@ -1520,7 +1520,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       if ( new_ugo ) {
 	if ( (new_act_itm = 
 	      find_prod_name( top_list, new_ugo->ugo_product ) ) ) {
-	  /*	  upsugo_free( new_ugo );
+	  /*	  (void) upsugo_free( new_ugo );
 		  new_ugo = new_act_itm->ugo */
 	}
       }
@@ -1669,7 +1669,7 @@ int parse_params( const char * const a_params, char **argv )
         /* and add it to the list */
 	
 	*ptr = '\0';
-	upsutl_str_remove_end_quotes( saved_ptr, "\"\'", WSPACE );
+	(void) upsutl_str_remove_end_quotes( saved_ptr, "\"\'", WSPACE );
 	argv[count++] = saved_ptr;
 	
       }
@@ -1690,7 +1690,7 @@ int parse_params( const char * const a_params, char **argv )
     
     /* Get the last one too */
 
-    upsutl_str_remove_end_quotes( saved_ptr, "\"\'", WSPACE );
+    (void) upsutl_str_remove_end_quotes( saved_ptr, "\"\'", WSPACE );
     argv[count++] = saved_ptr;
   }
   
@@ -1730,12 +1730,12 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 
   if ( ! strchr( cmd_line, ' ' ) ) {
 
-    strcpy( s_pname, cmd_line );
+    (void) strcpy( s_pname, cmd_line );
   }
   else {
 
     a_cmd_ugo = upsugo_bldcmd( cmd_line, g_cmd_info[e_unsetup].valid_opts );
-    strcpy( s_pname, a_cmd_ugo->ugo_product );
+    (void) strcpy( s_pname, a_cmd_ugo->ugo_product );
 
     /* check if instance can differ from SETUP_prod, if it can we will use 
        that instance, except if the instance is created from a setup action */
@@ -1752,7 +1752,7 @@ t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
   }
   else {
 
-    upsugo_free( a_cmd_ugo );
+    (void) upsugo_free( a_cmd_ugo );
     pname = upsutl_upcase( s_pname );
 
     /* fetch, from the environment the product defined in $SETUP_prod */
@@ -1790,14 +1790,14 @@ t_upstyp_action *get_act( const t_upsugo_command * const ugo_cmd,
 
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
     
-    /*    printf( "*** get_act: creating and inc a mat pointer %x\n",
+    /*    (void) printf( "*** get_act: creating and inc a mat pointer %x\n",
 	    (unsigned long)mat_prod ); */
     
     /* we keep the matched product */
        
     upsmem_inc_refctr( mat_prod );
     
-    upsutl_free_matched_product_list( &l_mproduct );
+    (void) upsutl_free_matched_product_list( &l_mproduct );
   }
 
   /* we are expecting one match, else the above should fail */
@@ -1841,14 +1841,14 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
     /* if no flavor was spcified by the action function (H) and a -H
        flavor was specified on the command line, we will pass that on */
 
-    strcpy( g_buff, p_cmd->argv[0] );
+    (void) strcpy( g_buff, p_cmd->argv[0] );
     if ( !strstr( g_buff, "-H" ) && g_ugo_cmd->ugo_H ) {
-      strcat( g_buff, " -H" );
+      (void) strcat( g_buff, " -H" );
       l_itm = upslst_first( g_ugo_cmd->ugo_osname );
       for ( ; l_itm; l_itm = l_itm->next ) {
-	strcat( g_buff, l_itm->data );
+	(void) strcat( g_buff, l_itm->data );
 	if ( l_itm->next )
-	  strcat( g_buff, ":" );
+	  (void) strcat( g_buff, ":" );
       }
     }      
 
@@ -1875,7 +1875,7 @@ t_upsugo_command *get_ugo( t_upsact_cmd *const p_cmd,
     
     a_ugo->ugo_z = g_ugo_cmd->ugo_z;
     if ( a_ugo->ugo_db ) {
-      upsugo_free_ugo_db( a_ugo->ugo_db );
+      (void) upsugo_free_ugo_db( a_ugo->ugo_db );
       a_ugo->ugo_db = 0;
     }
     a_ugo->ugo_db = merge_ugo_db( a_ugo->ugo_db, g_ugo_cmd->ugo_db );
@@ -1918,7 +1918,7 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
     if ( 1 ) {
       /*     if ( ! TOO_MUCH_FOR_UNSETUP( the_ugo_cmd ) ) { */
 
-      strcpy( s_pname, the_ugo_cmd->ugo_product );
+      (void) strcpy( s_pname, the_ugo_cmd->ugo_product );
       pname = upsutl_upcase( s_pname );
 
       if ( !g_COMPILE_FLAG && (g_ups_cmd != e_depend) )
@@ -2063,7 +2063,7 @@ t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
   t_upsact_item *new_act_itm = 0;
 
   new_act_itm = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
-  memset( new_act_itm, 0, sizeof( t_upsact_item ) );
+  (void) memset( new_act_itm, 0, sizeof( t_upsact_item ) );
 
   new_act_itm->level = act_itm->level;
   new_act_itm->mode = act_itm->mode;
@@ -2073,7 +2073,7 @@ t_upsact_item *copy_act_item( const t_upsact_item * const act_itm )
   upsmem_inc_refctr( act_itm->ugo );
 
   new_act_itm->mat = act_itm->mat;
-  /* printf( "*** copy_act_item: incrementing a mat pointer %x\n",
+  /* (void) printf( "*** copy_act_item: incrementing a mat pointer %x\n",
 	  (unsigned long)act_itm->mat ); */
   upsmem_inc_refctr( act_itm->mat );
 
@@ -2111,18 +2111,18 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
     
     mat_prod = (t_upstyp_matched_product *)l_mproduct->data;
     
-    /* printf( "*** new_act_item: creating and inc a mat pointer %x\n",
+    /* (void) printf( "*** new_act_item: creating and inc a mat pointer %x\n",
 	    (unsigned long)mat_prod );*/
     
     /* we keep the matched product */
        
     upsmem_inc_refctr( mat_prod );
     
-    upsutl_free_matched_product_list( &l_mproduct );
+    (void) upsutl_free_matched_product_list( &l_mproduct );
   }
   else {
     
-    /* printf( "*** new_act_item: incrementing a mat pointer %x\n",
+    /* (void) printf( "*** new_act_item: incrementing a mat pointer %x\n",
 	    (unsigned long)mat_prod ); */
     
     upsmem_inc_refctr( mat_prod );
@@ -2130,7 +2130,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
   }
 
   act_itm = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
-  memset( act_itm, 0, sizeof( t_upsact_item ) );
+  (void) memset( act_itm, 0, sizeof( t_upsact_item ) );
 
   act_itm->level = level;
   act_itm->mode = mode;
@@ -2168,13 +2168,13 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm,
 
     p_unact = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
     p_unact->action = (char *)malloc( strlen( act_name ) + 1 );
-    strcpy( p_unact->action, act_name );
+    (void) strcpy( p_unact->action, act_name );
     p_unact->command_list = reverse_command_list( p_act_itm, p_act->command_list );
   }      
   else if ( (g_cmd_info[iact].flags)&0x00000001 ) {
     p_unact = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
     p_unact->action = (char *)malloc( strlen( act_name ) + 1 );
-    strcpy( p_unact->action, act_name );
+    (void) strcpy( p_unact->action, act_name );
     p_unact->command_list = 0;
     p_unact->command_list = upslst_add( p_unact->command_list, 
 					upsutl_str_create( "dodefaults()", ' ' ) );
@@ -2214,7 +2214,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 
       if ( (i_uncmd = g_func_info[i_cmd].icmd_undo) != e_invalid_cmd ) {
 
-	strcpy( buf,  g_func_info[i_uncmd].cmd );
+	(void) strcpy( buf,  g_func_info[i_uncmd].cmd );
 
 	argc = g_func_info[i_cmd].max_params;
 	if ( argc > g_func_info[i_uncmd].max_params )
@@ -2222,7 +2222,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	if ( argc > p_cmd->argc )
 	  argc = p_cmd->argc;
 
-	strcat( buf, "(" );
+	(void) strcat( buf, "(" );
 	
 	/* handle first argument */
 
@@ -2241,7 +2241,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 
 	  if ( (fn = strrchr( fp, '/' )) ) {
 	    fn++;
-	    strncat( buf, fp, (size_t)( fn - fp ) );
+	    (void) strncat( buf, fp, (size_t)( fn - fp ) );
 	  }
 	  else
 	    fn = fp;
@@ -2251,9 +2251,9 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	  if ( !upsutl_strincmp( fn, "un", 2 ) )
 	    fn += 2; 	         /* remove 'un' */
 	  else
-	    strcat( buf, "un" ); /* prepend 'un', always lower case */
+	    (void) strcat( buf, "un" ); /* prepend 'un', always lower case */
 
-	  strcat( buf, fn );
+	  (void) strcat( buf, fn );
 
 	  /* SPECIAL case end */ 
 
@@ -2268,7 +2268,7 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	    t_upsugo_command *a_cmd_ugo = 0;	    
 
 	    if ( ! strchr( cmd_line, ' ' ) ) {
-	      strcat( buf, cmd_line );
+	      (void) strcat( buf, cmd_line );
 	    }
 	    else {
 	      a_cmd_ugo = upsugo_bldcmd( cmd_line, g_cmd_info[e_unsetup].valid_opts );
@@ -2280,10 +2280,10 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	         - if it's setuped, use only the product name */
 
 	      if ( (! g_COMPILE_FLAG) && upsugo_getenv( a_cmd_ugo->ugo_product ) )
-		strcat( buf, a_cmd_ugo->ugo_product );
+		(void) strcat( buf, a_cmd_ugo->ugo_product );
 	      else
-		strcat( buf, cmd_line );
-	      upsugo_free( a_cmd_ugo );
+		(void) strcat( buf, cmd_line );
+	      (void) upsugo_free( a_cmd_ugo );
 	    }
 	  }
 	}
@@ -2292,16 +2292,16 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
 	  /* normal */
 
 	  if ( argc > 0 )
-	    strcat( buf, p_cmd->argv[0] );
+	    (void) strcat( buf, p_cmd->argv[0] );
 	}
 
 	/* handle the rest of the arguments */
 
 	for ( i=1; i<argc; i++ ) {
-	  strcat( buf, ", " );	    
-	  strcat( buf, p_cmd->argv[i] );
+	  (void) strcat( buf, ", " );	    
+	  (void) strcat( buf, p_cmd->argv[i] );
 	}
-	strcat( buf, ")" );
+	(void) strcat( buf, ")" );
 
 	/* use _insert (and not _add), to reverse the order of commands */
 
@@ -2373,15 +2373,15 @@ char *actitem2str( const t_upsact_item *const p_act_itm )
 
   l_item = upslst_first( p_act_itm->mat->minst_list );
   mat_inst = (t_upstyp_matched_instance *)l_item->data;
-  strcpy( buf, upsget_envstr( p_act_itm->mat->db_info, mat_inst, p_act_itm->ugo ) );
+  (void) strcpy( buf, upsget_envstr( p_act_itm->mat->db_info, mat_inst, p_act_itm->ugo ) );
 
 
   /* chain information */
 
   l_item = upslst_first( p_act_itm->ugo->ugo_chain );
   if ( l_item && l_item->data ) {
-    strcat( buf, " -g " );
-    strcat( buf, (char *)l_item->data );
+    (void) strcat( buf, " -g " );
+    (void) strcat( buf, (char *)l_item->data );
     
     /* the following should in princip never happen: a dependency should
        only be reachable by a single chain, so maybe we should print an
@@ -2389,8 +2389,8 @@ char *actitem2str( const t_upsact_item *const p_act_itm )
 
     for ( l_item = l_item->next; l_item; l_item = l_item->next ) {
       if ( l_item->data ) {
-	strcat( buf, ":" );
-	strcat( buf, (char *)l_item->data );
+	(void) strcat( buf, ":" );
+	(void) strcat( buf, (char *)l_item->data );
       }
     } 
   }
@@ -2624,7 +2624,7 @@ static void f_envremove( ACTION_PARAMS)
         FPRINTF_ERROR();
       }
 
-      if ( fprintf((FILE *)a_stream, "  upstmp=%s\n", a_cmd->argv[1] ) < 0) {
+      if (fprintf((FILE *)a_stream, "  upstmp=%s\n", a_cmd->argv[1] ) < 0) {
 	FPRINTF_ERROR();
       }
 
@@ -3081,7 +3081,7 @@ static void f_pathremove( ACTION_PARAMS)
 	 it could contain some code there has to be executed, which we don't
 	 want to put into the dropit command */
 
-      if ( fprintf((FILE *)a_stream, "upstmp=%s\n", a_cmd->argv[1] ) < 0) {
+      if (fprintf((FILE *)a_stream, "upstmp=%s\n", a_cmd->argv[1] ) < 0) {
 	FPRINTF_ERROR();
       }
 
@@ -3180,7 +3180,7 @@ static void f_addalias( ACTION_PARAMS)
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:      /* DjF added ; before } */
-      sprintf(g_buff, "%s () { %s ;}\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
+      (void) sprintf(g_buff, "%s () { %s ;}\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
       if (strstr(g_buff, g_ACTPARAM)) {
 	/* the string is already in there, add the parameter string */
 	if (fprintf((FILE *)a_stream, g_buff, g_SHPARAM) < 0) {
@@ -3194,7 +3194,7 @@ static void f_addalias( ACTION_PARAMS)
       }
       break;
     case e_CSHELL:         /* DjF changed " to ' */
-      sprintf(g_buff, "alias %s \'%s\'\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
+      (void) sprintf(g_buff, "alias %s \'%s\'\n#\n", a_cmd->argv[0], a_cmd->argv[1]);
       if (strstr(g_buff, g_ACTPARAM)) {
 	/* the string is already in there, add the parameter string */
 	if (fprintf((FILE *)a_stream, g_buff, g_CSHPARAM) < 0) {
@@ -3800,7 +3800,7 @@ static void f_writecompilescript(ACTION_PARAMS)
 	  /* 2      now that we have the list, locate the current compile file
 	            if there is one, first we must add in the appropriate file
 		    extension */
-	  sprintf(buf, "%s.%s", a_cmd->argv[0], g_file_ext[i]);
+	  (void) sprintf(buf, "%s.%s", a_cmd->argv[0], g_file_ext[i]);
 	  if (upsutl_is_a_file(buf) == UPS_SUCCESS) {
 	    /* 3   the file exists. check argv[2] to see if we need to rename
 	           the file before writing the new one. if no flag was passed 
@@ -3809,13 +3809,13 @@ static void f_writecompilescript(ACTION_PARAMS)
 	      /* the flag was there, now see what it is */
 	      if (! upsutl_stricmp(a_cmd->argv[a_cmd->argc - 1], OLD_FLAG)) {
 		/* append ".OLD" to the file name */
-		sprintf(g_buff, "mv %s %s.%s\n", buf, buf, OLD_FLAG);
+		(void) sprintf(g_buff, "mv %s %s.%s\n", buf, buf, OLD_FLAG);
 		DO_SYSTEM_MOVE(moved_to_old);
 	      } else if (! upsutl_stricmp(a_cmd->argv[a_cmd->argc - 1],
 					  DATE_FLAG)) {
 		/* append a timedate stamp to the file name */
 		time_ptr = upsutl_time_date(STR_TRIM_PACK);
-		sprintf(g_buff, "mv %s %s.%s\n", buf, buf, time_ptr);
+		(void) sprintf(g_buff, "mv %s %s.%s\n", buf, buf, time_ptr);
 		DO_SYSTEM_MOVE(moved_to_timedate);
 	      }
 	    }
@@ -3863,9 +3863,9 @@ static void f_writecompilescript(ACTION_PARAMS)
       if ((moved_to_old || moved_to_timedate) && (UPS_ERROR != UPS_SUCCESS)) {
 	/* yes we did the move, and got an error, move the file back */
 	if (moved_to_old) {
-	  sprintf(g_buff, "mv %s.%s %s\n", buf, OLD_FLAG, buf);
+	  (void) sprintf(g_buff, "mv %s.%s %s\n", buf, OLD_FLAG, buf);
 	} else {
-	  sprintf(g_buff, "mv %s.%s %s\n", buf, time_ptr, buf);
+	  (void) sprintf(g_buff, "mv %s.%s %s\n", buf, time_ptr, buf);
 	}
 	/* since we are at end, it does not matter which flag we use here */
 	DO_SYSTEM_MOVE(moved_to_old);
@@ -3885,7 +3885,7 @@ static void f_writecompilescript(ACTION_PARAMS)
   }
   /* release any memory we acquired */
   if (mproduct && mproduct->minst_list) {
-    (void )upslst_free(mproduct->minst_list, ' ');
+    (void) upslst_free(mproduct->minst_list, ' ');
     upsmem_free(mproduct);
     upsmem_dec_refctr(a_db_info);
   }
@@ -3925,7 +3925,7 @@ static void f_unsetupenv( ACTION_PARAMS)
     if (a_minst->version && a_minst->version->product) {
       uprod_name = upsutl_upcase(a_minst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
-	sprintf(g_buff, "%s%s", SETUPENV,uprod_name);
+	(void) sprintf(g_buff, "%s%s", SETUPENV,uprod_name);
 	f_envunset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
     }
@@ -3966,7 +3966,7 @@ static void f_proddir( ACTION_PARAMS)
     } else if (a_minst->version && a_minst->version->prod_dir) {
       if (UPSRELATIVE(a_minst->version->prod_dir) && a_db_info &&
 	  a_db_info->config && a_db_info->config->prod_dir_prefix) {
-	sprintf(buf, "%s/%s", a_db_info->config->prod_dir_prefix,
+	(void) sprintf(buf, "%s/%s", a_db_info->config->prod_dir_prefix,
 		a_minst->version->prod_dir);
 	tmp_prod_dir = buf;
       } else {
@@ -3983,7 +3983,7 @@ static void f_proddir( ACTION_PARAMS)
     if (tmp_prod_dir && tmp_prod_name) {
       uprod_name = upsutl_upcase(tmp_prod_name);
       if (UPS_ERROR == UPS_SUCCESS) {
-	sprintf(g_buff, "%s_DIR", uprod_name);
+	(void) sprintf(g_buff, "%s_DIR", uprod_name);
 	
 	lcl_cmd.argv[1] = tmp_prod_dir;
 	f_envset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
@@ -4023,7 +4023,7 @@ static void f_unproddir( ACTION_PARAMS)
     if (a_minst->version && a_minst->version->product) {
       uprod_name = upsutl_upcase(a_minst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
-	sprintf(g_buff, "%s_DIR", uprod_name);
+	(void) sprintf(g_buff, "%s_DIR", uprod_name);
 	f_envunset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
     }
