@@ -34,9 +34,9 @@ CFLAGScia = $(INCDIRS)
 
 #
 #
-OBJECTS = 
+OBJECTS = ups_error.o
 
-CIAOBJECTS = 
+CIAOBJECTS = ups_error.a
 
 LDFLAGS = $(LLIBS)
 
