@@ -262,6 +262,16 @@ void print_chain(const t_upstyp_matched_instance * const instance,
       }                                                              \
     } printf("\n");                                                  \
 }
+
+#define PRINT_DB(dbname) \
+{    printf("DATABASE=");                                            \
+     if (dbname)                                                     \
+     { printf("%s ",dbname);                                         \
+     } else {                                                        \
+       printf("\"\" ");                                              \
+     } printf("\n");                                                 \
+}
+
 /* int list_error=UPS_SUCCESS;  */
 
 int product_cmp ( const void * const d1, const void * const d2 )
@@ -311,12 +321,9 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
       /* Output the requested information from the instances */
       /*  upsugo_dump(a_command_line);*/
       if (!a_command_line->ugo_K)
-      { printf("DATABASE=");
-        if (db_info->name)
-	{ printf("%s ",db_info->name);
-	} else {
-	  printf("\"\" ");
-	} printf("\n");
+      { if (db_info && db_info->name)
+	{ PRINT_DB(db_info->name);
+	}
       }
       list_output(mproduct_list, a_command_line);
       if (UPS_ERROR==UPS_SUCCESS)
@@ -338,10 +345,17 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
 	   mproduct_item = mproduct_item->next) 
       { mproduct = (t_upstyp_matched_product *)mproduct_item->data;
         if (! verify_db_done) 
-        { ups_verify_dbconfig(mproduct->db_info, 
+        { if (mproduct->db_info && mproduct->db_info->name)
+	  { PRINT_DB(mproduct->db_info->name);
+	  }
+	  ups_verify_dbconfig(mproduct->db_info, 
 		       (t_upstyp_matched_instance *)mproduct->minst_list->data,
 		       a_command_line);
 	  ++verify_db_done;
+	  /* there may be lots of messages so output them on a per product
+	     basis */
+	  upserr_output();
+	  upserr_clear();
 	}
 	for (minst_item = mproduct->minst_list ; minst_item ;
 	     minst_item = minst_item->next)
