@@ -21,6 +21,7 @@
 
 /* standard include files */
 #include <malloc.h>
+#include <stdio.h>
 
 /* ups specific include files */
 #include "ups_error.h"
@@ -38,6 +39,7 @@
 /* header attached to each piece of memory requested with umem_malloc */
 typedef struct umem_header {
   void *data;
+  int  num_bytes;
   int  reference_counter;
 } t_umem_header;
 
@@ -48,7 +50,7 @@ static t_ups_list_item *g_memory_list = 0;
  * Declaration of private functions.
  */
 
-t_umem_header *find_saved_data(const void * const a_data);
+static t_umem_header *find_saved_data(const void * const a_data);
 
 /*
  * Definition of public functions.
@@ -79,6 +81,7 @@ void *umem_malloc(const int a_bytes)
       memory = (t_umem_header *)dataPtr;
       memory->reference_counter = 0;
       memory->data = (void *)(memory + (int )sizeof(t_umem_header));
+      memory->num_bytes = a_bytes;
       dataPtr = (void *)memory->data;
 
       /* Add the memory to the linked list of stuff */
@@ -156,6 +159,34 @@ void umem_inc_refctr(const void * const a_data)
   }
 }
 
+/*-----------------------------------------------------------------------
+ * umem_print
+ *
+ * Print out g_memory_list.  Used mainly for debugging purposes.
+ *
+ * Input : none
+ * Output: none
+ * Return: none
+ */
+void umem_print(void)
+{
+  int i;
+  t_ups_list_item *tempItem = 0;
+  t_umem_header *memItem;
+
+  tempItem = g_memory_list;
+  if (tempItem == 0) {
+    printf("No memory on the list\n");
+  } else {
+    for (i = 0; tempItem != 0; ++i) {
+      memItem = tempItem->data;
+      printf("Num of Bytes = %d, Reference Count = %d\n", memItem->num_bytes,
+	     memItem->reference_counter);
+      tempItem = tempItem->next;
+    }
+  }
+}
+
 /*
  * Definition of private functions.
  */
@@ -171,7 +202,7 @@ void umem_inc_refctr(const void * const a_data)
  * Return: pointer to the memory list element
  *
  */
-t_umem_header *find_saved_data(const void * const a_data)
+static t_umem_header *find_saved_data(const void * const a_data)
 {
   t_ups_list_item *list_item;
   t_umem_header *data_item;
@@ -179,7 +210,7 @@ t_umem_header *find_saved_data(const void * const a_data)
 
   for (list_item = g_memory_list; list_item; list_item = list_item->next) {
     data_item = (t_umem_header *)list_item->data;
-    if ((void *)data_item == a_data) {
+    if ((void *)data_item->data == a_data) {
       /* we found the match get out */
       data_header = data_item;
       break;
