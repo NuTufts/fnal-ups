@@ -21,6 +21,7 @@
 
 /* standard include files */
 #include <stdio.h>
+#include <string.h>
 
 /* ups specific include files */
 #include "upserr.h"
@@ -180,8 +181,19 @@ static t_upslst_item *setup_core(const t_upsugo_command * const a_command_line,
 	upserr_add(UPS_NOT_AUTH, UPS_FATAL, mproduct->product);
       }
     }
-  } 
-
+  } else {
+    if (a_command_line->ugo_version && 
+	(strcmp(a_command_line->ugo_version, ANY_MATCH))) {
+      upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
+		 a_command_line->ugo_product,
+		 a_command_line->ugo_version, "version");
+    } else if (a_command_line->ugo_chain) {
+      upserr_add(UPS_NO_INSTANCE, UPS_INFORMATIONAL,
+		 a_command_line->ugo_product,
+		 (char *)a_command_line->ugo_chain->data, "chain");
+    }
+  }
+  
   return(mproduct_list);
 
 }
