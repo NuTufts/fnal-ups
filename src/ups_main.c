@@ -160,58 +160,70 @@ int main(int argc, char *argv[])
 	  case e_unsetup: mproduct_list = 
 			    ups_unsetup(command_line, temp_file, e_unsetup);
 	    break;
-	  case e_list: mproduct_list = ups_list(command_line,0);
-	    break;
-	  case e_verify: mproduct_list = 
-			   ups_list(command_line,1); /* verify IS list !! */
-	    break;
-	  case e_configure: mproduct_list =
-			   ups_configure(command_line, temp_file, e_configure);
-	    break;
-	  case e_copy: mproduct_list = 
-			 ups_copy(command_line, temp_file, e_copy);
-	    break;
-	  case e_depend: mproduct_list = 
-			   ups_depend(command_line, argv[1], e_depend);
-	    break;
-	  case e_exist: mproduct_list = 
-			  ups_setup(command_line, temp_file, e_setup,
-				    (int )TRUE);
-	    break;
-	  case e_modify: mproduct_list = 
-			   ups_modify(command_line, temp_file, e_modify);
-	    break;
-	  case e_start: mproduct_list = 
-			  ups_start(command_line, temp_file, e_start);
-	    break;
-	  case e_stop: mproduct_list = 
-			 ups_stop(command_line, temp_file, e_stop);
-	    break;
-	  case e_tailor: mproduct_list =
-			   ups_tailor(command_line, temp_file, e_tailor);
-	    break;
-	  case e_unconfigure: mproduct_list =
-				ups_unconfigure(command_line, temp_file,
-						e_unconfigure);
-	    break;
-	  case e_undeclare: mproduct_list =
-			   ups_undeclare(command_line, temp_file, e_undeclare);
-	    break;
-	  case e_flavor: ups_flavor(command_line);
-	    break;
-	  case e_create: ups_create(command_line, e_create);
-	    break;
-	  case e_get: mproduct_list = ups_get(command_line, temp_file, e_get);
-	    break;
-	  case e_declare: mproduct_list =
-			    ups_declare(command_line, temp_file, e_declare);
-	    break;
-	  case e_touch: mproduct_list =
+	  default:
+	    /* any of the following commands will use a call to the system
+	       function to process ups functions.  this call must have
+	       everything in shell.  so change whatever we have here to be
+	       bourne shell */
+	    command_line->ugo_shell = e_BOURNE;
+
+	    switch (g_cmd_info[i].cmd_index) {
+	    case e_list: mproduct_list = ups_list(command_line,0);
+	      break;
+	    case e_verify: mproduct_list = 
+			     ups_list(command_line,1); /* verify IS list !! */
+	      break;
+	    case e_configure: mproduct_list =
+				ups_configure(command_line, temp_file,
+					      e_configure);
+	      break;
+	    case e_copy: mproduct_list = 
+			   ups_copy(command_line, temp_file, e_copy);
+	      break;
+	    case e_depend: mproduct_list = 
+			     ups_depend(command_line, argv[1], e_depend);
+	      break;
+	    case e_exist: mproduct_list = 
+			    ups_setup(command_line, temp_file, e_setup,
+				      (int )TRUE);
+	      break;
+	    case e_modify: mproduct_list = 
+			     ups_modify(command_line, temp_file, e_modify);
+	      break;
+	    case e_start: mproduct_list = 
+			    ups_start(command_line, temp_file, e_start);
+	      break;
+	    case e_stop: mproduct_list = 
+			   ups_stop(command_line, temp_file, e_stop);
+	      break;
+	    case e_tailor: mproduct_list =
+			     ups_tailor(command_line, temp_file, e_tailor);
+	      break;
+	    case e_unconfigure: mproduct_list =
+				  ups_unconfigure(command_line, temp_file,
+						  e_unconfigure);
+	      break; 
+	    case e_undeclare: mproduct_list =
+				ups_undeclare(command_line, temp_file,
+					      e_undeclare);
+	      break;
+	    case e_flavor: ups_flavor(command_line);
+	      break;
+	    case e_create: ups_create(command_line, e_create);
+	      break;
+	    case e_get: mproduct_list = ups_get(command_line, temp_file,
+						e_get);
+	      break;
+	    case e_declare: mproduct_list =
+			      ups_declare(command_line, temp_file, e_declare);
+	      break;
+	    case e_touch: mproduct_list =
 			    ups_touch(command_line, temp_file, e_touch);
-	    break;
-	  case e_unk: mproduct_list = 
-			ups_unk(command_line, temp_file, argv[1]);
-	    break;
+	      break;
+	    case e_unk: mproduct_list = 
+			  ups_unk(command_line, temp_file, argv[1]);
+	      break;
+	    }
 	  }
 
 	  /* write out statistics info */
