@@ -2,7 +2,7 @@
 # ============================================================================
 # test the error routines
 # ============================================================================
-$ERUPT_DIR/test/ups_test << EOD
+$UPS_DIR/test/ups_test << EOD
 ups_echo "================================================================="
 ups_echo "you should see UPS_NO_DATABASE, UPS_TIME, and UPS_SUCCESS  errors"
 ups_echo "they should have severities of FATAL, WARNING, and INFORMATIONAL"

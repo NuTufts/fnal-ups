@@ -27,7 +27,7 @@ DIR=`pwd | sed	-e 's|^/tmp_mnt||' \
 # "cmd addproduct", and finally the distribution file name.
 # this section may change in later ups|addproduct incarnations
             PROD=erupt
-     PRODUCT_DIR=ERUPT_DIR
+     PRODUCT_DIR=UPS_DIR
             VERS=devel
 #          DEPEND=-b "< gcc current $(OS)$(CUST)"
            CHAIN=development
@@ -72,18 +72,18 @@ VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 # and a locally developed product that uses "premake"
 # "all" should probably depend on the product directory being set.
 
-ERUPTDBG=
+UPSDBG=
 INSIGHT=
 
 all: 	proddir_is_set
-	cd src; premake $(ERUPTDBG) $(INSIGHT)
-	cd test; premake $(ERUPTDBG) $(INSIGHT)
+	cd src; premake $(UPSDBG) $(INSIGHT)
+	cd test; premake $(UPSDBG) $(INSIGHT)
 
 debug: 	
-	make ERUPTDBG=-debug all
+	make UPSDBG=-debug all
 
 insight: 	
-	make INSIGHT=-i ERUPTDBG=-debug all
+	make INSIGHT=-i UPSDBG=-debug all
 
 clean:
 	for subdir in src inc test doc bin lib; do \

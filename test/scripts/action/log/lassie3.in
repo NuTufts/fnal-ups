@@ -1,2 +1,2 @@
-0:sr:lassie v3_0 -f NULL -z ../db1:dodefaults()
-0:sr:lassie v3_0 -f NULL -z ../db1:sourcerequired(lassie_v3_0)
+lassie v3_0 -f NULL -z ../db1:dodefaults()
+lassie v3_0 -f NULL -z ../db1:sourcerequired(lassie_v3_0)

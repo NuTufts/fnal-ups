@@ -1,0 +1,10 @@
+FILE = DBCONFIG
+
+#AUTHORIZED_NODES = *
+#PROD_DIR_PREFIX = 
+HTML_PATH = /tmp/html
+INFO_PATH = /tmp/info
+NEWS_PATH = /tmp/news
+MAN_PATH = /tmp/man
+CATMAN_PATH = /tmp/catman
+

@@ -3,8 +3,8 @@
 # test the file routines
 # ============================================================================
 PRODUCTS=""
-cd $ERUPT_DIR/test/scripts/list
-$ERUPT_DIR/test/ups_test << EOD
+cd $UPS_DIR/test/scripts/list
+$UPS_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 #
 #

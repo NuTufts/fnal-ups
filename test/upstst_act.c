@@ -44,6 +44,7 @@ int		stdout_dup;			/* dup of stdout */
 outfile = NULL; difffile = NULL; options = NULL; action = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
+
 if (!options) options = "tal";
 if (outfile) 					/* don't use stdout */
    {
@@ -97,11 +98,15 @@ static char     *myfunc = "upsact_process_commands";
 static char	*outfile;			/* filename to output */
 static char     *difffile;			/* file to diff */
 static char     *action;			/* file to diff */
+static char	*estatus_str;                   /*expected status str */
 int		status;				/* function status */
+int 		estatus = UPS_SUCCESS;          /* expected status */
 FILE		*ofd;				/* outfile file descriptor */
 upstst_argt     argt[] = {{"-out",    UPSTST_ARGV_STRING,NULL,&outfile},
                           {"-diff",   UPSTST_ARGV_STRING,NULL,&difffile},
-                          {"<action>", UPSTST_ARGV_STRING,NULL,&action},
+                          {"<action>",UPSTST_ARGV_STRING,NULL,&action},
+    			  {"-status", UPSTST_ARGV_STRING,NULL,&estatus_str},
+
                           {NULL,      UPSTST_ARGV_END,   NULL,NULL}};
 t_upsugo_command *uc =0;			/* ups command */
 char            diffcmd[132];                   /* diff command */
@@ -113,9 +118,11 @@ extern t_cmd_info g_cmd_info[];
 /* parse command line
    ------------------ */
 
-outfile = NULL; difffile = NULL; action = NULL;
+outfile = NULL; difffile = NULL; action = NULL; estatus_str = NULL;
 status = upstst_parse (&argc, argv, argt, UPSTST_PARSE_EXACTMATCH);
 UPSTST_CHECK_PARSE(status,argt,argv[0]);
+UPSTST_CHECK_ESTATUS (estatus_str, estatus);
+
 if (outfile) 					/* don't use stdout */
    {
    if (!(ofd = fopen(outfile,"w")))		/* open file */
@@ -136,9 +143,10 @@ while (uc = upsugo_next(argc,argv,UPSTST_ALLOPTS))	/* for all commands */
    {
    UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
    cmd_list = upsact_get_cmd(uc,NULL,action,upsact_action2enum(action));
-   UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
+   UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
+   if (estatus != UPS_SUCCESS) continue;
    upsact_process_commands(cmd_list, ofd);
-   UPSTST_CHECK_UPS_ERROR(UPS_SUCCESS);		/* check UPS_ERROR */
+   UPSTST_CHECK_UPS_ERROR(estatus);		/* check UPS_ERROR */
    }
 
 /* dump the output to specified file and compare

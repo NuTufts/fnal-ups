@@ -1,0 +1,203 @@
+setenv FLY_DIR "/NULL/fly"
+#
+setenv SETUP_FLY "fly v1_0 -f NULL -z ../db1"
+#
+setenv OPERA "AIDA FAUST"
+#
+setenv OPERA "${OPERA} MADAM_BUTTERFLY CARMEN"
+#
+setenv OPERA "FIDELIO ${OPERA}"
+#
+setenv upstmp "`dropit -p "$OPERA" -i   FAUST`"
+if ($status == 0 && "$upstmp" != " ") setenv OPERA $upstmp
+unsetenv upstmp
+#
+unsetenv OPERA
+#
+set path=(/bin:/usr/local/bin:/local/etc:/mybin)
+rehash
+#
+set path=($path emacs/bin)
+rehash
+#
+set path=(emacs/test $path)
+rehash
+#
+setenv upstmp "`dropit -p "$path" -i : emacs`"
+if ($status == 0 && "$upstmp" != ":") set path=$upstmp
+rehash
+unsetenv upstmp
+#
+setenv upstmp "`dropit -p "$path" -i : bin`"
+if ($status == 0 && "$upstmp" != ":") set path=$upstmp
+rehash
+unsetenv upstmp
+#
+if ( ! r blah ) then
+echo "can't read file"
+exit 1
+endif
+#
+??? whereis ls
+if ($status == 1) exit 1
+#
+setenv mystatus "`ls -l`"
+#
+incshell
+#
+echo "from extra1
+#
+echo "from extra3
+#
+setenv ups_prod_name "fly"
+#
+setenv ups_prod_version "v1_0"
+#
+setenv ups_prod_flavor "NULL"
+#
+setenv ups_prod_qualifiers ""
+#
+setenv ups_prod_dir "/NULL/fly"
+#
+setenv ups_shell "csh"
+#
+setenv ups_options ""
+#
+setenv ups_origin ""
+#
+setenv ups_verbose ""
+#
+setenv ups_extended ""
+#
+setenv ups_verbose ""
+#
+setenv ups_extended ""
+#
+setenv ups_this_db "../db1"
+#
+setenv products "../db1"
+#
+setenv ups_compile ""
+#
+cp info/* /tmp/info
+#
+??? cp man/* /tmp/man
+#
+??? cp catman/* /tmp/catman
+#
+cp html/* /tmp/html
+#
+cp news/* /tmp/news
+#
+if (-e reqfile1) then
+  source reqfile1
+else
+  echo "File (reqfile1)  not found"
+  exit 1
+endif
+#
+if (-e reqcheck1) then
+  source reqcheck1
+  setenv UPS_STATUS $status
+  if ("$UPS_STATUS" != "0") then
+    echo "Error $UPS_STATUS while sourcing reqcheck1
+    unsetenv UPS_STATUS
+    exit 1
+  endif
+  unsetenv UPS_STATUS
+else
+  echo "File (reqcheck1)  not found"
+  exit 1
+endif
+#
+if (-e optfile) then
+  source optfile
+endif
+#
+if (-e optcheck) then
+  source optcheck
+  setenv UPS_STATUS $status
+  if ("$UPS_STATUS" != "0") then
+    echo "Error $UPS_STATUS while sourcing optcheck
+    unsetenv UPS_STATUS
+    exit 1
+  endif
+  unsetenv UPS_STATUS
+endif
+#
+if (-e optfile) then
+  source optfile
+  exit
+endif
+#
+if (-e optcheck) then
+  source optcheck
+  setenv UPS_STATUS $status
+  if ("$UPS_STATUS" != "0") then
+    echo "Error $UPS_STATUS while sourcing optcheck
+    unsetenv UPS_STATUS
+    exit 1
+  endif
+  unsetenv UPS_STATUS
+  exit
+endif
+#
+if (-e reqcheck2) then
+  setenv UPS_PROD_NAME fly
+  setenv UPS_PROD_VERSION v1_0
+  setenv UPS_PROD_DIR /NULL/fly
+  unsetenv UPS_VERBOSE
+  unsetenv UPS_EXTENDED
+  setenv UPS_THIS_DB ../db1
+  setenv UPS_OS_FLAVOR IRIX+5.3
+  setenv UPS_PROD_FLAVOR NULL
+  setenv UPS_PROD_QUALIFIERS 
+  setenv UPS_SHELL csh
+  setenv UPS_OPTIONS ""
+  source reqcheck2
+  setenv UPS_STATUS $status
+  if ("$UPS_STATUS" != "0") then
+    echo "Error $UPS_STATUS while sourcing reqcheck2
+    unsetenv UPS_STATUS
+    unsetenv UPS_PROD_NAME
+    unsetenv UPS_PROD_VERSION
+    unsetenv UPS_PROD_DIR
+    unsetenv UPS_VERBOSE
+    unsetenv UPS_EXTENDED
+    unsetenv UPS_THIS_DB
+    unsetenv UPS_OS_FLAVOR
+    unsetenv UPS_PROD_FLAVOR
+    unsetenv UPS_PROD_QUALIFIERS
+    unsetenv UPS_SHELL
+    unsetenv UPS_OPTIONS
+    exit 1
+  endif
+  unsetenv UPS_STATUS
+  unsetenv UPS_PROD_NAME
+  unsetenv UPS_PROD_VERSION
+  unsetenv UPS_PROD_DIR
+  unsetenv UPS_VERBOSE
+  unsetenv UPS_EXTENDED
+  unsetenv UPS_THIS_DB
+  unsetenv UPS_OS_FLAVOR
+  unsetenv UPS_PROD_FLAVOR
+  unsetenv UPS_PROD_QUALIFIERS
+  unsetenv UPS_SHELL
+  unsetenv UPS_OPTIONS
+  exit
+else
+  echo "File (reqcheck2)  not found"
+  unsetenv UPS_PROD_NAME
+  unsetenv UPS_PROD_VERSION
+  unsetenv UPS_PROD_DIR
+  unsetenv UPS_VERBOSE
+  unsetenv UPS_EXTENDED
+  unsetenv UPS_THIS_DB
+  unsetenv UPS_OS_FLAVOR
+  unsetenv UPS_PROD_FLAVOR
+  unsetenv UPS_PROD_QUALIFIERS
+  unsetenv UPS_SHELL
+  unsetenv UPS_OPTIONS
+  exit 1
+endif
+#

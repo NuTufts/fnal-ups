@@ -1,0 +1,198 @@
+FLY_DIR="/NULL/fly";export FLY_DIR
+#
+SETUP_FLY="fly v1_0 -f NULL -z ../db1";export SETUP_FLY
+#
+OPERA="AIDA FAUST";export OPERA
+#
+OPERA="${OPERA-} MADAM_BUTTERFLY CARMEN";export OPERA
+#
+OPERA="FIDELIO ${OPERA-}";export OPERA
+#
+upstmp=`dropit -p "$OPERA" -i   FAUST`;
+if [ $? -eq 0 -a "$upstmp" != " " ]; then OPERA=$upstmp; fi
+unset upstmp;
+#
+unset OPERA
+#
+path=/bin:/usr/local/bin:/local/etc:/mybin;export path
+#
+path="${path-}emacs/etcemacs/bin";export path
+#
+path="emacs/test:${path-}";export path
+#
+upstmp=`dropit -p "$path" -i : emacs`;
+if [ $? -eq 0 -a "$upstmp" != ":" ]; then path=$upstmp; fi
+unset upstmp;
+#
+upstmp=`dropit -p "$path" -i : bin`;
+if [ $? -eq 0 -a "$upstmp" != ":" ]; then path=$upstmp; fi
+unset upstmp;
+#
+if [ ! r blah ]; then
+echo "can't read file";
+return 1;
+fi;
+#
+hash ls;
+if [ $? -eq 1 ]; then return 1; fi
+#
+mystatus=`ls -l`;export mystatus
+#
+inshell
+#
+echo "from extra1
+#
+echo "from extra3
+#
+ups_prod_name="fly";export ups_prod_name
+#
+ups_prod_version="v1_0";export ups_prod_version
+#
+ups_prod_flavor="NULL";export ups_prod_flavor
+#
+ups_prod_qualifiers="";export ups_prod_qualifiers
+#
+ups_prod_dir="/NULL/fly";export ups_prod_dir
+#
+ups_shell="sh";export ups_shell
+#
+ups_options="";export ups_options
+#
+ups_origin="";export ups_origin
+#
+ups_verbose="";export ups_verbose
+#
+ups_extended="";export ups_extended
+#
+ups_verbose="";export ups_verbose
+#
+ups_extended="";export ups_extended
+#
+ups_this_db="../db1";export ups_this_db
+#
+products="../db1";export products
+#
+ups_compile="";export ups_compile
+#
+cp info/* /tmp/info
+#
+???  cp man/* /tmp/man
+#
+??? cp catman/* /tmp/catman
+#
+cp html/* /tmp/html
+#
+cp news/* /tmp/news
+#
+if [ -s reqfile1 ]; then
+  . reqfile1
+else
+  echo "File (reqfile1)  not found"
+  return 1
+fi
+#
+if [ -s reqcheck1 ]; then
+  . reqcheck1
+  UPS_STATUS=$?
+  if [ "$UPS_STATUS" != "0" ]; then
+    echo "Error $UPS_STATUS while sourcing reqcheck1"
+    unset UPS_STATUS
+    return 1
+  fi
+  unset UPS_STATUS
+else
+  echo "File (reqcheck1)  not found"
+  return 1
+fi
+#
+if [ -s optfile ]; then
+  . optfile
+fi
+#
+if [ -s optcheck ]; then
+  . optcheck
+  UPS_STATUS=$?
+  if [ "$UPS_STATUS" != "0" ]; then
+    echo "Error $UPS_STATUS while sourcing optcheck"
+    unset UPS_STATUS
+    return 1
+  fi
+  unset UPS_STATUS
+fi
+#
+if [ -s optfile ]; then
+  . optfile
+  return
+fi
+#
+if [ -s optcheck ]; then
+  . optcheck
+  UPS_STATUS=$?
+  if [ "$UPS_STATUS" != "0" ]; then
+    echo "Error $UPS_STATUS while sourcing optcheck"
+    unset UPS_STATUS
+    return 1
+  fi
+  unset UPS_STATUS
+  return
+fi
+#
+if [ -s reqcheck2 ]; then
+  UPS_PROD_NAME=fly;export UPS_PROD_NAME
+  UPS_PROD_VERSION=v1_0;export UPS_PROD_VERSION
+  UPS_PROD_DIR=/NULL/fly;export UPS_PROD_DIR
+  unset UPS_VERBOSE
+  unset UPS_EXTENDED
+  UPS_THIS_DB=../db1;export UPS_THIS_DB
+  UPS_OS_FLAVOR=IRIX+5.3;export UPS_OS_FLAVOR
+  UPS_PROD_FLAVOR=NULL;export UPS_PROD_FLAVOR
+  UPS_PROD_QUALIFIERS=;export UPS_PROD_QUALIFIERS
+  UPS_SHELL=sh;export UPS_SHELL
+  UPS_OPTIONS="";export UPS_OPTIONS
+  . reqcheck2
+  UPS_STATUS=$?
+  if [ "$UPS_STATUS" != "0" ]; then
+    echo "Error $UPS_STATUS while sourcing reqcheck2"
+    unset UPS_STATUS
+    unset UPS_PROD_NAME
+    unset UPS_PROD_VERSION
+    unset UPS_PROD_DIR
+    unset UPS_VERBOSE
+    unset UPS_EXTENDED
+    unset UPS_THIS_DB
+    unset UPS_OS_FLAVOR
+    unset UPS_PROD_FLAVOR
+    unset UPS_PROD_QUALIFIERS
+    unset UPS_SHELL
+    unset UPS_OPTIONS
+    return 1
+  fi
+  unset UPS_STATUS
+  unset UPS_PROD_NAME
+  unset UPS_PROD_VERSION
+  unset UPS_PROD_DIR
+  unset UPS_VERBOSE
+  unset UPS_EXTENDED
+  unset UPS_THIS_DB
+  unset UPS_OS_FLAVOR
+  unset UPS_PROD_FLAVOR
+  unset UPS_PROD_QUALIFIERS
+  unset UPS_SHELL
+  unset UPS_OPTIONS
+  return
+else
+  echo "File (reqcheck2)  not found"
+  unset UPS_PROD_NAME
+  unset UPS_PROD_VERSION
+  unset UPS_PROD_DIR
+  unset UPS_VERBOSE
+  unset UPS_EXTENDED
+  unset UPS_THIS_DB
+  unset UPS_OS_FLAVOR
+  unset UPS_PROD_FLAVOR
+  unset UPS_PROD_QUALIFIERS
+  unset UPS_SHELL
+  unset UPS_OPTIONS
+  return 1
+fi
+#

@@ -3,8 +3,8 @@
 # test the match routines
 # ============================================================================
 unset PRODUCTS
-cd $ERUPT_DIR/test/scripts/match/log
-$ERUPT_DIR/test/ups_test << EOD
+cd $UPS_DIR/test/scripts/match/log
+$UPS_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 #
 # see if things work without a table file specified

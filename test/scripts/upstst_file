@@ -2,9 +2,9 @@
 # ============================================================================
 # test the file routines
 # ============================================================================
-cd $ERUPT_DIR/test/scripts/file
+cd $UPS_DIR/test/scripts/file
 touch dummy.file
-$ERUPT_DIR/test/ups_test << EOD
+$UPS_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 upsfil_read_file dog_v2_0.version
 upsfil_write_file dog_v2_0.version.out

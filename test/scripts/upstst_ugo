@@ -7,8 +7,8 @@ SETUP_titanic="doomed -H IRIX+5" ; export SETUP_titanic
 SETUP_lusitania="lusitania -f CHERRY v1_0" ; export SETUP_lusitania
 SETUP_bismark="bismark -g current -q a?b?c -f RUM_RAISIN"; export SETUP_bismark
 
-cd $ERUPT_DIR/test/scripts/ugo
-$ERUPT_DIR/test/ups_test << EOD
+cd $UPS_DIR/test/scripts/ugo
+$UPS_DIR/test/ups_test << EOD
 #ups_echo "================================================================="
 #
 # testing simple parsing
@@ -67,7 +67,7 @@ quit
 EOD
 
 unset PRODUCTS
-$ERUPT_DIR/test/ups_test << EOD2
+$UPS_DIR/test/ups_test << EOD2
 upsugo_next -out /dev/null -status UPS_NO_DATABASE
 quit
 EOD2
