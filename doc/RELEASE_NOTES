@@ -1,3 +1,10 @@
+<h1>UPS v4_4</h1>
+<p>
+<ul>
+<li>
+Fixed problem with ups verify outputting incorrect information about chains
+associated with versions.
+</ul>
 <h1>UPS v4_3</h1>
 <p>
 <ul>
