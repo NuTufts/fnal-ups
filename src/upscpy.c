@@ -134,7 +134,7 @@ void upscpy_info(UPSCPY_PARAMS)
             { SYSTEM_ERROR();
             }
           }
-          upsver_mes(0,"%s: Copying info from %s\n",info_source);
+          upsver_mes(0,"%s: Copying info from %s\n","UPSCPY",info_source);
           sprintf(buffer,"umask 003;cp %s/* %s\n", info_source,
                   a_db_info->config->info_target_dir);
           if (system(buffer))
@@ -165,7 +165,7 @@ void upscpy_info(UPSCPY_PARAMS)
         /* make sure we have not created it before */                  \
         if (not_yet_created(subdirs_made, subdirs_index, subdir)) {    \
           /* we must create the directory first */                     \
-         upsver_mes(0,"%s: Creating Target for %s %s\n","UPSCPY",type,dest);\
+         upsver_mes(0,"%s: Creating target for %s %s\n","UPSCPY",type,dest);\
           sprintf(buffer,"umask 003;/bin/mkdir -p %s\n", dest);        \
           if (system(buffer)) { SYSTEM_ERROR(); }                      \
           /* now keep a record so we only create it once */            \
@@ -185,7 +185,7 @@ void upscpy_info(UPSCPY_PARAMS)
       if ((dir_size == (int )strlen(dir_line->d_name)))                  \
       { /* the directory is = to dir_name */                             \
         if ((file_dir = opendir(filename))) {                            \
-          upsver_mes(0,"%s: Copying %s files\n",type);                   \
+          upsver_mes(0,"%s: Copying %s files\n","UPSCPY",type);          \
           while ((file_dir_line = readdir(file_dir))) {                  \
             if (file_dir_line->d_name[0] != '.') {                       \
               sprintf(g_buff, "%s/%s", filename, file_dir_line->d_name); \
@@ -197,7 +197,7 @@ void upscpy_info(UPSCPY_PARAMS)
         /* the directory is XXX#, where # is the subdir spec.            \
            we just need to copy the entire contents of this dir          \
            (of the form *.*) to the appropriate destination */           \
-        upsver_mes(0,"%s: Copying %s files\n",type);                     \
+        upsver_mes(0,"%s: Copying %s files\n","UPSCPY",type);            \
         sprintf(buffer, "umask 003;cp %s/*.* %s/%s/ \n", filename,       \
                 a_db_info->config->keyword, dir_line->d_name);           \
         if (system(buffer)) { SYSTEM_ERROR(); }                          \
@@ -243,7 +243,7 @@ void upscpy_man(UPSCPY_PARAMS)
               } else { /* this is a file, if it is a man file, copy  to the man
                      area */
                 if ((file = fopen(filename, "r")))
-                { upsver_mes(0,"%s: Copying man files\n");
+                { upsver_mes(0,"%s: Copying man files\n","UPSCPY");
                   while((isspace((unsigned long )
                         (c=(unsigned char )fgetc(file))))) ; 
                   { if (c == FIRST_MAN_CHAR) 
@@ -310,7 +310,7 @@ void upscpy_catman(UPSCPY_PARAMS)
                 /* this is a file, if it is a catman file, copy it to the man
                    area */
                 if ((file = fopen(filename, "r")))
-                { upsver_mes(0,"%s: Copying catman files\n");
+                { upsver_mes(0,"%s: Copying catman files\n","UPSCPY");
                   while(isspace((unsigned long )(c=(unsigned char )
                           fgetc(file)))) ;   /* skip empty spaces */
                   if (c != FIRST_MAN_CHAR) 
