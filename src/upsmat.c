@@ -1151,7 +1151,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	     tmp_quals_list = tmp_quals_list->next) {
 	  quals = (char *)tmp_quals_list->data;
 	  if ((! strcmp(instance->qualifiers, quals)) ||
-	      (! (want_all_q = strcmp(quals, ANY_MATCH)))) {
+	      (want_all_q = (!strcmp(quals, ANY_MATCH)))) {
 	    /* They do. Save the instances in the order they came in. */
 	    if (a_file_type == e_file_chain) {
 	      /* this instance was read in from a chain file, create a new
@@ -1177,14 +1177,14 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	}
 	/* if we got a match and we only want one, break.  if we got a match
 	   and want as many as we can get but not any-match (*), break */
-	if (got_match && (a_need_unique || (want_all_f && want_all_q))) {
+	if (got_match && (a_need_unique || !(want_all_f || want_all_q))) {
 	  /* go get the next flavor */
 	  break;
 	}
       }
     }
     /* If we only want one instance - we got it, leave now */
-    if ((a_need_unique) && got_match) {
+    if (a_need_unique && got_match) {
       break;
     }
   }
