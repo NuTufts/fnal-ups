@@ -167,11 +167,7 @@ static int g_ups_error;
 #define CHECK_NO_FILE(file) \
       if ((UPS_ERROR == UPS_NO_FILE) && ! a_need_unique) {      \
 	upserr_clear();						\
-      }                                                         \
-      else {							\
-        upserr_vplace();                                        \
-        upserr_add(UPS_NO_FILE, UPS_FATAL, file);               \
-      }								\
+      } 
 
 #define CHECK_SOFT_ERR() \
       if (UPS_ERROR != UPS_SUCCESS) {                                   \
@@ -1048,14 +1044,7 @@ static int match_from_table( const char * const a_product,
       /* free the table_file_path */
       upsmem_free(full_table_file);
     }
-  } else {
-    /* if we could not find the file and we are looking for more than one
-       instance then clear out the error.  otherwise if a ups list is done 
-       on an entire db for v2_0, all products without a v2_0 will generate
-       an error */
-    CHECK_NO_FILE(full_table_file);
-  }
-    
+  }    
     return num_matches;
 }
 
