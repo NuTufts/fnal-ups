@@ -79,22 +79,22 @@ test_upsugo: test_upsugo.o $(LIB)/libups.a
 ups_test : ups_test.o $(UPS_TEST_OBJECTS)
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.o $(UPS_TEST_OBJECTS) $(LDFLAGS)
 
-upstst_cmdline.o : upstst_cmdline.c
+upstst_cmdline.o : upstst_cmdline.c $(LIB)/libups.a
 	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
 
-upstst_cmdloop.o : upstst_cmdloop.c
+upstst_cmdloop.o : upstst_cmdloop.c $(LIB)/libups.a
 	$(CC) -c -o $@ -fullwarn -wlint,-f $< 
 
-upstst_error.o : upstst_error.c
+upstst_error.o : upstst_error.c $(LIB)/libups.a
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
-upstst_files.o : upstst_files.c
+upstst_files.o : upstst_files.c $(LIB)/libups.a
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
-upstst_ugo.o : upstst_ugo.c
+upstst_ugo.o : upstst_ugo.c $(LIB)/libups.a
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
-upstst_match.o : upstst_match.c
+upstst_match.o : upstst_match.c $(LIB)/libups.a
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
 
 #
