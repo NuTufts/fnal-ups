@@ -2012,13 +2012,15 @@ void trim_cache( void )
 
 int trim_qualifiers( char * const str )
 {
-  int i, len;
+  int i;
   
   if ( !str || strlen( str ) <= 0 ) return 0;
 
+  /* qualifiers are now case sensitive
   len = (int)strlen( str );
   for ( i=0; i<len; i++ )
     str[i] = (char)tolower( (int)str[i] );
+  */
   
   upsutl_str_remove( str, WCHARSQ );  
   upsutl_str_sort( str, ':' );
