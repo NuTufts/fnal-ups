@@ -1,5 +1,5 @@
 Priority: Low
-State: Unverified
+State: Fixed(?)
 
 Add special-case handling in ups/configure to convert to read-write
 afs location when writing setups scripts, because the upsconfig file

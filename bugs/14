@@ -1,5 +1,5 @@
 Priority: Low
-State: Unverified
+State: Fixed(?)
 
 Appending to a previously undefined path/variable string yields
 "<path_or_variable_name>: Undefined variable." warning in csh?
