@@ -120,10 +120,10 @@ void umem_free(void *a_data)
   memory = find_saved_data(a_data);
 
   if (memory != 0) {
-    /* Yes the memory was on the list. decrement the reference counter.
+    /* Yes the memory was on the list. check the reference counter.
        if it is <= 0, then free the data and the memory header, else do
        nothing */
-    if (--(memory->reference_counter) <= 0) {
+    if (memory->reference_counter <= 0) {
       /* okay, remove this item from the list and free it */
       g_memory_list = ups_list_delete(g_memory_list, (void *)memory, ' ');
       free(memory);
@@ -156,6 +156,28 @@ void umem_inc_refctr(const void * const a_data)
   if (memory != 0) {
     /* Yes the memory was on the list. increment the reference counter. */
     ++(memory->reference_counter);
+  }
+}
+
+/*-----------------------------------------------------------------------
+ * umem_dec_refctr
+ *
+ * Decrement the reference counter associated with the passed data
+ *
+ * Input : address of data whose reference counter is to be decremented
+ * Output: none
+ * Return: none
+ */
+void umem_dec_refctr(const void * const a_data)
+{
+  t_umem_header *memory;
+
+  /* See if the passed memory is saved in g_memory_list */
+  memory = find_saved_data(a_data);
+
+  if (memory != 0) {
+    /* Yes the memory was on the list. decrement the reference counter. */
+    --(memory->reference_counter);
   }
 }
 

@@ -79,25 +79,33 @@ int main(void)
   printf("\nIncremented reference counters, should be 3, 5, 0, 3, 0, 1\n");
   umem_print();
 
-  /* Free some stuff */
-  umem_free(myc2);
-  umem_free(myc3);
-  umem_free(myc5);
-  umem_free(myc5);
-  umem_free(myc5);
+  /* Decrement the reference counters */
+  umem_dec_refctr((void *)myc2);
+  umem_dec_refctr((void *)myc3);
+  umem_dec_refctr((void *)myc5);
+  umem_dec_refctr((void *)myc5);
+  umem_dec_refctr((void *)myc5);
 
-  printf("\nFreed some stuff, now have 5 items with reference counters - 3, 2, 0, 2, 1\n");
+  printf("\nDecremented counters, now have 6 items with reference counters - 3, 2, 0, 2, -1, 1\n");
   umem_print();
 
   /* now free everything */
+  umem_dec_refctr((void *)myc);
+  umem_dec_refctr((void *)myc3);
+  umem_dec_refctr((void *)myc3);
+  umem_dec_refctr((void *)myc5);
+  umem_dec_refctr((void *)myc5);
+  umem_dec_refctr((void *)myc6);
+  umem_dec_refctr((void *)myc6);
+  umem_dec_refctr((void *)myc6);
+  printf("\nDecremented all counters, now have 6 items with reference counters < 0\n");
+  umem_print();
+
   umem_free(myc);
-  umem_free(myc3);
+  umem_free(myc2);
   umem_free(myc3);
   umem_free(myc4);
   umem_free(myc5);
-  umem_free(myc5);
-  umem_free(myc6);
-  umem_free(myc6);
   umem_free(myc6);
 
   printf("\nPrint out empty memory list again\n");
