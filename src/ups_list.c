@@ -176,8 +176,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
       } else {                                          \
         printf("\"\":");                                \
       }                                                 \
-    } else {                                            \
-      printf("\"\":");                                  \
     }                                                   \
     if (instance->xtra_chains)                          \
     { for (clist = instance->xtra_chains ;              \
@@ -195,6 +193,28 @@ void list_K(const t_upstyp_matched_instance * const instance,
       { printf("%s ",instance->version->ELEMENT);       \
       } else {                                          \
         printf("\"\" ");                                \
+      }                                                 \
+    } else {                                            \
+      printf("\"\" ");                                  \
+    }                                                   \
+  }                                                     \
+}
+#define FromChain(ELEMENT) \
+{ if (!upsutl_stricmp(l_ptr->data,"" #ELEMENT "") ||    \
+      !upsutl_stricmp(l_ptr->data,"+"))                 \
+  { if(instance->chain)                                 \
+    { printf("%s",instance->chain->ELEMENT);            \
+      if (instance->xtra_chains)                        \
+      { for (clist = instance->xtra_chains ;            \
+             clist ; clist = clist->next)               \
+        { cinst_ptr = (t_upstyp_instance *)clist->data; \
+          if(cinst_ptr->ELEMENT)                        \
+          { printf(":%s", cinst_ptr->ELEMENT);          \
+          }                                             \
+        }                                               \
+        printf(" ");                                    \
+      } else {                                          \
+        printf(" ");                                    \
       }                                                 \
     } else {                                            \
       printf("\"\" ");                                  \
@@ -320,6 +340,7 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
   /* Get all the instances that the user requested */
 /*  mproduct_list = upsmat_instance(a_command_line, NULL, need_unique); */
   mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
+  if (UPS_ERROR != UPS_SUCCESS) upserr_output();
 
   return(mproduct_list);
 }
@@ -437,7 +458,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromAny(version) 
     FromAny(flavor) 
     FromAny(qualifiers)
-    FromBoth(chain)
+    FromChain(chain)
     if(upsutl_stricmp(l_ptr->data,"+"))
     { FromBoth(declarer)
       FromBoth(declared)
