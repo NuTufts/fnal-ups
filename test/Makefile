@@ -48,6 +48,9 @@ all : test_ups_error test_ups_list test_ups_memory test_ups_utils
 test_ups_error : test_ups_error.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
+test_ups_files : test_ups_files.o $(LIB)/libups.a
+	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
+
 test_ups_list : test_ups_list.o $(LIB)/libups.a
 	$(CC) -o $@ $(CCCHK) $(CFLAGS) $@.c $(LDFLAGS)
 
@@ -90,6 +93,8 @@ make :
 #START_DEPEND
 test_ups_error.o:	test_ups_error.c
 test_ups_error.o:	$(ERUPT_DIR)/inc/ups_error.h
+test_ups_files.o:       test_ups_files.c
+test_ups_files.o:       $(ERUPT_DIR)/inc/ups_files.h
 test_ups_list.o:	test_ups_list.c
 test_ups_list.o:	$(ERUPT_DIR)/inc/ups_list.h
 test_ups_memory.o:	test_ups_memory.c
