@@ -618,9 +618,9 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
     (void) strcat(newstr,string);
   }
   if ( command_line->ugo_v)
-  { (void) strcat(newstr," -v "); }
+  { (void) strcat(newstr," -v"); }
   if ( command_line->ugo_j)
-  { (void) strcat(newstr," -j "); }
+  { (void) strcat(newstr," -j"); }
   if ( command_line->ugo_r)
   { (void) strcat(newstr," -r ");
     (void) strcat(newstr,command_line->ugo_productdir);
@@ -639,7 +639,7 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
     (void) strcat(newstr,"\"");
   }
   if ( command_line->ugo_e)
-  { (void) strcat(newstr," -e "); }
+  { (void) strcat(newstr," -e"); }
   return newstr;
 }
 
