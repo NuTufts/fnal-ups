@@ -465,7 +465,7 @@ int upslst_count( t_upslst_item * const list_ptr )
 t_upslst_item *upslst_sort0( t_upslst_item * const list_ptr,
 			     int (* const cmp)(const void * const, const void * const) )
 {
-  t_upslst_item *l1 = upslst_first( list_ptr ), *l2;
+  t_upslst_item *l1 = upslst_first( list_ptr ), *l2 = 0;
   void *data;
 
   if ( !l1 || !l1->next )
