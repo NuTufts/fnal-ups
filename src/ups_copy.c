@@ -364,19 +364,20 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	       overwrite any existing table files either.  in that case, we
 	       will create a new table file in /usr/tmp and just echo the
 	       name to the user. */
-	if (! a_command_line->ugo_X) {
-	  /*   do not execute, so the table file goes to /usr/tmp */
+	if (! a_command_line->ugo_X && ! new_command_line->ugo_m) {
+	  /*   do not execute, if no table file entered, the table file goes
+	       to /usr/tmp , else use the one that was entered */
 	  if ((tmp_buf2 = tmpnam(tmp_file_buf)) != NULL) {
 	    sprintf(tmp_buf, "%s_table_%s", tmp_buf2, new_instance->product);
 	    tmp_buf2 = tmp_buf;
-
+	    
 	    /* tell user the name of the temporary file */
 	    printf("%s\n", tmp_buf);
 	  } else {
 	    tmp_buf2 = NULL;
 	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "tmpnam",
 		       strerror(errno));
-	  }    
+	  }
 	} else {
 	  /* we will be changing things so get the real thing. we need to get
 	     a few more pieces of info. */
