@@ -69,7 +69,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 09 */  "%s: Invalid argument specified \"%s\"\n",
 /* 10 */  "%s: No instance matches were made between the chain file (%s) and the version (%s)\n",
 /* 11 */  "%s: The passed filename was longer than the allowed system maximum (%d)\n",
-/* 12 */  "%s: No instance matches were made between the version file (%s) and the table file (%s)\n",
+/* 12 */  "%s: No instance matches were made between the \nversion file (%s) and the \ntable file (%s) for flavor (%s) and qualifiers (%s)\n",
 /* 13 */  "%s: File not found - %s\n",
 /* 14 */  "%s: Could not malloc %d bytes\n",
 /* 15 */  "%s: MAX_LINE_LEN exceeded in \"%s\"\n",
