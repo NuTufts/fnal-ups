@@ -87,8 +87,8 @@ static int g_MATCH_DONE = 0;
   }                                                     \
 }
 #define FromDatabase(ELEMENT,STRING) \
-{ if (!upsutl_stricmp((buffer),STRING))            \
-  { valid=1; \
+{ if (!upsutl_stricmp((buffer),STRING))                 \
+  { valid=1;                                            \
     if(product->db_info)                                \
     { if (product->db_info->ELEMENT)                    \
       { printf("\"%s\" ",product->db_info->ELEMENT);    \
@@ -101,8 +101,8 @@ static int g_MATCH_DONE = 0;
   }                                                     \
 }
 #define FromConfig(ELEMENT,STRING) \
-{ if (!upsutl_stricmp((buffer),STRING))            \
-  { valid=1; \
+{ if (!upsutl_stricmp((buffer),STRING))                 \
+  { valid=1;                                            \
     if(config_ptr)                                      \
     { if (config_ptr->ELEMENT)                          \
       { printf("\"%s\" ",config_ptr->ELEMENT);          \
@@ -667,6 +667,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
+  t_upstyp_db *db_ptr;
   static char buffer[20];
   char *nodes=0;
   char *str_val;
@@ -675,7 +676,8 @@ void list_K(const t_upstyp_matched_instance * const instance,
   int exists=1;
   int valid=0;
   if (product->db_info) 
-  { config_ptr = product->db_info->config;
+  { db_ptr = product->db_info;
+    config_ptr = db_ptr->config;
   }
   if (match_done)
   { for ( l_ptr = upslst_first( command->ugo_key ); 
@@ -813,6 +815,10 @@ void list_K(const t_upstyp_matched_instance * const instance,
     { valid=0;
       strcpy(buffer,(char *)l_ptr->data);
       OutputConfig();
+      if (!upsutl_stricmp((buffer),"database"))
+      { valid=1;
+        printf("\"%s\" ",db_ptr->name);
+      }
       if (!valid) 
       { upserr_add(UPS_INVALID_KEYWORD, UPS_WARNING,l_ptr->data,"-K"); 
       }

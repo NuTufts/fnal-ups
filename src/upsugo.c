@@ -240,7 +240,11 @@ int UPS_NEED_DB=1;
 
 /* Special case -O value (no check) */
 #define case_O case 'O': uc->ugo_O = 1; \
-        set_O_value (uc->ugo_options , "O") 
+        set_O_value (uc->ugo_options , "O")
+
+/* Request for G now also just like O */
+#define case_G case 'G': uc->ugo_G = 1; \
+        set_O_value (uc->ugo_passed , "G")
 
 /* Special case -p value (no pack) */
 #define case_p case 'p': uc->ugo_p = 1; \
@@ -945,6 +949,8 @@ int upsugo_free (struct ups_command * const uc)
          upsmem_free(uc->ugo_compile_file); 
       if ( uc->ugo_options ) 
          upsmem_free(uc->ugo_options); 
+      if ( uc->ugo_passed ) 
+         upsmem_free(uc->ugo_passed); 
       if ( uc->ugo_description ) 
          upsmem_free(uc->ugo_description); 
 /*      if ( uc->ugo_override ) 
@@ -1033,6 +1039,8 @@ int upsugo_dump (struct ups_command * const uc,
          printf("Anyfile:          %s\n",uc->ugo_anyfile); 
       if ( uc->ugo_options ) 
          printf("Options:          %s\n",uc->ugo_options); 
+      if ( uc->ugo_passed ) 
+         printf("Passed:          %s\n",uc->ugo_passed); 
       if ( uc->ugo_description ) 
          printf("Description:      %s\n",uc->ugo_description); 
 /*      if ( uc->ugo_override ) 
@@ -1353,9 +1361,9 @@ t_upsugo_command *upsugo_next(const int old_argc,
          case_g            /* also a chain */
          case_f case_K case_A case_h case_H
          /* single values */ 
-         case_b case_D case_m case_M case_N 
-         case_O case_p case_r case_T 
-         case_u case_U 
+         case_b case_D case_G case_m 
+         case_M case_N case_O case_p 
+         case_r case_T case_u case_U 
          case_0 case_1 case_2 case_3 /* number sets */
          case_q case_z               /* special cases */
          default:
