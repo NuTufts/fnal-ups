@@ -73,7 +73,8 @@ tag_file :
 main : $(BIN)/ups
 
 # Old stuff people just expect to work that really isn't part of ups
-old: $(BIN)/funame
+old: $(BIN)/funame \
+	$(BIN)/dropit
 
 library : $(LIB)/libups.a
 
@@ -90,6 +91,10 @@ $(BIN)/ups : ups_main.o library
 # Build the old products people expect that arn't really dependencies
 $(BIN)/funame : 
 	$(CC) funame.c -o $@ $(OLD_LIBS)
+
+$(BIN)/dropit :
+	$(CC) dropit.c -o $@ 
+
 #
 # Compile UPS library source
 #

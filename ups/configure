@@ -187,6 +187,22 @@ then
     exit 1
 fi
 rm -f $Ups_Dir/bootstrap/*
+if [ -x /usr/local/bin/funame ] 
+then
+    echo '**'
+    echo '**' WARNING: /usr/local/bin/funame exixts.
+    echo '**           Please remove this file before declaring ups current'
+    echo '**           It has the same name as a file in ups.'
+    echo '**'
+fi
+if [ -x /usr/local/bin/dropit ]
+then
+    echo '**'
+    echo '**' WARNING: /usr/local/bin/dropit exists.
+    echo '**           Please remove this file before declaring ups current'
+    echo '**           It has the same name as a file in ups.'
+    echo '**'
+fi
 #
 #
 # Create the local copy of the cache file.
