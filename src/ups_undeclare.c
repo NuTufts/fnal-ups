@@ -158,9 +158,10 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
  ***********************************************************************/
 
      if (uc->ugo_chain)
-     { for (chain_list = uc->ugo_chain ; chain_list ;
-         chain_list = chain_list->next)
-       { the_chain = (char *)(chain_list->data);
+     { uc->ugo_chain = upslst_first(uc->ugo_chain);
+       for (chain_list = uc->ugo_chain ; chain_list ;
+            chain_list = chain_list->next)
+       {  the_chain = (char *)(chain_list->data);
           save_next = chain_list->next;
           save_prev = chain_list->prev;
           chain_list->next=0;
@@ -170,7 +171,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
           chain_list->next = save_next;
           chain_list->prev = save_prev;
           if (mproduct_list)
-          { upsver_mes(1,"Match on chain found \n");
+          { upsver_mes(1,"Match on chain %s found \n",chain_list->data);
             mproduct_list = upslst_first(mproduct_list);
             mproduct = (t_upstyp_matched_product *)mproduct_list->data;
             minst_list = (t_upslst_item *)mproduct->minst_list;
