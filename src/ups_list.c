@@ -407,7 +407,13 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
        }
        /* free the matched products */
        (void )upsutl_free_matched_product_list(&mproduct_list);
-     }
+
+       /* if we were just looking for dbconfig keywords, we got them, no need
+	  to print them for every product in thei database. */
+       if (! g_MATCH_DONE) {
+	 break;
+       }
+    }
   }
 /*  UPS_ERROR=list_error; */
   return 0;
