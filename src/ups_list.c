@@ -487,10 +487,12 @@ void list_output(const t_upslst_item * const a_mproduct_list,
           printf("\t\tTable_File");
           strcpy(buffer,"table_file");
           FromVersion(table_file);
+          strcpy(buffer,"archive_file");
+          FromVersion(archive_file)
           printf("\n");
           printf("\t\tDescription=");
           strcpy(buffer,"description");
-          FromAny(description);
+          FromTable(description);
           printf("\n");
           for ( ul_ptr = upslst_first( instance->version->user_list ); 
                 ul_ptr; ul_ptr = ul_ptr->next, count++ )
@@ -574,7 +576,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(archive_file)
     FromVersion(compile_file)
     FromVersion(compile_dir)
-    FromAny(description)
+    FromTable(description)
     FromTable(man_source_dir)
     FromTable(catman_source_dir)
     FromTable(html_source_dir)

@@ -86,7 +86,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 25 */  "%s: No destination was specified in the UPS Database Configuration file for where to copy the %s files\n",
 /* 26 */  "%s: Error when writing to temp file while processing %s action\n",
 /* 27 */  "%s: Invalid number of parameters for action %s, must be between %i and %i (found %i)\n",
-/* 28 */  "%s: Unable to determine user shell, value = %s\n",
+/* 28 */  "%s: UPS_SHELL not set using SHELL or default, value = %s\n",
 /* 29 */  "%s: Unsetup of %s failed, continuing with setup\n",
 /* 30 */  "%s: Cannot create file %s, it already exists\n",
 /* 31 */  "%s: No table file name was specified on the command line\n",

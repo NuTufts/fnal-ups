@@ -92,8 +92,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
   t_upstyp_instance *new_cinst;             /* new chain instance  */
-/*  t_upslst_item *vinst_list;                 version instance list */
-/*  t_upstyp_instance *vinst;               /*   version instance      */
   t_upstyp_instance *tinst;                 /*   table instance      */
   t_upstyp_instance *new_vinst;             /* new version instance  */
   char *username;
@@ -365,7 +363,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       product->version = upsutl_str_create(uc->ugo_version,' ');
     }
     /* build new version instance */
-    if (buffer) /* instance doesn't exist */
+    if (buffer[0]!=0) /* instance doesn't exist */
     { new_vinst=ups_new_instance();
       new_vinst->product=upsutl_str_create(uc->ugo_product,' ');
       new_vinst->version=upsutl_str_create(save_version,' ');
@@ -388,6 +386,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       new_vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
       new_vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
       new_vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
+      new_vinst->archive_file=upsutl_str_create(uc->ugo_archivefile,' ');
 /* If I'm creating a totally matched version I have to create the matched 
    product structure by hand since it really doesn't exist yet on disk
    and a call to get it will fail
@@ -445,70 +444,72 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
       upserr_vplace();
       return 0;
     } 
-/* Process the configure action */
-    cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                               mproduct, g_cmd_info[e_configure].cmd,
+    if (!uc->ugo_C) /* Don't do anything but declare actions */
+                    /* Do configure actions                  */
+    { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                 mproduct, g_cmd_info[e_configure].cmd,
                                ups_command);
-    if (UPS_ERROR == UPS_SUCCESS) 
-    { upsact_process_commands(cmd_list, tmpfile); 
-      upsact_cleanup(cmd_list);
-    } else {
-      upsfil_clear_journal_files();
-      upserr_vplace();
-      return 0;
-    } 
-/* Let them know if there is a tailor action for this product */
-    cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                               mproduct, g_cmd_info[e_tailor].cmd,
-                               ups_command);
-    if (UPS_ERROR == UPS_SUCCESS) 
-    { if (cmd_list)
-      { upsver_mes(0,"A UPS tailor exists for this product\n");
+      if (UPS_ERROR == UPS_SUCCESS) 
+      { upsact_process_commands(cmd_list, tmpfile); 
         upsact_cleanup(cmd_list);
+      } else {
+        upsfil_clear_journal_files();
+        upserr_vplace();
+        return 0;
+      }
+/* Let them know if there is a tailor action for this product */
+      cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                 mproduct, g_cmd_info[e_tailor].cmd,
+                                 ups_command);
+      if (UPS_ERROR == UPS_SUCCESS) 
+      { if (cmd_list)
+        { upsver_mes(0,"A UPS tailor exists for this product\n");
+          upsact_cleanup(cmd_list);
+        }
+      } 
+      uc->ugo_chain=save_chain;
+      if (uc->ugo_chain)
+      { uc->ugo_flavor=save_flavor;
+        uc->ugo_qualifiers=save_qualifiers;
+        uc->ugo_version=save_version;
+        for (chain_list = uc->ugo_chain ; chain_list ;
+             chain_list = chain_list->next)
+        { the_chain = (char *)(chain_list->data);
+          save_next = chain_list->next;
+          save_prev = chain_list->prev;
+          chain_list->next=0;
+          chain_list->prev=0;
+          uc->ugo_chain=chain_list;
+          cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                    mproduct, the_chain,
+                                    ups_command);
+          if (UPS_ERROR == UPS_SUCCESS) 
+          { upsact_process_commands(cmd_list, tmpfile);
+            upsact_cleanup(cmd_list);
+          } else {
+            upsfil_clear_journal_files();
+            upserr_vplace();
+            return 0;
+          } 
+          if (strstr(the_chain,"current"))
+          { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                       mproduct, g_cmd_info[e_start].cmd,
+                                       ups_command);
+            if (!cmd_list)
+            { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
+                                         mproduct, g_cmd_info[e_stop].cmd,
+                                         ups_command);
+            }
+            /*          if (UPS_ERROR == UPS_SUCCESS)  */
+            if (cmd_list)
+            { upsver_mes(0,"A UPS start/stop exists for this product\n");
+              upsact_cleanup(cmd_list);
+            } 
+          }
+          chain_list->next = save_next;
+          chain_list->prev = save_prev;
+        }
       }
     } 
-    uc->ugo_chain=save_chain;
-    if (uc->ugo_chain)
-    { uc->ugo_flavor=save_flavor;
-      uc->ugo_qualifiers=save_qualifiers;
-      uc->ugo_version=save_version;
-      for (chain_list = uc->ugo_chain ; chain_list ;
-           chain_list = chain_list->next)
-      { the_chain = (char *)(chain_list->data);
-        save_next = chain_list->next;
-        save_prev = chain_list->prev;
-        chain_list->next=0;
-        chain_list->prev=0;
-        uc->ugo_chain=chain_list;
-        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                  mproduct, the_chain,
-				  ups_command);
-        if (UPS_ERROR == UPS_SUCCESS) 
-        { upsact_process_commands(cmd_list, tmpfile);
-          upsact_cleanup(cmd_list);
-        } else {
-          upsfil_clear_journal_files();
-          upserr_vplace();
-          return 0;
-        } 
-        if (strstr(the_chain,"current"))
-        { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                     mproduct, g_cmd_info[e_start].cmd,
-                                     ups_command);
-          if (!cmd_list)
-          { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
-                                       mproduct, g_cmd_info[e_stop].cmd,
-                                       ups_command);
-          }
-          /*          if (UPS_ERROR == UPS_SUCCESS)  */
-          if (cmd_list)
-          { upsver_mes(0,"A UPS start/stop exists for this product\n");
-            upsact_cleanup(cmd_list);
-          } 
-        }
-        chain_list->next = save_next;
-        chain_list->prev = save_prev;
-      }
-    }
     return 0;
 }

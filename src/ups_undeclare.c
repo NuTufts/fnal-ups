@@ -298,6 +298,5 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
         }
       }
     }
-    upsfil_stat(1);
     return 0;
 }
