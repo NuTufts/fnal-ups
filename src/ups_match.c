@@ -493,39 +493,47 @@ static int match_from_version( const char * const a_product,
 	/* get an instance and thus a table file */
 	inst = (t_ups_instance *)vinst->data;
 
-	/* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
-	   desired flavor and one of the desired qualifier to match */
-	TMP_LISTS_SET();
+	/* It is ok if we do not have a table file.  then we just do whatever
+	   the default action is */
+	if (!inst->table_file) {
+	  /* make 2 lists (tmp_flavor_list and tmp_quals_list), one of the 
+	     desired flavor and one of the desired qualifier to match */
+	  TMP_LISTS_SET();
 
-	/* see if any command line info should override what we read from the
-	   files - set tmp_upsdir, tmp_productdir */
-	USE_CMD_LINE_INFO();
+	  /* see if any command line info should override what we read from the
+	     files - set tmp_upsdir, tmp_productdir */
+	  USE_CMD_LINE_INFO();
 
-	if (UPS_VERBOSE) {
-	  printf("%sMatching with Version %s in Product %s using Table file %s\n",
-		 VPREFIX, inst->version, inst->product, inst->table_file);
-	  printf("%sUsing Flavor %s and Qualifiers %s\n", VPREFIX,
-		 (char *)(tmp_flavor_list->data),
-		 (char *)(tmp_quals_list->data));
+	  if (UPS_VERBOSE) {
+	    printf("%sMatching with Version %s in Product %s using Table file %s\n",
+		   VPREFIX, inst->version, inst->product, inst->table_file);
+	    printf("%sUsing Flavor %s and Qualifiers %s\n", VPREFIX,
+		   (char *)(tmp_flavor_list->data),
+		   (char *)(tmp_quals_list->data));
+	  }
+	  tmp_num_matches = match_from_table(inst->product, inst->table_file,
+					     inst->table_dir, tmp_upsdir,
+					     tmp_productdir, a_db,
+					     do_need_unique, tmp_flavor_list, 
+					     tmp_quals_list, a_tinst_list);
+	  if (tmp_num_matches == 0) {
+	    /* We should have had a match, this is an error */
+	    upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer,
+		       inst->table_file);
+
+	    /* clean up */
+	    num_matches = 0;
+	    *a_vinst_list = upsutl_free_inst_list(a_vinst_list);
+	    *a_tinst_list = upsutl_free_inst_list(a_tinst_list);
+	    break;                        /* stop any search */
+	  }
+
+	  /* keep a running total of the matches we found */
+	  ++num_matches;
+	} else {
+	  /* we have no table file so we must add a null list element */
+	  *a_tinst_list = upslst_add(*a_tinst_list, NULL);
 	}
-	tmp_num_matches = match_from_table(inst->product, inst->table_file,
-					   inst->table_dir, tmp_upsdir,
-					   tmp_productdir, a_db,
-					   do_need_unique, tmp_flavor_list, 
-					   tmp_quals_list, a_tinst_list);
-	if (tmp_num_matches == 0) {
-	  /* We should have had a match, this is an error */
-	  upserr_add(UPS_NO_TABLE_MATCH, UPS_FATAL, buffer, inst->table_file);
-
-	  /* clean up */
-	  num_matches = 0;
-	  *a_vinst_list = upsutl_free_inst_list(a_vinst_list);
-	  *a_tinst_list = upsutl_free_inst_list(a_tinst_list);
-	  break;                        /* stop any search */
-	}
-
-	/* keep a running total of the matches we found */
-	++num_matches;
       }
 
       /* we no longer need the lists */
