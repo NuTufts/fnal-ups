@@ -325,124 +325,58 @@ void upsugo_liststart(struct ups_command * const a_command_line);
 */
 int upsugo_bldfvr(struct ups_command * const uc)
 {
-   char   * addr;
-   char   * loc;
-   struct utsname *baseuname;
-   baseuname=(struct utsname *) malloc( sizeof(struct utsname));
-   if ( (uname(baseuname)) == -1) return(-1);
+   char   		*addr;
+   char   		*loc;
+   char			uname_flavor[80];	/* put together from uname */
+   struct utsname 	baseuname;		/* returned from uname */
+   char			*flavor;		/* flavor ptr */
 
-/* Silicon Graphics IRIX machines
-   The difference between 64 and 32 bit machines is ignored
-   The real old machines return R2300 - But I don't care...
-*/
-   if ((strncmp(baseuname->sysname,"IRIX",4)) == 0)
-   { (void) strcpy(baseuname->machine,"IRIX+");
-     (void) strcat(baseuname->machine,baseuname->release);
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'.');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'+');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=upsutl_str_create("NULL",' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     return(0);
-   }
-/* Linux - which I know very little about...
-   It has been suggested to drop down on odd version I don't know
-   if this is a correct thing to do???
-*/
-   if ((strncmp(baseuname->sysname,"Linux",5)) == 0)
-   { (void) strcpy(baseuname->machine,"Linux+");
-     (void) strcat(baseuname->machine,baseuname->release);
-     loc=strchr(baseuname->machine,'.');
-     *loc='-';
-     loc=strchr(baseuname->machine,'.');
-     *loc=0;				/* second dot not first */
-     loc=strchr(baseuname->machine,'-');
-     *loc='.';				/* return dot */
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'.');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'+');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=upsutl_str_create("NULL",' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     return(0);
-   }
-/* Sun Microsystems SunOS - Solaris */
-   if ((strncmp(baseuname->sysname,"SunOS",5)) == 0)
-   { (void) strcpy(baseuname->machine,"SunOS+");
-     (void) strcat(baseuname->machine,baseuname->release);
-     loc=strchr(baseuname->machine,'.');
-     *loc='-';
-     loc=strchr(baseuname->machine,'.');
-     *loc=0;				/* second dot not first */
-     loc=strchr(baseuname->machine,'-');
-     *loc='.';				/* return dot */
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'.');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'+');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=upsutl_str_create("NULL",' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     return(0);
-   }
-/* International Buisness Machines - AIX */
-   if ((strncmp(baseuname->sysname,"AIX",3)) == 0)
-   { (void) strcpy(baseuname->machine,"AIX+");
-     (void) strcat(baseuname->machine,baseuname->version);
-     (void) strcat(baseuname->machine,".");
-     (void) strcat(baseuname->machine,baseuname->release);
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'.');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'+');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=upsutl_str_create("NULL",' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     return(0);
-   }
-/* Digital Equipment Corporation OSF1
-*/
-   if ((strncmp(baseuname->sysname,"OSF1",4)) == 0)
-   { (void) strcpy(baseuname->machine,"OSF1+");
-     (void) strcat(baseuname->machine,baseuname->release);
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'.');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     loc=strchr(baseuname->machine,'+');
-     *loc = 0;
-     addr=upsutl_str_create(baseuname->machine,' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     addr=upsutl_str_create("NULL",' ');
-     uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-     return(0);
-   }
-   return(-1);
+/* get the flavor info from the os basically adding release name to sysname,
+   but some OS's are funny
+   ------------------------------------------------------------------------*/
+
+   flavor = uname_flavor;			/* init pointer */
+   if (uname(&baseuname) == -1) return(-1);	/* do uname */
+   (void) strcpy (flavor,baseuname.sysname);	/* get sysname */
+   (void) strcat (flavor,"+");			/* add plus */
+   if (strncmp(baseuname.sysname,"AIX",3) == 0)	/* because AIX is different */
+      {
+      (void) strcat(flavor,baseuname.version);	/* add in version */
+      (void) strcat(flavor,".");
+      }
+   (void) strcat(flavor,baseuname.release);	/* add in release */
+
+/* ok, have flavor string now. it should look like os+n.m.o. ...
+   we well build the flavor table by successively removing '.'
+   from the end of the string.
+   -------------------------------------------------------------- */
+
+   addr=upsutl_str_create(flavor,' ');		/* first add full */
+   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
+
+   while (loc = strrchr(flavor,'.'))
+      {
+      *loc = 0;
+      addr=upsutl_str_create(flavor,' ');
+      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+      }
+
+/* remove the '+' too 
+--------------------- */
+
+   if (loc = strrchr(flavor,'+'))
+      {
+      *loc = 0;
+      addr=upsutl_str_create(flavor,' ');
+      uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+      }
+
+/* add in NULL
+   ----------- */
+
+   addr=upsutl_str_create("NULL",' ');
+   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+   return(0);
 }
 /* ===========================================================================
 ** ROUTINE	upsugo_ifornota()
