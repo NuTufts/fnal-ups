@@ -443,6 +443,7 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
   char * addr;
   t_upskey_map *keymap;
   int do_match = 1;
+  int mwprod=0;             /* match with product , more exceptions will come */
   t_upstyp_product *db;
   t_upstyp_db *cli_db;
   t_upstyp_matched_product *mproduct;
@@ -452,9 +453,12 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
   for (key = (t_upslst_item *)a_command_line->ugo_key ; key ;
 	 key = key->next) {
     keymap = upskey_get_info((char *)key->data);
+    if (!upsutl_strincmp((char *)key->data,"action",6))
+    { mwprod=1;     /* match with product */
+    }
     if ((((int )(((char *)key->data)[0]) == '+') ||
          ((int )(((char *)key->data)[0]) == '@') ||
-         ((int )(((char *)key->data)[0]) == '_'))
+         ((int )(((char *)key->data)[0]) == '_')) || mwprod
         || (keymap && 
 	(UPSKEY_ISIN_VERSION(keymap->flag) ||
 	 UPSKEY_ISIN_TABLE(keymap->flag) ||
@@ -664,11 +668,16 @@ void list_K(const t_upstyp_matched_instance * const instance,
 	    const int match_done )
 {
   t_upslst_item *l_ptr = 0;
+  t_upslst_item *al_ptr = 0;            /* Action list pointer */
+  t_upslst_item *ald_ptr = 0;           /* Action list detail lines pointer */
+  t_upstyp_action *ac_ptr = 0;
   t_upstyp_instance *cinst_ptr = 0;
   t_upslst_item *clist = 0;
   t_upstyp_config  *config_ptr = 0;
   t_upstyp_db *db_ptr;
   static char buffer[20];
+  static char actbuf1[MAX_LINE_LEN];
+  static char actbuf2[MAX_LINE_LEN];
   char *nodes=0;
   char *str_val;
   char *addr;
@@ -726,6 +735,30 @@ void list_K(const t_upstyp_matched_instance * const instance,
       { (void)(upsutl_is_authorized(instance, product->db_info,&nodes));
         printf("\"%s\" ",nodes);
         valid=1;
+      }
+      if(!upsutl_strincmp(buffer,"action",6))
+      { valid=1;
+        if (instance->table)
+        { for ( al_ptr = upslst_first( instance->table->action_list ); 
+                  al_ptr; al_ptr = al_ptr->next, count++ )
+          { ac_ptr=al_ptr->data;
+            if(!upsutl_stricmp(buffer,"actions"))
+            { printf("\"%s\" ",ac_ptr->action);
+            } else { 
+              sprintf(actbuf1,"action=%s",ac_ptr->action);
+              sprintf(actbuf2,"action=\"%s\"",ac_ptr->action);
+              if(!upsutl_stricmp(actbuf1,buffer) ||
+                 !upsutl_stricmp(actbuf2,buffer))
+              { if ( ac_ptr->command_list )
+                { ald_ptr = upslst_first( ac_ptr->command_list );
+                  for ( ; ald_ptr; ald_ptr = ald_ptr->next )
+                  { printf( "\"%s\" ", (char*)ald_ptr->data );
+                  }
+                }
+              }
+            }
+          }
+        }
       }
       if (!upsutl_stricmp(buffer,"statistics")) 
       { if (config_ptr)

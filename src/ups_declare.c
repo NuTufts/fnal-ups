@@ -225,6 +225,10 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   save_qualifiers=uc->ugo_qualifiers;
   save_version=uc->ugo_version;
 
+  if (!uc->ugo_db) /* -m masks error in upsugo */
+  { upserr_add(UPS_NO_DATABASE, UPS_FATAL);
+    return 0;
+  }
   if (!uc->ugo_product || !uc->ugo_version )
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
                "Specification must include a product and a version");

@@ -299,9 +299,11 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
           return 0;
         }
         if (uc->ugo_Y && product_home) 
-        { fprintf((FILE *)tmpfile,"rm -rf %s\n",product_home);
+        { fprintf((FILE *)tmpfile,"touch %s;rm -rf %s\n",
+                   product_home,product_home);
           if (archive)
-          { fprintf((FILE *)tmpfile,"rm %s\n",archive);
+          { fprintf((FILE *)tmpfile,"touch %s;rm %s\n",
+                   archive,archive);
           }
         }
       } else {
