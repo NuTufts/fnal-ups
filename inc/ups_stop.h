@@ -38,9 +38,9 @@
 /*
  * Declaration of public functions.
  */
-void ups_stop( const t_upsugo_command * const a_command_line, 
-	       const FILE * const a_temp_file, 
-	       const int a_ups_command);
+t_upslst_item *ups_stop( const t_upsugo_command * const a_command_line, 
+			 const FILE * const a_temp_file, 
+			 const int a_ups_command);
 
 /*
  * Declaration of private globals.

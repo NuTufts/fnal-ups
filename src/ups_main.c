@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 /* ups specific include files */
 #include "ups_main.h"
@@ -61,6 +63,7 @@ extern int g_keep_temp_file;
 extern char *g_temp_file_name;
 extern t_cmd_info g_cmd_info[];
 int g_simulate;
+extern mode_t g_umask = 000;
 
 /*
  * Declaration of private functions.
@@ -89,6 +92,7 @@ int main(int argc, char *argv[])
   FILE *temp_file = NULL;
   int i = e_setup, empty_temp_file = 0;
   int rstatus = 0;              /* assume success */
+  t_upslst_item *mproduct_list  = NULL;
 
   if (argv[1]) {
     /* Figure out which command was entered */
@@ -124,6 +128,10 @@ int main(int argc, char *argv[])
       if (!command_line->ugo_help && (g_cmd_info[i].cmd_index != e_help)) {
 	/* no help requested - do the command */
 
+	/* set our umask so that if we create a file it has a standard set
+	   of permissions */
+	(void )umask(g_umask);
+
 	/* open the temp file. this is where shell specific action code will\
 	   be put */
 	if (! temp_file ) {                /* only open it once. */
@@ -142,47 +150,70 @@ int main(int argc, char *argv[])
 
 	if (UPS_ERROR == UPS_SUCCESS) {
 	  switch (g_cmd_info[i].cmd_index) {
-	  case e_setup: ups_setup(command_line, temp_file, e_setup);
+	  case e_setup: mproduct_list = 
+			  ups_setup(command_line, temp_file, e_setup);
 	    break;
-	  case e_unsetup: ups_unsetup(command_line, temp_file, e_unsetup);
+	  case e_unsetup: mproduct_list = 
+			    ups_unsetup(command_line, temp_file, e_unsetup);
 	    break;
-	  case e_list: ups_list(command_line,0);
+	  case e_list: mproduct_list = ups_list(command_line,0);
 	    break;
-	  case e_verify: ups_list(command_line,1); /* verify IS list !! */
+	  case e_verify: mproduct_list = 
+			   ups_list(command_line,1); /* verify IS list !! */
 	    break;
-	  case e_configure: ups_configure(command_line, temp_file,
-					  e_configure);
+	  case e_configure: mproduct_list =
+			   ups_configure(command_line, temp_file, e_configure);
 	    break;
-	  case e_copy: ups_copy(command_line, temp_file, e_copy);
+	  case e_copy: mproduct_list = 
+			 ups_copy(command_line, temp_file, e_copy);
 	    break;
-	  case e_depend: ups_depend(command_line, argv[1], e_depend);
+	  case e_depend: mproduct_list = 
+			   ups_depend(command_line, argv[1], e_depend);
 	    break;
-	  case e_exist: ups_setup(command_line, temp_file, e_setup);
+	  case e_exist: mproduct_list = 
+			  ups_setup(command_line, temp_file, e_setup);
 	    break;
-	  case e_modify: ups_modify(command_line, temp_file, e_modify);
+	  case e_modify: mproduct_list = 
+			   ups_modify(command_line, temp_file, e_modify);
 	    break;
-	  case e_start: ups_start(command_line, temp_file, e_start);
+	  case e_start: mproduct_list = 
+			  ups_start(command_line, temp_file, e_start);
 	    break;
-	  case e_stop: ups_stop(command_line, temp_file, e_stop);
+	  case e_stop: mproduct_list = 
+			 ups_stop(command_line, temp_file, e_stop);
 	    break;
-	  case e_tailor: ups_tailor(command_line, temp_file, e_tailor);
+	  case e_tailor: mproduct_list =
+			   ups_tailor(command_line, temp_file, e_tailor);
 	    break;
-	  case e_unconfigure: ups_unconfigure(command_line, temp_file,
-					      e_unconfigure);
+	  case e_unconfigure: mproduct_list =
+				ups_unconfigure(command_line, temp_file,
+						e_unconfigure);
 	    break;
-	  case e_undeclare: ups_undeclare(command_line, temp_file,
-                                          e_undeclare);
+	  case e_undeclare: mproduct_list =
+			   ups_undeclare(command_line, temp_file, e_undeclare);
 	    break;
 	  case e_flavor: ups_flavor(command_line);
 	    break;
 	  case e_create: ups_create(command_line, e_create);
 	    break;
-	  case e_get: ups_get(command_line, temp_file, e_get);
+	  case e_get: mproduct_list = ups_get(command_line, temp_file, e_get);
 	    break;
-	  case e_declare: ups_declare(command_line, temp_file, e_declare);
+	  case e_declare: mproduct_list =
+			    ups_declare(command_line, temp_file, e_declare);
 	    break;
-	  case e_unk: ups_unk(command_line, temp_file, argv[1]);
+	  case e_unk: mproduct_list = 
+			ups_unk(command_line, temp_file, argv[1]);
 	    break;
+	  }
+
+	  /* write out statistics info */
+	  if ((UPS_ERROR == UPS_SUCCESS) && mproduct_list) {
+	    upsutl_statistics(mproduct_list, g_cmd_info[i].cmd);
+	  }
+
+	  if (mproduct_list) {
+	    /* clean up the matched product list */
+	    mproduct_list = upsutl_free_matched_product_list(&mproduct_list);
 	  }
 	}
       } else {

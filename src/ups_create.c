@@ -39,9 +39,6 @@
  * Declaration of private functions.
  */
 
-static void create_core(const t_upsugo_command * const a_command_line,
-			const int a_ups_command);
-
 /*
  * Definition of global variables.
  */
@@ -56,38 +53,12 @@ static void create_core(const t_upsugo_command * const a_command_line,
  * Create a template table file based on the command line parameters. If
  * the file already exists, exit with an error.
  *
- * Input : command line information and an output stream
- * Output: none
- * Return: none
- */
-void ups_create( const t_upsugo_command * const a_command_line,
-	         const int a_ups_command)
-{
-
-  /* now do all the real work here */
-  create_core(a_command_line, a_ups_command);
-
-}
-
-/*
- * Definition of private globals.
- */
-
-/*
- * Definition of private functions.
- */
-
-/*-----------------------------------------------------------------------
- * create_core
- *
- * First create the specified file
- *
  * Input : information from the command line
  * Output: <output>
  * Return: <return>
  */
-static void create_core(const t_upsugo_command * const a_command_line,
-			const int a_ups_command)
+t_upslst_item *ups_create(const t_upsugo_command * const a_command_line,
+			  const int a_ups_command)
 {
   t_upslst_item *qualifier_list;
   static char buffer[MAX_LINE_LEN];
@@ -149,7 +120,14 @@ static void create_core(const t_upsugo_command * const a_command_line,
   } else {
     upserr_add(UPS_NO_TABLE_FILE, UPS_FATAL);
   }
-
+  return (NULL);
 }
 
+/*
+ * Definition of private globals.
+ */
+
+/*
+ * Definition of private functions.
+ */
 

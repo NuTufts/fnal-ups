@@ -48,9 +48,6 @@
  * Declaration of private functions.
  */
 
-static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
-				const FILE * const a_temp_file,
-				const int a_ups_command);
 static t_upsugo_command *fill_ugo_struct( 
                                const t_upstyp_instance * const a_instance,
 			       const t_upsugo_command * const a_command_line);
@@ -118,45 +115,8 @@ extern t_cmd_map g_cmd_maps[];
      new_command_line->ugo_elem = NULL;                               \
    }
 
-
 /*-----------------------------------------------------------------------
  * ups_copy
- *
- * Find the instance the user has requested, and process the copy actions.
- *
- * Input : command line information and an output stream
- * Output: none
- * Return: none
- */
-void ups_copy( const t_upsugo_command * const a_command_line,
-	       const FILE * const a_temp_file, const int a_ups_command)
-{
-  t_upslst_item *mproduct_list = NULL;
-
-  /* now find the desired instance and translate actions to the temp file */
-  mproduct_list = copy_core(a_command_line, a_temp_file, a_ups_command);
-
-  /* check if we got an error */
-  if (UPS_ERROR == UPS_SUCCESS) {
-    /* write statistics information */
-    if (mproduct_list) {
-      upsutl_statistics(mproduct_list, g_cmd_info[a_ups_command].cmd);
-    }
-  }
-  /* clean up the matched product list */
-  mproduct_list = upsutl_free_matched_product_list(&mproduct_list);
-}
-
-/*
- * Definition of private globals.
- */
-
-/*
- * Definition of private functions.
- */
-
-/*-----------------------------------------------------------------------
- * copy_core
  *
  * Cycle through the actions for copy, translate them,
  * and write them to the temp file.
@@ -165,9 +125,9 @@ void ups_copy( const t_upsugo_command * const a_command_line,
  * Output: <output>
  * Return: matched product of the original product
  */
-static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
-				 const FILE * const a_temp_file,
-				 const int a_ups_command)
+t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
+			const FILE * const a_temp_file,
+			const int a_ups_command)
 {
   t_upslst_item *mproduct_list;
   t_upstyp_matched_product *mproduct;
@@ -522,6 +482,14 @@ static t_upslst_item *copy_core(const t_upsugo_command * const a_command_line,
   return(mproduct_list);
 }
 
+/*
+ * Definition of private globals.
+ */
+
+/*
+ * Definition of private functions.
+ */
+
 /*-----------------------------------------------------------------------
  * fill_ugo_structure
  *
@@ -612,3 +580,5 @@ static t_upsugo_command *free_ugo_struct(
   
   return(NULL);
 }
+
+

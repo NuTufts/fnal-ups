@@ -42,9 +42,6 @@
  * Declaration of private functions.
  */
 
-static t_upslst_item *get_core(const t_upsugo_command * const a_command_line,
-			       const FILE * const a_temp_file,
-			       const int a_ups_command);
 static void get_files(const t_upstyp_matched_product * const a_mproduct,
 		      const t_upsugo_command * const a_command_line);
 
@@ -65,47 +62,8 @@ extern t_cmd_info g_cmd_info[];
      }                                                \
    }
 
-
-
 /*-----------------------------------------------------------------------
  * ups_get
- *
- * Find the instance the user has requested and output the information
- * requested.
- *
- * Input : command line information and an output stream
- * Output: none
- * Return: none
- */
-void ups_get( const t_upsugo_command * const a_command_line,
-	      const FILE * const a_temp_file, const int a_ups_command)
-{
-  t_upslst_item *mproduct_list = NULL;
-
-  /* now find the desired instance and translate actions to the temp file */
-  mproduct_list = get_core(a_command_line, a_temp_file, a_ups_command);
-
-  /* check if we got an error */
-  if (UPS_ERROR == UPS_SUCCESS) {
-    /* write statistics information */
-    if (mproduct_list) {
-      upsutl_statistics(mproduct_list, g_cmd_info[a_ups_command].cmd);
-    }
-  }
-  /* clean up the matched product list */
-  mproduct_list = upsutl_free_matched_product_list(&mproduct_list);
-}
-
-/*
- * Definition of private globals.
- */
-
-/*
- * Definition of private functions.
- */
-
-/*-----------------------------------------------------------------------
- * get_core
  *
  * Cycle through the actions for get, translate them,
  * and write them to the temp file. Also output the requested additional
@@ -115,9 +73,9 @@ void ups_get( const t_upsugo_command * const a_command_line,
  * Output: <output>
  * Return: <return>
  */
-static t_upslst_item *get_core(const t_upsugo_command * const a_command_line,
-			       const FILE * const a_temp_file,
-			       const int a_ups_command)
+t_upslst_item *ups_get(const t_upsugo_command * const a_command_line,
+		       const FILE * const a_temp_file,
+		       const int a_ups_command)
 {
   t_upslst_item *mproduct_list = NULL;
   t_upstyp_matched_product *mproduct = NULL;
@@ -156,6 +114,14 @@ static t_upslst_item *get_core(const t_upsugo_command * const a_command_line,
   return(mproduct_list);
 
 }
+
+/*
+ * Definition of private globals.
+ */
+
+/*
+ * Definition of private functions.
+ */
 
 /*-----------------------------------------------------------------------
  * get_files

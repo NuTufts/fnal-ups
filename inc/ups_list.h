@@ -38,7 +38,7 @@
 /*
  * Declaration of public functions.
  */
-void ups_list( t_upsugo_command * const a_command_line , int);
+t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int);
 
 /*
  * Declaration of private globals.

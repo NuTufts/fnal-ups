@@ -39,7 +39,7 @@
  * Declaration of public functions.
  */
 void ups_create( const t_upsugo_command * const a_command_line, 
-	       const int a_ups_command);
+		 const int a_ups_command);
 
 /*
  * Declaration of private globals.

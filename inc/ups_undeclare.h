@@ -36,9 +36,9 @@
  * Declaration of public functions.
  */
 
-void ups_undeclare(t_upsugo_command * const a_command_line,
-                    const FILE * const a_temp_file,
-                    const int a_ups_command);
+t_upslst_item *ups_undeclare(t_upsugo_command * const a_command_line,
+			     const FILE * const a_temp_file,
+			     const int a_ups_command);
 
 
 #endif /* _UPS_UNDECLARE_H_ */

@@ -270,7 +270,7 @@ int product_cmp ( const void * const d1, const void * const d2 )
  * Output: 
  * Return: 
  */
-void ups_list( t_upsugo_command * const a_command_line , int verify )
+t_upslst_item *ups_list( t_upsugo_command * const a_command_line , int verify )
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *tmp_mprod_list = NULL;
@@ -309,18 +309,13 @@ void ups_list( t_upsugo_command * const a_command_line , int verify )
     } else { 
       upserr_output(); 
       upserr_clear(); 
-      return; 
+      return 0; 
     }
   }
     /* free the matched products */
-    for (tmp_mprod_list = mproduct_list ; tmp_mprod_list ; 
-         tmp_mprod_list = tmp_mprod_list->next) {
-      mproduct = (t_upstyp_matched_product *)tmp_mprod_list->data;
-      ups_free_matched_product(mproduct);      /* free the data */
-    }
-    /* now free the list */
-    tmp_mprod_list = upslst_free(tmp_mprod_list, ' ');
+    tmp_mprod_list = upsutl_free_matched_product_list(&mproduct_list);
   }
+  return 0;
 }
 
 

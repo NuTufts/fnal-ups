@@ -55,14 +55,15 @@
  * Output: none
  * Return: none
  */
-void ups_depend( t_upsugo_command * const u_cmd, 
-		 const char * const s_cmd,
-		 const int e_cmd )
+t_upslst_item *ups_depend( t_upsugo_command * const u_cmd, 
+			   const char * const s_cmd,
+			   const int e_cmd )
 {
   if ( u_cmd->ugo_l > 0 )
     upsact_print( u_cmd, 0, "setup", e_cmd, "l" );
   else
     upsact_print( u_cmd, 0, "setup", e_cmd, "" );
+  return NULL;
 }
 
 /*

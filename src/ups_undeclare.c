@@ -62,8 +62,9 @@ extern t_cmd_info g_cmd_info[];
  * Output: 
  * Return: 
  */
-void ups_undeclare( t_upsugo_command * const uc ,
-                    const FILE * const tmpfile, const int ups_command)
+t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
+			      const FILE * const tmpfile,
+			      const int ups_command)
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *minst_list = NULL;
@@ -90,23 +91,23 @@ void ups_undeclare( t_upsugo_command * const uc ,
   if (!uc->ugo_product || (!uc->ugo_version && !uc->ugo_chain) )
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
            "Specifications must include a product and a version or chain(s)");
-    return;
+    return 0;
   }
   if (uc->ugo_version && uc->ugo_chain)
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
            "Specificy a version, which will remove ALL chains, or chains(s)");
-    return;
+    return 0;
   }
   if ((int)(upslst_count(uc->ugo_flavor) ==0 ) )
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
            "Specification must include a flavor");
-    return;
+    return 0;
   }
   mproduct_list = upsmat_instance(uc, db_list , not_unique);
   if (!mproduct_list)
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
            "No matching product found");
-    return;
+    return 0;
   }
 
 /************************************************************************
@@ -236,4 +237,5 @@ void ups_undeclare( t_upsugo_command * const uc ,
         upsact_cleanup(cmd_list); */
       }
     }
+    return 0;
 }
