@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 # Copyright (c) 1998 Universities Research Association, Inc.
 #       All Rights Reserved
 #
@@ -15,7 +15,7 @@
 # represents that its use would not infringe privately owned rights.
 #
 
-Setups_Flag=SETUPS_PATH
+Setups_Flag=SETUPS_DIR
 
 StartUp_Flag=UPS_START
 
@@ -63,7 +63,7 @@ else
     Name_Of_Sh=/bin/sh
 fi
 #
-# Parse the SETUPS_PATH from the dbconfig file
+# Parse the SETUPS_DIR from the dbconfig file
 #
 if [ -f $Ups_DB_Path/.upsfiles/dbconfig ]
 then
