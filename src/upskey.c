@@ -231,7 +231,7 @@ char *upskey_inst_getuserval( t_upstyp_instance * const inst,
   for ( ; usr_l; usr_l = usr_l->next ) {
     sp_d = (char *)usr_l->data;
     if ( (sp_e = strchr( sp_d, '=' )) ) {
-      if ( (len == (sp_e - sp_d)) && 
+      if ( (len == (size_t )(sp_e - sp_d)) && 
 	   !upsutl_strincmp( sp_d, skey, len ) )
 	return ++sp_e;
     }

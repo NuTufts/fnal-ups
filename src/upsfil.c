@@ -285,7 +285,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     int l;
     char buf[MAX_LINE_LEN];
     strcpy( buf, ups_file );
-    l = strlen( buf );
+    l = (int )strlen( buf );
     while ( --l >= 0 && buf[l] != '/' ) buf[l] = 0;
     if ( l > 0 && upsutl_is_a_file( buf ) == UPS_NO_FILE )
       mkdir( buf, 0775 );
@@ -356,7 +356,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   return UPS_SUCCESS;
 }
 
-void free_product( const void *key, void **prod, void *cl ) 
+void free_product( const void *key, void ** prod, void *cl ) 
 {
   ups_free_product( *prod );
 }     
