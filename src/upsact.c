@@ -1276,10 +1276,13 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
       /* if nessecary, reorder database list, that will only
          be done for 1'st level dependencies */
 
+
+      /* for b4_11 ... no reorder
       if ( new_ugo ) {
 	new_ugo->ugo_db = 
 	  prepend_ugo_db( new_ugo->ugo_db, p_act_itm->mat->db_info );
       }
+      */
 
       /* get the action item */
 
