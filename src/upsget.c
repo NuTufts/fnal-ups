@@ -365,6 +365,7 @@ char *upsget_translation_tilde( char * const oldstr )
     }
     if ( (tr_env = (char *)upsget_tilde_dir( env )) )
     { strcat( buf, tr_env );
+      strcat( buf, "/" );
     } else {
       sprintf(error,"~%s",env);
       upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);

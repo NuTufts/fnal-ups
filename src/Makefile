@@ -62,7 +62,7 @@ LDFLAGS = $(LLIBS)
 #=============================================================================
 
 default:	
-	@echo Please invoke this makefile using premake. >&2
+	@echo Please invoke this makefile using upspremake. >&2
 	@exit 1
 
 all : library main old
@@ -121,7 +121,7 @@ make :
 	make_make -cc '$(CC) $(CFLAGS)' -nostd -file Makefile \
                                                          -env $$ccenv *.c
 
-# DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "premake make" IN THE
+# DO NOT HAND EDIT BELOW THE START_DEPEND LINE. USE "upspremake make" IN THE
 # src DIRECTORY TO GENERATE IT
 #START_DEPEND
 ups_configure.o:	ups_configure.c
