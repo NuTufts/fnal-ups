@@ -302,14 +302,14 @@ int upsact_parse( char * const a_action_line, char ** const a_params,
 
       /* see if we found a match, if not - return an error */
       if (! match_found) {
-	rstatus = UPS_INV_ACTION;
+	rstatus = UPS_INVALID_ACTION;
       }
     } else {
       rstatus = UPS_LINE_TOO_LONG;
     }
   } else {
     /* This is an incorrectly formatted line */
-    rstatus = UPS_INV_ACTION;
+    rstatus = UPS_INVALID_ACTION;
   }
 
   return rstatus;
