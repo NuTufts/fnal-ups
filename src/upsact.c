@@ -170,6 +170,11 @@ static void f_copynews( const t_upstyp_matched_instance * const a_inst,
 			const t_upsugo_command * const a_command_line,
 			const FILE * const a_stream,
 			const t_upsact_cmd * const a_cmd);
+static void f_cshexecute( const t_upstyp_matched_instance * const a_inst,
+			  const t_upstyp_db * const a_db_info,
+			  const t_upsugo_command * const a_command_line,
+			  const FILE * const a_stream,
+			  const t_upsact_cmd * const a_cmd);
 static void f_envappend( const t_upstyp_matched_instance * const a_inst,
 			 const t_upstyp_db * const a_db_info,
 			 const t_upsugo_command * const a_command_line,
@@ -230,6 +235,11 @@ static void f_pathset( const t_upstyp_matched_instance * const a_inst,
 		       const t_upsugo_command * const a_command_line,
 		       const FILE * const a_stream,
 		       const t_upsact_cmd * const a_cmd);
+static void f_shexecute( const t_upstyp_matched_instance * const a_inst,
+			 const t_upstyp_db * const a_db_info,
+			 const t_upsugo_command * const a_command_line,
+			 const FILE * const a_stream,
+			 const t_upsact_cmd * const a_cmd);
 static void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
 			      const t_upstyp_db * const a_db_info,
 			      const t_upsugo_command * const a_command_line,
@@ -451,6 +461,8 @@ static t_cmd_map g_cmd_maps[] = {
   { "sourceoptcheck", e_sourceoptcheck, f_sourceoptcheck, 1, 3, e_invalid_cmd },
   { "exeaccess", e_exeaccess, f_exeaccess, 1, 1, e_invalid_cmd },
   { "execute", e_execute, f_execute, 1, 2, e_invalid_cmd },
+  { "cshexecute", e_cshexecute, f_cshexecute, 1, 2, e_invalid_cmd },
+  { "shexecute", e_shexecute, f_shexecute, 1, 2, e_invalid_cmd },
   { "filetest", e_filetest, f_filetest, 2, 3, e_invalid_cmd },
   { "copyhtml", e_copyhtml, f_copyhtml, 1, 1, e_invalid_cmd },
   { "copyinfo", e_copyinfo, f_copyinfo, 1, 1, e_invalid_cmd },
@@ -2678,6 +2690,50 @@ static void f_execute( const t_upstyp_matched_instance * const a_inst,
   }
 }
 
+static void f_cshexecute( const t_upstyp_matched_instance * const a_inst,
+			  const t_upstyp_db * const a_db_info,
+			  const t_upsugo_command * const a_command_line,
+			  const FILE * const a_stream,
+			  const t_upsact_cmd * const a_cmd)
+{
+  CHECK_NUM_PARAM("cshexecute");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    if (a_command_line->ugo_shell == e_CSHELL) {
+      f_execute(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
+    }
+  }
+}
+
+static void f_shexecute( const t_upstyp_matched_instance * const a_inst,
+			 const t_upstyp_db * const a_db_info,
+			 const t_upsugo_command * const a_command_line,
+			 const FILE * const a_stream,
+			 const t_upsact_cmd * const a_cmd)
+{
+  CHECK_NUM_PARAM("shexecute");
+
+  /* only proceed if we have a valid number of parameters and a stream to write
+     them to */
+  if ((UPS_ERROR == UPS_SUCCESS) && a_stream) {
+    if (a_command_line->ugo_shell == e_BOURNE) {
+      f_execute(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+    }
+    if (UPS_ERROR != UPS_SUCCESS) {
+      upserr_vplace();
+      upserr_add(UPS_ACTION_WRITE_ERROR, UPS_FATAL,
+		 g_cmd_maps[a_cmd->icmd].cmd);
+    }
+  }
+}
+
 static void f_filetest( const t_upstyp_matched_instance * const a_inst,
 			const t_upstyp_db * const a_db_info,
 			const t_upsugo_command * const a_command_line,
@@ -3441,7 +3497,7 @@ static void f_writecompilescript(
     
       /*       get the action command list */
       cmd_list = upsact_get_cmd((t_upsugo_command *)a_command_line, &mproduct,
-				a_cmd->argv[1], e_setup );
+				a_cmd->argv[1], a_cmd->icmd );
       if (UPS_ERROR == UPS_SUCCESS) {
 	/* 2      now that we have the list, locate the current compile file
 	          if there is one */
@@ -3580,6 +3636,7 @@ static void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       lcl_cmd.iact = a_cmd->iact;
       lcl_cmd.argc = g_cmd_maps[e_copyman].min_params;   /* # of args */
       f_copyman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
+      f_copycatman(a_inst, a_db_info, a_command_line, a_stream, a_cmd);
       break;
     case e_declare:	/* None */
       break;
