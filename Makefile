@@ -23,7 +23,6 @@ DIR=$(DEFAULT_DIR)
 # Qualifiers, and customization information, which is also used for 
 # "cmd addproduct", and finally the distribution file name.
 # this section may change in later ups|addproduct incarnations
-# cvs testing...
             PROD=ups
      PRODUCT_DIR=UPS_DIR
             VERS=v4_7
