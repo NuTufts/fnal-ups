@@ -477,9 +477,9 @@ static t_upstyp_matched_product *match_instance_core(
       GET_NEW_MPRODUCT();
     }
     
-  /* we were not passed a specific list of chains and we have some versions,
-     start by reading the version files. */
-  } else if (a_any_chain && a_version_list) { 
+  /* we were not passed a specific list of chains (or we were passed no chains
+     at all) and we have some versions,  start by reading the version files. */
+  } else if ((a_any_chain || !a_chain_list) && a_version_list) { 
     for (version_list = (t_upslst_item *)a_version_list; version_list;
 	 version_list = version_list->next) {
       /* get the version */
