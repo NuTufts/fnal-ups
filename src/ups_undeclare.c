@@ -191,14 +191,30 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                          mproduct, unchain,ups_command);
               if (UPS_ERROR == UPS_SUCCESS) 
-              { upsact_process_commands(cmd_list, tmpfile); }
-              upsact_cleanup(cmd_list);
+              { upsact_process_commands(cmd_list, tmpfile);
+                upsact_cleanup(cmd_list);
+              } else {
+                upsfil_clear_journal_files();
+                upserr_vplace();
+                return 0;
+              }
               cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                          mproduct,g_cmd_info[ups_command].cmd,
 					ups_command);
               if (UPS_ERROR == UPS_SUCCESS) 
-              { upsact_process_commands(cmd_list, tmpfile); }
-              upsact_cleanup(cmd_list);
+              { upsact_process_commands(cmd_list, tmpfile);
+                upsact_cleanup(cmd_list);
+              } else {
+                upsfil_clear_journal_files();
+                upserr_vplace();
+                return 0;
+              }
+            } else {
+              if (UPS_ERROR != UPS_SUCCESS) /* just an error */
+              { upsfil_clear_journal_files();
+                upserr_vplace();
+                return 0;
+              }
             }
           } 
        } 
@@ -263,10 +279,22 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
 /*        cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                    mproduct, UNDECLARE,ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
-        { upsact_process_commands(cmd_list, tmpfile); }
-        upsact_cleanup(cmd_list); */
+        { upsact_process_commands(cmd_list, tmpfile); 
+           upsact_cleanup(cmd_list); 
+        } else {
+          upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0;
+        }
+*/
         if (uc->ugo_Y) 
         { fprintf((FILE *)tmpfile,"rm -rf %s\n",product_home);
+        }
+      } else {
+        if (UPS_ERROR != UPS_SUCCESS) /* just an error */
+        { upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0;
         }
       }
     }

@@ -53,5 +53,6 @@ while ((uc = upsugo_next(argc,argv,"AacCdfghKltmMNoOPqrTuUvz")) != 0 )
       { ups_list(uc,0); 
         upserr_output();
        }
+upsfil_stat(1);
 	exit(0);
 }

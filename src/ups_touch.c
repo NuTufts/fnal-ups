@@ -62,8 +62,9 @@ extern t_cmd_info g_cmd_info[];
  * Output: 
  * Return: 
  */
-t_upslst_item *ups_touch( t_upsugo_command * const uc ,
-			    const FILE * const tmpfile, const int ups_command)
+t_upslst_item *ups_touch( t_upsugo_command * const uc,
+			  const FILE * const tmpfile, 
+                          const int ups_command)
 {
   t_upslst_item *mproduct_list = NULL;
   t_upslst_item *minst_list = NULL;
@@ -83,17 +84,10 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc ,
   static char buffer[FILENAME_MAX+1];
   static char *file=buffer;
   char *the_chain;
-  char *the_flavor;
-  char *the_qualifiers;
-  char *saddr;				/* start address for -O manipulation */
-  char *eaddr;				/* end address for -O manipulation */
-  char *naddr;				/* new address for -O manipulation */
   t_upslst_item *cinst_list;                /* chain instance list */
   t_upstyp_instance *cinst;                 /* chain instance      */
-  t_upstyp_instance *new_cinst;             /* new chain instance  */
   t_upslst_item *vinst_list;                /* version instance list */
   t_upstyp_instance *vinst;                 /* version instance      */
-  t_upstyp_instance *new_vinst;             /* new version instance  */
   char *username;
   struct tm *mytime;
   char *declared_date;
@@ -182,7 +176,11 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc ,
            chain_list->prev=0;
            uc->ugo_chain=chain_list;
          mproduct_list = upsmat_instance(uc, db_list , need_unique);
-         if (UPS_ERROR != UPS_SUCCESS) {  return 0; }
+         if (UPS_ERROR != UPS_SUCCESS) 
+         { upsfil_clear_journal_files();
+           upserr_vplace();
+           return 0; 
+         }
          upsver_mes(1,"Chain %s currently exist\n",the_chain);
          chain_list->next = save_next;
          chain_list->prev = save_prev;
@@ -201,9 +199,15 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc ,
            cinst->modifier=username;
            cinst->modified=declared_date;
            (void )upsfil_write_file(product, buffer,' ',JOURNAL);
+         } else {
+           if (UPS_ERROR != UPS_SUCCESS) /* just an error */
+           { upsfil_clear_journal_files();
+             upserr_vplace();
+             return 0; 
+           }
          }
        }
-       return(0);
+       return(0); /* this is sucess no clear doing just chains */
      }
      mproduct_list = upsmat_instance(uc, db_list , need_unique);
      if (UPS_ERROR != UPS_SUCCESS) {  return 0; }
@@ -224,6 +228,12 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc ,
        vinst->modifier=username;
        vinst->modified=declared_date;
        (void )upsfil_write_file(product, buffer,' ',JOURNAL);
+     } else { 
+       if (UPS_ERROR != UPS_SUCCESS) /* just an error */
+       { upsfil_clear_journal_files();
+         upserr_vplace();
+         return 0; 
+       }
      }
     return 0;
 }

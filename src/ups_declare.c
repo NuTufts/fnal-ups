@@ -206,7 +206,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            uc->ugo_chain=chain_list;
          mproduct_list = upsmat_instance(uc, db_list , not_unique);
          if (UPS_ERROR != UPS_SUCCESS) 
-         {  return 0; 
+         { upsfil_clear_journal_files(); 
+           upserr_vplace();
+           return 0; 
          }
            chain_list->next = save_next;
            chain_list->prev = save_prev;
@@ -217,7 +219,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            uc->ugo_chain=chain_list;
            mproduct_list = upsmat_instance(uc, db_list , need_unique);
            if (UPS_ERROR != UPS_SUCCESS) 
-           {  return 0; 
+           { upsfil_clear_journal_files();
+             upserr_vplace();
+             return 0; 
            }
            if (mproduct_list)  /* different version only */
            { upsver_mes(1,"same flavor and qualifiers exist\n");
@@ -245,8 +249,13 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
                                           mproduct, unchain,ups_command);
                if (UPS_ERROR == UPS_SUCCESS) 
-               { upsact_process_commands(cmd_list, tmpfile); }
-               upsact_cleanup(cmd_list);
+               { upsact_process_commands(cmd_list, tmpfile); 
+                 upsact_cleanup(cmd_list);
+               } else {
+                 upsfil_clear_journal_files();
+                 upserr_vplace();
+                 return 0 ;
+               }
              }
            } /* Get chain file (maybe again) */
            sprintf(buffer,"%s/%s/%s%s",
@@ -308,14 +317,18 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     uc->ugo_qualifiers = upslst_new(upsutl_str_create(ANY_MATCH,' '));
     mproduct_list = upsmat_instance(uc, db_list , not_unique);
     if (UPS_ERROR != UPS_SUCCESS) 
-    {  return 0; 
+    { upsfil_clear_journal_files();
+      upserr_vplace();
+      return 0; 
     }
     if (mproduct_list) 
     {  uc->ugo_flavor=save_flavor;
        uc->ugo_qualifiers=save_qualifiers;
        mproduct_list = upsmat_instance(uc, db_list , need_unique);
        if (UPS_ERROR != UPS_SUCCESS) 
-       { return 0; 
+       { upsfil_clear_journal_files();
+         upserr_vplace();
+         return 0; 
        }
        if (!mproduct_list) 
        { upsver_mes(1,"Version exists adding additional instance\n");
@@ -413,7 +426,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
         uc->ugo_chain=chain_list;
         mproduct_list = upsmat_instance(uc, db_list , need_unique);
         if (UPS_ERROR != UPS_SUCCESS) 
-        {  return 0; 
+        { upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0; 
         }
         chain_list->next = save_next;
         chain_list->prev = save_prev;
@@ -427,19 +442,30 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
 				  mproduct, g_cmd_info[ups_command].cmd,
 				  ups_command);
         if (UPS_ERROR == UPS_SUCCESS) 
-        { upsact_process_commands(cmd_list, tmpfile); }
-        upsact_cleanup(cmd_list);
+        { upsact_process_commands(cmd_list, tmpfile); 
+          upsact_cleanup(cmd_list);
+        } else {
+          upsfil_clear_journal_files();
+          upserr_vplace();
+          return 0;
+        } 
         if (strstr(the_chain,"current"))
         { cmd_list = upsact_get_cmd((t_upsugo_command *)uc,
 				  mproduct, g_cmd_info[e_start].cmd,
 				  e_start);
-          if (cmd_list)
-          { printf("theres a start...\n");
-            upsact_cleanup(cmd_list);
+          if (UPS_ERROR == UPS_SUCCESS) 
+          { if (cmd_list)
+            { printf("theres a start...\n");
+              upsact_cleanup(cmd_list);
+            }
+          } else {
+            /* don't fail is start is junk do I care? */
+            /* upsfil_clear_journal_files(); */
+            /* upserr_vplace(); */
+            /* return 0; */
           }
         }
       }
     }
-    upsfil_stat(1);
     return 0;
 }
