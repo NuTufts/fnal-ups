@@ -9,12 +9,13 @@ PROD_DIR_PREFIX = /usr/products
 # keep statistics about the following products (uncomment this to get it):
 #STATISTICS = edt,tpu,tkreq
 
-# manpages, info files, etc. go here:
+# manpages, info files, etc. go here: (html and news filesare not automatically
+#    supported in this version of ups.
 MAN_TARGET_DIR = /usr/products/man
 CATMAN_TARGET_DIR = /usr/products/catman
 INFO_TARGET_DIR = /usr/products/Info
-HTML_TARGET_DIR = /usr/products/SunOS/html/www-oss/docs
-NEWS_TARGET_DIR = /dev/null
+#HTML_TARGET_DIR = /usr/products/SunOS/html/www-oss/docs
+#NEWS_TARGET_DIR = /dev/null
 
 # this db contains the ups product; copy the setups.[c]sh
 #  and cached files to this directory
