@@ -4,6 +4,8 @@
  *               All Rights Reserved.                                         *
  *                                                                            *
  ******************************************************************************/
+/*static char           *str_create( char * const str ); */
+/* char    *       upsugo_getarg          (int , char *, char **); */
 /* ==========================================================================
 **                                                                           
 ** DESCRIPTION
@@ -42,17 +44,16 @@
 #include <sys/utsname.h>
 
 #include "ups_types.h"
+#include "ups_memory.h"
 
 #ifdef UPS_ID
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	1.00";
 #endif
-/*
 #define FREE( X )	{			\
 			free( X );		\
 			X = 0;		\
 			}
 
-*/
 	int	errflg = 0;
 /* ===========================================================================
 ** ROUTINE	upsugo_getarg( int argc, char * argv[])
@@ -70,7 +71,7 @@
 ** ==========================================================================
 */
 
-char * upsugo_getarg(argc, argv, argbuf)
+char * upsugo_getarg(argc,argv,argbuf)
 int argc;
 char *  argv[];
 char ** argbuf;
@@ -101,14 +102,13 @@ char ** argbuf;
     if( argv != argpt)
 	{
 	if( buff )
-	    upsmem_free(buff);
+	    FREE(buff);
 	argpt = argv;
 	argindx = 0;
 	arg_end = 0;
 	}
-
     if( (*argbuf == 0) && (buff != 0))
-	upsmem_free(buff);
+	FREE(buff);
 
     if( argv[argindx] == 0 )
 	{
@@ -123,7 +123,7 @@ char ** argbuf;
 	    {
 	    if((*argv[argindx] == '-') && (strlen(argv[argindx]) >2))
 		{
-		buff = (char *) upsmem_malloc(strlen(argv[argindx] +1));
+		buff = (char *) malloc((int)strlen(argv[argindx]) +1);
 		strcpy(buff, argv[argindx]);
 		*argbuf = buff + 2;
 		}
@@ -142,7 +142,7 @@ char ** argbuf;
 	*argbuf = c+1;
 	if(**argbuf == '\0')
 	    {
-	    upsmem_free(buff);
+	    FREE(buff);
 	    *argbuf = 0;
 	    }
 	return &d[0];
@@ -153,11 +153,12 @@ char ** argbuf;
  * Utils
  */
 
-char *str_create( char *str )
+char *str_create( char * const str )
 {
   char *new_str = NULL;
     
   if ( str ) {
+/*    new_str = (char *)upsmem_malloc( (int) strlen( str ) + 1 ); */
     new_str = (char *)upsmem_malloc( strlen( str ) + 1 );
     strcpy( new_str, str );
   }
@@ -185,7 +186,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    char   * addr;
    char   * loc;
    
-
+   char   **savbuf;
    char   **argbuf;		/* String to hold residual argv stuff*/
 				/* returned by upsugo_getarg */
 				/* if contents are used is reset to */
@@ -199,6 +200,10 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
    my_qualifiers=0;
    uc->ugo_product = 0;
    uc->ugo_version = 0;
+   uc->ugo_key = 0;
+   uc->ugo_qualifiers = 0;
+   uc->ugo_auth = 0;
+   uc->ugo_db = 0;
 /* Chain flags, still setting them in addition to chain list 
 ** to be consistant and possibly could be used				*/
 
@@ -241,7 +246,7 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
 	uc->ugo_t = 0;	/* test chain				*/
 	uc->ugo_T = 0;	/* CODE INCOMPLETE			*/
 	uc->ugo_u = 0;	/* uncompile first			*/
-/*	uc->ugo_U = 0;	/* CODE INCOMPLETE			*/
+	uc->ugo_U = 0;	/* CODE INCOMPLETE			*/
 	uc->ugo_v = 0;	/* verbose				*/
 	uc->ugo_V = 0;	/* Don't delete temp file(s)		*/
 	uc->ugo_w = 0;	/* stop first then start		*/
@@ -375,9 +380,13 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
+/* leak */
+                    addr=str_create(addr);
 		    uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  }
-                 uc->ugo_chain = upslst_add(uc->ugo_chain,arg_str);
+/* leak */
+                    addr=str_create(addr);
+                 uc->ugo_chain = upslst_add(uc->ugo_chain,addr);
                  break;
                }
                errflg = 1;
@@ -406,9 +415,13 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
+/* leak */
+                    addr=str_create(addr);
 		    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                  }
-                 uc->ugo_flavor = upslst_add(uc->ugo_flavor,arg_str);
+/* leak */
+                    addr=str_create(arg_str);
+                 uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
                  break;
                }
                errflg = 1;
@@ -437,9 +450,13 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
+/* leak */
+                    addr=str_create(addr);
 		    uc->ugo_host = upslst_add(uc->ugo_host,addr);
                  }
-                 uc->ugo_host = upslst_add(uc->ugo_host,arg_str);
+/* leak */
+                 addr=str_create(arg_str);
+                 uc->ugo_host = upslst_add(uc->ugo_host,addr);
                  break;
                }
                errflg = 1;
@@ -468,9 +485,13 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
+/* leak */
+                    addr=str_create(addr);
 		    uc->ugo_key = upslst_add(uc->ugo_key,addr);
                  }
-                 uc->ugo_key = upslst_add(uc->ugo_key,arg_str);
+/* leak */
+                    addr=str_create(arg_str);
+                 uc->ugo_key = upslst_add(uc->ugo_key,addr);
                  break;
                }
                errflg = 1;
@@ -575,9 +596,11 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                  { errflg = 1;
                    break;
                  }
-                 my_qualifiers = upslst_add(my_qualifiers,arg_str);
+/* leak */
+                    addr=str_create(arg_str);
+                 my_qualifiers = upslst_add(my_qualifiers,addr);
 /* return something for now */
-                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,arg_str);
+                 uc->ugo_qualifiers = upslst_add(uc->ugo_qualifiers,addr);
                  break;
                }
                errflg = 1;
@@ -657,9 +680,13 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
+/* leak */
+                    addr=str_create(addr);
 		    uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                  }
-                 uc->ugo_auth = upslst_add(uc->ugo_auth,arg_str);
+/* leak */
+                    addr=str_create(arg_str);
+                 uc->ugo_auth = upslst_add(uc->ugo_auth,addr);
                  break;
                }
                errflg = 1;
@@ -688,9 +715,13 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
                     addr=arg_str;
                     arg_str=loc+1;
                     *loc = 0;
+/* leak */
+                    addr=str_create(addr);
 		    uc->ugo_db = upslst_add(uc->ugo_db,addr);
                  }
-                 uc->ugo_db = upslst_add(uc->ugo_db,arg_str);
+/* leak */
+                    addr=str_create(arg_str);
+                 uc->ugo_db = upslst_add(uc->ugo_db,addr);
                  break;
                }
                errflg = 1;
@@ -700,6 +731,9 @@ t_ups_command *upsugo_next(int ups_argc,char *ups_argv[],char *validopts)
        }
      } else {
        uc->ugo_product = arg_str;
+       if ( strchr(arg_str,',') != 0 )
+          fprintf(stdout,"found , \n");
+
        if((arg_str = upsugo_getarg(ups_argc, ups_argv, argbuf)) != 0)
        if(*arg_str == '-')   errflg = 1;
        uc->ugo_version = arg_str;
