@@ -242,7 +242,9 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 void write_journal_file( const void *key, void ** prod, void *cl ) 
 {
   /* a little helper for upsfil_write_journal_files */
-  upsfil_write_file( *prod, key, 'd', NOJOURNAL );   
+  t_upstyp_product *p = (t_upstyp_product *)*prod;
+  if ( p->journal == JOURNAL )
+    upsfil_write_file( p, key, 'd', NOJOURNAL );
 }
 /*-----------------------------------------------------------------------
  * upsfil_write_journal_files
@@ -259,6 +261,34 @@ int upsfil_write_journal_files( void )
   if ( g_ft ) {
     P_VERB_s( 1, "Writing journal files" );
     upstbl_map( g_ft, write_journal_file, NULL );
+    upstbl_free( &g_ft );
+    g_ft = 0;
+  }
+
+  return UPS_SUCCESS;
+}
+
+void clear_journal_file( const void *key, void ** prod, void *cl ) 
+{
+  /* a little helper for upsfil_clear_journal_files */
+  t_upstyp_product *p = (t_upstyp_product *)*prod;
+  p->journal = NOJOURNAL;
+}
+/*-----------------------------------------------------------------------
+ * upsfil_clear_journal_files
+ *
+ * Will clear the journal flag for all products in the cache
+ *
+ * Input : none
+ * Output: none
+ * Return: int, UPS_SUCCESS just fine, else UPS_<error> number.
+ */
+int upsfil_clear_journal_files( void )
+{
+
+  if ( g_ft ) {
+    P_VERB_s( 1, "Clearing journal files" );
+    upstbl_map( g_ft, clear_journal_file, NULL );
     upstbl_free( &g_ft );
     g_ft = 0;
   }
@@ -315,8 +345,8 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 
   /* handle journal files */
 
+  prod_ptr->journal = journal;
   if ( journal == JOURNAL ) {
-    prod_ptr->journal = JOURNAL;
 
     /* add file to cache */
 
@@ -464,19 +494,29 @@ int upsfil_exist( const char * const ups_file )
     return 0;
 }
 
-void free_product( const void *key, void ** prod, void *cl ) 
+void flush_product( const void *key, void ** prod, void *cl ) 
 {
+  /* a little helper for upsfil_flush */
+
+  /* write the file to disk, if journal flag set */
+
+  t_upstyp_product *p = (t_upstyp_product *)*prod;
+  if ( p->journal == JOURNAL )
+    upsfil_write_file( p, key, 'd', NOJOURNAL );
+
+  /* free product */
+
   ups_free_product( *prod );
 }     
 void upsfil_flush( void )
 {
   /* upsfil_stat( 1 ); */
 
-  /* clean up cache */
+  /* write journal files to disk and clean up cache */
 
   if ( g_ft ) {
     P_VERB_s( 1, "Flushing cache" );
-    upstbl_map( g_ft, free_product, NULL );
+    upstbl_map( g_ft, flush_product, NULL );
     upstbl_free( &g_ft );
     g_ft = 0;
   }
