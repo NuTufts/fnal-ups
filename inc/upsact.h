@@ -129,7 +129,10 @@ enum {
   e_setupenv,
   e_proddir,
   e_unsetupenv,
-  e_unproddir
+  e_unproddir,
+  e_if,
+  e_endif,
+  e_else
 };
 
 /*

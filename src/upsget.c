@@ -28,6 +28,8 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 #include <pwd.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* ups specific include files */
 
@@ -755,10 +757,20 @@ char *upsget_ups_dir(const t_upstyp_db * const db_info_ptr,
 { static char *string;
   static char *prefix_string;
   static char *env_string;
+  static struct stat sbuf;
+  string = 0;
+
   if (command_line && command_line->ugo_U)
   { string=command_line->ugo_upsdir;
-  } else { 
-    get_element(string,ups_dir);
+  } else 
+  { get_element(string,ups_dir);
+  }
+  if ( 0 == string ) 
+  { prefix_string = upsget_prod_dir(db_info_ptr, instance, command_line );
+    prefix_string = upsutl_str_crecat(prefix_string,"/ups"); 
+    if (0 == stat(prefix_string, &sbuf) && S_ISDIR(sbuf.st_mode))
+    { return prefix_string;
+    }
   }
   if (string)            
   { if((env_string=upsget_translation_env(string))!=0)
