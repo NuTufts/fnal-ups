@@ -82,8 +82,8 @@ typedef struct ups_command
     char    *ugo_options; 
     int     ugo_p;           /* Product Description                  */
     char    *ugo_description; 
-    int     ugo_P;           /* override product name                */
-    char    *ugo_override; 
+    int     ugo_P;           /* Output Actions Only                  */
+/*    char    *ugo_override;  old override product name */
     int     ugo_q;           /* CODE INCOMPLETE                      */
     t_upslst_item *ugo_qualifiers;
 /*  int     ugo_Q;           UPD-RESERVE */
