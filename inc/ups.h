@@ -53,5 +53,6 @@
 #include "ups_unconfigure.h"
 #include "ups_unk.h"
 #include "ups_unsetup.h"
+#include "ups_undeclare.h"
 
 #endif /* _UPS_H_ */
