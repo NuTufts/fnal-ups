@@ -29,11 +29,11 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <unistd.h>
-#ifdef _SYSTYPE_SVR4
+/* #ifdef _SYSTYPE_SVR4 */
 #include <dirent.h>
-#else
+/* #else
 #include <sys/dir.h>
-#endif
+#endif */
 
 /* ups specific include files */
 #include "ups_utils.h"
@@ -121,11 +121,11 @@ t_upslst_item *upsutl_free_inst_list( t_upslst_item **a_inst_list)
 t_upslst_item * upsutl_get_files(const char * const a_dir,
 				 const char * const a_pattern)
 {
-#ifdef _SYSTYPE_SVR4
+/* #ifdef _SYSTYPE_SVR4 */
   struct dirent *dir_line = NULL;
-#else
+/* #else
   struct direct *dir_line = NULL;
-#endif
+#endif */
   t_upslst_item *file_list = NULL;
   DIR *dir = NULL;
   char *new_string = NULL;
