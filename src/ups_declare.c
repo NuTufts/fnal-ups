@@ -50,8 +50,107 @@ extern t_cmd_info g_cmd_info[];
 #define DECLARE "declare"
 #define UPS_DECLARE "DECLARE: "
 
-static char buf[MAX_LINE_LEN];
 
+static char buf[MAX_LINE_LEN];
+static char *the_flavor;
+static char *the_qualifiers;
+static char *the_chain=0;
+static char *save_version;
+static char *save_table_dir;		/* match won't work "how I want" */
+static char *save_table_file;		/* with table specifications     */
+static char *username=0;
+static char *declared_date=0;
+
+
+t_upstyp_product *upsdcl_new_product(t_upsugo_command * const uc)
+{
+  t_upstyp_product *product;
+  product = ups_new_product();
+  product->file = upsutl_str_create( CHAIN, ' ' );
+  product->product=upsutl_str_create( uc->ugo_product, ' ' );
+  product->chain = upsutl_str_create( the_chain, ' ' );
+  product->version = upsutl_str_create( save_version, ' ' );
+  return product;
+} 
+ 
+t_upstyp_instance *upsdcl_new_chain(t_upsugo_command * const uc)
+{
+t_upstyp_instance *cinst;
+   cinst=ups_new_instance();
+   cinst->product=upsutl_str_create(uc->ugo_product, ' ' );
+   cinst->version=upsutl_str_create(save_version,' ');
+   cinst->flavor=upsutl_str_create(the_flavor,' ');
+   cinst->qualifiers=upsutl_str_create(the_qualifiers,' ');
+   cinst->declarer=upsutl_str_create(username,' ');
+   cinst->declared=upsutl_str_create(declared_date,' ');
+   cinst->modifier=upsutl_str_create(username,' ');
+   cinst->modified=upsutl_str_create(declared_date,' ');
+   return cinst;
+}
+
+t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
+                                      t_upstyp_db * const db_info)
+{
+   t_upstyp_instance *vinst;
+   t_upslst_item *auth_list=0;
+   char *allauthnodes=0;
+   char *hold_env; /* temporary holding place for translated env's */
+   char *tmp_ptr;
+   int count=0;
+   vinst=ups_new_instance();
+   vinst->product=upsutl_str_create(uc->ugo_product,' ');
+   vinst->version=upsutl_str_create(save_version,' ');
+   vinst->flavor=upsutl_str_create(the_flavor,' ');
+   vinst->qualifiers=upsutl_str_create(the_qualifiers,' ');
+   vinst->declarer=upsutl_str_create(username,' ');
+   vinst->declared=upsutl_str_create(declared_date,' ');
+   vinst->modifier=upsutl_str_create(username,' ');
+   vinst->modified=upsutl_str_create(declared_date,' ');
+   vinst->prod_dir=upsutl_str_create(uc->ugo_productdir,' ');
+   vinst->table_dir=upsutl_str_create(save_table_dir,' ');
+   vinst->table_file=upsutl_str_create(save_table_file,' ');
+   vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' ');
+   vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
+   vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
+   vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
+   vinst->archive_file=upsutl_str_create(uc->ugo_archivefile,' ');
+   if (uc->ugo_A) { allauthnodes=upsutl_str_create("",' '); }
+   for ( auth_list = upslst_first(uc->ugo_auth ); auth_list; 
+         auth_list = auth_list->next, count++ )
+   { allauthnodes=upsutl_str_crecat(allauthnodes,auth_list->data);
+     if (auth_list->next != 0) 
+     { allauthnodes=upsutl_str_crecat(allauthnodes,":");
+     }
+   }
+   vinst->authorized_nodes=allauthnodes;
+   /* If no ups_dir specified on command line add ups if it exists */
+   if ((! vinst->ups_dir) && vinst->prod_dir)
+   { if (!(tmp_ptr = upsget_translation_env(vinst->prod_dir)))
+     { tmp_ptr = vinst->prod_dir; }
+     if (db_info && db_info->config && 
+         db_info->config->prod_dir_prefix && UPSRELATIVE(tmp_ptr))
+     { sprintf(buf,"%s/%s/ups", db_info->config->prod_dir_prefix, tmp_ptr);
+     } else {
+       sprintf(buf,"%s/ups", tmp_ptr);
+     }
+     if (upsutl_is_a_file(buf) == UPS_SUCCESS)
+     { vinst->ups_dir=upsutl_str_create("ups",' ');
+     }
+   }
+/* I'm going to create the save instance and just put everything in 
+   there as the first fix for this */
+   vinst->sav_inst = ups_new_instance();
+   vinst->sav_inst->prod_dir=upsutl_str_create(vinst->prod_dir,' ');
+   if((hold_env=upsget_translation_env(vinst->prod_dir))!=0)
+   { vinst->prod_dir=upsutl_str_create(hold_env,' '); }
+   if((hold_env=upsget_translation_env(vinst->compile_dir))!=0)
+   { vinst->compile_dir=upsutl_str_create(hold_env,' '); }
+   if((hold_env=upsget_translation_env(vinst->ups_dir))!=0)
+   { vinst->ups_dir=upsutl_str_create(hold_env,' '); }
+   if((hold_env=upsget_translation_env(vinst->table_dir))!=0)
+   { vinst->table_dir=upsutl_str_create(hold_env,' '); }
+   return vinst;
+}
 /*
  * Definition of public functions.
  */
@@ -73,9 +172,6 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upslst_item *minst_list = NULL;
   t_upslst_item *chain_list = NULL;
   t_upslst_item *cmd_list = NULL;
-  t_upslst_item *auth_list=0;
-  char *allauthnodes=0;
-  int count=0;
   int chain=0; /* was a chain specified, trick on on info messages */
   int version=0; /* version was defined */
   t_upstyp_db *db_info = 0;
@@ -84,16 +180,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upstyp_matched_instance *minst = NULL;
   int not_unique = 0;
   int need_unique = 1;
-  t_upslst_item *save_flavor;
-  t_upslst_item *save_qualifiers;
-  t_upslst_item *save_chain;
-  char * save_version;
   t_upstyp_product *product;
   char buffer[FILENAME_MAX+1];
   char *file=buffer;
-  char *the_chain;
-  char *the_flavor = NULL;
-  char *the_qualifiers;
   char *saddr;				/* start address for -O manipulation */
   char *eaddr;				/* end address for -O manipulation */
   char *naddr;				/* new address for -O manipulation */
@@ -102,19 +191,20 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   t_upstyp_instance *new_cinst;             /* new chain instance  */
   t_upstyp_instance *tinst;                 /*   table instance      */
   t_upstyp_instance *new_vinst;             /* new version instance  */
-  char *hold_env; /* temporary holding place for translated env's */
-  char *username;
   struct tm *mytime;
-  char *declared_date;
   char *unchain;
   t_upslst_item *save_next;
   t_upslst_item *save_prev;
   time_t seconds=0;
-  char * save_table_dir;		/* match won't work "how I want" */
-  char * save_table_file;		/* with table specifications     */
-  char * tmp_ptr;
+  t_upslst_item *save_flavor;
+  t_upslst_item *save_qualifiers;
+  t_upslst_item *save_chain;
   int save_m=uc->ugo_m;
   int save_M=uc->ugo_M;
+  the_flavor=0;
+  the_qualifiers=0;
+  the_chain=0;
+  save_version=0;
   uc->ugo_m=0;
   uc->ugo_M=0;
   save_table_dir=uc->ugo_tablefiledir;
@@ -166,16 +256,16 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
 /*    ups_undeclare(uc, tmpfile, e_undeclare); */
     uc->ugo_version=save_version;
   }
-  username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
-  seconds=time(0);
-  mytime = localtime(&seconds);
-  mytime->tm_mon++; /* correct jan=0 */
-  declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
-				    STR_TRIM_DEFAULT);
-/* (char *) malloc((size_t)(9));
-  sprintf(declared_date,"%d-%d-%d",
-          mytime->tm_mon,mytime->tm_mday,mytime->tm_year);
-*/
+  if(!username) /* static may allready be set */
+  { username=upsutl_str_create(upsutl_user(), STR_TRIM_DEFAULT);
+    seconds=time(0);
+    mytime = localtime(&seconds);
+    mytime->tm_mon++; /* correct jan=0 */
+    declared_date = upsutl_str_create(upsutl_time_date(STR_TRIM_DEFAULT),
+                                      STR_TRIM_DEFAULT);
+    sprintf(declared_date,"%d-%d-%d",
+            mytime->tm_mon,mytime->tm_mday,mytime->tm_year);
+  }
 
 /************************************************************************
  *
@@ -306,44 +396,23 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
            /* allready there  strcpy(buffer,file); */
            /* if(!product) Chain deleted was all only one */ 
            } else { 
-             product = ups_new_product();
-             product->file = upsutl_str_create( CHAIN, ' ' );
-             product->product=upsutl_str_create( uc->ugo_product, ' ' );
-             product->chain = upsutl_str_create( the_chain, ' ' );
-             product->version = upsutl_str_create( save_version, ' ' );
+             product=upsdcl_new_product(uc);
            }
          } else { /* new chain does NOT exist at all */
-           product = ups_new_product();
+           product=upsdcl_new_product(uc);
            sprintf(buffer,"%s/%s/%s%s",
                    db_info->name,
                    uc->ugo_product,
                    the_chain,CHAIN_SUFFIX);
-           product->file = upsutl_str_create( CHAIN, ' ' );
-           product->product=upsutl_str_create( uc->ugo_product, ' ' );
-           product->chain = upsutl_str_create( the_chain, ' ' );
-           product->version = upsutl_str_create( save_version, ' ' );
          }
          /* build new chain instance */
-         new_cinst=ups_new_instance();
-         new_cinst->product=upsutl_str_create( uc->ugo_product, ' ' );
-         new_cinst->version=upsutl_str_create(save_version,' ');
-         if (!the_flavor)
-         { the_flavor=save_flavor->data; 
-         }
-         new_cinst->flavor=upsutl_str_create(the_flavor,' ');
+         if (!the_flavor) { the_flavor=save_flavor->data; }
          the_qualifiers=save_qualifiers->data;
-         new_cinst->qualifiers=upsutl_str_create(the_qualifiers,' ');
-         new_cinst->declarer=upsutl_str_create(username,' ');
-         new_cinst->declared=upsutl_str_create(declared_date,' ');
-         new_cinst->modifier=upsutl_str_create(username,' ');
-         new_cinst->modified=upsutl_str_create(declared_date,' ');
+         new_cinst=upsdcl_new_chain(uc);
          product->instance_list = 
             upslst_add(product->instance_list,new_cinst);
          upsver_mes(1,"%sAdding %s chain version %s to %s\n",
-                    UPS_DECLARE,
-                    the_chain,
-                    new_cinst->version,
-                    buffer);
+                    UPS_DECLARE, the_chain, new_cinst->version, buffer);
          (void )upsfil_write_file(product, buffer,' ',JOURNAL);  
         }
       }
@@ -410,71 +479,9 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
     uc->ugo_M=save_M;
     /* build new version instance */
     if (buffer[0]!=0) /* instance doesn't exist */
-    { new_vinst=ups_new_instance();
-      new_vinst->product=upsutl_str_create(uc->ugo_product,' ');
-      new_vinst->version=upsutl_str_create(save_version,' ');
-      the_flavor=save_flavor->data;
-      new_vinst->flavor=upsutl_str_create(the_flavor,' ');
+    { the_flavor=save_flavor->data;
       the_qualifiers=save_qualifiers->data;
-      new_vinst->qualifiers=upsutl_str_create(the_qualifiers,' ');
-      new_vinst->declarer=upsutl_str_create(username,' ');
-      new_vinst->declared=upsutl_str_create(declared_date,' ');
-      new_vinst->modifier=upsutl_str_create(username,' ');
-      new_vinst->modified=upsutl_str_create(declared_date,' ');
-      new_vinst->prod_dir=upsutl_str_create(uc->ugo_productdir,' ');
-/*      new_vinst->table_dir=uc->ugo_tablefiledir;
-        new_vinst->table_file=uc->ugo_tablefile;   */
-      new_vinst->table_dir=upsutl_str_create(save_table_dir,' ');
-      new_vinst->table_file=upsutl_str_create(save_table_file,' ');
-      new_vinst->ups_dir=upsutl_str_create(uc->ugo_upsdir,' ');
-      /* if no ups dir was entered on the command line, then check if 
-	 PROD_DIR/ups exists. if it does, then set this = to ups. EFB */
-      if ((! new_vinst->ups_dir) && new_vinst->prod_dir) {
-	/* we must pass prod_dir through the env variable translator first */
-	if (!(tmp_ptr = upsget_translation_env(new_vinst->prod_dir))) {
-	  /* there was nothing to translate, use the original */
-	  tmp_ptr = new_vinst->prod_dir;
-	}
-	if (db_info && db_info->config && db_info->config->prod_dir_prefix
-	    && UPSRELATIVE(tmp_ptr)) {
-	  /* we don't have to translate prod_dir_prefix, it is done when it
-	     is read in */
-	  sprintf(buf,"%s/%s/ups", db_info->config->prod_dir_prefix, tmp_ptr);
-        } else {
-	  sprintf(buf,"%s/ups", tmp_ptr);
-        }
-	if (upsutl_is_a_file(buf) == UPS_SUCCESS) {
-	  /* the file existed */
-	  new_vinst->ups_dir=upsutl_str_create("ups",' ');
-	}
-      }
-      new_vinst->origin=upsutl_str_create(uc->ugo_origin,' ');
-      new_vinst->compile_file=upsutl_str_create(uc->ugo_compile_file,' ');
-      new_vinst->compile_dir=upsutl_str_create(uc->ugo_compile_dir,' ');
-      new_vinst->archive_file=upsutl_str_create(uc->ugo_archivefile,' ');
-      if (uc->ugo_A)
-      { allauthnodes=upsutl_str_create("",' ');
-      }
-      for ( auth_list = upslst_first(uc->ugo_auth ); auth_list; 
-            auth_list = auth_list->next, count++ )
-      { allauthnodes=upsutl_str_crecat(allauthnodes,auth_list->data);
-        if (auth_list->next != 0) 
-        { allauthnodes=upsutl_str_crecat(allauthnodes,":");
-        }
-      }
-      new_vinst->authorized_nodes=allauthnodes;
-/* I'm going to create the save instance and just put everything in 
-   there as the first fix for this */
-      new_vinst->sav_inst = ups_new_instance();
-      new_vinst->sav_inst->prod_dir=upsutl_str_create(new_vinst->prod_dir,' ');
-      if((hold_env=upsget_translation_env(new_vinst->prod_dir))!=0)
-      { new_vinst->prod_dir=upsutl_str_create(hold_env,' '); }
-      if((hold_env=upsget_translation_env(new_vinst->compile_dir))!=0)
-      { new_vinst->compile_dir=upsutl_str_create(hold_env,' '); }
-      if((hold_env=upsget_translation_env(new_vinst->ups_dir))!=0)
-      { new_vinst->ups_dir=upsutl_str_create(hold_env,' '); }
-      if((hold_env=upsget_translation_env(new_vinst->table_dir))!=0)
-      { new_vinst->table_dir=upsutl_str_create(hold_env,' '); }
+      new_vinst=upsdcl_new_version(uc,db_info);
 /* If I'm creating a totally matched version I have to create the matched 
    product structure by hand since it really doesn't exist yet on disk
    and a call to get it will fail
