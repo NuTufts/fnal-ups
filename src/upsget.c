@@ -182,11 +182,17 @@ char *upsget_allout(const FILE * const stream,
       fprintf((FILE *)stream,"UPS_PROD_DIR=%s;export UPS_PROD_DIR\n",
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
-      if (addr) 
-      { fprintf((FILE *)stream,"UPS_VERBOSE=\"%s\";export UPS_VERBOSE\n",addr); } 
+      if (strlen(addr)) 
+      { fprintf((FILE *)stream,"UPS_VERBOSE=%s;export UPS_VERBOSE\n",addr);
+      } else { 
+        fprintf((FILE *)stream,"unset UPS_VERBOSE\n");
+      }
       addr=upsget_extended(db,instance,command_line);
-      if (addr) 
-      { fprintf((FILE *)stream,"UPS_EXTENDED=\"%s\";export UPS_EXTENDED\n",addr); } 
+      if (strlen(addr))
+      { fprintf((FILE *)stream,"UPS_EXTENDED=%s;export UPS_EXTENDED\n",addr); 
+      } else { 
+        fprintf((FILE *)stream,"unset UPS_EXTENDED\n");
+      } 
       fprintf((FILE *)stream,"UPS_THIS_DB=%s;export UPS_THIS_DB\n",
                upsget_database(db,instance,command_line));
       fprintf((FILE *)stream,"UPS_OS_FLAVOR=%s;export UPS_OS_FLAVOR\n",
@@ -207,11 +213,17 @@ char *upsget_allout(const FILE * const stream,
       fprintf((FILE *)stream,"setenv UPS_PROD_DIR=%s\n",
                upsget_prod_dir(db,instance,command_line));
       addr=upsget_verbose(db,instance,command_line);
-      if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_VERBOSE=\"%s\"\n",addr); } 
+      if (strlen(addr))
+      { fprintf((FILE *)stream,"setenv UPS_VERBOSE=%s\n",addr);
+      } else { 
+        fprintf((FILE *)stream,"unset UPS_VERBOSE\n");
+      }
       addr=upsget_extended(db,instance,command_line);
-      if (addr) 
-      { fprintf((FILE *)stream,"setenv UPS_EXTENDED=\"%s\"\n",addr); } 
+      if (strlen(addr))
+      { fprintf((FILE *)stream,"setenv UPS_EXTENDED=%s\n",addr); 
+      } else { 
+        fprintf((FILE *)stream,"unset UPS_EXTENDED\n");
+      }
       fprintf((FILE *)stream,"setenv UPS_THIS_DB=%s\n",
                upsget_database(db,instance,command_line));
       fprintf((FILE *)stream,"setenv UPS_OS_FLAVOR=%s\n",
