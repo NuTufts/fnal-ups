@@ -58,6 +58,8 @@ which is more complicated than
   execute-if-sh("if [ ! -r whatever-file ] then; do-the-stuff; fi")
   execute-if-csh("if ( ! -r whatever-file ) then; do-the-stuff; endif")
 
-6. 
+6. When creating the temp file, first define a function that undefined all
+	the UPS local environment variables and removes the temp file.  Then
+	before each return/exit point, call this function.
 
 
