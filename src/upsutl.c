@@ -675,102 +675,105 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   for (mproduct_item = (t_upslst_item *)a_mproduct_list ;
        mproduct_item ; mproduct_item = mproduct_item->next) {
     mproduct = (t_upstyp_matched_product *)mproduct_item->data;
-    if ((mproduct->db_info) && (mproduct->db_info->config) && 
-	(tmp_stat = mproduct->db_info->config->statistics)) {
-      if (! NOT_EQUAL_ANY_MATCH(tmp_stat)) {
-	global_yes = 1;      /* write statistics for everything in this db */
-      } else {
-	global_yes = 0;
-	len = strlen(mproduct->product);
-	ptr = strstr(tmp_stat, mproduct->product);
-	/* first check if the product is at the beginning of the list of is
-	   the only element in the list of products */
-	if (ptr && (tmp_stat == ptr)) {
-	  if (((ptr + len)[0] ==  '\0') || ((int )(ptr + len)[0] == ':')) {
-	    global_yes = 1;
-	  }
-	  /* now check if the product is at the end of the list or in the
-	     middle */
-	} else if (ptr && ((int )(ptr - 1)[0] == ':')) {
-	  if (((int )(ptr + len)[0] == ':') || ((ptr + len)[0] == '\0')) {
-	    global_yes = 1;
+    if (mproduct->product) {
+      if ((mproduct->db_info) && (mproduct->db_info->config) && 
+	  (tmp_stat = mproduct->db_info->config->statistics)) {
+	if (! NOT_EQUAL_ANY_MATCH(tmp_stat)) {
+	  global_yes = 1;      /* write statistics for everything in this db */
+	} else {
+	  global_yes = 0;
+	  len = strlen(mproduct->product);
+	  ptr = strstr(tmp_stat, mproduct->product);
+	  /* first check if the product is at the beginning of the list of is
+	     the only element in the list of products */
+	  if (ptr && (tmp_stat == ptr)) {
+	    if (((ptr + len)[0] ==  '\0') || ((int )(ptr + len)[0] == ':')) {
+	      global_yes = 1;
+	    }
+	    /* now check if the product is at the end of the list or in the
+	       middle */
+	  } else if (ptr && ((int )(ptr - 1)[0] == ':')) {
+	    if (((int )(ptr + len)[0] == ':') || ((ptr + len)[0] == '\0')) {
+	      global_yes = 1;
+	    }
 	  }
 	}
       }
-    }
-    for (minst_item = (t_upslst_item *)mproduct->minst_list ;
-	 minst_item ; minst_item = minst_item->next) {
-      minst = (t_upstyp_matched_instance *)minst_item->data;
-      /* check to see if the instance indicates to keep statistics */
-      if (global_yes || (minst->chain && minst->chain->statistics) ||
-	                (minst->version && minst->version->statistics) ||
-	                (minst->table && minst->table->statistics)) {
-	if (! file_stream ) {       /* we need to still open the stream */
-	  dir_s = (int )strlen(mproduct->db_info->name);
-	  stat_s = (int )strlen(g_stat_dir);
-	  file_s = (int )strlen(mproduct->product);
-	  if ( (dir_s + UPS_FILES_LEN + stat_s + file_s + 4) < FILENAME_MAX) {
-	    /* Construct the filename where the statistics are to be stored. */
-	    sprintf(stat_file, "%s/%s/%s", mproduct->db_info->name,
-		    UPS_FILES, g_stat_dir);
+      for (minst_item = (t_upslst_item *)mproduct->minst_list ;
+	   minst_item ; minst_item = minst_item->next) {
+	minst = (t_upstyp_matched_instance *)minst_item->data;
+	/* check to see if the instance indicates to keep statistics */
+	if (global_yes || (minst->chain && minst->chain->statistics) ||
+	                  (minst->version && minst->version->statistics) ||
+	                  (minst->table && minst->table->statistics)) {
+	  if (! file_stream ) {       /* we need to still open the stream */
+	    dir_s = (int )strlen(mproduct->db_info->name);
+	    stat_s = (int )strlen(g_stat_dir);
+	    file_s = (int )strlen(mproduct->product);
+	    if ( (dir_s + UPS_FILES_LEN + stat_s + file_s + 4) <
+		 FILENAME_MAX) {
+	      /* Construct filename where the statistics are to be stored. */
+	      sprintf(stat_file, "%s/%s/%s", mproduct->db_info->name,
+		      UPS_FILES, g_stat_dir);
 
-	    /* check to make sure the statistics directory exists first */
-	    if (upsutl_is_a_file(stat_file) == UPS_NO_FILE) {
-	      /* no statistics directory, this is a warning error */
-	      upserr_add(UPS_NO_FILE, UPS_WARNING, stat_file);
-	    } else {
-	      strcat(stat_file, mproduct->product);         /* filename */
-
-	      /* See if we can open the file (rw) to write to. */
-	      old_umask = umask(g_umask);
-
-	      if ((file_stream = fopen(stat_file, mode)) == NULL) {
-		/* Error opening file */
-		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
-			   strerror(errno));
-		upserr_add(UPS_OPEN_FILE, UPS_WARNING, stat_file);
+	      /* check to make sure the statistics directory exists first */
+	      if (upsutl_is_a_file(stat_file) == UPS_NO_FILE) {
+		/* no statistics directory, this is a warning error */
+		upserr_add(UPS_NO_FILE, UPS_WARNING, stat_file);
+	      } else {
+		strcat(stat_file, mproduct->product);         /* filename */
+		
+		/* See if we can open the file (rw) to write to. */
+		old_umask = umask(g_umask);
+		
+		if ((file_stream = fopen(stat_file, mode)) == NULL) {
+		  /* Error opening file */
+		  upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fopen",
+			     strerror(errno));
+		  upserr_add(UPS_OPEN_FILE, UPS_WARNING, stat_file);
+		}
+		/* set this back to what it was */
+		(void )umask(old_umask);
 	      }
-	      /* set this back to what it was */
-	      (void )umask(old_umask);
+	    } else {
+	      /* Error size of directory path to file is too long */
+	      upserr_add(UPS_NAME_TOO_LONG, UPS_WARNING, FILENAME_MAX);
 	    }
-	  } else {
-	    /* Error size of directory path to file is too long */
-	    upserr_add(UPS_NAME_TOO_LONG, UPS_WARNING, FILENAME_MAX);
 	  }
-	}
-	if (file_stream) {
-	  /* note the format of this output should be the same as that for 
-	     ups list -K+, with the extra information added on at the end */
-	  if (fprintf(file_stream, "\"%s\" ", mproduct->product)) {
-	    if (minst->version) {
-	      (void )fprintf(file_stream, "\"%s\" \"%s\" \"%s\" \"\" ",
-			     minst->version->version, minst->version->flavor,
-			     minst->version->qualifiers);
-	    } else if (minst->table) {
-	      (void )fprintf(file_stream, "\"\" \"%s\" \"%s\" \"\" ",
-			     minst->table->flavor,
-			     minst->table->qualifiers);
-	    }
-	    if (! fprintf(file_stream, "\"%s\" \"%s\" \"%s\"\n", user,
-			  time_date, a_command))
+	  if (file_stream) {
+	    /* note the format of this output should be the same as that for 
+	       ups list -K+, with the extra information added on at the end */
+	    if (fprintf(file_stream, "\"%s\" ", mproduct->product)) {
+	      if (minst->version) {
+		(void )fprintf(file_stream, "\"%s\" \"%s\" \"%s\" \"\" ",
+			       minst->version->version, minst->version->flavor,
+			       minst->version->qualifiers);
+	      } else if (minst->table) {
+		(void )fprintf(file_stream, "\"\" \"%s\" \"%s\" \"\" ",
+			       minst->table->flavor,
+			       minst->table->qualifiers);
+	      }
+	      if (! fprintf(file_stream, "\"%s\" \"%s\" \"%s\"\n", user,
+			    time_date, a_command))
+		upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
+			   strerror(errno));
+	      break;
+	    } else {
 	      upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
 			 strerror(errno));
 	      break;
-	  } else {
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_WARNING, "fprintf",
-		       strerror(errno));
+	    } 
+	  } else {     /* error opening file stream already added to buffer */
 	    break;
-	  } 
-	} else {     /* error opening file stream already added to buffer */
-	  break;
+	  }
 	}
       }
-    }
 
-    /* Close the file if it was opened */
-    if (file_stream != NULL) {
-      fclose(file_stream);
-      file_stream = NULL;
+      /* Close the file if it was opened */
+      if (file_stream != NULL) {
+	fclose(file_stream);
+	file_stream = NULL;
+      }
     }
   }
 
