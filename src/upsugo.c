@@ -75,6 +75,7 @@ int upsugo_bldfvr(struct ups_command * const uc);
 int upsugo_ifornota(struct ups_command * const uc);
 int upsugo_bldqual(struct ups_command * const uc, char * const inaddr);
 int upsugo_dump (struct ups_command * const uc);
+void upsugo_liststart(struct ups_command * const a_command_line);
 
 
 /* ===========================================================================
@@ -408,6 +409,24 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  }
  return(0);
 }
+/* ===========================================================================
+** ROUTINE	upsugo_liststart(t_upsugo_command * const a_command_line)
+**
+*/
+void upsugo_liststart(t_upsugo_command * const a_command_line)
+{
+  /* move all lists in the command line to their first element.  there
+     may be a better way to do this, maybe dave can take a look at it */
+  a_command_line->ugo_auth = upslst_first(a_command_line->ugo_auth);
+  a_command_line->ugo_flavor = upslst_first(a_command_line->ugo_flavor);
+  a_command_line->ugo_host = upslst_first(a_command_line->ugo_host);
+  a_command_line->ugo_key = upslst_first(a_command_line->ugo_key);
+  a_command_line->ugo_qualifiers = 
+                         upslst_first(a_command_line->ugo_qualifiers);
+  a_command_line->ugo_db = upslst_first(a_command_line->ugo_db);
+  a_command_line->ugo_chain = upslst_first(a_command_line->ugo_chain);
+}
+
 /* ===========================================================================
 ** ROUTINE	upsugo_getarg( int argc, char * argv[])
 **
@@ -794,6 +813,7 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
         upslst_delete( last_command, last_command->data, 'd');
         luc = ugo_commands->data;
         UPS_VERBOSE = luc->ugo_v;
+	upsugo_liststart(luc);       /* move all lists to first element */
         return (t_upsugo_command *)ugo_commands->data; 
      } else {
         return 0;
@@ -1374,6 +1394,7 @@ t_upsugo_command *upsugo_next(const int ups_argc,char *ups_argv[],char * const v
    ugo_commands=upslst_first(ugo_commands);
    luc = ugo_commands->data;
    UPS_VERBOSE=luc->ugo_v;
+   upsugo_liststart(luc);       /* move all lists to first element */
    return (t_upsugo_command *)ugo_commands->data; 
    } /* not subsequent call ... */
 }
