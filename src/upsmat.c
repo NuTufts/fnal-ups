@@ -931,7 +931,7 @@ static int match_from_table( const char * const a_product,
  *    still done with the prefix just left off.
  *
  *         tablefiledir/tablefile
- *         ./tablefile
+ *         tablefile
  *         ups_dir/tablefile
  *         prod_dir_prefix/prod_dir/ups_dir/tablefile
  *         db/prodname/tablefile
@@ -976,8 +976,8 @@ static char *get_table_file_path( const char * const a_prodname,
       }
     }
     /* try ./tablefile */
-    if ((found == 0) && ((total_chars = file_chars + 1) <= FILENAME_MAX)) {
-      sprintf(buffer, "./%s", a_tablefile);
+    if ((found == 0) && ((total_chars = file_chars) <= FILENAME_MAX)) {
+      sprintf(buffer, "%s", a_tablefile);
       if (is_a_file(buffer) == UPS_SUCCESS) {
 	G_SAVE_PATH(file_chars);            /* found it */
 	found = 1;
