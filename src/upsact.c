@@ -389,27 +389,26 @@ t_cmd_info g_cmd_info[] = {
   {e_unchain,       "unchain", 0, 0x00000010, e_chain},
   {e_setup,       "setup",       "?B:cdef:g:H:jkm:M:noO:Pq:r:stU:vVz:Z0123", 0x00000011, e_invalid_action},
   {e_unsetup,     "unsetup",     "?cdef:g:H:jm:M:noO:Pq:r:stU:vVz:Z0123", 0x00000011, e_setup},
-  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_list,        "list",        "?acdf:g:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:G:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z0123", 0x00000010, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vVz:Z0123", 0x00000010, e_declare},
-  {e_depend,      "depend",      "?cdnotg:f:H:jK:lm:M:q:r:RU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_depend,      "depend",      "?cdg:f:H:jK:lm:M:noq:r:RtU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_exist,       "exist",       "?B:cdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
-  {e_modify,      "modify",      "a?A:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000010, e_invalid_action},
+  {e_modify,      "modify",      "?aA:Ef:H:m:M:Nop:q:r:T:U:vVx:z:Z", 0x00000010, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:Pq:r:stU:vVwz:Z0123", 0x00000010, e_invalid_action},
   {e_stop,        "stop",        "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
-  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_tailor,      "tailor",      "?cdf:g:H:K:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_touch,       "touch",       "?A:b:cCdD:f:g:H:m:M:noO:p:q:r:tT:u:U:vVz:Z0123", 0x00000010, e_invalid_action},
   {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z0123", 0x00000010, e_configure},
   {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:tU:vVyYz:Z0123", 0x00000010, e_undeclare},
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000010, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:lvZ0123", 0x00000000, e_invalid_action},
-  {e_verify,      "verify",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
-  {e_help,        "help",
-            "a?A:b:B:cCdD:eEf:Fg:G:h:H:jkK:lm:M:nNoO:Pp:q:r:sStT:u:U:vVwW:x:XyYz:Z0123", 0x00000000, e_invalid_action},
+  {e_verify,      "verify",      "?acdf:g:H:K:lm:M:noq:r:tU:vVz:Z0123", 0x00000010, e_invalid_action},
+  {e_help,        "help",        "?v", 0x00000000, e_invalid_action},
   /* the following one must always be at the end and contains all options */
-  {e_unk,         NULL,
-            "a?A:b:B:cCdD:eEf:Fg:G:h:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:x:XyYz:Z0123", 0x00000010, e_invalid_action}
+  {e_unk,         NULL,          "?aA:b:B:cCdD:eEf:Fg:G:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:x:XyYz:Z0123",
+                                  0x00000010, e_invalid_action}
 };
 
 /* These action commands are listed in order of use.  Hopefully the more
