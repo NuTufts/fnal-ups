@@ -7,5 +7,6 @@ unsetenv UPS_EXTENDED
 setenv UPS_THIS_DB '../list/db1'
 setenv UPS_OS_FLAVOR '__YOUR_FLAVOR_HERE__'
 setenv UPS_PROD_FLAVOR 'NULL'
+setenv UPS_REQ_QUALIFIERS 'nodbg:opt'
 setenv UPS_PROD_QUALIFIERS 'nodbg:opt'
 setenv UPS_OPTIONS ''
