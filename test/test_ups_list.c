@@ -65,8 +65,11 @@ int main( void )
     print_str_list( l_ptr2 );
   }
   
-  printf( "\nMerging lists\n" );
-  l_ptr1 = upslst_merge( l_ptr1, l_ptr2 );
+  printf( "\nInserting lists\n" );
+  l_ptr1 = upslst_first( l_ptr1 );
+  l_ptr1 = upslst_insert_list( l_ptr1, l_ptr2 );
+  printf( "After list insert: p=%p, i=%p, n=%p, data=%s\n",
+	  l_ptr1->prev, l_ptr1, l_ptr1->next, (char *)l_ptr1->data );    
   print_str_list( l_ptr1 );  
 
   for ( i=0; i<DATA_COUNT; i=i+2 ) {

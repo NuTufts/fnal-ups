@@ -57,7 +57,6 @@ static int            write_chain_file( void );
 static int            write_table_file( void );
 static int            write_action( t_ups_action * const act );
 
-
 /* Line parsing */
 static int            get_key( void );
 static int            next_key( void );
@@ -132,8 +131,8 @@ static FILE           *g_fh = 0; /* file handle */
 static char           g_line[MAX_LINE_LEN] = "";  /* current line */
 static char           g_key[MAX_LINE_LEN] = "";   /* current key */
 static char           g_val[MAX_LINE_LEN] = "";   /* current value */
-static int            g_ikey = e_key_unknown;        /* current key as enum */  
-static int            g_ifile = e_file_unknown;      /* current file type as enum */
+static int            g_ikey = e_key_unknown;     /* current key as enum */  
+static int            g_ifile = e_file_unknown;   /* current file type as enum */
 
 static int            g_imargin = 0;
 
@@ -433,7 +432,7 @@ int read_file( void )
     }
     
     if ( l_ptr ) 
-      g_pd->instance_list = upslst_merge( g_pd->instance_list, l_ptr );
+      g_pd->instance_list = upslst_add_list( g_pd->instance_list, l_ptr );
   }
 	  
   return 1;
@@ -738,7 +737,7 @@ t_upslst_item *read_groups( void )
 	l_tmp_ptr = read_group();
 
 	if ( l_tmp_ptr ) {
-	  l_ptr = upslst_merge( l_ptr, l_tmp_ptr );
+	  l_ptr = upslst_add_list( l_ptr, l_tmp_ptr );
 	}
 	else {
 	  break;
