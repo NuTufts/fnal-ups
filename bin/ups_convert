@@ -551,7 +551,7 @@ sub WriteVersionRecs {
        print VersionFile "# Source -\n";
        print VersionFile "# Origin - \n";
        print VersionFile "# Distribution - \n";
-       print VersionFile "# Auth_nodes - \n";
+       print VersionFile "# Authorized_nodes - \n";
        print VersionFile "# table_dir - \n";
        print VersionFile "# table_file -\n";
        print VersionFile "# \n";
