@@ -1,4 +1,3 @@
-/var/tmp/baaa0069T_table_bee3
 
-ups declare bee3 v4_1 -f "CHERRY" -q "linus" -r "/NULL/bee3" -z "/home/t1/votava/cvs/erupt/test/scripts/copy/db1"  -U "blah"  -m "a.out"  -M "ups"  -C 
+ups declare bee3 v4_1 -f "CHERRY" -q "linus" -r "/NULL/bee3" -z "/dev/NULL/db"  -U "blah"  -m "kitchen.table"  -M "ups"  -C 
 

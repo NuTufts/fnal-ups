@@ -1,4 +1,3 @@
-/var/tmp/aaaa005qo_table_bee3
 
 ups declare bee3 v4_1 -f "NULL" -q "" -r "/NULL/bee1" -z "/home/t1/votava/cvs/erupt/test/scripts/copy/db1"  -U "ups"  -m "a.out" 
 
