@@ -92,7 +92,7 @@ void upsutl_start_timing(void);
 void upsutl_stop_timing(void);
 void upsutl_statistics(t_upslst_item const * const a_mproduct,
 		       char const * const a_command);
-char *upsutl_time_date(void);
+char *upsutl_time_date(int a_flag);
 char *upsutl_user(void);
 
 int   upsutl_stricmp( const char *s1, const char *s2 );
