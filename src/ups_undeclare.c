@@ -175,8 +175,8 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
             mproduct_list = upslst_first(mproduct_list);
             mproduct = (t_upstyp_matched_product *)mproduct_list->data;
             minst_list = (t_upslst_item *)mproduct->minst_list;
-            minst = (t_upstyp_matched_instance *)(minst_list->data);
-            cinst = (t_upstyp_instance *)minst->chain;
+            minst = minst_list ? (t_upstyp_matched_instance *)(minst_list->data) : 0;
+            cinst = minst ? (t_upstyp_instance *)minst->chain : 0;
             product = upsget_chain_file(db_info->name,
                                         uc->ugo_product,
                                         the_chain, &file);

@@ -292,6 +292,7 @@ char *upsget_translation_env( char * const oldstr )
   char *e_loc = 0;
   char *tr_env = 0;
   
+  buf[0] = 0; /* reset buf[0] */
 
   while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) 
   { if(!clear_flag)                   
