@@ -1,0 +1,8 @@
+astro v1_0 -f NULL -z ../db1
+snoopy v1_0 -f NULL -z ../db1
+rover v1_0 -f NULL -z ../db1
+fly v1_0 -f NULL -z ../db1
+spot v3_0 -f NULL -z ../db1
+lassie v1_0 -f NULL -z ../db1
+asta v1_0 -f NULL -z ../db2
+rabbit v1_0 -f NULL -z ../db3
