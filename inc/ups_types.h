@@ -29,21 +29,11 @@
 /*-----------------------------------------------------------------------
  * ups specific include files, if needed for .h file
  */
+#include "ups_list.h"
 
 /*-----------------------------------------------------------------------
  * Public typdef's
  */
-
-/*
- * a list, still need a 'nice' interface (add, delete, clear, etc).
- * which probaly will justify a 'ups_list.c' and 'ups_list.h'.
- */
-typedef struct ups_list_item
-{
-  struct ups_list_item    *prev;
-  void                    *data;
-  struct ups_list_item    *next;
-} t_ups_list_item;
 
 /* a 'full' product, not sure if that need to be public */
 typedef struct ups_product
@@ -103,7 +93,7 @@ typedef struct ups_action
   char             *prod_version;
   char             *prod_qualifiers;
     
-  t_ups_list_item  *action_list;
+  t_ups_list_item  *command_list;
 
   t_ups_instance   *instance;
 } t_ups_action;
