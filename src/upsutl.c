@@ -75,20 +75,6 @@ static int qsort_cmp_string( const void *, const void * ); /* used by qsort */
 #define NULL 0
 #endif
 
-#define CMP_AUTH_NODES(struct) \
-    if (struct && struct->authorized_nodes) {                   \
-      *a_nodes = struct->authorized_nodes;                       \
-      if (strcmp(struct->authorized_nodes, ANY_MATCH) &&        \
-	  !strstr(struct->authorized_nodes, nodename)) {        \
-	is_auth = 0;                                            \
-      }                                                         \
-    }
-
-#define G_SAVE_PATH(s) \
-  path_ptr = (char *)upsmem_malloc(s);   \
-  strcpy(path_ptr, buffer);              \
-  found = 1;      
-
 static clock_t g_start_cpu, g_finish_cpu;
 static time_t g_start_w, g_finish_w;
 static char g_stat_dir[] = "statistics/";
@@ -133,7 +119,8 @@ static char g_buffer[FILENAME_MAX+1];
  */
 #define LOOK_FOR_FILE()   \
    if ((! a_exist_flag) || (upsutl_is_a_file(buffer)) == UPS_SUCCESS) {  \
-     G_SAVE_PATH(total_chars);        /* found it */                     \
+     path_ptr = buffer;                                                  \
+     found = 1;                                                          \
    }
 
 char *upsutl_get_table_file_path( const char * const a_prodname,
@@ -144,7 +131,8 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 				  const t_upstyp_db * const a_db_info,
 				  const int a_exist_flag)
 {
-  char buffer[FILENAME_MAX+1];   /* max size of file name and path on system */
+  static char buffer[FILENAME_MAX+1];   /* max size of file name and path 
+					   on system */
   char *path_ptr = NULL;
   int file_chars = 0, total_chars = 0;
   int found = 0;
@@ -187,9 +175,9 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	  }
 	}
       }
-    } else {
+    } else { /* if ((a_tablefiledir != NULL) && (a_tablefiledir[0] == '/')) */
       /* try ups_dir/tablefile */
-      if ((found == 0) && (a_upsdir != NULL) && (a_upsdir[0] == '/')) {
+      if ((a_upsdir != NULL) && (a_upsdir[0] == '/')) {
 	if ((total_chars = file_chars + (int )strlen(a_upsdir))
 	    <= FILENAME_MAX) {
 	  sprintf(buffer, "%s/%s", a_upsdir, a_tablefile);
@@ -202,9 +190,10 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
       /* try prod_dir/ups_dir/tablefile */
       if ((found == 0) && (a_upsdir != NULL) && (a_productdir != NULL)) {
 	if (a_db_info->config && a_db_info->config->prod_dir_prefix) {
-	  if ((total_chars += (int )strlen(a_productdir) + 
+	  if ((total_chars = file_chars + (int )strlen(a_upsdir) + 
+	       (int )strlen(a_productdir) + 
 	       (int )strlen(a_db_info->config->prod_dir_prefix) +
-	       1) <= FILENAME_MAX) {
+	       3) <= FILENAME_MAX) {
 	    sprintf(buffer, "%s/%s/%s/%s", a_db_info->config->prod_dir_prefix,
 		    a_productdir, a_upsdir, a_tablefile);
 	    LOOK_FOR_FILE();
@@ -213,8 +202,8 @@ char *upsutl_get_table_file_path( const char * const a_prodname,
 	    upserr_add(UPS_FILENAME_TOO_LONG, UPS_FATAL, total_chars);
 	  }
 	} else {
-	  if ((total_chars += (int )strlen(a_productdir) + 1)
-	      <= FILENAME_MAX) {
+	  if ((total_chars = file_chars + (int )strlen(a_upsdir) +
+	       (int )strlen(a_productdir) + 2) <= FILENAME_MAX) {
 	    sprintf(buffer, "%s/%s/%s", a_productdir, a_upsdir, a_tablefile);
 	    LOOK_FOR_FILE();
 	  } else {
@@ -372,6 +361,15 @@ char *upsutl_get_hostname( void )
  * Output: list of nodes on which the product is authorized
  * Return: 0 if not authorized, else 1.
  */
+#define CMP_AUTH_NODES(struct) \
+    if (struct && struct->authorized_nodes) {                   \
+      *a_nodes = struct->authorized_nodes;                      \
+      if (strcmp(struct->authorized_nodes, ANY_MATCH) &&        \
+	  !strstr(struct->authorized_nodes, nodename)) {        \
+	is_auth = 0;                                            \
+      }                                                         \
+    }
+
 int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
 			  const t_upstyp_db * const a_db_info, 
 			  char ** const a_nodes)
