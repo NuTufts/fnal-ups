@@ -279,7 +279,7 @@ case $ccenv in
 				cflags="$cflags -g3" 
 			fi
 		fi
-		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -D_OSF_SOURCE -migrate -check\""
+		defs="$defs CCCHK=\"-warnprotos -std1 -D_POSIX_SOURCE -D_OSF_SOURCE -migrate\""
 		llibs="-lots"
 		;;
 # Don't muck with AIX unless YOU test it, DjF
