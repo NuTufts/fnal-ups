@@ -503,6 +503,7 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromVersion(prod_dir)
     FromVersion(archive_file)
     FromVersion(description)
+    FromVersion(origin)
 /*    FromVersion(db_dir) */
 /* DO NOT CHANGE ORDER here it's the default !!! */
     FromAny(product) 
@@ -523,33 +524,6 @@ void list_K(const t_upstyp_matched_instance * const instance,
     FromConfig(man_path,"Man_Path")
     FromConfig(html_path,"Html_Path")
     FromConfig(info_path,"Info_Path")
-    if (!strncmp(l_ptr->data,"USERKEY",7) || !strncmp(l_ptr->data,"userkey",7))
-    { for ( ul_ptr = upslst_first( instance->version->user_list ); 
-            ul_ptr; ul_ptr = ul_ptr->next, count++ )
-      { if (strlen(l_ptr->data) == 7) /* no specific key give all */
-        { printf("\"%s\" ",(char *)ul_ptr->data); /* Give keys and values */
-        } else {
-          str_ptr=l_ptr->data;
-          str_ptr+=8;
-          str_val=0;
-          if (instance->chain) 
-             str_val = upskey_inst_getuserval( instance->chain,str_ptr);
-          if (instance->version && !str_val )
-             str_val = upskey_inst_getuserval( instance->version,str_ptr);
-          if (instance->table && !str_val )
-             str_val = upskey_inst_getuserval( instance->table,str_ptr);
-          if (!str_val) 
-          { printf("\"\" ");
-          } else {
-            if (strlen(str_val))
-            { printf("\"%s\" ",str_val);
-            } else { 
-              printf("\"%s\" ",(char *)l_ptr->data);
-            }
-          } 
-        } 
-      }
-    }
     if (!strncmp(l_ptr->data,"_",1))
     { str_val=0;
       if (instance->chain) 

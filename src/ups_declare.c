@@ -222,6 +222,16 @@ void ups_declare( t_upsugo_command * const uc ,
            product = upsget_chain_file(db_info->name,
                                        uc->ugo_product,
                                        the_chain, &file);
+           if(!product) /* Chain deleted was all only one */ 
+           { product = ups_new_product();
+             sprintf(file,"%s/%s/%s%s",
+                     db_info->name,
+                     uc->ugo_product,
+                     the_chain,CHAIN_SUFFIX);
+             product->file = CHAIN;
+             product->product=uc->ugo_product;
+             product->chain = the_chain;
+           }
          } else { /* new chain does NOT exist at all */
            product = ups_new_product();
            sprintf(file,"%s/%s/%s%s",
