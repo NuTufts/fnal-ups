@@ -471,7 +471,6 @@ t_upslst_item *upsutl_free_matched_product_list(
   t_upslst_item *mproduct_item;
   t_upstyp_matched_product *mproduct;
 
-
   /* make sure we are at the beginning of the list */
   *a_mproduct_list = upslst_first(*a_mproduct_list);
 
@@ -508,15 +507,7 @@ t_upslst_item *upsutl_free_matched_instance_list(
   /* free the instances */
   for (list_item = *a_minst_list; list_item; list_item = list_item->next) {
     minst_ptr = (t_upstyp_matched_instance *)(list_item->data);
-    if (minst_ptr->chain) {
-      ups_free_instance(minst_ptr->chain);
-    }
-    if (minst_ptr->version) {
-      ups_free_instance(minst_ptr->version);
-    }
-    if (minst_ptr->table) {
-      ups_free_instance(minst_ptr->table);
-    }
+    (void )ups_free_matched_instance(minst_ptr);
   }
 
   /* Now free the list */
@@ -731,8 +722,8 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   char *time_date, *user;
   mode_t old_umask;
 
-  /* Get the current time and date */
-  time_date = upsutl_time_date();
+  /* Get the current time and date (with spaces) */
+  time_date = upsutl_time_date(STR_TRIM_DEFAULT);
 
   /* Get the current user */
   user = upsutl_user();
@@ -993,12 +984,12 @@ char *upsutl_strstr( const char * const a_str, const char * const a_pattern )
  *
  * Return an ascii representation of the current time and date
  *
- * Input : none
+ * Input : a flag whether or not to return a string with spaces or '_'
  * Output: none
  * Return: character string containing the current time and date
  *          formatted like "YYYY-MM-DD HH:MM:SS TZ"
  */
-char *upsutl_time_date(void)
+char *upsutl_time_date(int a_flag)
 {
   time_t now, len;
   static char buff[MAX_LINE_LEN];
@@ -1006,8 +997,13 @@ char *upsutl_time_date(void)
 
   /* Get the current time and date */
   now = time(NULL);
-  len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d %H.%M.%S GMT",
-			  gmtime(&now));
+  if (a_flag == STR_TRIM_DEFAULT) {
+    len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d %H.%M.%S GMT",
+			    gmtime(&now));
+  } else {
+    len = (size_t )strftime(buff, MAX_LINE_LEN, "%Y-%m-%d_%H.%M.%S_GMT",
+			    gmtime(&now));
+  }
   if (len == 0) {
     buf_ptr = NULL;
   } else {
