@@ -43,6 +43,7 @@
 #include "upsutl.h"
 #include "upshlp.h"
 #include "upsget.h"
+#include "ups_declare.h"
 
 /*
  * Definition of public variables.
@@ -155,8 +156,6 @@ int main(int argc, char *argv[])
 	    break;
 	  case e_copy: ups_unk(command_line, argv[1], e_copy);
 	    break;
-	  case e_declare: ups_unk(command_line, argv[1], e_declare);
-	    break;
 	  case e_depend: ups_unk(command_line, argv[1], e_depend);
 	    break;
 	  case e_exist: ups_setup(command_line, temp_file, e_exist);
@@ -179,6 +178,8 @@ int main(int argc, char *argv[])
 	  case e_get: ups_unk(command_line, argv[1], e_get);
 	    break;
 	  case e_validate: ups_unk(command_line, argv[1], e_validate);
+	    break;
+	  case e_declare: ups_declare(command_line);
 	    break;
 	  case e_unk: ups_unk(command_line, argv[1], e_unk);
 	    break;
