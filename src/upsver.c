@@ -59,7 +59,7 @@ void upsver_mes (const int vl, char * const format, ...)
 
   if ( UPS_VERBOSE >= vl )
   { va_start(args,format);
-    vfprintf(stderr,format, args);
+    (void) vfprintf(stderr,format, args);
     va_end(args);
   }
 }
