@@ -78,6 +78,7 @@ typedef struct s_cmd_map {
   tpf_cmd func;
   int  min_params;
   int  max_params;
+  int  icmd_undo;
 } t_cmd_map;
 
 /*
@@ -105,6 +106,8 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 			     t_upstyp_matched_product *mat_prod,
 			     const int level,
 			     const char * const act_name );
+t_upstyp_action *new_default_action( const char *act_name, const int iact );
+int actname2enum( const char * const act_name );
 char *action2inst( const t_upsact_item *const p_cur );
 
 /* functions to handle specific action commands */
@@ -262,23 +265,50 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 
 static char g_default_delimiter[2] = ":";
 
-/* This is a list of the actions that can exist that are not UPS commands.
-   The list of Ups commands can also be actions but they are defined in an
-   enum in ups_main.h */
-enum {
-  e_invalid_action = -1,
-  e_current = e_unk+1,
-  e_development,
-  e_new,
-  e_old,
-  e_test,
-  e_chain,
-  e_uncurrent,
-  e_undevelopment,
-  e_unnew,
-  e_unold,
-  e_untest,
-  e_unchain
+/* 
+ * Note: This array should in princip be in ups_main.c, but since
+ * ups_main is not part of the ups library, it's here.
+ *
+ * The enum is defined in ups_main.h
+ * where flag:
+ * <byte>: <description>
+ *   0   : specify if that action has a default set of commands
+ */
+t_cmd_info g_cmd_info[] = {
+  {e_current,       "current", 0, 0x00000001},
+  {e_development,   "development", 0, 0x00000000},
+  {e_new,           "new", 0, 0x00000000},
+  {e_old,           "old", 0, 0x00000000},
+  {e_test,          "test", 0, 0x00000000},
+  {e_chain,         "chain", 0, 0x00000000},
+  {e_uncurrent,     "uncurrent", 0, 0x00000001},
+  {e_undevelopment, "undevelopment", 0, 0x00000000},
+  {e_unnew,         "unnew", 0, 0x00000000},
+  {e_unold,         "unold", 0, 0x00000000},
+  {e_untest,        "untest", 0, 0x00000000},
+  {e_unchain,       "unchain", 0, 0x00000000},
+  {e_setup,       "setup",       "?B:cde:f:g:H:jkm:M:noO:q:r:tU:vVz:Z", 0x00000001},
+  {e_unsetup,     "unsetup",     "?cde:f:g:H:jm:M:noO:q:tU:vVz:Z", 0x00000001},
+  {e_list,        "list",        "a?cdf:g:h:H:K:lm:M:noq:r:tU:vVz:Z", 0x00000000},
+  {e_configure,   "configure",   "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
+  {e_copy,        "copy",        "?A:cCdf:g:H:m:M:noO:p:P:q:r:tT:U:vVWXz:Z", 0x00000000},
+  {e_declare,     "declare",     "?A:cCdf:g:H:m:M:noO:p:q:r:tT:U:vVz:Z", 0x00000000},
+  {e_depend,      "depend",      "?cdotg:f:H:K:m:M:q:r:U:vVz:Z", 0x00000000},
+  {e_exist,       "exist",       "?B:cde:f:g:H:jkm:M:oO:q:r:tU:vVz:Z", 0x00000000},
+  {e_modify,      "modify",      "?A:Ef:H:m:M:op:q:r:T:U:vVx:z:Z", 0x00000000},
+  {e_start,       "start",       "?cdf:g:H:m:M:noO:q:r:tU:vVwz:Z", 0x00000000},
+  {e_stop,        "stop",        "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
+  {e_tailor,      "tailor",      "?cdf:g:h:H:K:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
+  {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:q:r:tU:vVz:Z", 0x00000000},
+  {e_undeclare,   "undeclare",   "?cdf:g:H:m:M:noO:q:r:tU:vVyYz:Z", 0x00000000},
+  {e_create,      "create",      "?f:H:m:M:p:q:vZ", 0x00000000},
+  {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vVz:Z", 0x00000000},
+  {e_validate,    "validate",    "?cdf:g:h:H:lm:M:nNoq:r:StU:vVz:Z", 0x00000000},
+  {e_help,        "help",
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000},
+  /* the following one must always be at the end and contains all options */
+  {e_unk,         NULL,
+            "a?A:B:cCdeEf:Fg:h:H:jkK:lm:M:nNoO:p:P:q:r:StT:U:vVwW:x:XyYz:Z", 0x00000000}
 };
 
 enum {
@@ -502,7 +532,7 @@ t_upsact_cmd *upsact_parse_cmd( const char * const cmd_str )
   /* fill p_cmd, split parameter string into a list of arguments */
   
   if ( icmd != e_invalid_action ) {
-    pcmd->icmd = icmd;    
+    pcmd->icmd = icmd;
     pcmd->argc = parse_params( act_s, pcmd->argv );
     return pcmd;
   }
@@ -560,7 +590,7 @@ void upsact_print_cmd( const t_upsact_cmd * const cmd_cur )
   icmd = cmd_cur->icmd;
   
   printf( "%s(", g_cmd_maps[icmd].cmd );
-  for ( i = 0; i < cmd_cur->argc; i++ ) {
+ for ( i = 0; i < cmd_cur->argc; i++ ) {
     if ( i == cmd_cur->argc - 1 ) 
       printf( " %s ", cmd_cur->argv[i] );
     else
@@ -723,6 +753,7 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
   t_upslst_item *top_list = 0;
+  int i_act = actname2enum( act_name );
 
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
     p_line = upsget_translation( p_cur->mat, p_cur->ugo,
@@ -732,6 +763,7 @@ t_upslst_item *get_top_prod( t_upsact_item *const p_cur,
     if ( p_cmd && p_cmd->icmd >= 0 ) {
       t_upsact_item *new_cur = 0;
       t_upsugo_command *new_ugo = 0;
+      p_cmd->iact = i_act;
       switch ( p_cmd->icmd ) 
       {
       case e_setuprequired: case e_setupoptional:
@@ -766,10 +798,25 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 			 const char copt )
 {
   static char *valid_switch = "AacCdfghKtmMNoOPqrTuUv";
-  t_upslst_item *l_cmd = p_cur->act ? p_cur->act->command_list : 0;
+
+  t_upslst_item *l_cmd = 0;
   t_upsact_cmd *p_cmd = 0;
   char *p_line = 0;
+  int i_act = e_invalid_action;
 
+  if ( !p_cur )
+    return dep_list;
+
+  i_act = actname2enum( act_name );
+
+  /* take care of defaults cases */
+
+  if ( !p_cur->act ) {
+    if ( !(p_cur->act = new_default_action( act_name, i_act )) ) 
+      return dep_list;
+  }
+
+  l_cmd = p_cur->act->command_list;
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
 
     /* translate and parse command */    
@@ -778,6 +825,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
     p_cmd = upsact_parse_cmd( p_line );
 
     if ( p_cmd && p_cmd->icmd >= 0 ) {
+      p_cmd->iact = i_act;
       if ( p_cmd->icmd > e_unsetuprequired ) {
 	t_upsact_item *new_cur = (t_upsact_item *)upsmem_malloc( sizeof( t_upsact_item ) );
 	new_cur->level = p_cur->level;
@@ -881,6 +929,22 @@ char *action2inst( const t_upsact_item *const p_cur )
   }
 
   return buf;
+}
+
+int actname2enum( const char * const act_name )
+{
+  int iact = e_invalid_action, i = 0;
+
+  if ( act_name ) {
+    for ( i=0; g_cmd_info[i].cmd; i++ ) {
+      if (! upsutl_stricmp(g_cmd_info[i].cmd, act_name)) {
+	iact = i;
+	break;
+      }
+    }
+  }
+  
+  return iact;
 }
 
 /*-----------------------------------------------------------------------
@@ -999,6 +1063,22 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
   act_item->cmd = 0;
 
   return act_item;
+}
+
+t_upstyp_action *new_default_action( const char *act_name, int iact )
+{
+  t_upstyp_action *new_act = 0;
+
+  if ( iact > e_invalid_action && (g_cmd_info[iact].flags)&0x00000001 ) {
+    new_act = (t_upstyp_action *)malloc( sizeof( t_upstyp_action ) );
+    new_act->action = (char *)malloc( strlen( act_name ) + 1 );
+    strcpy( new_act->action, act_name );
+    new_act->command_list = 0;
+    new_act->command_list = upslst_add( new_act->command_list, 
+					upsutl_str_create( "dodefault()", ' ' ) );
+  }
+
+  return new_act;
 }
 
 /*-----------------------------------------------------------------------
@@ -2027,7 +2107,7 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
 		   const t_upstyp_db * const a_db_info,
 		   const t_upsugo_command * const a_command_line,
 		   const FILE * const a_stream,
-		   const t_upsact_cmd * const a_cmd)
+	   const t_upsact_cmd * const a_cmd)
 {
   t_upsact_cmd lcl_cmd;
   static char buff[MAX_LINE_LEN];
