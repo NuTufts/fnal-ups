@@ -1,5 +1,5 @@
 Name         = lassie	
-Tilde        = //dir/filename	
+Tilde        = __YOUR_LP_GOES_HERE__/dir/filename	
 Version      = v2_0	
 Flavor       = NULL	
 Qualifiers   = nodbg:opt	
