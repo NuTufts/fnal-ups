@@ -38,6 +38,10 @@
  */
 #define DIVIDER  "#####################################################################"
 
+#define STR_TRIM 't'
+#define STR_TRIM_PACK 'p'
+#define STR_TRIM_DEFAULT ' '
+
 /*
  * Types.
  */

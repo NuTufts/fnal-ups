@@ -439,8 +439,9 @@ char *upsutl_user(void)
  * Will create a sring on the heap, using upsmem. 
  *
  * Input : char *, string to be copied.
- *         char, options, 't' will trim edges of passed string.
- *             , options, 'p' will trim full string (packing).
+ *         char, options, STR_TRIM ('t') will trim edges of passed string.
+ *             ,          STR_TRIM_PACK ('p') will trim full string (packing).
+ *             ,          STR_TRIM_DEFAULT (' ') will do nothing.
  * Output: none
  * Return: char *, new string.
  */
@@ -448,12 +449,13 @@ char *upsutl_str_create( char * const str, const char copt )
 {
   char *new_str = 0;
   
-  if ( ! str ) return 0;
+  if ( !str ) return 0;
 
-  if ( copt == 't' || copt == 'p' ) {
+  if ( copt == 'p' || copt == 't' ) {
     
     /* copy overhead only when option 't' or 'p' is passed */
-    
+
+    static char bad_chars[] = " \t\n\r\f\"";
     static char buf[MAX_LINE_LEN];
     if ( strlen( str ) >= MAX_LINE_LEN ) {    
       upserr_add( UPS_LINE_TOO_LONG, UPS_FATAL, "upsutl_str_create" );
@@ -461,9 +463,9 @@ char *upsutl_str_create( char * const str, const char copt )
     }    
     strcpy( buf, str );
     if ( copt == 'p' )
-      upsutl_str_remove( buf, " \t\n\r\f\"" );
+      upsutl_str_remove( buf, bad_chars );
     else
-      upsutl_str_remove_edges( buf, " \t\n\r\f\"" );
+      upsutl_str_remove_edges( buf, bad_chars );
     
     new_str = (char *)upsmem_malloc( (int)strlen( buf ) + 1 );
     strcpy( new_str, buf );      
