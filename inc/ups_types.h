@@ -25,6 +25,7 @@
  *       28-Aug-1997, DjF, added upsugo_env - Build ups_command structure
  *                         from the product environment variable given
  *                         product name.
+ *       08-Sep-1997, LR, Added constant INVALID_INDEX.
  *
  ***********************************************************************/
 
@@ -60,7 +61,8 @@ typedef struct ups_product
 {
   char             *file;
   char             *product;
-  char             *chaver;
+  char             *version;
+  char             *chain;
   char             *ups_db_version;
   
   t_upslst_item    *instance_list;
@@ -76,9 +78,6 @@ typedef struct ups_instance
   char             *qualifiers;
   
   char             *chain;
-  char             *chain_declarer;
-  char             *chain_declared;
-  
   char             *declarer;
   char             *declared;
   char             *prod_dir;
@@ -184,7 +183,7 @@ typedef struct ups_command
  */
 #define ANY_MATCH "*"
 #define MAX_LINE_LEN 1024
-
+#define INVALID_INDEX -1
 
 /*
  * Declaration of public functions.

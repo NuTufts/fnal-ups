@@ -88,7 +88,8 @@ int ups_free_product( t_ups_product * const prod_ptr )
   if ( all_gone( prod_ptr ) ) {
     if ( prod_ptr->file ) { upsmem_free( prod_ptr->file ); }
     if ( prod_ptr->product ) { upsmem_free( prod_ptr->product); }
-    if ( prod_ptr->chaver ) { upsmem_free( prod_ptr->chaver ); }
+    if ( prod_ptr->chain ) { upsmem_free( prod_ptr->chain ); }
+    if ( prod_ptr->version ) { upsmem_free( prod_ptr->version ); }
     if ( prod_ptr->ups_db_version ) { upsmem_free( prod_ptr->ups_db_version ); }
 
     /* get rid of instances */
@@ -157,9 +158,6 @@ int ups_free_instance( t_ups_instance * const inst_ptr )
     if ( inst_ptr->qualifiers ) { upsmem_free( inst_ptr->qualifiers ); }
   
     if ( inst_ptr->chain ) { upsmem_free( inst_ptr->chain ); }
-    if ( inst_ptr->chain_declarer ) { upsmem_free( inst_ptr->chain_declarer ); }
-    if ( inst_ptr->chain_declared ) { upsmem_free( inst_ptr->chain_declared ); }
-
     if ( inst_ptr->declarer ) { upsmem_free( inst_ptr->declarer ); }
     if ( inst_ptr->declared ) { upsmem_free( inst_ptr->declared ); }
     if ( inst_ptr->prod_dir ) { upsmem_free( inst_ptr->prod_dir ); }
