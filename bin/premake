@@ -56,7 +56,7 @@ for a in "$@" ; do
 	# we parsed the option, now save the value
 	case "$positional" in
 	  -cc)
-		ccenv="$a"
+		ccenv="$a";;
 	  -cflags)
 		cflags="$cflags $a";;
 	  -f)
