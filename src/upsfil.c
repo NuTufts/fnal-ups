@@ -146,7 +146,7 @@ static int               g_call_count = 0;           /* # times read_file is cal
 			       g_filename, (str1), (num), (str2))
 
 #define P_VERB_s_i_s_s_s( iver, str1, num, str2, str3, str4 ) \
-  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s %d %s\n", \
+  if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s %d %s %s %s\n", \
 			       g_filename, (str1), (num), (str2), (str3), (str4))
 
 /*
@@ -1226,7 +1226,7 @@ int next_key( void )
 
     P_VERB_s_i_s_nn( 3, "reading line :", g_line_count, g_line );
   
-    if ( !upsutl_str_remove_end_quotes( g_line, QUOTES, WCHARS ) ) continue;
+    if ( !upsutl_str_remove_edges( g_line, WCHARS ) ) continue;
 
     if ( get_key() != e_key_eol ) {
       return g_ikey;
@@ -1282,13 +1282,15 @@ int get_key( void )
   
     while( cp && *cp && *cp != '=' ) { cp++; }
     cp++;
-    while( cp && *cp && (isspace( (int)*cp ) || *cp == '"') ) { cp++; }
+    while( cp && *cp && isspace( (int)*cp ) ) { cp++; }
     count = 0;
     while( cp && *cp && *cp != '\n' ) {
       g_val[count] = *cp;
       count++; cp++;
     }
     g_val[count] = 0;
+
+    upsutl_str_remove_end_quotes( g_val, QUOTES, 0 );  
   }
 
   g_mkey = upskey_get_map( g_key );
@@ -1297,10 +1299,12 @@ int get_key( void )
   else
     g_ikey = e_key_unknown;
 
-  if ( has_val )
+  if ( has_val ) {
     P_VERB_s_i_s_s_s( 3, "parsed line  :", g_line_count, g_key, "=", g_val );
-  else 
+  }
+  else {
     P_VERB_s_i_s( 3, "parsed line  :", g_line_count, g_key );
+  }
 
   return g_ikey;
 }
