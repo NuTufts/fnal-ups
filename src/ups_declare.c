@@ -129,21 +129,29 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                "Specification must include a product and a version");
     return 0;
   }
+  save_chain=uc->ugo_chain;
   if ((int)(upslst_count(uc->ugo_flavor) != 2) ) /* remember any */
   { if(!uc->ugo_chain) /* not possibly just defining a chain */
     { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
                  "Specification must include a single flavor");
       return 0;
     } else {  /* if just defining a chain it be there */
-      mproduct_list = upsmat_instance(uc, db_list , not_unique);
+      uc->ugo_chain=0;
+      mproduct_list = upsmat_instance(uc, db_list , need_unique);
       if (!mproduct_list)
       { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
                    "Specification must include a single flavor");
         return 0;
+      } else { /* get the flavor for chain */
+        mproduct_list = upslst_first(mproduct_list);
+        mproduct = (t_upstyp_matched_product *)mproduct_list->data;
+        minst_list = (t_upslst_item *)mproduct->minst_list;
+        minst = (t_upstyp_matched_instance *)(minst_list->data);
+        the_flavor=minst->version->flavor;
       }
     }
   }
-  save_chain=uc->ugo_chain;
+  uc->ugo_chain=save_chain;
 /* if they are defining a version ONLY and it allready exists fail */
   if ( !uc->ugo_chain && uc->ugo_version) 
   if (mproduct_list)
@@ -256,6 +264,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
              minst_list = (t_upslst_item *)mproduct->minst_list;
              minst = (t_upstyp_matched_instance *)(minst_list->data);
              cinst = (t_upstyp_instance *)minst->chain;
+             the_flavor=cinst->flavor;
              product = upsget_chain_file(db_info->name,
                                          uc->ugo_product,
                                          the_chain, &file);
@@ -316,7 +325,7 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
          new_cinst=ups_new_instance();
          new_cinst->product=upsutl_str_create( uc->ugo_product, ' ' );
          new_cinst->version=upsutl_str_create(save_version,' ');
-         the_flavor=save_flavor->data;
+         /* the_flavor=save_flavor->data; */
          new_cinst->flavor=upsutl_str_create(the_flavor,' ');
          the_qualifiers=save_qualifiers->data;
          new_cinst->qualifiers=upsutl_str_create(the_qualifiers,' ');

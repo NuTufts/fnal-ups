@@ -403,6 +403,33 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
   }
 }
 
+char *upsutl_copy_info( const t_upstyp_matched_instance * const a_minst,
+                        const FILE * const a_stream, const int a_shell,
+                        const t_upstyp_db * const a_db_info)
+{
+}
+/* 
+{ if (a_db_info->config && a_db_info->config->info_target_dir &&
+      a_minst->table && a_minst->table->info_source_dir) 
+  { switch ( a_shell ) 
+    { case e_BOURNE:
+      case e_CSHELL:
+*/
+        /* first check to see if the directory where the info files are
+           located exists and is a directory */
+/*
+        if (! stat(a_minst->table->info_source_dir, &file_stat)) {
+          if (S_ISDIR(file_stat.st_mode)) {
+            if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n",
+                        a_minst->table->info_source_dir,
+                        a_db_info->config->info_target_dir) < 0) {
+              FPRINTF_ERROR();
+            }
+          }
+        }
+}
+*/
+
 /*-----------------------------------------------------------------------
  * upsutl_find_manpages
  *
