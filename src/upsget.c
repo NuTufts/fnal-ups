@@ -79,6 +79,8 @@
 }
 
 
+char *upsget_translation_tilde( char * const oldstr );
+ 
 typedef char * (*var_func)(const t_upstyp_db * const db_info_ptr,
                            const t_upstyp_matched_instance * const instance,
                            const t_upsugo_command * const command_line );
@@ -270,12 +272,14 @@ char *upsget_translation_env( char * const oldstr )
      is done, it will return a pointer to a static string containing the 
      translated string. if no translation is done, it will return (null).
 
-     Note: right now it quit dum, it will only recognize ${var},
+     Note: right now it quit dumb, it will only recognize ${var},
      but should probaly also recognize ${ var }, $var, maybe even
      ${var1_${var2}} ... */
 
   static char buf[MAX_LINE_LEN];
+  static char *buf2;
   static char env[48];
+  static char error[51];
   static char *s_tok = "${";
   static char *e_tok = "}";  
   char *s_loc = oldstr;
@@ -284,42 +288,82 @@ char *upsget_translation_env( char * const oldstr )
   
   memset( buf, 0, sizeof( buf ) );
 
-  while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) {
-
-    memset( env, 0, sizeof( env ) );
-
-    /* copy up to env.var */
-    strncat( buf, s_loc, e_loc - s_loc );
-
-    /* move s_loc up to end of env.var */
-    if ( ! (s_loc = strstr( e_loc, e_tok )) ) {
-
-      /* error case */
-      return 0;
+  while ( s_loc && *s_loc && (e_loc = strstr( s_loc, s_tok )) != 0 ) 
+  { memset( env, 0, sizeof( env ) );
+    strncat( buf, s_loc, e_loc - s_loc );    /* copy everything upto ${     */
+    if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding })*/
+    { upserr_add(UPS_NO_TRANSLATION, UPS_FATAL, e_loc);
+      return 0;                              /* NO matching } */
     }
-
-    /* copy, translate and append env var */
-    e_loc += 2;
-    strncpy( env, e_loc, s_loc - e_loc );
+    e_loc += 2;                              /* Skip over the ${            */
+    strncpy( env, e_loc, s_loc - e_loc );    /* copy from there to } in env */
     if ( (tr_env = (char *)getenv( env )) )
-      strcat( buf, tr_env );
-
+    { strcat( buf, tr_env );
+    } else {
+      sprintf(error,"${%s}",env);
+      upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
+    }
     /* move pass the '}' */
     ++s_loc;    
   }
-
-  if ( buf[0] ) {
-
-    /* append the rest */
-    if ( s_loc )
-      strcat( buf, s_loc );
-    return buf;
+  if ( buf[0] ) 
+  { if ( s_loc )
+    { strcat( buf, s_loc ); /* Something left after translation tack on */
+    }
+    strcpy(buf2,buf);
+    if ((buf2=upsget_translation_tilde(buf))==0)
+    { return buf;
+    } else {
+      return buf2;
+    }
+  } else {
+    if ((buf2=upsget_translation_tilde(oldstr))==0)
+    { return 0;
+    } else {
+      return buf2;
+    }
   }
-  else {
+}
+char *upsget_translation_tilde( char * const oldstr )
+{
+  static char buf[MAX_LINE_LEN];
+  static char env[48];
+  static char error[49];
+  static char *e_tok = "/";  
+  char *s_loc = oldstr;
+  char *e_loc = 0;
+  char *tr_env = 0;
+  
+  memset( buf, 0, sizeof( buf ) );
+
+  while ( s_loc && *s_loc && (e_loc = strstr( s_loc, TILDE)) != 0 ) 
+  { memset( env, 0, sizeof( env ) );
+    strncat( buf, s_loc, e_loc - s_loc );    /* copy everything upto ~      */
+    if (!(s_loc = strstr( e_loc, e_tok )))   /* set s_loc to end (finding /)*/
+    { s_loc = strstr( e_loc, " ");           /* set s_loc to end space */
+    }
+/*    e_loc++;  oops tilde_dir does that... Skip over the ~             */
+    if (s_loc)
+    { strncpy( env, e_loc, s_loc - e_loc );  /* copy from there to / in env */
+    } else {
+      strcpy(env,e_loc);
+    }
+    if ( (tr_env = (char *)upsget_tilde_dir( env )) )
+    { strcat( buf, tr_env );
+    } else {
+      sprintf(error,"~%s",env);
+      upserr_add(UPS_NO_TRANSLATION, UPS_INFORMATIONAL, error);
+    }
+  }
+  if ( buf[0] ) 
+  { if ( s_loc )
+    { strcat( buf, s_loc ); /* Something left after translation tack on */
+    }
+    return buf;
+  } else {
     return 0;
   }
 }
-
 char *upsget_translation( const t_upstyp_matched_instance * const minstance,
 			  const t_upstyp_db *db_info_ptr,
 			  const t_upsugo_command * const command_line,
@@ -410,7 +454,7 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
   { count = ( loc - upto );
     strncat(newstr,upto,(unsigned int )count);
     upto += count;
-    eaddr =strchr(upto,'/');
+    eaddr = strchr(upto,'/'); 
     *eaddr = '\0';
     found=0;
     if (strchr(upto,'~')) 
@@ -423,7 +467,8 @@ char *upsget_translation( const t_upstyp_matched_instance * const minstance,
       strcat(newstr,"/");
     } 
     *eaddr = '/';
-    upto = strchr(upto,'/') + 1;
+    upto=eaddr+1;
+    /* upto = strchr(upto,'/') + 1; */
   }
   if (any)
   { strcat(newstr,upto);
@@ -443,7 +488,9 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
   strcpy(newstr,string);
   strcat(newstr," ");
   get_element(string,version);
-  strcat(newstr,string);
+  if (string) 
+  { strcat(newstr,string);
+  }
   strcat(newstr," -f ");
   get_element(string,flavor);
   strcat(newstr,string);
@@ -452,7 +499,7 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
     strcat(newstr,db_info_ptr->name);
   }
   get_element(string,qualifiers);
-  if ( *string != 0 )
+  if ( string )
   { strcat(newstr," -q ");
     strcat(newstr,string);
   }

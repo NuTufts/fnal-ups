@@ -592,9 +592,11 @@ sub WriteVersionRecs {
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   MODIFIED=$DaTe\n";
     print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-    print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
+    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
+    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
     if ( &upsdir ) {
-     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
+     $UpS_Dir=&fix_env_specs($instanceHash{$flvr}{$version}[$#UPSDIR]);
+     print VersionFile "   UPS_DIR=$UpS_DiR\n";
     } else {  
      print VersionFile "   UPS_DIR=ups\n";
     }
@@ -633,9 +635,11 @@ sub WriteVersionRecs {
     print VersionFile "   DECLARER=$instanceHash{$flvr}{$version}[$#WHO]\n";
     print VersionFile "   MODIFIED=$DaTe\n";
     print VersionFile "   MODIFIER=$instanceHash{$flvr}{$version}[$#WHO]\n";
-    print VersionFile "   PROD_DIR=$instanceHash{$flvr}{$version}[$#PRODDIR]\n";
+    $PrOd_DiR=&fix_env_specs($instanceHash{$flvr}{$version}[$#PRODDIR]);
+    print VersionFile "   PROD_DIR=$PrOd_DiR\n";
     if ( &upsdir ) {
-     print VersionFile "   UPS_DIR=$instanceHash{$flvr}{$version}[$#UPSDIR]\n";
+     $UpS_Dir=&fix_env_specs($instanceHash{$flvr}{$version}[$#UPSDIR]);
+     print VersionFile "   UPS_DIR=$UpS_DiR\n";
     } else {  
      print VersionFile "   UPS_DIR=ups\n";
     }
@@ -710,6 +714,13 @@ sub use_flags { return $reqHash{"USE"}{$reqCat}{$reqName}[$#FLAGS] }
 sub convert_to_gmt
 { @D = split ( '\-' , $_[0]);
   return sprintf("19%s-%02d-%02d 00.00.00 GMT",$D[2],$D[0],$D[1]);
+}
+sub fix_env_specs
+{ my $value = $_[0];
+  $value =~ s/\$(\w*)/\${$1}/g;
+# yes I bet there's a better way but it works... if ${JOE} put ${}{JOE}
+  $value =~ s/{}//g;
+  return $value;
 }
 sub table_file { 
     my $type = $_[0];
