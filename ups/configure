@@ -29,11 +29,9 @@ Name_Of_Ups=$UPS_PROD_NAME
 
 Script_Prefix=set${Name_Of_Ups}
 
-Setups_Products_Init_Default="/\${Node}/products/ups_database/declared \
-				/usr/products/declared \
-				/usr/upsII/ups_database/devel \
-				/usr/upsII/ups_database/declared/oss \
-				/usr/upsII/ups_database/declared/afs"
+Setups_Products_Init_Default="\${Node}/products/ups_database \
+				/usr/products/ups_database \
+				/afs/fnal/ups/db"
 
 # ===  DO NOT EDIT BELOW THIS LINE  ===  DO NOT REMOVE THIS LINE ===
 

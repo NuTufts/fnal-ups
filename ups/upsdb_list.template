@@ -26,7 +26,7 @@
 #
 ${Node}/products/ups_database
 /usr/products/ups_database 
-/afs/fnal/products/ups/db 
+/afs/fnal/ups/db 
 #  Additional documentation:
 #
 # Example of a database relative to a specific user's $HOME
