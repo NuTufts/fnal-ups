@@ -31,6 +31,12 @@
  *                        with upslst_merge.
  *                        Added upslst_copy, which will create a new list
  *                        with data elements from passed list.
+ *       09-sep-1997, LR, Added upslst_count, to return number of items in
+ *                        a list.
+ *       10-sep-1997, LR, Added upslst_delete_safe, to delete items in a safe
+ *                        way (can be used inside a list iteration).
+ *       10-sep-1997, LR, Added upslst_sort0, a simple (insertion) sort of a
+ *                        list.
  *
  ***********************************************************************/
 
@@ -64,6 +70,8 @@ t_upslst_item *upslst_insert( t_upslst_item * list_ptr, void * const data_ptr );
 t_upslst_item *upslst_add( t_upslst_item * list_ptr, void * const data_ptr );
 t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
 			      void * const data_ptr, const char copt );
+t_upslst_item *upslst_delete_safe( t_upslst_item * const list_ptr,
+			      void * const data_ptr, const char copt );
 
 t_upslst_item *upslst_add_list( t_upslst_item * const list_ptr_1,
 				t_upslst_item * const list_ptr_2 );
@@ -73,7 +81,10 @@ t_upslst_item *upslst_copy( t_upslst_item * const list_ptr );
 
 t_upslst_item *upslst_first( t_upslst_item * const list_ptr );
 t_upslst_item *upslst_last( t_upslst_item * const list_ptr );
-
+int           upslst_count( t_upslst_item * const list_ptr );
+t_upslst_item *upslst_sort0( t_upslst_item * const c,
+			     int (*cmp)(const void *, const void *) );
+     
 /*
  * Declaration of private globals.
  */

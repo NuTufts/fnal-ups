@@ -31,6 +31,12 @@
  *                        with upslst_merge
  *                        Added upslst_copy, which will create a new list
  *                        containing data elements from passed list.
+ *       09-sep-1997, LR, Added upslst_count, to return number of items in
+ *                        a list.
+ *       10-sep-1997, LR, Added upslst_delete_safe, to delete items in a safe
+ *                        way (can be used inside a list iteration).
+ *       10-sep-1997, LR, Added upslst_sort0, a simple (insertion) sort of a
+ *                        list.
  *
  ***********************************************************************/
 
@@ -246,6 +252,50 @@ t_upslst_item *upslst_delete( t_upslst_item * const list_ptr,
 }
 
 /*-----------------------------------------------------------------------
+ * upslst_delete_safe
+ *
+ * Will delete item from list. And return next item in list.
+ * (it's safe to use in a loop there is traversing a list).
+ * If option 'd' is passed the data element are also freed.
+ *
+ * Input : t_upslst_item *, pointer to a list
+ *         void *, data element of item to be deletet.
+ *         char, copt = 'd', will also delete data elements.
+ * Output: none
+ * Return: t_upslst_item *, pointer to top of list
+ */
+t_upslst_item *upslst_delete_safe( t_upslst_item * const list_ptr,
+			      void * const data_ptr, const char copt )
+{
+  t_upslst_item *l_ptr = 0;
+  t_upslst_item *l_prev = 0, *l_next = 0;
+
+  for ( l_ptr = list_ptr; l_ptr; l_ptr = l_ptr->next ) {
+    l_prev = l_ptr->prev;
+
+    if ( l_ptr->data == data_ptr ) {
+      if ( l_ptr->next ) {
+	l_ptr->next->prev = l_prev;
+	if ( l_prev ) l_prev->next = l_ptr->next;
+      }
+      else {
+	if ( l_prev ) l_prev->next = 0;
+      }
+      upsmem_dec_refctr ( l_ptr->data );
+      if ( copt == 'd' && l_ptr->data ) {
+	upsmem_free( l_ptr->data );
+      }
+      l_next = l_ptr->next;
+      free( l_ptr );
+      return l_next;
+    }
+  }
+
+  /* item was not found */
+  return 0;
+}
+
+/*-----------------------------------------------------------------------
  * upslst_add_list
  *
  * Will append second list to the end of first list.
@@ -383,6 +433,64 @@ t_upslst_item *upslst_last( t_upslst_item * const list_ptr )
   return l_ptr;
 }
 
+/*-----------------------------------------------------------------------
+ * upslst_count
+ *
+ * Will return number of items in a list.
+ *
+ * Input : t_upslst_item *, pointer to a list
+ * Output: none
+ * Return: int, number of items in a list
+ */
+int upslst_count( t_upslst_item * const list_ptr )
+{
+  int count = 0;
+  t_upslst_item *l_ptr = upslst_first( list_ptr );
+  
+  for ( ; l_ptr; l_ptr = l_ptr->next ) { count++; }
+
+  return count;
+}
+
+/*-----------------------------------------------------------------------
+ * upslst_sort0
+ *
+ * Sorting a list. This is just a insertion sort. We should implement
+ * something better if we need to sort large (>20 items) lists.
+ *
+ * Input : t_upslst_item *, pointer to a list
+ * Output: none
+ * Return: t_upslst_item *, pointer to first element in list.
+ */
+t_upslst_item *upslst_sort0( t_upslst_item * const list_ptr,
+			     int (*cmp)(const void *, const void *) )
+{
+  t_upslst_item *l1 = upslst_first( list_ptr ), *l2;
+  void *data;
+
+  if ( !l1 || !l1->next )
+    return l1;
+  
+  for ( l1 = l1->next; l1; l1 = l1->next ) {
+    data = l1->data;
+    l2 = l1;
+    while ( l2->prev && cmp( l2->prev->data, data ) > 0 ) {
+      l2->data = l2->prev->data;
+      l2 = l2->prev;
+    }
+    l2->data = data;
+  }
+
+  return upslst_first( l2 );
+}
+
 /*
  * Definition of private functions.
  */
+
+
+
+
+
+
+
