@@ -29,7 +29,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "../inc/ups_types.h"
+#include "ups_types.h"
  
 void print_list( t_upslst_item *list_ptr );
 /* ==========================================================================
@@ -49,7 +49,6 @@ int main (argc,argv)
 {
 
 	int 	status = 0;
-        struct upslst_item * pointer;
 	struct ups_command * uc;
 
 /*
@@ -136,8 +135,11 @@ void print_list( t_upslst_item *list_ptr )
    */
   
   for ( l_ptr = upslst_first( list_ptr ); l_ptr; l_ptr = l_ptr->next, count++ ) {
+/* fprintf(stdout,"ref count %d\n",upsmem_get_refctr((void *)(l_ptr))); */
+fprintf(stdout,"ref count %d\n",upsmem_get_refctr(l_ptr->data));
+
     printf( "%03d: p=%08x, i=%08x, n=%08x, data=%s\n",
 	    count, (int)l_ptr->prev, (int)l_ptr,
-	    (int)l_ptr->next, (int)l_ptr->data );    
+	    (int)l_ptr->next, (char *)l_ptr->data );    
   }
 }
