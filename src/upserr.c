@@ -112,7 +112,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 51 */  "%s: Chain keyword \'%s\' must match name of file it is in \'%s\'\n",
 /* 52 */  "%s: Version keyword \'%s\' must match name of file it is in \'%s\'\n",
 /* 53 */  "%s: Verifying product \'%s\'\n",
-/* 54 */  "%s: Environment Variables must be of the form \${var} - not as in  \'%s\'\n",
+/* 54 */  "%s: Environment Variables must be of the form ${var} - not as in  \'%s\'\n",
 /* 55 */  "%s:  \'%s\' is not a directory\n",
 /* 56 */  "%s:  \'%s\'is not an allowable separator in \'%s\'\n",
 /* 57 */  "%s: TABLE_FILE keyword not specified when TABLE_DIR was, in version \'%s\'\n",
