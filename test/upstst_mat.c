@@ -61,7 +61,7 @@ UPSTST_CHECK_ESTATUS (estatus_str, estatus);
 if (database) 
    {
    dbaddr = upsmem_malloc(sizeof(t_upstyp_db));
-   dbaddr->name = database;
+   dbaddr->name = upsutl_str_create(database, STR_TRIM_DEFAULT);
    dbaddr->config= NULL;
    dblist = upslst_new(dbaddr);
    }
