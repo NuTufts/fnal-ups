@@ -138,6 +138,8 @@ t_upstyp_matched_product *ups_new_matched_product(const char * const a_db,
 			  	     const char * const a_prod_name,
 			             const t_upslst_item * const a_minst_list);
 t_upstyp_matched_instance *ups_new_matched_instance( void );
+t_upstyp_matched_instance *ups_free_matched_instance(
+                                 t_upstyp_matched_instance * const minst_ptr);
 t_upstyp_product     *ups_new_product( void );
 int               ups_free_product( t_upstyp_product * const prod_ptr );
 t_upstyp_instance    *ups_new_instance( void );
@@ -146,8 +148,6 @@ t_upstyp_action      *ups_new_action( void );
 int               ups_free_action( t_upstyp_action * const act_ptr );
 t_upstyp_config      *ups_new_config( void );
 int               ups_free_config( t_upstyp_config * const conf_ptr );
-t_upstyp_matched_product *ups_free_mp(
-				  t_upstyp_matched_product * const a_mproduct);
 
 
 #endif /* _UPSTYP_H_ */
