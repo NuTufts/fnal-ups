@@ -793,7 +793,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 			endif
 		    end
 		    set xflav=x\`echo \$Full_Flavor|\$grep \$Ups_Flavor\`
-		    if ( x\$xflav == x ) then
+		    if ( \$xflav == x ) then
 		        unsetenv UPS_DIR
 			set No_SETUP_UPS=1
 #		        unsetenv SETUP_UPS
