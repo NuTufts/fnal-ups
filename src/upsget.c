@@ -1166,8 +1166,8 @@ char *upsget_table_file( const char * const a_prodname,
 	/* first translate any environmental variables */
 	TRANSLATE_ENV(tmp_pd, a_productdir);
 
-	if (a_db_info->config && a_db_info->config->prod_dir_prefix &&
-	    UPSRELATIVE(tmp_pd)) {
+	if (a_db_info && a_db_info->config &&
+	    a_db_info->config->prod_dir_prefix && UPSRELATIVE(tmp_pd)) {
 	  if ((total_chars += (int )strlen(tmp_pd) + 
 	       (int )strlen(a_db_info->config->prod_dir_prefix) +
 	       1) <= FILENAME_MAX) {
@@ -1195,7 +1195,7 @@ char *upsget_table_file( const char * const a_prodname,
       TRANSLATE_ENV(tmp_pd, a_productdir);
 
       /* try db/prod_name/tablefile */
-      if ((a_db_info != NULL) && (a_prodname != NULL)) {
+      if (a_db_info && a_prodname) {
 	if ((total_chars = file_chars + (int )(strlen(a_prodname) +
 					       strlen(a_db_info->name)) + 1)
 	    <= FILENAME_MAX) {
@@ -1221,8 +1221,8 @@ char *upsget_table_file( const char * const a_prodname,
       /* try prod_dir/ups_dir/tablefile */
       if ((found == 0) && (tmp_ud != NULL) && (tmp_pd != NULL) &&
 	  UPSRELATIVE(tmp_ud)) {
-	if (a_db_info->config && a_db_info->config->prod_dir_prefix &&
-	    UPSRELATIVE(tmp_pd)) {
+	if (a_db_info && a_db_info->config &&
+	    a_db_info->config->prod_dir_prefix && UPSRELATIVE(tmp_pd)) {
 	  if ((total_chars = file_chars + (int )strlen(tmp_ud) + 
 	       (int )strlen(tmp_pd) + 
 	       (int )strlen(a_db_info->config->prod_dir_prefix) +
