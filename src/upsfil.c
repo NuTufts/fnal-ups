@@ -1646,7 +1646,7 @@ int get_key( void )
     upsutl_str_remove_end_quotes( g_val, QUOTES, 0 );  
   }
 
-  g_mkey = upskey_get_map( g_key );
+  g_mkey = upskey_get_info( g_key );
   if ( g_mkey ) {
     g_ikey = g_mkey->ikey;
   }

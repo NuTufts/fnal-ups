@@ -135,7 +135,7 @@ t_upskey_map g_key_info[] =
  */
 
 /*-----------------------------------------------------------------------
- * upskey_get_map
+ * upskey_get_info
  *
  * Will return a map (t_upskey_map) for passed key.
  *
@@ -143,7 +143,7 @@ t_upskey_map g_key_info[] =
  * Output: none.
  * Return: t_upskey_map *, corresponding map, or 0.
  */
-t_upskey_map *upskey_get_map( const char * const str )
+t_upskey_map *upskey_get_info( const char * const str )
 {
   t_upskey_map *keys;
 
@@ -169,7 +169,7 @@ t_upskey_map *upskey_get_map( const char * const str )
  */
 char *upskey_inst_getval( t_upstyp_instance * const inst, const char * const skey )
 {
-  t_upskey_map *key = upskey_get_map( skey );
+  t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->i_index != NO )
     return UPSKEY_INST2ARR( inst )[key->i_index];
   else
@@ -190,7 +190,7 @@ char *upskey_inst_getval( t_upstyp_instance * const inst, const char * const ske
 char *upskey_inst_setval( t_upstyp_instance * const inst,
 			  const char * const skey, const char * const sval )
 {
-  t_upskey_map *key = upskey_get_map( skey );
+  t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->i_index != NO ) {
     char *new_val = (char *)upsmem_malloc( (int)strlen( sval ) + 1 );
     strcpy( new_val, sval );
@@ -303,7 +303,7 @@ void upskey_inst_print( const t_upstyp_instance * const inst )
  */
 char *upskey_prod_getval( t_upstyp_product * const prod, const char * const skey )
 {
-  t_upskey_map *key = upskey_get_map( skey );
+  t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->p_index != NO )
     return UPSKEY_PROD2ARR( prod )[key->p_index];
   else
@@ -324,7 +324,7 @@ char *upskey_prod_getval( t_upstyp_product * const prod, const char * const skey
 char *upskey_prod_setval( t_upstyp_product * const prod,
 			  const char * const skey, const char * const sval )
 {
-  t_upskey_map *key = upskey_get_map( skey );
+  t_upskey_map *key = upskey_get_info( skey );
   if ( key && key->p_index != NO ) {
     char *new_val = (char *)upsmem_malloc( (int)strlen( sval ) + 1 );
     strcpy( new_val, sval );

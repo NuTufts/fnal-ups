@@ -140,7 +140,7 @@ typedef union upskey_config_u {
 /*
  * Declaration of public functions.
  */
-t_upskey_map *upskey_get_map( const char * const skey );
+t_upskey_map *upskey_get_info( const char * const skey );
 char         *upskey_inst_getval( t_upstyp_instance * const inst,
 				  const char * const skey );
 char         *upskey_inst_setval( t_upstyp_instance * const inst,
