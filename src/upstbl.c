@@ -351,6 +351,7 @@ void upstbl_dump( T const table )
   if ( !table || (table->length <= 0) )
     return;
 
+  printf( "total number of items in table = %d\n", table->length );
   for ( i = 0; i < table->size; i++ )
     for ( p = table->buckets[i]; p; p = p->link )
       printf( "bucket %d : %s\n", i, (char *)p->key );
