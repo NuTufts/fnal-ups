@@ -69,6 +69,9 @@ char *upsget_envout(const FILE * const,
                     const t_upstyp_db * const,
                     const t_upstyp_matched_instance * const,
                     const t_upsugo_command * const);
+char *upsget_origin(const t_upstyp_db * const,
+                    const t_upstyp_matched_instance * const ,
+                    const t_upsugo_command * const );
 t_upstyp_product *upsget_chain_file(const char * const,
                                     const char * const,
                                     const char * const,
