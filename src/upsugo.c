@@ -521,7 +521,8 @@ int upsugo_blddb(struct ups_command * const uc, char * inaddr)
  char * loc;
  char * db;
  struct upstyp_db * addr;
- while((loc=strchr(inaddr,':'))!=0)
+/* quick NT fix on \ is this good enough ??? */
+ while((loc=strchr(inaddr,':'))!=0 && strchr(inaddr,'\\')==0)
  {  db=inaddr;
    inaddr=loc+1;
    *loc = 0;
