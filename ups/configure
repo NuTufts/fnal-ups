@@ -764,9 +764,9 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	#======================================================================
 	set Flavor=\`echo \$Full_Flavor|cut -f1 -d'.'\`
 	foreach level (2 3 4 5 6 7 8 9)
-	    set fl=\`echo \$Full_Flavor|cut -f1-\$level -d'.'\`
-	    if ( \$fl != \$Full_Flavor ) then
-		set Flavor_\$level=\$fl
+	    set fl="\`echo \$Full_Flavor|cut -f1-\$level -d'.'\`"
+	    if ( "\$fl" != "\$Full_Flavor" ) then
+		set Flavor_\$level="\$fl"
 	    else
 		set Flavor_\$level=''
 	    endif
@@ -831,7 +831,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	# a usable UPS_DIR.
 	#======================================================================
 	if ( \$?PRODUCTS && ! \$?UPS_DIR ) then
-	    foreach fl ( \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor "\$MACH_OS" NULL )
+	    foreach fl ( "\$Node" "\$Full_Flavor" "\$Flavor_9" "\$Flavor_8" "\$Flavor_7" "\$Flavor_6" "\$Flavor_5" "\$Flavor_4" "\$Flavor_3" "\$Flavor_2" "\$Flavor" "\$MACH_OS" NULL )
 	        if ( -f \${Setups_Home}/set\${Name_Of_Ups}.cache.\${fl} ) then
 		    eval setenv UPS_DIR \`\$cat \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}|\$grep -v '^#'\`
 	            if ( \$?UPS_DIR ) then
@@ -1053,7 +1053,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	for level in 2 3 4 5 6 7 8 9
 	do
 	    fl=\`echo \$Full_Flavor|cut -f1-\$level -d'.'\`
-	    if test \$fl != \$Full_Flavor
+	    if test "\$fl" != "\$Full_Flavor"
 	    then
 		eval Flavor_\$level=\$fl
 	    else
@@ -1121,7 +1121,7 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.sh
 	#======================================================================
 	if test x\`echo \${PRODUCTS:-}|cut -c1\` = x/ -a x\$UPS_DIR = x
 	then
-	    for fl in \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor "\$MACH_OS" NULL
+	    for fl in "\$Node" "\$Full_Flavor" "\$Flavor_9" "\$Flavor_8" "\$Flavor_7" "\$Flavor_6" "\$Flavor_5" "\$Flavor_4" "\$Flavor_3" "\$Flavor_2" "\$Flavor" "\$MACH_OS" NULL
 	    do
 	        if test -f \$Setups_Home/set\${Name_Of_Ups}.cache.\${fl}
 	        then
@@ -1305,7 +1305,7 @@ for Start_Or_Stop in startup shutdown
 	for level in 2 3 4 5 6 7 8 9
 	do
 	    fl=\`echo \$Full_Flavor|cut -f1-\$level -d'.'\`
-	    if test \$fl != \$Full_Flavor
+	    if test "\$fl" != "\$Full_Flavor"
 	    then
 	        eval Flavor_\$level=\$fl
 	    else
@@ -1335,7 +1335,7 @@ for Start_Or_Stop in startup shutdown
 	#======================================================================
 	# execute the appropriate node.products or flavor.products file
 	#======================================================================
-	    for fl in \$Node \$Full_Flavor \$Flavor_9 \$Flavor_8 \$Flavor_7 \$Flavor_6 \$Flavor_5 \$Flavor_4 \$Flavor_3 \$Flavor_2 \$Flavor "\$MACH_OS"
+	    for fl in "\$Node" "\$Full_Flavor" "\$Flavor_9" "\$Flavor_8" "\$Flavor_7" "\$Flavor_6" "\$Flavor_5" "\$Flavor_4" "\$Flavor_3" "\$Flavor_2" "\$Flavor" "\$MACH_OS"
 	    do
 		if test -f \$starts_dir/\$fl.products
 		then
