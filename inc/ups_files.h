@@ -41,6 +41,9 @@ void          g_print_product( t_ups_product * const prod_ptr );
  * Declarations of public variables
  */
 
+#define VERSION_SUFFIX  ".version"
+#define CHAIN_SUFFIX    ".chain"
+
 #endif /* _UPS_FIL_H_ */
 
 
