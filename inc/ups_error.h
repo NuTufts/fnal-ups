@@ -45,7 +45,6 @@
 #define UPS_NERR              9
 #define UPS_INVALID_ARGUMENT  10
 
-#define UPS_ERROR           1
 #define UPS_FATAL           "ERROR"
 #define UPS_WARNING         "WARNING"
 #define UPS_INFORMATIONAL   "INFORMATIONAL"
@@ -73,6 +72,7 @@ void upserr_output (void);
  * Declarations of public variables.
  */
 
+extern int UPS_ERROR;
 extern int UPS_VERBOSE;
 extern int g_ups_line;
 extern char *g_ups_file;

@@ -32,7 +32,8 @@
  * Definition of public variables.
  */
 
-int UPS_VERBOSE = 0;     /* start out not verbose */
+int UPS_ERROR = UPS_SUCCESS;    /* start out with no errors */
+int UPS_VERBOSE = 0;            /* start out not verbose */
 int g_ups_line = 0;
 char *g_ups_file = '\0';
 
@@ -89,6 +90,7 @@ void upserr_add (const int a_error_index, ...)
 
   /* Initialize */
   buf[0] = '\0';
+  UPS_ERROR = a_error_index;
 
   if ( (a_error_index < UPS_NERR) && (a_error_index > UPS_INVALID)) {
     /* format the error and put it in the error buf */
@@ -99,6 +101,7 @@ void upserr_add (const int a_error_index, ...)
   else {
     /* This was an invalid error message request */
     sprintf(buf, "ERROR: Invalid error message number %d.\n", a_error_index);
+    UPS_ERROR = UPS_INVALID;
   }
 
   /* Check if we need to add error location information to output too */
@@ -170,6 +173,8 @@ void upserr_clear (void)
     /* Reset */
     g_buf_start = G_ERROR_INIT;
   }
+
+  UPS_ERROR = UPS_SUCCESS;
 }
 
 /*-----------------------------------------------------------------------
