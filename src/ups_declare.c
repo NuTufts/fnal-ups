@@ -109,6 +109,10 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   save_table_file=uc->ugo_tablefile;
   uc->ugo_tablefile=0;
   uc->ugo_tablefiledir=0;
+  save_chain=uc->ugo_chain;
+  save_flavor=uc->ugo_flavor;
+  save_qualifiers=uc->ugo_qualifiers;
+  save_version=uc->ugo_version;
 
   if (!uc->ugo_product || !uc->ugo_version )
   { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
@@ -120,21 +124,18 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
                "Specification must include a flavor");
     return 0;
   }
-/*
-  mproduct_list = upsmat_instance(uc, db_list , need_unique);
+  mproduct_list = upsmat_instance(uc, db_list , not_unique);
   if (UPS_ERROR != UPS_SUCCESS) 
   {  return 0; 
   }
   if (mproduct_list)
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
+  { if (uc->ugo_chain) { uc->ugo_version=0; }
+    ups_undeclare(uc, tmpfile, e_undeclare);
+    uc->ugo_version=save_version;
+/*  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare", 
                "Exact product definition exists");
-    return 0;
+    return 0; */
   }
-*/
-  save_chain=uc->ugo_chain;
-  save_flavor=uc->ugo_flavor;
-  save_qualifiers=uc->ugo_qualifiers;
-  save_version=uc->ugo_version;
   username=upsutl_user();
   seconds=time(0);
   mytime = localtime(&seconds);

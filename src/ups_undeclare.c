@@ -91,23 +91,23 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
   char *unchain;
 
   if (!uc->ugo_product || (!uc->ugo_version && !uc->ugo_chain) )
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
            "Specifications must include a product and a version or chain(s)");
     return 0;
   }
   if (uc->ugo_version && uc->ugo_chain)
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
            "Specificy a version, which will remove ALL chains, or chains(s)");
     return 0;
   }
   if ((int)(upslst_count(uc->ugo_flavor) ==0 ) )
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
            "Specification must include a flavor");
     return 0;
   }
   mproduct_list = upsmat_instance(uc, db_list , not_unique);
   if (!mproduct_list)
-  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Declare",
+  { upserr_add(UPS_INVALID_SPECIFICATION, UPS_FATAL, "Undeclare",
            "No matching product found");
     return 0;
   }

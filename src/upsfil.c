@@ -532,6 +532,8 @@ int write_chain_file( void )
     put_key( "VERSION", inst_ptr->version );
     put_key( "DECLARED", inst_ptr->declared );
     put_key( "DECLARER", inst_ptr->declarer );
+    put_key( "MODIFIED", inst_ptr->modified);
+    put_key( "MODIFIER", inst_ptr->modifier);
     g_imargin -= 2;
   }  
 
