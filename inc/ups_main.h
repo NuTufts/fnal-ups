@@ -57,6 +57,13 @@ enum {
  * Types.
  */
 
+/* all individual command information */
+typedef struct s_cmd_info {
+  int cmd_index;
+  char *cmd;
+  char *valid_opts;
+} t_cmd_info;
+
 /*
  * Declaration of public functions.
  */
