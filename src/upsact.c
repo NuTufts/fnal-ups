@@ -237,6 +237,10 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       err_message = "";                            \
     }
 
+#define FPRINTF_ERROR() \
+    upserr_vplace();                                                     \
+    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+
 /*
  * Definition of global variables.
  */
@@ -848,10 +852,9 @@ void f_copyhtml( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
 		    a_cmd->argv[0], a_db_info->config->html_path) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	}
 	break;
       default:
@@ -887,10 +890,9 @@ void f_copyinfo( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
 		    a_cmd->argv[0], a_db_info->config->info_path) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	}
 	break;
       default:
@@ -935,10 +937,9 @@ void f_copyman( const t_upstyp_matched_instance * const a_inst,
 	  /* we have to construct a source */
 	  buf = upsutl_find_manpages(a_inst, a_db_info);
 	}
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
 		    buf, a_db_info->config->man_path) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",strerror(errno));
+	  FPRINTF_ERROR();
 	}
 	break;
       default:
@@ -993,12 +994,11 @@ void f_uncopyman( const t_upstyp_matched_instance * const a_inst,
 	  if (fprintf((FILE *)a_stream, "rm %s/%s\n", 
 		      a_db_info->config->man_path, (char *)man_item->data)
 	      < 0) {
-	    upserr_vplace();
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-		       strerror(errno));
+	    FPRINTF_ERROR();
 	    break;
 	  }
 	}
+	fprintf((FILE *)a_stream, "#\n");
 	break;
       default:
 	upserr_vplace();
@@ -1033,10 +1033,9 @@ void f_copynews( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
       case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "cp %s/* %s\n", 
+	if (fprintf((FILE *)a_stream, "cp %s/* %s\n#\n", 
 		    a_cmd->argv[0], a_db_info->config->news_path) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	}
 	break;
       default:
@@ -1071,18 +1070,17 @@ void f_envappend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=\${%s-}%s%s;export %s\n",
+      if (fprintf((FILE *)a_stream, "%s=\${%s-}%s%s;export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s \${%s}%s%s\n", a_cmd->argv[0],
-		  a_cmd->argv[0], delimiter, a_cmd->argv[1]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      if (fprintf((FILE *)a_stream, "setenv %s \${%s}%s%s\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[0], delimiter,
+		  a_cmd->argv[1]) < 0) {
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1116,18 +1114,17 @@ void f_envprepend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n",
+      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s %s%s\${%s}\n", a_cmd->argv[0],
-		  a_cmd->argv[1], delimiter, a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      if (fprintf((FILE *)a_stream, "setenv %s %s%s\${%s}\n#\n",
+		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
+		  a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1163,20 +1160,18 @@ void f_envremove( const t_upstyp_matched_instance * const a_inst,
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n",
+		  "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) setenv %s $upstmp\nunsetenv upstmp\n",
+		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) setenv %s $upstmp\nunsetenv upstmp\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter,
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1206,17 +1201,15 @@ void f_envset( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_cmd->argv[0],
+      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s %s\n", a_cmd->argv[0],
+      if (fprintf((FILE *)a_stream, "setenv %s %s\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1245,15 +1238,13 @@ void f_envunset( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "unset %s\n", a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      if (fprintf((FILE *)a_stream, "unset %s\n#\n", a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "unsetenv %s\n", a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      if (fprintf((FILE *)a_stream, "unsetenv %s\n#\n", a_cmd->argv[0]) < 0) {
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1283,17 +1274,16 @@ void f_exeaccess( const t_upstyp_matched_instance * const a_inst,
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "hash %s;\nif [ $? -eq 1 ]; then return 1; fi\n",
+		  "hash %s;\nif [ $? -eq 1 ]; then return 1; fi\n#\n",
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "whereis %s\nif ($status == 1) return 1\n",
+      if (fprintf((FILE *)a_stream,
+		  "whereis %s\nif ($status == 1) return 1\n#\n",
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1322,17 +1312,15 @@ void f_execute( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n", a_cmd->argv[1],
+      if (fprintf((FILE *)a_stream, "%s=`%s`;export %s\n#\n", a_cmd->argv[1],
 		  a_cmd->argv[0], a_cmd->argv[1]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n", a_cmd->argv[1],
+      if (fprintf((FILE *)a_stream, "setenv %s \"`%s`\"\n#\n", a_cmd->argv[1],
 		  a_cmd->argv[0])< 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1367,18 +1355,16 @@ void f_filetest( const t_upstyp_matched_instance * const a_inst,
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "if [ ! %s %s ]; then\necho %s;\nreturn 1;\nfi;\n",
+		  "if [ ! %s %s ]; then\necho %s;\nreturn 1;\nfi;\n#\n",
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "if ( ! %s %s ) then\necho %s\nreturn 1\nendif\n", 
+		  "if ( ! %s %s ) then\necho %s\nreturn 1\nendif\n#\n", 
 		  a_cmd->argv[1], a_cmd->argv[0], err_message) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1412,18 +1398,16 @@ void f_pathappend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=${%s-}%s%s;export %s\n",
+      if (fprintf((FILE *)a_stream, "%s=${%s-}%s%s;export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter, a_cmd->argv[1],
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n",
+      if (fprintf((FILE *)a_stream, "set %s=($%s %s)\nrehash\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[1]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1457,18 +1441,16 @@ void f_pathprepend( const t_upstyp_matched_instance * const a_inst,
 
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n",
+      if (fprintf((FILE *)a_stream, "%s=%s%s\${%s-};export %s\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter, a_cmd->argv[0],
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n",
+      if (fprintf((FILE *)a_stream, "set %s=(%s $%s)\nrehash\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1504,20 +1486,18 @@ void f_pathremove( const t_upstyp_matched_instance * const a_inst,
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
       if (fprintf((FILE *)a_stream,
-		  "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n",
+		  "upstmp=`dropit.pl %s %s %s`;\nif [ $? -eq 0 ]; then %s=$upstmp; fi\nunset upstmp;\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[1], delimiter,
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
       if (fprintf((FILE *)a_stream,
-		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) set %s=$upstmp\nrehash\nunsetenv upstmp\n",
+		  "setenv upstmp \"`dropit.pl %s %s %s`\"\nif ($status == 0) set %s=$upstmp\nrehash\nunsetenv upstmp\n#\n",
 		  a_cmd->argv[0], a_cmd->argv[0], delimiter, 
 		  a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1547,17 +1527,15 @@ void f_pathset( const t_upstyp_matched_instance * const a_inst,
   
     switch ( a_command_line->ugo_shell ) {
     case e_BOURNE:
-      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n", a_cmd->argv[0],
+      if (fprintf((FILE *)a_stream, "%s=%s;export %s\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1], a_cmd->argv[0]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     case e_CSHELL:
-      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n", a_cmd->argv[0],
+      if (fprintf((FILE *)a_stream, "set %s=(%s)\nrehash\n#\n", a_cmd->argv[0],
 		  a_cmd->argv[1]) < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       }
       break;
     default:
@@ -1590,15 +1568,13 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
       g_LOCAL_VARS_DEF = 1;   /* keep track that we defined local variables */
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
-	if (fprintf((FILE *)a_stream, ". %s\n", a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	if (fprintf((FILE *)a_stream, ". %s\n#\n", a_cmd->argv[0]) < 0) {
+	  FPRINTF_ERROR();
 	}
 	break;
       case e_CSHELL:
-	if (fprintf((FILE *)a_stream, "source %s\n", a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	if (fprintf((FILE *)a_stream, "source %s\n#\n", a_cmd->argv[0]) < 0) {
+	  FPRINTF_ERROR();
 	}
 	break;
       default:
@@ -1606,8 +1582,7 @@ void f_sourcerequired( const t_upstyp_matched_instance * const a_inst,
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
     } else {
-      upserr_vplace();
-      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      FPRINTF_ERROR();
     }
     if (UPS_ERROR != UPS_SUCCESS) {
       upserr_vplace();
@@ -1633,29 +1608,23 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
     case e_BOURNE:
       if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_cmd->argv[0])
 	  < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if [ ! -r %s -o ! -x %s]; then\n  echo File to be optionally sourced (%s) is not readable or not executable;\nelse\n",
 		    a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
-	    if (fprintf((FILE *)a_stream, "  . %s;\n;\nfi;\nfi;\n", 
+	    if (fprintf((FILE *)a_stream, "  . %s;\n;\nfi;\nfi;\n#\n", 
 			a_cmd->argv[0]) < 0) {
-	      upserr_vplace();
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-			 strerror(errno));
+	      FPRINTF_ERROR();
 	    }
 	  } else {
-	    upserr_vplace();
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-		       strerror(errno));
+	    FPRINTF_ERROR();
 	  }
 	}
       }
@@ -1663,29 +1632,23 @@ void f_sourceoptional( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream, "if (-e %s) then\n\n", a_cmd->argv[0])
 	  < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if (! -r %s || ! -x %s) then\n  echo File to be optionally sourced (%s) is not readable or not executable\nelse\n", 
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
-	    if (fprintf((FILE *)a_stream, "  source %s\n\nendif\nendif\n", 
+	    if (fprintf((FILE *)a_stream, "  source %s\n\nendif\nendif\n#\n", 
 			a_cmd->argv[0]) < 0) {
-	      upserr_vplace();
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-			 strerror(errno));
+	      FPRINTF_ERROR();
 	    }
 	  } else {
-	    upserr_vplace();
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-		       strerror(errno));
+	    FPRINTF_ERROR();
 	  }
 	}
       }
@@ -1720,18 +1683,16 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
       switch ( a_command_line->ugo_shell ) {
       case e_BOURNE:
 	if (fprintf((FILE *)a_stream,
-		    ". %s;\nif [ $? -eq 1 ]; then return 1; fi;\n",
+		    ". %s;\nif [ $? -eq 1 ]; then return 1; fi;\n#\n",
 		    a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	}
 	break;
       case e_CSHELL:
 	if (fprintf((FILE *)a_stream,
-		    "source %s\nif ($status == 1) return 1/n",
+		    "source %s\nif ($status == 1) return 1/n#\n",
 		    a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	}
 	break;
       default:
@@ -1739,8 +1700,7 @@ void f_sourcereqcheck( const t_upstyp_matched_instance * const a_inst,
 	upserr_add(UPS_INVALID_SHELL, UPS_FATAL, a_command_line->ugo_shell);
       }
     } else {
-      upserr_vplace();
-      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+      FPRINTF_ERROR();
     }
 
     if (UPS_ERROR != UPS_SUCCESS) {
@@ -1767,30 +1727,24 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
     case e_BOURNE:
       if (fprintf((FILE *)a_stream, "if [ -s %s ]; then\n", a_cmd->argv[0])
 	  < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if [ ! -r %s -o ! -x %s]; then\n  echo File to be optionally sourced (%s) is not readable or not executable;\nelse\n",
 		    a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	    if (fprintf((FILE *)a_stream,
-			"  . %s;\n  if [ $? -eq 1 ]; then return 1; fi;\nfi;\nfi;\n", 
+			"  . %s;\n  if [ $? -eq 1 ]; then return 1; fi;\nfi;\nfi;\n#\n", 
 			a_cmd->argv[0]) < 0) {
-	      upserr_vplace();
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-			 strerror(errno));
+	      FPRINTF_ERROR();
 	    }
 	  } else {
-	    upserr_vplace();
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-		       strerror(errno));
+	    FPRINTF_ERROR();
 	  }
 	}
       }
@@ -1798,30 +1752,24 @@ void f_sourceoptcheck( const t_upstyp_matched_instance * const a_inst,
     case e_CSHELL:
       if (fprintf((FILE *)a_stream, "if (-e %s) then\n\n", a_cmd->argv[0])
 	  < 0) {
-	upserr_vplace();
-	upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	FPRINTF_ERROR();
       } else {
 	if (fprintf((FILE *)a_stream,
 		    "if (! -r %s || ! -x %s) then\n  echo File to be optionally sourced (%s) is not readable or not executable\nelse\n", 
 		  a_cmd->argv[0], a_cmd->argv[0], a_cmd->argv[0]) < 0) {
-	  upserr_vplace();
-	  upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf", strerror(errno));
+	  FPRINTF_ERROR();
 	} else {
 	  /* define all of the UPS local variables that the user may need. */
 	  upsget_allout(a_stream, a_db_info, a_inst, a_command_line);
 	  if (UPS_ERROR == UPS_SUCCESS) {
 	    g_LOCAL_VARS_DEF = 1;   /* we defined local variables */
 	    if (fprintf((FILE *)a_stream,
-			"  source %s\n  if ($status == 1) return 1/nendif\nendif\nendif\n", 
+			"  source %s\n  if ($status == 1) return 1/nendif\nendif\nendif\n#\n", 
 			a_cmd->argv[0]) < 0) {
-	      upserr_vplace();
-	      upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-			 strerror(errno));
+	      FPRINTF_ERROR();
 	    }
 	  } else {
-	    upserr_vplace();
-	    upserr_add(UPS_SYSTEM_ERROR, UPS_FATAL, "fprintf",
-		       strerror(errno));
+	    FPRINTF_ERROR();
 	  }
 	}
       }
@@ -1857,9 +1805,10 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       lcl_cmd.argc = g_cmd_maps[e_envset].min_params;   /* # of args */
       lcl_cmd.icmd = e_envset;
       lcl_cmd.argv[0] = buff;
-      uprod_name = upsutl_upcase(a_inst->version->product);
-      if (UPS_ERROR == UPS_SUCCESS) {
-	if (a_inst->version->prod_dir) {
+      if (a_inst->version && a_inst->version->prod_dir
+	                  && a_inst->version->product) {
+	uprod_name = upsutl_upcase(a_inst->version->product);
+	if (UPS_ERROR == UPS_SUCCESS) {
 	  sprintf(buff, "%s_DIR", uprod_name);
 	  lcl_cmd.argv[1] = a_inst->version->prod_dir;
 	  f_envset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
@@ -1933,12 +1882,14 @@ void f_dodefaults( const t_upstyp_matched_instance * const a_inst,
       lcl_cmd.argc = g_cmd_maps[e_envunset].min_params;   /* # of args */
       lcl_cmd.icmd = e_envunset;
       lcl_cmd.argv[0] = buff;
-      uprod_name = upsutl_upcase(a_inst->version->product);
-      if (UPS_ERROR == UPS_SUCCESS) {
-	sprintf(buff, "%s_DIR", uprod_name);
-	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
-	sprintf(buff, "%s%s", SETUPENV, uprod_name);
-	f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+      if (a_inst->version && a_inst->version->product) {
+	uprod_name = upsutl_upcase(a_inst->version->product);
+	if (UPS_ERROR == UPS_SUCCESS) {
+	  sprintf(buff, "%s_DIR", uprod_name);
+	  f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+	  sprintf(buff, "%s%s", SETUPENV, uprod_name);
+	  f_envunset(a_inst, a_db_info, a_command_line, a_stream, &lcl_cmd);
+	}
       }
       break;
     case e_untest:	/* None */
