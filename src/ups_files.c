@@ -557,8 +557,9 @@ size_t trim_line( void )
   
   while ( cp && is_space( *cp ) ){ cp++; }
   cstart = cp;
-  cp = &g_line[strlen( g_line ) - 1];
-  while ( cp && is_space( *cp ) ){ cp--; }
+  count = strlen( g_line );
+  cp = &g_line[count - 1];
+  while ( count && is_space( *cp ) ){ cp--; count--; }
   cend = cp;
 
   count = 0;
