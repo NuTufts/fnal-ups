@@ -162,15 +162,13 @@ ups_append_release(char *buf)
 /*
 ** just thinking about this for now...
 */
-void
-ups_append_default_quals(char *buf) {
+char *
+ups_get_default_quals(char *buf) {
    char **p;
 
-   if (strlen(buf) > 0) {
-	(void)strcat(buf,":");
-   }
    if (0 != (p = ups_have_flavor_override()) && p[2] ) {
-	(void)strcat(buf, p[2]);
-	return;
+	return p[2];
+   } else {
+	return 0;
    }
 }

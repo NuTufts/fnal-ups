@@ -1512,6 +1512,8 @@ t_upsugo_command *upsugo_next(const int old_argc,
     argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
     *argbuf = 0;
     (void) upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
+    if (ups_get_default_quals())
+        upsugo_bldqual(uc,ups_get_default_quals());
     while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
     { if(*arg_str == '-')      /* is it an option */
       { if (!strchr((validopts ? validopts : ""),(int)*(arg_str+1))) { 
