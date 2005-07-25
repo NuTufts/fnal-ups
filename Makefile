@@ -85,7 +85,7 @@ all: 	proddir_is_set cvswebtags
 	cd man; ../bin/upspremake $(UPSDBG) $(INSURE)
 
 cvswebtags: FORCE
-	-find src inc -name '*.[ch]' -exec ctags -txw {} \; > cvswebtags
+	-find src inc -name '*.[ch]' -exec ctags -xw {} \; > cvswebtags
 
 test: FORCE
 	cd test/scripts; PATH=.:$$PATH; export PATH; upstst_all
