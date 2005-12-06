@@ -15,13 +15,13 @@ DEFAULT_SETUPS_DIR = os.environ.get('SETUPS_DIR', '/usr/local/etc')
 #  
 #  ups.setup('my project spec' [, setupsDir=/path/to/setups.sh])
 #############################################################
-# returns the address of a singleton upsManager object:
+# returns the address of a singleton UpsManager object:
 
 singletonUps = None
 def getUps(setupsDir=DEFAULT_SETUPS_DIR):
     global singletonUps
     if (singletonUps is None):
-        singletonUps = upsManager(setupsDir)
+        singletonUps = UpsManager(setupsDir)
     return singletonUps
 
 def setup(arg, setupsDir=DEFAULT_SETUPS_DIR):
@@ -39,23 +39,18 @@ def set_setupsDir(setupsDir=DEFAULT_SETUPS_DIR):
     DEFAULT_SETUPS_DIR = setupsDir
 #############################################################
 
-# force a reload and exec of the requested version of
-# python:
+# force a reload and exec of the requested version of python:
 def use_python(pythonVersion=DEFAULT_PYTHON_VERSION):
-    if (pythonVersion != DEFAULT_PYTHON_VERSION):
-        vm = '.*'
-    else:
-        vm = pythonVersion
-
-    ups = getUps()
-
     # did we setup python at all?  Or are we getting it by default from the path?
     alreadySetup = os.environ.get('SETUP_PYTHON') is not None
     
     # are we already using the requested version?
-    alreadyUsing = alreadySetup and re.search('python ' + pythonVersion, os.environ.get('SETUP_PYTHON')) is not None
+    alreadyUsing = alreadySetup and re.search('python %s' % pythonVersion, os.environ.get('SETUP_PYTHON')) is not None
     
     if not alreadyUsing:
+        # get a ups instance:
+        ups = getUps()
+
         # unsetup if we are already setup:
         if alreadySetup: ups.unsetup('python')
 
@@ -71,12 +66,7 @@ def use_python(pythonVersion=DEFAULT_PYTHON_VERSION):
 
         # bye bye, exec into another context:
         pythonDir = os.path.normpath(os.environ.get('PYTHON_DIR'))
-        try:
-            os.execve('%s/bin/python' % pythonDir, sys.argv, os.environ)
-        except OSError:
-            print("OS ERROR: PYTHON_DIR=%s" % pythonDir)
-            print("sys.argv = %s" % str(sys.argv))
-            raise
+        os.execve('%s/bin/python' % pythonDir, sys.argv, os.environ)
 
 ##############################################################################
 
@@ -84,17 +74,21 @@ class upsException(Exception):
     def __init__(self, msg):
         self.args = msg
     
-class upsManager:
+class UpsManager:
     def __init__(self, setupsDir=DEFAULT_SETUPS_DIR):
 
         # initial setup of ups itself:
         os.environ['UPS_SHELL'] = 'sh'
-	f = os.popen('. %s/setups.sh; ' % setupsDir + \
-                      'echo os.environ\\[\\"UPS_DIR\\"\\]=\\"$UPS_DIR\\"; ' + \
-                      'echo os.environ\\[\\"PRODUCTS\\"\\]=\\"$PRODUCTS\\";' + \
-                      'echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"$SETUP_UPS\\"')
-	exec f.read()
-	f.close()
+
+        # initial setup of ups itself:
+        os.environ['UPS_SHELL'] = 'sh'
+        f = os.popen('. %s/setups.sh; ' % setupsDir + \
+                     'echo os.environ\\[\\"UPS_DIR\\"\\]=\\"${UPS_DIR}\\"; ' + \
+                     'echo os.environ\\[\\"PRODUCTS\\"\\]=\\"${PRODUCTS}\\";' + \
+                     'echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"${SETUP_UPS}\\";' + \
+                     'echo os.environ\\[\\"PYTHONPATH\\"\\]=\\"${PYTHONPATH}\\";')
+        exec f.read()
+        f.close()
 
         # we need to initialize the following so that we can
         #  make the correct changes to sys.path later when products
