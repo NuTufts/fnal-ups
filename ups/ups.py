@@ -1,19 +1,17 @@
+#!/usr/bin/env python
 import os
 import re
 import sys
 import string
 
 DEFAULT_PYTHON_VERSION = ''
-if os.environ.has_key('SETUPS_DIR'):
-    DEFAULT_SETUPS_DIR = os.environ['SETUPS_DIR']
-else:
-    DEFAULT_SETUPS_DIR = '/usr/local/etc'
+DEFAULT_SETUPS_DIR = os.environ.get('SETUPS_DIR', '/usr/local/etc')
 
 #############################################################
 # User interface:
 #  import ups
 #  optional:
-#       ups.getUps( [setupsDir=/path/to/setups.sh] )
+#       ups.getUps([setupsDir=/path/to/setups.sh])
 #  
 #  ups.setup('my project spec' [, setupsDir=/path/to/setups.sh])
 #############################################################
@@ -22,13 +20,17 @@ else:
 singletonUps = None
 def getUps(setupsDir=DEFAULT_SETUPS_DIR):
     global singletonUps
-    if ( singletonUps is None ):
+    if (singletonUps is None):
         singletonUps = upsManager(setupsDir)
     return singletonUps
 
 def setup(arg, setupsDir=DEFAULT_SETUPS_DIR):
-    upsmgr = getUps()
+    upsmgr = getUps(setupsDir)
     upsmgr.setup(arg)
+
+def unsetup(arg, setupsDir=DEFAULT_SETUPS_DIR):
+    upsmgr = getUps(setupsDir)
+    upsmgr.unsetup(arg)
 
 #############################################################
 
@@ -40,38 +42,41 @@ def set_setupsDir(setupsDir=DEFAULT_SETUPS_DIR):
 # force a reload and exec of the requested version of
 # python:
 def use_python(pythonVersion=DEFAULT_PYTHON_VERSION):
-    if ( pythonVersion != DEFAULT_PYTHON_VERSION ):
+    if (pythonVersion != DEFAULT_PYTHON_VERSION):
         vm = '.*'
     else:
         vm = pythonVersion
 
-    obj = getUps()
+    ups = getUps()
 
     # did we setup python at all?  Or are we getting it by default from the path?
-    alreadySetup = ( os.environ.has_key('SETUP_PYTHON') and
-                     os.environ['SETUP_PYTHON'] != '' )
-
+    alreadySetup = os.environ.get('SETUP_PYTHON') is not None
+    
     # are we already using the requested version?
-    alreadyUsing = ( os.environ.has_key('SETUP_PYTHON') and
-                     re.search('python ' + pythonVersion, os.environ['SETUP_PYTHON']) != None )
+    alreadyUsing = alreadySetup and re.search('python ' + pythonVersion, os.environ.get('SETUP_PYTHON')) is not None
+    
+    if not alreadyUsing:
+        # unsetup if we are already setup:
+        if alreadySetup: ups.unsetup('python')
 
-    if ( alreadyUsing ):
-        # already using the requested version, no-op.
-        pass
-    else:
-        if ( alreadySetup ):
-            obj._inhaleresults(os.environ['UPS_DIR'] + '/bin/ups unsetup python')
-        obj._inhaleresults(os.environ['UPS_DIR'] + '/bin/ups setup python ' + pythonVersion)
+        # now set it up
+        ups.setup('python %s' % pythonVersion)
 
         # now exec into the context of the requested version of python:
         # were we running the python interpreter itself?  Special handling required!
-        if ( sys.argv == [''] ):
-            sys.argv = [ os.environ['PYTHON_DIR'] + '/bin/python' ]
+        if (sys.argv == ['']):
+            sys.argv = [os.environ.get('PYTHON_DIR', '') + '/bin/python']
         else:
-            sys.argv.insert(0, os.environ['PYTHON_DIR'] + '/bin/python')
+            sys.argv.insert(0, os.environ.get('PYTHON_DIR', '') + '/bin/python')
 
         # bye bye, exec into another context:
-        os.execve( os.environ['PYTHON_DIR']+'/bin/python', sys.argv, os.environ )
+        pythonDir = os.path.normpath(os.environ.get('PYTHON_DIR'))
+        try:
+            os.execve('%s/bin/python' % pythonDir, sys.argv, os.environ)
+        except OSError:
+            print("OS ERROR: PYTHON_DIR=%s" % pythonDir)
+            print("sys.argv = %s" % str(sys.argv))
+            raise
 
 ##############################################################################
 
@@ -84,7 +89,7 @@ class upsManager:
 
         # initial setup of ups itself:
         os.environ['UPS_SHELL'] = 'sh'
-	f = os.popen( '. %s/setups.sh; ' % setupsDir + \
+	f = os.popen('. %s/setups.sh; ' % setupsDir + \
                       'echo os.environ\\[\\"UPS_DIR\\"\\]=\\"$UPS_DIR\\"; ' + \
                       'echo os.environ\\[\\"PRODUCTS\\"\\]=\\"$PRODUCTS\\";' + \
                       'echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"$SETUP_UPS\\"')
@@ -94,10 +99,7 @@ class upsManager:
         # we need to initialize the following so that we can
         #  make the correct changes to sys.path later when products
         #  we setup modify PYTHONPATH
-        try:
-            self._pythonPath = os.environ['PYTHONPATH']
-        except KeyError:
-            self._pythonPath = ''
+        self._pythonPath = os.environ.get('PYTHONPATH', '')
         self._sysPath = sys.path
         (self._internalSysPathPrepend, self._internalSysPathAppend) = self._getInitialSyspathElements()
 
@@ -105,19 +107,19 @@ class upsManager:
     # set a product up:
     def setup(self, arg):
         try:
-            self._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups setup ' + arg)
+            self._inhaleresults("%s/bin/ups setup %s" % (os.environ.get('UPS_DIR'), arg))
+            self._updateImportPath()
         except upsException:
             raise
-        self._updateImportPath()
 
     ############################################################################
     # unsetup a product:
     def unsetup(self, arg):
         try:
-            self._inhaleresults(os.environ["UPS_DIR"] + '/bin/ups unsetup ' + arg)
+            self._inhaleresults("%s/bin/ups unsetup %s" % (os.environ.get('UPS_DIR'), arg))
+            self._updateImportPath()
         except upsException:
             raise
-        self._updateImportPath()
 
     ############################################################################ 
     # PRIVATE METHODS BELOW THIS POINT.
@@ -135,20 +137,20 @@ class upsManager:
         # (and hence must have come from the internals)?
         internalSysPathAppend = []
         for element in sysPath:
-            if ( element not in pyPath ):
+            if (element not in pyPath):
                 internalSysPathAppend.append(element)
         return (internalSysPathPrepend, internalSysPathAppend)
         
     ############################################################################
     def _setPythonPath(self):
-        self._pythonPath = os.environ['PYTHONPATH']
+        self._pythonPath = os.environ.get('PYTHONPATH', '')
 
     ############################################################################
     def _updateImportPath(self):
         # make sure that sys.path reflects what is in PYTHONPATH after
         # any setups are performed!
-        if (os.environ['PYTHONPATH'] != self._pythonPath):
-            pypathElements = string.split( os.environ['PYTHONPATH'], ':' )
+        if (os.environ.get('PYTHONPATH', '') != self._pythonPath):
+            pypathElements = string.split(os.environ.get('PYTHONPATH', ''), ':')
             # sys.path includes the current working directory as the first element:
             sys.path = self._internalSysPathPrepend
             # now append each pythonpath element
@@ -162,36 +164,38 @@ class upsManager:
     ############################################################################
     def _inhaleresults(self, cmd):
 	(stdin,stdout,stderr) = os.popen3(cmd)
-        filename = stdout.read()
-	filename = filename[0:-1]
-        if ( filename == "/dev/null" ):
-            msg = stderr.read()
-            raise upsException(msg)
-        stdin.close()
-        stdout.close()
-        stderr.close()
+        try:
+            filename = stdout.read()
+            filename = filename[0:-1]
+            if (filename == "/dev/null"):
+                msg = stderr.read()
+                raise upsException(msg)
+        finally:
+            stdin.close()
+            stdout.close()
+            stderr.close()
 
-	setup = open(filename,"a")
-	setup.write(""" 
-cat <<'EOF' | python
-import os
-import re
-print "--------------cut here-------------"
-for v in os.environ.keys():
-  fix= re.sub( "\'", "\\'", os.environ[v])
-  print "os.environ['"+v+"'] = '" + fix + "'" 
-EOF
-"""
-        )
+        cutHere = '--------------cut here-------------'
+	setup = open(filename, 'a')
+	setup.write(self._getNewPythonEnv(cutHere))
 	setup.close()
 
-	f = os.popen("/bin/sh " + filename)
+	f = os.popen("/bin/sh %s" % filename)
 	c1 = f.read()
 	f.close()
-        (realUpsStuff, ourOsEnvironmentStuff) = re.split('.*--------------cut here-------------', c1)
-	os.environ = {}
+
+        (realUpsStuff, ourOsEnvironmentStuff) = re.split('.*%s' % cutHere, c1)
         exec ourOsEnvironmentStuff
 
-
-
-
+    ############################################################################
+    def _getNewPythonEnv(self, cutHere):
+        codeLines = []
+        codeLines.append('')
+        codeLines.append('echo "%s"' % cutHere)
+        codeLines.append("cat <<'EOF' | python")
+        codeLines.append("import os")
+        codeLines.append("import re")
+        codeLines.append("for (k,v) in os.environ.items():")
+        codeLines.append("    print('os.environ[%s] = %s' % (repr(k), repr(v)))")
+        codeLines.append("EOF")
+        return '\n'.join(codeLines)
