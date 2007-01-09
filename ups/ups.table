@@ -59,6 +59,5 @@ action=setup
 # addAlias(ups,${UPS_PROD_DIR}/bin/ups %s)
   addAlias(setup,'${UPS_SOURCE} `${UPS_PROD_DIR}/bin/ups setup %s`')
   addAlias(unsetup,'${UPS_SOURCE} `${UPS_PROD_DIR}/bin/ups unsetup %s`')
-  setupOptional (egcs)
   setupOptional (upd)
 
