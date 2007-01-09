@@ -51,9 +51,6 @@
 #ifdef _SGIAPI
 extern int gethostname(char *, int);
 #endif
-#ifdef __linux__
-extern int gethostname(char *, int);
-#endif
 
 /* ups specific include files */
 #include "upsutl.h"
@@ -311,7 +308,7 @@ void upsutl_finish_temp_file( const FILE * const a_stream,
       break;
     }
     (void) fprintf((FILE *)a_stream, "%s/bin/rm -f %s\n", a_prefix, g_temp_file_name);
-    (void) fprintf((FILE *)a_stream, "test $rc = 0\n", a_prefix, g_temp_file_name);
+    (void) fprintf((FILE *)a_stream, "test $rc = 0\n");
   }
 }
 

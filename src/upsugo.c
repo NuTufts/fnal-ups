@@ -239,7 +239,6 @@ flavor_sub(char *flavor, struct ups_command * uc)
    is the same a -f "OS1:MYOS:ANYOS:OSEND" of course with or wihout "'s
    NOTE: build list includes the BREAK
 */
-extern char *strdup();
 static char reqchainbuf[512];
 #define build_list( LIST_ELEMENT , ARG )                          \
 { if ( *argbuf )                                                  \
