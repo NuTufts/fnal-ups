@@ -26,7 +26,6 @@ ups_have_flavor_override() {
     }
     if ( 0 != (override = getenv("UPS_OVERRIDE")) ) {
 
-	res = parts;
 
 	scan = strdup(override);
 	while( isspace(*scan) && *scan ) {
@@ -39,6 +38,7 @@ ups_have_flavor_override() {
 		    scan++;
 		}
 		parts[0] = scan;
+	        res = parts;
 		while( !isspace(*scan) && '+' != *scan && *scan) {
 		    scan++;
 		}
@@ -60,6 +60,7 @@ ups_have_flavor_override() {
 		    scan++;
 		}
 		parts[2] = scan;
+	        res = parts;
 		while( !isspace(*scan) && *scan ) {
 		    scan++;
 		}
@@ -90,7 +91,7 @@ ups_append_OS(char *buf)
    if (uname(&baseuname) == -1) 
 	return;      				/* do uname */
 
-   if (0 != (p = ups_have_flavor_override())) {
+   if (0 != (p = ups_have_flavor_override()) && p[0]) {
        (void)strcpy(buf, p[0]);
        return;
    }
@@ -117,7 +118,7 @@ ups_append_release(char *buf)
    if (uname(&baseuname) == -1) 
        return;     				/* do uname */
 
-   if (0 != (p = ups_have_flavor_override()) && 0 != p[1]) {
+   if (0 != (p = ups_have_flavor_override()) && p[1]) {
 	(void)strcat(buf, p[1]);
 	return;
    }

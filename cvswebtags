@@ -250,9 +250,9 @@ bit_bucket       variable     49 src/ups_depend.c static long bit_bucket = 0;
 shutup           function     94 src/ups_depend.c static void shutup (const char * const s_cmd)
 ups_depend       function     66 src/ups_depend.c t_upslst_item *ups_depend( t_upsugo_command * const u_cmd, 
 HOST_BUF_SIZE    macro        13 src/upsuname.c   #define HOST_BUF_SIZE 1024
-ups_append_OS    function     84 src/upsuname.c   ups_append_OS(char *buf) 
-ups_append_release function    111 src/upsuname.c   ups_append_release(char *buf) 
-ups_get_default_quals function    166 src/upsuname.c   ups_get_default_quals(char *buf) {
+ups_append_OS    function     85 src/upsuname.c   ups_append_OS(char *buf) 
+ups_append_release function    112 src/upsuname.c   ups_append_release(char *buf) 
+ups_get_default_quals function    167 src/upsuname.c   ups_get_default_quals(char *buf) {
 ups_have_flavor_override function     16 src/upsuname.c   ups_have_flavor_override() {
 CHECK_FOR_COMMA  macro       106 src/ups_verify.c #define CHECK_FOR_COMMA(keyword) \
 SHUTUP           macro        62 src/ups_verify.c #define SHUTUP \
