@@ -179,17 +179,37 @@ class UpsManager:
 	f.close()
 
         (realUpsStuff, ourOsEnvironmentStuff) = re.split('.*%s' % cutHere, c1)
+        #print("ourOsEnvironmentStuff = %s" % ourOsEnvironmentStuff)
         exec ourOsEnvironmentStuff
 
     ############################################################################
     def _getNewPythonEnv(self, cutHere):
+        # quoting difficulties for fixing the thing we're about to import:
+        #  need to triple-quote the incoming value of the environmental variable
+        #  so that multi-line entries are imported correctly
+        quote = '"'
+        tick = "'"
+        tick3 = "%s%s%s" % (tick, tick, tick)
+        
+        #               fix = re.sub(  "\'",   "\\'",      v)
+        the_fix_line = "fix = re.sub( %s\%s%s, %s\\\\%s%s, v)" % (quote,tick,quote, quote,tick,quote)
+
+        #                 print "os.environ['"   +k+"']   = '''" + fix + "'''" 
+        the_print_line = "print %sos.environ[%s%s+k+%s%s] = %s%s + fix + %s%s%s" % (quote, tick,quote, quote,tick,
+                                                                                   tick3,quote, quote,tick3,quote)
+        
         codeLines = []
         codeLines.append('')
         codeLines.append('echo "%s"' % cutHere)
         codeLines.append("cat <<'EOF' | python")
         codeLines.append("import os")
         codeLines.append("import re")
-        codeLines.append("for (k,v) in os.environ.items():")
-        codeLines.append("    print('os.environ[%s] = %s' % (repr(k), repr(v)))")
+        codeLines.append("envkeys = os.environ.keys()")
+        codeLines.append("envkeys.sort()")
+        codeLines.append("for k in envkeys:")
+        codeLines.append("    v = os.environ.get(k, '')")
+        codeLines.append("    %s" % the_fix_line)
+        codeLines.append("    %s" % the_print_line)
         codeLines.append("EOF")
+
         return '\n'.join(codeLines)
