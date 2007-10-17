@@ -477,9 +477,9 @@ t_cmd_map g_func_info[] = {
   { "writecompilescript", e_writecompilescript, f_writecompilescript, 2, 3, e_invalid_cmd, 0x00000001 },
   { "dodefaults", e_dodefaults, f_dodefaults, 0, 1, e_dodefaults, 0x00000001 },
   { "setupenv", e_setupenv, f_setupenv, 0, 0, e_unsetupenv, 0x00000001 },
-  { "proddir", e_proddir, f_proddir, 0, 0, e_unproddir, 0x00000001 },
+  { "proddir", e_proddir, f_proddir, 0, 2, e_unproddir, 0x00000001 },
   { "unsetupenv", e_unsetupenv, f_unsetupenv, 0, 0, e_setupenv, 0x00000001 },
-  { "unproddir", e_unproddir, f_unproddir, 0, 0, e_proddir, 0x00000001 },
+  { "unproddir", e_unproddir, f_unproddir, 0, 1, e_proddir, 0x00000001 },
   { "if", e_if, f_if, 1, 1, e_endunless, 0x00000001},
   { "endif", e_endif, f_endif, 1, 1, e_unless, 0x00000001 },
   { "else", e_else, f_else, 0, 0, e_else, 0x00000001 },
@@ -3821,9 +3821,12 @@ static void f_unsetupenv( ACTION_PARAMS)
 static void f_proddir( ACTION_PARAMS)
 {
   static char buf[MAX_LINE_LEN];
+  static char buf2[MAX_LINE_LEN];
   t_upsact_cmd lcl_cmd;
   char *tmp_prod_dir = NULL, *tmp_prod_name = NULL;
   char *uprod_name;
+  char *suffix="_DIR";
+
 
   CHECK_NUM_PARAM("prodDir");
 
@@ -3838,10 +3841,16 @@ static void f_proddir( ACTION_PARAMS)
     lcl_cmd.icmd = e_envset;
     lcl_cmd.argv[0] = g_buff;
 
-    /* since the prod_dir may come from the command line we need to check
-       if the user entered one that we have to use */
+    /* Need to figure out "prod_name" (in tmp_prod_name) and "prod_dir" in
+       tmp_prod_dir.
+       Since the prod_dir may come from the command line we need to check
+       if the user entered one that we have to use.
+       OR it may be an optional arg.
+    */
     if (a_command_line->ugo_productdir) {
-      tmp_prod_dir = a_command_line->ugo_productdir;
+      strcpy( buf, a_command_line->ugo_productdir ); /* may need to trim
+							below */
+      tmp_prod_dir = buf;
       if (! a_minst->version) {
 	/* we do not have a version file read in.  therefore use the product
 	   name from the command line */
@@ -3856,7 +3865,9 @@ static void f_proddir( ACTION_PARAMS)
 		a_minst->version->prod_dir);
 	tmp_prod_dir = buf;
       } else {
-	tmp_prod_dir = a_minst->version->prod_dir;
+	strcpy( buf, a_minst->version->prod_dir ); /* may need to trim
+							below */
+	tmp_prod_dir = buf;
       }
       if (! a_minst->version->product) {
 	/* we do not have a product name in the version file.  therefore use
@@ -3866,10 +3877,24 @@ static void f_proddir( ACTION_PARAMS)
 	tmp_prod_name = a_minst->version->product;
       }
     }
+    /* done getting "prod_name" and "prod_name" */
+
+    /* make adjustments */
+    if (a_cmd->argc >= 1) suffix = a_cmd->argv[0];
+    if (a_cmd->argc == 2 && tmp_prod_dir) {
+      int skip_first=0;
+      if (tmp_prod_dir[strlen(tmp_prod_dir)-1] == '/') {
+	tmp_prod_dir[strlen(tmp_prod_dir)-1] = '\0';
+      }
+      if (a_cmd->argv[1][0] == '/') skip_first=1;
+      (void)sprintf( buf2, "%s/%s", tmp_prod_dir, &(a_cmd->argv[1][skip_first]) );
+      tmp_prod_dir = buf2;
+    }
+
     if (tmp_prod_dir && tmp_prod_name) {
       uprod_name = upsutl_upcase(tmp_prod_name);
       if (UPS_ERROR == UPS_SUCCESS) {
-	(void) sprintf(g_buff, "%s_DIR", uprod_name);
+	(void) sprintf(g_buff, "%s%s", uprod_name, suffix);
 	
 	lcl_cmd.argv[1] = tmp_prod_dir;
 	f_envset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
@@ -3893,6 +3918,7 @@ static void f_unproddir( ACTION_PARAMS)
 {
   t_upsact_cmd lcl_cmd;
   char *uprod_name;
+  char *suffix="_DIR";
 
   CHECK_NUM_PARAM("unProdDir");
 
@@ -3910,7 +3936,8 @@ static void f_unproddir( ACTION_PARAMS)
     if (a_minst->version && a_minst->version->product) {
       uprod_name = upsutl_upcase(a_minst->version->product);
       if (UPS_ERROR == UPS_SUCCESS) {
-	(void) sprintf(g_buff, "%s_DIR", uprod_name);
+	if (a_cmd->argc == 1) suffix = a_cmd->argv[0];
+	(void) sprintf(g_buff, "%s%s", uprod_name, suffix);
 	f_envunset(a_minst, a_db_info, a_command_line, a_stream, &lcl_cmd);
       }
     }
