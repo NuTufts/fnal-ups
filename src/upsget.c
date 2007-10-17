@@ -127,6 +127,7 @@ typedef struct s_var_sub {
 #define DO_NOT_QUOTE_STRING 1        /* Always quote, for now */
 
 static t_var_sub g_var_subs[] = {
+  { "${UPS_PROD_NAME_UC", upsget_product_uc, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_PROD_NAME", upsget_product, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_NOT_QUOTE_STRING },
   { "${UPS_PROD_VERSION", upsget_version, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_QUOTE_STRING },
   { "${UPS_PROD_DIR", upsget_prod_dir, DO_INCLUDE_IN_ENV, DO_NOT_UNSET_IF_NULL, DO_QUOTE_STRING },
@@ -889,6 +890,17 @@ char *upsget_product(const t_upstyp_db * const db_info_ptr,
   get_element(string,product);
   SHUTUP;
   return string;
+}
+char *upsget_product_uc(const t_upstyp_db * const db_info_ptr,
+			const t_upstyp_matched_instance * const instance,
+			const t_upsugo_command * const command_line )
+{ static char *string;
+  static char newstr[4096];
+
+  get_element(string,product);
+  strcpy( newstr, upsutl_upcase(string) );
+  SHUTUP;
+  return newstr;
 }
 char *upsget_version(const t_upstyp_db * const db_info_ptr,
                       const t_upstyp_matched_instance * const instance,
