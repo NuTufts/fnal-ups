@@ -382,6 +382,32 @@ int upsugo_bldfvr(struct ups_command * const uc)
 /* get the flavor info from the os basically adding release name to sysname,
    but some OS's are funny
    ------------------------------------------------------------------------*/
+
+if (!uc->ugo_H) {
+    /* these declarations are all to make the build_list macro work... */
+    char *argbuf[2];  
+    char *loc;
+    int ups_argc = 0;
+    char **ups_argv = 0;
+    char *arg_str;
+
+    upsver_mes(3,"%sChecking for UPS_OVERRIDE with -H\n", UPSUGO); 
+
+    /* see if we have a UPS_OVERRIDE for -H... */
+    argbuf[0] = ups_get_default_host();
+    loc = argbuf[0];
+    if (argbuf[0]) {
+        upsver_mes(3,"%s found UPS_OVERRIDE -H %s\n", UPSUGO, argbuf[0]); 
+
+ 	/* act like we saw it on the command line... */
+	switch(1) {
+        default:
+	uc->ugo_H = 1;
+        build_list (uc->ugo_osname , "H")   
+        }
+    }
+}
+
 if (!uc->ugo_H)
  {
    flavor[0] = 0;

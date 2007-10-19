@@ -6,5 +6,7 @@ QUALIFIERS = ""
 
 ACTION = SETUP
    doDefaults()
+   prodDir()
+   prodDir(_FOO,${UPS_PROD_DIR}/foo)
    setupRequired("lassie v5_0")
    setupRequired("snif v1_0")

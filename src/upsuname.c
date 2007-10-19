@@ -39,16 +39,8 @@ ups_have_flavor_override() {
 		}
 		parts[0] = scan;
 	        res = parts;
-		while( !isspace(*scan) && '+' != *scan && *scan) {
+		while( !isspace(*scan) && *scan) {
 		    scan++;
-		}
-		if ( '+' == *scan ) {
-		    *scan = 0;
-		    scan++;
-		    parts[1] = scan;
-		    while( !isspace(*scan) && *scan) {
-			scan++;
-		    }
 		}
 		if (*scan) {
 		   *scan = 0;
@@ -59,7 +51,7 @@ ups_have_flavor_override() {
 		while( isspace(*scan) && *scan ) {
 		    scan++;
 		}
-		parts[2] = scan;
+		parts[1] = scan;
 	        res = parts;
 		while( !isspace(*scan) && *scan ) {
 		    scan++;
@@ -91,12 +83,6 @@ ups_append_OS(char *buf)
    if (uname(&baseuname) == -1) 
 	return;      				/* do uname */
 
-   if (0 != (p = ups_have_flavor_override()) && p[0]) {
-       (void)strcpy(buf, p[0]);
-       return;
-   }
-
-
    (void) strcpy (buf,baseuname.sysname);	/* get sysname */
    if (!strncmp(buf,"IRIX",4))  		/* Slam all IRIXanything */
    { 
@@ -117,11 +103,6 @@ ups_append_release(char *buf)
 
    if (uname(&baseuname) == -1) 
        return;     				/* do uname */
-
-   if (0 != (p = ups_have_flavor_override()) && p[1]) {
-	(void)strcat(buf, p[1]);
-	return;
-   }
 
    if (0 != (pc = strchr(baseuname.release, '('))) {
 	/* releases with parens in them break stuff, so cut it off there */
@@ -167,8 +148,20 @@ char *
 ups_get_default_quals(char *buf) {
    char **p;
 
-   if (0 != (p = ups_have_flavor_override()) && p[2] ) {
-	return p[2];
+   if (0 != (p = ups_have_flavor_override()) && p[1] ) {
+	return p[1];
+   } else {
+	return 0;
+   }
+}
+
+char *
+ups_get_default_host() {
+   char **p;
+
+   if (0 != (p = ups_have_flavor_override()) && p[0]) {
+       /* KLUGE put flavor back together */
+       return p[0];
    } else {
 	return 0;
    }
