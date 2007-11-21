@@ -601,7 +601,7 @@ $sed 's%	%%' <<XEoF >$BootStrap_Dir/$Setups_Products_Script
 		    PRODUCTS=\$Prod
 		    prod_set=yes
 	
-        	elif test \`echo \$PRODUCTS|\$grep -c \$Prod\` = "0"
+        	elif test \`echo :\$PRODUCTS:|\$grep -c :\$Prod:\` = "0"
 	        then
 		    PRODUCTS=\${PRODUCTS}:\${Prod}
 		fi
@@ -1490,7 +1490,7 @@ $sed 's%^	%%' <<XEoF > $BootStrap_Dir/${Script_Prefix}.common
 	            then
 			PRODUCTS=\$Prod
 			prodset=yes
-	            elif test \`echo \$PRODUCTS|\$grep -c \$Prod\` = "0"
+	            elif test \`echo :\$PRODUCTS:|\$grep -c :\$Prod:\` = "0"
 	            then
 	                PRODUCTS="\$PRODUCTS' '\${Prod}"
 	            fi
