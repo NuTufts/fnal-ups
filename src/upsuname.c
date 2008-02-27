@@ -94,6 +94,40 @@ ups_append_OS(char *buf)
    }
 }
 
+
+void
+ups_append_MACHINE(char *buf) 
+{  
+   struct utsname baseuname;                    /* returned from uname */
+   char **p;
+
+   buf = buf + strlen(buf);     		/* init pointer */
+   if (uname(&baseuname) == -1) 
+	return;      				/* do uname */
+
+   (void) strcpy (buf,baseuname.machine);	/* get sysname */
+
+   /* 64 bit aliases...  rather than the whole machine we return
+   **  just a "64" suffix...
+   */
+   if (0 == strcmp(buf,"x86_64")) {
+       strcpy(buf,"64");
+   }
+   if (0 == strncmp(buf,"sun",3)) {
+       strcpy(buf,"64");		
+   }
+   return;
+}
+
+/* cheap kluge for now... */
+
+int 
+ups_64bit_check() {
+  char buf[512];
+  buf[0] = 0;
+  ups_append_MACHINE(buf);
+  return (buf[0] == '6' && buf[1] == '4');
+}
 void
 ups_append_release(char *buf) 
 {
