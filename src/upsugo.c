@@ -422,7 +422,21 @@ if (!uc->ugo_H)
    addr=upsutl_str_create(flavor,' ');		/* first add full */
    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
+   /* 64-bit hackage... */
+   if (ups_64bit_check()) {
+       flavor[0] = 0;
+       ups_append_OS(flavor);
+       ups_append_MACHINE(flavor);
+       (void)strcat(flavor, "+");
+       ups_append_release(flavor);
+       addr=upsutl_str_create(flavor,' ');		/* first add full */
+       upsver_mes(3,"%sAdding 64bit flavor to flavor list as well\n",UPSUGO);
+       uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
+   } else {
+       upsver_mes(3,"%snot 64bit...\n",UPSUGO);
+   }
    flavor_sub(flavor, uc);
+
  } else { 
    for ( l_ptr = upslst_first(uc->ugo_osname); 
        l_ptr; l_ptr = l_ptr->next, count++ )
