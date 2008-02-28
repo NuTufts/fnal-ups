@@ -111,10 +111,10 @@ ups_append_MACHINE(char *buf)
    **  just a "64" suffix...
    */
    if (0 == strcmp(buf,"x86_64")) {
-       strcpy(buf,"64");
+       strcpy(buf,"64bit");
    }
    if (0 == strncmp(buf,"sun",3)) {
-       strcpy(buf,"64");		
+       strcpy(buf,"64bit");		
    }
    return;
 }

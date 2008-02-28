@@ -424,6 +424,7 @@ if (!uc->ugo_H)
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
    /* 64-bit hackage... */
    if (ups_64bit_check()) {
+       flavor_sub(flavor, uc);
        flavor[0] = 0;
        ups_append_OS(flavor);
        ups_append_MACHINE(flavor);
