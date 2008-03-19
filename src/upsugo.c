@@ -89,29 +89,55 @@ expand_flavorlist(struct ups_command * uc) {
 }
 
 static void
-flavor_sub(char *flavor, struct ups_command * uc)
+flavor_sub(struct ups_command * uc)
 {  
    char *addr;
    char *loc;
-  
+   int found1;
+   char *flavor;
+   t_upslst_item *l_ptr;
+
+   for ( l_ptr = upslst_first(uc->ugo_osname); 
+	       l_ptr; l_ptr = l_ptr->next) {
+       flavor = l_ptr->data;
+        addr=upsutl_str_create(flavor,' ');
+        uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+   }
+   for ( l_ptr = upslst_first(uc->ugo_osname); 
+	       l_ptr; l_ptr = l_ptr->next) {
+       flavor = l_ptr->data;
    if ((loc = strrchr(flavor,'-')))
       { *loc = 0;
         addr=upsutl_str_create(flavor,' ');
         upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
       }
-   while ((loc = strrchr(flavor,'.')))
+   }
+   found1 = 1;
+   while (found1) {
+   found1 = 0;
+   for ( l_ptr = upslst_first(uc->ugo_osname); 
+	       l_ptr; l_ptr = l_ptr->next) {
+       flavor = l_ptr->data;
+   if ((loc = strrchr(flavor,'.')))
       { *loc = 0;
         addr=upsutl_str_create(flavor,' ');
         upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+        found1 = 1;
       }
+   }
+   }
+   for ( l_ptr = upslst_first(uc->ugo_osname); 
+	       l_ptr; l_ptr = l_ptr->next) { 
+       flavor = l_ptr->data;
    if ((loc = strrchr(flavor,'+')))
       { *loc = 0;
         addr=upsutl_str_create(flavor,' ');
         upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
       }
+   }
    addr=upsutl_str_create("NULL",' ');
    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
@@ -414,42 +440,23 @@ if (!uc->ugo_H)
    ups_append_OS(flavor);
    (void)strcat(flavor, "+");
    ups_append_release(flavor);
-
-/* ok, have flavor string now. it should look like os+n.m.o. ...
-   we well build the flavor table by successively removing '.'
-   from the end of the string.
-   -------------------------------------------------------------- */
-   addr=upsutl_str_create(flavor,' ');		/* first add full */
-   upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
-   uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
-   /* 64-bit hackage... */
+   addr=upsutl_str_create(flavor,' ');	
+   uc->ugo_osname = upslst_new(addr);
    if (ups_64bit_check()) {
-       flavor_sub(flavor, uc);
        flavor[0] = 0;
        ups_append_OS(flavor);
        ups_append_MACHINE(flavor);
        (void)strcat(flavor, "+");
        ups_append_release(flavor);
        addr=upsutl_str_create(flavor,' ');		/* first add full */
-       upsver_mes(3,"%sAdding 64bit flavor to flavor list as well\n",UPSUGO);
-       uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);	/* flavor */
+       uc->ugo_osname = upslst_add(uc->ugo_osname, addr);
    } else {
        upsver_mes(3,"%snot 64bit...\n",UPSUGO);
    }
-   flavor_sub(flavor, uc);
-
- } else { 
-   for ( l_ptr = upslst_first(uc->ugo_osname); 
-       l_ptr; l_ptr = l_ptr->next, count++ )
-   {   addr=upsutl_str_create(l_ptr->data,' ');
-       upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr); 
-       uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
-       (void) strcpy(flavor,l_ptr->data);
-       flavor_sub(flavor, uc);
-   }
+ } 
+ flavor_sub(uc);
 /*   upslst_free(uc->ugo_osname,'d');    need -f and -H
    uc->ugo_osname=0; */
- } 
  if (uc->ugo_number)                       /* specified a specific os level  */
  { count = upslst_count(uc->ugo_flavor);   /* if they specified a level more */
    if(uc->ugo_number > upslst_count(uc->ugo_flavor))   /* specific then      */
