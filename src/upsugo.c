@@ -438,6 +438,9 @@ if (!uc->ugo_H)
  {
    flavor[0] = 0;
    ups_append_OS(flavor);
+   if (ups_64bit_check()) {
+       ups_append_MACHINE(flavor);
+   }
    (void)strcat(flavor, "+");
    ups_append_release(flavor);
    addr=upsutl_str_create(flavor,' ');	
@@ -445,7 +448,6 @@ if (!uc->ugo_H)
    if (ups_64bit_check()) {
        flavor[0] = 0;
        ups_append_OS(flavor);
-       ups_append_MACHINE(flavor);
        (void)strcat(flavor, "+");
        ups_append_release(flavor);
        addr=upsutl_str_create(flavor,' ');		/* first add full */
