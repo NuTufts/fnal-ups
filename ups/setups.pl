@@ -6,7 +6,7 @@ BEGIN {
     $setups_sh = "${Setups_Home}/setups.sh";
     $::ENV{UPS_SHELL} = "sh";
     $c1=` . $setups_sh; 
-	  echo "\$::ENV{UPS_DIR}=q(\$UPS_DIR); \$::ENV{PRODUCTS}=q(\$PRODUCTS); \$::ENV{SETUP_UPS}=q(\$SETUP_UPS);"`;
+          echo "\$::ENV{UPS_DIR}=q(\$UPS_DIR); \$::ENV{PRODUCTS}=q(\$PRODUCTS); \$::ENV{SETUP_UPS}=q(\$SETUP_UPS);\$::ENV{PATH}=q(\$PATH);"`;
 
     unless (eval $c1) {
 	die("setups.pl failed $@");
