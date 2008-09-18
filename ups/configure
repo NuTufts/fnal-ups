@@ -1582,11 +1582,9 @@ $sed 's%^	%%' <<XEoF > $BootStrap_Dir/${Script_Prefix}.common
 					    export PRODUCTS
 	    				    if test \$Shell = 'sh'
 	    				    then
-	        				\$echo PRODUCTS="\${Pstr_new}"; export PRODUCTS;
 	        				\$echo UPS_DIR=\$UPS_DIR; export UPS_DIR;
 	    				    elif test \$Shell = 'csh'
 	    				    then
-	        				\$echo setenv PRODUCTS "\${Pstr_new};"
 	        				\$echo setenv UPS_DIR \$UPS_DIR;
 	    				    else
 	        				\$echo echo '**';
