@@ -404,6 +404,7 @@ int upsugo_bldfvr(struct ups_command * const uc)
    char			*flavor;		/* flavor ptr */
    t_upslst_item        *l_ptr;
    int count = 0;
+   int hcount = 0;
    flavor = uname_flavor;			/* init pointer */
 /* get the flavor info from the os basically adding release name to sysname,
    but some OS's are funny
@@ -445,22 +446,28 @@ if (!uc->ugo_H)
    ups_append_release(flavor);
    addr=upsutl_str_create(flavor,' ');	
    uc->ugo_osname = upslst_new(addr);
-   if (ups_64bit_check()) {
-       flavor[0] = 0;
-       ups_append_OS(flavor);
-       (void)strcat(flavor, "+");
-       ups_append_release(flavor);
-       addr=upsutl_str_create(flavor,' ');		/* first add full */
-       uc->ugo_osname = upslst_add(uc->ugo_osname, addr);
-   } else {
-       upsver_mes(3,"%snot 64bit...\n",UPSUGO);
+   if (ups_64bit_check()) 
+   { flavor[0] = 0;
+     ups_append_OS(flavor);
+     (void)strcat(flavor, "+");
+     ups_append_release(flavor);
+     addr=upsutl_str_create(flavor,' ');		/* first add full */
+     uc->ugo_osname = upslst_add(uc->ugo_osname, addr);
+   } else 
+   { upsver_mes(3,"%snot 64bit...\n",UPSUGO);
    }
  } 
  flavor_sub(uc);
 /*   upslst_free(uc->ugo_osname,'d');    need -f and -H
    uc->ugo_osname=0; */
  if (uc->ugo_number)                       /* specified a specific os level  */
- { count = upslst_count(uc->ugo_flavor);   /* if they specified a level more */
+ { if (uc->ugo_H) 
+   {  hcount = upslst_count(uc->ugo_osname);
+   } else 
+   {  hcount = 1;
+   }
+   uc->ugo_number = (uc->ugo_number -1) * hcount + 1;  /* flavors from -H foo:bar are interleaved */
+   count = upslst_count(uc->ugo_flavor);/* if they specified a level more */
    if(uc->ugo_number > upslst_count(uc->ugo_flavor))   /* specific then      */
    { uc->ugo_number=upslst_count(uc->ugo_flavor); } /* available set to max  */
    l_ptr = upslst_first(uc->ugo_flavor);   /* Start at begining of list      */
