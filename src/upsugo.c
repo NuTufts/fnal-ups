@@ -461,11 +461,9 @@ if (!uc->ugo_H)
 /*   upslst_free(uc->ugo_osname,'d');    need -f and -H
    uc->ugo_osname=0; */
  if (uc->ugo_number)                       /* specified a specific os level  */
- { if (uc->ugo_H) 
-   {  hcount = upslst_count(uc->ugo_osname);
-   } else 
-   {  hcount = 1;
-   }
+ { 
+   hcount = upslst_count(uc->ugo_osname);
+   /* printf("XXX hcount is %d\n", hcount); */
    uc->ugo_number = (uc->ugo_number -1) * hcount + 1;  /* flavors from -H foo:bar are interleaved */
    count = upslst_count(uc->ugo_flavor);/* if they specified a level more */
    if(uc->ugo_number > upslst_count(uc->ugo_flavor))   /* specific then      */
