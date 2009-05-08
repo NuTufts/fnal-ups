@@ -533,6 +533,12 @@ int upsugo_ifornota(struct ups_command * const uc)
    char   * loc;
    static char temp[1024];
 
+   if (!uc->ugo_q && ups_get_default_quals()) {
+     /* this looks like it doesn't do anything, but it sets our default
+	  qualifiers, since they get prepended to the empty string... */
+     uc->ugo_q = 1;
+     upsugo_bldqual(uc, "");
+   }
    if (!uc->ugo_product)                        /* no product                */
    { addr=upsutl_str_create("*",' ');           /* wildcard product name     */
      upsver_mes(3,"%sNo product specified set to %s\n",UPSUGO,addr); 
@@ -774,7 +780,9 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  {
    char mergebuf[512];
    strcpy(mergebuf, inaddr);
-   strcat(mergebuf,":");
+   if (*inaddr) {
+     strcat(mergebuf,":");
+   }
    strcat(mergebuf, ups_get_default_quals());
    uc->ugo_reqqualifiers = strdup(mergebuf);
  } else {
@@ -783,6 +791,7 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
 
  is_decl = ( g_command_verb == e_undeclare ||
              g_command_verb == e_declare );
+
  fix_inaddr = ugo_old2newquals( uc->ugo_reqqualifiers, is_decl );
 
  if ( strchr(fix_inaddr,'?') == 0) {       /* no optional qualifiers */
