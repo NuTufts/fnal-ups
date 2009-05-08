@@ -770,11 +770,20 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  int is_decl;
  t_upslst_item *l_ptr = 0;
 
- uc->ugo_reqqualifiers = strdup(inaddr);
+ if (ups_get_default_quals()) 
+ {
+   char mergebuf[512];
+   strcpy(mergebuf, inaddr);
+   strcat(mergebuf,":");
+   strcat(mergebuf, ups_get_default_quals());
+   uc->ugo_reqqualifiers = strdup(mergebuf);
+ } else {
+   uc->ugo_reqqualifiers = strdup(inaddr);
+ }
 
  is_decl = ( g_command_verb == e_undeclare ||
              g_command_verb == e_declare );
- fix_inaddr = ugo_old2newquals( inaddr, is_decl );
+ fix_inaddr = ugo_old2newquals( uc->ugo_reqqualifiers, is_decl );
 
  if ( strchr(fix_inaddr,'?') == 0) {       /* no optional qualifiers */
   addr=upsutl_str_create(fix_inaddr,'p');
@@ -1566,8 +1575,6 @@ t_upsugo_command *upsugo_next(const int old_argc,
     argbuf = (char **)upsmem_malloc(sizeof(char *)+1);
     *argbuf = 0;
     (void) upsugo_rearg(old_argc,old_argv,&ups_argc,ups_argv);
-    if (ups_get_default_quals())
-        upsugo_bldqual(uc,ups_get_default_quals());
     while ((arg_str= upsugo_getarg(ups_argc, ups_argv , argbuf)) != 0)
     { if(*arg_str == '-')      /* is it an option */
       { if (!strchr((validopts ? validopts : ""),(int)*(arg_str+1))) { 
