@@ -201,6 +201,7 @@ ups_make_default_quals_optional() {
            }
            s++;
         }
+        *(s-offset) = *(s);
      }
 }
 
