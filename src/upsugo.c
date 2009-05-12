@@ -776,6 +776,8 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
  int is_decl;
  t_upslst_item *l_ptr = 0;
 
+ uc->ugo_reqqualifiers = strdup(inaddr);
+
  if (ups_get_default_quals()) 
  {
    char mergebuf[512];
@@ -784,15 +786,15 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
      strcat(mergebuf,":");
    }
    strcat(mergebuf, ups_get_default_quals());
-   uc->ugo_reqqualifiers = strdup(mergebuf);
+   fix_inaddr = strdup(mergebuf);
  } else {
-   uc->ugo_reqqualifiers = strdup(inaddr);
+   fix_inaddr = strdup(inaddr);
  }
 
  is_decl = ( g_command_verb == e_undeclare ||
              g_command_verb == e_declare );
 
- fix_inaddr = ugo_old2newquals( uc->ugo_reqqualifiers, is_decl );
+ fix_inaddr = ugo_old2newquals( fix_inaddr, is_decl );
 
  if ( strchr(fix_inaddr,'?') == 0) {       /* no optional qualifiers */
   addr=upsutl_str_create(fix_inaddr,'p');
