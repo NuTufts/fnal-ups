@@ -787,6 +787,8 @@ int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
    }
    strcat(mergebuf, ups_get_default_quals());
    fix_inaddr = strdup(mergebuf);
+
+   ups_make_default_quals_optional();
  } else {
    fix_inaddr = strdup(inaddr);
  }

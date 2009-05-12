@@ -189,6 +189,21 @@ ups_get_default_quals(char *buf) {
    }
 }
 
+ups_make_default_quals_optional() {
+   char **p, *s;
+   int offset = 0;
+   if (0 != (p = ups_have_flavor_override()) && p[1] ) {
+	s =  p[1];
+        while (*s) {
+           *(s-offset) = *(s);
+           if (*s == '+') {
+              offset++;
+           }
+           s++;
+        }
+     }
+}
+
 char *
 ups_get_default_host() {
    char **p;
