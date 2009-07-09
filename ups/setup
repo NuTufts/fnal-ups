@@ -1,0 +1,84 @@
+# Ron's ups bootstrap "setup"
+#   $RCSfile$
+#   $Revision$
+#   $Date$
+# Note: on some systems, if there is a "setup" command in PATH before "." then you
+# may have to specify a path (either rel. or abs.) to this "setup" file:
+#      source path/setup
+#  OR  .      path/setup
+# so that the shell does not search the path for an executable file to source
+#
+# When sourcing this file from a /bin/csh script, you may have to tell this
+# source file where it (or actually the products database) is via the prod_db
+# shell variable. I.e.:
+#    set prod_db=/some/path; source /some/path/this_file
+# When sourcing from an sh script (except when sh is really bash) you may have
+# to tell this source file where it is by passing the source file a parameter:
+#    . /some/path/this_file /some/path
+
+test $?shell = 1 && set ss=csh || ss=sh
+echo Shell type is $ss.
+
+# make some things similar. need to use set_ because sh builtin set would hide function set
+test "$ss" = csh && alias set_ set
+test "$ss" =  sh && eval 'set_() { for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`; val=`expr "$xx" : "[^=]*=\(.*\)"`; eval "$var=\"$val\"";done; }'
+test "$ss" =  sh && eval 'setenv() { eval "$1=\"\$2\""; export $1; }' && eval 'source() { file=$1; shift; . $file "$@"; }'
+test "$ss" =  sh && eval 'tnotnull() { eval "test -n \"\${$1-}\""; }'                             && eval 'nullout() { "$@" >/dev/null 2>&1; }'
+test "$ss" = csh && alias tnotnull "eval '"'test $?'"\!* -eq 1' && eval '"'test -n "$'"\!*"'"'"'" && alias nullout "\!* >& /dev/null"
+
+# now is if we were passed a path or if not, if we can figure it out (maybe if we are interactive)
+#   bash, zsh, ksh and tcsh pass params to a source file, csh does not. but someone will be writing csh scripts
+set_ msg='Please set shell variable prod_db or specify a path on "source" line. Fix this and other errors may go away.'
+tnotnull prod_db && set_ db="`cd $prod_db >/dev/null;pwd`" && echo 'setting db from prod_db variable' || set_ db=
+
+# note, for sh tnotnull $1 would be the function's $1, not the source script $1
+test -z "$db" -a "$ss" =  sh && eval 'test -n "${1-}"'                  && set_ db="`cd $1 >/dev/null;pwd`"  && echo 'setting db from param'
+test -z "$db" -a "$ss" = csh && test -n "$1"                            && set_ db="`cd $1 >/dev/null;pwd`"  && echo 'setting db from param'
+test -z "$db" && tnotnull BASH_SOURCE && set_ me=`dirname $BASH_SOURCE` && set_ db="`cd $me >/dev/null;pwd`" && echo 'setting db via BASH_SOURCE'
+
+# history is applicable only for interactive t/csh
+test -z "$db" -a "$ss" = csh && test $?history = 0 && set history=5  # make sure history 1 works
+test -z "$db" -a "$ss" = csh && set me=`history 1|sed 's/^[ \t0-9:]*//'` && test -n "$me" && set me=`dirname $me[2]` && set db=`cd $me >/dev/null;pwd` \
+   && echo 'setting db via interactive history'
+
+test -z "$db" && echo "$msg" || echo "db=$db"
+
+# NEED TO DETERMINE WHERE an appropriate ups exe is.
+#  Need to rely on some ups product install standards:
+#   The starting point is flavor -- it is determined here and it must match the
+#     a flavor specified in the $db/ups/current.chain file.
+#   The version is taken from the current.chain file based on the flavor match.
+#   The PROD_DIR is retrieved from the version file.
+#   Although, for some products, the exe might be under PROD_DIR/flavor/bin
+#   for ups, the exe is always assumed to be under PROD_DIR/bin.
+# Because the ups product is the foundational product, I _will_not_ support ups's
+#  full flavor matching but I _will_ support the 64/32 matching, and the backward
+# compatible os+majRev.
+set_ os=`uname -s` os_rev=`uname -r |cut -d. -f1-2` mach=`uname -m` libc=; test $os = Linux && set_ libc=-`/bin/ls /lib/libc-*|sed '{s/^[^0-9]*//;s/[^0-9]*$//;q}'`
+set_ b64=`sh -c "case $mach in x86_64|sun*) echo 64bit;;*) echo ;;esac"`
+set_ fl1=$os$b64+$os_rev$libc fl2=$os+$os_rev$libc fl3=$os+`expr "$os_rev" : '\([0-9]*\)'`
+
+echo "the flavors are: fl1=$fl1 fl2=$fl2 fl3=$fl3"
+
+setenv UPS_SHELL $ss
+
+test -n "$db"        && set_ pdp=`sed -n '/^ *PROD_DIR_PREFIX/{s/.*= *//;s|${UPS_THIS_DB}|'"$db|;p;}" $db/.upsfiles/dbconfig`
+# the following assumes VERSION immediately follows FLAVOR in the current.chain file
+set_ ver=
+test -n "$db"              && set_ ver=`sed -n "/${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $db/ups/current.chain |grep .` && set_ flv=$fl1
+test -n "$db" -a -z "$ver" && set_ ver=`sed -n "/${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $db/ups/current.chain |grep .` && set_ flv=$fl2
+test -n "$db" -a -z "$ver" && set_ ver=`sed -n "/${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $db/ups/current.chain |grep .` && set_ flv=$fl3
+
+test -n "$db" && echo "the current version of ups for this flavor is $ver "`test -n "$ver" && echo "flv=$flv"`
+
+# now get the prddir and exe
+test -n "$db" && set_ prddir=`sed -n -e "/$flv/,/PROD_DIR/{" -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` && echo "prddir=$prddir"
+# NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin ls is smart).
+tnotnull prddir && nullout ls $prddir/bin/ups && set_ exe=$prddir/bin/ups || set_ exe=
+test -z "$exe" && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
+tnotnull PRODUCTS && set_ products=$PRODUCTS || set_ products=$db; expr ":$products:" : ".*:$db:" >/dev/null || set_ products=$db:$products
+test -n "$exe" && setenv PRODUCTS $products
+test -n "$exe" && source `$exe setup -z$db ups $ver` && test -f "$db/setup.initial" && source "$db/setup.initial"
+
+test "$ss" = csh && unalias tnotnull nullout set_
+unset ss msg db me os os_rev mach libc b64 fl1 fl2 fl3 pdp ver flv prddir exe  set_ setenv tnotnull source nullout products

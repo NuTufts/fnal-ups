@@ -1,0 +1,100 @@
+#   $RCSfile$
+#   $Revision$
+#   $Date$
+
+FILE = TABLE
+
+GROUP:
+
+FLAVOR = ANY
+QUALIFIERS = "debug"
+
+FLAVOR = ANY
+QUALIFIERS = ""
+
+COMMON:
+   ACTION = SETUP
+        # so product can be unsetup
+        setupEnv()
+        # <PRODUCT>_DIR
+        proddir()
+
+	# could have 2 bin dirs (one for platform independent scripts)
+        # Note: if blocks do not do automatic unsetup action(s)
+	if    (test -d ${UPS_PROD_DIR}/bin )
+            pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
+	endif (test -d ${UPS_PROD_DIR}/bin )
+
+	if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS} )
+	 if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin )
+            pathPrepend(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin, :)
+	 endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin )
+	 if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/lib )
+            proddir( _LIB, ${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/lib )
+            envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
+	 endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/lib )
+	else()
+         if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR} )
+          if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin )
+            pathPrepend(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin, :)
+          endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin )
+          if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/lib )
+            proddir( _LIB, ${UPS_PROD_FLAVOR}/lib )
+            envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
+          endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/lib )
+         else()
+          if    (test -d ${UPS_PROD_DIR}/lib )
+            proddir( _LIB, lib )
+            envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
+          endif (test -d ${UPS_PROD_DIR}/lib )          
+         endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR} )
+	endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS} )
+
+        if    (test -d ${UPS_PROD_DIR}/inc )
+            proddir( _INC, inc )
+        else()
+	 if    (test -d ${UPS_PROD_DIR}/include )
+            proddir( _INC, include )
+	 else()
+          if    (test -d ${UPS_PROD_DIR}/h )
+            proddir( _INC, h )
+          endif (test -d ${UPS_PROD_DIR}/h )
+	 endif (test -d ${UPS_PROD_DIR}/include )
+	endif (test -d ${UPS_PROD_DIR}/inc )
+
+        envSetIfNotSet( MANPATH, "`man -w`" )
+        if    (test -d ${UPS_PROD_DIR}/man )
+            envPrepend( MANPATH, ${UPS_PROD_DIR}/man, :)
+	endif (test -d ${UPS_PROD_DIR}/man )
+	envUnset( UNSETUP_${UPS_PROD_NAME_UC}_VER )
+
+	execute( "true ${UPS_PROD_NAME} version is ${UPS_PROD_VERSION}            ", NO_UPS_ENV )
+	execute( "test ${UPS_SHELL} =  sh &&     me=$BASH_SOURCE                   ", NO_UPS_ENV )
+	execute( "test ${UPS_SHELL} = csh && set me=`echo $_` && eval set me=$me[2]", NO_UPS_ENV )
+	#execute( "echo grepping for ${UPS_PROD_NAME} version in $me", NO_UPS_ENV )
+	#execute( "grep '${UPS_PROD_NAME} version i[s]' $me", NO_UPS_ENV )
+	execute( "test `grep '${UPS_PROD_NAME} version i[s]' $me | sort -u | wc -l` -gt 1 && echo warn: ${UPS_PROD_NAME} version change", NO_UPS_ENV )
+
+
+   ACTION = unsetup
+        # IS THERE ANY WAY TO TELL IF THIS ACTION is being executed during a setup???
+	# the following allows setup to see if there is a version change
+	execute( "true ${UPS_PROD_NAME} version is ${UPS_PROD_VERSION}            ", NO_UPS_ENV )
+	
+        if    (test -d ${UPS_PROD_DIR}/man )
+            envRemove( MANPATH, ${UPS_PROD_DIR}/man, :)
+	endif (test -d ${UPS_PROD_DIR}/man )
+        #if    (test -d ${UPS_PROD_DIR}/inc )
+            unproddir( _INC )
+        #endif (test -d ${UPS_PROD_DIR}/inc )
+	if    (printenv ${UPS_PROD_NAME_UC}_LIB >/dev/null )
+            envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
+            unproddir( _LIB )
+	endif (printenv ${UPS_PROD_NAME_UC}_LIB >/dev/null )
+        pathRemove(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin, :)
+        pathRemove(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin, :)
+        pathRemove(PATH, ${UPS_PROD_DIR}/bin, :)
+        unproddir()
+        unsetupEnv()
+
+END:
