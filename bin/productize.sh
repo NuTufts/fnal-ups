@@ -30,6 +30,7 @@ Options:
 --clean                *B
 --no-src               *I do not copy src (not implemented yet)
 --redo                 will redo some operation that appear to be done
+--quiet                output from the stages is only in <stage-flv>.out
 -v
 
 *B - build  stage option
@@ -51,11 +52,12 @@ while opt=`expr "${1-}" : '-\([^=]*\)'`;do
     -clean)              opt_clean=1;;
     -no-src)             opt_no_src=1;;
     -redo)               opt_redo=1;;
+    -quiet)              opt_quiet=1;;
     v)                   opt_v=1;;
     *)           echo "Unknown option: $opt"; echo "$USAGE";exit;;
     esac
 done
-if [ $# -ne 0 ];then echo "$USAGE";exit;fi
+if [ $# -ne 0 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
 
 #-----------------------------------------------------------------------
 
@@ -64,21 +66,26 @@ else                         stages=build:install:declare; fi
 
 #-----------------------------------------------------------------------
 
-echov() { if [ "${opt_v-}" ];then echo "$@";fi; }
+echov() { if [ "${opt_v-}" ];then echo "`date`; $@";fi; }
+cmd() { echov "$@"; eval "$@"; }
 
 #-----------------------------------------------------------------------
 
 set_NAM_and_VER()   # $1=nam-ver
 {
-    prod_=`expr "$1" : '\(.*\)-[0-9][-0-9.a-zA-z]*$'`
-     ver_=`expr "$1" : '.*-\([0-9][-0-9.a-zA-z]*\)$'`
+    # tests:
+    #   gcc-4.1.2-20080102  -> gcc  v4_1_2_20080102
+    prod_=`echo "$1" | sed 's/-[0-9][-0-9.a-zA-z]*$//'`
+     ver_=`expr "$1" : "${prod_}-\(.*\)"`
     if   [ "$prod_" = '' -a "${opt_prod-}" = '' ];then
         echo can not determine prod; exit
     elif [ "$prod_"      -a "${opt_prod-}"      ];then
         if [ "$prod_" = "${opt_prod-}" ];then
             PROD_NAM=$prod_; echov OK - "$prod_" = "${opt_prod-}"
         else
-            echo "Error - $prod_ != ${opt_prod-}"
+            echov "Warning - $prod_ != ${opt_prod-}. Taking ${opt_prod-}."
+            # example: prefer "python" over "Python" 
+            PROD_NAM=$opt_prod
         fi
     else
         if [ "$prod_" ];then 
@@ -93,7 +100,8 @@ set_NAM_and_VER()   # $1=nam-ver
         if [ "$ver_" = "${opt_ver-}" ];then
             PROD_VER=$ver_; echov OK - "$ver_" = "${opt_ver-}" 
         else
-            echo "Error - $ver_ != ${opt_ver-}"
+            echov "Warning - $ver_ != ${opt_ver-}. Taking ${opt_ver-}."
+            PROD_VER=$opt_ver
         fi
     else
         if [ "$ver_" ];then
@@ -143,12 +151,28 @@ get_productization_lib()
             exit
         fi
     elif [ -d $PRODS_RT/ups ];then
+        echov UPS_DIR =${UPS_DIR-}
+        echov PRODS_RT=$PRODS_RT
+        # I need _full_ ups (i.e. setup function)
         if [ -f $PRODS_RT/setup ];then
             . $PRODS_RT/setup
-        elif [ "${UPS_DIR-}" ];then
-            PATH=$UPS_DIR/bin:$PATH
         else
-            echo Error - can not initial ups support script environment
+            for fuefile in /usr/local/etc/fermi.shrc \
+                   /usr/local/etc/setups.sh \
+                   /fnal/ups/etc/setups.sh; do
+                if [ -f $fuefile ];then
+                    unset PRODUCTS SETUP_UPS UPS_DIR
+                    set +u  # bad programmers
+                    . $fuefile
+                    set -u
+                    break
+                fi
+            done
+            if type setup | grep 'ups setup' >/dev/null && hash ups 2>/dev/null;then
+                : success
+            else
+                echo Error - can not initial ups support script environment
+            fi
         fi
         if [ -f $UPS_DIR/bin/ups_productization_lib.sh ];then
             .   $UPS_DIR/bin/ups_productization_lib.sh
@@ -175,9 +199,11 @@ get_productization_lib()
     else
         echo Error - ups must be installed 1st into products root at $PRODS_RT
     fi
-}
+}   # get_productization_lib
 
 #------------------------------------------------------------------------------
+
+echov "`basename $0` starting in .../`basename $PWD`"
 
 set_NAM_and_VER `basename $PWD`
 
@@ -185,33 +211,36 @@ set_PRODS_RT
 
 get_productization_lib
 
+#--
+
 set_FLV
 
 redo_stage=99
-q_inst_dir=`qualified_inst_dir`
+PREFIX=`qualified_inst_dir`  # important var
 
 if   declare --status;then  last_stage_done=3
 elif install --status;then  last_stage_done=2
 elif build   --status;then  last_stage_done=1
 else                        last_stage_done=0
 fi
-echo last_stage_done=$last_stage_done
+if [ "${opt_quiet-}" ];then outspec='>/dev/null 2>&1';else outspec=; fi
+echov last_stage_done=$last_stage_done
 for ss in build install declare;do
     if echo $stages | grep $ss >/dev/null;then :;else continue; fi
     case $ss in
     build)
-        if [ $last_stage_done -lt 1 -o $redo_stage -ge 1 ];then
-            build 2>&1 | tee build-`basename $q_inst_dir`.out
+        if [ $last_stage_done -lt 1 -o $redo_stage -le 1 ];then
+            cmd "build 2>&1   | tee build-`basename $PREFIX`.out $outspec"
         fi;;
     install)
-        if [ $last_stage_done -lt 2 -o $redo_stage -ge 2 ];then
-            install 2>&1 | tee install-`basename $q_inst_dir`.out
+        if [ $last_stage_done -lt 2 -o $redo_stage -le 2 ];then
+            cmd "install 2>&1 | tee install-`basename $PREFIX`.out $outspec"
         fi;;
     declare)
-        if [ $last_stage_done -lt 3 -o $redo_stage -ge 3 ];then
-            declare 2>&1 | tee declare-`basename $q_inst_dir`.out
+        if [ $last_stage_done -lt 3 -o $redo_stage -le 3 ];then
+            cmd "declare 2>&1 | tee declare-`basename $PREFIX`.out $outspec"
         fi;;
     esac
 done
 
-echo "Done."
+echov "Done."
