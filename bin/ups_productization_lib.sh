@@ -22,7 +22,9 @@ build()
     else
         generic_build "$@"
     fi
-    echov "build took `delta_m` minutes"
+    rsts=$?
+    echov "build $@ took `delta_m` minutes"
+    return $rsts
 }   # build
 
 install()
@@ -35,7 +37,9 @@ install()
     else
         generic_install "$@"
     fi
-    echov "build took `delta_m` minutes"
+    rsts=$?
+    echov "install $@ took `delta_m` minutes"
+    return $rsts
 }   # install
 
 declare()
@@ -48,7 +52,9 @@ declare()
     else
         generic_declare "$@"
     fi
-    echov "build took `delta_m` minutes"
+    rsts=$?
+    echov "declare $@ took `delta_m` minutes"
+    return $rsts
 }   # declare
 
 #------------------------------------------------------------------------------
