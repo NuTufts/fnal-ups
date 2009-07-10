@@ -244,4 +244,4 @@ for ss in build install declare;do
     esac
 done
 
-echov "Done."
+echov "Done in .../`basename $PWD`"
