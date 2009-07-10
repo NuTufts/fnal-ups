@@ -161,7 +161,8 @@ get_productization_lib()
                    /usr/local/etc/setups.sh \
                    /fnal/ups/etc/setups.sh; do
                 if [ -f $fuefile ];then
-                    unset PRODUCTS SETUP_UPS UPS_DIR
+                    # I do not want to reset PRODUCTS
+                    unset SETUP_UPS UPS_DIR # PRODUCTS
                     set +u  # bad programmers
                     . $fuefile
                     set -u
