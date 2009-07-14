@@ -69,14 +69,12 @@ test -n "$db" && echo "the current version of ups for this flavor is $ver "`test
 # now get the prddir and exe
 test -n "$ver" && set_ prddir=`sed -n -e "/$flv/,/PROD_DIR/{" -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` && echo "prddir=$prddir"
 # NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin ls is smart).
-tnotnull prddir && nullout ls $prddir/bin/ups && set_ exe=$prddir/bin/ups || set_ exe=
+tnotnull prddir && nullout ls $prddir/bin/ups && set_ exe=$prddir/bin/ups || set_ exe=`which ups` || set_ exe=
 test -z "$exe" && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
 tnotnull PRODUCTS && set_ products=$PRODUCTS || set_ products=$db; expr ":${products}:" : ".*:${db}:" >/dev/null || set_ products=${db}:$products
-tnotnull SETUP_UPS && set_ olddb=`expr "$SETUP_UPS" : '.* -z *\([^ ]*\)'`
 tnotnull UPS_DIR &&                     setenv PATH   `echo :${PATH}:     | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv SETUP_UPS UPS_DIR
-tnotnull olddb && test ! -d "$olddb" && set_ products=`echo :${products}: | sed -e "s|:${olddb}:|:|"        -e 's|^:||;s|:$||'`
 test -n "$exe" && setenv PRODUCTS $products
-test -n "$exe" && source `$exe setup -z$db ups $ver` && test -f "$db/setup.initial" && source "$db/setup.initial"
+test -n "$exe" && source `$exe setup ups $ver` && test -f "$db/setup.initial" && source "$db/setup.initial"
 
 test "$ss" = csh && unalias tnotnull nullout set_
 unset ss msg db me os os_rev mach libc b64 fl1 fl2 fl3 pdp ver flv chainf prddir exe products olddb  set_ setenv unsetenv tnotnull source nullout
