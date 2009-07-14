@@ -11,6 +11,10 @@
 
 echov "hello from ups_productization_lib"
 
+# NOTE: all "stages" (build,install,install_fix,and declare) are run in a
+#       sub-shell. So do not set variables that are needed in other stages and
+#       do not worry about preserving the cwd.
+
 build()
 {
     echov build
@@ -26,7 +30,6 @@ build()
     echov "build $@ took `delta_m` minutes"
     return $rsts
 }   # build
-
 install()
 {
     echov install
@@ -41,7 +44,20 @@ install()
     echov "install $@ took `delta_m` minutes"
     return $rsts
 }   # install
-
+install_fix()
+{
+    echov install_fix
+    t0=`date +%s`
+    if type ${PROD_NAM}_install_fix 2>/dev/null | grep 'is a function' >/dev/null;then
+        echov prod specific install_fix function found...
+        ${PROD_NAM}_install_fix "$@"
+    else
+        generic_install_fix "$@"
+    fi
+    rsts=$?
+    echov "install_fix $@ took `delta_m` minutes"
+    return $rsts
+}   # install_fix
 declare()
 {
     echov delare
@@ -58,6 +74,9 @@ declare()
 }   # declare
 
 #------------------------------------------------------------------------------
+# For the "generic" case, of the 4 stages (build,install,install_fix,and
+# declare), I will dispatch to 3 of them -- the declare will be the same for
+# all.
 
 generic_build()
 {
@@ -81,6 +100,16 @@ generic_install()
         generic_build_install_dispatch install
     fi
 }   # generic_install
+generic_install_fix()
+{
+    echov "generic install $@; PREFIX=$PREFIX"
+    if [ "${1-}" = --status ];then
+        # I want this a separate step, but have not determine a check
+        return 1
+    else
+        generic_build_install_dispatch install_fix
+    fi
+}   # generic_install_fix
 generic_declare()
 {
     echov "generic declare $@; PREFIX=$PREFIX"
@@ -118,13 +147,13 @@ ups_build()
         else                          return 1;fi
     else
 
-        dir_sav=$PWD
-
         # if Linux64bit -- try stripping 64bit and using CFLAGS=-m32
         if ups_flv=`get_flv_64_to_32`;then cflags="-cflags -m32"; fi
 
         if [ ! -d build-$ups_flv ];then mkdir build-$ups_flv;fi
+        
         cd build-$ups_flv
+        ups_dir=$PWD
         ln -s ../inc .
         for dd in bin lib src man doc ups;do
             mkdir $dd
@@ -155,16 +184,15 @@ ups_build()
                     /bin/mv -f Makefile.$$ Makefile
                 fi
                 if [ "${opt_clean-}" ];then
-                    UPS_DIR=$dir_sav/build-$ups_flv ../../bin/upspremake clean
+                    UPS_DIR=$ups_dir ../../bin/upspremake clean
                 fi
-                UPS_DIR=$dir_sav/build-$ups_flv ../../bin/upspremake ${cflags-}
+                UPS_DIR=$ups_dir ../../bin/upspremake ${cflags-}
             fi
 
             cd ..
         done
         /bin/rm -fr src inc        # remove these "lndirs"
 
-        cd $dir_sav
     fi
 }   # ups_build
 
@@ -182,9 +210,19 @@ ups_install()
         mkdir -p $inst_
         /bin/cp -Lr bin lib man doc ups  $inst_
         unset inst_
-        cd ..
     fi
 }   # ups_install
+
+ups_install_fix()
+{
+    echov "ups install_fix $@"
+    if [ "${1-}" = --status ];then
+        # even though nothing is done in the ups_install_fix,
+        return 1 # so that the install will not be considered completed
+    else
+        :  nothing needs to be fixed
+    fi
+}   # ups_install_fix
 
 ups_declare()
 {
@@ -224,110 +262,121 @@ EOF
 
 generic_configure_build()
 {
-    eval "configure_opts=\"${opt_configure-}\""  # eval $PREFIX
-    echov "generic \"./configure\" build (configure_opts=$configure_opts)"
+    echov "generic \"./configure\" build (opt_configure=${opt_configure-})"
     mkdir -p $q_bld_dir
     cd $q_bld_dir
     if [ -f config.log ];then
         echo config.log exists
     fi
-    if echo :${opt_q-}: | grep :debug: >/dev/null;then
-        CFLAGS="-g -O0" CXXFLAGS="-g -O0" \
-            ../configure --prefix=$PREFIX $configure_opts
-        if [ ! -f Makefile.orig ];then cp -p Makefile Makefile.orig;fi
-        # use 2 sed express so as to not filter out -O from -O0
-        sed -i -e '/[ "]-O[s1-3 "]/s/-O[s1-3 ]//' \
-               -e '/[ "]-O$/s/-O//'        Makefile  # " quote for emacs
-                                                     #  colorization
-        CFLAGS="-g -O0" CXXFLAGS="-g -O0" \
-            make
-    else
-        ../configure --prefix=$PREFIX $configure_opts
-        make
-    fi
-    cd ..
+    flags=`qual_to_flags`
+    # eval for flags and $PREFIX in $opt_configure
+    cmd "$flags ../configure --prefix=$PREFIX ${opt_configure-}"
+    qual_unO_Makefile
+    make
 }   # generic_configure_build
 generic_configure_install()
 {
-        q_bld_dir=build-`basename $PREFIX`
-        if [ -d $q_bld_dir ];then   # the result of the build
-            dir_sav=$PWD
-            cd $q_bld_dir
-            if [ -f Makefile ];then
-                prefix=`sed -n '/^ *prefix *=/{s/^[^=]*=[ 	]*//;p;q}' Makefile`
-                if [ "$prefix" != $PREFIX ];then
-                    echo "Error - build/install mismatch"
-                    echo "   >$prefix<"
-                    echo "!= >$PREFIX<"
-                    exit
-                fi
-            else
-                echo 'Error '
+    q_bld_dir=build-`basename $PREFIX`
+    if [ -d $q_bld_dir ];then   # created by build stage
+        cd $q_bld_dir
+        if [ -f Makefile ];then
+            prefix=`sed -n '/^ *prefix *=/{s/^[^=]*=[ 	]*//;p;q}' Makefile`
+            if [ "$prefix" -a "$prefix" != $PREFIX ];then
+                echo "Error - build/install mismatch"
+                echo "   >$prefix<"
+                echo "!= >$PREFIX<"
                 exit
             fi
-
-            make install
-
-            echov now install fix
-
-            cd $PREFIX
-            re="^#! *$PREFIX/bin/"
-            ff_l=`find . -type f | xargs grep -l "$re"`
-            for ff in $ff_l;do
-                if grep "${re}[^ ]*  *-" $ff >/dev/null;then
-                    echo 'Trouble -- interp with option(s)'
-                else
-                    echov "fixing $ff"
-                    # what about permissions???
-                    sed -i "s|$re|#!/usr/bin/env |" $ff
-                fi
-            done
-            re="$PREFIX"
-            ff_l=`find . -type f | xargs grep -l "$re"`
-            for ff in $ff_l;do
-                ere='script|ELF|English|ASCII text|archive'
-                file_t=`file $ff | egrep -o "$ere" | sed 's/ //'`
-                ff_basename=`basename $ff`
-                ext=`expr "$ff_basename" : '.*\.\([^.]*\)'`
-                echov "$ff: >$ext $file_t<"
-                case "$ext $file_t" in
-                'rb English')  # ruby file
-                    # let flavor[_qual] stay
-                    sed -i "s|$PRODS_RT/$PROD_NAM/$PROD_VER|#{ENV[\"RUBY_DIR\"]}|" $ff
-                    ;;
-                esac
-            done
-
-            cd $dir_sav
         else
-            echo 'Error - generic (build) install error'
+            echo 'Error '
             exit
         fi
+        make install
+    else
+        echo 'Error - generic (build) install error'
+        exit
+    fi
 }   # generic_configure_install
+generic_configure_install_fix()
+{
+    if [ -d $PREFIX ];then   # the result of the install
+        cd $q_bld_dir
+        inst_PREFIX_fix $PREFIX
+    else
+        echo 'Error - generic install error'
+        exit
+    fi
+}   # generic_configure_install_fix
+
+
 generic_cmake_build()
 {   echov 'generic_cmake_build'
+    mkdir -p $q_bld_dir
+    cd $q_bld_dir
+    flags=`qual_to_flags`
+    cmd "$flags cmake .. -DCMAKE_INSTALL_PREFIX:PATH=$PREFIX"
+    qual_unO_Makefile
+    make
 }   # generic_cmake_build
 generic_cmake_install()
 {   echov 'generic_cmake_install'
+    generic_configure_install
 }   # generic_cmake_install
+generic_cmake_install_fix()
+{   echov 'generic_cmake_install_fix'
+    generic_configure_install_fix
+}   # generic_cmake_install_fix
+
 generic_bootstrap_build()
 {   echov 'generic_bootstrap_build'
+    eval "configure_opts=\"${opt_configure-}\""  # eval $PREFIX
+    echov "generic \"./configure\" build (configure_opts=$configure_opts)"
+    mkdir -p $q_bld_dir
+    cd $q_bld_dir
+    cmd "../bootstrap --prefix=$PREFIX"
+    make
 }   # generic_bootstrap_build
 generic_bootstrap_install()
 {   echov 'generic_bootstrap_install'
+    generic_configure_install
 }   # generic_bootstrap_install
+generic_bootstrap_install_fix()
+{   echov 'generic_bootstrap_install_fix'
+    generic_configure_install_fix
+}   # generic_bootstrap_install_fix
+
 generic_setup_py_build()
 {   echov 'generic_setup_py_build'
+    mkdir -p $q_bld_dir
+    cd $q_bld_dir
+    flags=`qual_to_flags`
+    cmd "$flags python ../setup.py build --prefix=$PREFIX"
 }   # generic_setup_py_build
 generic_setup_py_install()
 {   echov 'generic_setup_py_install'
+    q_bld_dir=build-`basename $PREFIX`
+    if [ -d $q_bld_dir ];then   # created by build stage
+        cd $q_bld_dir
+        cmd "$flags python ../setup.py install"
+    else
+        echo 'Error - generic (build) install error'
+        exit
+    fi
 }   # generic_setup_py_install
+generic_setup_py_install_fix()
+{   echov 'generic_setup_py_install_fix'
+    generic_configure_install_fix
+}   # generic_setup_py_install_fix
+
 generic_Makefile_build()
 {   echov 'generic_Makefile_build'
 }   # generic_Makefile_build
 generic_Makefile_install()
 {   echov 'generic_Makefile_install'
 }   # generic_Makefile_install
+generic_Makefile_install_fix()
+{   echov 'generic_Makefile_install_fix'
+}   # generic_Makefile_install_fix
 
 
 #------------------------------------------------------------------------------
@@ -335,29 +384,81 @@ generic_Makefile_install()
 calc() { echo "scale=4;$@" | bc; }
 delta_m() { t1=`date +%s`; delta_s=`expr $t1 - $t0`; calc "$delta_s / 60"; }
 
+qual_to_flags()
+{
+    if echo :${opt_q-}: | grep :debug: >/dev/null;then
+        echo "CFLAGS=\"$CFLAGS -g -O0\" CXXFLAGS=\"$CXXFLAGS -g -O0\""
+    elif echo :${opt_q-}: | grep :cxxcheck: >/dev/null;then
+        echo "CFLAGS=\"$CFLAGS -g -O0\" CXXFLAGS=\"$CXXFLAGS -g -O0\"\
+ CPPFLAGS=\"$CPPFLAGS -D_GLIBCXX_DEBUG\""
+    fi
+}
+
+qual_unO_Makefile()
+{
+    if echo :${opt_q-}: | egrep ':(debug|cxxcheck):' >/dev/null;then
+        if [ ! -f Makefile.orig ];then cp -p Makefile Makefile.orig;fi
+        sed -i -e '/[ "]-O[s1-3 "]/s/-O[s1-3 ]//' \
+               -e '/[ "]-O$/s/-O//'        Makefile  # " quote for emacs
+                                                     #  colorization
+    fi
+}
+
+inst_PREFIX_fix()
+{
+    re="^#! *$PREFIX/bin/"
+    ff_l=`find . -type f | xargs grep -l "$re"`
+    for ff in $ff_l;do
+        if grep "${re}[^ ]*  *-" $ff >/dev/null;then
+            echo 'Trouble -- interp with option(s)'
+        else
+            echov "fixing $ff"
+            # what about permissions???
+            sed -i "s|$re|#!/usr/bin/env |" $ff
+        fi
+    done
+    re="$PREFIX"
+    ff_l=`find . -type f | xargs grep -l "$re"`
+    for ff in $ff_l;do
+        ere='script|ELF|English|ASCII text|archive'
+        file_t=`file $ff | egrep -o "$ere" | sed 's/ //'`
+        ff_basename=`basename $ff`
+        ext=`expr "$ff_basename" : '.*\.\([^.]*\)'`
+        echov "$ff: >$ext $file_t<"
+        case "$ext $file_t" in
+        'rb English')  # ruby file
+            # let flavor[_qual] stay
+            sed -i "s|$PRODS_RT/$PROD_NAM/$PROD_VER|#{ENV[\"RUBY_DIR\"]}|" $ff
+            ;;
+        esac
+    done
+}
+
 generic_build_install_dispatch()
 {
     # of course, the order of checking is important!!!
-    if   [ -f bootstrap ];then
-        method=bootstrap
-    elif [ -f configure ];then
-        method=configure
-    elif xx=`/bin/ls *.cmake 2>/dev/null`;then
-        if [ `echo "$xx"|wc -l` -gt 1 ];then
-            echo "Warning - more than 1 cmake" >&2
+    if [ "${BLD_INST_METHOD-}" = '' ];then
+        if   [ -f bootstrap ];then
+            BLD_INST_METHOD=bootstrap
+        elif [ -f configure ];then
+            BLD_INST_METHOD=configure
+        elif xx=`/bin/ls *.cmake 2>/dev/null`;then
+            if [ `echo "$xx"|wc -l` -gt 1 ];then
+                echo "Warning - more than 1 cmake" >&2
+            fi
+            BLD_INST_METHOD=cmake
+        elif [ -f setup.py ];then
+            BLD_INST_METHOD=setup_py
+        elif [ -f Makefile ];then
+            BLD_INST_METHOD=Makefile
+        else
+            echo 'Error - cannot determine "generic" method. You must create a'
+            echo '<prod>_productization_lib.sh file for $PROD_NAM'
+            exit
         fi
-        method=cmake
-    elif [ -f setup.py ];then
-        method=setup_py
-    elif [ -f Makefile ];then
-        method=Makefile
-    else
-        echo 'Error - cannot determine "generic" method. You must create a'
-        echo '<prod>_productization_lib.sh file for $PROD_NAM'
-        exit
     fi
     case $1 in
-    build|install)   generic_${method}_$1;;
+    build|install|install_fix)   generic_${BLD_INST_METHOD}_$1;;
     *)  echo 'Error - internal';exit;;
     esac
 }
@@ -430,41 +531,6 @@ flavor()
     *)       echo $fl3;;
     esac
 }
-
-lndir()
-{   src=$1
-    dst=$2
-    abs_src=`cd $src;pwd`
-    abs_dst=`cd $dst;pwd`
-    abs_chk_len=`expr "$abs_dst/" : '.*'`
-    cd $dst
-    src_slash_cnt=`echo $src | sed 's/[^/]//g' | wc -c`
-    src_slash_cnt=`expr $src_slash_cnt - 1`
-    (cd $src;find . -type d ) | \
-    while read dd;do
-        dd=`expr "$dd" : '\.\(.*\)'` # strip off leading "."
-        if [ `expr "$abs_src$dd/" : "$abs_dst/"` -eq $abs_chk_len ];then
-            echo skipping $abs_src$dd >&2
-            continue
-        fi
-        if [ "$dd" ];then  mkdir .$dd; fi
-
-        if expr "$src" : / >/dev/null;then
-            extra_up=
-        else
-            slash_cnt=`echo $dd | sed 's/[^/]//g' | wc -c`
-            extra_up=
-            slash_cnt=`expr $slash_cnt - $src_slash_cnt`
-            while slash_cnt=`expr $slash_cnt - 1`;do
-                extra_up="../$extra_up"
-            done
-        fi
-
-        no_prune=`basename "$src$dd"`
-        find "$src$dd" \! -type d -o -type d \! -name "$no_prune" -prune \! -type d | \
-        while read ff;do ln -s $extra_up$ff .$dd; done
-    done
-}   # lndir
 
 set_FLV()
 {

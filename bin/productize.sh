@@ -36,26 +36,35 @@ Options:
 *B - build  stage option
 *I - install stage option
 "
-while opt=`expr "${1-}" : '-\([^=]*\)'`;do
-    if opt_val=`expr "${1-}" : '[^=]*=\(.*\)'`;then shift;set - "$opt_val" "$@"
-    else                                            shift;  fi
-    case "$opt" in
-    \?|h|-help)  echo "$USAGE";exit;;
-    -prod)               opt_prod=$1;               shift;;
-    -ver)                opt_ver=$1;                shift;;
-    -prods-root)         opt_prods_root=$1;         shift;;
-    -productization-lib) opt_productization_lib=$1; shift;;
-    -stage|-stages)      opt_stages=$1;             shift;;
-    -deps)               opt_deps=$1;               shift;;
-    -configure)          opt_configure=$1;          shift;;
-    -q)                  opt_q=$1;                  shift;;
-    -clean)              opt_clean=1;;
-    -no-src)             opt_no_src=1;;
-    -redo)               opt_redo=1;;
-    -quiet)              opt_quiet=1;;
-    v)                   opt_v=1;;
-    *)           echo "Unknown option: $opt"; echo "$USAGE";exit;;
-    esac
+opts_w_args='prod|ver|prods-root|productization-lib|stages|deps|configure|q'
+opts_wo_args='clean|no-src|redo|quiet|v'
+do_opt="\
+    case \$opt in
+    \\?|h|help)    echo \"\$USAGE\"; exit 0;;
+    $opts_wo_args) eval opt_\`echo \$opt |sed -e 's/-/_/g'\`=1;;
+    $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
+                   elif [      $#      -gt 1  ];then arg=\$1; shift
+                   else  echo \"option \$opt requires argument\"; exit 1; fi
+                   eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
+                   opts=\"\$opts '\$arg'\";;
+    *) echo \"invalid option: \$opt\" 2>&1;echo \"\$USAGE\" 2>&1; exit 1;;
+    esac"
+while op=`expr "${1-}" : '-\(.*\)'`;do
+    shift
+    if xx=`expr "$op" : '-\(.*\)'`;then
+        if   opt=`expr     "$xx" : '\([^=]*\)='`;then
+            set - "`expr "$xx" : '[^=]*=\(.*\)'`" "$@"
+        else opt=$xx; fi
+        opts="${opts-} '--$opt'"
+        eval "$do_opt"
+    else
+        while opt=`expr "$op" : '\(.\)'`;do
+            opts="${opts-} '-$opt'"
+            rest=`expr "$op" : '.\(.*\)'`
+            eval "$do_opt"
+            op=$rest
+        done
+    fi
 done
 if [ $# -ne 0 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
 
@@ -67,7 +76,7 @@ else                         stages=build:install:declare; fi
 #-----------------------------------------------------------------------
 
 echov() { if [ "${opt_v-}" ];then echo "`date`; $@";fi; }
-cmd() { echov "$@"; eval "$@"; }
+cmd() { eval echov "$@"; eval "$@"; }
 
 #-----------------------------------------------------------------------
 
@@ -219,15 +228,18 @@ set_FLV
 redo_stage=99
 PREFIX=`qualified_inst_dir`  # important var
 
-if   declare --status;then  last_stage_done=3
-elif install --status;then  last_stage_done=2
-elif build   --status;then  last_stage_done=1
-else                        last_stage_done=0
+if   declare     --status;then  last_stage_done=4
+elif install_fix --status;then  last_stage_done=3
+elif install     --status;then  last_stage_done=2
+elif build       --status;then  last_stage_done=1
+else                            last_stage_done=0
 fi
 if [ "${opt_quiet-}" ];then outspec='>/dev/null 2>&1';else outspec=; fi
 echov last_stage_done=$last_stage_done
 for ss in build install declare;do
     if echo $stages | grep $ss >/dev/null;then :;else continue; fi
+    # all stages are run in a pipeline to collect output AND to run in
+    # sub-shell (so the cwd in this parent shell is preserved).
     case $ss in
     build)
         if [ $last_stage_done -lt 1 -o $redo_stage -le 1 ];then
@@ -237,8 +249,12 @@ for ss in build install declare;do
         if [ $last_stage_done -lt 2 -o $redo_stage -le 2 ];then
             cmd "install 2>&1 | tee install-`basename $PREFIX`.out $outspec"
         fi;;
-    declare)
+    install_fix)
         if [ $last_stage_done -lt 3 -o $redo_stage -le 3 ];then
+            cmd "install_fix 2>&1 | tee install_fix-`basename $PREFIX`.out $outspec"
+        fi;;
+    declare)
+        if [ $last_stage_done -lt 4 -o $redo_stage -le 4 ];then
             cmd "declare 2>&1 | tee declare-`basename $PREFIX`.out $outspec"
         fi;;
     esac
