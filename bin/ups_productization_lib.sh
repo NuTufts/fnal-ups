@@ -17,7 +17,7 @@ echov "hello from ups_productization_lib"
 
 build()
 {
-    echov build
+    echov "build - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
     t0=`date +%s`
     # look for a build function
     if type ${PROD_NAM}_build 2>/dev/null | grep 'is a function' >/dev/null;then
@@ -32,7 +32,7 @@ build()
 }   # build
 install()
 {
-    echov install
+    echov "install - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
     t0=`date +%s`
     if type ${PROD_NAM}_install 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific install function found...
@@ -46,7 +46,7 @@ install()
 }   # install
 install_fix()
 {
-    echov install_fix
+    echov "install_fix - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
     t0=`date +%s`
     if type ${PROD_NAM}_install_fix 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific install_fix function found...
@@ -60,7 +60,7 @@ install_fix()
 }   # install_fix
 declare()
 {
-    echov delare
+    echov "delare - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
     t0=`date +%s`
     if type ${PROD_NAM}_declare 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific declare function found...
@@ -132,6 +132,7 @@ generic_declare()
                 $PROD_NAM $PROD_VER"
         else
             echo 'Error - generic (qualified) inst dir does not exists'
+            exit 1
         fi
     fi
 }   # generic_declare
@@ -160,20 +161,7 @@ ups_build()
             cd $dd
             for ff in ../../$dd/*;do ln -s $ff .;done
 
-            # TABLE FILE ADJUST SHOULD GO INTO CVS!!!
-            if [ -f ups.table ];then
-                if grep PRODUCTS ups.table >/dev/null;then
-                    :
-                else
-                    sed '/Action=current/,/^$/d
-/End:/i\
-\     envRemove( PRODUCTS, ${UPS_THIS_DB}, : )\
-\     envPrepend( PRODUCTS, ${UPS_THIS_DB}, : )\
-\     Execute("echo added ${UPS_THIS_DB} to PRODUCTS",UPS_ENV)
-' ups.table >ups.table.$$
-                    /bin/mv -f ups.table.$$ ups.table
-                fi
-            elif [ -f Makefile ];then
+            if [ -f Makefile ];then
                 # MAKEFILE ADJUST SHOULD GO INTO CVS!!!
                 if grep 'funame.*(OLD_LIBS)$' Makefile >/dev/null;then
                 # fix for SunOS - tack  " $(LDFLAGS)" on the end of the funame
@@ -285,16 +273,16 @@ generic_configure_install()
                 echo "Error - build/install mismatch"
                 echo "   >$prefix<"
                 echo "!= >$PREFIX<"
-                exit
+                exit 1
             fi
         else
-            echo 'Error '
-            exit
+            echo 'Error - no Makefile found. Can not make install'
+            exit 1
         fi
         make install
     else
         echo 'Error - generic (build) install error'
-        exit
+        exit 1
     fi
 }   # generic_configure_install
 generic_configure_install_fix()
@@ -304,7 +292,7 @@ generic_configure_install_fix()
         inst_PREFIX_fix $PREFIX
     else
         echo 'Error - generic install error'
-        exit
+        exit 1
     fi
 }   # generic_configure_install_fix
 
@@ -350,17 +338,17 @@ generic_setup_py_build()
     mkdir -p $q_bld_dir
     cd $q_bld_dir
     flags=`qual_to_flags`
-    cmd "$flags python ../setup.py build --prefix=$PREFIX"
+    cmd "$flags python ../setup.py build"
 }   # generic_setup_py_build
 generic_setup_py_install()
 {   echov 'generic_setup_py_install'
     q_bld_dir=build-`basename $PREFIX`
     if [ -d $q_bld_dir ];then   # created by build stage
         cd $q_bld_dir
-        cmd "$flags python ../setup.py install"
+        cmd "python ../setup.py install --prefix=$PREFIX"
     else
         echo 'Error - generic (build) install error'
-        exit
+        exit 1
     fi
 }   # generic_setup_py_install
 generic_setup_py_install_fix()
@@ -454,12 +442,12 @@ generic_build_install_dispatch()
         else
             echo 'Error - cannot determine "generic" method. You must create a'
             echo '<prod>_productization_lib.sh file for $PROD_NAM'
-            exit
+            exit 1
         fi
     fi
     case $1 in
     build|install|install_fix)   generic_${BLD_INST_METHOD}_$1;;
-    *)  echo 'Error - internal';exit;;
+    *)  echo 'Error - internal';exit 1;;
     esac
 }
 
@@ -478,6 +466,10 @@ setup_deps()
     if [ "${opt_deps-}" ];then
         IFSsav=$IFS IFS=,; for dep in $opt_deps;do IFS=$IFSsav
             setup $dep
+            if [ $? -ne 0 ];then
+                echo "Error - error setting up $dep"
+                exit 1
+            fi
         done
     fi
 }
@@ -511,6 +503,46 @@ cp_with_deps()
         cp $tblf_i $tblf_o
     fi
 }   # cp_with_deps
+
+lndir()
+{   src=$1
+    dst=$2
+    cdsav=$PWD
+    cd $dst
+    abs_dst=$PWD
+    abs_src=`cd $src;pwd`
+    abs_chk_len=`expr "$abs_dst/" : '.*'`
+    src_slash_cnt=`echo $src | sed 's/[^/]//g' | wc -c`
+    src_slash_cnt=`expr $src_slash_cnt - 1`
+    (cd $src;find . -type d ) | \
+    while read dd;do
+        dd=`expr "$dd" : '\.\(.*\)'` # strip off leading "."
+        if [ `expr "$abs_src$dd/" : "$abs_dst/"` -eq $abs_chk_len ];then
+            echo skipping $abs_src$dd >&2
+            continue
+        fi
+        if [ "$dd" ];then  mkdir .$dd; fi
+
+        if expr "$src" : / >/dev/null;then
+            extra_up=
+        else
+            slash_cnt=`echo $dd | sed 's/[^/]//g' | wc -c`
+            extra_up=
+            slash_cnt=`expr $slash_cnt - $src_slash_cnt`
+            if [ $slash_cnt -ge 1 ];then
+                while slash_cnt=`expr $slash_cnt - 1`;do
+                    extra_up="../$extra_up"
+                done
+            fi
+        fi
+
+        no_prune=`basename "$src$dd"`
+        find "$src$dd" \! -type d -o -type d \! -name "$no_prune" -prune \! -type d | \
+        while read ff;do ln -s $extra_up$ff .$dd; done
+    done
+    cd $cdsav
+    unset cdsav src dst abs_src abs_dst abs_chk_len src_slash_cnt
+}   # lndir
 
 flavor()
 {
