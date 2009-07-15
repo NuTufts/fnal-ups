@@ -71,9 +71,9 @@ COMMON:
 	execute( "true ${UPS_PROD_NAME} version is ${UPS_PROD_VERSION}            ", NO_UPS_ENV )
 	execute( "test ${UPS_SHELL} =  sh &&     me=$BASH_SOURCE                   ", NO_UPS_ENV )
 	execute( "test ${UPS_SHELL} = csh && set me=`echo $_` && eval set me=$me[2]", NO_UPS_ENV )
-	#execute( "echo grepping for ${UPS_PROD_NAME} version in $me", NO_UPS_ENV )
+	execute( "echo grepping for ${UPS_PROD_NAME} version in $me", NO_UPS_ENV )
 	#execute( "grep '${UPS_PROD_NAME} version i[s]' $me", NO_UPS_ENV )
-	execute( "test `grep '${UPS_PROD_NAME} version i[s]' $me | sort -u | wc -l` -gt 1 && echo warn: ${UPS_PROD_NAME} version change", NO_UPS_ENV )
+	#execute( "test `grep '${UPS_PROD_NAME} version i[s]' $me | sort -u | wc -l` -gt 1 && echo warn: ${UPS_PROD_NAME} version change", NO_UPS_ENV )
 
 
    ACTION = unsetup
