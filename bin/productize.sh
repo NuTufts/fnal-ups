@@ -5,7 +5,7 @@
 #  contacting Ron or Fermi Lab in Batavia IL, 60510, phone: 630-840-3000.
 #  $RCSfile$
 #  rev='$Revision$$Date$'
-
+if [ "$1" = -x ];then set -x;shift;fi
 set -u
 
 USAGE="\
@@ -23,7 +23,7 @@ Options:
 --ver=
 --prods-root=          or 1st \"db\" in PRODUCTS env.var.
 --deps=
---q=                    understand: debug,; others just used in declare
+--q=                    understand: debug,cxxcheck; others just used in declare
 --productization-lib=
 --stages=              dflt: build:install:declare
 --configure=           *B configure options (for prods that use \"configure\")
@@ -31,19 +31,20 @@ Options:
 --no-src               *I do not copy src (not implemented yet)
 --redo                 will redo some operation that appear to be done
 --quiet                output from the stages is only in <stage-flv>.out
+--out
 -v
 
 *B - build  stage option
 *I - install stage option
 "
 opts_w_args='prod|ver|prods-root|productization-lib|stages|deps|configure|q'
-opts_wo_args='clean|no-src|redo|quiet|v'
+opts_wo_args='clean|no-src|redo|quiet|v|out'
 do_opt="\
     case \$opt in
     \\?|h|help)    echo \"\$USAGE\"; exit 0;;
     $opts_wo_args) eval opt_\`echo \$opt |sed -e 's/-/_/g'\`=1;;
     $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
-                   elif [      $#      -gt 1  ];then arg=\$1; shift
+                   elif [      $#      -ge 1  ];then arg=\$1; shift
                    else  echo \"option \$opt requires argument\"; exit 1; fi
                    eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
                    opts=\"\$opts '\$arg'\";;
@@ -53,7 +54,7 @@ while op=`expr "${1-}" : '-\(.*\)'`;do
     shift
     if xx=`expr "$op" : '-\(.*\)'`;then
         if   opt=`expr     "$xx" : '\([^=]*\)='`;then
-            set - "`expr "$xx" : '[^=]*=\(.*\)'`" "$@"
+            set ${-+-$-} -- "`expr "$xx" : '[^=]*=\(.*\)'`" "$@"
         else opt=$xx; fi
         opts="${opts-} '--$opt'"
         eval "$do_opt"
@@ -71,23 +72,37 @@ if [ $# -ne 0 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
 #-----------------------------------------------------------------------
 
 if [ "${opt_stages-}" ];then stages=${opt_stages-}
-else                         stages=build:install:declare; fi
+else                         stages=build:install:install_fixdeclare; fi
+
+exec 3>&1 4>&2    # dup so as to enable restore
+orestore='1>&3 2>&4'
+if [ "${opt_out-}" ];then
+    ospec='>>productize-`basename $PREFIX`${opt_q+_`echo $opt_q | tr : _`}.out 2>&1'
+    # expect error status to be enough if error before exec after PROD_*
+    exec >/dev/null 2>&1
+else
+    ospec='1>&3 2>&4'
+fi
 
 #-----------------------------------------------------------------------
 
 echov() { if [ "${opt_v-}" ];then echo "`date`; $@";fi; }
-cmd() { eval echov "$@"; eval "$@"; }
+cmd() { eval "echov \"$@\""; eval "$@"; }
 
 #-----------------------------------------------------------------------
 
 set_NAM_and_VER()   # $1=nam-ver
 {
     # tests:
-    #   gcc-4.1.2-20080102  -> gcc  v4_1_2_20080102
-    prod_=`echo "$1" | sed 's/-[0-9][-0-9.a-zA-z]*$//'`
-     ver_=`expr "$1" : "${prod_}-\(.*\)"`
+    #   gcc-4.1.2-20080102  -> gcc       v4_1_2_20080102
+    #   root-v5-18-00f.svn  -> root      v5_18_00f_svn
+    #   boost_1_34_1        -> boost     v1_34_1
+    #   libsigc++-2.2.3     -> libsigcxx v2_2_3
+    prod_=`echo "$1" | sed 's/[-_]v*[0-9][-0-9.a-zA-z]*$//'`
+     ver_=`expr "$1" : "${prod_}[-_]\(.*\)"`
+    prod_=`echo "$prod_" | sed 's/++/xx/'`    # libsigc++ -> libsigcxx
     if   [ "$prod_" = '' -a "${opt_prod-}" = '' ];then
-        echo can not determine prod; exit
+        echo can not determine prod; return 1
     elif [ "$prod_"      -a "${opt_prod-}"      ];then
         if [ "$prod_" = "${opt_prod-}" ];then
             PROD_NAM=$prod_; echov OK - "$prod_" = "${opt_prod-}"
@@ -104,7 +119,7 @@ set_NAM_and_VER()   # $1=nam-ver
         fi
     fi
     if   [ "$ver_" = '' -a "${opt_ver-}" = '' ];then
-        echo can not determine ver; exit
+        echo can not determine ver; return 1
     elif [ "$ver_"      -a "${opt_ver-}"      ];then
         if [ "$ver_" = "${opt_ver-}" ];then
             PROD_VER=$ver_; echov OK - "$ver_" = "${opt_ver-}" 
@@ -120,9 +135,9 @@ set_NAM_and_VER()   # $1=nam-ver
         fi
     fi
     if expr "$PROD_VER" : v >/dev/null;then
-        : OK
+        PROD_VER=`echo "$PROD_VER" | tr '.-' '__'`
     else
-        PROD_VER=v`echo "$PROD_VER" | sed 's/\./_/g'`
+        PROD_VER=v`echo "$PROD_VER" | tr '.-' '__'`
     fi
 }   # set_NAM_and_VER
 
@@ -190,22 +205,16 @@ get_productization_lib()
             echo "ups_productization_lib.sh not found"
             exit
         fi
-        # Now, additionally, there may be a {PROD_NAM}_productization_lib.sh
-        if [ "${opt_productization_lib-}" ];then
-            if [ -f "${opt_productization_lib-}" ];then
-                . "${opt_productization_lib-}"
-            else
-                echo 'Error: --productization_lib is not a file'
-                exit
-            fi
-        else
-            for dd in . ..;do
-                for ff in ${PROD_NAM}_productization_lib \
-                    ${PROD_NAM}_productization_lib.sh;do
-                    if [ -f $dd/$ff ];then . $dd/$ff; break 2; fi
-                done
+        # Now, additionally, there may be an  ${opt_productization_lib-} or
+        # an {PROD_NAM}_productization_lib.sh
+        for ff in ${opt_productization_lib+$opt_productization_lib $opt_productization_lib.sh} \
+            ${PROD_NAM}_productization_lib \
+            ${PROD_NAM}_productization_lib.sh;do
+            for dd in '' .. $UPS_DIR/bin;do
+              echov "checking for ${dd:+$dd/}$ff"
+              if [ -f ${dd:+$dd/}$ff ];then . ${dd:+$dd/}$ff; break 2; fi
             done
-        fi
+        done
     else
         echo Error - ups must be installed 1st into products root at $PRODS_RT
     fi
@@ -213,9 +222,11 @@ get_productization_lib()
 
 #------------------------------------------------------------------------------
 
-echov "`basename $0` starting in .../`basename $PWD`"
-
-set_NAM_and_VER `basename $PWD`
+if set_NAM_and_VER `basename $PWD`;then
+    : OK
+else
+    exit 1
+fi
 
 set_PRODS_RT
 
@@ -227,6 +238,11 @@ set_FLV
 
 redo_stage=99
 PREFIX=`qualified_inst_dir`  # important var
+if [ "${opt_out-}" ];then
+    >productize-`basename $PREFIX`${opt_q+_`echo $opt_q | tr : _`}.out
+    eval "exec ${ospec-}"
+fi
+echov "`basename $0` starting in .../`basename $PWD`"
 
 if   declare     --status;then  last_stage_done=4
 elif install_fix --status;then  last_stage_done=3
@@ -236,28 +252,53 @@ else                            last_stage_done=0
 fi
 if [ "${opt_quiet-}" ];then outspec='>/dev/null 2>&1';else outspec=; fi
 echov last_stage_done=$last_stage_done
-for ss in build install declare;do
+for ss in build install install_fix declare;do
     if echo $stages | grep $ss >/dev/null;then :;else continue; fi
     # all stages are run in a pipeline to collect output AND to run in
     # sub-shell (so the cwd in this parent shell is preserved).
+    pid=
+    ofile=$ss-`basename $PREFIX`${opt_q+_`echo $opt_q | tr : _`}.out
     case $ss in
     build)
         if [ $last_stage_done -lt 1 -o $redo_stage -le 1 ];then
-            cmd "build 2>&1   | tee build-`basename $PREFIX`.out $outspec"
+            echov "output in $ofile"
+            exec >$ofile 2>&1
+            build & pid=$!
         fi;;
     install)
         if [ $last_stage_done -lt 2 -o $redo_stage -le 2 ];then
-            cmd "install 2>&1 | tee install-`basename $PREFIX`.out $outspec"
+            echov "output in $ofile"
+            exec >$ofile 2>&1
+            install & pid=$!
         fi;;
     install_fix)
         if [ $last_stage_done -lt 3 -o $redo_stage -le 3 ];then
-            cmd "install_fix 2>&1 | tee install_fix-`basename $PREFIX`.out $outspec"
+            echov "output in $ofile"
+            exec >$ofile 2>&1
+            install_fix & pid=$!
         fi;;
     declare)
         if [ $last_stage_done -lt 4 -o $redo_stage -le 4 ];then
-            cmd "declare 2>&1 | tee declare-`basename $PREFIX`.out $outspec"
+            echov "output in $ofile"
+            exec >$ofile 2>&1
+            declare & pid=$!
         fi;;
     esac
+    if [ "$pid" ];then
+        eval "exec ${ospec-}"  # restore normal output
+        if [ "${opt_quiet-}" ];then
+            wait $pid
+        else
+            tail --pid=$pid -f $ss-`basename $PREFIX`.out
+            wait $pid
+        fi
+        if [ $? -eq 0 ];then
+            echov "stage $ss completed OK"
+        else
+            echo "Error in $ss stage for $PROD_NAM $PROD_VER ${opt_q-}"
+            exit 1            
+        fi
+    fi
 done
 
 echov "Done in .../`basename $PWD`"
