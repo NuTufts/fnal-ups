@@ -492,7 +492,7 @@ cp_with_deps()
             : echo table file has unsetup
         else
             echo 'Error - missing unsetup in table file'
-            exit
+            exit 1
         fi
 
         sed "\
@@ -503,6 +503,46 @@ cp_with_deps()
         cp $tblf_i $tblf_o
     fi
 }   # cp_with_deps
+cp_with_vars()
+{
+    tblf_i=$11; shift
+    tblf_o=$1; shift
+    if [ $# -gt 0 ];then
+        sed_up=''
+        sed_dn=''
+        set -- "$@" ${opt_var-}
+        while var=`expr "${1-}" : '\([^=]*\)'`;do
+            val=`expr "$1" : '[^=]*=\(.*\)'`
+            shift
+            sed_up="$sed_up\\        envSet( $var, $val )\\n"
+            # unsetup in opposite order
+            sed_dn="\\        envUnset( $var )\\n$sed_dn"
+        done
+        if xx=`grep -io '^[  ]*action[       ]*=[    ]unsetup' $tblf_i`;then
+            : echo table file has unsetup
+        else
+            echo 'Error - missing unsetup in table file'
+            exit 1
+        fi
+
+        sed "\
+/$xx/i$sed_up\n
+/$xx/a$sed_dn
+" $tblf_i >$tblf_o
+    else
+        cp $tblf_i $tblf_o
+    fi
+}   # cp_with_vars
+
+        if [ "${opt_var-}" ];then
+            var=`expr "${opt_var-}" : '\([^=]*\)'`
+            val=`expr "${opt_var-}" : '[^=]*=\(.*\)'`
+            sed_up="$sed_up\\        envSet( $var, $val )\\n"
+            sed_dn="\\        envUnset( $var )\\n$sed_dn"
+        fi
+
+
+
 
 lndir()
 {   src=$1
@@ -580,4 +620,5 @@ get_flv_64_to_32()
 
 case "${1-}" in
 flavor)  shift; flavor "$@";;
+cp_with_vars) shift; cp_with_vars 'ROOTSYS=${UPS_PROD_DIR}' "$@";;
 esac
