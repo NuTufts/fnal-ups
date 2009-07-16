@@ -23,6 +23,7 @@ Options:
 --ver=
 --prods-root=          or 1st \"db\" in PRODUCTS env.var.
 --deps=
+--var=
 --q=                    understand: debug,cxxcheck; others just used in declare
 --productization-lib=
 --stages=              dflt: build:install:declare
@@ -37,7 +38,7 @@ Options:
 *B - build  stage option
 *I - install stage option
 "
-opts_w_args='prod|ver|prods-root|productization-lib|stages|deps|configure|q'
+opts_w_args='prod|ver|prods-root|productization-lib|stages|deps|var|configure|q'
 opts_wo_args='clean|no-src|redo|quiet|v|out'
 do_opt="\
     case \$opt in
