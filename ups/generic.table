@@ -17,13 +17,17 @@ COMMON:
         # so product can be unsetup
         setupEnv()
         # <PRODUCT>_DIR
-        proddir()
+        prodDir()
 
 	# could have 2 bin dirs (one for platform independent scripts)
         # Note: if blocks do not do automatic unsetup action(s)
 	if    (test -d ${UPS_PROD_DIR}/bin )
             pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
 	endif (test -d ${UPS_PROD_DIR}/bin )
+
+        sourceOptional( $UPS_DIR/bin/ups_set_UPS_PROD_FQ_DIR, UPS_ENV )
+	envSetIfNotSet( UPS_PROD_FQ_DIR, ${UPS_PROD_DIR}
+	execute( "echo UPS_PROD_FQ_DIR=$UPS_PROD_FQ_DIR", NO_UPS_ENV )
 
 	if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS} )
 	 if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin )
@@ -66,7 +70,6 @@ COMMON:
         if    (test -d ${UPS_PROD_DIR}/man )
             envPrepend( MANPATH, ${UPS_PROD_DIR}/man, :)
 	endif (test -d ${UPS_PROD_DIR}/man )
-	envUnset( UNSETUP_${UPS_PROD_NAME_UC}_VER )
 
 	execute( "true ${UPS_PROD_NAME} version is ${UPS_PROD_VERSION}            ", NO_UPS_ENV )
 	execute( "test ${UPS_SHELL} =  sh &&     me=$BASH_SOURCE                   ", NO_UPS_ENV )
@@ -74,6 +77,7 @@ COMMON:
 	execute( "echo grepping for ${UPS_PROD_NAME} version in $me", NO_UPS_ENV )
 	#execute( "grep '${UPS_PROD_NAME} version i[s]' $me", NO_UPS_ENV )
 	#execute( "test `grep '${UPS_PROD_NAME} version i[s]' $me | sort -u | wc -l` -gt 1 && echo warn: ${UPS_PROD_NAME} version change", NO_UPS_ENV )
+	envUnSet( UPS_PROD_FQ_DIR )
 
 
    ACTION = unsetup
@@ -89,7 +93,7 @@ COMMON:
         #endif (test -d ${UPS_PROD_DIR}/inc )
 	if    (printenv ${UPS_PROD_NAME_UC}_LIB >/dev/null )
             envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
-            unproddir( _LIB )
+            unprodDir( _LIB )
 	endif (printenv ${UPS_PROD_NAME_UC}_LIB >/dev/null )
         pathRemove(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin, :)
         pathRemove(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin, :)
