@@ -1,0 +1,129 @@
+#! /bin/sh
+#  This file (ups_FQ) was created by Ron Rechenmacher <ron@fnal.gov> on
+#  Aug 7, 2009. "TERMS AND CONDITIONS" governing this file are in the README
+#  or COPYING file. If you do not have such a file, one can be obtained by
+#  contacting Ron or Fermi Lab in Batavia IL, 60510, phone: 630-840-3000.
+#  $RCSfile$
+#  rev='$Revision$$Date$'
+set -u
+
+KnownBldQuals="debug:cxxcheck"
+
+USAGE="\
+   usage: `basename $0` [-opts] <prod_dir> <flavor> [qualifier_list]
+       OR `basename $0` test
+examples: `basename $0` /p/ups/v99 Linux64bit+2.6-2.5
+          `basename $0` /p/ups/v99 Linux64bit+2.6-2.5 debug
+          `basename $0` /p/ups/v99 Linux64bit+2.6-2.5 debug:cms
+          `basename $0` --set=debug:xxx /p/ups/v99 Linux64bit+2.6-2.5 debug:cms
+
+--add=     add to the default Known Build Qualifiers list
+--set=     set the Known Build Qualifiers list
+
+If both, set 1st, then add.
+The default Known Build Qualifiers list is $KnownBldQuals
+"
+while opt=`expr "${1-}" : '-\([^=]*\)'`;do
+    if opt_val=`expr "${1-}" : '[^=]*=\(.*\)'`;then shift;set - "$opt_val" "$@"
+    else                                            shift;  fi
+    case "$opt" in
+    -add) opt_add=$1; shift;;
+    -set) opt_set=$1; shift;;
+    \?|h|help)   echo "$USAGE";exit;;
+    *)           echo "Unknown option -$opt";echo "$USAGE";exit;;
+    esac
+done
+
+if   [ $# -eq 1 ];then
+    if [ "${1-}" != test ];then echo "$USAGE";exit 1;fi
+elif [ $# -lt 2 -o $# -gt 3 ];then
+    echo "$USAGE";exit 1
+fi
+
+if [ "${opt_set-}" ];then KnownBldQuals=${opt_set-}; fi
+if [ "${opt_add-}" ];then KnownBldQuals=${KnownBldQuals:+$KnownBldQuals:}${opt_add-}; fi
+
+if [ "$1" != test ];then
+    prod_dir=$1
+    flavor=$2
+    filter_quals()
+    {   out=
+        for ii in `echo $1 | tr : ' '`;do
+            for kk in `echo $KnownBldQuals | tr : ' '`;do
+                if [ $ii = $kk ];then out=$out:$ii;fi
+            done
+        done
+        expr "$out" : ':*\(.*\)'
+    }
+    quals=`filter_quals "${3-}"`
+
+    if [ "$quals" = '' ];then
+        if   [ -d $prod_dir/$flavor ];then echo $flavor
+        elif [ -d $prod_dir         ];then echo
+        else echo "no prod_dir/flavor dir" >&2; exit 1;fi
+    else
+        build_fq_combinations()
+        {   list=$1
+            pre_list=${2-}
+            for qq in `echo $list | tr : ' '`;do
+                new_list=`echo :$list: | sed "s/:$qq:/:/;s/^://;s/:$//"`
+                #echo new_list=$new_list
+                if [ "${opt_all-}" ];then echo $pre_list$qq; fi
+                if [ "$new_list" ];then
+                    yy=`build_fq_combinations $new_list $pre_list${qq}_`
+                    echo "$yy"
+                else
+                    if [ "${opt_all-}" = '' ];then echo $pre_list$qq; fi
+                fi
+            done
+        }
+        for qq in `build_fq_combinations $quals`;do
+            if [ -d $prod_dir/${flavor}_$qq ];then
+                echo ${flavor}_$qq
+                exit 0
+            fi
+        done
+        echo "no prod_dir/flavor_qualifer dir" >&2; exit 1
+    fi
+else
+    # test
+    tmpdir=/tmp/`basename $0`.$$
+    prod_dir=$tmpdir/prd1/v1
+    flavor=Linux
+    mkdir -p $prod_dir/${flavor}
+    mkdir -p $prod_dir/${flavor}_debug
+    mkdir -p $prod_dir/${flavor}_debug_cms
+    mkdir -p $prod_dir/${flavor}_debug_cms_xx
+
+    zz()
+    { echo -n "$1 should be $2"
+      if [ "$1" = "$2" ];then echo " ... OK"
+      else                    echo " ... humph :(";fi
+    }
+    echo NULL qualifier
+    xx=`$0 $prod_dir $flavor`;       yy=Linux
+    zz "$xx" "$yy"
+    qq="debug";         echo $qq qualifier
+    xx=`$0 $prod_dir $flavor $qq`;   yy=Linux_debug
+    zz "$xx" "$yy"
+    qq="debug:cms";     echo $qq qualifier
+    xx=`$0 --add=cms $prod_dir $flavor $qq`;   yy=Linux_debug_cms
+    zz "$xx" "$yy"
+    qq="cms:debug";     echo $qq qualifier
+    xx=`$0 $prod_dir $flavor $qq`;   yy=Linux_debug
+    zz "$xx" "$yy"
+    qq="cms:debug:xx";  echo $qq qualifier
+    xx=`$0 --set cms:xx --add debug $prod_dir $flavor $qq`;   yy=Linux_debug_cms_xx
+    zz "$xx" "$yy"
+    qq="cms:xx:debug";  echo $qq qualifier
+    xx=`$0 --set xx:cms:debug $prod_dir $flavor $qq`;   yy=Linux_debug_cms_xx
+    zz "$xx" "$yy"
+    qq="yyy:debug";     echo $qq qualifier
+    xx=`$0 --set a:b:c:d:e $prod_dir $flavor $qq`;   yy=Linux
+    zz "$xx" "$yy"
+    qq="yyy:debug";     echo $qq qualifier
+    xx=`$0 --add yyy $prod_dir $flavor $qq`;   yy=
+    zz "$xx" "$yy"
+
+    rm -fr $tmpdir
+fi
