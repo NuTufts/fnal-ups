@@ -19,6 +19,7 @@ examples: `basename $0` /p/ups/v99 Linux64bit+2.6-2.5
 
 --add=     add to the default Known Build Qualifiers list
 --set=     set the Known Build Qualifiers list
+--get      do not look for dir, just echo 1st possibility
 
 If both, set 1st, then add.
 The default Known Build Qualifiers list is $KnownBldQuals
@@ -29,6 +30,7 @@ while opt=`expr "${1-}" : '-\([^=]*\)'`;do
     case "$opt" in
     -add) opt_add=$1; shift;;
     -set) opt_set=$1; shift;;
+    -get) opt_get=1;;
     \?|h|help)   echo "$USAGE";exit;;
     *)           echo "Unknown option -$opt";echo "$USAGE";exit;;
     esac
@@ -48,7 +50,7 @@ if [ "$1" != test ];then
     flavor=$2
     filter_quals()
     {   out=
-        for ii in `echo $1 | tr : ' '`;do
+        for ii in `echo $1 | tr : '\n' | sort`;do
             for kk in `echo $KnownBldQuals | tr : ' '`;do
                 if [ $ii = $kk ];then out=$out:$ii;fi
             done
@@ -58,7 +60,8 @@ if [ "$1" != test ];then
     quals=`filter_quals "${3-}"`
 
     if [ "$quals" = '' ];then
-        if   [ -d $prod_dir/$flavor ];then echo $flavor
+        if   [ "${opt_get-}" ];then echo $flavor
+        elif [ -d $prod_dir/$flavor ];then echo $flavor
         elif [ -d $prod_dir         ];then echo
         else echo "no prod_dir/flavor dir" >&2; exit 1;fi
     else
@@ -78,7 +81,8 @@ if [ "$1" != test ];then
             done
         }
         for qq in `build_fq_combinations $quals`;do
-            if [ -d $prod_dir/${flavor}_$qq ];then
+            if   [ "${opt_get-}" ];then echo ${flavor}_$qq; exit 0
+            elif [ -d $prod_dir/${flavor}_$qq ];then
                 echo ${flavor}_$qq
                 exit 0
             fi
