@@ -20,7 +20,7 @@ echo Shell type is $ss.
 # make some things similar. need to use set_ because sh builtin set would hide function set
 test "$ss" = csh && alias set_ set
 test "$ss" =  sh && eval 'set_() { for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`; val=`expr "$xx" : "[^=]*=\(.*\)"`; eval "$var=\"$val\"";done; }'
-test "$ss" =  sh && eval 'setenv() { eval "$1=\"\$2\""; export $1; }' && eval 'source() { file=$1; shift; . $file "$@"; }' && eval 'unsetenv() { unset "$@"; }'
+test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\$2\""; }' && eval 'source() { file=$1; shift; . $file "$@"; }' && eval 'unsetenv() { unset "$@"; }'
 test "$ss" =  sh && eval 'tnotnull() { eval "test -n \"\${$1-}\""; }'                             && eval 'nullout() { "$@" >/dev/null 2>&1; }'
 test "$ss" = csh && alias tnotnull "eval '"'test $?'"\!* -eq 1' && eval '"'test -n "$'"\!*"'"'"'" && alias nullout "\!* >& /dev/null"
 
