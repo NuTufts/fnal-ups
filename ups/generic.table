@@ -1,104 +1,87 @@
 #   $RCSfile$
 #   $Revision$
 #   $Date$
-
 FILE = TABLE
-
 GROUP:
 
 FLAVOR = ANY
-QUALIFIERS = "debug"
+QUALIFIERS = "debug:cms"
+    ACTION = setup
+	setupRequired("test_boost -j v1_2 -q +gcc431:debug")
+        exeActionRequired("setup__")
 
 FLAVOR = ANY
-QUALIFIERS = ""
+QUALIFIERS = "cms"
+    ACTION = setup
+	setupRequired("test_boost -j v1_2 -q +gcc431")
+        exeActionRequired("setup__")
+
+FLAVOR = ANY
+QUALIFIERS = "debug"
+    ACTION = setup
+	setupRequired("test_boost -j v1_0")
+        exeActionRequired("setup__")
+
+Flavor=ANY
+Qualifiers=""
+    ACTION = setup
+	setupRequired( test_boost -j v1_0 )
+        exeActionRequired("setup__")
 
 COMMON:
-   ACTION = SETUP
-        # so product can be unsetup
+   ACTION = setup__
+        execute( "echo setup__ ${UPS_PROD_NAME} ${UPS_PROD_VERSION} ${UPS_PROD_FLAVOR} q=${UPS_PROD_QUALIFIERS} rq=${UPS_REQ_QUALIFIERS}", NO_UPS_ENV )
+
+	# the following is necessary so that both setup and unsetup will work
+	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
+	if    ( unsetenv _FQ && unset setenv unsetenv )
+	    execute( true, NO_UPS_ENV )
+	endif ( unsetenv _FQ && unset setenv unsetenv )
+	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
+
+	# want to abort if there is a problem found by ups_FQ
+	unless    ( setenv _FQ `sh -c 'for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
+	    sourceRequired( "no_-_DIRECTORY_flavor-qualifier", NO_UPS_ENV )
+	endUnless ( setenv _FQ `sh -c 'for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
+
         setupEnv()
-        # <PRODUCT>_DIR
-        prodDir()
+        proddir()
 
-	# could have 2 bin dirs (one for platform independent scripts)
-        # Note: if blocks do not do automatic unsetup action(s)
-	if    (test -d ${UPS_PROD_DIR}/bin )
-            pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
-	endif (test -d ${UPS_PROD_DIR}/bin )
+	# double(2) double-quotes(") is a bit of trick - ups is enclosing things inside of double quotes so it thinks it can strip off the first and last...
+	# double(2) double-quotes(") is needed to be shell independent - to work on cshell or bourne shell
+	#prodDir( _FQ, ""`sh -c 'for dd in ${UPS_UPS_DIR} $UPS_DIR/ups;do ff=$dd/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};break;fi;done'`"")
+	prodDir( _FQ, _FQ )
 
-        sourceOptional( $UPS_DIR/bin/ups_set_UPS_PROD_FQ_DIR, UPS_ENV )
-	envSetIfNotSet( UPS_PROD_FQ_DIR, ${UPS_PROD_DIR}
-	execute( "echo UPS_PROD_FQ_DIR=$UPS_PROD_FQ_DIR", NO_UPS_ENV )
+	pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
+	pathPrepend(PATH, $${UPS_PROD_NAME_UC}_FQ/bin, :)
 
-	if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS} )
-	 if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin )
-            pathPrepend(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin, :)
-	 endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin )
-	 if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/lib )
-            proddir( _LIB, ${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/lib )
-            envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
-	 endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/lib )
-	else()
-         if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR} )
-          if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin )
-            pathPrepend(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin, :)
-          endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin )
-          if    (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/lib )
-            proddir( _LIB, ${UPS_PROD_FLAVOR}/lib )
-            envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
-          endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/lib )
-         else()
-          if    (test -d ${UPS_PROD_DIR}/lib )
-            proddir( _LIB, lib )
-            envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
-          endif (test -d ${UPS_PROD_DIR}/lib )          
-         endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR} )
-	endif (test -d ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS} )
+	# These are use by other products' build system
+	envSet( ${UPS_PROD_NAME_UC}_LIB, ${${UPS_PROD_NAME_UC}_FQ}/lib )
+	envSet( ${UPS_PROD_NAME_UC}_INC, ""`sh -c 'for dd in ${${UPS_PROD_NAME_UC}_FQ} ${UPS_PROD_DIR};do for ii in ${UPS_PROD_NAME} inc include h;do [ -d $dd/$ii ] && echo $dd/$ii && exit;done;done'`"" )
 
-        if    (test -d ${UPS_PROD_DIR}/inc )
-            proddir( _INC, inc )
-        else()
-	 if    (test -d ${UPS_PROD_DIR}/include )
-            proddir( _INC, include )
-	 else()
-          if    (test -d ${UPS_PROD_DIR}/h )
-            proddir( _INC, h )
-          endif (test -d ${UPS_PROD_DIR}/h )
-	 endif (test -d ${UPS_PROD_DIR}/include )
-	endif (test -d ${UPS_PROD_DIR}/inc )
+	envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
+	envPrepend( MANPATH, ${UPS_PROD_DIR}/man, :)
+	envPrepend( MANPATH, ${${UPS_PROD_NAME_UC}_FQ}/man, :)
 
-        envSetIfNotSet( MANPATH, "`man -w`" )
-        if    (test -d ${UPS_PROD_DIR}/man )
-            envPrepend( MANPATH, ${UPS_PROD_DIR}/man, :)
-	endif (test -d ${UPS_PROD_DIR}/man )
+	if    ( test ! -d ${UPS_PROD_DIR}/bin )
+	    pathRemove( PATH, ${UPS_PROD_DIR}/bin, :)
+	endif ( test ! -d ${UPS_PROD_DIR}/bin )
+	if    ( test ! -d ${${UPS_PROD_NAME_UC}_FQ}/bin )
+	    pathRemove( PATH, ${${UPS_PROD_NAME_UC}_FQ}/bin, :)
+	endif ( test ! -d ${${UPS_PROD_NAME_UC}_FQ}/bin )
+	if    ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
+	    envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
+	endif ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
+	if    ( test ! -d ${UPS_PROD_DIR}/man )
+	    envRemove( MANPATH, ${UPS_PROD_DIR}/man, :)
+	endif ( test ! -d ${UPS_PROD_DIR}/man )
+	if    ( test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
+	    envRemove( MANPATH, ${${UPS_PROD_NAME_UC}_FQ}/man, :)
+	endif ( test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
 
-	execute( "true ${UPS_PROD_NAME} version is ${UPS_PROD_VERSION}            ", NO_UPS_ENV )
-	execute( "test ${UPS_SHELL} =  sh &&     me=$BASH_SOURCE                   ", NO_UPS_ENV )
-	execute( "test ${UPS_SHELL} = csh && set me=`echo $_` && eval set me=$me[2]", NO_UPS_ENV )
-	execute( "echo grepping for ${UPS_PROD_NAME} version in $me", NO_UPS_ENV )
-	#execute( "grep '${UPS_PROD_NAME} version i[s]' $me", NO_UPS_ENV )
-	#execute( "test `grep '${UPS_PROD_NAME} version i[s]' $me | sort -u | wc -l` -gt 1 && echo warn: ${UPS_PROD_NAME} version change", NO_UPS_ENV )
-	envUnSet( UPS_PROD_FQ_DIR )
-
-
-   ACTION = unsetup
-        # IS THERE ANY WAY TO TELL IF THIS ACTION is being executed during a setup???
-	# the following allows setup to see if there is a version change
-	execute( "true ${UPS_PROD_NAME} version is ${UPS_PROD_VERSION}            ", NO_UPS_ENV )
-	
-        if    (test -d ${UPS_PROD_DIR}/man )
-            envRemove( MANPATH, ${UPS_PROD_DIR}/man, :)
-	endif (test -d ${UPS_PROD_DIR}/man )
-        #if    (test -d ${UPS_PROD_DIR}/inc )
-            unproddir( _INC )
-        #endif (test -d ${UPS_PROD_DIR}/inc )
-	if    (printenv ${UPS_PROD_NAME_UC}_LIB >/dev/null )
-            envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
-            unprodDir( _LIB )
-	endif (printenv ${UPS_PROD_NAME_UC}_LIB >/dev/null )
-        pathRemove(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/bin, :)
-        pathRemove(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin, :)
-        pathRemove(PATH, ${UPS_PROD_DIR}/bin, :)
-        unproddir()
-        unsetupEnv()
-
+	# this if is for unsetup, where the "execute" statements do not happen but the if/unless statements do
+	if    ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }' )
+	    execute( true, NO_UPS_ENV )
+	endif ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }' )
+	execute( unsetenv _FQ && unset setenv unsetenv, NO_UPS_ENV )
 END:
