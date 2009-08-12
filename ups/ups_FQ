@@ -59,10 +59,33 @@ if [ "$1" != test ];then
     }
     quals=`filter_quals "${3-}"`
 
+    check_bin_dist()
+    {   # bin/lib dir under dir which might not be a ups flavor
+        cnt=0
+        for dd in `find $prod_dir/*/. -type d -maxdepth 2 -name bin -o -name lib`;do
+            if   expr "$dd" : '.*/bin$' >/dev/null;then
+                if file $dd/* | grep ' ELF' >/dev/null;then have_bin=$dd; cnt=`expr $cnt + 1`; fi
+            elif expr "$dd" : '.*/lib$' >/dev/null;then
+                if file $dd/* | egrep ' ELF| archive' >/dev/null;then have_lib=$dd; cnt=`expr $cnt + 1`; fi
+            fi
+        done
+        if [   \( "${have_bin-}" -a "${have_lib-}" = '' -a $cnt -eq 1 \) \
+            -o \( "${have_lib-}" -a "${have_bin-}" = '' -a $cnt -eq 1 \) \
+            -o \( "${have_lib-}" -a "${have_bin-}" = "${have_bin-}" -a $cnt -eq 2 \) ];then
+            if [ "${have_bin-}" ];then bb="$have_bin"; else bb="$have_lib";fi
+        fi
+        if [ "${bb-}" ];then
+            echo "${bb-}" | sed "s|$prod_dir/||;s|/\./|/|;s|/...\$||"
+        else
+            return 1
+        fi
+    }
+
     if [ "$quals" = '' ];then
         if   [ "${opt_get-}" ];then echo $flavor
         elif [ -d $prod_dir/$flavor ];then echo $flavor
-        elif [ -d $prod_dir         ];then echo
+        #elif [ -d $prod_dir         ];then echo
+        elif check_bin_dist;then :
         else echo "no prod_dir/flavor dir" >&2; exit 1;fi
     else
         build_fq_combinations()
@@ -87,7 +110,9 @@ if [ "$1" != test ];then
                 exit 0
             fi
         done
-        echo "no prod_dir/flavor_qualifer dir" >&2; exit 1
+        if check_bin_dist;then :;else
+            echo "no prod_dir/flavor_qualifer dir" >&2; exit 1
+        fi
     fi
 else
     # test
