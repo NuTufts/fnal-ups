@@ -72,8 +72,17 @@ if [ $# -ne 0 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
 
 #-----------------------------------------------------------------------
 
-if [ "${opt_stages-}" ];then stages=${opt_stages-}
-else                         stages=build:install:install_fixdeclare; fi
+all_stages=build:install:install_fix:declare
+if [ "${opt_stages-}" ];then
+    stages=
+    for ss in `echo $all_stages | tr : ' '`;do
+        if xx=`expr ":${opt_stages}:" : ".*:${ss}:"`;then
+            stages="${stages:+$stages:}$xx"
+        fi
+    done
+else
+    stages=$all_stages
+fi
 
 exec 3>&1 4>&2    # dup so as to enable restore
 orestore='1>&3 2>&4'
@@ -92,16 +101,53 @@ cmd() { eval "echov \"$@\""; eval "$@"; }
 
 #-----------------------------------------------------------------------
 
+set_PRODS_RT()    # aka PRODS_DB (I combine them)
+{
+    if   [ "${opt_prods_root-}" ];then
+        PRODS_RT="$opt_prods_root"
+    elif [ "${PRODUCTS-}"       ];then
+        DB=`expr "$PRODUCTS" : '\([^:]*\)'`
+        if [ -f $DB/.upsfiles/dbconfig ];then
+            # check for PROD_DIR_PREFIX
+            PROD_DIR_PREFIX=`sed -n '/^[ \t]*PROD_DIR_PREFIX/{s/.*= *//;s/[ \t]*$//;p}' $DB/.upsfiles/dbconfig`
+            if [ "$PROD_DIR_PREFIX" = "$DB" -o "$PROD_DIR_PREFIX" = '${UPS_THIS_DB}' ];then
+                PRODS_RT=$DB
+            else
+                echo "Incompatible DB $DB != $PROD_DIR_PREFIX"
+            fi
+        else
+            echo 'Products DB, $DB, has not been initialized - .upsfile/dbconfig'
+            ehco 'file not found.'
+        fi
+    fi
+    if [ "${PRODS_RT-}" = '' ];then
+        echo 'Error - cannot determine "products root" - the place to where'
+        echo 'product will be installed'
+        echo "$USAGE"; exit
+    fi
+    echov PRODS_RT=$PRODS_RT
+}   # set_PRODS_RT
+
 set_NAM_and_VER()   # $1=nam-ver
 {
-    # tests:
-    #   gcc-4.1.2-20080102  -> gcc       v4_1_2_20080102
-    #   root-v5-18-00f.svn  -> root      v5_18_00f_svn
-    #   boost_1_34_1        -> boost     v1_34_1
-    #   libsigc++-2.2.3     -> libsigcxx v2_2_3
-    prod_=`echo "$1" | sed 's/[-_]v*[0-9][-0-9.a-zA-z]*$//'`
-     ver_=`expr "$1" : "${prod_}[-_]\(.*\)"`
-    prod_=`echo "$prod_" | sed 's/++/xx/'`    # libsigc++ -> libsigcxx
+    if nam_ver=`expr "$PWD" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
+        echo "name/ver=$nam_ver"
+        prod_=`expr "$nam_ver" : '\([^/][^/]*\)'`
+         ver_=`expr "$nam_ver" : '[^/][^/]*/\([^/][^/]*\)'`
+        stages=`echo :$stages:|sed 's/:build:/:/;s/:install:/:/;s/^://;s/:$//'`
+        echo "set stages=$stages"
+    else
+        # tests:
+        #   gcc-4.1.2-20080102  -> gcc       v4_1_2_20080102
+        #   root-v5-18-00f.svn  -> root      v5_18_00f_svn
+        #   boost_1_34_1        -> boost     v1_34_1
+        #   libsigc++-2.2.3     -> libsigcxx v2_2_3
+        nam_ver=`basename $PWD`
+        prod_=`echo "$nam_ver" | sed 's/[-_]v*[0-9][-0-9.a-zA-z]*$//'`
+         ver_=`expr "$nam_ver" : "${prod_}[-_]\(.*\)"`
+        prod_=`echo "$prod_" | sed 's/++/xx/'`    # libsigc++ -> libsigcxx
+    fi
+
     if   [ "$prod_" = '' -a "${opt_prod-}" = '' ];then
         echo can not determine prod; return 1
     elif [ "$prod_"      -a "${opt_prod-}"      ];then
@@ -135,26 +181,12 @@ set_NAM_and_VER()   # $1=nam-ver
             PROD_VER=$opt_ver; echov "ver is $opt_ver (from opt)"
         fi
     fi
-    if expr "$PROD_VER" : v >/dev/null;then
-        PROD_VER=`echo "$PROD_VER" | tr '.-' '__'`
-    else
+    if expr "$PROD_VER" : '[0-9]' >/dev/null;then
         PROD_VER=v`echo "$PROD_VER" | tr '.-' '__'`
+    else
+        PROD_VER=`echo "$PROD_VER" | tr '.-' '__'`
     fi
 }   # set_NAM_and_VER
-
-set_PRODS_RT()    # aka PRODS_DB (I combine them)
-{
-    if   [ "${opt_prods_root-}" ];then
-        PRODS_RT="$opt_prods_root"
-    elif [ "${PRODUCTS-}"       ];then
-        PRODS_RT=`expr "$PRODUCTS" : '\([^:]*\)'`
-    else
-        echo 'Error - cannot determine "products root" - the place to where'
-        echo 'product will be installed'
-        echo "$USAGE"; exit
-    fi
-    echov PRODS_RT=$PRODS_RT
-}   # set_PRODS_RT
 
 #-----------------------------------------------------------------------
 
@@ -223,13 +255,13 @@ get_productization_lib()
 
 #------------------------------------------------------------------------------
 
-if set_NAM_and_VER `basename $PWD`;then
+set_PRODS_RT
+
+if set_NAM_and_VER;then
     : OK
 else
     exit 1
 fi
-
-set_PRODS_RT
 
 get_productization_lib
 
@@ -253,7 +285,7 @@ else                            last_stage_done=0
 fi
 if [ "${opt_quiet-}" ];then outspec='>/dev/null 2>&1';else outspec=; fi
 echov last_stage_done=$last_stage_done
-for ss in build install install_fix declare;do
+for ss in `echo $stages | tr : ' '`;do
     if echo $stages | grep $ss >/dev/null;then :;else continue; fi
     # all stages are run in a pipeline to collect output AND to run in
     # sub-shell (so the cwd in this parent shell is preserved).
