@@ -15,12 +15,12 @@
 # or  prod_db=/some/path; . /some/path/this_file
 
 test $?shell = 1 && set ss=csh || ss=sh
-echo Shell type is $ss.
+#echo Shell type is $ss.
 
 # make some things similar. need to use set_ because sh builtin set would hide function set
 test "$ss" = csh && alias set_ set
-test "$ss" =  sh && eval 'set_() { for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`; val=`expr "$xx" : "[^=]*=\(.*\)"`; eval "$var=\"$val\"";done; }'
-test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\$2\""; }' && eval 'source() { file=$1; shift; . $file "$@"; }' && eval 'unsetenv() { unset "$@"; }'
+test "$ss" =  sh && eval 'set_() { ss=$?;for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`;val=`expr "$xx" : "[^=]*=\(.*\)"`;eval "$var=\"$val\"";done;return $ss; }'
+test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\${2-}\""; }' && eval 'source() { file=$1; shift; . $file "$@"; }' && eval 'unsetenv() { unset "$@"; }'
 test "$ss" =  sh && eval 'tnotnull() { eval "test -n \"\${$1-}\""; }'                             && eval 'nullout() { "$@" >/dev/null 2>&1; }'
 test "$ss" = csh && alias tnotnull "eval '"'test $?'"\!* -eq 1' && eval '"'test -n "$'"\!*"'"'"'" && alias nullout "\!* >& /dev/null"
 
@@ -49,11 +49,12 @@ test -z "$db" && echo "$msg" || echo "db=$db"
 # Because the ups product is the foundational product, I _will_not_ support ups's
 #  full flavor matching but I _will_ support the 64/32 matching, and the backward
 # compatible os+majRev.
-set_ os=`uname -s` os_rev=`uname -r |cut -d. -f1-2` mach=`uname -m` libc=; test $os = Linux && set_ libc=-`/bin/ls /lib/libc-*|sed '{s/^[^0-9]*//;s/[^0-9]*$//;q}'`
+set_ os=`uname -s` os_rev1=`uname -r |cut -d. -f1-2` os_rev2=`uname -r |cut -d. -f1` mach=`uname -m` libc1= libc2=
+test $os = Linux && set_ libc1=-`/bin/ls /lib/libc-*|sed '{s/^[^0-9]*//;s/[^0-9]*$//;q}'` libc2=-`/bin/ls /lib/libc-*|sed 's/^[^0-9]*\([0-9]*\.[0-9]*\).*/\1/;q'`
 set_ b64=`sh -c "case $mach in x86_64|sun*) echo 64bit;;*) echo ;;esac"`
-set_ fl1=$os$b64+$os_rev$libc fl2=$os+$os_rev$libc fl3=$os+`expr "$os_rev" : '\([0-9]*\)'`
+set_ fl1=$os$b64+$os_rev1$libc1 fl2=$os+$os_rev1$libc1 fl3=$os$b64+$os_rev1$libc2 fl4=$os+$os_rev1$libc2 fl5=$os$b64+$os_rev2 fl6=$os+$os_rev2
 
-echo "the flavors are: fl1=$fl1 fl2=$fl2 fl3=$fl3"
+echo "the flavors are: $fl1 $fl2 $fl3 $fl4 $fl5 $fl6"
 
 setenv UPS_SHELL $ss
 
@@ -63,6 +64,9 @@ set_ ver= flv= chainf=$db/ups/current.chain
 test -n "$db" -a -f $chainf              && set_ ver=`sed -n "/${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl1
 test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl2
 test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl3
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl4
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl5
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl6
 
 test -n "$db" && echo "the current version of ups for this flavor is $ver "`test -n "$ver" && echo "flv=$flv"`
 
@@ -72,9 +76,13 @@ test -n "$ver" && set_ prddir=`sed -n -e "/$flv/,/PROD_DIR/{" -e "/PROD_DIR/{s/.
 tnotnull prddir && nullout ls $prddir/bin/ups && set_ exe=$prddir/bin/ups || set_ exe=`which ups` || set_ exe=
 test -z "$exe" && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
 tnotnull PRODUCTS && set_ products=$PRODUCTS || set_ products=$db; expr ":${products}:" : ".*:${db}:" >/dev/null || set_ products=${db}:$products
-tnotnull UPS_DIR &&                     setenv PATH   `echo :${PATH}:     | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv SETUP_UPS UPS_DIR
-test -n "$exe" && setenv PRODUCTS $products
-test -n "$exe" && source `$exe setup ups $ver` && test -f "$db/setup.initial" && source "$db/setup.initial"
+tnotnull UPS_DIR && setenv PATH `echo :${PATH}: | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv SETUP_UPS UPS_DIR
+test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
+
+#tnotnull prddir && set_ ovexe=`sh -c 'for ff in '$prddir'/.ups_OVERRIDE $UPS_DIR/ups/ups_OVERRIDE;do if [ -x $ff ];then echo $ff;exit;fi;done;exit 1'`
+#tnotnull ovexe  && set_ ov="`$ovexe`" && setenv UPS_OVERRIDE "$ov"
+
+test -n "$exe" && test -f "$db/setup.initial" && source "$db/setup.initial"
 
 test "$ss" = csh && unalias tnotnull nullout set_
-unset ss msg db me os os_rev mach libc b64 fl1 fl2 fl3 pdp ver flv chainf prddir exe products olddb  set_ setenv unsetenv tnotnull source nullout
+unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 pdp ver flv chainf prddir exe products olddb  set_ setenv unsetenv tnotnull source nullout ovexe ov
