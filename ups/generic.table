@@ -20,11 +20,11 @@ Qualifiers=""
 COMMON:
    ACTION = setup__
 	# the following is necessary so that both setup and unsetup will work. For unsetup, "if(cmd)" and "unless(cmd)" cmd's happen but "execute(cmd)" cmd's do not
-	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
+	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
 	if    ( unsetenv _FQ && unset setenv unsetenv )
 	    execute( true, NO_UPS_ENV )
 	endif ( unsetenv _FQ && unset setenv unsetenv )
-	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
+	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
 
 	# want to abort if there is a problem found by ups_FQ
 	unless    ( setenv _FQ `sh -c 'for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
@@ -63,9 +63,9 @@ COMMON:
 	endif ( test -d ${${UPS_PROD_NAME_UC}_FQ}/man )
 
 	# this if is for unsetup, where the "execute" statements do not happen but the if/unless statements do
-	if    ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }' )
+	if    ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }' )
 	    execute( true, NO_UPS_ENV )
-	endif ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\$2\""; return $sts; };unsetenv() { unset "$@"; }' )
+	endif ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }' )
 	execute( unsetenv _FQ && unset setenv unsetenv, NO_UPS_ENV )
 
 	# ADD common env vars here
