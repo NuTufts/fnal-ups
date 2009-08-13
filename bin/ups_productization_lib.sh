@@ -75,8 +75,8 @@ declare()
 
 #------------------------------------------------------------------------------
 # For the "generic" case, of the 4 stages (build,install,install_fix,and
-# declare), I will dispatch to 3 of them -- the declare will be the same for
-# all.
+# declare), I will dispatch to 2 of them -- the install_fix and declare stages
+# will be the same for all.
 
 generic_build()
 {
@@ -89,7 +89,7 @@ generic_build()
         setup_deps
         generic_build_install_dispatch build
     fi
-}
+}   # generic_build
 generic_install()
 {
     echov "generic install $@; PREFIX=$PREFIX"
@@ -107,7 +107,13 @@ generic_install_fix()
         # I want this a separate step, but have not determine a check
         return 1
     else
-        generic_build_install_dispatch install_fix
+        if [ -d $PREFIX ];then   # the result of the install
+            cd $PREFIX
+            inst_PREFIX_fix $PREFIX
+        else
+            echo 'Error - generic install error'
+            exit 1
+        fi
     fi
 }   # generic_install_fix
 generic_declare()
@@ -123,8 +129,10 @@ generic_declare()
                 -o "${opt_redo-}" ];then
                 echo mkdir -p $PRODS_RT/$PROD_NAM/$PROD_VER/ups
                 mkdir -p $PRODS_RT/$PROD_NAM/$PROD_VER/ups
-                cp_with_deps $UPS_DIR/ups/generic.table \
-                    $PRODS_RT/$PROD_NAM/$PROD_VER/ups/$PROD_NAM.table
+                add_fq --tblf=$UPS_DIR/ups/generic.table --flv=${PROD_FLV} --qual=${opt_q-} \
+                   >$PRODS_RT/$PROD_NAM/$PROD_VER/ups/$PROD_NAM.table
+                #cp_with_deps $UPS_DIR/ups/generic.table \
+                #    $PRODS_RT/$PROD_NAM/$PROD_VER/ups/$PROD_NAM.table
             fi
         
             cmd "ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER -Mups \
@@ -285,17 +293,6 @@ generic_configure_install()
         exit 1
     fi
 }   # generic_configure_install
-generic_configure_install_fix()
-{
-    if [ -d $PREFIX ];then   # the result of the install
-        cd $q_bld_dir
-        inst_PREFIX_fix $PREFIX
-    else
-        echo 'Error - generic install error'
-        exit 1
-    fi
-}   # generic_configure_install_fix
-
 
 generic_cmake_build()
 {   echov 'generic_cmake_build'
@@ -310,10 +307,6 @@ generic_cmake_install()
 {   echov 'generic_cmake_install'
     generic_configure_install
 }   # generic_cmake_install
-generic_cmake_install_fix()
-{   echov 'generic_cmake_install_fix'
-    generic_configure_install_fix
-}   # generic_cmake_install_fix
 
 generic_bootstrap_build()
 {   echov 'generic_bootstrap_build'
@@ -328,10 +321,6 @@ generic_bootstrap_install()
 {   echov 'generic_bootstrap_install'
     generic_configure_install
 }   # generic_bootstrap_install
-generic_bootstrap_install_fix()
-{   echov 'generic_bootstrap_install_fix'
-    generic_configure_install_fix
-}   # generic_bootstrap_install_fix
 
 generic_setup_py_build()
 {   echov 'generic_setup_py_build'
@@ -351,10 +340,6 @@ generic_setup_py_install()
         exit 1
     fi
 }   # generic_setup_py_install
-generic_setup_py_install_fix()
-{   echov 'generic_setup_py_install_fix'
-    generic_configure_install_fix
-}   # generic_setup_py_install_fix
 
 generic_Makefile_build()
 {   echov 'generic_Makefile_build'
@@ -362,10 +347,6 @@ generic_Makefile_build()
 generic_Makefile_install()
 {   echov 'generic_Makefile_install'
 }   # generic_Makefile_install
-generic_Makefile_install_fix()
-{   echov 'generic_Makefile_install_fix'
-}   # generic_Makefile_install_fix
-
 
 #------------------------------------------------------------------------------
 
@@ -422,9 +403,8 @@ inst_PREFIX_fix()
     done
 }
 
-generic_build_install_dispatch()
+echo_BLD_INST_METHOD()
 {
-    # of course, the order of checking is important!!!
     if [ "${BLD_INST_METHOD-}" = '' ];then
         if   [ -f bootstrap ];then
             BLD_INST_METHOD=bootstrap
@@ -440,13 +420,26 @@ generic_build_install_dispatch()
         elif [ -f Makefile ];then
             BLD_INST_METHOD=Makefile
         else
-            echo 'Error - cannot determine "generic" method. You must create a'
-            echo '<prod>_productization_lib.sh file for $PROD_NAM'
-            exit 1
+            return 1
         fi
+    else
+        echo $BLD_INST_METHOD
+    fi
+}
+
+generic_build_install_dispatch()
+{
+    # of course, the order of checking is important!!!
+    if BLD_INST_METHOD=`echo_BLD_INST_METHOD`;then
+        : OK
+    else
+        echo "Error - cannot determine \"generic\") method (for $1 stage)."
+        echo 'You must create a <prod>_productization_lib.sh file'
+        echo "for $PROD_NAM"
+        exit 1
     fi
     case $1 in
-    build|install|install_fix)   generic_${BLD_INST_METHOD}_$1;;
+    build|install)   generic_${BLD_INST_METHOD}_$1;;
     *)  echo 'Error - internal';exit 1;;
     esac
 }
@@ -454,10 +447,44 @@ generic_build_install_dispatch()
 qualified_inst_dir()
 {
     if [ "${opt_q-}" ];then
-        qq=`echo $opt_q | sed 's/:/_/g'`
-        echo $PRODS_RT/$PROD_NAM/$PROD_VER/${PROD_FLV}_$qq
+        # FIXME -- strip out "non-build qualifiers" (aka "environment qualifiers")
+        if [ -x $UPS_DIR/ups/ups_FQ ];then
+            qq=`$UPS_DIR/ups/ups_FQ --get '' ${PROD_FLV} $opt_q`
+        else
+            qq=${PROD_FLV}_`echo $opt_q | sed 's/:/_/g'`
+        fi
     else
-        echo $PRODS_RT/$PROD_NAM/$PROD_VER/$PROD_FLV
+        qq=$PROD_FLV
+    fi
+    # check for bin dist
+    if nam_ver=`expr "$PWD" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
+        echo 'qualified_inst_dir' >&2
+        for dd in `find . -type d -maxdepth 3`;do
+            if   expr "$dd" : '.*/bin$' >/dev/null;then
+                if file $dd/* | grep 'ELF ' >/dev/null;then have_bin=$dd; fi
+            elif expr "$dd" : '.*/lib$' >/dev/null;then
+                if file $dd/* | grep 'ELF ' >/dev/null;then have_lib=$dd; fi
+            fi
+        done
+        if [   \( "${have_bin-}" -a "${have_lib-}" = '' \) \
+            -o \( "${have_lib-}" -a "${have_bin-}" = '' \) \
+            -o \( "${have_lib-}" -a "${have_bin-}" = "${have_bin-}" \) ];then
+            if [ "${have_bin-}" ];then bb="$have_bin"; else bb="$have_lib";fi
+        fi
+        if [ "${bb-}" -a "`echo_BLD_INST_METHOD`" = '' ];then
+            echo 'looks like "binary dist."' >&2
+            bb=`expr "$bb" : '\./\(.*\)/...$'`   # no match OK for ./bin
+            # now bb may be '' (if bb was ./bin or ./lib)
+            if [ "$bb" != $qq ];then
+                echo "Warning $bb != $qq" >&2
+            fi
+            echo $PRODS_RT/$PROD_NAM/$PROD_VER/$bb
+        else
+            echo $PRODS_RT/$PROD_NAM/$PROD_VER/$qq
+        fi
+    else
+        # source dir
+        echo $PRODS_RT/$PROD_NAM/$PROD_VER/$qq
     fi
 }
 
@@ -534,14 +561,93 @@ cp_with_vars()
     fi
 }   # cp_with_vars
 
-        if [ "${opt_var-}" ];then
-            var=`expr "${opt_var-}" : '\([^=]*\)'`
-            val=`expr "${opt_var-}" : '[^=]*=\(.*\)'`
-            sed_up="$sed_up\\        envSet( $var, $val )\\n"
-            sed_dn="\\        envUnset( $var )\\n$sed_dn"
+
+add_fq()
+{
+    set_fq_opt "$@"
+    set_TBLF
+    set_FLVR
+    echo "add_fq aft set_FLVR FLVR=${FLVR-}" >&2
+    set_QUAL
+    echo "add_fq aft set_QUAL" >&2
+    if [ "${opt_deps-}" ];then
+        sed_up=''
+        IFSsav=$IFS IFS=,; for dep in $opt_deps;do IFS=$IFSsav
+            dep=`echo $dep`
+            echo "dep=>$dep<"
+            sed_up="$sed_up\\        setupRequired( \"$dep\" )\\n"
+        done
+    fi
+    echo "add_fq b4 list_fq" >&2
+    if list_fq | grep "$FLVR \"$QUAL\"";then
+        echo "flv/qual combination already exists"
+    else
+        sed "\
+/^GROUP:/a\
+\\\n\
+\\FLAVOR = $FLVR\nQUALIFIERS = \"$QUAL\"\n\
+\\    ACTION = setup\n${sed_up-}\
+\\        exeActionRequired(\"setup__\")\n\
+" $TBLF
+    fi
+    echo "add_fq finish" >&2
+}
+list_fq()
+{
+    set_fq_opt "$@"
+    set_TBLF
+    sed -n -e'/^FLAVOR *=/{s/^FLAVOR *= *//;h;}'\
+           -e'/^QUALIFIERS *=/{s/^QUALIFIERS *= */ /;H;x;s/\n//;p}' $TBLF
+}
+
+#------------------------------------------------------------------------------
+set_TBLF()
+{   if [ "${TBLF-}" ];then return; fi
+    if [ "${opt_tblf-}" ];then TBLF=$opt_tblf
+    else                       TBLF=$UPS_DIR/ups/generic.table; fi
+}
+set_FLVR()
+{   echo "set_FLV called" >&2
+    if [ "${FLVR-}" ];then return; fi
+    if [ "${opt_flv-}" ];then FLVR=$opt_flv
+    else                      FLVR=`ups flavor`; fi
+    echo "setting FLVR=$FLVR" >&2
+}
+set_QUAL()
+{   if [ "${QUAL-}" ];then return; fi
+    if [ "${opt_qual-}" ];then QUAL=$opt_qual
+    else                       QUAL=; fi
+}
+set_fq_opt()
+{
+    opts_w_args='tblf|flv|qual|deps'
+    do_opt="\
+    case \$opt in
+    $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
+                   elif [      $#      -ge 1  ];then arg=\$1; shift
+                   else  echo \"option \$opt requires argument\"; exit 1; fi
+                   eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
+                   opts=\"\$opts '\$arg'\";;      # tricky part Aa
+    *) echo \"internal fq function error - valid option: \$opt\" 2>&1; exit 1;;
+    esac"
+    while op=`expr "${1-}" : '-\(.*\)'`;do
+        shift
+        if xx=`expr "$op" : '-\(.*\)'`;then
+            if   opt=`expr     "$xx" : '\([^=]*\)='`;then
+                set ${-+-$-} -- "`expr "$xx" : '[^=]*=\(.*\)'`" "$@"
+            else opt=$xx; fi
+            opts="${opts-} '--$opt'"      # tricky part Ab
+            eval "$do_opt"
+        else
+            while opt=`expr "$op" : '\(.\)'`;do
+                opts="${opts-} '-$opt'"      # tricky part Ac
+                rest=`expr "$op" : '.\(.*\)'`
+                eval "$do_opt"
+                op=$rest
+            done
         fi
-
-
+    done
+}
 
 
 lndir()
