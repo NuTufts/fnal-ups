@@ -10,7 +10,8 @@ set -u
 
 USAGE="\
    usage: `basename $0`
-examples: `basename $0` --prod=ups --ver=4.7.4x
+examples: cd some/dir
+          `basename $0` --prod=ups --ver=4.7.4x
           `basename $0` --deps='prodA v1, prodB v2'
           `basename $0` --deps='prodA v1 -qdebug, prodB v2 -qdebug' -qdebug
           `basename $0` --deps='prodA vX, prodB vZ' -qcms
