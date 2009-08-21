@@ -52,9 +52,9 @@ test -z "$db" && echo "$msg" || echo "db=$db"
 set_ os=`uname -s` os_rev1=`uname -r |cut -d. -f1-2` os_rev2=`uname -r |cut -d. -f1` mach=`uname -m` libc1= libc2=
 test $os = Linux && set_ libc1=-`/bin/ls /lib/libc-*|sed '{s/^[^0-9]*//;s/[^0-9]*$//;q}'` libc2=-`/bin/ls /lib/libc-*|sed 's/^[^0-9]*\([0-9]*\.[0-9]*\).*/\1/;q'`
 set_ b64=`sh -c "case $mach in x86_64|sun*) echo 64bit;;*) echo ;;esac"`
-set_ fl1=$os$b64+$os_rev1$libc1 fl2=$os+$os_rev1$libc1 fl3=$os$b64+$os_rev1$libc2 fl4=$os+$os_rev1$libc2 fl5=$os$b64+$os_rev2 fl6=$os+$os_rev2
+set_ fl1=$os$b64+$os_rev1$libc1 fl2=$os+$os_rev1$libc1 fl3=$os$b64+$os_rev1$libc2 fl4=$os+$os_rev1$libc2 fl5=$os$b64+$os_rev1 fl6=$os+$os_rev1 fl7=$os$b64+$os_rev2 fl8=$os+$os_rev2
 
-echo "the flavors are: $fl1 $fl2 $fl3 $fl4 $fl5 $fl6"
+echo "the flavors are: $fl1 $fl2 $fl3 $fl4 $fl5 $fl6 $fl7 $fl8"
 
 setenv UPS_SHELL $ss
 
@@ -67,6 +67,8 @@ test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl3}[ 	]*"'$/{n
 test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl4
 test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl5
 test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl6
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl7
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl8
 
 test -n "$db" && echo "the current version of ups for this flavor is $ver "`test -n "$ver" && echo "flv=$flv"`
 
@@ -85,4 +87,4 @@ test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
 test -n "$exe" && test -f "$db/setup.initial" && source "$db/setup.initial"
 
 test "$ss" = csh && unalias tnotnull nullout set_
-unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 pdp ver flv chainf prddir exe products olddb  set_ setenv unsetenv tnotnull source nullout ovexe ov
+unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 fl7 fl8 pdp ver flv chainf prddir exe products olddb  set_ setenv unsetenv tnotnull source nullout ovexe ov
