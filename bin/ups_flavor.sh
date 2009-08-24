@@ -13,9 +13,16 @@ APP=`basename $0`
 USAGE="\
 Attempt to tell the "flavor" of the bin and lib sub directories based on
 the info from the files in those directories.
-  usage: $APP
+  usage: $APP [-?]
+example: cd some/dir
+         $APP
 "
-
+while opt=`expr "${1-}" : '-\([^=]*\)'`;do
+    case "$opt" in
+    \?|h|-help)  echo "$USAGE";exit;;
+    *)           echo "Unknown option -$opt";echo "$USAGE";exit;;
+    esac
+done
 echov() { echo "$APP: $@"; }
 
 dirsOfInterest=`find . -type d \( -name lib -o -name 'lib.*' -o -name bin -o -name 'bin.*' \)`
