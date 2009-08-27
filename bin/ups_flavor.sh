@@ -25,7 +25,8 @@ while opt=`expr "${1-}" : '-\([^=]*\)'`;do
 done
 echov() { echo "$APP: $@"; }
 
-dirsOfInterest=`find . -type d \( -name lib -o -name 'lib.*' -o -name bin -o -name 'bin.*' \)`
+dirsOfInterest=`find . -type d \( -name bin -o -name 'bin.*' \)`
+dirsOfInterest="$dirsOfInterest `find . -type d \( -name lib -o -name 'lib.*' \)`"
 
 if [ "$dirsOfInterest" = '' ];then
     echo NULL
@@ -107,9 +108,9 @@ for dd in $dirsOfInterest;do
                 prbsl4=          prbsl4_file=   # has 
                 prbsl5=          prbsl5_file=
                 for vv in $VERS;do
-                    eval "${vv}lo=16777215 ${vv}lofile="
-                    eval "${vv}lx=0        ${vv}lxfile="
-                    eval "${vv}hi=0        ${vv}hifile="
+                    eval "${vv}lo=16777215 ${vv}lo_file="
+                    eval "${vv}lx=0        ${vv}lx_file="
+                    eval "${vv}hi=0        ${vv}hi_file="
                 done
             fi
             for ff in $files;do
