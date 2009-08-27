@@ -27,24 +27,24 @@ COMMON:
 	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
 
 	# want to abort if there is a problem found by ups_FQ
-	unless    ( setenv _FQ `sh -c 'for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
+	unless    ( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
 	    sourceRequired( "no_-_DIRECTORY_flavor-qualifier", NO_UPS_ENV )
-	endUnless ( setenv _FQ `sh -c 'for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
+	endUnless ( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
 
         setupEnv()
         proddir()
 
-	prodDir( _FQ, `test -n "$_FQ" && echo "$_FQ" || echo .` )
-
-	pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
-	pathPrepend(PATH, $${UPS_PROD_NAME_UC}_FQ/bin, :)
+	envSet( ${UPS_PROD_NAME_UC}_FQ, `test -n "$_FQ" && echo "$_FQ" || echo .` )
 
 	# These are use by other products' build system
 	# double(2) double-quotes(") is a bit of trick - ups is enclosing things inside of double quotes so it thinks it can strip off the first and last...
 	# double(2) double-quotes(") is needed to be shell independent - to work on cshell or bourne shell
-	envSet( ${UPS_PROD_NAME_UC}_INC, ""`sh -c 'for dd in ${UPS_PROD_DIR} ${${UPS_PROD_NAME_UC}_FQ};do for ii in ${UPS_PROD_NAME} inc include h;do [ -d $dd/$ii ] && echo $dd/$ii && exit;done;done'`"" )
-	envSet( ${UPS_PROD_NAME_UC}_LIB, `echo ${${UPS_PROD_NAME_UC}_FQ}/lib | sed 's|/./|/|g'` )
+	prodDir( _INC, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/ "";do for ii in ${UPS_PROD_NAME} inc include h;do [ -d ${UPS_PROD_DIR}/${dd}$ii ] && echo ${dd}$ii && exit;done;done'`"" )
+	prodDir( _LIB, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/lib lib/$${UPS_PROD_NAME_UC}_FQ lib.$${UPS_PROD_NAME_UC}_FQ;do [ -d ${UPS_PROD_DIR}/$dd ] && echo $dd && exit;done;echo .'`"" )
+	prodDir( _BIN, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/bin bin/$${UPS_PROD_NAME_UC}_FQ bin.$${UPS_PROD_NAME_UC}_FQ;do [ -d ${UPS_PROD_DIR}/$dd ] && echo $dd && exit;done;echo .'`"" )
 
+	pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
+	pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_BIN}, :)
 	envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
 
 	envSetIfNotSet( MANPATH, "`man -w`" )
@@ -54,9 +54,10 @@ COMMON:
 	if    ( test ! -d ${UPS_PROD_DIR}/bin )
 	    pathRemove( PATH, ${UPS_PROD_DIR}/bin, :)
 	endif ( test ! -d ${UPS_PROD_DIR}/bin )
-	if    ( expr "${${UPS_PROD_NAME_UC}_FQ}" : '.*/\.$' >/dev/null || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/bin )
-	    pathRemove( PATH, ${${UPS_PROD_NAME_UC}_FQ}/bin, :)
-	endif ( expr "${${UPS_PROD_NAME_UC}_FQ}" : '.*/\.$' >/dev/null || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/bin )
+	if    ( expr "$${UPS_PROD_NAME_UC}_BIN" : '.*/\.$' >/dev/null || test ! -d $${UPS_PROD_NAME_UC}_BIN )
+	    pathRemove( PATH, $${UPS_PROD_NAME_UC}_BIN, :)
+	    # must leave _BIN env for pathRemove which will happen during unsetup (un-action for pathPrepend)
+	endif ( expr "$${UPS_PROD_NAME_UC}_BIN" : '.*/\.$' >/dev/null || test ! -d $${UPS_PROD_NAME_UC}_BIN )
 
 	if    ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 	    envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
