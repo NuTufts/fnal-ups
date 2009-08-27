@@ -10,6 +10,10 @@ set -u
 KnownBldQuals="debug:cxxcheck"
 
 USAGE="\
+The intent of this script is to find a string built from the flavor and
+the components of the qualifer such that the search for a \"bin\" or \"lib\"
+directory containing the string will succeed.
+
    usage: `basename $0` [-opts] <prod_dir> <flavor> [qualifier_list]
        OR `basename $0` test
 examples: `basename $0` /p/ups/v99 Linux64bit+2.6-2.5
@@ -59,6 +63,8 @@ if [ "$1" != test ];then
     }
     quals=`filter_quals "${3-}"`
 
+    # obsolete - does not work (yet) for multiple flavors -- would need to
+    # determine flavor and verify flavor of directory matches flavor passed
     check_bin_dist()
     {   # bin/lib dir under dir which might not be a ups flavor
         cnt=0
@@ -82,11 +88,14 @@ if [ "$1" != test ];then
     }
 
     if [ "$quals" = '' ];then
-        if   [ "${opt_get-}" ];then echo $flavor
-        elif [ -d $prod_dir/$flavor ];then echo $flavor
-        #elif [ -d $prod_dir         ];then echo
-        elif check_bin_dist;then :
-        else echo "no prod_dir/flavor dir" >&2; exit 1;fi
+        if   [ "${opt_get-}" ];then echo $flavor;exit 0
+        else
+            for sub in "" bin/ lib/ bin. lib.;do
+                if [ -d $prod_dir/${sub}$flavor ];then
+                    echo $flavor;    exit 0
+                fi
+            done
+        fi
     else
         build_fq_combinations()
         {   list=$1
@@ -105,15 +114,16 @@ if [ "$1" != test ];then
         }
         for qq in `build_fq_combinations $quals`;do
             if   [ "${opt_get-}" ];then echo ${flavor}_$qq; exit 0
-            elif [ -d $prod_dir/${flavor}_$qq ];then
-                echo ${flavor}_$qq
-                exit 0
+            else
+                for sub in "" bin/ lib/ bin. lib.;do
+                    if [ -d $prod_dir/${sub}${flavor}_$qq ];then
+                        echo ${flavor}_$qq;           exit 0
+                    fi
+                done
             fi
         done
-        if check_bin_dist;then :;else
-            echo "no prod_dir/flavor_qualifer dir" >&2; exit 1
-        fi
     fi
+    echo "no prod_dir/flavor_qualifer dir" >&2; exit 1
 else
     # test
     tmpdir=/tmp/`basename $0`.$$
