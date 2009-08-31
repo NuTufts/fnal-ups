@@ -101,10 +101,13 @@ add_to_fq_list()
     add_fq=$1;   shift
     add_os=$1;   shift
     add_bits=$1; shift
+    echov "add_fq=$add_fq add_os=$add_os add_bits=$add_bits $*"
     if _fq=`echo "$fq_list" | grep "^$add_fq "`;then
         fq_list=`echo "$fq_list" | grep -v "^$add_fq "`
-        _add_os=`echo $_fq | awk '{print $3;}'`
+        _add_os=`echo $_fq | awk '{print $2;}'`
         if [ $_add_os != ANY ];then add_os=$_add_os;fi
+        _add_bits=`echo $_fq | awk '{print $3;}'`
+        if [ $_add_bits -gt $add_bits ];then add_bits=$_add_bits;fi
         add_str=
         str_idx=4
         xx=`echo $_fq | awk "{print \\\$$str_idx;}"`
@@ -226,9 +229,7 @@ for dd in $dirsOfInterest;do
             if [   $klo -eq 16777215 -a $khi -eq 0 \
                 -a $GLIBC_lo -eq 16777215 -a $GLIBC_hi -eq 0 \
                 -a -z "$prbsl4" -a -z "$prbsl5" ];then
-                if [ -z "$subdir_dot_has_flavor" ];then
-                    echo "for dir:$dd/$ss: NULL"
-                fi
+                echov "for dir:$dd/$ss: NULL"
             elif true;then
                 echov "for dir:$dd/$ss: os=$os  os_file=$os_file"
                 for vv in k $VERS;do
@@ -269,13 +270,19 @@ for dd in $dirsOfInterest;do
     done   # ss
     popd >/dev/null
 done   # dd
+list_sz=`echo "$fq_list" | wc -l`
+echov "fq_list:"
 echov "$fq_list"
 if [ "$fq_list" ];then
     echo "$fq_list" | while read fq os bit klo GLIBC_hi GLIBCXX_hi CXXABI_hi;do
         echov "fq=$fq os=$os bit=$bit klo=$klo"
         if [ "$bit" = 64 ];then bit=64bit; else bit=; fi
                 kvdot=`dec2dot $klo`
-                if   [ $klo -ge 132617 -a $klo -lt 16777215 ];then  # 2.6.9
+                if   [ $klo -eq 16777215 -a $os = ANY ];then
+                    if [ "$fq" != . -o $list_sz -eq 1 ];then
+                        echo "fq=$fq flavor=NULL"
+                    fi
+                elif [ $klo -ge 132617 -a $klo -lt 16777215 ];then  # 2.6.9
                     if [ "${opt_ups-}" ];then gldot=2.5
                     else                      gldot=`dec2dot $GLIBC_hi`; fi
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
