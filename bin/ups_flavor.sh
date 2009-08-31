@@ -173,6 +173,7 @@ for dd in $dirsOfInterest;do
         if [ "$files" ];then
             # 16777215  ==  0xffffff
             os=ANY           os_file=
+            bits=0           bits_file=
             prbsl4=          prbsl4_file=
             prbsl5=          prbsl5_file=
             for vv in k $VERS;do
