@@ -22,7 +22,8 @@ supplied.
 Options:
 --prod=
 --ver=
---prods-root=          or 1st \"db\" in PRODUCTS env.var.
+--prods-root=          or 1st \"db\" in PRODUCTS env.var. (IF \"db\" is a
+                        combined db/prod_root)
 --deps=
 --var=
 --q=                    understand: debug,cxxcheck; others just used in declare
@@ -73,12 +74,16 @@ if [ $# -ne 0 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
 
 #-----------------------------------------------------------------------
 
+redo_stage=99
 all_stages=build:install:install_fix:declare
 if [ "${opt_stages-}" ];then
+    stage_idx=0
     stages=
     for ss in `echo $all_stages | tr : ' '`;do
-        if xx=`expr ":${opt_stages}:" : ".*:${ss}:"`;then
+        stage_idx=`expr $stage_idx + 1`
+        if xx=`expr ":${opt_stages}:" : ".*:\(${ss}\):"`;then
             stages="${stages:+$stages:}$xx"
+            if [ $redo_stage -eq 99 ];then redo_stage=$stage_idx;fi
         fi
     done
 else
@@ -270,7 +275,6 @@ get_productization_lib
 
 set_FLV
 
-redo_stage=99
 PREFIX=`qualified_inst_dir`  # important var
 if [ "${opt_out-}" ];then
     >productize-`basename $PREFIX`${opt_q+_`echo $opt_q | tr : _`}.out
@@ -285,9 +289,9 @@ elif build       --status;then  last_stage_done=1
 else                            last_stage_done=0
 fi
 if [ "${opt_quiet-}" ];then outspec='>/dev/null 2>&1';else outspec=; fi
-echov last_stage_done=$last_stage_done
+echov last_stage_done=$last_stage_done redo_stage=$redo_stage stages=$stages
 for ss in `echo $stages | tr : ' '`;do
-    if echo $stages | grep $ss >/dev/null;then :;else continue; fi
+    #if echo $stages | grep $ss >/dev/null;then :;else continue; fi
     # all stages are run in a pipeline to collect output AND to run in
     # sub-shell (so the cwd in this parent shell is preserved).
     pid=
