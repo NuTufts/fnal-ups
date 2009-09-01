@@ -10,6 +10,8 @@ if [ "$1" = -x ];then set -x; shift; fi
 set -u
 
 VERS="GLIBC_ GLIBCXX_ CXXABI_" # no fortran yet
+tab=`echo -e "\t"`
+#echo "tab=>$tab<"
 
 APP=`basename $0`
 opts_wo_args='v|ups'
@@ -44,7 +46,8 @@ while op=`expr "${1-}" : '-\(.*\)'`;do
         done
     fi
 done
-echov() { if [ ${opt_v-0} -ge 1 ];then echo "$@"; fi; }
+echov()  { if [ ${opt_v-0} -ge 1 ];then echo "$@"; fi; }
+echovv() { if [ ${opt_v-0} -ge 2 ];then echo "$@"; fi; }
 
 dirsOfInterest=`find . -type d \( -name bin -o -name 'bin.*' \)`
 dirsOfInterest="$dirsOfInterest `find . -type d \( -name lib -o -name 'lib.*' \)`"
@@ -99,35 +102,54 @@ fq_list=
 add_to_fq_list()
 {
     add_fq=$1;   shift
+    add_dd=$1;   shift
     add_os=$1;   shift
     add_bits=$1; shift
-    echov "add_fq=$add_fq add_os=$add_os add_bits=$add_bits $*"
-    if _fq=`echo "$fq_list" | grep "^$add_fq "`;then
-        fq_list=`echo "$fq_list" | grep -v "^$add_fq "`
-        _add_os=`echo $_fq | awk '{print $2;}'`
+    echov "add_fq=$add_fq add_dd=$add_dd add_os=$add_os add_bits=$add_bits $*"
+    if _fq=`echo "$fq_list" | grep "^$add_fq$tab"`;then
+        fq_list=`echo "$fq_list" | grep -v "^$add_fq$tab"`
+        #echov fq_list grep-v lines: `echo "$fq_list" | wc -lc`
+        echov "fq_list: $fq_list"
+        _add_dd=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $2;}'`
+        _add_os=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $3;}'`
         if [ $_add_os != ANY ];then add_os=$_add_os;fi
-        _add_bits=`echo $_fq | awk '{print $3;}'`
+        _add_bits=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $4;}'`
         if [ $_add_bits -gt $add_bits ];then add_bits=$_add_bits;fi
         add_str=
-        str_idx=4
-        xx=`echo $_fq | awk "{print \\\$$str_idx;}"`
+        str_idx=5
+        xx=`echo "$_fq" | awk "BEGIN{FS=\"\\\t\";}{print \\\$$str_idx;}"`
         yy=$1;shift
         if [ $yy -lt $xx ];then xx=$yy;fi
-        add_str="$add_str $xx"
+        add_str="$xx"
         str_idx=`expr $str_idx + 1`
         for vv in $VERS;do
-            xx=`echo $_fq | awk "{print \\\$$str_idx;}"`
+            xx=`echo "$_fq" | awk "BEGIN{FS=\"\\\t\";}{print \\\$$str_idx;}"`
             yy=$1;shift
             if [ $yy -gt $xx ];then xx=$yy;fi
-            add_str="$add_str $xx"
+            add_str="$add_str${tab}$xx"
             str_idx=`expr $str_idx + 1`
         done
-        fq_list=`echo "$fq_list";echo "$add_fq $add_os $add_bits $add_str"`
+        if [ "$fq_list" ];then
+            fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$add_str"`
+        else
+            fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$add_str"
+        fi
+    elif _fq=`echo "$fq_list" | grep "${tab}$add_dd${tab}"`;then
+        echov found $add_dd
+        if [ $add_os != ANY ];then
+            fq_list=`echo "$fq_list" | grep -v "^$add_fq$tab"`
+            if [ "$fq_list" ];then
+                fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"`
+            else
+                fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"
+            fi
+        fi
     elif [ "$fq_list" ];then
-        fq_list=`echo "$fq_list";echo "$add_fq $add_os $add_bits $*"`
+        fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"`
     else
-        fq_list="$add_fq $add_os $add_bits $*"
+        fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"
     fi
+    echov fq_list lines: `echo "$fq_list" | wc -lc`
 }
 
 cnt_f=0
@@ -135,10 +157,13 @@ for dd in $dirsOfInterest;do
     # 3 cases for fq
     if   [ \( `basename $dd` = bin -o `basename $dd` = lib \) \
         -a `dirname $dd` != . ];then
+        # fq/bin
         fq=`dirname $dd`; fq=`expr "$fq" : './\(.*\)'`
     elif fq=`expr "$dd" : '.*/bin\.\(.*\)'` || fq=`expr "$dd" : '.*/lib\.\(.*\)'`;then
+        # bin.fq   --- assuming NOT blah/blah/bin.fq
         :
     else
+        # bin/fq
         fq=   # to be determined below
     fi
     pushd $dd >/dev/null
@@ -167,6 +192,11 @@ for dd in $dirsOfInterest;do
             # note: fq will be '' for single flavor ./bin/file (non-fq) structure
             if [ "$fq" = '' ];then fq=.;fi
         fi
+           fq_dd=`expr "$dd/$ss" : "./$fq/bin/\(.*\)"` \
+        || fq_dd=`expr "$dd/$ss" : "./$fq/lib/\(.*\)"` \
+        || fq_dd=`expr "$dd/$ss" : "\(.*\)/bin\.$fq"` \
+        || fq_dd=`expr "$dd/$ss" : "\(.*\)/lib\.$fq"` \
+        || fq_dd=.
         echov "potential fq=$fq"
         pushd $ss >/dev/null
         files=`find . \! -name . -prune -type f -print`
@@ -185,10 +215,11 @@ for dd in $dirsOfInterest;do
                 cnt_f=`expr $cnt_f + 1`
                 finfo=`file -b $ff`
                 ftype=`echo "$finfo" | cut -d, -f1`
+                echovv "ftype=$ftype ff=$ff"
                 case "$ftype" in
                 ELF*executable|ELF*shared\ object)
                     bits=`expr "$ftype" : 'ELF \([0-9]*\)-bit'`
-                    echov "bits=$bits"
+                    echovv "bits=$bits"
                     ee=$finfo
                     if   kv=`expr "$ee" : '.*for [^ ]* \([0-9.]*\)'`;then
                         kv=`dot2dec $kv`
@@ -197,6 +228,9 @@ for dd in $dirsOfInterest;do
                         os=`expr "$ee" : '.*for \([^ ,]*\)'` os_file=$ff
                     elif os_=`expr "$ee" : '.*for \([^ ,]*\)'`;then
                         os=$os_  os_file=$ff
+                    else
+                        # old file (no "for ")
+                        :
                     fi
                     os=`adjust_os "$os"`
                     for vv in $VERS;do
@@ -231,6 +265,9 @@ for dd in $dirsOfInterest;do
                 -a $GLIBC_lo -eq 16777215 -a $GLIBC_hi -eq 0 \
                 -a -z "$prbsl4" -a -z "$prbsl5" ];then
                 echov "for dir:$dd/$ss: NULL"
+                if echo "$dd" | egrep '/lib$|/lib\.[^/]*$' >/dev/null;then
+                    popd >/dev/null;continue
+                fi
             elif true;then
                 echov "for dir:$dd/$ss: os=$os  os_file=$os_file"
                 for vv in k $VERS;do
@@ -265,7 +302,7 @@ for dd in $dirsOfInterest;do
                 eval "hi=\$${vv}hi hi_file=\$${vv}hi_file"
                 vers_str="$vers_str $hi"
             done
-            add_to_fq_list "$fq" $os "$bits" $vers_str
+            add_to_fq_list "$fq" "$fq_dd" $os "$bits" $vers_str
         fi
         popd >/dev/null
     done   # ss
@@ -275,39 +312,42 @@ list_sz=`echo "$fq_list" | wc -l`
 echov "fq_list:"
 echov "$fq_list"
 if [ "$fq_list" ];then
-    echo "$fq_list" | while read fq os bit klo GLIBC_hi GLIBCXX_hi CXXABI_hi;do
-        echov "fq=$fq os=$os bit=$bit klo=$klo"
+    IFSsav=$IFS
+    #IFS="${tab}"
+    echo "$fq_list" | while read fq dd os bit klo GLIBC_hi GLIBCXX_hi CXXABI_hi;do
+        echov "-----> fq=$fq dd=$dd os=$os bit=$bit klo=$klo"
         if [ "$bit" = 64 ];then bit=64bit; else bit=; fi
                 kvdot=`dec2dot $klo`
                 if   [ $klo -eq 16777215 -a $os = ANY ];then
                     if [ "$fq" != . -o $list_sz -eq 1 ];then
-                        echo "fq=$fq flavor=NULL"
+                        echo "flavor=NULL fq=$fq"
                     fi
                 elif [ $klo -ge 132617 -a $klo -lt 16777215 ];then  # 2.6.9
                     if [ "${opt_ups-}" ];then gldot=2.5
                     else                      gldot=`dec2dot $GLIBC_hi`; fi
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                    echo "fq=$fq flavor=$flavor"
+                    echo "flavor=$flavor fq=$fq"
                     # need to make fq keyed dictionary of flavors
                 elif [ $klo -ge 131589 -a $klo -lt   132617 ];then  # 2.2.5
                     if [ "${opt_ups-}" ];then kvdot=2.6; fi
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                    echo "fq=$fq flavor=$flavor"
+                    echo "flavor=$flavor fq=$fq"
                 elif [ $klo -ge 131072 -a $klo -lt   131589 ];then  # 2.0.0
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
                     if [ "${opt_ups-}" ];then flavor=$os$bit; fi
-                    echo "fq=$fq flavor=$flavor"
+                    echo "flavor=$flavor fq=$fq"
                 elif [ $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 ];then # 2.4.0
                     gldot=`dec2dot $GLIBC_hi`
                     # guess kernel 2.6
                     flavor=$os$bit+2.6-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                    echo "fq=$fq flavor=$flavor"
+                    echo "flavor=$flavor fq=$fq"
                 elif [ $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 ];then # 2.3.0
                     # guess kernel 2.2
                     flavor=$os$bit+2.2
-                    echo "fq=$fq flavor=$flavor"
+                    echo "flavor=$flavor fq=$fq"
                 fi
     done
+    IFS=$IFSsav
 fi
 
 if [ $cnt_f -gt 0 ];then echov cnt_f=$cnt_f;fi
