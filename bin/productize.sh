@@ -43,16 +43,16 @@ Options:
 opts_w_args='prod|ver|prods-root|productization-lib|stages|deps|var|configure|q'
 opts_wo_args='clean|no-src|redo|quiet|v|out'
 do_opt="\
-    case \$opt in
-    \\?|h|help)    echo \"\$USAGE\"; exit 0;;
-    $opts_wo_args) eval opt_\`echo \$opt |sed -e 's/-/_/g'\`=1;;
-    $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
-                   elif [      $#      -ge 1  ];then arg=\$1; shift
-                   else  echo \"option \$opt requires argument\"; exit 1; fi
-                   eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
-                   opts=\"\$opts '\$arg'\";;
-    *) echo \"invalid option: \$opt\" 2>&1;echo \"\$USAGE\" 2>&1; exit 1;;
-    esac"
+  case \$opt in
+  \\?|h|help)    echo \"\$USAGE\"; exit 0;;
+  $opts_wo_args) eval opt_\`echo \$opt |sed -e 's/-/_/g'\`=1;;
+  $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
+                 elif [      $#      -ge 1  ];then arg=\$1; shift
+                 else  echo \"option \$opt requires argument\"; exit 1; fi
+                 eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
+                 opts=\"\$opts '\$arg'\";;
+  *) echo \"invalid option: \$opt\" 2>&1;echo \"\$USAGE\" 2>&1; exit 1;;
+  esac"
 while op=`expr "${1-}" : '-\(.*\)'`;do
     shift
     if xx=`expr "$op" : '-\(.*\)'`;then
@@ -102,8 +102,8 @@ fi
 
 #-----------------------------------------------------------------------
 
-echov() { if [ "${opt_v-}" ];then echo "`date`; $@";fi; }
-cmd() { eval "echov \"$@\""; eval "$@"; }
+echov() { if [ "${opt_v-}" ];then echo "`date`: $@";fi; }
+cmd() { eval "echov \"$@\""; eval "$@"; }   # used in ups_productization_lib.sh
 
 #-----------------------------------------------------------------------
 
