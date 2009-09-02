@@ -100,7 +100,7 @@ $(BIN)/funame : upsuname.o
 	$(CC) $(CFLAGS) funame.c -o $@ upsuname.o $(OLD_LIBS)
 
 $(BIN)/dropit :
-	$(CC) dropit.c -o $@ 
+	$(CC) $(CFLAGS) dropit.c -o $@ 
 
 #
 # Compile UPS library source
