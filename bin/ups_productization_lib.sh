@@ -223,12 +223,14 @@ ups_install_fix()
 ups_declare()
 {
     echov "ups declare $@"
+    ups_flv=`get_flv_64_to_32`
     if [ "${1-}" = --status ];then
-        if [ -f $PRODS_RT/$PROD_NAM/$PROD_VER.version ];then return 0
-        else                                                 return 1;fi
+        vf=$PRODS_RT/$PROD_NAM/$PROD_VER.version
+        if [ -f $vf ];then
+            if grep "FLAVOR.*$ups_flv" $vf >/dev/null;then  return 0
+            else                                            return 1; fi
+        else                                                return 1; fi
     else
-
-        ups_flv=`get_flv_64_to_32`
 
         # ups is special -- see if db is initializaed
         mkdir -p $PRODS_RT/.upsfiles
@@ -717,7 +719,13 @@ set_FLV()
 
 get_flv_64_to_32()
 {
-    echo $PROD_FLV | sed 's/64bit//'
+    flv_=`echo $PROD_FLV | sed 's/64bit//'`
+    case $flv_ in
+    Linux+2.4-2.3.2)   echo Linux;;
+    Linux+2.6-2.3.4)   echo Linux+2.6;;
+    Linux+2.6-2.5)     echo Linux+2.6-2.5;;
+    *)                 echo $flv_;;
+    esac
     if expr "$PROD_FLV" : '.*64bit' >/dev/null;then return 0
     else                                            return 1; fi
 }
