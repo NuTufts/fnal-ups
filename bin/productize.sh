@@ -31,10 +31,10 @@ Options:
 --stages=              dflt: build:install:declare
 --configure=           *B configure options (for prods that use \"configure\")
 --clean                *B
---no-src               *I do not copy src (not implemented yet)
---redo                 will redo some operation that appear to be done
---quiet                output from the stages is only in <stage-flv>.out
---out
+#--no-src               *I do not copy src (not implemented yet)
+#--redo                 will redo some operation that appear to be done
+#--quiet                output from the stages is only in <stage-flv>.out
+#--out
 -v
 
 *B - build  stage option
@@ -149,7 +149,7 @@ set_NAM_and_VER()   # $1=nam-ver
         #   boost_1_34_1        -> boost     v1_34_1
         #   libsigc++-2.2.3     -> libsigcxx v2_2_3
         nam_ver=`basename $PWD`
-        prod_=`echo "$nam_ver" | sed 's/[-_]v*[0-9][-0-9.a-zA-z]*$//'`
+        prod_=`echo "$nam_ver" | sed 's/[-_]v*[0-9][-0-9.a-zA-Z]*$//'`
          ver_=`expr "$nam_ver" : "${prod_}[-_]\(.*\)"`
         prod_=`echo "$prod_" | sed 's/++/xx/'`    # libsigc++ -> libsigcxx
     fi
@@ -268,6 +268,9 @@ if set_NAM_and_VER;then
 else
     exit 1
 fi
+
+# check write permissions...
+# 
 
 get_productization_lib
 
