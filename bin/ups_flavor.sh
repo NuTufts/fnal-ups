@@ -18,7 +18,7 @@ opts_wo_args='v|ups'
 USAGE="\
 Attempt to tell the \"flavor\" of the bin and lib sub directories based on
 the info from the files in those directories.
-  usage: $APP [-?|$opts_wo_args]
+  usage: $APP [-?|$opts_wo_args] [dir]
 example: cd some/dir
          $APP
 "
@@ -46,6 +46,10 @@ while op=`expr "${1-}" : '-\(.*\)'`;do
         done
     fi
 done
+
+if [ $# -gt 1 ];then echo "$USAGE";exit; fi
+if [ $# -eq 1 ];then cd $1 >/dev/null; fi
+
 echov()  { if [ ${opt_v-0} -ge 1 ];then echo "$@"; fi; }
 echovv() { if [ ${opt_v-0} -ge 2 ];then echo "$@"; fi; }
 
@@ -129,6 +133,11 @@ add_to_fq_list()
             add_str="$add_str${tab}$xx"
             str_idx=`expr $str_idx + 1`
         done
+        xx=`echo "$_fq" | cut -d"$tab" -f$str_idx-`
+        yy="$1$tab$2$tab$3"
+        if [ "$1 $2 $3" = '0 0 0' ];then yy=$xx;fi
+        if [ "$xx" != "$yy" ];then echo "Strange: \"$xx\" != \"$yy\"" >&2;fi
+        add_str="$add_str${tab}$yy"
         if [ "$fq_list" ];then
             fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$add_str"`
         else
@@ -139,15 +148,15 @@ add_to_fq_list()
         if [ $add_os != ANY ];then
             fq_list=`echo "$fq_list" | grep -v "^$add_fq$tab"`
             if [ "$fq_list" ];then
-                fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"`
+                fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4${tab}$5${tab}$6${tab}$7"`
             else
-                fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"
+                fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4${tab}$5${tab}$6${tab}$7"
             fi
         fi
     elif [ "$fq_list" ];then
-        fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"`
+        fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4${tab}$5${tab}$6${tab}$7"`
     else
-        fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4"
+        fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4${tab}$5${tab}$6${tab}$7"
     fi
     echov fq_list lines: `echo "$fq_list" | wc -lc`
 }
@@ -206,6 +215,9 @@ for dd in $dirsOfInterest;do
             bits=0           bits_file=
             prbsl4=          prbsl4_file=
             prbsl5=          prbsl5_file=
+            sect_got_plt=0   sect_got_plt_file=
+            sect_hash=0      sect_gnu_file=
+            sect_gnu_hash=0  sect_gnu_hash_file=
             for vv in k $VERS;do
                 eval "${vv}lo=16777215 ${vv}lo_file="
                 eval "${vv}lx=0        ${vv}lx_file="
@@ -233,8 +245,9 @@ for dd in $dirsOfInterest;do
                         :
                     fi
                     os=`adjust_os "$os"`
+                    elfVS=`readelf -VS $ff`
                     for vv in $VERS;do
-                        vers=`readelf -V $ff | awkvers $vv`
+                        vers=`echo "$elfVS" | awkvers $vv`
                         lo_hi=`echo "$vers" | awkhilo`
                         if lo=`expr "$lo_hi" : '\([0-9][0-9]*\)'`;then
                             hi=`expr "$lo_hi" : '[0-9][0-9]* \([0-9][0-9]*\)'`
@@ -245,13 +258,22 @@ for dd in $dirsOfInterest;do
                             "
                         fi
                     done
+                    if echo "$elfVS" | grep ' \.got\.plt' >/dev/null;then
+                        sect_got_plt=1  sect_got_plt_file=$ff
+                    fi
+                    if echo "$elfVS" | grep ' \.hash' >/dev/null;then
+                        sect_hash=1     sect_hash_file=$ff
+                    fi
+                    if echo "$elfVS" | grep ' \.gnu\.hash' >/dev/null;then
+                        sect_gnu_hash=1 sect_gnu_hash_file=$ff
+                    fi
                     ;;
                 "current ar archive"|ELF*relocatable)
                     # attempt to look inside the archive for ELF files
                     ee=`readelf -hg $ff`
                     if cc=`echo "$ee" | grep 'Class:.*ELF'`;then
                         bits=`expr "$cc" : '.*ELF\([0-9]*\)'`
-                        echov "bits=$bits"
+                        echovv "bits=$bits"
                         if echo "$ee" | grep 'i686\.get_pc_' >/dev/null;then
                             if [ -z "$prbsl5" ];then prbsl5=Y prbsl5_file=$ff;fi
                         else
@@ -302,8 +324,10 @@ for dd in $dirsOfInterest;do
                 eval "hi=\$${vv}hi hi_file=\$${vv}hi_file"
                 vers_str="$vers_str $hi"
             done
-            add_to_fq_list "$fq" "$fq_dd" $os "$bits" $vers_str
-        fi
+            add_to_fq_list "$fq" "$fq_dd" $os "$bits" $vers_str $sect_got_plt $sect_hash $sect_gnu_hash
+        else
+            echov "no files in subdir $ss"
+        fi # "$files"
         popd >/dev/null
     done   # ss
     popd >/dev/null
@@ -314,38 +338,103 @@ echov "$fq_list"
 if [ "$fq_list" ];then
     IFSsav=$IFS
     #IFS="${tab}"
-    echo "$fq_list" | while read fq dd os bit klo GLIBC_hi GLIBCXX_hi CXXABI_hi;do
+    echo "$fq_list" | while read fq dd os bit klo GLIBC_hi GLIBCXX_hi CXXABI_hi sect_got_plt sect_hash sect_gnu_hash;do
         echov "-----> fq=$fq dd=$dd os=$os bit=$bit klo=$klo"
+        kvdot=`dec2dot $klo`
         if [ "$bit" = 64 ];then bit=64bit; else bit=; fi
-                kvdot=`dec2dot $klo`
-                if   [ $klo -eq 16777215 -a $os = ANY ];then
-                    if [ "$fq" != . -o $list_sz -eq 1 ];then
-                        echo "flavor=NULL fq=$fq"
-                    fi
-                elif [ $klo -ge 132617 -a $klo -lt 16777215 ];then  # 2.6.9
+
+        # Marc says basically
+        #   lts3 = ups flavor -1   ==>  Linux
+        #   sl4  = ups flavor -3   ==>  Linux+2.6
+        #   sl5  = ups flavor -4   ==>  Linux+2.6-2.5
+        # for SL4: (ref notes for 2009.08.24)
+        # SO, the "default" for 32 bit (i386/i686??) seems to be 2.0.0 while the
+        # default for 64 bit seems to be 2.4.0
+        if [ "$bit" = 64bit ];then
+            if [ "$sect_got_plt $sect_hash $sect_gnu_hash" != '0 0 0' ];then
+                case "$sect_got_plt $sect_hash $sect_gnu_hash" in
+                "0 1 0") echo "flavor=$os$bit fq=$fq";;   # LTS3
+                "1 1 0")                                  # SLF4
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    if [ "${opt_ups-}" ];then kvdot=2.6; fi
+                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
+                    echo "flavor=$flavor fq=$fq";;
+                "1 0 1")                                  # SLF5
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
                     if [ "${opt_ups-}" ];then gldot=2.5
                     else                      gldot=`dec2dot $GLIBC_hi`; fi
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                    echo "flavor=$flavor fq=$fq"
-                    # need to make fq keyed dictionary of flavors
-                elif [ $klo -ge 131589 -a $klo -lt   132617 ];then  # 2.2.5
+                    echo "flavor=$flavor fq=$fq";;
+                *)  echo "unexpected value";;
+                esac
+            elif [ $klo -eq 16777215 -a $os = ANY ];then
+                if [ "$fq" != . -o $list_sz -eq 1 ];then
+                    echo "flavor=NULL fq=$fq"
+                fi
+            elif [   \( $klo      -ge 132608 -a $klo      -lt 16777215 \) \
+                  -o \( $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 \) ];then
+                # could be SL5
+                if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                if [ "${opt_ups-}" ];then gldot=2.5
+                else                      gldot=`dec2dot $GLIBC_hi`; fi
+                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
+                echo "flavor=$flavor fq=$fq"
+            elif [   \( $klo      -ge 131589 -a $klo      -lt   132617 \) \
+                  -o \( $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 \) ];then
+                # could be SL4
+                if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                if [ "${opt_ups-}" ];then kvdot=2.6; fi
+                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
+                echo "flavor=$flavor fq=$fq"
+            elif [ $klo -ge 131072 -a $klo -lt   131589 ];then  # 2.0.0
+                # could be LTS3
+                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
+                if [ "${opt_ups-}" ];then flavor=$os$bit; fi
+                echo "flavor=$flavor fq=$fq"
+            else
+                echo "flavor=$os fq=$fq"
+            fi
+        else
+            if [ "$sect_got_plt $sect_hash $sect_gnu_hash" != '0 0 0' ];then
+                case "$sect_got_plt $sect_hash $sect_gnu_hash" in
+                "0 1 0") echo "flavor=$os$bit fq=$fq";;   # LTS3
+                "1 1 0")                                  # SLF4
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
                     if [ "${opt_ups-}" ];then kvdot=2.6; fi
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                    echo "flavor=$flavor fq=$fq"
-                elif [ $klo -ge 131072 -a $klo -lt   131589 ];then  # 2.0.0
-                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                    if [ "${opt_ups-}" ];then flavor=$os$bit; fi
-                    echo "flavor=$flavor fq=$fq"
-                elif [ $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 ];then # 2.4.0
-                    gldot=`dec2dot $GLIBC_hi`
-                    # guess kernel 2.6
-                    flavor=$os$bit+2.6-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                    echo "flavor=$flavor fq=$fq"
-                elif [ $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 ];then # 2.3.0
-                    # guess kernel 2.2
-                    flavor=$os$bit+2.2
-                    echo "flavor=$flavor fq=$fq"
+                    echo "flavor=$flavor fq=$fq";;
+                "1 0 1")                                  # SLF5
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    if [ "${opt_ups-}" ];then gldot=2.5
+                    else                      gldot=`dec2dot $GLIBC_hi`; fi
+                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
+                    echo "flavor=$flavor fq=$fq";;
+                *)  echo "unexpected value";;
+                esac
+            elif [ $klo -eq 16777215 -a $os = ANY ];then
+                if [ "$fq" != . -o $list_sz -eq 1 ];then
+                    echo "flavor=NULL fq=$fq"
                 fi
+            elif [   \( $klo      -ge 132608 -a $klo      -lt 16777215 \) \
+                  -o \( $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 \) ];then
+                # could be SL5
+                if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                if [ "${opt_ups-}" ];then gldot=2.5
+                else                      gldot=`dec2dot $GLIBC_hi`; fi
+                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
+                echo "flavor=$flavor fq=$fq"
+            elif [   \( $klo      -ge 131072 -a $klo      -lt   132608 \) \
+                  -o \( $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 \) ];then
+                # could be SL4
+                if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                if [ "${opt_ups-}" ];then kvdot=2.6; fi
+                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
+                echo "flavor=$flavor fq=$fq"
+            else
+                # could be LTS3
+                echo "flavor=$os fq=$fq"
+            fi
+        fi
     done
     IFS=$IFSsav
 fi
