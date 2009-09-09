@@ -9,16 +9,22 @@ if [ "$1" = -x ];then set -x;shift; fi
 set -u
 
 opts_wo_args='v|n|ups|y'
+opts_w_args='deps|vars'
 USAGE="\
    usage: `basename $0` [options] <dir>...
 examples: `basename $0` --ups .
-options=$opts_wo_args
+options=$opts_wo_args or $opts_w_args
 "
 do_opt="\
   case \$opt in
   \\?|h|help)    echo \"\$USAGE\"; exit 0;;
   $opts_wo_args) vv=opt_\`echo \$opt |sed -e 's/-/_/g'\`
                  eval xx=\\\${\$vv-0};eval \"\$vv=\`expr \$xx + 1\`\";;
+  $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
+                 elif [      $#      -ge 1  ];then arg=\$1; shift
+                 else  echo \"option \$opt requires argument\"; exit 1; fi
+                 eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
+                 opts=\"\$opts '\$arg'\";;      # tricky part Aa
   *) echo \"invalid option: \$opt\" 2>&1;echo \"\$USAGE\" 2>&1; exit 1;;
   esac"
 while op=`expr "${1-}" : '-\(.*\)'`;do
@@ -142,7 +148,7 @@ for dd in "$@";do
             QUAL="-q`echo $qq | tr _ :`"
         elif [ "$PROD_FQ" != . -a "$PROD_FQ" != "$PROD_FLV" ];then
             prod_name_uc=`echo $PROD_NAM | tr '[a-z]' '[A-Z]'`
-            VAR="--vars=${VAR:+$VAR,}${prod_name_uc}_FQ=$PROD_FQ"
+            VAR="--vars=${prod_name_uc}_FQ=$PROD_FQ${VAR:+,$VAR}"
         fi
 
         if [ -z "${QUAL-}" -a -z "${DEP-}" -a -z "${VAR-}" ];then
