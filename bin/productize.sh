@@ -140,8 +140,8 @@ set_NAM_and_VER()   # $1=nam-ver
         echo "name/ver=$nam_ver"
         prod_=`expr "$nam_ver" : '\([^/][^/]*\)'`
          ver_=`expr "$nam_ver" : '[^/][^/]*/\([^/][^/]*\)'`
-        stages=`echo :$stages:|sed 's/:build:/:/;s/:install:/:/;s/^://;s/:$//'`
-        echo "set stages=$stages"
+        #stages=`echo :$stages:|sed 's/:build:/:/;s/:install:/:/;s/^://;s/:$//'`
+        #echo "set stages=$stages"
     else
         # tests:
         #   gcc-4.1.2-20080102  -> gcc       v4_1_2_20080102
