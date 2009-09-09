@@ -8,11 +8,12 @@
 if [ "$1" = -x ];then set -x;shift; fi
 set -u
 
-USAGE="\
-   usage: `basename $0` <dir>...
-examples: `basename $0` <dir>...
-"
 opts_wo_args='v|n|ups|y'
+USAGE="\
+   usage: `basename $0` [options] <dir>...
+examples: `basename $0` --ups .
+options=$opts_wo_args
+"
 do_opt="\
   case \$opt in
   \\?|h|help)    echo \"\$USAGE\"; exit 0;;
@@ -113,6 +114,7 @@ for dd in "$@";do
         echo "#    $flavor $fq"
         PROD_FLV=`expr $flavor : 'flavor=\(.*\)'`
         PROD_FQ=`expr $fq : 'fq=\(.*\)'`
+        VAR=${opt_vars-}
 
         opt_K="PRODUCT:VERSION:FLAVOR:QUALIFIERS:CHAIN:PROD_DIR"
         ll=`ups list -aK$opt_K -z$PRODS_DB -f$PROD_FLV $PROD_NAM $PROD_VER`
@@ -122,8 +124,8 @@ for dd in "$@";do
         fi
 
         if [ ! -d ups ];then cmd "    mkdir ups"; fi
-        if   [ -f ups/$PROD_NAM.table ];then tblf=$PROD_NAM.table
-        elif [ -f ups/generic.table   ];then tblf=generic.table
+        if   [ -f ups/$PROD_NAM.table ];then tbld=ups tblf=$PROD_NAM.table
+        elif [ -f ups/generic.table   ];then tbld=ups tblf=generic.table
         else
             # need to have a table file
             if [ ! -f $UPS_DIR/ups/generic.table ];then
@@ -132,20 +134,32 @@ for dd in "$@";do
                 echo "Please try to generate a table file."
                 continue
             else
-                tblf=$PROD_NAM.table
-                if   qq=`expr "$PROD_FQ" : "${PROD_FLV}_\(.*\)"`;then
-                    QUAL="-q`echo $qq | tr _ :`"
-                elif [ "$PROD_FQ" != . -a "$PROD_FQ" != "$PROD_FLV" ];then
-                    prod_name_uc=`echo $PROD_NAM | tr '[a-z]' '[A-Z]'`
-                    VAR="--vars=${VAR+$VAR,}${prod_name_uc}_FQ=$PROD_FQ"
-                fi
-                if [ -z "${QUAL-}" -a -z "${DEP-}" -a -z "${VAR-}" ];then
-                    cmd "    cp $UPS_DIR/ups/generic.table ups/$tblf"
-                else
-                    cmd "    ups_table.sh -f $PROD_FLV ${QUAL-} ${DEP+"$DEP"} ${VAR+"$VAR"} >ups/$tblf"
-                fi
+                tbld=$UPS_DIR/ups tblf=$PROD_NAM.table
             fi
         fi
+
+        if   qq=`expr "$PROD_FQ" : "${PROD_FLV}_\(.*\)"`;then
+            QUAL="-q`echo $qq | tr _ :`"
+        elif [ "$PROD_FQ" != . -a "$PROD_FQ" != "$PROD_FLV" ];then
+            prod_name_uc=`echo $PROD_NAM | tr '[a-z]' '[A-Z]'`
+            VAR="--vars=${VAR:+$VAR,}${prod_name_uc}_FQ=$PROD_FQ"
+        fi
+
+        if [ -z "${QUAL-}" -a -z "${DEP-}" -a -z "${VAR-}" ];then
+            if [ "$tbld" != ups ];then
+                cmd "    cp $UPS_DIR/ups/generic.table ups/$tblf"
+            else
+                echo "# tblf OK"
+            fi
+        else
+            if [ "$tbld" != ups ];then
+                cmd "    ups_table.sh add_fq -f $PROD_FLV ${QUAL-} ${DEP+"$DEP"} ${VAR+"$VAR"} >ups/$tblf"
+            else
+                cmd "    mv ups/$tblf{,.old}"
+                cmd "    ups_table.sh add_fq -mups/$tblf.old -f $PROD_FLV ${QUAL-} ${DEP+"$DEP"} ${VAR+"$VAR"} >ups/$tblf"
+            fi
+        fi
+
         declare="ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER -Mups"
         declare="$declare -m$tblf -f$PROD_FLV $PROD_NAM $PROD_VER"
         cmd "    $declare"
