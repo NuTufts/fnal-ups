@@ -15,17 +15,20 @@ the components of the qualifer such that the search for a \"bin\" or \"lib\"
 directory containing the string will succeed.
 
    usage: `basename $0` [-opts] <prod_dir> <flavor> [qualifier_list]
-       OR `basename $0` test
+       OR `basename $0` test|ups_env
 examples: `basename $0` /p/ups/v99 Linux64bit+2.6-2.5
           `basename $0` /p/ups/v99 Linux64bit+2.6-2.5 debug
           `basename $0` /p/ups/v99 Linux64bit+2.6-2.5 debug:cms
           `basename $0` --set=debug:xxx /p/ups/v99 Linux64bit+2.6-2.5 debug:cms
-
+If arg is \"test\" then tests are run.
+If arg is \"ups_env\" then args are taken from env.vars:
+  \${UPS_PROD_DIR} \${UPS_PROD_FLAVOR} \${UPS_PROD_QUALIFIERS}
+options:
 --add=     add to the default Known Build Qualifiers list
 --set=     set the Known Build Qualifiers list
 --get      do not look for dir, just echo 1st possibility
 
-If both, set 1st, then add.
+If both --set and --add, set 1st, then add.
 The default Known Build Qualifiers list is $KnownBldQuals
 "
 while opt=`expr "${1-}" : '-\([^=]*\)'`;do
@@ -41,7 +44,12 @@ while opt=`expr "${1-}" : '-\([^=]*\)'`;do
 done
 
 if   [ $# -eq 1 ];then
-    if [ "${1-}" != test ];then echo "$USAGE";exit 1;fi
+    if [ "${1-}" = ups_env -o "${1-}" = UPS_ENV ];then
+        set "${UPS_PROD_DIR-}" "${UPS_PROD_FLAVOR-}" "${UPS_PROD_QUALIFIERS-}"
+    elif [ "${1-}" != test ];then
+        echo "$USAGE"
+        exit 1
+    fi
 elif [ $# -lt 2 -o $# -gt 3 ];then
     echo "$USAGE";exit 1
 fi
@@ -123,7 +131,8 @@ if [ "$1" != test ];then
             fi
         done
     fi
-    echo "no prod_dir/flavor_qualifer dir" >&2; exit 1
+    echo .
+    #echo "no prod_dir/flavor_qualifer dir" >&2; exit 1
 else
     # test
     tmpdir=/tmp/`basename $0`.$$

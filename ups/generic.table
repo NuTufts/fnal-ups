@@ -14,27 +14,20 @@ Qualifiers=""
 #Qualifiers="debug"
 #    ACTION = setup
 #        setupRequired( test_boost -j v1_0 )
-#        exeActionRequired("setup__")
 #        envSet( XX, yy )
+#        exeActionRequired("setup__")
 
 COMMON:
    ACTION = setup__
-	# the following is necessary so that both setup and unsetup will work. For unsetup, "if(cmd)" and "unless(cmd)" cmd's happen but the stuff within does not
-	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
-	if    ( unsetenv _FQ && unset setenv unsetenv )
-	    execute( true, NO_UPS_ENV )
-	endif ( unsetenv _FQ && unset setenv unsetenv )
-	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
-
-	# want to abort if there is a problem found by ups_FQ
-	unless    ( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
-	    sourceRequired( "no_-_DIRECTORY_flavor-qualifier", NO_UPS_ENV )
-	endUnless ( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ${UPS_PROD_DIR} ${UPS_PROD_FLAVOR} ${UPS_PROD_QUALIFIERS};exit $?;fi;done'` )
-
         setupEnv()
         proddir()
 
-	envSet( ${UPS_PROD_NAME_UC}_FQ, `test -n "$_FQ" && echo "$_FQ" || echo .` )
+	# For unsetup, "if(cmd)" and "unless(cmd)" cmd's happen but the stuff within does not
+	# For unsetup, the "execute" statements do not happen but the if/unless statements do
+	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
+
+	execute( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ups_env;exit $?;fi;done'`, UPS_ENV )
+	envSet( ${UPS_PROD_NAME_UC}_FQ, $_FQ )
 
 	# These are use by other products' build system
 	# double(2) double-quotes(") is a bit of trick - ups is enclosing things inside of double quotes so it thinks it can strip off the first and last...
@@ -55,26 +48,22 @@ COMMON:
 	if    ( test ! -d ${UPS_PROD_DIR}/bin )
 	    pathRemove( PATH, ${UPS_PROD_DIR}/bin, :)
 	endif ( test ! -d ${UPS_PROD_DIR}/bin )
-	if    ( expr "$${UPS_PROD_NAME_UC}_BIN" : '.*/\.$' >/dev/null || test ! -d $${UPS_PROD_NAME_UC}_BIN )
+	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_BIN )
 	    pathRemove( PATH, $${UPS_PROD_NAME_UC}_BIN, :)
 	    # must leave _BIN env for pathRemove which will happen during unsetup (un-action for pathPrepend)
-	endif ( expr "$${UPS_PROD_NAME_UC}_BIN" : '.*/\.$' >/dev/null || test ! -d $${UPS_PROD_NAME_UC}_BIN )
+	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_BIN )
 
-	if    ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
+	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 	    envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
-	endif ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
+	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 
 	if    ( test ! -d ${UPS_PROD_DIR}/man )
 	    envRemove( MANPATH, ${UPS_PROD_DIR}/man, :)
 	endif ( test ! -d ${UPS_PROD_DIR}/man )
-	if    ( expr "${${UPS_PROD_NAME_UC}_FQ}" : '.*/\.$' >/dev/null || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
+	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
 	    envRemove( MANPATH, ${${UPS_PROD_NAME_UC}_FQ}/man, :)
-	endif ( expr "${${UPS_PROD_NAME_UC}_FQ}" : '.*/\.$' >/dev/null || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
+	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
 
-	# this if is for unsetup, where the "execute" statements do not happen but the if/unless statements do
-	if    ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }' )
-	    execute( true, NO_UPS_ENV )
-	endif ( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }' )
 	execute( unsetenv _FQ && unset setenv unsetenv, NO_UPS_ENV )
 
 	# ADD common env vars here
