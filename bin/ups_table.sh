@@ -11,8 +11,9 @@ USAGE="\
 table file to add qualified (or build) and non-qualified dependencies
 and qualified (or build) and non-qualified env. variables.
 
-   usage: `basename $0` [opt] <cmd=add_fq>
- example: `basename $0` add_fq
+   usage: `basename $0` <cmd=add_fq> [options]
+examples: `basename $0` add_fq
+          `basename $0` add_fq -f Linux+2.6-2.5 --vars=OSPL_FQ=HDE_gcc41/x86.linux2.6
 options:
   -f flavor
   -q qualifiers
