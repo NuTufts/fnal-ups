@@ -37,8 +37,8 @@ COMMON:
 
 	prodDir( _BIN, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/bin bin/$${UPS_PROD_NAME_UC}_FQ bin.$${UPS_PROD_NAME_UC}_FQ;do [ -d ${UPS_PROD_DIR}/$dd ] && echo $dd && exit;done;echo .'`"" )
 
-	pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
 	pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_BIN}, :)
+	pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
 	envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
 
 	envSetIfNotSet( MANPATH, "`man -w`" )
@@ -48,14 +48,14 @@ COMMON:
 	if    ( test ! -d ${UPS_PROD_DIR}/bin )
 	    pathRemove( PATH, ${UPS_PROD_DIR}/bin, :)
 	endif ( test ! -d ${UPS_PROD_DIR}/bin )
-	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_BIN )
+	if    ( test ! -d $${UPS_PROD_NAME_UC}_BIN )
 	    pathRemove( PATH, $${UPS_PROD_NAME_UC}_BIN, :)
-	    # must leave _BIN env for pathRemove which will happen during unsetup (un-action for pathPrepend)
-	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_BIN )
+	    # must leave _BIN (and _LIB (below)) env for pathRemove which will happen during unsetup (un-action for pathPrepend)
+	endif ( test ! -d $${UPS_PROD_NAME_UC}_BIN )
 
-	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
+	if    ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 	    envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
-	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
+	endif ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 
 	if    ( test ! -d ${UPS_PROD_DIR}/man )
 	    envRemove( MANPATH, ${UPS_PROD_DIR}/man, :)
