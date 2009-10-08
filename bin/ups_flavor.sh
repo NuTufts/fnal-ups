@@ -111,32 +111,43 @@ add_to_fq_list()
     add_bits=$1; shift
     echov "add_fq=$add_fq add_dd=$add_dd add_os=$add_os add_bits=$add_bits $*"
     if _fq=`echo "$fq_list" | grep "^$add_fq$tab"`;then
-        fq_list=`echo "$fq_list" | grep -v "^$add_fq$tab"`
+        fq_list=`echo "$fq_list" | grep -v "^$add_fq$tab"`    # remove the existing one from the list
         #echov fq_list grep-v lines: `echo "$fq_list" | wc -lc`
         echov "fq_list: $fq_list"
-        _add_dd=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $2;}'`
-        _add_os=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $3;}'`
-        if [ $_add_os != ANY ];then add_os=$_add_os;fi
-        _add_bits=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $4;}'`
-        if [ $_add_bits -gt $add_bits ];then add_bits=$_add_bits;fi
+        # prv is for "previous" (the fq we just removed)
+        prv_dd=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $2;}'`
+        prv_os=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $3;}'`
+        if [ $prv_os != ANY ];then add_os=$prv_os;fi
+        prv_bits=`echo "$_fq" | awk 'BEGIN{FS="\t";}{print $4;}'`
+        if [ $prv_bits -gt $add_bits ];then add_bits=$prv_bits;fi
         add_str=
         str_idx=5
-        xx=`echo "$_fq" | awk "BEGIN{FS=\"\\\t\";}{print \\\$$str_idx;}"`
-        yy=$1;shift
-        if [ $yy -lt $xx ];then xx=$yy;fi
-        add_str="$xx"
+        prv=`echo "$_fq" | awk "BEGIN{FS=\"\\\t\";}{print \\\$$str_idx;}"`
+        yy=$1;shift   # should be klo
+        if [ $yy -lt $prv ];then prv=$yy;fi
+        add_str="$prv"
         str_idx=`expr $str_idx + 1`
         for vv in $VERS;do
-            xx=`echo "$_fq" | awk "BEGIN{FS=\"\\\t\";}{print \\\$$str_idx;}"`
+            prv=`echo "$_fq" | awk "BEGIN{FS=\"\\\t\";}{print \\\$$str_idx;}"`
             yy=$1;shift
-            if [ $yy -gt $xx ];then xx=$yy;fi
-            add_str="$add_str${tab}$xx"
+            if [ $yy -gt $prv ];then prv=$yy;fi
+            add_str="$add_str${tab}$prv"
             str_idx=`expr $str_idx + 1`
         done
-        xx=`echo "$_fq" | cut -d"$tab" -f$str_idx-`
+        # check for any weirdness in the new values (and just stick with the old in that case)
+        #  got_plt  hash   gnu_hash
+        #     0       0       0         invalid
+        #     0       0       1         invalid
+        #     0       1       0        Linux     +2.4-2.3.2    i.e. LTS3
+        #     0       1       1         invalid
+        #     1       0       0         invalid
+        #     1       0       1        Linux     +2.6-2.5      i.e. SL5
+        #     1       1       0        Linux     +2.6-2.3.4    i.e. SL4
+        #     1       1       1         invalid
+        prv=`echo "$_fq" | cut -d"$tab" -f$str_idx-`
         yy="$1$tab$2$tab$3"
-        if [ "$1 $2 $3" = '0 0 0' ];then yy=$xx;fi
-        if [ "$xx" != "$yy" ];then echo "Strange: \"$xx\" != \"$yy\"" >&2;fi
+        if [ "$1 $2 $3" = '0 0 0' ];then yy=$prv;fi
+        if [ "$prv" != "$yy" ];then echo "Strange: \"$prv\" != \"$yy\"" >&2;fi
         add_str="$add_str${tab}$yy"
         if [ "$fq_list" ];then
             fq_list=`echo "$fq_list";echo "$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$add_str"`
@@ -360,9 +371,12 @@ if [ "$fq_list" ];then
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
                     echo "flavor=$flavor fq=$fq";;
                 "1 0 1")                                  # SLF5
-                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                    if [ "${opt_ups-}" ];then gldot=2.5
-                    else                      gldot=`dec2dot $GLIBC_hi`; fi
+                    if [ "${opt_ups-}" ];then
+                        gldot=2.5 kvdot=2.6
+                    else
+                        if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                        gldot=`dec2dot $GLIBC_hi`
+                    fi
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
                     echo "flavor=$flavor fq=$fq";;
                 *)  echo "unexpected value";;
@@ -404,9 +418,12 @@ if [ "$fq_list" ];then
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
                     echo "flavor=$flavor fq=$fq";;
                 "1 0 1")                                  # SLF5
-                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                    if [ "${opt_ups-}" ];then gldot=2.5
-                    else                      gldot=`dec2dot $GLIBC_hi`; fi
+                    if [ "${opt_ups-}" ];then
+                        gldot=2.5 kvdot=2.6
+                    else
+                        if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                        gldot=`dec2dot $GLIBC_hi`
+                    fi
                     flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
                     echo "flavor=$flavor fq=$fq";;
                 *)  echo "unexpected value";;
