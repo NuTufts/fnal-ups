@@ -61,22 +61,24 @@ setenv UPS_SHELL $ss
 test -n "$db"        && set_ pdp=`sed -n '/^ *PROD_DIR_PREFIX/{s/.*= *//;s|${UPS_THIS_DB}|'"$db|;p;}" $db/.upsfiles/dbconfig`
 # the following assumes VERSION immediately follows FLAVOR in the current.chain file
 set_ ver= flv= chainf=$db/ups/current.chain
-test -n "$db" -a -f $chainf              && set_ ver=`sed -n "/${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl1
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl2
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl3
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl4
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl5
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl6
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl7
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl8
+test -n "$db" -a -f $chainf              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl1
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl2
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl3
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl4
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl5
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl6
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl7
+test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl8
 
 test -n "$db" && echo "the current version of ups for this flavor is $ver "`test -n "$ver" && echo "flv=$flv"`
 
 # now get the prddir and exe
-test -n "$ver" && set_ prddir=`sed -n -e "/$flv/,/PROD_DIR/{" -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` && echo "prddir=$prddir"
+test -n "$ver" && set_ prddir=`sed -n -e "/[ 	]*$flv$/,/PROD_DIR/{" -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` && echo "prddir=$prddir"
 # NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin ls is smart).
-tnotnull prddir && nullout ls $prddir/bin/ups && set_ exe=$prddir/bin/ups || set_ exe=`which ups` || set_ exe=
-test -z "$exe" && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
+tnotnull prddir && nullout ls $prddir/bin/ups      && set_ exe=$prddir/bin/ups      || set_ exe=
+tnotnull prddir && test -z "$exe"  && nullout ls $prddir/$flv/bin/ups && set_ exe=$prddir/$flv/bin/ups
+test -z "$exe"  && set_ exe=`which ups`
+test -z "$exe"  && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
 tnotnull PRODUCTS && set_ products=$PRODUCTS || set_ products=$db; expr ":${products}:" : ".*:${db}:" >/dev/null || set_ products=${db}:$products
 tnotnull UPS_DIR && setenv PATH `echo :${PATH}: | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv SETUP_UPS UPS_DIR
 test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
@@ -87,4 +89,5 @@ test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
 test -n "$exe" && test -f "$db/setup.initial" && source "$db/setup.initial"
 
 test "$ss" = csh && unalias tnotnull nullout set_
-unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 fl7 fl8 pdp ver flv chainf prddir exe products olddb  set_ setenv unsetenv tnotnull source nullout ovexe ov
+unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 fl7 fl8 pdp ver flv chainf prddir prdbin exe products olddb
+unset set_ setenv unsetenv tnotnull source nullout ovexe ov
