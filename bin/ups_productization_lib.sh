@@ -9,7 +9,7 @@
 
 
 
-echov "hello from ups_productization_lib"
+echov "hello from ups_productization_lib.sh"
 
 # NOTE: all "stages" (build,install,install_fix,and declare) are run in a
 #       sub-shell. So do not set variables that are needed in other stages and
@@ -222,12 +222,13 @@ ups_install_fix()
 
 ups_declare()
 {
-    echov "ups declare $@"
     ups_flv=`get_flv_64_to_32`
+    echov "ups declare $@ ups_flv=$ups_flv"
     if [ "${1-}" = --status ];then
         vf=$PRODS_RT/$PROD_NAM/$PROD_VER.version
         if [ -f $vf ];then
-            if grep "FLAVOR.*$ups_flv" $vf >/dev/null;then  return 0
+            ups_flv_ere=`echo "$ups_flv" | sed 's/\([+.]\)/\\\\\1/g'`
+            if egrep "^[^#]*FLAVOR *= *$ups_flv_ere"'($|[ ])' $vf >/dev/null;then  return 0
             else                                            return 1; fi
         else                                                return 1; fi
     else
@@ -247,6 +248,9 @@ EOF
         fi
 
         cd build-$ups_flv
+
+# Should I act differently if under $PRODS_RT ????
+
         bin/ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER/$ups_flv -Mups \
             -m$PROD_NAM.table -f$ups_flv $PROD_NAM $PROD_VER
 
