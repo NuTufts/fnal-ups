@@ -20,6 +20,7 @@ options:
   -m table file
  --deps=
  --vars=
+ --alias=
 "
 set_opt()
 {
@@ -76,7 +77,7 @@ build_fq_ere()
 }
 
 #-------------------------------------------------------------------------
-
+# add the 
 add_fq()
 {
     set_opt "$@"
@@ -102,6 +103,8 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
 \";}"
     fi
 
+    # insert any depend product setups just after the "ACTION = setup" line
+    # that is added above
     if [ "${opt_deps-}" ];then
         sed_up=''
         sed_dn=''
@@ -127,6 +130,7 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
         awk_deps='{print;}'
     fi
 
+    # insert any variable definitions before the ``exeActionRequired("setup__")'' line
     if [ "${opt_vars-}" ];then
         vars=''
         IFSsav=$IFS IFS=,; for vv in $opt_vars;do IFS=$IFSsav
@@ -150,9 +154,38 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
         awk_vars='{print;}'
     fi
 
+    # insert any alias definitions before the ``exeActionRequired("setup__")'' line
+    if [ "${opt_alias-}" ];then
+        alias=''
+        IFSsav=$IFS IFS=,; for vv in $opt_vars;do IFS=$IFSsav
+            anam=`expr "$vv" : ' *\([^=]*\)'` # recall, there may be a " " after a "," IFS
+            adef=`expr "$vv" : '[^=]*=\(.*\)'`
+            alias="$alias        addAlias( $anam, $adef )\\n"
+        done
+        awk_alias="BEGIN{IGNORECASE=1;}
+ /^flavor *=/{flv=gensub(/flavor *= */,\"\",1);}
+ /^qualifiers *=/{qual=gensub(/qualifiers *= */,\"\",1);
+   if (flv == \"$FLV\" && qual == \"\\\"$QUAL\\\"\") {
+      do_it=1;
+   }
+ }
+ /^ *exeActionRequired/ {
+   if (do_it == 1) {printf \"$alias\";do_it=0;}
+ }
+ {print;}
+"
+    else
+        awk_alias='{print;}'
+    fi
 
-    cat $TBLF | awk "$awk_fq" | awk "$awk_deps" | awk "$awk_vars"
-}
+    # because vars and aliases are both inserted before the
+    # ``exeActionRequired("setup__")'' line, the order matters;
+    # they will appear in the output in the same order that they are in in the
+    # pipeline
+    cat $TBLF | awk "$awk_fq" | awk "$awk_deps" | awk "$awk_vars" \
+              | awk "$awk_alias"
+}   # add_fq
+
 list_fq()
 {
     set_opt "$@"
