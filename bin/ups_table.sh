@@ -13,18 +13,20 @@ and qualified (or build) and non-qualified env. variables.
 
    usage: `basename $0` <cmd=add_fq> [options]
 examples: `basename $0` add_fq
-          `basename $0` add_fq -f Linux+2.6-2.5 --vars=OSPL_FQ=HDE_gcc41/x86.linux2.6
+          `basename $0` add_fq -f Linux+2.6-2.5 --envvar=OSPL_FQ=HDE_gcc41/x86.linux2.6
 options:
   -f flavor
   -q qualifiers
   -m table file
- --deps=
- --vars=
- --alias=
+ --deps=    comma separated list of dependent products to setup
+ --envvar=    comma separated list: VAR=val[,VAR=val]...
+ --alias=   comma separated list: alias_name=alias_val[,alias_name=alias_val]...
+ --envpre=  comma separated list simalar to --envvar but value get prepended to
+               the variable list value.
 "
 set_opt()
 {
-    opts_w_args='m|f|q|deps|vars'
+    opts_w_args='m|f|q|deps|envvar|alias|envpre'
     opts_wo_args='v'
     do_opt="\
       case \$opt in
@@ -131,14 +133,14 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
     fi
 
     # insert any variable definitions before the ``exeActionRequired("setup__")'' line
-    if [ "${opt_vars-}" ];then
-        vars=''
-        IFSsav=$IFS IFS=,; for vv in $opt_vars;do IFS=$IFSsav
+    if [ "${opt_envvar-}" ];then
+        envvar=''
+        IFSsav=$IFS IFS=,; for vv in $opt_envvar;do IFS=$IFSsav
             vvar=`expr "$vv" : ' *\([^=]*\)'` # recall, there may be a " " after a "," IFS
             vval=`expr "$vv" : '[^=]*=\(.*\)'`
-            vars="$vars        envSet( $vvar, $vval )\\n"
+            envvar="$envvar        envSet( $vvar, $vval )\\n"
         done
-        awk_vars="BEGIN{IGNORECASE=1;}
+        awk_envvar="BEGIN{IGNORECASE=1;}
  /^flavor *=/{flv=gensub(/flavor *= */,\"\",1);}
  /^qualifiers *=/{qual=gensub(/qualifiers *= */,\"\",1);
    if (flv == \"$FLV\" && qual == \"\\\"$QUAL\\\"\") {
@@ -146,18 +148,42 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
    }
  }
  /^ *exeActionRequired/ {
-   if (do_it == 1) {printf \"$vars\";do_it=0;}
+   if (do_it == 1) {printf \"$envvar\";do_it=0;}
  }
  {print;}
 "
     else
-        awk_vars='{print;}'
+        awk_envvar='{print;}'
+    fi
+
+    # insert any envPrepend definitions before the ``exeActionRequired("setup__")'' line
+    if [ "${opt_envpre-}" ];then
+        envvar=''
+        IFSsav=$IFS IFS=,; for vv in $opt_envpre;do IFS=$IFSsav
+            vvar=`expr "$vv" : ' *\([^=]*\)'` # recall, there may be a " " after a "," IFS
+            vval=`expr "$vv" : '[^=]*=\(.*\)'`
+            envvar="$envvar        envPrepend( $vvar, $vval )\\n"
+        done
+        awk_envpre="BEGIN{IGNORECASE=1;}
+ /^flavor *=/{flv=gensub(/flavor *= */,\"\",1);}
+ /^qualifiers *=/{qual=gensub(/qualifiers *= */,\"\",1);
+   if (flv == \"$FLV\" && qual == \"\\\"$QUAL\\\"\") {
+      do_it=1;
+   }
+ }
+ /^ *exeActionRequired/ {
+   if (do_it == 1) {printf \"$envvar\";do_it=0;}
+ }
+ {print;}
+"
+    else
+        awk_envpre='{print;}'
     fi
 
     # insert any alias definitions before the ``exeActionRequired("setup__")'' line
     if [ "${opt_alias-}" ];then
         alias=''
-        IFSsav=$IFS IFS=,; for vv in $opt_vars;do IFS=$IFSsav
+        IFSsav=$IFS IFS=,; for vv in $opt_alias;do IFS=$IFSsav
             anam=`expr "$vv" : ' *\([^=]*\)'` # recall, there may be a " " after a "," IFS
             adef=`expr "$vv" : '[^=]*=\(.*\)'`
             alias="$alias        addAlias( $anam, $adef )\\n"
@@ -182,8 +208,8 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
     # ``exeActionRequired("setup__")'' line, the order matters;
     # they will appear in the output in the same order that they are in in the
     # pipeline
-    cat $TBLF | awk "$awk_fq" | awk "$awk_deps" | awk "$awk_vars" \
-              | awk "$awk_alias"
+    cat $TBLF | awk "$awk_fq"     | awk "$awk_deps"  | awk "$awk_envvar" \
+              | awk "$awk_envpre" | awk "$awk_alias"
 }   # add_fq
 
 list_fq()

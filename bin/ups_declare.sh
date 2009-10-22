@@ -9,7 +9,7 @@ if [ "$1" = -x ];then set -x;shift; fi
 set -u
 
 opts_wo_args='v|n|ups|y'
-opts_w_args='deps|vars'
+opts_w_args='deps|envvar|envpre|alias'
 USAGE="\
    usage: `basename $0` [options] <dir>...
 examples: `basename $0` --ups .
@@ -120,7 +120,6 @@ for dd in "$@";do
         echo "#    $flavor $fq"
         PROD_FLV=`expr $flavor : 'flavor=\(.*\)'`
         PROD_FQ=`expr $fq : 'fq=\(.*\)'`
-        VAR=${opt_vars-}
 
         opt_K="PRODUCT:VERSION:FLAVOR:QUALIFIERS:CHAIN:PROD_DIR"
         ll=`ups list -aK$opt_K -z$PRODS_DB -f$PROD_FLV $PROD_NAM $PROD_VER`
@@ -130,40 +129,51 @@ for dd in "$@";do
         fi
 
         if [ ! -d ups ];then cmd "    mkdir ups"; fi
-        if   [ -f ups/$PROD_NAM.table ];then tbld=ups tblf=$PROD_NAM.table
-        elif [ -f ups/generic.table   ];then tbld=ups tblf=generic.table
+        if   [ -f ups/$PROD_NAM.table ];then prd_has_upstbl=y tblf=$PROD_NAM.table
+        elif [ -f ups/generic.table   ];then prd_has_upstbl=y tblf=generic.table
         else
-            # need to have a table file
+            # need to have a table file from which to copy from
             if [ ! -f $UPS_DIR/ups/generic.table ];then
                 echo "Cannot find \$UPS_DIR/generic.table."
                 echo "Skipping ups declare for $PROD_NAM $PROD_VER."
                 echo "Please try to generate a table file."
                 continue
             else
-                tbld=$UPS_DIR/ups tblf=$PROD_NAM.table
+                prd_has_upstbl=n tblf=$PROD_NAM.table # create $PROD_NAM.table
             fi
         fi
 
         if   qq=`expr "$PROD_FQ" : "${PROD_FLV}_\(.*\)"`;then
             QUAL="-q`echo $qq | tr _ :`"
+            VAR=${opt_envvar+--envvar=$opt_envvar}
         elif [ "$PROD_FQ" != . -a "$PROD_FQ" != "$PROD_FLV" ];then
             prod_name_uc=`echo $PROD_NAM | tr '[a-z]' '[A-Z]'`
-            VAR="--vars=${prod_name_uc}_FQ=$PROD_FQ${VAR:+,$VAR}"
+            VAR="--envvar=${prod_name_uc}_FQ=$PROD_FQ${opt_envvar+,$opt_envvar}"
+        else
+            VAR=${opt_envvar+--envvar=$opt_envvar}
         fi
 
-        if [ -z "${QUAL-}" -a -z "${DEP-}" -a -z "${VAR-}" ];then
-            if [ "$tbld" != ups ];then
-                cmd "    cp $UPS_DIR/ups/generic.table ups/$tblf"
-            else
+
+        if [    -z "${QUAL-}"     -a -z "${VAR-}"\
+             -a -z "${opt_deps-}" -a -z "${opt_alias-}"\
+             -a -z "${opt_envpre-}" ];then
+            if [ "$prd_has_upstbl" = y ];then
                 echo "# tblf OK"
+            else
+                cmd "    cp $UPS_DIR/ups/generic.table ups/$tblf"
             fi
         else
-            if [ "$tbld" != ups ];then
-                cmd "    ups_table.sh add_fq -f $PROD_FLV ${QUAL-} ${DEP+"$DEP"} ${VAR+"$VAR"} >ups/$tblf"
-            else
+            if [ "$prd_has_upstbl" = y ];then
                 cmd "    mv ups/$tblf{,.old}"
-                cmd "    ups_table.sh add_fq -mups/$tblf.old -f $PROD_FLV ${QUAL-} ${DEP+"$DEP"} ${VAR+"$VAR"} >ups/$tblf"
+                tbl_src_opt="-mups/$tblf.old"
+            else
+                tbl_src_opt=
             fi
+            cmd "    ups_table.sh add_fq $tbl_src_opt -f $PROD_FLV ${QUAL-}\
+ ${opt_deps+--deps=\"$opt_deps\"}\
+ ${opt_alias+--alias=\"$opt_alias\"}\
+ ${opt_envpre+--envpre=\"$opt_envpre\"}\
+ ${VAR+\"$VAR\"} >ups/$tblf"
         fi
 
         declare="ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER -Mups"
