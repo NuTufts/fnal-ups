@@ -758,7 +758,10 @@ $sed 's%^	%%' <<XEoF >$BootStrap_Dir/${Script_Prefix}.csh
 	    if ( \$mach == CYGW ) setenv MACH_OS CYGWIN32_NT
 	    set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`'.'\`uname -v|sed -e 's/[ ()].*//'\`
 	    if ( "\$MACH_OS" == AIX ) set Full_Flavor="\$MACH_OS"'+'\`uname -v\`'.'\`uname -r\`
-	    if ( "\$MACH_OS" == Linux ) set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`
+	    if ( "\$MACH_OS" == Linux ) then
+                set Trailer="'\`uname -r|sed -e 's/[ ()].*//'\`"
+                set Full_Flavor="\${MACH_OS}+\${Trailer}"
+            endif
 	    if ( `uname -m` == "PPC" && "\$MACH_OS" == "Linux" ) set Full_Flavor="\$MACH_OS"\`uname -m\`'+'\`uname -v\`'.'\`uname -r|sed -e 's/[ ()].*//'\`
 	    if ( "\$MACH_OS" == CYGWIN32_NT ) set Full_Flavor="\$MACH_OS"'+'\`uname -r|sed -e 's/[ ()].*//'\`
 	endif
