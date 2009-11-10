@@ -145,12 +145,17 @@ for dd in "$@";do
 
         if   qq=`expr "$PROD_FQ" : "${PROD_FLV}_\(.*\)"`;then
             QUAL="-q`echo $qq | tr _ :`"
-            VAR=${opt_envvar+--envvar=$opt_envvar}
+            if [ "$PROD_FQ" != "$PROD_FLV" ];then
+                prod_name_uc=`echo $PROD_NAM | tr '[a-z]' '[A-Z]'`
+                INI="--envini=${prod_name_uc}_FQ=$PROD_FQ${opt_envini+,$opt_envini}"
+            else
+                INI=${opt_envvar+--envvar=$opt_envvar}
+            fi
         elif [ "$PROD_FQ" != . -a "$PROD_FQ" != "$PROD_FLV" ];then
             prod_name_uc=`echo $PROD_NAM | tr '[a-z]' '[A-Z]'`
-            VAR="--envvar=${prod_name_uc}_FQ=$PROD_FQ${opt_envvar+,$opt_envvar}"
+            INI="--envini=${prod_name_uc}_FQ=$PROD_FQ${opt_envini+,$opt_envini}"
         else
-            VAR=${opt_envvar+--envvar=$opt_envvar}
+            INI=${opt_envvar+--envvar=$opt_envvar}
         fi
 
 
@@ -173,7 +178,8 @@ for dd in "$@";do
  ${opt_deps+--deps=\"$opt_deps\"}\
  ${opt_alias+--alias=\"$opt_alias\"}\
  ${opt_envpre+--envpre=\"$opt_envpre\"}\
- ${VAR+\"$VAR\"} >ups/$tblf"
+ ${opt_envvar+--envvar=\"$opt_envvar\"}\
+ ${INI+\"$INI\"} >ups/$tblf"
         fi
 
         declare="ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER -Mups"

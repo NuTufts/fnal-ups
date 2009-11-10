@@ -18,15 +18,23 @@ options:
   -f flavor
   -q qualifiers
   -m table file
- --deps=    comma separated list of dependent products to setup
- --envvar=    comma separated list: VAR=val[,VAR=val]...
- --alias=   comma separated list: alias_name=alias_val[,alias_name=alias_val]...
+ --deps=    comma separated list of dependent products to setup before the
+            generic setup action is executed.
+ --envini=  initial env.vars set before generic setup action is
+            executed. (comma  separated list: VAR=val[,VAR=val]...)
+ --envvar=  comma separated list: VAR=val[,VAR=val]...  (set after generic
+            setup action is executed.)
  --envpre=  comma separated list simalar to --envvar but value get prepended to
-               the variable list value.
+               the existing variable list value (if defined or just assigned as
+               the variable value if not already defined).
+ --alias=   comma separated list: alias_name=alias_val[,alias_name=alias_val]...
+# --envvar-com=  set at end of generic setup action
+# --envpre-com=  set at end of generic setup action
+# - not implemented yet.
 "
 set_opt()
 {
-    opts_w_args='m|f|q|deps|envvar|alias|envpre'
+    opts_w_args='m|f|q|deps|envvar|alias|envpre|envini|env'
     opts_wo_args='v'
     do_opt="\
       case \$opt in
@@ -105,7 +113,7 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
 \";}"
     fi
 
-    # insert any depend product setups just after the "ACTION = setup" line
+    # insert any depend product setups just AFTER the "ACTION = setup" line
     # that is added above
     if [ "${opt_deps-}" ];then
         sed_up=''
@@ -132,7 +140,31 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
         awk_deps='{print;}'
     fi
 
-    # insert any variable definitions before the ``exeActionRequired("setup__")'' line
+    # insert any variable definitions BEFORE the ``exeActionRequired("setup__")'' line
+    if [ "${opt_envini-}" ];then
+        envvar=''
+        IFSsav=$IFS IFS=,; for vv in $opt_envini;do IFS=$IFSsav
+            vvar=`expr "$vv" : ' *\([^=]*\)'` # recall, there may be a " " after a "," IFS
+            vval=`expr "$vv" : '[^=]*=\(.*\)'`
+            envvar="$envvar        envSet( $vvar, $vval )\\n"
+        done
+        awk_envini="BEGIN{IGNORECASE=1;}
+ /^flavor *=/{flv=gensub(/flavor *= */,\"\",1);}
+ /^qualifiers *=/{qual=gensub(/qualifiers *= */,\"\",1);
+   if (flv == \"$FLV\" && qual == \"\\\"$QUAL\\\"\") {
+      do_it=1;
+   }
+ }
+ /^ *exeActionRequired/ {
+   if (do_it == 1) {printf \"$envvar\";do_it=0;}
+ }
+ {print;}
+"
+    else
+        awk_envini='{print;}'
+    fi
+
+    # insert any variable definitions AFTER the ``exeActionRequired("setup__")'' line
     if [ "${opt_envvar-}" ];then
         envvar=''
         IFSsav=$IFS IFS=,; for vv in $opt_envvar;do IFS=$IFSsav
@@ -147,16 +179,16 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
       do_it=1;
    }
  }
+ {print;}
  /^ *exeActionRequired/ {
    if (do_it == 1) {printf \"$envvar\";do_it=0;}
  }
- {print;}
 "
     else
         awk_envvar='{print;}'
     fi
 
-    # insert any envPrepend definitions before the ``exeActionRequired("setup__")'' line
+    # insert any envPrepend definitions AFTER the ``exeActionRequired("setup__")'' line
     if [ "${opt_envpre-}" ];then
         envvar=''
         IFSsav=$IFS IFS=,; for vv in $opt_envpre;do IFS=$IFSsav
@@ -171,16 +203,16 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
       do_it=1;
    }
  }
+ {print;}
  /^ *exeActionRequired/ {
    if (do_it == 1) {printf \"$envvar\";do_it=0;}
  }
- {print;}
 "
     else
         awk_envpre='{print;}'
     fi
 
-    # insert any alias definitions before the ``exeActionRequired("setup__")'' line
+    # insert any alias definitions AFTER the ``exeActionRequired("setup__")'' line
     if [ "${opt_alias-}" ];then
         alias=''
         IFSsav=$IFS IFS=,; for vv in $opt_alias;do IFS=$IFSsav
@@ -195,21 +227,21 @@ FLAVOR = $FLV\nQUALIFIERS = \\\"$QUAL\\\"\n\
       do_it=1;
    }
  }
+ {print;}
  /^ *exeActionRequired/ {
    if (do_it == 1) {printf \"$alias\";do_it=0;}
  }
- {print;}
 "
     else
         awk_alias='{print;}'
     fi
 
-    # because vars and aliases are both inserted before the
+    # because envvar, envpre, and aliases are all inserted AFTER the
     # ``exeActionRequired("setup__")'' line, the order matters;
-    # they will appear in the output in the same order that they are in in the
-    # pipeline
-    cat $TBLF | awk "$awk_fq"     | awk "$awk_deps"  | awk "$awk_envvar" \
-              | awk "$awk_envpre" | awk "$awk_alias"
+    # they will appear in the output in the reverse order that they are in in
+    # the pipeline
+    cat $TBLF | awk "$awk_fq"     | awk "$awk_deps"   | awk "$awk_envini" \
+              | awk "$awk_alias"  | awk "$awk_envpre" | awk "$awk_envvar"
 }   # add_fq
 
 list_fq()
