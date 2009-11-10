@@ -36,14 +36,17 @@ COMMON:
 	prodDir( _LIB, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/lib lib/$${UPS_PROD_NAME_UC}_FQ lib.$${UPS_PROD_NAME_UC}_FQ;do [ -d ${UPS_PROD_DIR}/$dd ] && echo $dd && exit;done;echo .'`"" )
 
 	prodDir( _BIN, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/bin bin/$${UPS_PROD_NAME_UC}_FQ bin.$${UPS_PROD_NAME_UC}_FQ;do [ -d ${UPS_PROD_DIR}/$dd ] && echo $dd && exit;done;echo .'`"" )
+	prodDir( _SBIN, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/sbin sbin/$${UPS_PROD_NAME_UC}_FQ sbin.$${UPS_PROD_NAME_UC}_FQ;do [ -d ${UPS_PROD_DIR}/$dd ] && echo $dd && exit;done;echo .'`"" )
+
+	prodDir( _MAN, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/ "";do for ii in man share/man;do [ -d ${UPS_PROD_DIR}/${dd}$ii ] && echo ${dd}$ii && exit;done;done'`"" )
 
 	pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_BIN}, :)
+	pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_SBIN}, :)
 	pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
 	envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
 
 	envSetIfNotSet( MANPATH, "`man -w`" )
-	envPrepend( MANPATH, ${UPS_PROD_DIR}/man, :)
-	envPrepend( MANPATH, ${${UPS_PROD_NAME_UC}_FQ}/man, :)
+	envPrepend( MANPATH, ${${UPS_PROD_NAME_UC}_MAN}, :)
 
 	if    ( test ! -d ${UPS_PROD_DIR}/bin )
 	    pathRemove( PATH, ${UPS_PROD_DIR}/bin, :)
@@ -54,16 +57,20 @@ COMMON:
 	  endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_BIN )
 	endif ( test ! -d ${UPS_PROD_DIR}/bin )
 
+	if    ( test ! -d ${UPS_PROD_DIR}/sbin )
+	    pathRemove( PATH, ${UPS_PROD_DIR}/sbin, :)
+	endif ( test ! -d ${UPS_PROD_DIR}/sbin )
+	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_SBIN )
+	    pathRemove( PATH, $${UPS_PROD_NAME_UC}_SBIN, :)
+	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_SBIN )
+
 	if    ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 	    envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
 	endif ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 
-	if    ( test ! -d ${UPS_PROD_DIR}/man )
-	    envRemove( MANPATH, ${UPS_PROD_DIR}/man, :)
-	endif ( test ! -d ${UPS_PROD_DIR}/man )
-	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
-	    envRemove( MANPATH, ${${UPS_PROD_NAME_UC}_FQ}/man, :)
-	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d ${${UPS_PROD_NAME_UC}_FQ}/man )
+	if    ( test ! -d ${${UPS_PROD_NAME_UC}_MAN} )
+	    envRemove( MANPATH, ${${UPS_PROD_NAME_UC}_MAN}, :)
+	endif ( test ! -d ${${UPS_PROD_NAME_UC}_MAN} )
 
 	execute( unsetenv _FQ && unset setenv unsetenv, NO_UPS_ENV )
 
