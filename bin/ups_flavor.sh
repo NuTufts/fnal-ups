@@ -170,7 +170,7 @@ add_to_fq_list()
         fq_list="$add_fq${tab}$add_dd${tab}$add_os${tab}$add_bits${tab}$1${tab}$2${tab}$3${tab}$4${tab}$5${tab}$6${tab}$7"
     fi
     echov fq_list lines: `echo "$fq_list" | wc -lc`
-}
+}   # add_to_fq_list
 
 cnt_f=0
 for dd in $dirsOfInterest;do
@@ -362,95 +362,93 @@ if [ "$fq_list" ];then
         # SO, the "default" for 32 bit (i386/i686??) seems to be 2.0.0 while the
         # default for 64 bit seems to be 2.4.0
         if [ "$bit" = 64bit ];then
-            if [ "$sect_got_plt $sect_hash $sect_gnu_hash" != '0 0 0' ];then
-                case "$sect_got_plt $sect_hash $sect_gnu_hash" in
-                "0 1 0") echo "flavor=$os$bit fq=$fq";;   # LTS3
-                "1 1 0")                                  # SLF4
-                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                    if [ "${opt_ups-}" ];then kvdot=2.6; fi
-                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                    echo "flavor=$flavor fq=$fq";;
-                "1 0 1")                                  # SLF5
-                    if [ "${opt_ups-}" ];then
-                        gldot=2.5 kvdot=2.6
-                    else
-                        if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                        gldot=`dec2dot $GLIBC_hi`
-                    fi
-                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                    echo "flavor=$flavor fq=$fq";;
-                *)  echo "unexpected value";;
-                esac
-            elif [ $klo -eq 16777215 -a $os = ANY ];then
-                if [ "$fq" != . -o $list_sz -eq 1 ];then
-                    echo "flavor=NULL fq=$fq"
-                fi
-            elif [   \( $klo      -ge 132608 -a $klo      -lt 16777215 \) \
-                  -o \( $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 \) ];then
-                # could be SL5
-                if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                if [ "${opt_ups-}" ];then gldot=2.5
-                else                      gldot=`dec2dot $GLIBC_hi`; fi
-                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                echo "flavor=$flavor fq=$fq"
-            elif [   \( $klo      -ge 131589 -a $klo      -lt   132617 \) \
-                  -o \( $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 \) ];then
-                # could be SL4
+            case "$sect_got_plt $sect_hash $sect_gnu_hash" in
+            "0 1 0") echo "flavor=$os$bit fq=$fq";;   # LTS3
+            "1 1 0")                                  # SLF4
                 if [ $klo -eq 16777215 ];then kvdot=2.6; fi
                 if [ "${opt_ups-}" ];then kvdot=2.6; fi
                 flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                echo "flavor=$flavor fq=$fq"
-            elif [ $klo -ge 131072 -a $klo -lt   131589 ];then  # 2.0.0
-                # could be LTS3
-                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                if [ "${opt_ups-}" ];then flavor=$os$bit; fi
-                echo "flavor=$flavor fq=$fq"
-            else
-                echo "flavor=$os fq=$fq"
-            fi
+                echo "flavor=$flavor fq=$fq";;
+            "1 0 1")                                  # SLF5
+                if [ "${opt_ups-}" ];then
+                    gldot=2.5 kvdot=2.6
+                else
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    gldot=`dec2dot $GLIBC_hi`
+                fi
+                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
+                echo "flavor=$flavor fq=$fq";;
+            *)
+                if [ $klo -eq 16777215 -a $os = ANY ];then
+                    if [ "$fq" != . -o $list_sz -eq 1 ];then
+                        echo "flavor=NULL fq=$fq"
+                    fi
+                elif [   \( $klo      -ge 132608 -a $klo      -lt 16777215 \) \
+                    -o \( $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 \) ];then
+                    # could be SL5
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    if [ "${opt_ups-}" ];then gldot=2.5
+                    else                      gldot=`dec2dot $GLIBC_hi`; fi
+                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
+                    echo "flavor=$flavor fq=$fq"
+                elif [   \( $klo      -ge 131589 -a $klo      -lt   132617 \) \
+                    -o \( $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 \) ];then
+                    # could be SL4
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    if [ "${opt_ups-}" ];then kvdot=2.6; fi
+                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
+                    echo "flavor=$flavor fq=$fq"
+                elif [ $klo -ge 131072 -a $klo -lt   131589 ];then  # 2.0.0
+                    # could be LTS3
+                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
+                    if [ "${opt_ups-}" ];then flavor=$os$bit; fi
+                    echo "flavor=$flavor fq=$fq"
+                else
+                    echo "flavor=$os fq=$fq"
+                fi
+            esac
         else
-            if [ "$sect_got_plt $sect_hash $sect_gnu_hash" != '0 0 0' ];then
-                case "$sect_got_plt $sect_hash $sect_gnu_hash" in
-                "0 1 0") echo "flavor=$os$bit fq=$fq";;   # LTS3
-                "1 1 0")                                  # SLF4
-                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                    if [ "${opt_ups-}" ];then kvdot=2.6; fi
-                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                    echo "flavor=$flavor fq=$fq";;
-                "1 0 1")                                  # SLF5
-                    if [ "${opt_ups-}" ];then
-                        gldot=2.5 kvdot=2.6
-                    else
-                        if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                        gldot=`dec2dot $GLIBC_hi`
-                    fi
-                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                    echo "flavor=$flavor fq=$fq";;
-                *)  echo "unexpected value";;
-                esac
-            elif [ $klo -eq 16777215 -a $os = ANY ];then
-                if [ "$fq" != . -o $list_sz -eq 1 ];then
-                    echo "flavor=NULL fq=$fq"
-                fi
-            elif [   \( $klo      -ge 132608 -a $klo      -lt 16777215 \) \
-                  -o \( $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 \) ];then
-                # could be SL5
-                if [ $klo -eq 16777215 ];then kvdot=2.6; fi
-                if [ "${opt_ups-}" ];then gldot=2.5
-                else                      gldot=`dec2dot $GLIBC_hi`; fi
-                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
-                echo "flavor=$flavor fq=$fq"
-            elif [   \( $klo      -ge 131072 -a $klo      -lt   132608 \) \
-                  -o \( $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 \) ];then
-                # could be SL4
+            case "$sect_got_plt $sect_hash $sect_gnu_hash" in
+            "0 1 0") echo "flavor=$os$bit fq=$fq";;   # LTS3
+            "1 1 0")                                  # SLF4
                 if [ $klo -eq 16777215 ];then kvdot=2.6; fi
                 if [ "${opt_ups-}" ];then kvdot=2.6; fi
                 flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
-                echo "flavor=$flavor fq=$fq"
-            else
-                # could be LTS3
-                echo "flavor=$os fq=$fq"
-            fi
+                echo "flavor=$flavor fq=$fq";;
+            "1 0 1")                                  # SLF5
+                if [ "${opt_ups-}" ];then
+                    gldot=2.5 kvdot=2.6
+                else
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    gldot=`dec2dot $GLIBC_hi`
+                fi
+                flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
+                echo "flavor=$flavor fq=$fq";;
+            *)
+                if [ $klo -eq 16777215 -a $os = ANY ];then
+                    if [ "$fq" != . -o $list_sz -eq 1 ];then
+                        echo "flavor=NULL fq=$fq"
+                    fi
+                elif [   \( $klo      -ge 132608 -a $klo      -lt 16777215 \) \
+                    -o \( $GLIBC_hi -ge 132096 -a $GLIBC_hi -lt 16777215 \) ];then
+                    # could be SL5
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    if [ "${opt_ups-}" ];then gldot=2.5
+                    else                      gldot=`dec2dot $GLIBC_hi`; fi
+                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`-`expr $gldot : '\([0-9]*\.[0-9]*\)'`
+                    echo "flavor=$flavor fq=$fq"
+                elif [   \( $klo      -ge 131072 -a $klo      -lt   132608 \) \
+                    -o \( $GLIBC_hi -ge 131840 -a $GLIBC_hi -lt   132096 \) ];then
+                    # could be SL4
+                    if [ $klo -eq 16777215 ];then kvdot=2.6; fi
+                    if [ "${opt_ups-}" ];then kvdot=2.6; fi
+                    flavor=$os$bit+`expr $kvdot : '\([0-9]*\.[0-9]*\)'`
+                    echo "flavor=$flavor fq=$fq"
+                else
+                    # could be LTS3
+                    echo "flavor=$os fq=$fq"
+                fi
+            esac
         fi
     done
     IFS=$IFSsav
