@@ -159,7 +159,7 @@ for dd in "$@";do
         fi
 
 
-        if [    -z "${QUAL-}"     -a -z "${VAR-}"\
+        if [    -z "${QUAL-}"     -a -z "${INI-}"\
              -a -z "${opt_deps-}" -a -z "${opt_alias-}"\
              -a -z "${opt_envpre-}" ];then
             if [ "$prd_has_upstbl" = y ];then
