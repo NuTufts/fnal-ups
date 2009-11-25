@@ -123,7 +123,7 @@ set_PRODS_RT()    # aka PRODS_DB (I combine them)
             fi
         else
             echo 'Products DB, $DB, has not been initialized - .upsfile/dbconfig'
-            ehco 'file not found.'
+            echo 'file not found.'
         fi
     fi
     if [ "${PRODS_RT-}" = '' ];then
@@ -172,7 +172,12 @@ set_NAM_and_VER()   # $1=nam-ver
         fi
     fi
     if   [ "$ver_" = '' -a "${opt_ver-}" = '' ];then
-        echo can not determine ver; return 1
+        echo "Error - can not determine ver (assuming prod=$PROD_NAM)"
+        echo "   If prod is wrong, you might want to try using the --prod,"
+        echo "--ver and/or --prods-root option(s). For example:"
+        guess_root=`dirname $PWD`
+        echo " $0 --prods-root=`dirname $guess_root`"
+        return 1
     elif [ "$ver_"      -a "${opt_ver-}"      ];then
         if [ "$ver_" = "${opt_ver-}" ];then
             PROD_VER=$ver_; echov OK - "$ver_" = "${opt_ver-}" 
