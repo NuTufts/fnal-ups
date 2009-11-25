@@ -60,8 +60,8 @@ src_root=`CDPATH= cd "$appdir/..";pwd`
 src_root_base=`basename "$src_root"`
 src_root_parent=`dirname "$src_root"`
 
-if ls -ld $PROD_NAME-$RELEASE.tgz;then
-    echo File exists.
+if ls -ld $PROD_NAME-$RELEASE.tgz 2>/dev/null;then
+    echo "File exists; move it out of the way or delete it."
     echo "$USAGE"; exit 1
 fi
 
@@ -91,7 +91,6 @@ else
     mv $src_root $PROD_NAME/$RELEASE
 fi
 
-
 arg_dir="\"$PROD_NAME-$RELEASE.tgz\" \"$PROD_NAME/$RELEASE\""
 tar_cmd="tar cz --wildcards --exclude '*~'\
  --exclude '*.o'\
@@ -107,6 +106,9 @@ tar_cmd="tar cz --wildcards --exclude '*~'\
  \"$PROD_NAME/$RELEASE/test\"\
  \"$PROD_NAME/$RELEASE/ups\"\
 "
+if [ -d "$PROD_NAME/$RELEASE/CVS" ];then
+    tar_cmd="$tar_cmd \"$PROD_NAME/$RELEASE/CVS\""
+fi
 
 echo "executing: $tar_cmd"
 eval "$tar_cmd"
