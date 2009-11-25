@@ -535,3 +535,8 @@ html-html:
 	find . -name '*.html' -print |					 \
 	    cpio -dumpv $$dest
 
+#
+#
+#
+tar tarball source_tar:
+	@bin/make_tar.sh $(VERS)
