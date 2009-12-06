@@ -80,6 +80,7 @@ tnotnull prddir && test -z "$exe"  && nullout ls $prddir/$flv/bin/ups && set_ ex
 test -z "$exe"  && set_ exe=`which ups`
 test -z "$exe"  && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
 tnotnull PRODUCTS && set_ products=$PRODUCTS || set_ products=$db; expr ":${products}:" : ".*:${db}:" >/dev/null || set_ products=${db}:$products
+#tnotnull PRODUCTS && set_ products=${db}:`echo :${PRODUCTS}: | sed -e "s|:${db}:|:|g" -e 's|^:||;s|:$||'` || set_ products=$db
 tnotnull UPS_DIR && setenv PATH `echo :${PATH}: | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv SETUP_UPS UPS_DIR
 test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
 
