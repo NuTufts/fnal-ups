@@ -8,14 +8,15 @@
 if [ "$1" = -x ];then set -x;shift;fi
 set -u
 
+APP=`basename $0`
 USAGE="\
-   usage: `basename $0`
-examples: cd some/dir
-          `basename $0` --prod=ups --ver=4.7.4x
-          `basename $0` --deps='prodA v1, prodB v2'
-          `basename $0` --deps='prodA v1 -qdebug, prodB v2 -qdebug' -qdebug
-          `basename $0` --deps='prodA vX, prodB vZ' -qcms
-          `basename $0` --deps='prodA vX -qdebug, prodB vZ -qdebug' -qcms:debug
+   usage: $APP <path/to/src>
+examples: $APP --prod=ups --ver=4.7.4x some/dir
+          $APP --deps='prodA v1, prodB v2' some/dir
+          $APP --deps='prodA v1 -qdebug, prodB v2 -qdebug' -qdebug some/dir
+          cd some/dir
+          $APP --deps='prodA vX, prodB vZ' -qcms .
+          $APP --deps='prodA vX -qdebug, prodB vZ -qdebug' -qcms:debug .
 
 If PWD is not in the form prod-ver, then --prod and --ver options must be
 supplied.
@@ -26,7 +27,7 @@ Options:
                         combined db/prod_root)
 --deps=
 --var=
---q=                    understand: debug,cxxcheck; others just used in declare
+-q | --qual=           understand: debug,cxxcheck; others just used in declare
 --productization-lib=
 --stages=              dflt: build:install:declare
 --configure=           *B configure options (for prods that use \"configure\")
@@ -34,43 +35,50 @@ Options:
 #--no-src               *I do not copy src (not implemented yet)
 #--redo                 will redo some operation that appear to be done
 #--quiet                output from the stages is only in <stage-flv>.out
-#--out
--v
+#--out                  (not done yet)
+-v                     verbose
 
 *B - build  stage option
 *I - install stage option
 "
-opts_w_args='prod|ver|prods-root|productization-lib|stages|deps|var|configure|q'
-opts_wo_args='clean|no-src|redo|quiet|v|out'
-do_opt="\
-  case \$opt in
-  \\?|h|help)    echo \"\$USAGE\"; exit 0;;
-  $opts_wo_args) eval opt_\`echo \$opt |sed -e 's/-/_/g'\`=1;;
-  $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
-                 elif [      $#      -ge 1  ];then arg=\$1; shift
-                 else  echo \"option \$opt requires argument\"; exit 1; fi
-                 eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
-                 opts=\"\$opts '\$arg'\";;
-  *) echo \"invalid option: \$opt\" 2>&1;echo \"\$USAGE\" 2>&1; exit 1;;
-  esac"
-while op=`expr "${1-}" : '-\(.*\)'`;do
-    shift
-    if xx=`expr "$op" : '-\(.*\)'`;then
-        if   opt=`expr     "$xx" : '\([^=]*\)='`;then
-            set ${-+-$-} -- "`expr "$xx" : '[^=]*=\(.*\)'`" "$@"
-        else opt=$xx; fi
-        opts="${opts-} '--$opt'"
-        eval "$do_opt"
+reqarg='test -z "${1+1}" && echo opt $op requires arg. &&echo "$USAGE" && exit'
+ op1arg='rest=`expr "$op" : "[^-]\(.*\)"`   && set --  "$rest" "$@";'"$reqarg"
+ op1chr='rest=`expr "$op" : "[^-]\(.*\)"`   && set -- "-$rest" "$@"'
+while [ "${1-}" ];do
+    if expr "x${1-}" : 'x-' >/dev/null;then
+        leq=`expr "x$1" : 'x--[^=]*=\(.*\)'` op=`echo "$1"|sed 's/^-//'`
+        shift;test "$leq" &&set -- "$leq" "$@" && op=`expr "$op" : '\([^=]*\)'`
+        case "$op" in
+        -prod)               eval $reqarg; opt_prod=$1; shift;;
+        -ver)                eval $reqarg; opt_ver=$1; shift;;
+        -prods-root)         eval $reqarg; opt_prods_root=$1; shift;;
+        -productization-lib) eval $reqarg; opt_productization_lib=$1; shift;;
+        -stages)             eval $reqarg; opt_stages=$1; shift;;
+        -deps)               eval $reqarg; opt_deps="${opt_deps+$opt_deps,}$1"
+                                                                        shift;;
+        -var)                eval $reqarg; opt_var=$1; shift;;
+        -configure)          eval $reqarg; opt_configure=$1; shift;;
+        q*|-qual)            eval $op1arg; opt_qual=$1; shift;;
+
+        v*)                  eval $op1chr; opt_v=`expr ${opt_v-0} + 1`;;
+        -clean)                            opt_clean=1;;
+        -redo)                             opt_redo=1;;
+        -quiet)                            opt_quiet=1;;
+
+        \?|h|-help)          echo "$USAGE";exit;;
+        *)                   echo "Unknown option -$op";echo "$USAGE";exit;;
+        esac
     else
-        while opt=`expr "$op" : '\(.\)'`;do
-            opts="${opts-} '-$opt'"
-            rest=`expr "$op" : '.\(.*\)'`
-            eval "$do_opt"
-            op=$rest
-        done
+        aa=`echo "$1" | sed -e "s/'/'\"'\"'/g"`
+        args="${args-} '$aa'"; shift
     fi
 done
-if [ $# -ne 0 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
+eval "set -- ${args-} \"\$@\""
+
+if [ $# -ne 1 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
+
+cd $1
+Src_Root=$PWD
 
 #-----------------------------------------------------------------------
 
@@ -93,7 +101,7 @@ fi
 exec 3>&1 4>&2    # dup so as to enable restore
 orestore='1>&3 2>&4'
 if [ "${opt_out-}" ];then
-    ospec='>>productize-`basename $PREFIX`${opt_q+_`echo $opt_q | tr : _`}.out 2>&1'
+    ospec='>>productize-`basename $PREFIX`${opt_qual+_`echo $opt_qual | tr : _`}.out 2>&1'
     # expect error status to be enough if error before exec after PROD_*
     exec >/dev/null 2>&1
 else
@@ -285,10 +293,10 @@ set_FLV
 
 PREFIX=`qualified_inst_dir`  # important var
 if [ "${opt_out-}" ];then
-    >productize-`basename $PREFIX`${opt_q+_`echo $opt_q | tr : _`}.out
+    >productize-`basename $PREFIX`${opt_qual+_`echo $opt_qual | tr : _`}.out
     eval "exec ${ospec-}"
 fi
-echov "`basename $0` starting in .../`basename $PWD`"
+echov "$APP: starting in .../`basename $PWD`"
 
 if   declare     --status;then  last_stage_done=4
 elif install_fix --status;then  last_stage_done=3
@@ -303,45 +311,45 @@ for ss in `echo $stages | tr : ' '`;do
     # all stages are run in a pipeline to collect output AND to run in
     # sub-shell (so the cwd in this parent shell is preserved).
     pid=
-    ofile=$ss-`basename $PREFIX`${opt_q+_`echo $opt_q | tr : _`}.out
+    ofile=$ss-`basename $PREFIX`${opt_qual+_`echo $opt_qual | tr : _`}.out
     case $ss in
     build)
         if [ $last_stage_done -lt 1 -o $redo_stage -le 1 ];then
-            echov "output in $ofile"
+            echo "$APP: output in $ofile"
             exec >$ofile 2>&1
             build & pid=$!
         fi;;
     install)
         if [ $last_stage_done -lt 2 -o $redo_stage -le 2 ];then
-            echov "output in $ofile"
+            echo "$APP: output in $ofile"
             exec >$ofile 2>&1
             install & pid=$!
         fi;;
     install_fix)
         if [ $last_stage_done -lt 3 -o $redo_stage -le 3 ];then
-            echov "output in $ofile"
+            echo "$APP: output in $ofile"
             exec >$ofile 2>&1
             install_fix & pid=$!
         fi;;
     declare)
         if [ $last_stage_done -lt 4 -o $redo_stage -le 4 ];then
-            echov "output in $ofile"
+            echo "$APP: output in $ofile"
             exec >$ofile 2>&1
             declare & pid=$!
         fi;;
     esac
     if [ "$pid" ];then
         eval "exec ${ospec-}"  # restore normal output
-        if [ "${opt_quiet-}" ];then
+        if [ "${opt_v-}" ];then
+            tail --pid=$pid -f $ss-`basename $PREFIX`.out
             wait $pid
         else
-            tail --pid=$pid -f $ss-`basename $PREFIX`.out
             wait $pid
         fi
         if [ $? -eq 0 ];then
             echov "stage $ss completed OK"
         else
-            echo "Error in $ss stage for $PROD_NAM $PROD_VER ${opt_q-}"
+            echo "Error in $ss stage for $PROD_NAM $PROD_VER ${opt_qual-}"
             exit 1            
         fi
     fi
