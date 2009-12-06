@@ -34,36 +34,28 @@ options:
 "
 set_opt()
 {
-    opts_w_args='m|f|q|deps|envvar|alias|envpre|envini|env'
-    opts_wo_args='v'
-    do_opt="\
-      case \$opt in
-      \\?|h|help)    echo \"\$USAGE\"; exit 0;;
-      $opts_wo_args) vv=opt_\`echo \$opt |sed -e 's/-/_/g'\`
-                     eval xx=\\\${\$vv-0};eval \"\$vv=\`expr \$xx + 1\`\";;
-      $opts_w_args)  if   [ \"\${rest-}\" != '' ];then arg=\$rest; rest=
-                     elif [      $#      -ge 1  ];then arg=\$1; shift
-                     else  echo \"option \$opt requires argument\"; exit 1; fi
-                     eval opt_\`echo \$opt|sed -e 's/-/_/g'\`=\"'\$arg'\"
-                     opts=\"\$opts '\$arg'\";;      # tricky part Aa
-      *) echo \"invalid option: \$opt\" 2>&1;echo \"\$USAGE\" 2>&1; exit 1;;
-      esac"
-    while op=`expr "${1-}" : '-\(.*\)'`;do
-        shift
-        if xx=`expr "$op" : '-\(.*\)'`;then
-            if   opt=`expr     "$xx" : '\([^=]*\)='`;then
-                set ${-+-$-} -- "`expr "$xx" : '[^=]*=\(.*\)'`" "$@"
-            else opt=$xx; fi
-            opts="${opts-} '--$opt'"      # tricky part Ab
-            eval "$do_opt"
-        else
-            while opt=`expr "$op" : '\(.\)'`;do
-                opts="${opts-} '-$opt'"      # tricky part Ac
-                rest=`expr "$op" : '.\(.*\)'`
-                eval "$do_opt"
-                op=$rest
-            done
-        fi
+reqarg='test -z "${1+1}" && echo opt $op requires arg. &&echo "$USAGE" && exit'
+ op1arg='rest=`expr "$op" : "[^-]\(.*\)"`   && set --  "$rest" "$@";'"$reqarg"
+ op1chr='rest=`expr "$op" : "[^-]\(.*\)"`   && set -- "-$rest" "$@"'
+    while expr "x${1-}" : 'x-' >/dev/null;do
+        leq=`expr "x$1" : 'x--[^=]*=\(.*\)'` op=`echo "$1"|sed 's/^-//'`
+        shift;test "$leq" &&set -- "$leq" "$@" && op=`expr "$op" : '\([^=]*\)'`
+        case "$op" in
+        m*)               eval $op1arg; opt_tblf=$1; shift;;
+        f*)               eval $op1arg; opt_flv=$1; shift;;
+        q*)               eval $op1arg; opt_qual=$1; shift;;
+        -deps)   eval $reqarg;opt_deps="${opt_deps+$opt_deps,}$1";shift;;
+        -envvar) eval $reqarg;opt_envvar="${opt_envvar+$opt_envvar,}$1";shift;;
+        -alias)  eval $reqarg;opt_alias="${opt_alias+$opt_alias,}$1";shift;;
+        -envpre) eval $reqarg;opt_envpre="${opt_envpre+$opt_envpre,}$1";shift;;
+        -envini) eval $reqarg;opt_envini="${opt_envini+$opt_envini,}$1";shift;;
+        -env)    eval $reqarg;opt_env="${opt_env+$opt_env,}$1";shift;;
+
+        v*)                  eval $op1chr; opt_v=`expr ${opt_v-0} + 1`;;
+
+        \?|h|-help)          echo "$USAGE";exit;;
+        *)                   echo "Unknown option -$op";echo "$USAGE";exit;;
+        esac
     done
 }
 
@@ -299,17 +291,17 @@ list_deps()
 #------------------------------------------------------------------------------
 set_TBLF()
 {   if [ "${TBLF-}" ];then return; fi
-    if [ "${opt_m-}" ];then TBLF=$opt_m
-    else                      TBLF=$UPS_DIR/ups/generic.table; fi
+    if [ "${opt_tblf-}" ];then TBLF=$opt_tblf
+    else                       TBLF=$UPS_DIR/ups/generic.table; fi
 }
 set_FLV()
 {   if [ "${FLV-}" ];then return; fi
-    if [ "${opt_f-}" ];then FLV=$opt_f
+    if [ "${opt_flv-}" ];then FLV=$opt_flv
     else                      FLV=`ups flavor`; fi
 }
 set_QUAL()
-{   if [ "${QUAL-}" ];then return; fi
-    if [ "${opt_q-}" ];then QUAL=$opt_q
+{   if [ "${QUAL-}"     ];then return; fi
+    if [ "${opt_qual-}" ];then QUAL=$opt_qual
     else                       QUAL=; fi
 }
 #------------------------------------------------------------------------------
