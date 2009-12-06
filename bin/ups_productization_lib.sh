@@ -17,7 +17,7 @@ echov "hello from ups_productization_lib.sh"
 
 build()
 {
-    echov "build - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
+    echov "build - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
     t0=`date +%s`
     # look for a build function
     if type ${PROD_NAM}_build 2>/dev/null | grep 'is a function' >/dev/null;then
@@ -32,7 +32,7 @@ build()
 }   # build
 install()
 {
-    echov "install - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
+    echov "install - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
     t0=`date +%s`
     if type ${PROD_NAM}_install 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific install function found...
@@ -46,7 +46,7 @@ install()
 }   # install
 install_fix()
 {
-    echov "install_fix - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
+    echov "install_fix - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
     t0=`date +%s`
     if type ${PROD_NAM}_install_fix 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific install_fix function found...
@@ -60,7 +60,7 @@ install_fix()
 }   # install_fix
 declare()
 {
-    echov "delare - PROD: $PROD_NAM $PROD_VER ${opt_q-}"
+    echov "delare - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
     t0=`date +%s`
     if type ${PROD_NAM}_declare 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific declare function found...
@@ -129,14 +129,14 @@ generic_declare()
                 -o "${opt_redo-}" ];then
                 echo mkdir -p $PRODS_RT/$PROD_NAM/$PROD_VER/ups
                 mkdir -p $PRODS_RT/$PROD_NAM/$PROD_VER/ups
-                add_fq --tblf=$UPS_DIR/ups/generic.table --flv=${PROD_FLV} --qual=${opt_q-} \
+                add_fq --tblf=$UPS_DIR/ups/generic.table --flv=${PROD_FLV} --qual=${opt_qual-} \
                    >$PRODS_RT/$PROD_NAM/$PROD_VER/ups/$PROD_NAM.table
                 #cp_with_deps $UPS_DIR/ups/generic.table \
                 #    $PRODS_RT/$PROD_NAM/$PROD_VER/ups/$PROD_NAM.table
             fi
         
             cmd "ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER -Mups \
-                -m$PROD_NAM.table -f$PROD_FLV ${opt_q+-q$opt_q} \
+                -m$PROD_NAM.table -f$PROD_FLV ${opt_qual+-q$opt_qual} \
                 $PROD_NAM $PROD_VER"
         else
             echo 'Error - generic (qualified) inst dir does not exists'
@@ -164,6 +164,7 @@ ups_build()
         cd build-$ups_flv
         ups_dir=$PWD
         ln -s ../inc .
+        sts=0
         for dd in bin lib src man doc ups;do
             mkdir $dd
             cd $dd
@@ -183,12 +184,15 @@ ups_build()
                     UPS_DIR=$ups_dir ../../bin/upspremake clean
                 fi
                 UPS_DIR=$ups_dir ../../bin/upspremake ${cflags-}
+                _sts_=$?
+                if [ $_sts_ -ne 0 ];then sts=$_sts_;fi
             fi
 
             cd ..
         done
         /bin/rm -fr src inc        # remove these "lndirs"
 
+        return $sts
     fi
 }   # ups_build
 
@@ -361,9 +365,9 @@ delta_m() { t1=`date +%s`; delta_s=`expr $t1 - $t0`; calc "$delta_s / 60"; }
 
 qual_to_flags()
 {
-    if echo :${opt_q-}: | grep :debug: >/dev/null;then
+    if echo :${opt_qual-}: | grep :debug: >/dev/null;then
         echo "CFLAGS=\"$CFLAGS -g -O0\" CXXFLAGS=\"$CXXFLAGS -g -O0\""
-    elif echo :${opt_q-}: | grep :cxxcheck: >/dev/null;then
+    elif echo :${opt_qual-}: | grep :cxxcheck: >/dev/null;then
         echo "CFLAGS=\"$CFLAGS -g -O0\" CXXFLAGS=\"$CXXFLAGS -g -O0\"\
  CPPFLAGS=\"$CPPFLAGS -D_GLIBCXX_DEBUG\""
     fi
@@ -371,7 +375,7 @@ qual_to_flags()
 
 qual_unO_Makefile()
 {
-    if echo :${opt_q-}: | egrep ':(debug|cxxcheck):' >/dev/null;then
+    if echo :${opt_qual-}: | egrep ':(debug|cxxcheck):' >/dev/null;then
         if [ ! -f Makefile.orig ];then cp -p Makefile Makefile.orig;fi
         sed -i -e '/[ "]-O[s1-3 "]/s/-O[s1-3 ]//' \
                -e '/[ "]-O$/s/-O//'        Makefile  # " quote for emacs
@@ -452,12 +456,12 @@ generic_build_install_dispatch()
 
 qualified_inst_dir()
 {
-    if [ "${opt_q-}" ];then
+    if [ "${opt_qual-}" ];then
         # FIXME -- strip out "non-build qualifiers" (aka "environment qualifiers")
         if [ -x $UPS_DIR/ups/ups_FQ ];then
-            qq=`$UPS_DIR/ups/ups_FQ --get '' ${PROD_FLV} $opt_q`
+            qq=`$UPS_DIR/ups/ups_FQ --get '' ${PROD_FLV} $opt_qual`
         else
-            qq=${PROD_FLV}_`echo $opt_q | sed 's/:/_/g'`
+            qq=${PROD_FLV}_`echo $opt_qual | sed 's/:/_/g'`
         fi
     else
         qq=$PROD_FLV
