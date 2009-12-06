@@ -432,9 +432,8 @@ echo_BLD_INST_METHOD()
         else
             return 1
         fi
-    else
-        echo $BLD_INST_METHOD
     fi
+    echo $BLD_INST_METHOD
 }
 
 generic_build_install_dispatch()
