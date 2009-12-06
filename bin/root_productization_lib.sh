@@ -23,6 +23,7 @@ generic_build()
         # eval for flags and $PREFIX in $opt_configure
         cmd "$flags ./configure --prefix=$PREFIX ${opt_configure-}"
         qual_unO_Makefile
-        make
+        test -f /proc/cpuinfo && j_opt=-j`grep processor /proc/cpuinfo | wc -l`
+        make ${j_opt-} ${opt_make-}
     fi
 }
