@@ -27,7 +27,7 @@ Options:
                         combined db/prod_root)
 --deps=
 --var=
--q | --qual=           understand: debug,cxxcheck; others just used in declare
+-q | --quals=          understand: debug,cxxcheck; others just used in declare
 --productization-lib=
 --stages=              dflt: build:install:declare
 --configure=           *B configure options (for prods that use \"configure\")
@@ -58,7 +58,7 @@ while [ "${1-}" ];do
                                                                         shift;;
         -var)                eval $reqarg; opt_var=$1; shift;;
         -configure)          eval $reqarg; opt_configure=$1; shift;;
-        q*|-qual)            eval $op1arg; opt_qual=$1; shift;;
+        q*|-quals)           eval $op1arg; opt_quals=$1; shift;;
 
         v*)                  eval $op1chr; opt_v=`expr ${opt_v-0} + 1`;;
         -clean)                            opt_clean=1;;
@@ -78,9 +78,12 @@ eval "set -- ${args-} \"\$@\""
 if [ $# -ne 1 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
 
 cd $1
-Src_Root=$PWD
+DIST_DIR=$PWD
 
 #-----------------------------------------------------------------------
+
+if [ "${opt_quals-}" ];then PROD_QUALS=$opt_quals
+else                        PROD_QUALS= ;fi
 
 redo_stage=99
 all_stages=build:install:install_fix:declare
@@ -293,11 +296,28 @@ fi
 
 get_productization_lib
 
-#--
-
 set_FLV
 
-PREFIX=`qualified_inst_dir`  # important var
+PROD_FQ=`flavor_qualifier_dir`
+PREFIX=$PRODS_RT/$PROD_NAM/$PROD_VER/$PROD_FQ  # important var
+BLD_DIR=$DIST_DIR/$PROD_FQ
+
+echo
+echo "  PRODS_RT=$PRODS_RT"
+echo "  PROD_NAM=$PROD_NAM"
+echo "  PROD_VER=$PROD_VER"
+echo "  PROD_FLV=$PROD_FLV"
+echo "  PROD_QUALS=$PROD_QUALS"
+echo "  "
+echo "  DIST_DIR=$DIST_DIR"     # if dist is src, dist_dir is src_dir
+echo "  BLD_DIR=$BLD_DIR"                                # na if bin dist
+echo "  "
+echo "  PROD_FQ=$PROD_FQ"
+echo "  INST_DIR=$PRODS_RT/$PROD_NAM/$PROD_VER/$PROD_FQ"
+echo
+
+#----
+
 if [ "${opt_out-}" ];then
     >productize-`basename $PREFIX`${opt_qual+_`echo $opt_qual | tr : _`}.out
     eval "exec ${ospec-}"

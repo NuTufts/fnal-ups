@@ -7,9 +7,15 @@
 #  rev='$Revision$$Date$'
 
 
+# root does not support out of source builds.
+# The lndir trick does not work (completely).
+# With lndir, the make install ends up installing
+# over 2000 symlinks from the build dir.
+
+
 generic_build()
 {
-    echov "root build $@; PREFIX=$PREFIX"
+    echov "root_productization build $@; PREFIX=$PREFIX"
     q_bld_dir=build-`basename $PREFIX`
     export ROOTSYS; ROOTSYS=$PREFIX
     if [ "${1-}" = --status ];then
@@ -28,10 +34,28 @@ generic_build()
         make ${j_opt-} ${opt_make-}
     fi
 }
+generic_install_fix()
+{
+    echov "root_productization install_fix $@; PREFIX=$PREFIX"
+    if [ "${1-}" = --status ];then
+        # I want this a separate step, but have not determine a check
+        return 1
+    else
+        if [ -d $PREFIX ];then   # the result of the install
+            cd $PREFIX
+            find . -type l | while read ll;do rm $ll; cp $DIST_DIR/$ll $ll;done
+        else
+            echo 'Error - generic install error'
+            exit 1
+        fi
+    fi
+}   # generic_install_fix
 generic_declare()
 {
-    echov "generic declare $@; PREFIX=$PREFIX"
+    echov "root_productization declare $@; PREFIX=$PREFIX"
     if [ "${1-}" = --status ];then
+        # NOTE: this portion not in sub-shell -- setting env.vars here will
+        #       effect future sub-shells (but watchout for --stages option)
         if [ -f $PRODS_RT/$PROD_NAM/$PROD_VER.version ];then return 0
         else                                                 return 1;fi
     else

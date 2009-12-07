@@ -454,21 +454,21 @@ generic_build_install_dispatch()
     esac
 }
 
-qualified_inst_dir()
+flavor_qualifier_dir()
 {
-    if [ "${opt_qual-}" ];then
+    if [ "$PROD_QUALS" ];then
         # FIXME -- strip out "non-build qualifiers" (aka "environment qualifiers")
         if [ -x $UPS_DIR/ups/ups_FQ ];then
-            qq=`$UPS_DIR/ups/ups_FQ --get '' ${PROD_FLV} $opt_qual`
+            qq=`$UPS_DIR/ups/ups_FQ --get '' $PROD_FLV $PROD_QUALS`
         else
-            qq=${PROD_FLV}_`echo $opt_qual | sed 's/:/_/g'`
+            qq=${PROD_FLV}_`echo $PROD_QUALS | sed 's/:/_/g'`
         fi
     else
         qq=$PROD_FLV
     fi
     # check for bin dist
     if nam_ver=`expr "$PWD" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
-        echo 'qualified_inst_dir' >&2
+        echo 'flavor_qualifier_dir' >&2
         for dd in `find . -type d -maxdepth 3`;do
             if   expr "$dd" : '.*/bin$' >/dev/null;then
                 if file $dd/* | grep 'ELF ' >/dev/null;then have_bin=$dd; fi
@@ -488,13 +488,13 @@ qualified_inst_dir()
             if [ "$bb" != $qq ];then
                 echo "Warning $bb != $qq" >&2
             fi
-            echo $PRODS_RT/$PROD_NAM/$PROD_VER/$bb
+            echo $bb
         else
-            echo $PRODS_RT/$PROD_NAM/$PROD_VER/$qq
+            echo $qq
         fi
     else
         # source dir
-        echo $PRODS_RT/$PROD_NAM/$PROD_VER/$qq
+        echo $qq
     fi
 }
 
@@ -657,8 +657,53 @@ set_fq_opt()
             done
         fi
     done
+}   # set_fq_opt
+
+flavor()
+{
+    os=`uname -s` os_rev=`uname -r | cut -d. -f1-2` mach=`uname -m` libc=
+    if [ $os = Linux ];then
+        libc=-`/bin/ls /lib/libc-* | sed '{s/^[^0-9]*//;s/[^0-9]*$//;q}'`
+    fi
+    case $mach in
+    x86_64|sun*) b64=64bit;;
+    *)           b64=;;
+    esac
+    fl1=$os$b64+$os_rev$libc
+    fl2=$os+$os_rev$libc
+    fl3=$os+`expr "$os_rev" : '\([0-9]*\)'`
+    case "${1-}" in
+    ''|-4)      echo $fl1;;
+    -[1-3])  nn=`expr "$1" : '-\(.\)'`;expr "$fl1" : "\(\([^-+.]*[-+.]\)\{$nn\}\)" | sed 's/.$//';;
+    *)       echo $fl3;;
+    esac
 }
 
+legacy_flavor()
+{
+    flv_=$1
+    case $flv_ in
+    Linux+2.4-2.3.2)        echo Linux;;
+    Linux+2.6-2.3.4)        echo Linux+2.6;;
+    Linux+2.6-2.5)          echo Linux+2.6-2.5;;
+    Linux64bit+2.4-2.3.2)   echo Linux64bit;;
+    Linux64bit+2.6-2.3.4)   echo Linux64bit+2.6;;
+    Linux64bit+2.6-2.5)     echo Linux64bit+2.6-2.5;;
+    *)                      echo $flv_;;
+    esac
+}
+
+set_FLV()
+{
+    PROD_FLV=`flavor`
+}
+
+get_flv_64_to_32()
+{
+    legacy_flavor `echo $PROD_FLV | sed 's/64bit//'`
+    if expr "$PROD_FLV" : '.*64bit' >/dev/null;then return 0
+    else                                            return 1; fi
+}
 
 lndir()
 {   src=$1
@@ -700,46 +745,8 @@ lndir()
     unset cdsav src dst abs_src abs_dst abs_chk_len src_slash_cnt
 }   # lndir
 
-flavor()
-{
-    os=`uname -s` os_rev=`uname -r | cut -d. -f1-2` mach=`uname -m` libc=
-    if [ $os = Linux ];then
-        libc=-`/bin/ls /lib/libc-* | sed '{s/^[^0-9]*//;s/[^0-9]*$//;q}'`
-    fi
-    case $mach in
-    x86_64|sun*) b64=64bit;;
-    *)           b64=;;
-    esac
-    fl1=$os$b64+$os_rev$libc
-    fl2=$os+$os_rev$libc
-    fl3=$os+`expr "$os_rev" : '\([0-9]*\)'`
-    case "${1-}" in
-    ''|-4)      echo $fl1;;
-    -[1-3])  nn=`expr "$1" : '-\(.\)'`;expr "$fl1" : "\(\([^-+.]*[-+.]\)\{$nn\}\)" | sed 's/.$//';;
-    *)       echo $fl3;;
-    esac
-}
-
-set_FLV()
-{
-    PROD_FLV=`flavor`
-}
-
-get_flv_64_to_32()
-{
-    flv_=`echo $PROD_FLV | sed 's/64bit//'`
-    case $flv_ in
-    Linux+2.4-2.3.2)   echo Linux;;
-    Linux+2.6-2.3.4)   echo Linux+2.6;;
-    Linux+2.6-2.5)     echo Linux+2.6-2.5;;
-    *)                 echo $flv_;;
-    esac
-    if expr "$PROD_FLV" : '.*64bit' >/dev/null;then return 0
-    else                                            return 1; fi
-}
-
 #------------------------------------------------------------------------------
-
+# allow for testing of some functions...
 case "${1-}" in
 flavor)  shift; flavor "$@";;
 cp_with_vars) shift; cp_with_vars 'ROOTSYS=${UPS_PROD_DIR}' "$@";;
