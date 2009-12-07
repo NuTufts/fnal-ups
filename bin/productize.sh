@@ -111,7 +111,13 @@ fi
 #-----------------------------------------------------------------------
 
 echov() { if [ "${opt_v-}" ];then echo "`date`: $@";fi; }
-cmd() { eval "echov \"$@\""; eval "$@"; }   # used in ups_productization_lib.sh
+cmd()   # used in ups_productization_lib.sh
+{   eval "echov \"$@\""
+    eval "$@"
+    sts=$?
+    if [ $sts -ne 0 ];then echo "Error with cmd: $@"; fi
+    return $sts
+}
 
 #-----------------------------------------------------------------------
 
