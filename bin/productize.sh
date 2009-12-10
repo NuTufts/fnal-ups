@@ -80,6 +80,8 @@ if [ $# -ne 1 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
 cd $1
 DIST_DIR=$PWD
 
+unset CDPATH   # CDPATH has been known to cause some configures and other
+               # build mechanisms problems.
 #-----------------------------------------------------------------------
 
 if [ "${opt_quals-}" ];then PROD_QUALS=$opt_quals
