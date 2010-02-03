@@ -40,7 +40,7 @@ EOF
 	f = os.popen("/bin/sh " + filename)
 	c1 = f.read()
 	f.close()
-	c1 = re.sub( '.*--------------cut here-------------', '', c1)
+	c1 = re.sub( '(?s).*--------------cut here-------------', '', c1)
 	os.environ = {}
 	exec c1
 
