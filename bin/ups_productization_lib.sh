@@ -18,58 +18,58 @@ echov "hello from ups_productization_lib.sh"
 build()
 {
     echov "build - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
-    t0=`date +%s`
+    t0=`epoch`
     # look for a build function
     if type ${PROD_NAM}_build 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific build function found...
-        ${PROD_NAM}_build "$@"
+        ${PROD_NAM}_build "${@-}"
     else
-        generic_build "$@"
+        generic_build "${@-}"
     fi
     rsts=$?
-    echov "build $@ took `delta_m` minutes"
+    echov "build ${@-} took `delta_m` minutes"
     return $rsts
 }   # build
 install()
 {
     echov "install - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
-    t0=`date +%s`
+    t0=`epoch`
     if type ${PROD_NAM}_install 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific install function found...
-        ${PROD_NAM}_install "$@"
+        ${PROD_NAM}_install "${@-}"
     else
-        generic_install "$@"
+        generic_install "${@-}"
     fi
     rsts=$?
-    echov "install $@ took `delta_m` minutes"
+    echov "install ${@-} took `delta_m` minutes"
     return $rsts
 }   # install
 install_fix()
 {
     echov "install_fix - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
-    t0=`date +%s`
+    t0=`epoch`
     if type ${PROD_NAM}_install_fix 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific install_fix function found...
-        ${PROD_NAM}_install_fix "$@"
+        ${PROD_NAM}_install_fix "${@-}"
     else
-        generic_install_fix "$@"
+        generic_install_fix "${@-}"
     fi
     rsts=$?
-    echov "install_fix $@ took `delta_m` minutes"
+    echov "install_fix ${@-} took `delta_m` minutes"
     return $rsts
 }   # install_fix
 declare()
 {
     echov "delare - PROD: $PROD_NAM $PROD_VER ${opt_qual-}"
-    t0=`date +%s`
+    t0=`epoch`
     if type ${PROD_NAM}_declare 2>/dev/null | grep 'is a function' >/dev/null;then
         echov prod specific declare function found...
-        ${PROD_NAM}_declare "$@"
+        ${PROD_NAM}_declare "${@-}"
     else
-        generic_declare "$@"
+        generic_declare "${@-}"
     fi
     rsts=$?
-    echov "declare $@ took `delta_m` minutes"
+    echov "declare ${@-} took `delta_m` minutes"
     return $rsts
 }   # declare
 
@@ -80,7 +80,7 @@ declare()
 
 generic_build()
 {
-    echov "generic build $@; PREFIX=$PREFIX"
+    echov "generic build ${@-}; PREFIX=$PREFIX"
     q_bld_dir=build-`basename $PREFIX`
     if [ "${1-}" = --status ];then
         if [ -d $q_bld_dir ];then return 0
@@ -92,7 +92,7 @@ generic_build()
 }   # generic_build
 generic_install()
 {
-    echov "generic install $@; PREFIX=$PREFIX"
+    echov "generic install ${@-}; PREFIX=$PREFIX"
     if [ "${1-}" = --status ];then
         if [ -d $PREFIX ];then return 0
         else                       return 1;fi
@@ -102,7 +102,7 @@ generic_install()
 }   # generic_install
 generic_install_fix()
 {
-    echov "generic install $@; PREFIX=$PREFIX"
+    echov "generic install ${@-}; PREFIX=$PREFIX"
     if [ "${1-}" = --status ];then
         # I want this a separate step, but have not determine a check
         return 1
@@ -118,7 +118,7 @@ generic_install_fix()
 }   # generic_install_fix
 generic_declare()
 {
-    echov "generic declare $@; PREFIX=$PREFIX"
+    echov "generic declare ${@-}; PREFIX=$PREFIX"
     if [ "${1-}" = --status ];then
         if [ -f $PRODS_RT/$PROD_NAM/$PROD_VER.version ];then return 0
         else                                                 return 1;fi
@@ -149,7 +149,7 @@ generic_declare()
 
 ups_build()
 {
-    echov "ups build $@"
+    echov "ups build ${@-}"
     if [ "${1-}" = --status ];then
         ups_flv=`get_flv_64_to_32`
         if [ -d build-$ups_flv ];then return 0
@@ -198,7 +198,7 @@ ups_build()
 
 ups_install()
 {
-    echov "ups install $@"
+    echov "ups install ${@-}"
     if [ "${1-}" = --status ];then
         if [ -d $PRODS_RT/$PROD_NAM/$PROD_VER/$PROD_FLV ];then return 0
         else                                                   return 1;fi
@@ -215,7 +215,7 @@ ups_install()
 
 ups_install_fix()
 {
-    echov "ups install_fix $@"
+    echov "ups install_fix ${@-}"
     if [ "${1-}" = --status ];then
         # even though nothing is done in the ups_install_fix,
         return 1 # so that the install will not be considered completed
@@ -227,7 +227,7 @@ ups_install_fix()
 ups_declare()
 {
     ups_flv=`get_flv_64_to_32`
-    echov "ups declare $@ ups_flv=$ups_flv"
+    echov "ups declare ${@-} ups_flv=$ups_flv"
     if [ "${1-}" = --status ];then
         vf=$PRODS_RT/$PROD_NAM/$PROD_VER.version
         if [ -f $vf ];then
@@ -362,7 +362,9 @@ generic_Makefile_install()
 #------------------------------------------------------------------------------
 
 calc() { echo "scale=4;$@" | bc; }
-delta_m() { t1=`date +%s`; delta_s=`expr $t1 - $t0`; calc "$delta_s / 60"; }
+#epoch() { date +%s; }
+epoch() { perl -e 'use Time::Local;print timelocal(localtime());'; }
+delta_m() { t1=`epoch`; delta_s=`expr $t1 - $t0`; calc "$delta_s / 60"; }
 
 qual_to_flags()
 {
@@ -469,7 +471,8 @@ flavor_qualifier_dir()
     # check for bin dist
     if nam_ver=`expr "$PWD" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
         echo 'flavor_qualifier_dir' >&2
-        for dd in `find . -type d -maxdepth 3`;do
+        #for dd in `find . -type d -maxdepth 3`;do
+        for dd in `find . -type d`;do
             if   expr "$dd" : '.*/bin$' >/dev/null;then
                 if file $dd/* | grep 'ELF ' >/dev/null;then have_bin=$dd; fi
             elif expr "$dd" : '.*/lib$' >/dev/null;then
