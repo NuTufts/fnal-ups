@@ -183,7 +183,7 @@ ups_build()
                 if [ "${opt_clean-}" ];then
                     UPS_DIR=$ups_dir ../../bin/upspremake clean
                 fi
-                UPS_DIR=$ups_dir ../../bin/upspremake ${cflags-}
+                PRODUCTS=$PRODS_RT UPS_DIR=$ups_dir ../../bin/upspremake ${cflags-}
                 _sts_=$?
                 if [ $_sts_ -ne 0 ];then sts=$_sts_;fi
             fi
