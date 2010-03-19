@@ -78,7 +78,7 @@ eval "set -- ${args-} \"\${@-}\""
 if [ $# -ne 1 ];then echo "no. arguments (${@-}) != 1";echo "$USAGE";exit;fi
 
 cd $1
-DIST_DIR=$PWD
+DIST_DIR=`pwd`
 
 unset CDPATH   # CDPATH has been known to cause some configures and other
                # build mechanisms problems.
@@ -155,7 +155,8 @@ set_PRODS_RT()    # aka PRODS_DB (I combine them)
 
 set_NAM_and_VER()   # $1=nam-ver
 {
-    if nam_ver=`expr "$PWD" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
+    Pwd=`pwd`
+    if nam_ver=`expr "$Pwd" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
         echo "name/ver=$nam_ver"
         prod_=`expr "$nam_ver" : '\([^/][^/]*\)'`
          ver_=`expr "$nam_ver" : '[^/][^/]*/\([^/][^/]*\)'`
@@ -167,7 +168,7 @@ set_NAM_and_VER()   # $1=nam-ver
         #   root-v5-18-00f.svn  -> root      v5_18_00f_svn
         #   boost_1_34_1        -> boost     v1_34_1
         #   libsigc++-2.2.3     -> libsigcxx v2_2_3
-        nam_ver=`basename $PWD`
+        nam_ver=`basename $Pwd`
         prod_=`echo "$nam_ver" | sed 's/[-_]v*[0-9][-0-9.a-zA-Z]*$//'`
          ver_=`expr "$nam_ver" : "${prod_}[-_]\(.*\)"`
         prod_=`echo "$prod_" | sed 's/++/xx/'`    # libsigc++ -> libsigcxx
@@ -194,7 +195,7 @@ set_NAM_and_VER()   # $1=nam-ver
         echo "Error - can not determine ver (assuming prod=$PROD_NAM)"
         echo "   If prod is wrong, you might want to try using the --prod,"
         echo "--ver and/or --prods-root option(s). For example:"
-        guess_root=`dirname $PWD`
+        guess_root=`dirname $Pwd`
         echo " $0 --prods-root=`dirname $guess_root`"
         return 1
     elif [ "$ver_"      -a "${opt_ver-}"      ];then
@@ -223,7 +224,7 @@ set_NAM_and_VER()   # $1=nam-ver
 get_productization_lib()
 {
     if [ $PROD_NAM = ups ];then
-        PATH=$PWD/bin:$PATH
+        PATH=`pwd`/bin:$PATH
         if [ -f bin/ups_productization_lib.sh ];then
             .   bin/ups_productization_lib.sh
         elif [ "${opt_productization_lib-}" ];then
@@ -324,7 +325,8 @@ if [ "${opt_out-}" ];then
     >productize-`basename $PREFIX`${opt_qual+_`echo $opt_qual | tr : _`}.out
     eval "exec ${ospec-}"
 fi
-echov "$APP: starting in .../`basename $PWD`"
+Pwd=`pwd`
+echov "$APP: starting in .../`basename $Pwd`"
 
 if   declare     --status;then  last_stage_done=4
 elif install_fix --status;then  last_stage_done=3
@@ -383,4 +385,5 @@ for ss in `echo $stages | tr : ' '`;do
     fi
 done
 
-echov "Done in .../`basename $PWD`"
+Pwd=`pwd`
+echov "Done in .../`basename $Pwd`"

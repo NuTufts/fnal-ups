@@ -162,7 +162,7 @@ ups_build()
         if [ ! -d build-$ups_flv ];then mkdir build-$ups_flv;fi
         
         cd build-$ups_flv
-        ups_dir=$PWD
+        ups_dir=`pwd`
         ln -s ../inc .
         sts=0
         for dd in bin lib src man doc ups;do
@@ -469,7 +469,8 @@ flavor_qualifier_dir()
         qq=$PROD_FLV
     fi
     # check for bin dist
-    if nam_ver=`expr "$PWD" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
+    Pwd=`pwd`
+    if nam_ver=`expr "$Pwd" : "$PRODS_RT/\([^/][^/]*/[^/][^/]*\)\$"`;then
         echo 'flavor_qualifier_dir' >&2
         #for dd in `find . -type d -maxdepth 3`;do
         for dd in `find . -type d`;do
@@ -711,9 +712,9 @@ get_flv_64_to_32()
 lndir()
 {   src=$1
     dst=$2
-    cdsav=$PWD
+    cdsav=`pwd`
     cd $dst
-    abs_dst=$PWD
+    abs_dst=`pwd`
     abs_src=`cd $src;pwd`
     abs_chk_len=`expr "$abs_dst/" : '.*'`
     src_slash_cnt=`echo $src | sed 's/[^/]//g' | wc -c`
