@@ -42,12 +42,12 @@ Options:
 *I - install stage option
 "
 reqarg='test -z "${1+1}" && echo opt $op requires arg. &&echo "$USAGE" && exit'
- op1arg='rest=`expr "$op" : "[^-]\(.*\)"`   && set --  "$rest" "$@";'"$reqarg"
- op1chr='rest=`expr "$op" : "[^-]\(.*\)"`   && set -- "-$rest" "$@"'
+ op1arg='rest=`expr "$op" : "[^-]\(.*\)"`   && set --  "$rest" "${@-}";'"$reqarg"
+ op1chr='rest=`expr "$op" : "[^-]\(.*\)"`   && set -- "-$rest" "${@-}"'
 while [ "${1-}" ];do
     if expr "x${1-}" : 'x-' >/dev/null;then
         leq=`expr "x$1" : 'x--[^=]*=\(.*\)'` op=`echo "$1"|sed 's/^-//'`
-        shift;test "$leq" &&set -- "$leq" "$@" && op=`expr "$op" : '\([^=]*\)'`
+        shift;test "$leq" &&set -- "$leq" "${@-}" && op=`expr "$op" : '\([^=]*\)'`
         case "$op" in
         -prod)               eval $reqarg; opt_prod=$1; shift;;
         -ver)                eval $reqarg; opt_ver=$1; shift;;
@@ -73,9 +73,9 @@ while [ "${1-}" ];do
         args="${args-} '$aa'"; shift
     fi
 done
-eval "set -- ${args-} \"\$@\""
+eval "set -- ${args-} \"\${@-}\""
 
-if [ $# -ne 1 ];then echo "no arguments ($@) expected";echo "$USAGE";exit;fi
+if [ $# -ne 1 ];then echo "no. arguments (${@-}) != 1";echo "$USAGE";exit;fi
 
 cd $1
 DIST_DIR=$PWD
@@ -212,9 +212,9 @@ set_NAM_and_VER()   # $1=nam-ver
         fi
     fi
     if expr "$PROD_VER" : '[0-9]' >/dev/null;then
-        PROD_VER=v`echo "$PROD_VER" | tr '.-' '__'`
+        PROD_VER=v`echo "$PROD_VER" | tr '.\-' '__'`
     else
-        PROD_VER=`echo "$PROD_VER" | tr '.-' '__'`
+        PROD_VER=`echo "$PROD_VER" | tr '.\-' '__'`
     fi
 }   # set_NAM_and_VER
 
