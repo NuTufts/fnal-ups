@@ -6,7 +6,7 @@
 #  $RCSfile$
 #  rev='$Revision$$Date$'
 if [ "$1" = -x ];then set -x;shift;fi
-set -u
+/bin/sh -c 'set -u;x="$*"' 2>/dev/null && set -u
 
 APP=`basename $0`
 USAGE="\
@@ -42,12 +42,12 @@ Options:
 *I - install stage option
 "
 reqarg='test -z "${1+1}" && echo opt $op requires arg. &&echo "$USAGE" && exit'
- op1arg='rest=`expr "$op" : "[^-]\(.*\)"`   && set --  "$rest" "${@-}";'"$reqarg"
- op1chr='rest=`expr "$op" : "[^-]\(.*\)"`   && set -- "-$rest" "${@-}"'
+ op1arg='rest=`expr "$op" : "[^-]\(.*\)"`   && set --  "$rest" "$@";'"$reqarg"
+ op1chr='rest=`expr "$op" : "[^-]\(.*\)"`   && set -- "-$rest" "$@"'
 while [ "${1-}" ];do
     if expr "x${1-}" : 'x-' >/dev/null;then
         leq=`expr "x$1" : 'x--[^=]*=\(.*\)'` op=`echo "$1"|sed 's/^-//'`
-        shift;test "$leq" &&set -- "$leq" "${@-}" && op=`expr "$op" : '\([^=]*\)'`
+        shift;test "$leq" &&set -- "$leq" "$@" && op=`expr "$op" : '\([^=]*\)'`
         case "$op" in
         -prod)               eval $reqarg; opt_prod=$1; shift;;
         -ver)                eval $reqarg; opt_ver=$1; shift;;
@@ -73,9 +73,9 @@ while [ "${1-}" ];do
         args="${args-} '$aa'"; shift
     fi
 done
-eval "set -- ${args-} \"\${@-}\""
+eval "set -- ${args-} \"\$@\""
 
-if [ $# -ne 1 ];then echo "no. arguments (${@-}) != 1";echo "$USAGE";exit;fi
+if [ $# -ne 1 ];then echo "no. arguments ($*) != 1";echo "$USAGE";exit;fi
 
 cd $1
 DIST_DIR=`pwd`
@@ -115,12 +115,12 @@ fi
 
 #-----------------------------------------------------------------------
 
-echov() { if [ "${opt_v-}" ];then echo "`date`: $@";fi; }
+echov() { if [ "${opt_v-}" ];then echo "`date`: $*";fi; }
 cmd()   # used in ups_productization_lib.sh
 {   eval "echov \"$@\""
     eval "$@"
     sts=$?
-    if [ $sts -ne 0 ];then echo "Error with cmd: $@"; fi
+    if [ $sts -ne 0 ];then echo "Error with cmd: $*"; fi
     return $sts
 }
 
