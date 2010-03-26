@@ -141,6 +141,7 @@ OPTIONS     :
 -z :database : use this database to get instance information 
 -Z :time this command (does not include sourcing of temp file for
 :setup/unsetup
+-. :shorthand for "-r `pwd` -M ups -m ${UPS_PRODUCT}.table"
 -0 :Pick flavor for operating system generic to any UNIX or comparable 
 -1 :Pick flavor for operating system generic to the vendor
 -2 :Pick flavor for operating system to level of major version number

@@ -119,6 +119,7 @@ typedef struct ups_command
     int     ugo_number;      /* -0,-1,-2,etc value offset by +1      */
     char   *ugo_reqqualifiers; /* original qualifier -q string */
     char   *ugo_reqchain; /* original chain -g string -- with -g */
+    int    ugo_dot;        /* had -. option... */
 } t_upsugo_command;
 
 /* 
