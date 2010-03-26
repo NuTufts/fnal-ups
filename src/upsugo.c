@@ -332,6 +332,7 @@ static char reqchainbuf[512];
 
 #define case_dot case '.': \
          {char cwdbuf[PATH_MAX]; \
+         uc->ugo_dot = 1; \
          uc->ugo_r = 1; uc->ugo_M = 1; uc->ugo_m = 1; \
          uc->ugo_productdir = strcpy(upsmem_malloc(strlen(getcwd(cwdbuf,PATH_MAX))),cwdbuf) ; \
          uc->ugo_tablefiledir = strcpy(upsmem_malloc(4),"ups"); \
@@ -1634,6 +1635,12 @@ t_upsugo_command *upsugo_next(const int old_argc,
           addr=upsutl_str_create(arg_str,' ');
           if ( !uc->ugo_product ) 
           { uc->ugo_product = addr;
+            if (uc->ugo_dot) 
+            {
+               /* we had a -. before the product name, so now we can
+                  figure out the table file name */
+               uc->ugo_tablefile = strcat(strcpy(upsmem_malloc(strlen(uc->ugo_product)+7),uc->ugo_product),".table");
+            }
           } else { 
             if ( !uc->ugo_version )
             { uc->ugo_version = addr ;
