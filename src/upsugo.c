@@ -40,6 +40,8 @@
 #include <sys/utsname.h>
 #include <string.h>
 
+extern char *get_current_dir_name(void);
+
 #include "ups.h"
 #include "upsuname.h"
 
@@ -327,6 +329,13 @@ static char reqchainbuf[512];
 #define case_T case 'T': uc->ugo_T = 1; set_value (uc->ugo_archivefile , "T")
 #define case_u case 'u': uc->ugo_u = 1; set_value (uc->ugo_compile_dir, "u")
 #define case_U case 'U': uc->ugo_U = 1; set_value (uc->ugo_upsdir , "U")
+
+#define case_dot case '.': \
+         {char cwdbuf[PATH_MAX]; \
+         uc->ugo_r = 1; uc->ugo_M = 1; uc->ugo_m = 1; \
+         uc->ugo_productdir = strcpy(upsmem_malloc(strlen(getcwd(cwdbuf,PATH_MAX))),cwdbuf) ; \
+         uc->ugo_tablefiledir = strcpy(upsmem_malloc(4),"ups"); \
+         uc->ugo_tablefile = uc->ugo_product ? strcat(strcpy(upsmem_malloc(strlen(uc->ugo_product)+7),uc->ugo_product),".table") : 0;}
 
 /* Special case -O value (no check) */
 #define case_O case 'O': uc->ugo_O = 1; \
@@ -1611,6 +1620,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
           case_r case_T case_u case_U 
           case_0 case_1 case_2 case_3 case_4 case_5 case_6 case_7 /* number sets */
           case_q case_z               /* special cases */
+          case_dot
           default:
              errflg = 1;
         }

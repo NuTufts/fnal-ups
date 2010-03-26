@@ -73,11 +73,21 @@ ups_have_flavor_override() {
     return res;
 }
 
+static
+char *default_machines[5][2] = {
+  {"Linux", "86"},
+  {"SunOS", "sun"},
+  {"IRIX", "sgi"},
+  {"OSF",  "alpha"},
+  { 0, 0 }
+};
+
 void
 ups_append_OS(char *buf) 
 {  
    struct utsname baseuname;                    /* returned from uname */
-   char **p;
+   int i;
+   char *p;
 
    buf = buf + strlen(buf);     		/* init pointer */
    if (uname(&baseuname) == -1) 
@@ -92,6 +102,22 @@ ups_append_OS(char *buf)
    { 
         (void) strcpy(buf,"CYGWIN32_NT");
    }
+   i = 0;
+
+   /* this tries to find our uname -s, uname -m in the table, above */
+
+   while(default_machines[i][0]) {
+       if ( !strncmp(default_machines[i][0],buf,strlen(default_machines[i][0])) ) {
+          p = strrchr(baseuname.machine,default_machines[i][1][0]);
+          if ( p && !strncmp(p, default_machines[i][1],strlen(default_machines[i]))) {
+              /* looks like our default machine type, so leave it off */
+              return;
+          }
+       }
+       i++;
+   }
+   /* if it's not a default host, add the machine name on the end */
+   strcat(buf,baseuname.machine);
 }
 
 
@@ -114,6 +140,9 @@ ups_append_MACHINE(char *buf)
        strcpy(buf,"64bit");
    }
    if (0 == strncmp(buf,"sun",3)) {
+       strcpy(buf,"64bit");		
+   }
+   if (0 == strncmp(buf,"ppc64",5)) {
        strcpy(buf,"64bit");		
    }
    return;
