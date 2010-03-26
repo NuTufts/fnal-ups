@@ -1659,3 +1659,4 @@ t_upsugo_command *upsugo_next(const int old_argc,
   upsugo_liststart(luc);      /* move all lists to first element */
   return (t_upsugo_command *)ugo_commands->data; 
 }
+
