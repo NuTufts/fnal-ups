@@ -2194,6 +2194,8 @@ t_upstyp_action *new_default_action( t_upsact_item *const p_act_itm,
   return p_unact;
 }
 
+#define MAXIFDEPTH 20
+
 t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm, 
 				     t_upslst_item *const cmd_list )
 {
@@ -2210,6 +2212,8 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
   char *p_line;
   t_upsact_cmd *p_cmd;
   int i;
+  int ifdepth = 0;
+  int elseflags[MAXIFDEPTH];
 
   for ( ; l_cmd; l_cmd = l_cmd->next ) {
 
@@ -2224,6 +2228,27 @@ t_upslst_item *reverse_command_list( t_upsact_item *const p_act_itm,
     if ( p_cmd && ((i_cmd = p_cmd->icmd) != e_invalid_cmd) ) {
 
       if ( (i_uncmd = g_func_info[i_cmd].icmd_undo) != e_invalid_cmd ) {
+
+        /* deal with nested if and else changing endif inverse action */
+
+        if ((i_cmd == e_if || i_cmd == e_unless) && ifdepth < MAXIFDEPTH) {
+           ifdepth++;
+           elseflags[ifdepth] = 0;
+        }
+        if (i_cmd == e_else) {
+           elseflags[ifdepth] = 1;
+        }
+
+        if (i_cmd == e_endif || i_cmd == e_endunless) {
+            if ( !elseflags[ifdepth] && i_cmd == e_endif)
+               i_cmd = e_endunless;
+            if ( !elseflags[ifdepth] && i_cmd == e_endunless)
+               i_cmd = e_endif;
+           elseflags[ifdepth] = 0;
+           ifdepth--;
+           if (ifdepth < 0)
+              ifdepth = 0;
+        }
 
 	(void) strcpy( buf,  g_func_info[i_uncmd].cmd );
 
