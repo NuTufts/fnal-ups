@@ -77,7 +77,7 @@ test -n "$db" && echo "the current version of ups for this flavor is $ver "`test
 # now get the prddir and exe
 test -n "$ver" && set_ prddir=`sed -n -e "/[ 	]*$flv$/,/PROD_DIR/{" -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` && echo "prddir=$prddir"
 # NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin ls is smart).
-tnotnull prddir && nullout ls $prddir/bin/ups      && set_ exe=$prddir/bin/ups      || set_ exe=
+tnotnull prddir && nullout /bin/ls $prddir/bin/ups      && set_ exe=$prddir/bin/ups      || set_ exe=
 tnotnull prddir && test -z "$exe"  && nullout ls $prddir/$flv/bin/ups && set_ exe=$prddir/$flv/bin/ups
 test -z "$exe"  && set_ exe=`which ups`
 test -z "$exe"  && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
