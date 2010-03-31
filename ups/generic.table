@@ -22,15 +22,16 @@ COMMON:
         setupEnv()
         proddir()
 
-	# For unsetup, "if(cmd)" and "unless(cmd)" cmd's happen but the stuff within does not
-	# For unsetup, the "execute" statements do not happen but the if/unless statements do
+	# For unsetup, "if(cmd)" and "unless(cmd)" cmd's happen and pathAppend is the reverse of pathRemove
+        #   -- the "if" and "unless" status check is reverse between setup and unsetup.
+	# For unsetup, the "execute" and "envRemove" statements do not happen; they are not reversible
 	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
 
 	execute( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ups_env;exit $?;fi;done'`, UPS_ENV )
 	envSet( ${UPS_PROD_NAME_UC}_FQ, $_FQ )
 
 	# These are use by other products' build system
-	# double(2) double-quotes(") is a bit of trick - ups is enclosing things inside of double quotes so it thinks it can strip off the first and last...
+	# double(2) double-quotes(") is a bit of a trick - ups is enclosing things inside of double quotes so it thinks it can strip off the first and last...
 	# double(2) double-quotes(") is needed to be shell independent - to work on cshell or bourne shell
 	prodDir( _INC, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/ "";do for ii in ${UPS_PROD_NAME} inc include h;do [ -d ${UPS_PROD_DIR}/${dd}$ii ] && echo ${dd}$ii && exit;done;done'`"" )
 	prodDir( _LIB, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/lib lib/$${UPS_PROD_NAME_UC}_FQ lib.$${UPS_PROD_NAME_UC}_FQ;do [ -d ${UPS_PROD_DIR}/$dd ] && echo $dd && exit;done;echo .'`"" )
@@ -40,29 +41,27 @@ COMMON:
 
 	prodDir( _MAN, ""`sh -c 'for dd in $${UPS_PROD_NAME_UC}_FQ/ "";do for ii in man share/man;do [ -d ${UPS_PROD_DIR}/${dd}$ii ] && echo ${dd}$ii && exit;done;done'`"" )
 
-	pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_BIN}, :)
-	pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_SBIN}, :)
-	pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
+        if    ( test `expr "${${UPS_PROD_NAME_UC}_BIN}" : '.*[/.]/'` -eq 0 -a -d "${${UPS_PROD_NAME_UC}_BIN}" )
+            pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_BIN}, :)
+            # older versions of ups (v4_7_4a) have bug that requires else() clause
+	else  ()
+            execute( true, UPS_ENV )
+        endif ( test `expr "${${UPS_PROD_NAME_UC}_BIN}" : '.*[/.]/'` -eq 0 -a -d "${${UPS_PROD_NAME_UC}_BIN}" )
+        if    ( test `expr "${${UPS_PROD_NAME_UC}_SBIN}" : '.*\.$'` -eq 0 -a -d "${${UPS_PROD_NAME_UC}_SBIN}" )
+            pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_SBIN}, :)
+	else  ()
+            execute( true, UPS_ENV )
+        endif ( test `expr "${${UPS_PROD_NAME_UC}_SBIN}" : '.*\.$'` -eq 0 -a -d "${${UPS_PROD_NAME_UC}_SBIN}" )
+        if    ( test -d ${UPS_PROD_DIR}/bin )
+            pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
+	else  ()
+            execute( true, UPS_ENV )
+        endif ( test -d ${UPS_PROD_DIR}/bin )
+
 	envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
 
 	envSetIfNotSet( MANPATH, "`man -w`" )
 	envPrepend( MANPATH, ${${UPS_PROD_NAME_UC}_MAN}, :)
-
-	if    ( test ! -d ${UPS_PROD_DIR}/bin )
-	    pathRemove( PATH, ${UPS_PROD_DIR}/bin, :)
-	else()
-	  if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_BIN )
-	    pathRemove( PATH, $${UPS_PROD_NAME_UC}_BIN, :)
-	    # must leave _BIN (and _LIB (below)) env for pathRemove which will happen during unsetup (un-action for pathPrepend)
-	  endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_BIN )
-	endif ( test ! -d ${UPS_PROD_DIR}/bin )
-
-	if    ( test ! -d ${UPS_PROD_DIR}/sbin )
-	    pathRemove( PATH, ${UPS_PROD_DIR}/sbin, :)
-	endif ( test ! -d ${UPS_PROD_DIR}/sbin )
-	if    ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_SBIN )
-	    pathRemove( PATH, $${UPS_PROD_NAME_UC}_SBIN, :)
-	endif ( test "${${UPS_PROD_NAME_UC}_FQ}" = . || test ! -d $${UPS_PROD_NAME_UC}_SBIN )
 
 	if    ( test ! -d ${${UPS_PROD_NAME_UC}_LIB} )
 	    envRemove( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
