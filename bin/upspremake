@@ -159,8 +159,10 @@ case $ccenv in
 		if [ "$dbg" != "" ]; then 
 			cflags="$cflags -g" 
 		fi
-#		defs="$defs CCCHK=\"-Xa -vc\""
-		defs="$defs CCCHK=\"-Xc -v\""
+                # 2010.03.31 giving sun cc -Xc causes recently add PATH_MAX
+                # in src/upsugp.c to be undefined :(
+		#defs="$defs CCCHK=\"-Xc -v\""
+		defs="$defs CCCHK=\"-v\""
                 llibs="-lnsl"
 		;;
 

@@ -39,6 +39,7 @@
 #include <math.h>
 #include <sys/utsname.h>
 #include <string.h>
+#include <limits.h>				/* PATH_MAX */
 
 extern char *get_current_dir_name(void);
 
