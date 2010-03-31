@@ -18,7 +18,7 @@ test $?shell = 1 && set ss=csh || ss=sh
 #echo Shell type is $ss.
 
 # make some things similar. need to use set_ because sh builtin set would hide function set
-test "$ss" = csh && alias set_ set
+test "$ss" = csh && alias set_ set && alias vecho_ 'if ($?vv == 1) echo \!*' || eval 'vecho_() { test -n "${vv-}" && echo "$@";}'
 test "$ss" =  sh && eval 'set_() { ss=$?;for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`;val=`expr "$xx" : "[^=]*=\(.*\)"`;eval "$var=\"$val\"";done;return $ss; }'
 test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\${2-}\""; }' && eval 'source() { file=$1; shift; . $file "$@"; }' && eval 'unsetenv() { unset "$@"; }'
 test "$ss" =  sh && eval 'tnotnull() { eval "test -n \"\${$1-}\""; }'                             && eval 'nullout() { "$@" >/dev/null 2>&1; }'
@@ -27,16 +27,16 @@ test "$ss" = csh && alias tnotnull "eval '"'test $?'"\!* -eq 1' && eval '"'test 
 # now is if we were passed a path or if not, if we can figure it out (maybe if we are interactive)
 #   bash, zsh, ksh and tcsh pass params to a source file, csh does not. but someone will be writing csh scripts
 set_ msg='Please set shell or env. variable prod_db (to be the path to the products DB). Fix this and other errors may go away.'
-tnotnull prod_db && set_ db="`cd $prod_db >/dev/null;pwd`" && echo 'setting db from prod_db variable' || set_ db=
+tnotnull prod_db && set_ db="`cd $prod_db >/dev/null;pwd`" && vecho_ 'setting db from prod_db variable' || set_ db=
 
-test -z "$db" && tnotnull BASH_SOURCE && set_ me=`dirname $BASH_SOURCE` && set_ db="`cd $me >/dev/null;pwd`" && echo 'setting db via BASH_SOURCE'
+test -z "$db" && tnotnull BASH_SOURCE && set_ me=`dirname $BASH_SOURCE` && set_ db="`cd $me >/dev/null;pwd`" && vecho_ 'setting db via BASH_SOURCE'
 
 # history is applicable only for interactive t/csh
 test -z "$db" -a "$ss" = csh && test $?history = 0 && set history=5  # make sure history 1 works
 test -z "$db" -a "$ss" = csh && set me=`history 1|sed 's/^[ 	0-9:]*//'` && test -n "$me" && set me=`dirname $me[2]` && set db=`cd $me >/dev/null;pwd` \
-   && echo 'setting db via interactive history'
+   && vecho_ 'setting db via interactive history'
 
-test -z "$db" && echo "$msg" || echo "db=$db"
+test -z "$db" && echo "$msg" || vecho_ "db=$db"
 
 # NEED TO DETERMINE WHERE an appropriate ups exe is.
 #  Need to rely on some ups product install standards:
@@ -56,7 +56,7 @@ set_ mach=`sh -c "case $mach in *86*|sun*) :;; *) echo $mach;;esac"`
 set_ fl1=$os$mach$b64+$os_rev1$libc1 fl2=$os$mach+$os_rev1$libc1 fl3=$os$mach$b64+$os_rev1$libc2 fl4=$os$mach+$os_rev1$libc2
 set_ fl5=$os$mach$b64+$os_rev1       fl6=$os$mach+$os_rev1       fl7=$os$mach$b64+$os_rev2       fl8=$os$mach+$os_rev2
 
-echo "the flavors are: $fl1 $fl2 $fl3 $fl4 $fl5 $fl6 $fl7 $fl8"
+vecho_ "the flavors are: $fl1 $fl2 $fl3 $fl4 $fl5 $fl6 $fl7 $fl8"
 
 setenv UPS_SHELL $ss
 
@@ -72,15 +72,15 @@ test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6
 test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl7
 test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl8
 
-test -n "$db" && echo "the current version of ups for this flavor is $ver "`test -n "$ver" && echo "flv=$flv"`
+test -n "$db" && vecho_ "the current version of ups for this flavor is $ver "`test -n "$ver" && vecho_ "flv=$flv"`
 
 # now get the prddir and exe
-test -n "$ver" && set_ prddir=`sed -n -e "/[ 	]*$flv$/,/PROD_DIR/{" -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` && echo "prddir=$prddir"
-# NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin ls is smart).
+test -n "$ver" && set_ prddir=`sed -n -e "/[ 	]*$flv$/,/PROD_DIR/{" -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` && vecho_ "prddir=$prddir"
+# NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin /bin/ls is smart).
 tnotnull prddir && nullout /bin/ls $prddir/bin/ups      && set_ exe=$prddir/bin/ups      || set_ exe=
-tnotnull prddir && test -z "$exe"  && nullout ls $prddir/$flv/bin/ups && set_ exe=$prddir/$flv/bin/ups
+tnotnull prddir && test -z "$exe"  && nullout /bin/ls $prddir/$flv/bin/ups && set_ exe=$prddir/$flv/bin/ups
 test -z "$exe"  && set_ exe=`which ups`
-test -z "$exe"  && echo "ERROR: did not find ups binary" || echo "using ups exe $exe"
+test -z "$exe"  && echo "ERROR: did not find ups binary" || vecho_ "using ups exe $exe"
 tnotnull PRODUCTS && set_ products=$PRODUCTS || set_ products=$db; expr ":${products}:" : ".*:${db}:" >/dev/null || set_ products=${db}:$products
 tnotnull UPS_DIR && setenv PATH `echo :${PATH}: | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv SETUP_UPS UPS_DIR
 test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
@@ -90,6 +90,6 @@ test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
 
 test -n "$exe" && test -f "$db/setup.initial" && source "$db/setup.initial"
 
-test "$ss" = csh && unalias tnotnull nullout set_
+test "$ss" = csh && unalias tnotnull nullout set_ vecho_ 
 unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 fl7 fl8 pdp ver flv chainf prddir prdbin exe products olddb
-unset set_ setenv unsetenv tnotnull source nullout ovexe ov
+unset set_ setenv unsetenv tnotnull source nullout ovexe ov vecho_
