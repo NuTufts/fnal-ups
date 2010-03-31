@@ -134,7 +134,7 @@ set_PRODS_RT()    # aka PRODS_DB (I combine them)
         DB=`expr "$PRODUCTS" : '\([^:]*\)'`
         if [ -f $DB/.upsfiles/dbconfig ];then
             # check for PROD_DIR_PREFIX
-            PROD_DIR_PREFIX=`sed -n '/^[ \t]*PROD_DIR_PREFIX/{s/.*= *//;s/[ \t]*$//;p}' $DB/.upsfiles/dbconfig`
+            PROD_DIR_PREFIX=`sed -n '/^[ \t]*PROD_DIR_PREFIX/{s/.*= *//;s/[ \t]*$//;p;}' $DB/.upsfiles/dbconfig`
             if [ "$PROD_DIR_PREFIX" = "$DB" -o "$PROD_DIR_PREFIX" = '${UPS_THIS_DB}' ];then
                 PRODS_RT=$DB
             else
