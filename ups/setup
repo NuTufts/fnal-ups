@@ -18,6 +18,8 @@ test $?shell = 1 && set ss=csh || ss=sh
 #echo Shell type is $ss.
 
 # make some things similar. need to use set_ because sh builtin set would hide function set
+# Note: perhaps the trickiest thing in this file is the sh set_ function tries to return the same status
+#       as at the start of the function (which most likely is the result of a back-tick expression
 test "$ss" = csh && alias set_ set && alias vecho_ 'if ($?vv == 1) echo \!*' || eval 'vecho_() { test -n "${vv-}" && echo "$@";}'
 test "$ss" =  sh && eval 'set_() { ss=$?;for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`;val=`expr "$xx" : "[^=]*=\(.*\)"`;eval "$var=\"$val\"";done;return $ss; }'
 test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\${2-}\""; }' && eval 'source() { file=$1; shift; . $file "$@"; }' && eval 'unsetenv() { unset "$@"; }'
