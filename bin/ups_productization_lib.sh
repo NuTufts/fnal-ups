@@ -259,7 +259,7 @@ EOF
             -m$PROD_NAM.table -f$ups_flv $PROD_NAM $PROD_VER
 
         # now make sure the famous "setup" file is copied to $PRODS_RT
-        if [ -f $PRODS_RT/setup ];then
+        if [ -f $PRODS_RT/setup -o -L $PRODS_RT/setup ];then
             if diff ups/setup $PRODS_RT >/dev/null;then
                 echo "setup bootstrap file already in $PRODS_RT; copy skipped"
             else
