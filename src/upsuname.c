@@ -109,7 +109,7 @@ ups_append_OS(char *buf)
    while(default_machines[i][0]) {
        if ( !strncmp(default_machines[i][0],buf,strlen(default_machines[i][0])) ) {
           p = strrchr(baseuname.machine,default_machines[i][1][0]);
-          if ( p && !strncmp(p, default_machines[i][1],strlen(default_machines[i]))) {
+          if ( p && !strncmp(p, default_machines[i][1],strlen(default_machines[i][1]))) {
               /* looks like our default machine type, so leave it off */
               return;
           }

@@ -10,7 +10,7 @@ g_start_w        variable     95 src/upsutl.c     static time_t g_start_w, g_fin
 g_stat_dir       variable     96 src/upsutl.c     static char g_stat_dir[] = "statistics/";
 g_umask          variable     98 src/upsutl.c     static mode_t g_umask = 0;
 g_unknown_user   variable     97 src/upsutl.c     static char g_unknown_user[] = "UNKNOWN";
-qsort_cmp_string function   1337 src/upsutl.c     int qsort_cmp_string( const void * c1, const void * c2 )
+qsort_cmp_string function   1363 src/upsutl.c     int qsort_cmp_string( const void * c1, const void * c2 )
 stricmp_charmap  variable    848 src/upsutl.c     static unsigned char stricmp_charmap[] = {
 upsutl_finish_temp_file function    282 src/upsutl.c     void upsutl_finish_temp_file( const FILE * const a_stream,
 upsutl_finish_up function    114 src/upsutl.c     int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
@@ -22,6 +22,7 @@ upsutl_get_config function    418 src/upsutl.c     t_upstyp_product *upsutl_get_
 upsutl_get_files function    556 src/upsutl.c     void upsutl_get_files(const char * const a_dir,
 upsutl_get_hostname function    325 src/upsutl.c     char *upsutl_get_hostname( void )
 upsutl_get_prod_dir function    626 src/upsutl.c     char *upsutl_get_prod_dir(const char * const a_db,
+upsutl_is_a_dir  function   1342 src/upsutl.c     int upsutl_is_a_dir(const char * const a_pathname)
 upsutl_is_a_file function   1319 src/upsutl.c     int upsutl_is_a_file(const char * const a_filename)
 upsutl_is_authorized function    369 src/upsutl.c     int upsutl_is_authorized( const t_upstyp_matched_instance * const a_minst,
 upsutl_start_timing function    661 src/upsutl.c     void upsutl_start_timing(void)
@@ -368,99 +369,99 @@ next             member       16 src/dropit.c     struct Cell_s *next;
 pathlist         variable     20 src/dropit.c     static struct Cell_s *pathlist = 0;
 safe             variable     13 src/dropit.c     static char *safe = 0;
 value            member       17 src/dropit.c     char *value;
-FREE             macro        58 src/upsugo.c     #define FREE( X ) free( X ); X = 0;
-MAX_ARGS         macro        56 src/upsugo.c     #define MAX_ARGS 1000
-UPSUGO           macro        57 src/upsugo.c     #define UPSUGO "UPSUGO: "
-UPS_NEED_DB      variable     54 src/upsugo.c     int UPS_NEED_DB=1;
-UPS_UGO_ID       variable     49 src/upsugo.c     char UPS_UGO_ID[] = "@(#)upsugo.c 4.00";
-add_chain        macro       184 src/upsugo.c     #define add_chain(CHAIN) \
-argindx          variable    389 src/upsugo.c     int argindx;
-build_list       macro       271 src/upsugo.c     #define build_list( LIST_ELEMENT , ARG ) \
-case_0           macro       174 src/upsugo.c     #define case_0 case '0': uc->ugo_number = 1; break;
-case_1           macro       175 src/upsugo.c     #define case_1 case '1': uc->ugo_number = 2; break;
-case_2           macro       176 src/upsugo.c     #define case_2 case '2': uc->ugo_number = 3; break;
-case_3           macro       177 src/upsugo.c     #define case_3 case '3': uc->ugo_number = 4; break;
-case_4           macro       178 src/upsugo.c     #define case_4 case '4': uc->ugo_number = 5; break;
-case_5           macro       179 src/upsugo.c     #define case_5 case '5': uc->ugo_number = 6; break;
-case_6           macro       180 src/upsugo.c     #define case_6 case '6': uc->ugo_number = 7; break;
-case_7           macro       181 src/upsugo.c     #define case_7 case '7': uc->ugo_number = 8; break;
-case_A           macro       315 src/upsugo.c     #define case_A case 'A': uc->ugo_A = 1; build_list (uc->ugo_auth , "A") 
-case_C           macro       151 src/upsugo.c     #define case_C case 'C': uc->ugo_C = 1; break;
-case_D           macro       324 src/upsugo.c     #define case_D case 'D': uc->ugo_D = 1; set_value (uc->ugo_origin , "D") 
-case_E           macro       153 src/upsugo.c     #define case_E case 'E': uc->ugo_E = 1; break;
-case_F           macro       154 src/upsugo.c     #define case_F case 'F': uc->ugo_F = 1; break;
-case_G           macro       346 src/upsugo.c     #define case_G case 'G': uc->ugo_G = 1; \
-case_H           macro       318 src/upsugo.c     #define case_H case 'H': uc->ugo_H = 1; build_list (uc->ugo_osname , "H") 
-case_K           macro       320 src/upsugo.c     #define case_K case 'K': uc->ugo_K = 1; build_list (uc->ugo_key , "K") 
-case_L           macro       158 src/upsugo.c     #define case_L case 'L': uc->ugo_L = 1; break;
-case_M           macro       326 src/upsugo.c     #define case_M case 'M': uc->ugo_M = 1; set_value (uc->ugo_tablefiledir, "M")
-case_N           macro       327 src/upsugo.c     #define case_N case 'N': uc->ugo_N = 1; set_value (uc->ugo_anyfile , "N") 
-case_O           macro       342 src/upsugo.c     #define case_O case 'O': uc->ugo_O = 1; \
-case_P           macro       159 src/upsugo.c     #define case_P case 'P': uc->ugo_P = 1; break;
-case_R           macro       160 src/upsugo.c     #define case_R case 'R': uc->ugo_R = 1; break;
-case_S           macro       162 src/upsugo.c     #define case_S case 'S': uc->ugo_S = 1; break;
-case_T           macro       329 src/upsugo.c     #define case_T case 'T': uc->ugo_T = 1; set_value (uc->ugo_archivefile , "T")
-case_U           macro       331 src/upsugo.c     #define case_U case 'U': uc->ugo_U = 1; set_value (uc->ugo_upsdir , "U")
-case_V           macro       165 src/upsugo.c     #define case_V case 'V': uc->ugo_V = 1; break;
-case_W           macro       167 src/upsugo.c     #define case_W case 'W': uc->ugo_W = 1; break;
-case_X           macro       169 src/upsugo.c     #define case_X case 'X': uc->ugo_X = 1; break;
-case_Y           macro       171 src/upsugo.c     #define case_Y case 'Y': uc->ugo_Y = 1; break;
-case_Z           macro       172 src/upsugo.c     #define case_Z case 'Z': uc->ugo_Z = 1; break;
-case_a           macro       150 src/upsugo.c     #define case_a case 'a': uc->ugo_a = 1; break;
-case_b           macro       323 src/upsugo.c     #define case_b case 'b': uc->ugo_b = 1; set_value (uc->ugo_compile_file, "b") 
-case_c           macro       188 src/upsugo.c     #define case_c case 'c': uc->ugo_c = 1; add_chain("current"); uc->ugo_reqchain = "-c"; break;
-case_d           macro       189 src/upsugo.c     #define case_d case 'd': uc->ugo_d = 1; add_chain("development"); uc->ugo_reqchain = "-d"; break;
-case_dot         macro       333 src/upsugo.c     #define case_dot case '.': \
-case_e           macro       152 src/upsugo.c     #define case_e case 'e': uc->ugo_e = 1; break;
-case_f           macro       316 src/upsugo.c     #define case_f case 'f': uc->ugo_f = 1; build_list (uc->ugo_flavor , "f") 
-case_g           macro       317 src/upsugo.c     #define case_g case 'g': uc->ugo_g = 1; build_list (uc->ugo_chain , "g")
-case_h           macro       319 src/upsugo.c     #define case_h case 'h': uc->ugo_h = 1; build_list (uc->ugo_host , "h") 
-case_help        macro       149 src/upsugo.c     #define case_help case '?': uc->ugo_help = 1; break;
-case_j           macro       155 src/upsugo.c     #define case_j case 'j': uc->ugo_j = 1; break;
-case_k           macro       156 src/upsugo.c     #define case_k case 'k': uc->ugo_k = 1; break;
-case_l           macro       157 src/upsugo.c     #define case_l case 'l': uc->ugo_l = 1; break;
-case_m           macro       325 src/upsugo.c     #define case_m case 'm': uc->ugo_m = 1; set_value (uc->ugo_tablefile , "m") 
-case_n           macro       190 src/upsugo.c     #define case_n case 'n': uc->ugo_n = 1; add_chain("new"); uc->ugo_reqchain = "-n"; break;
-case_o           macro       192 src/upsugo.c     #define case_o case 'o': uc->ugo_o = 1; add_chain("old"); uc->ugo_reqchain = "-o"; break;
-case_p           macro       350 src/upsugo.c     #define case_p case 'p': uc->ugo_p = 1; \
-case_q           macro       353 src/upsugo.c     #define case_q case 'q': uc->ugo_q = 1; \
-case_r           macro       328 src/upsugo.c     #define case_r case 'r': uc->ugo_r = 1; set_value (uc->ugo_productdir , "r")
-case_s           macro       161 src/upsugo.c     #define case_s case 's': uc->ugo_s = 1; break;
-case_t           macro       191 src/upsugo.c     #define case_t case 't': uc->ugo_t = 1; add_chain("test"); uc->ugo_reqchain = "-t"; break;
-case_u           macro       330 src/upsugo.c     #define case_u case 'u': uc->ugo_u = 1; set_value (uc->ugo_compile_dir, "u")
-case_v           macro       164 src/upsugo.c     #define case_v case 'v': uc->ugo_v +=1; UPS_VERBOSE=uc->ugo_v; break;
-case_w           macro       166 src/upsugo.c     #define case_w case 'w': uc->ugo_w = 1; break;
-case_y           macro       170 src/upsugo.c     #define case_y case 'y': uc->ugo_y = 1; break;
-case_z           macro       369 src/upsugo.c     #define case_z case 'z': uc->ugo_z = 1; \
-errflg           variable    386 src/upsugo.c     int errflg = 0;
-expand_flavorlist function     61 src/upsugo.c     expand_flavorlist(struct ups_command * uc) {
-flavor_sub       function     94 src/upsugo.c     flavor_sub(struct ups_command * uc)
-g_UPS_SHELL      variable    390 src/upsugo.c     int g_UPS_SHELL=e_INVALID_SHELL;
-g_command_verb   variable     52 src/upsugo.c     int g_command_verb = 0;
-last_command     variable    388 src/upsugo.c     t_upslst_item *last_command = 0;
-reqchainbuf      variable    270 src/upsugo.c     static char reqchainbuf[512];
-set_O_value      macro       245 src/upsugo.c     #define set_O_value( ELEMENT , ARG ) \
-set_value        macro       201 src/upsugo.c     #define set_value( ELEMENT , ARG ) \
-set_value_nop    macro       221 src/upsugo.c     #define set_value_nop( ELEMENT , ARG ) \
-ugo_commands     variable    387 src/upsugo.c     t_upslst_item *ugo_commands = 0;
-ugo_old2newquals function    706 src/upsugo.c     ugo_old2newquals( const char *inaddr, int declflag ) {
-upsugo_bldcmd    function   1503 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
-upsugo_blddb     function    643 src/upsugo.c     int upsugo_blddb(struct ups_command * const uc, char * inaddr)
-upsugo_bldfvr    function    410 src/upsugo.c     int upsugo_bldfvr(struct ups_command * const uc)
-upsugo_bldqual   function    770 src/upsugo.c     int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
-upsugo_dump      function   1237 src/upsugo.c     int upsugo_dump (struct ups_command * const uc,
-upsugo_env       function   1426 src/upsugo.c     t_upsugo_command *upsugo_env(char * const product,char * const validopts)
-upsugo_free      function   1144 src/upsugo.c     int upsugo_free (struct ups_command * const uc)
-upsugo_free_ugo_db function   1207 src/upsugo.c     void upsugo_free_ugo_db( t_upslst_item * const ugo_db ) 
-upsugo_getarg    function    973 src/upsugo.c     char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
-upsugo_getenv    function   1400 src/upsugo.c     char *upsugo_getenv( char * const prod_name )
-upsugo_ifornota  function    539 src/upsugo.c     int upsugo_ifornota(struct ups_command * const uc)
-upsugo_liststart function    941 src/upsugo.c     void upsugo_liststart(t_upsugo_command * const a_command_line)
-upsugo_next      function   1557 src/upsugo.c     t_upsugo_command *upsugo_next(const int old_argc,
-upsugo_prtdb     function   1352 src/upsugo.c     void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title ,
-upsugo_prtlst    function   1311 src/upsugo.c     void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title ,
-upsugo_rearg     function   1065 src/upsugo.c     int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *argv_new[])
-upsugo_setshell  function    502 src/upsugo.c     void upsugo_setshell(struct ups_command * const uc)
+FREE             macro        59 src/upsugo.c     #define FREE( X ) free( X ); X = 0;
+MAX_ARGS         macro        57 src/upsugo.c     #define MAX_ARGS 1000
+UPSUGO           macro        58 src/upsugo.c     #define UPSUGO "UPSUGO: "
+UPS_NEED_DB      variable     55 src/upsugo.c     int UPS_NEED_DB=1;
+UPS_UGO_ID       variable     50 src/upsugo.c     char UPS_UGO_ID[] = "@(#)upsugo.c 4.00";
+add_chain        macro       185 src/upsugo.c     #define add_chain(CHAIN) \
+argindx          variable    390 src/upsugo.c     int argindx;
+build_list       macro       272 src/upsugo.c     #define build_list( LIST_ELEMENT , ARG ) \
+case_0           macro       175 src/upsugo.c     #define case_0 case '0': uc->ugo_number = 1; break;
+case_1           macro       176 src/upsugo.c     #define case_1 case '1': uc->ugo_number = 2; break;
+case_2           macro       177 src/upsugo.c     #define case_2 case '2': uc->ugo_number = 3; break;
+case_3           macro       178 src/upsugo.c     #define case_3 case '3': uc->ugo_number = 4; break;
+case_4           macro       179 src/upsugo.c     #define case_4 case '4': uc->ugo_number = 5; break;
+case_5           macro       180 src/upsugo.c     #define case_5 case '5': uc->ugo_number = 6; break;
+case_6           macro       181 src/upsugo.c     #define case_6 case '6': uc->ugo_number = 7; break;
+case_7           macro       182 src/upsugo.c     #define case_7 case '7': uc->ugo_number = 8; break;
+case_A           macro       316 src/upsugo.c     #define case_A case 'A': uc->ugo_A = 1; build_list (uc->ugo_auth , "A") 
+case_C           macro       152 src/upsugo.c     #define case_C case 'C': uc->ugo_C = 1; break;
+case_D           macro       325 src/upsugo.c     #define case_D case 'D': uc->ugo_D = 1; set_value (uc->ugo_origin , "D") 
+case_E           macro       154 src/upsugo.c     #define case_E case 'E': uc->ugo_E = 1; break;
+case_F           macro       155 src/upsugo.c     #define case_F case 'F': uc->ugo_F = 1; break;
+case_G           macro       347 src/upsugo.c     #define case_G case 'G': uc->ugo_G = 1; \
+case_H           macro       319 src/upsugo.c     #define case_H case 'H': uc->ugo_H = 1; build_list (uc->ugo_osname , "H") 
+case_K           macro       321 src/upsugo.c     #define case_K case 'K': uc->ugo_K = 1; build_list (uc->ugo_key , "K") 
+case_L           macro       159 src/upsugo.c     #define case_L case 'L': uc->ugo_L = 1; break;
+case_M           macro       327 src/upsugo.c     #define case_M case 'M': uc->ugo_M = 1; set_value (uc->ugo_tablefiledir, "M")
+case_N           macro       328 src/upsugo.c     #define case_N case 'N': uc->ugo_N = 1; set_value (uc->ugo_anyfile , "N") 
+case_O           macro       343 src/upsugo.c     #define case_O case 'O': uc->ugo_O = 1; \
+case_P           macro       160 src/upsugo.c     #define case_P case 'P': uc->ugo_P = 1; break;
+case_R           macro       161 src/upsugo.c     #define case_R case 'R': uc->ugo_R = 1; break;
+case_S           macro       163 src/upsugo.c     #define case_S case 'S': uc->ugo_S = 1; break;
+case_T           macro       330 src/upsugo.c     #define case_T case 'T': uc->ugo_T = 1; set_value (uc->ugo_archivefile , "T")
+case_U           macro       332 src/upsugo.c     #define case_U case 'U': uc->ugo_U = 1; set_value (uc->ugo_upsdir , "U")
+case_V           macro       166 src/upsugo.c     #define case_V case 'V': uc->ugo_V = 1; break;
+case_W           macro       168 src/upsugo.c     #define case_W case 'W': uc->ugo_W = 1; break;
+case_X           macro       170 src/upsugo.c     #define case_X case 'X': uc->ugo_X = 1; break;
+case_Y           macro       172 src/upsugo.c     #define case_Y case 'Y': uc->ugo_Y = 1; break;
+case_Z           macro       173 src/upsugo.c     #define case_Z case 'Z': uc->ugo_Z = 1; break;
+case_a           macro       151 src/upsugo.c     #define case_a case 'a': uc->ugo_a = 1; break;
+case_b           macro       324 src/upsugo.c     #define case_b case 'b': uc->ugo_b = 1; set_value (uc->ugo_compile_file, "b") 
+case_c           macro       189 src/upsugo.c     #define case_c case 'c': uc->ugo_c = 1; add_chain("current"); uc->ugo_reqchain = "-c"; break;
+case_d           macro       190 src/upsugo.c     #define case_d case 'd': uc->ugo_d = 1; add_chain("development"); uc->ugo_reqchain = "-d"; break;
+case_dot         macro       334 src/upsugo.c     #define case_dot case '.': \
+case_e           macro       153 src/upsugo.c     #define case_e case 'e': uc->ugo_e = 1; break;
+case_f           macro       317 src/upsugo.c     #define case_f case 'f': uc->ugo_f = 1; build_list (uc->ugo_flavor , "f") 
+case_g           macro       318 src/upsugo.c     #define case_g case 'g': uc->ugo_g = 1; build_list (uc->ugo_chain , "g")
+case_h           macro       320 src/upsugo.c     #define case_h case 'h': uc->ugo_h = 1; build_list (uc->ugo_host , "h") 
+case_help        macro       150 src/upsugo.c     #define case_help case '?': uc->ugo_help = 1; break;
+case_j           macro       156 src/upsugo.c     #define case_j case 'j': uc->ugo_j = 1; break;
+case_k           macro       157 src/upsugo.c     #define case_k case 'k': uc->ugo_k = 1; break;
+case_l           macro       158 src/upsugo.c     #define case_l case 'l': uc->ugo_l = 1; break;
+case_m           macro       326 src/upsugo.c     #define case_m case 'm': uc->ugo_m = 1; set_value (uc->ugo_tablefile , "m") 
+case_n           macro       191 src/upsugo.c     #define case_n case 'n': uc->ugo_n = 1; add_chain("new"); uc->ugo_reqchain = "-n"; break;
+case_o           macro       193 src/upsugo.c     #define case_o case 'o': uc->ugo_o = 1; add_chain("old"); uc->ugo_reqchain = "-o"; break;
+case_p           macro       351 src/upsugo.c     #define case_p case 'p': uc->ugo_p = 1; \
+case_q           macro       354 src/upsugo.c     #define case_q case 'q': uc->ugo_q = 1; \
+case_r           macro       329 src/upsugo.c     #define case_r case 'r': uc->ugo_r = 1; set_value (uc->ugo_productdir , "r")
+case_s           macro       162 src/upsugo.c     #define case_s case 's': uc->ugo_s = 1; break;
+case_t           macro       192 src/upsugo.c     #define case_t case 't': uc->ugo_t = 1; add_chain("test"); uc->ugo_reqchain = "-t"; break;
+case_u           macro       331 src/upsugo.c     #define case_u case 'u': uc->ugo_u = 1; set_value (uc->ugo_compile_dir, "u")
+case_v           macro       165 src/upsugo.c     #define case_v case 'v': uc->ugo_v +=1; UPS_VERBOSE=uc->ugo_v; break;
+case_w           macro       167 src/upsugo.c     #define case_w case 'w': uc->ugo_w = 1; break;
+case_y           macro       171 src/upsugo.c     #define case_y case 'y': uc->ugo_y = 1; break;
+case_z           macro       370 src/upsugo.c     #define case_z case 'z': uc->ugo_z = 1; \
+errflg           variable    387 src/upsugo.c     int errflg = 0;
+expand_flavorlist function     62 src/upsugo.c     expand_flavorlist(struct ups_command * uc) {
+flavor_sub       function     95 src/upsugo.c     flavor_sub(struct ups_command * uc)
+g_UPS_SHELL      variable    391 src/upsugo.c     int g_UPS_SHELL=e_INVALID_SHELL;
+g_command_verb   variable     53 src/upsugo.c     int g_command_verb = 0;
+last_command     variable    389 src/upsugo.c     t_upslst_item *last_command = 0;
+reqchainbuf      variable    271 src/upsugo.c     static char reqchainbuf[512];
+set_O_value      macro       246 src/upsugo.c     #define set_O_value( ELEMENT , ARG ) \
+set_value        macro       202 src/upsugo.c     #define set_value( ELEMENT , ARG ) \
+set_value_nop    macro       222 src/upsugo.c     #define set_value_nop( ELEMENT , ARG ) \
+ugo_commands     variable    388 src/upsugo.c     t_upslst_item *ugo_commands = 0;
+ugo_old2newquals function    707 src/upsugo.c     ugo_old2newquals( const char *inaddr, int declflag ) {
+upsugo_bldcmd    function   1504 src/upsugo.c     t_upsugo_command *upsugo_bldcmd(char * const cmdstr,char * const validopts)
+upsugo_blddb     function    644 src/upsugo.c     int upsugo_blddb(struct ups_command * const uc, char * inaddr)
+upsugo_bldfvr    function    411 src/upsugo.c     int upsugo_bldfvr(struct ups_command * const uc)
+upsugo_bldqual   function    771 src/upsugo.c     int upsugo_bldqual(struct ups_command * const uc, char * const inaddr)
+upsugo_dump      function   1238 src/upsugo.c     int upsugo_dump (struct ups_command * const uc,
+upsugo_env       function   1427 src/upsugo.c     t_upsugo_command *upsugo_env(char * const product,char * const validopts)
+upsugo_free      function   1145 src/upsugo.c     int upsugo_free (struct ups_command * const uc)
+upsugo_free_ugo_db function   1208 src/upsugo.c     void upsugo_free_ugo_db( t_upslst_item * const ugo_db ) 
+upsugo_getarg    function    974 src/upsugo.c     char * upsugo_getarg( const int argc, char *argv[], char ** const argbuf)
+upsugo_getenv    function   1401 src/upsugo.c     char *upsugo_getenv( char * const prod_name )
+upsugo_ifornota  function    540 src/upsugo.c     int upsugo_ifornota(struct ups_command * const uc)
+upsugo_liststart function    942 src/upsugo.c     void upsugo_liststart(t_upsugo_command * const a_command_line)
+upsugo_next      function   1558 src/upsugo.c     t_upsugo_command *upsugo_next(const int old_argc,
+upsugo_prtdb     function   1353 src/upsugo.c     void upsugo_prtdb( t_upslst_item * const list_ptr , char * const title ,
+upsugo_prtlst    function   1312 src/upsugo.c     void upsugo_prtlst( t_upslst_item * const list_ptr , char * const title ,
+upsugo_rearg     function   1066 src/upsugo.c     int upsugo_rearg(const int argc_old,char *argv_old[],int * const argc_new,char *argv_new[])
+upsugo_setshell  function    503 src/upsugo.c     void upsugo_setshell(struct ups_command * const uc)
 ups_configure    function     61 src/ups_configure.c t_upslst_item *ups_configure(const t_upsugo_command * const a_command_line,
 ups_stop         function     61 src/ups_stop.c   t_upslst_item *ups_stop(const t_upsugo_command * const a_command_line,
 CMPATOM          macro       178 src/upstbl.c     #define CMPATOM( x, y ) ((x) != (y))
