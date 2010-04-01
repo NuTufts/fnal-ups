@@ -101,6 +101,7 @@ size_t upsutl_str_remove( char * const str, const char * const ct );
 size_t upsutl_str_remove_edges( char * const str, const char * const ct );
 size_t upsutl_str_remove_end_quotes( char * str, char * const quotes, char * const wspaces );
 int    upsutl_is_a_file(const char * const a_filename);
+int    upsutl_is_a_dir(const char * const a_pathname);
 
 
 /*

@@ -1329,6 +1329,32 @@ int upsutl_is_a_file(const char * const a_filename)
   
 }
 
+/*-----------------------------------------------------------------------
+ * upsutl_is_a_dir
+ *
+ * Given a filename including path, see if the path is a directory (as opposed
+ * to anything else).
+ *
+ * Input : path
+ * Output: none
+ * Return: UPS_SUCCESS if file exists, else UPS_NO_STAT_DIR
+ */
+int upsutl_is_a_dir(const char * const a_pathname)
+{
+  int status = UPS_SUCCESS;
+  struct stat buf;
+
+  if (stat(a_pathname, &buf) == -1) {
+    status = UPS_NO_STAT_DIR;
+  }
+  if (!S_ISDIR(buf.st_mode)) {
+    status = UPS_NO_STAT_DIR;
+  }
+
+  return(status);
+  
+}
+
 /*
  * Definition of private functions
  */

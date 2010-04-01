@@ -448,8 +448,8 @@ t_upslst_item *upsmat_instance(t_upsugo_command * const a_command_line,
 		upsver_mes(MATVLEVEL, "%sLooking for Product = %s\n", VPREFIX,
 			   prod_name);
 	      
-		/* make sure that the product actually exists. */
-		if (upsutl_is_a_file(location) == UPS_SUCCESS) {
+		/* make sure that the "product" actually exists. */
+		if (upsutl_is_a_dir(location) == UPS_SUCCESS) {
 		  /* Check if chains were requested. if a specific version was
 		     passed, but no chain, the we will want to report all
 		     chains. this is only true in the case where we are not
