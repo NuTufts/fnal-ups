@@ -206,7 +206,7 @@ ups_install()
         # b/c I'm not using 
         ups_flv=`get_flv_64_to_32`
         cd build-$ups_flv
-        inst_flv=`ups_flavor.sh | sed 's/flavor=//;s/ .*//'`
+        inst_flv=`ups_flavor.sh --ups | sed 's/flavor=//;s/ .*//'`
         inst_=$PRODS_RT/$PROD_NAM/$PROD_VER/$inst_flv
         mkdir -p $inst_
         /bin/cp -Lr bin lib man doc ups  $inst_
@@ -249,7 +249,7 @@ EOF
         fi
 
         cd build-$ups_flv
-        inst_flv=`ups_flavor.sh | sed 's/flavor=//;s/ .*//'`
+        inst_flv=`ups_flavor.sh --ups | sed 's/flavor=//;s/ .*//'`
 
 # Should I act differently if under $PRODS_RT ????
 
