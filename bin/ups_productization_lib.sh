@@ -206,7 +206,8 @@ ups_install()
         # b/c I'm not using 
         ups_flv=`get_flv_64_to_32`
         cd build-$ups_flv
-        inst_=$PRODS_RT/$PROD_NAM/$PROD_VER/$ups_flv
+        inst_flv=`ups_flavor.sh | sed 's/flavor=//;s/ .*//'`
+        inst_=$PRODS_RT/$PROD_NAM/$PROD_VER/$inst_flv
         mkdir -p $inst_
         /bin/cp -Lr bin lib man doc ups  $inst_
         unset inst_
@@ -229,12 +230,8 @@ ups_declare()
     ups_flv=`get_flv_64_to_32`
     echov "ups declare $* ups_flv=$ups_flv"
     if [ "${1-}" = --status ];then
-        vf=$PRODS_RT/$PROD_NAM/$PROD_VER.version
-        if [ -f $vf ];then
-            ups_flv_ere=`echo "$ups_flv" | sed 's/\([+.]\)/\\\\\1/g'`
-            if egrep "^[^#]*FLAVOR *= *$ups_flv_ere"'($|[ ])' $vf >/dev/null;then  return 0
-            else                                            return 1; fi
-        else                                                return 1; fi
+        # Can't tell which flavor would be built, so can't tell if its been declared
+        return 1
     else
 
         # ups is special -- see if db is initializaed
@@ -252,11 +249,12 @@ EOF
         fi
 
         cd build-$ups_flv
+        inst_flv=`ups_flavor.sh | sed 's/flavor=//;s/ .*//'`
 
 # Should I act differently if under $PRODS_RT ????
 
-        bin/ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER/$ups_flv -Mups \
-            -m$PROD_NAM.table -f$ups_flv $PROD_NAM $PROD_VER
+        bin/ups declare -c -z$PRODS_RT -r$PROD_NAM/$PROD_VER/$inst_flv -Mups \
+            -m$PROD_NAM.table -f$inst_flv $PROD_NAM $PROD_VER
 
         # now make sure the famous "setup" file is copied to $PRODS_RT
         if [ -f $PRODS_RT/setup -o -L $PRODS_RT/setup ];then
