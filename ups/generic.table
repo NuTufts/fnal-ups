@@ -19,15 +19,18 @@ Qualifiers=""
 
 COMMON:
    ACTION = setup__
+        # setupEnv puts SETUP_${UPS_PROD_NAME_UC} env var in env so product can be unsetup
         setupEnv()
         proddir()
 
 	# For unsetup, "if(cmd)" and "unless(cmd)" cmd's happen and pathAppend is the reverse of pathRemove
         #   -- the "if" and "unless" status check is reverse between setup and unsetup.
 	# For unsetup, the "execute" and "envRemove" statements do not happen; they are not reversible
+        # b/c "execute" statements only happen upon "setup" (not "unsetup") and any statement with "UPS_ENV" causes UPS_UPS_DIR env.var
+        #   to be set, this (the presence of UPS_UPS_DIR in env.) could possible be used to distinguish between setup and unsetup???
 	execute( test $?shell = 1 || eval 'setenv() { sts=$?; export $1; eval "$1=\"\${2-}\""; return $sts; };unsetenv() { unset "$@"; }', NO_UPS_ENV )
 
-	execute( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ups_env;exit $?;fi;done'`, UPS_ENV )
+	execute( setenv _FQ `sh -c 'expr "$${UPS_PROD_NAME_UC}_FQ" : "\(..*\)" || for dd in ${UPS_PROD_DIR} $UPS_DIR;do ff=$dd/ups/ups_FQ;if [ -x $ff ];then $ff ups_env;exit $?;fi;done'`, NO_UPS_ENV )
 	envSet( ${UPS_PROD_NAME_UC}_FQ, $_FQ )
 
 	# These are use by other products' build system
@@ -45,17 +48,17 @@ COMMON:
             pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_BIN}, :)
             # older versions of ups (v4_7_4a) have bug that requires else() clause
 	else  ()
-            execute( true, UPS_ENV )
+            execute( true, NO_UPS_ENV )
         endif ( test `expr "${${UPS_PROD_NAME_UC}_BIN}" : '.*[/.]/'` -eq 0 -a -d "${${UPS_PROD_NAME_UC}_BIN}" )
         if    ( test `expr "${${UPS_PROD_NAME_UC}_SBIN}" : '.*\.$'` -eq 0 -a -d "${${UPS_PROD_NAME_UC}_SBIN}" )
             pathPrepend(PATH, ${${UPS_PROD_NAME_UC}_SBIN}, :)
 	else  ()
-            execute( true, UPS_ENV )
+            execute( true, NO_UPS_ENV )
         endif ( test `expr "${${UPS_PROD_NAME_UC}_SBIN}" : '.*\.$'` -eq 0 -a -d "${${UPS_PROD_NAME_UC}_SBIN}" )
         if    ( test -d ${UPS_PROD_DIR}/bin )
             pathPrepend(PATH, ${UPS_PROD_DIR}/bin, :)
 	else  ()
-            execute( true, UPS_ENV )
+            execute( true, NO_UPS_ENV )
         endif ( test -d ${UPS_PROD_DIR}/bin )
 
 	envPrepend( LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB}, :)
