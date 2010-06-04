@@ -388,6 +388,14 @@ sub filtParse_gcc {
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+sub filtParse_Darwin {
+
+   local ($lclSev);
+   return (&filtParse_gcc);		# Linux uses gcc by default
+}
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 sub filtParse_Linux {
 
    local ($lclSev);

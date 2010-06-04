@@ -88,7 +88,7 @@ cia :	$(CIAOBJECTS)
 # Build main line executable
 #
 $(BIN)/ups : ups_main.o library
-	$(CC) ups_main.o -o $@  $(CFLAGS) $(LDFLAGS)
+	$(LD) ups_main.o -o $@  $(LDFLAGS)
 
 $(BIN)/ups_parent : ups_parent.pl
 	cp ups_parent.pl $@
@@ -97,10 +97,12 @@ $(BIN)/ups_parent : ups_parent.pl
 #
 # Build the old products people expect that arn't really dependencies
 $(BIN)/funame : upsuname.o
-	$(CC) $(CFLAGS) funame.c -o $@ upsuname.o $(OLD_LIBS)
+	$(CC) $(CFLAGS) -c funame.c 
+	$(LD) funame.o -o $@ upsuname.o $(OLD_LIBS) $(LDFLAGS)
 
 $(BIN)/dropit :
-	$(CC) $(CFLAGS) dropit.c -o $@ 
+	$(CC) $(CFLAGS) -c dropit.c 
+	$(LD)  dropit.o -o $@ $(LDFLAGS)
 
 #
 # Compile UPS library source

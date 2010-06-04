@@ -40,7 +40,12 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#ifdef __MACH__
+#include <term.h>
+#include <termios.h>
+#else
 #include <termio.h>
+#endif
 #include <signal.h>     /* Needed for signal function */
 #include <sys/types.h>
 
@@ -73,7 +78,11 @@ static void upstst_cmdtstp(void);
 /*
 ** LOCALLY GLOBAL LINE EDITOR "ORIGINAL" TERMINAL CHARACTERISTICS
 */
+#ifdef __TERMIOS_H__
+static	struct termios	g_ed_savearg;
+#else
 static	struct termio	g_ed_savearg;
+#endif
 
 /*
 ** LOCALLY GLOBAL INTERRUPT SIGNAL FLAGS
@@ -113,6 +122,22 @@ struct sigaction	g_sigterm_old;
 **
 ** ED_ON : MACRO TO SET TERMINAL CHARACTERISTICS
 */
+#ifdef __TERMIOS_H__
+
+#define ED_ON(a_savearg) 			\
+   { 						\
+   struct termios ed_arg; 			\
+   tcgetattr(1, a_savearg); 	\
+   tcgetattr(1, &ed_arg); 	\
+   ed_arg.c_lflag &= (unsigned long) ~(ICANON | ECHO); 		\
+   ed_arg.c_iflag &= (unsigned long) ~(INLCR | ICRNL); 		\
+   ed_arg.c_cc[VMIN] = 1;			\
+   ed_arg.c_cc[VTIME] = 0;			\
+   tcsetattr(1,TCSANOW,&ed_arg); 		\
+   }
+
+#else
+
 #define ED_ON(a_savearg) 			\
    { 						\
    struct termio ed_arg; 			\
@@ -125,15 +150,27 @@ struct sigaction	g_sigterm_old;
    ioctl(1, TCSETA, (char*)&ed_arg); 		\
    }
 
+#endif
 
 /*---------------------------------------------------------------------
+
 **
 ** ED_OFF : MACRO TO RESET TERMINAL CHARACTERISTICS
 */
+#ifdef __TERMIOS_H__
+#define ED_OFF(a_savearg) \
+   { \
+   tcsetattr(1, TCSANOW, a_savearg); \
+   }
+
+#else
+
 #define ED_OFF(a_savearg) \
    { \
    ioctl(1, TCSETA, (char*)(a_savearg)); \
    }
+
+#endif
 
 
 static void upstst_exithandler(void);	/* forward declaration */
@@ -777,7 +814,11 @@ static void upstst_cmdcont(void)
 **============================================================================
 */
 {
+#ifdef __TERMIOS_H__
+struct termios	    l_ed_savearg;
+#else
 struct termio	    l_ed_savearg;
+#endif
 struct sigaction    act;
 
 /*

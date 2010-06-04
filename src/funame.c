@@ -68,9 +68,6 @@ char *ipaddress;
 	int c,i;
 	int length;
 	struct hostent *hostentry;
-#ifndef VMS
-	extern int sys_nerr;
-#endif	/* VMS */
 	char *tpoint;
 	char thostname[MAXHOSTNAMELEN];
 
@@ -330,9 +327,6 @@ char ** argv;
 	short errflag = 0;
 	short space = 0;
 	extern int errno;
-#ifndef VMS
-	extern int sys_nerr;
-#endif	/* VMS */
 	char hostname[MAXHOSTNAMELEN];
 	char ipaddress[MAXIPLEN+1];
 

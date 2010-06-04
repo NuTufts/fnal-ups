@@ -36,7 +36,12 @@ Revision history:-
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef __MACH__
+#include <term.h>
+#include <termios.h>
+#else
 #include <termio.h>
+#endif
 #include <signal.h>
 #include <fcntl.h>
  

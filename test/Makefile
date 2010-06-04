@@ -14,7 +14,7 @@ SHELL = /bin/sh
 #
 
 .c.o :
-	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $*.c
+	$(CC) -c $(CCCHK) $(CFLAGS) $*.c
 
 #
 SRC	= ../src
@@ -56,52 +56,34 @@ integration_tests : ups_test
 #
 
 test_ups_list : test_ups_list.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upsact : test_upsact.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upserr : test_upserr.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upsfil : test_upsfil.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upslst : test_upslst.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upsmem : test_upsmem.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upsutl : test_upsutl.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upsmat : test_upsmat.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 test_upsugo: test_upsugo.o $(LIB)/libups.a
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(LDFLAGS)
 
 ups_test : ups_test.o $(UPS_TEST_OBJECTS)
-	$(CC) $@.o -o $@ $(CCCHK) $(CFLAGS) $(UPS_TEST_OBJECTS) $(LDFLAGS)
-
-upstst_cmdline.o : upstst_cmdline.c $(LIB)/libups.a
-	$(CC) -c -o $@   $< 
-
-upstst_cmdloop.o : upstst_cmdloop.c $(LIB)/libups.a
-	$(CC) -c -o $@   $< 
-
-upstst_error.o : upstst_error.c $(LIB)/libups.a
-	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
-
-upstst_files.o : upstst_files.c $(LIB)/libups.a
-	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
-
-upstst_ugo.o : upstst_ugo.c $(LIB)/libups.a
-	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
-
-upstst_match.o : upstst_match.c $(LIB)/libups.a
-	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $< $(LDFLAGS)
+	$(LD) $@.o -o $@ $(LIB)/libups.a $(UPS_TEST_OBJECTS) $(LDFLAGS)
 
 #
 # Now standard targets
