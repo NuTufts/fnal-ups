@@ -8,12 +8,40 @@
 if [ "$1" = -x ];then set -x;shift; fi
 set -u
 
+app=`basename $0`
 opts_wo_args='v|n|ups|y'
 opts_w_args='deps|envvar|envpre|alias'
 USAGE="\
-   usage: `basename $0` [options] <dir>...
-examples: `basename $0` --ups .
-options=$opts_wo_args or $opts_w_args
+Declare a product rooted within a ups combined ups database/products root.
+
+usage: $app [options] <dir>...
+options=$opts_wo_args         (do not have option-arguments)
+     or $opts_w_args    (require option-arguments)
+
+examples:
+  1 \$ $app --ups .
+  2 \$ xx='\\\${UPS_PROD_DIR}/\\\$\\\${UPS_PROD_NAME_UC}_FQ';\\
+$app --ups --envpre=\"\\
+RUBYLIB=\$xx/lib/ruby/1.9.1/x86_64-linux,\\
+RUBYLIB=\$xx/lib/ruby/1.9.1,\\
+RUBYLIB=\$xx/lib/ruby/vendor_ruby,\\
+RUBYLIB=\$xx/lib/ruby/vendor_ruby/1.9.1/x86_64-linux,\\
+RUBYLIB=\$xx/lib/ruby/vendor_ruby/1.9.1,\\
+RUBYLIB=\$xx/lib/ruby/site_ruby,\\
+RUBYLIB=\$xx/lib/ruby/site_ruby/1.9.1/x86_64-linux,\\
+RUBYLIB=\$xx/lib/ruby/site_ruby/1.9.1\\
+\" .
+  3 \$ $app --ups --envvar=\"\\
+OSPL_HOME=\\\\\\\${UPS_PROD_DIR}/\\\\\\\$OSPL_FQ,\\
+OSPL_TARGET=x86.linux2.6,\\
+CPATH=\\\\\\\$OSPL_HOME/include:\\\\\\\$OSPL_HOME/include/sys,\\
+OSPL_TMPL_PATH=\\\\\\\$OSPL_HOME/etc/idlpp,\\
+OSPL_URI=file://\\\\\\\$OSPL_HOME/etc/config/ospl.xml,\\
+PTECH_LICENSE_FILE=\\\\\\\$OSPL_HOME/etc\"\\
+ --envpre=\"\\
+CLASSPATH=\\\\\\\$OSPL_HOME/jar/dcpssaj.jar,\\
+CLASSPATH=\\\\\\\$OSPL_HOME/jar/dcpscj.jar,\\
+CLASSPATH=\\\\\\\$OSPL_HOME/jar/dlrlsaj.jar\"\\ .
 "
 do_opt="\
   case \$opt in
@@ -83,8 +111,11 @@ set_PRODS_RT()    # aka PRODS_DB (I combine them)
         fi
         dd=`dirname $dd`
     done
-    if [ "$PRODS_RT" = '' ];then
-        echo "Incompatible DB $DB != $PROD_DIR_PREFIX"
+    if [ ! -f $DB/.upsfiles/dbconfig ];then
+        echo "Incompatible UPS structure -- products root not combined within a ups db."
+        exit 1
+    elif [ "$PRODS_RT" = '' ];then
+        echo "Incompatible DB ($DB?) != ${PROD_DIR_PREFIX-}"
         exit 1
     fi
     echov PRODS_RT=$PRODS_RT
