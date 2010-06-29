@@ -14,14 +14,16 @@ tab=`echo -e "\t"`
 #echo "tab=>$tab<"
 
 APP=`basename $0`
-opts_wo_args='v|ups'
 USAGE="\
 Attempt to tell the \"flavor\" of the bin and lib sub directories based on
-the info from the files in those directories.
-  usage: $APP [-?|$opts_wo_args] [dir]
+the info from the files in those directories.  Or, just print the recommend
+Linux flavor for the host for use in a ups declare.
+  usage: $APP [-?|-v|--ups] [dir]
+    OR   $APP --host --ups
 example: cd some/dir
          $APP
 "
+opts_wo_args='v|ups|host'
 do_opt="\
   case \$opt in
   \\?|h|help)    echo \"\$USAGE\"; exit 0;;
@@ -49,6 +51,19 @@ done
 
 if [ $# -gt 1 ];then echo "$USAGE";exit; fi
 if [ $# -eq 1 ];then cd $1 >/dev/null; fi
+
+if [ -n "${opt_host-}" ];then
+    flv=`ups flavor`
+    if [ -n "${opt_ups-}" ];then
+        case $flv in
+        Linux*+2.4*)     flv=`expr $flv : '\([^+]*\)'`;;
+        Linux*+2.6-2.3*) flv=`expr $flv : '\([^-]*\)'`;;
+        Linux*+2.6-2.5*) : let it be;;
+        esac
+    fi
+    echo $flv
+    exit
+fi
 
 echov()  { if [ ${opt_v-0} -ge 1 ];then echo "$@"; fi; }
 echovv() { if [ ${opt_v-0} -ge 2 ];then echo "$@"; fi; }
