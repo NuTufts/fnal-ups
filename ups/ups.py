@@ -4,6 +4,14 @@ import re
 import sys
 import string
 
+# os.popen3 becomes deprecated, replace with newer subprocess module if available
+try:
+    from subprocess import Popen, PIPE
+    POPEN_AVAILABLE = 1
+except:
+    POPEN_AVAILABLE = 0
+    
+
 DEFAULT_PYTHON_VERSION = ''
 DEFAULT_SETUPS_DIR = os.environ.get('SETUPS_DIR', '/usr/local/etc')
 
@@ -82,11 +90,20 @@ class UpsManager:
 
         # initial setup of ups itself:
         os.environ['UPS_SHELL'] = 'sh'
-        f = os.popen('. %s/setups.sh; ' % setupsDir + \
-                     'echo os.environ\\[\\"UPS_DIR\\"\\]=\\"${UPS_DIR}\\"; ' + \
-                     'echo os.environ\\[\\"PRODUCTS\\"\\]=\\"${PRODUCTS}\\";' + \
-                     'echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"${SETUP_UPS}\\";' + \
-                     'echo os.environ\\[\\"PYTHONPATH\\"\\]=\\"${PYTHONPATH}\\";')
+        if POPEN_AVAILABLE:
+            f = Popen('. %s/setups.sh; ' % setupsDir + \
+                      'echo os.environ\\[\\"UPS_DIR\\"\\]=\\"${UPS_DIR}\\"; ' + \
+                      'echo os.environ\\[\\"PRODUCTS\\"\\]=\\"${PRODUCTS}\\";' + \
+                      'echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"${SETUP_UPS}\\";' + \
+                      'echo os.environ\\[\\"PYTHONPATH\\"\\]=\\"${PYTHONPATH}\\";',
+                      shell=True,
+                      stdout=PIPE).stdout
+        else:
+            f = os.popen('. %s/setups.sh; ' % setupsDir + \
+                         'echo os.environ\\[\\"UPS_DIR\\"\\]=\\"${UPS_DIR}\\"; ' + \
+                         'echo os.environ\\[\\"PRODUCTS\\"\\]=\\"${PRODUCTS}\\";' + \
+                         'echo os.environ\\[\\"SETUP_UPS\\"\\]=\\"${SETUP_UPS}\\";' + \
+                         'echo os.environ\\[\\"PYTHONPATH\\"\\]=\\"${PYTHONPATH}\\";')
         exec f.read()
         f.close()
 
@@ -157,7 +174,12 @@ class UpsManager:
 
     ############################################################################
     def _inhaleresults(self, cmd):
-	(stdin,stdout,stderr) = os.popen3(cmd)
+        if POPEN_AVAILABLE:
+            p = Popen(cmd, shell=True, 
+                      stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+            (stdin, stdout, stderr) = (p.stdin, p.stdout, p.stderr)
+        else:
+            (stdin,stdout,stderr) = os.popen3(cmd)
         try:
             filename = stdout.read()
             filename = filename[0:-1]
@@ -174,7 +196,11 @@ class UpsManager:
 	setup.write(self._getNewPythonEnv(cutHere))
 	setup.close()
 
-	f = os.popen("/bin/sh %s" % filename)
+        if POPEN_AVAILABLE:
+            f = Popen("/bin/sh %s" % filename,
+                      shell=True, stdout=PIPE).stdout
+        else:
+            f = os.popen("/bin/sh %s" % filename)
 	c1 = f.read()
 	f.close()
 

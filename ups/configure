@@ -631,7 +631,7 @@ XEoF
 chmod +x $BootStrap_Dir/$Setups_Products_Script
 #
 #======================================================================
-# Create the setups.pl, ups.pm, setups.py files in the bootstrap directory.
+# Create the setups.pl, ups.pm, setups.py, ups.py files in the bootstrap directory.
 #======================================================================
 # These are done differently, since they only needs ${Setups_Home} 
 # replaced, and use setups.sh...
