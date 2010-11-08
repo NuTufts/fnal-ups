@@ -44,7 +44,8 @@ Revision history:-
 #endif
 #include <signal.h>
 #include <fcntl.h>
- 
+#include <unistd.h>
+
 #include "upstst_cmdline.h"
 #include "upstst_parse.h"
 #include "upstst_cmdtable.h"
