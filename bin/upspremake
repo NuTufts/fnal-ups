@@ -171,12 +171,12 @@ case $ccenv in
 	Darwin)			
 		defs="$defs AR=libtool ARFLAGS=\"-static -o\"  RANLIB=/usr/bin/ranlib"
 		cc="gcc"
-                archflags="-arch ppc -arch i386 -arch ppc64 -arch x86_64"
-                cflags="$archflags"
-                libbase="/Developer/SDKs/MacOSX10.4u.sdk/usr/lib"
-                crtfile="$libbase/gcrt1.o"
-                ld="Darwin-ld" 
-                llibs="$archflags -L$libbase -L$libbase/system $crtfile -lgcc_s.10.5 -lSystemStubs -lSystem -lmathCommon"
+                #archflags="-arch ppc -arch i386 -arch ppc64 -arch x86_64"
+                #cflags="$archflags"
+                #libbase="/Developer/SDKs/MacOSX10.4u.sdk/usr/lib"
+                #crtfile="$libbase/gcrt1.o"
+                #ld="Darwin-ld" 
+                #llibs="$archflags -L$libbase -L$libbase/system $crtfile -lgcc_s.10.5 -lSystemStubs -lSystem -lmathCommon"
 		cflags="$cflags -pedantic"
 		if [ "$opt" != "" ]; then
 			cflags="$cflags -O" 
