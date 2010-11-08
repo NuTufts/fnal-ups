@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
+#include <unistd.h>				/* getcwd & execvp */
 
 /* ups specific include files */
 #include "ups_main.h"

@@ -2439,7 +2439,7 @@ void print_instance( t_upstyp_instance * const inst_ptr )
     }
   }
   else {
-    (void) printf( "Actions = %s\n", (char*)0 );
+    (void) printf( "Actions = NULL\n" );
   }
   
   if ( inst_ptr->user_list ) {
@@ -2450,7 +2450,7 @@ void print_instance( t_upstyp_instance * const inst_ptr )
     }
   }
   else {
-    (void) printf( "User Defined = %s\n", (char*)0 );
+    (void) printf( "User Defined = NULL\n" );
   }
 }
 
@@ -2470,7 +2470,7 @@ void print_action( t_upstyp_action * const act_ptr )
     }
   }
   else {
-    (void) printf( "Command list = %s\n", (char*)0 );
+    (void) printf( "Command list = NULL\n" );
   }
 }
 

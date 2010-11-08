@@ -125,7 +125,6 @@ void
 ups_append_MACHINE(char *buf) 
 {  
    struct utsname baseuname;                    /* returned from uname */
-   char **p;
 
    buf = buf + strlen(buf);     		/* init pointer */
    if (uname(&baseuname) == -1) 
@@ -162,7 +161,7 @@ ups_append_release(char *buf)
 {
    struct utsname baseuname;              	/* returned from uname */
    static char dstr[80];
-   char **p, *pc;
+   char *pc;
 
    if (uname(&baseuname) == -1) 
        return;     				/* do uname */
@@ -208,7 +207,7 @@ ups_append_release(char *buf)
 ** just thinking about this for now...
 */
 char *
-ups_get_default_quals(char *buf) {
+ups_get_default_quals() {
    char **p;
 
    if (0 != (p = ups_have_flavor_override()) && p[1] ) {
@@ -218,6 +217,7 @@ ups_get_default_quals(char *buf) {
    }
 }
 
+void
 ups_make_default_quals_optional() {
    char **p, *s;
    int offset = 0;

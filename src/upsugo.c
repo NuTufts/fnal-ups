@@ -40,6 +40,7 @@
 #include <sys/utsname.h>
 #include <string.h>
 #include <limits.h>				/* PATH_MAX */
+#include <unistd.h>				/* getcwd & execvp */
 
 extern char *get_current_dir_name(void);
 
