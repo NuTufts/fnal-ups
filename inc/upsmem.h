@@ -46,10 +46,10 @@ typedef union _Align  {
    float            filler_8;
    void            *filler_9;
    int            (*filler_10)(void);
-} ALIGN;
+} UALIGN;
 
-#define MAXALIGN (sizeof(ALIGN))
-#define ALIGN(x) ((((x)+MAXALIGN-1)/MAXALIGN)*MAXALIGN)
+#define MAXALIGN (sizeof(UALIGN))
+#define UALIGN(x) ((((x)+MAXALIGN-1)/MAXALIGN)*MAXALIGN)
 
 /*
  * Declaration of public functions.

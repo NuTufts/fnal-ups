@@ -35,7 +35,7 @@
  * Definition of global variables.
  */
 
-#define UPSMEM_INT ALIGN(sizeof(int))
+#define UPSMEM_INT UALIGN(sizeof(int))
 #define UPSMEM_GET_TOP(memPtr) ((char *)memPtr - (UPSMEM_INT))
 #define UPSMEM_GET_USER(memPtr) ((char *)memPtr + (UPSMEM_INT))
 
@@ -65,7 +65,7 @@ void *upsmem_malloc(const int a_bytes)
   /* Return if no memory requested */
   if (a_bytes > 0) {
     numBytes = ( unsigned int )(a_bytes + (int )(UPSMEM_INT));
-    numBytes = ALIGN(numBytes);         /* make sure alignment is proper */
+    numBytes = UALIGN(numBytes);         /* make sure alignment is proper */
     dataPtr = (int *)malloc(numBytes);
     if (dataPtr != 0) {
       /* We got the memory, initialize it */

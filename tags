@@ -36,8 +36,8 @@ add_to_instance	./src/upsfil.c	2099;"	f
 ADD_TO_MINST_LIST	./src/upsmat.c	184;"	d	file:
 ADD_TO_MPRODUCT_LIST	./src/upsmat.c	208;"	d	file:
 adjust_os	./bin/ups_flavor.sh	60;"	f
-ALIGN	./inc/upsmem.h	49;"	t
-ALIGN	./inc/upsmem.h	52;"	d
+UALIGN	./inc/upsmem.h	49;"	t
+UALIGN	./inc/upsmem.h	52;"	d
 all_gone	./src/upstyp.c	459;"	f
 anchored	./src/dropit.c	118;"	f	file:
 ANY_FLAVOR	./inc/upstyp.h	170;"	d
