@@ -479,7 +479,7 @@ t_upskey_instance_u 123 inc/upskey.h     } t_upskey_instance_u;
 t_upskey_map     113 inc/upskey.h     } t_upskey_map;
 t_upskey_product_u 118 inc/upskey.h     } t_upskey_product_u;
 t_upslst_item     62 inc/upslst.h     } t_upslst_item;
-ALIGN             49 inc/upsmem.h     } ALIGN;
+UALIGN            49 inc/upsmem.h     } UALIGN;
 binding           29 inc/upstbl.h       struct binding {
 t_upstbl          34 inc/upstbl.h     } t_upstbl;
 NOT_EQUAL_ANY_MATCH 168 inc/upstyp.h     #define NOT_EQUAL_ANY_MATCH(string) (*(string) - '*')
