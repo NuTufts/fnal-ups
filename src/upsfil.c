@@ -169,6 +169,7 @@ t_upslst_item            *add_to_action_list( t_upslst_item * const add_to,
 int                      add_to_instance( t_upstyp_instance * const inst,
 					  t_upstyp_instance * const inst_add );
 
+static int g_subdir_files_flag = 1;
 /*
  * Definition of global variables
  */
@@ -498,6 +499,33 @@ int upsfil_clear_journal_files( void )
   return UPS_SUCCESS;
 }
 
+void
+start_file(const char *ups_file) {
+  t_upslst_item *l_ptr = 0;
+
+  if ( ! g_fh ) {
+    P_VERB_s( 1, "Open file for write ERROR" );
+    upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
+    upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
+    return UPS_OPEN_FILE;
+  }    
+  P_VERB_s( 1, "Open file for write" );
+
+  g_imargin = 0;
+    
+  /* write comments */
+
+  l_ptr = upslst_first( g_pd->comment_list );
+  for( ; l_ptr; l_ptr = l_ptr->next ) {
+    (void) fprintf( g_fh, "%s\n", (char *)l_ptr->data );
+  }    
+
+  return 0;
+
+}
+
+static char g_subdir_buf[PATH_MAX];
+static const char *g_subdir_base;
 /*-----------------------------------------------------------------------
  * upsfil_write_file
  *
@@ -517,6 +545,11 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 {
   const char *key = 0;
   static char buff[MAX_LINE_LEN];
+  int res;
+  struct stat statbuf;
+  DIR *dd;
+  struct dirent *de;
+  
 
   t_upslst_item *l_ptr = 0;
   (void) strcpy( g_filename, ups_file );
@@ -577,6 +610,18 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     if ( g_ft ) 
       (void) upstbl_remove( g_ft, key );
     /* remove file */
+    
+    res = stat(ups_file, &statbuf);
+    if (S_ISDIR(statbuf.st_mode)) {
+      dd = opendir(ups_file);
+      while (0 != (de = readdir(dd))) {
+	 if (de->d_name[0] != '.') {
+            sprintf(g_subdir_buf, "%s/%s", ups_file, de->d_name);
+	    remove(g_subdir_buf);
+         }
+      }
+    }
+
     if (remove( ups_file ) != 0)
     {
       P_VERB_s( 1, "Removing file ERROR" );
@@ -608,29 +653,25 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     }
   }
 
-  /* open file */
-
-  g_fh = fopen ( ups_file, "w" );
-  if ( ! g_fh ) {
-    P_VERB_s( 1, "Open file for write ERROR" );
-    upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
-    upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
-    return UPS_OPEN_FILE;
-  }    
-  P_VERB_s( 1, "Open file for write" );
-
-  g_imargin = 0;
-  
-  /* write comments */
-
-  l_ptr = upslst_first( g_pd->comment_list );
-  for( ; l_ptr; l_ptr = l_ptr->next ) {
-    (void) fprintf( g_fh, "%s\n", (char *)l_ptr->data );
-  }    
-
   /* set file type (g_ifile) */
 
   (void) cfilei();
+
+  /* open file */
+
+  if (g_subdir_files_flag && ( g_ifile == e_file_version || g_ifile == e_file_chain )) {
+
+     g_subdir_base = ups_file;
+     mkdir( g_subdir_base, 0775 );
+
+  } else {
+
+    g_fh = fopen ( ups_file, "w" );
+    start_file(ups_file);
+    if ( ! g_fh ) 
+        return UPS_OPEN_FILE;
+
+  }
 
   if ( g_ifile == e_file_unknown ) {
     P_VERB_s( 1, "Unknown file type for writing" );
@@ -775,12 +816,16 @@ int write_version_file( void )
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *inst_ptr = 0;
+  int *hkeys=0;
   int *ikeys=0;
   int o_imargin = g_imargin;
 
   /* write file descriptor */
   
-  (void) put_head_keys( upskey_verhead_arr() );
+
+  if (!g_subdir_files_flag) {
+      (void) put_head_keys( upskey_verhead_arr());
+  }
   
   /* write instances */
   
@@ -794,6 +839,22 @@ int write_version_file( void )
     if ( !inst_ptr || !inst_ptr->flavor ) {
       /* handle error !!! */
       return 0;
+    }
+
+    if (g_subdir_files_flag) {
+      g_fh && fclose(g_fh);
+
+      sprintf(g_subdir_buf, "%s/%s", g_subdir_base, inst_ptr->flavor );
+  
+      g_fh = fopen( g_subdir_buf, "w" );
+ 
+      start_file(g_subdir_buf);
+
+      if ( ! g_fh ) 
+        return UPS_OPEN_FILE;
+
+      put_head_keys(upskey_verhead_arr());
+      (void)upskey_verinst_arr();
     }
 
     g_imargin = o_imargin;
@@ -818,7 +879,9 @@ int write_chain_file( void )
 
   /* write file descriptor */
   
-  (void) put_head_keys( upskey_chnhead_arr() );
+  if (!g_subdir_files_flag) {
+    (void) put_head_keys( upskey_chnhead_arr() );
+  }
   
   /* write instances */
   
@@ -833,6 +896,19 @@ int write_chain_file( void )
       return 0;
     }
 
+    if (g_subdir_files_flag) {
+      g_fh && fclose(g_fh);
+      sprintf(g_subdir_buf, "%s/%s", g_subdir_base, inst_ptr-> flavor );
+
+      g_fh = fopen( g_subdir_buf, "w" );
+ 
+      start_file(g_subdir_buf);
+      if ( ! g_fh ) 
+        return UPS_OPEN_FILE;
+      (void) put_head_keys( upskey_chnhead_arr() );
+      (void) upskey_chninst_arr();
+    }
+
     g_imargin = o_imargin;
 
     g_item_count++;
@@ -840,6 +916,7 @@ int write_chain_file( void )
     (void) put_key( 0, SEPARATION_LINE );
 
     (void) put_inst_keys( ikeys, inst_ptr, 0 );
+
   }  
 
   return 1;
