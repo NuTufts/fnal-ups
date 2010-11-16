@@ -1153,6 +1153,7 @@ t_upstyp_product *upsget_version_file(const char * const a_db,
   if (file_chars <= FILENAME_MAX) {
     (void) sprintf(buffer, "%s/%s/%s%s", a_db, a_prod, a_version, VERSION_SUFFIX);
     read_product = upsfil_read_file(&buffer[0]);
+    read_product = upsfil_read_file(&buffer[0]);
     *a_buffer = buffer;
   } else {
     upserr_vplace();

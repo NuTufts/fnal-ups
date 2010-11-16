@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 /* ups specific include files */
 #include "upsutl.h"
@@ -233,6 +234,57 @@ static int               g_call_count = 0;           /* # times read_file is cal
  * Definition of public functions
  */
 
+/* 
+** upsfil_read_dir(path):
+** call upsfil_read_file for each item in directory...
+*/
+t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
+  int dlen;
+  static char namebuf[PATH_MAX];
+  DIR *dd;
+  struct dirent *de;
+  int res = 1;
+
+  dlen=strlen(ups_dir)+1;
+  strcpy(namebuf,ups_dir);
+  strcat(namebuf,"/");
+
+
+  dd = opendir(ups_dir);
+
+  g_pd = ups_new_product();
+
+  if ( g_pd ) {       
+    while (0 != (de = readdir(dd))) {
+       if (de->d_name[0] != '.') {
+	  namebuf[dlen] = 0;
+	  strcat(namebuf, de->d_name);
+	  g_fh = fopen ( namebuf, "r" );
+	  if ( ! g_fh ) {
+	    P_VERB_s( 1, "Open file for read ERROR" );
+	    upserr_vplace();
+	    upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
+	    if (errno == ENOENT)
+	       upserr_add( UPS_NO_FILE, UPS_FATAL, namebuf );
+	    else
+	      upserr_add( UPS_OPEN_FILE, UPS_FATAL, namebuf );
+	    return 0;
+	  }
+	  P_VERB_s( 1, "Open file for read" );
+          res &= read_file();
+          (void) fclose( g_fh );
+       }
+    }
+  }
+  if (!res) {
+    (void) ups_free_product( g_pd );
+    g_pd = 0;
+    g_item_count = 0;
+  }
+
+  return g_pd;
+}
+
 /*-----------------------------------------------------------------------
  * upsfil_read_file
  *
@@ -245,6 +297,9 @@ static int               g_call_count = 0;           /* # times read_file is cal
 t_upstyp_product *upsfil_read_file( const char * const ups_file )
 {
   const char *key = 0;
+  int res;
+  struct stat statbuf;
+  
 
   UPS_ERROR = UPS_SUCCESS;
   (void) strcpy( g_filename, ups_file );
@@ -275,6 +330,17 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
       return g_pd;
     }
   }
+
+  res = stat(ups_file, &statbuf);
+  if (S_ISDIR(statbuf.st_mode)) {
+    upsfil_read_dir(ups_file);
+
+    /* add product to cache */
+
+    if ( g_ft && g_pd )
+      (void) upstbl_put( g_ft, key, g_pd );
+    return g_pd;
+   }
 
   /* product is not in cache */
 
@@ -320,6 +386,9 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
   return g_pd;
 }
+
+
+
 
 void write_journal_file( const void *key, void ** prod, void *cl ) 
 {
@@ -877,7 +946,7 @@ int read_file( void )
 {
   int iret = 0;
   t_upslst_item *l_ptr = 0;
-  
+
   /* read comments */
 
   g_pd->comment_list = read_comments();
