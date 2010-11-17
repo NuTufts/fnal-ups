@@ -169,7 +169,7 @@ t_upslst_item            *add_to_action_list( t_upslst_item * const add_to,
 int                      add_to_instance( t_upstyp_instance * const inst,
 					  t_upstyp_instance * const inst_add );
 
-static int g_subdir_files_flag = 1;
+int g_subdir_files_flag = 0;
 /*
  * Definition of global variables
  */
