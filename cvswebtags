@@ -141,7 +141,7 @@ save_version     variable     58 src/ups_declare.c static char *save_version;
 the_chain        variable     57 src/ups_declare.c static char *the_chain=0;
 the_flavor       variable     55 src/ups_declare.c static char *the_flavor;
 the_qualifiers   variable     56 src/ups_declare.c static char *the_qualifiers;
-ups_declare      function    172 src/ups_declare.c t_upslst_item *ups_declare( t_upsugo_command * const uc ,
+ups_declare      function    186 src/ups_declare.c t_upslst_item *ups_declare( t_upsugo_command * const uc ,
 upsdcl_new_chain function     78 src/ups_declare.c t_upstyp_instance *upsdcl_new_chain(t_upsugo_command * const uc)
 upsdcl_new_product function     67 src/ups_declare.c t_upstyp_product *upsdcl_new_product(t_upsugo_command * const uc)
 upsdcl_new_version function     93 src/ups_declare.c t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
@@ -200,24 +200,24 @@ upsver_mes       function     56 src/upsver.c     void upsver_mes (const int vl,
 NO               macro        44 src/upskey.c     #define NO INVALID_INDEX
 g_ikeys          variable     47 src/upskey.c     static int g_ikeys[ e_key_count+1 ];
 g_key_info       variable     81 src/upskey.c     t_upskey_map g_key_info[] =
-upskey_chnhead_arr function    427 src/upskey.c     int *upskey_chnhead_arr(void)
-upskey_chninst_arr function    443 src/upskey.c     int *upskey_chninst_arr(void)
-upskey_conf_print function    478 src/upskey.c     void upskey_conf_print( const t_upstyp_config * const conf )
-upskey_get_info  function    146 src/upskey.c     t_upskey_map *upskey_get_info( const char * const str )
-upskey_inst_arr  function    353 src/upskey.c     int *upskey_inst_arr(void)
-upskey_inst_getaction function    211 src/upskey.c     t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
-upskey_inst_getuserval function    245 src/upskey.c     char *upskey_inst_getuserval( t_upstyp_instance * const inst,
-upskey_inst_getval function    170 src/upskey.c     char *upskey_inst_getval( t_upstyp_instance * const inst, const char * const skey )
-upskey_inst_print function    279 src/upskey.c     void upskey_inst_print( const t_upstyp_instance * const inst )
-upskey_inst_setval function    189 src/upskey.c     char *upskey_inst_setval( t_upstyp_instance * const inst,
-upskey_prod_arr  function    339 src/upskey.c     int *upskey_prod_arr(void)
-upskey_prod_getval function    302 src/upskey.c     char *upskey_prod_getval( t_upstyp_product * const prod, const char * const skey )
-upskey_prod_print function    465 src/upskey.c     void upskey_prod_print( const t_upstyp_product * const prod )
-upskey_prod_setval function    321 src/upskey.c     char *upskey_prod_setval( t_upstyp_product * const prod,
-upskey_tblhead_arr function    397 src/upskey.c     int *upskey_tblhead_arr(void)
-upskey_tblinst_arr function    413 src/upskey.c     int *upskey_tblinst_arr(void)
-upskey_verhead_arr function    367 src/upskey.c     int *upskey_verhead_arr(void)
-upskey_verinst_arr function    383 src/upskey.c     int *upskey_verinst_arr(void)
+upskey_chnhead_arr function    428 src/upskey.c     int *upskey_chnhead_arr(void)
+upskey_chninst_arr function    444 src/upskey.c     int *upskey_chninst_arr(void)
+upskey_conf_print function    479 src/upskey.c     void upskey_conf_print( const t_upstyp_config * const conf )
+upskey_get_info  function    147 src/upskey.c     t_upskey_map *upskey_get_info( const char * const str )
+upskey_inst_arr  function    354 src/upskey.c     int *upskey_inst_arr(void)
+upskey_inst_getaction function    212 src/upskey.c     t_upstyp_action *upskey_inst_getaction( t_upstyp_instance * const inst,
+upskey_inst_getuserval function    246 src/upskey.c     char *upskey_inst_getuserval( t_upstyp_instance * const inst,
+upskey_inst_getval function    171 src/upskey.c     char *upskey_inst_getval( t_upstyp_instance * const inst, const char * const skey )
+upskey_inst_print function    280 src/upskey.c     void upskey_inst_print( const t_upstyp_instance * const inst )
+upskey_inst_setval function    190 src/upskey.c     char *upskey_inst_setval( t_upstyp_instance * const inst,
+upskey_prod_arr  function    340 src/upskey.c     int *upskey_prod_arr(void)
+upskey_prod_getval function    303 src/upskey.c     char *upskey_prod_getval( t_upstyp_product * const prod, const char * const skey )
+upskey_prod_print function    466 src/upskey.c     void upskey_prod_print( const t_upstyp_product * const prod )
+upskey_prod_setval function    322 src/upskey.c     char *upskey_prod_setval( t_upstyp_product * const prod,
+upskey_tblhead_arr function    398 src/upskey.c     int *upskey_tblhead_arr(void)
+upskey_tblinst_arr function    414 src/upskey.c     int *upskey_tblinst_arr(void)
+upskey_verhead_arr function    368 src/upskey.c     int *upskey_verhead_arr(void)
+upskey_verinst_arr function    384 src/upskey.c     int *upskey_verinst_arr(void)
 CHAIN            macro        48 src/ups_undeclare.c #define CHAIN "chain"
 NULL             macro        45 src/ups_undeclare.c #define NULL 0
 UPS_UNDECLARE    macro        50 src/ups_undeclare.c #define UPS_UNDECLARE "UNDECLARE: "
@@ -670,128 +670,132 @@ upsact_print_item function    925 src/upsact.c     void upsact_print_item( const
 upsact_process_commands function   2448 src/upsact.c     void upsact_process_commands( const t_upslst_item * const a_cmd_list,
 upsact_trim_unsetup function    767 src/upsact.c     t_upslst_item *upsact_trim_unsetup( t_upslst_item * const act_list,
 ups_unconfigure  function     61 src/ups_unconfigure.c t_upslst_item *ups_unconfigure( const t_upsugo_command * const a_command_line,
-P_VERB           macro       209 src/upsfil.c     #define P_VERB( iver, str ) \
-P_VERB_s         macro       213 src/upsfil.c     #define P_VERB_s( iver, str ) \
-P_VERB_s_i       macro       217 src/upsfil.c     #define P_VERB_s_i( iver, str1, num ) \
-P_VERB_s_i_s     macro       221 src/upsfil.c     #define P_VERB_s_i_s( iver, str1, num, str2 ) \
-P_VERB_s_i_s_nn  macro       225 src/upsfil.c     #define P_VERB_s_i_s_nn( iver, str1, num, str2 ) \
-P_VERB_s_i_s_s_s macro       229 src/upsfil.c     #define P_VERB_s_i_s_s_s( iver, str1, num, str2, str3, str4 ) \
-QUOTES           macro       183 src/upsfil.c     #define QUOTES "\"\'"
-SEPARATION_LINE  macro       186 src/upsfil.c     #define SEPARATION_LINE "#*************************************************\n#"
-WCHARS           macro       182 src/upsfil.c     #define WCHARS " \t\n\r\f"
-WCHARSQ          macro       184 src/upsfil.c     #define WCHARSQ " \t\n\r\f\"\'"
-action_cmp       function   2320 src/upsfil.c     int action_cmp ( const void * const d1, 
-add_to_action_list function   2216 src/upsfil.c     t_upslst_item *add_to_action_list( t_upslst_item * const list_to,
-add_to_instance  function   2168 src/upsfil.c     int add_to_instance( t_upstyp_instance * const inst,
-cfilei           function   2114 src/upsfil.c     int cfilei( void )
-clear_journal_file function    466 src/upsfil.c     void clear_journal_file( const void *key, void ** prod, void *cl ) 
-cmp_actions      function   2331 src/upsfil.c     int cmp_actions( t_upslst_item *l_ptr1, 
+P_VERB           macro       210 src/upsfil.c     #define P_VERB( iver, str ) \
+P_VERB_s         macro       214 src/upsfil.c     #define P_VERB_s( iver, str ) \
+P_VERB_s_i       macro       218 src/upsfil.c     #define P_VERB_s_i( iver, str1, num ) \
+P_VERB_s_i_s     macro       222 src/upsfil.c     #define P_VERB_s_i_s( iver, str1, num, str2 ) \
+P_VERB_s_i_s_nn  macro       226 src/upsfil.c     #define P_VERB_s_i_s_nn( iver, str1, num, str2 ) \
+P_VERB_s_i_s_s_s macro       230 src/upsfil.c     #define P_VERB_s_i_s_s_s( iver, str1, num, str2, str3, str4 ) \
+QUOTES           macro       184 src/upsfil.c     #define QUOTES "\"\'"
+SEPARATION_LINE  macro       187 src/upsfil.c     #define SEPARATION_LINE "#*************************************************\n#"
+WCHARS           macro       183 src/upsfil.c     #define WCHARS " \t\n\r\f"
+WCHARSQ          macro       185 src/upsfil.c     #define WCHARSQ " \t\n\r\f\"\'"
+action_cmp       function   2397 src/upsfil.c     int action_cmp ( const void * const d1, 
+add_to_action_list function   2293 src/upsfil.c     t_upslst_item *add_to_action_list( t_upslst_item * const list_to,
+add_to_instance  function   2245 src/upsfil.c     int add_to_instance( t_upstyp_instance * const inst,
+cfilei           function   2191 src/upsfil.c     int cfilei( void )
+clear_journal_file function    467 src/upsfil.c     void clear_journal_file( const void *key, void ** prod, void *cl ) 
+cmp_actions      function   2408 src/upsfil.c     int cmp_actions( t_upslst_item *l_ptr1, 
 e_group_count    enumerator   63 src/upsfil.c     e_group_count = 9,
 e_group_items    enumerator   64 src/upsfil.c     e_group_items = 7
-e_key_eof        enumerator  179 src/upsfil.c     e_key_eof = -1
-e_key_eol        enumerator  178 src/upsfil.c     e_key_eol = -2,
-find_common_mask function   2278 src/upsfil.c     int *find_common_mask( t_upstyp_instance * const inst1,
-find_common_mask_list function   2238 src/upsfil.c     int *find_common_mask_list( t_upslst_item *l_inst,
-find_group       function   2386 src/upsfil.c     t_upslst_item *find_group( t_upslst_item * const list_ptr, 
-find_start_key   function   1643 src/upsfil.c     int find_start_key( void )
-flush_product    function    719 src/upsfil.c     void flush_product( const void *key, void ** prod, void *cl ) 
-g_call_cache_count variable    206 src/upsfil.c     static int g_call_cache_count = 0; /* # times cache is used */
-g_call_count     variable    207 src/upsfil.c     static int g_call_count = 0; /* # times read_file is called */
-g_fh             variable    189 src/upsfil.c     static FILE *g_fh = 0; /* file handle */
-g_file_cache     function    768 src/upsfil.c     t_upstbl *g_file_cache( void )
-g_filename       variable    200 src/upsfil.c     static char g_filename[MAX_LINE_LEN] = "";
-g_ft             variable    205 src/upsfil.c     static t_upstbl *g_ft = 0; /* pointer to file cache */
+e_key_eof        enumerator  180 src/upsfil.c     e_key_eof = -1
+e_key_eol        enumerator  179 src/upsfil.c     e_key_eol = -2,
+find_common_mask function   2355 src/upsfil.c     int *find_common_mask( t_upstyp_instance * const inst1,
+find_common_mask_list function   2315 src/upsfil.c     int *find_common_mask_list( t_upslst_item *l_inst,
+find_group       function   2463 src/upsfil.c     t_upslst_item *find_group( t_upslst_item * const list_ptr, 
+find_start_key   function   1720 src/upsfil.c     int find_start_key( void )
+flush_product    function    760 src/upsfil.c     void flush_product( const void *key, void ** prod, void *cl ) 
+g_call_cache_count variable    207 src/upsfil.c     static int g_call_cache_count = 0; /* # times cache is used */
+g_call_count     variable    208 src/upsfil.c     static int g_call_count = 0; /* # times read_file is called */
+g_fh             variable    190 src/upsfil.c     static FILE *g_fh = 0; /* file handle */
+g_file_cache     function    809 src/upsfil.c     t_upstbl *g_file_cache( void )
+g_filename       variable    201 src/upsfil.c     static char g_filename[MAX_LINE_LEN] = "";
+g_ft             variable    206 src/upsfil.c     static t_upstbl *g_ft = 0; /* pointer to file cache */
 g_groups         variable     66 src/upsfil.c     static int g_groups[ e_group_count ][ e_group_items ] = 
-g_ifile          variable    197 src/upsfil.c     static int g_ifile = e_file_unknown; /* current file type as enum */
-g_ikey           variable    196 src/upsfil.c     static int g_ikey = e_key_unknown; /* current key as enum */ 
-g_imargin        variable    199 src/upsfil.c     static int g_imargin = 0;
-g_item_count     variable    201 src/upsfil.c     static int g_item_count = 0;
-g_key            variable    192 src/upsfil.c     static char g_key[MAX_LINE_LEN] = ""; /* current key */
-g_line           variable    191 src/upsfil.c     static char g_line[MAX_LINE_LEN] = ""; /* current line */
-g_line_count     variable    202 src/upsfil.c     static int g_line_count = 0;
-g_mkey           variable    195 src/upsfil.c     static t_upskey_map *g_mkey = 0; /* current map */
-g_pd             variable    188 src/upsfil.c     static t_upstyp_product *g_pd = 0; /* current product to fill */
-g_print_product  function   2546 src/upsfil.c     void g_print_product( t_upstyp_product * const prod_ptr )
-g_tval           variable    194 src/upsfil.c     static char *g_tval = 0; /* current translated value */
-g_use_cache      variable    204 src/upsfil.c     static int g_use_cache = 1; /* turn on/off use of cache */
-g_val            variable    193 src/upsfil.c     static char g_val[MAX_LINE_LEN] = ""; /* current value */
-get_key          function   1720 src/upsfil.c     int get_key( void )
-is_start_key     function   2080 src/upsfil.c     int is_start_key( void )
-is_stop_key      function   2098 src/upsfil.c     int is_stop_key( void )
-next_key         function   1666 src/upsfil.c     int next_key( int ignore_unknown )
-print_action     function   2526 src/upsfil.c     void print_action( t_upstyp_action * const act_ptr )
-print_instance   function   2477 src/upsfil.c     void print_instance( t_upstyp_instance * const inst_ptr )
-put_group        function   1800 src/upsfil.c     int put_group( t_upslst_item * const l_inst, 
-put_head_keys    function   1847 src/upsfil.c     int put_head_keys( int * ikeys ) 
-put_inst_keys    function   1886 src/upsfil.c     int put_inst_keys( int * ikeys, 
-put_inst_keys_mask function   1964 src/upsfil.c     int put_inst_keys_mask( int * ikeys, 
-put_key          function   2048 src/upsfil.c     int put_key( const char * const key, const char * const val )
-read_action      function   1452 src/upsfil.c     t_upstyp_action *read_action( void )
-read_actions     function   1424 src/upsfil.c     t_upslst_item *read_actions( void )
-read_comments    function   1008 src/upsfil.c     t_upslst_item *read_comments( void )
-read_common      function   1331 src/upsfil.c     t_upstyp_instance *read_common( void )
-read_config      function   1492 src/upsfil.c     t_upstyp_config *read_config( void )
-read_file        function    945 src/upsfil.c     int read_file( void )
-read_file_desc   function   1072 src/upsfil.c     int read_file_desc( void )
-read_file_type   function   1037 src/upsfil.c     int read_file_type( void )
-read_group       function   1573 src/upsfil.c     t_upslst_item *read_group( void )
-read_groups      function   1538 src/upsfil.c     t_upslst_item *read_groups( void )
-read_instance    function   1212 src/upsfil.c     t_upstyp_instance *read_instance( void )
-read_instances   function   1180 src/upsfil.c     t_upslst_item *read_instances( void )
-trim_cache       function   2142 src/upsfil.c     void trim_cache( void )
-trim_qualifiers  function   2148 src/upsfil.c     int trim_qualifiers( char * const str )
-upsfil_clear_journal_files function    491 src/upsfil.c     int upsfil_clear_journal_files( void )
-upsfil_exist     function    705 src/upsfil.c     int upsfil_exist( const char * const ups_file )
-upsfil_flush     function    734 src/upsfil.c     void upsfil_flush( void )
-upsfil_is_in_cache function    688 src/upsfil.c     t_upstyp_product *upsfil_is_in_cache( const char * const ups_file )
-upsfil_last_file function    681 src/upsfil.c     const char *upsfil_last_file( void )
-upsfil_read_dir  function    241 src/upsfil.c     t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
-upsfil_read_file function    297 src/upsfil.c     t_upstyp_product *upsfil_read_file( const char * const ups_file )
-upsfil_stat      function    753 src/upsfil.c     void upsfil_stat( const int iopt )
-upsfil_write_file function    513 src/upsfil.c     int upsfil_write_file( t_upstyp_product * const prod_ptr,
-upsfil_write_journal_files function    449 src/upsfil.c     int upsfil_write_journal_files( void )
-verify_groups    function   1138 src/upsfil.c     void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
-verify_keys      function   1105 src/upsfil.c     void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
-write_action     function    916 src/upsfil.c     int write_action( t_upstyp_action * const act_ptr )
-write_chain_file function    812 src/upsfil.c     int write_chain_file( void )
-write_journal_file function    393 src/upsfil.c     void write_journal_file( const void *key, void ** prod, void *cl ) 
-write_table_file function    848 src/upsfil.c     int write_table_file( void )
-write_version_file function    774 src/upsfil.c     int write_version_file( void )
+g_ifile          variable    198 src/upsfil.c     static int g_ifile = e_file_unknown; /* current file type as enum */
+g_ikey           variable    197 src/upsfil.c     static int g_ikey = e_key_unknown; /* current key as enum */ 
+g_imargin        variable    200 src/upsfil.c     static int g_imargin = 0;
+g_item_count     variable    202 src/upsfil.c     static int g_item_count = 0;
+g_key            variable    193 src/upsfil.c     static char g_key[MAX_LINE_LEN] = ""; /* current key */
+g_line           variable    192 src/upsfil.c     static char g_line[MAX_LINE_LEN] = ""; /* current line */
+g_line_count     variable    203 src/upsfil.c     static int g_line_count = 0;
+g_mkey           variable    196 src/upsfil.c     static t_upskey_map *g_mkey = 0; /* current map */
+g_pd             variable    189 src/upsfil.c     static t_upstyp_product *g_pd = 0; /* current product to fill */
+g_print_product  function   2623 src/upsfil.c     void g_print_product( t_upstyp_product * const prod_ptr )
+g_subdir_base    variable    528 src/upsfil.c     static const char *g_subdir_base;
+g_subdir_buf     variable    527 src/upsfil.c     static char g_subdir_buf[PATH_MAX];
+g_subdir_files_flag variable    172 src/upsfil.c     int g_subdir_files_flag = 0;
+g_tval           variable    195 src/upsfil.c     static char *g_tval = 0; /* current translated value */
+g_use_cache      variable    205 src/upsfil.c     static int g_use_cache = 1; /* turn on/off use of cache */
+g_val            variable    194 src/upsfil.c     static char g_val[MAX_LINE_LEN] = ""; /* current value */
+get_key          function   1797 src/upsfil.c     int get_key( void )
+is_start_key     function   2157 src/upsfil.c     int is_start_key( void )
+is_stop_key      function   2175 src/upsfil.c     int is_stop_key( void )
+next_key         function   1743 src/upsfil.c     int next_key( int ignore_unknown )
+print_action     function   2603 src/upsfil.c     void print_action( t_upstyp_action * const act_ptr )
+print_instance   function   2554 src/upsfil.c     void print_instance( t_upstyp_instance * const inst_ptr )
+put_group        function   1877 src/upsfil.c     int put_group( t_upslst_item * const l_inst, 
+put_head_keys    function   1924 src/upsfil.c     int put_head_keys( int * ikeys ) 
+put_inst_keys    function   1963 src/upsfil.c     int put_inst_keys( int * ikeys, 
+put_inst_keys_mask function   2041 src/upsfil.c     int put_inst_keys_mask( int * ikeys, 
+put_key          function   2125 src/upsfil.c     int put_key( const char * const key, const char * const val )
+read_action      function   1529 src/upsfil.c     t_upstyp_action *read_action( void )
+read_actions     function   1501 src/upsfil.c     t_upslst_item *read_actions( void )
+read_comments    function   1085 src/upsfil.c     t_upslst_item *read_comments( void )
+read_common      function   1408 src/upsfil.c     t_upstyp_instance *read_common( void )
+read_config      function   1569 src/upsfil.c     t_upstyp_config *read_config( void )
+read_file        function   1022 src/upsfil.c     int read_file( void )
+read_file_desc   function   1149 src/upsfil.c     int read_file_desc( void )
+read_file_type   function   1114 src/upsfil.c     int read_file_type( void )
+read_group       function   1650 src/upsfil.c     t_upslst_item *read_group( void )
+read_groups      function   1615 src/upsfil.c     t_upslst_item *read_groups( void )
+read_instance    function   1289 src/upsfil.c     t_upstyp_instance *read_instance( void )
+read_instances   function   1257 src/upsfil.c     t_upslst_item *read_instances( void )
+start_file       function    503 src/upsfil.c     start_file(const char *ups_file) {
+trim_cache       function   2219 src/upsfil.c     void trim_cache( void )
+trim_qualifiers  function   2225 src/upsfil.c     int trim_qualifiers( char * const str )
+upsfil_clear_journal_files function    492 src/upsfil.c     int upsfil_clear_journal_files( void )
+upsfil_exist     function    746 src/upsfil.c     int upsfil_exist( const char * const ups_file )
+upsfil_flush     function    775 src/upsfil.c     void upsfil_flush( void )
+upsfil_is_in_cache function    729 src/upsfil.c     t_upstyp_product *upsfil_is_in_cache( const char * const ups_file )
+upsfil_last_file function    722 src/upsfil.c     const char *upsfil_last_file( void )
+upsfil_read_dir  function    242 src/upsfil.c     t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
+upsfil_read_file function    298 src/upsfil.c     t_upstyp_product *upsfil_read_file( const char * const ups_file )
+upsfil_stat      function    794 src/upsfil.c     void upsfil_stat( const int iopt )
+upsfil_write_file function    541 src/upsfil.c     int upsfil_write_file( t_upstyp_product * const prod_ptr,
+upsfil_write_journal_files function    450 src/upsfil.c     int upsfil_write_journal_files( void )
+verify_groups    function   1215 src/upsfil.c     void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
+verify_keys      function   1182 src/upsfil.c     void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
+write_action     function    993 src/upsfil.c     int write_action( t_upstyp_action * const act_ptr )
+write_chain_file function    873 src/upsfil.c     int write_chain_file( void )
+write_journal_file function    394 src/upsfil.c     void write_journal_file( const void *key, void ** prod, void *cl ) 
+write_table_file function    925 src/upsfil.c     int write_table_file( void )
+write_version_file function    815 src/upsfil.c     int write_version_file( void )
 _UPS_START_H_    macro        23 inc/ups_start.h  #define _UPS_START_H_
 _UPS_TAILOR_H_   macro        23 inc/ups_tailor.h #define _UPS_TAILOR_H_
 _UPS_CONFIGURE_H_ macro        23 inc/ups_configure.h #define _UPS_CONFIGURE_H_
-UPSKEY_CONF2ARR  macro       134 inc/upskey.h     #define UPSKEY_CONF2ARR( conf ) (((t_upskey_config_u *)conf)->arr)
-UPSKEY_INST2ARR  macro       133 inc/upskey.h     #define UPSKEY_INST2ARR( inst ) (((t_upskey_instance_u *)inst)->arr)
-UPSKEY_ISIN_CHAIN macro       138 inc/upskey.h     #define UPSKEY_ISIN_CHAIN( flag ) (flag&0x00000100 ? 1 : 0)
-UPSKEY_ISIN_CONFIG macro       139 inc/upskey.h     #define UPSKEY_ISIN_CONFIG( flag ) (flag&0x00001000 ? 1 : 0)
-UPSKEY_ISIN_TABLE macro       137 inc/upskey.h     #define UPSKEY_ISIN_TABLE( flag ) (flag&0x00000010 ? 1 : 0)
-UPSKEY_ISIN_VERSION macro       136 inc/upskey.h     #define UPSKEY_ISIN_VERSION( flag ) (flag&0x00000001 ? 1 : 0)
-UPSKEY_PROD2ARR  macro       132 inc/upskey.h     #define UPSKEY_PROD2ARR( prod ) (((t_upskey_product_u *)prod)->arr)
-UPSKEY_TRY_TRANSLATE macro       140 inc/upskey.h     #define UPSKEY_TRY_TRANSLATE( flag ) (flag&0x00010000 ? 1 : 0)
+UPSKEY_CONF2ARR  macro       135 inc/upskey.h     #define UPSKEY_CONF2ARR( conf ) (((t_upskey_config_u *)conf)->arr)
+UPSKEY_INST2ARR  macro       134 inc/upskey.h     #define UPSKEY_INST2ARR( inst ) (((t_upskey_instance_u *)inst)->arr)
+UPSKEY_ISIN_CHAIN macro       139 inc/upskey.h     #define UPSKEY_ISIN_CHAIN( flag ) (flag&0x00000100 ? 1 : 0)
+UPSKEY_ISIN_CONFIG macro       140 inc/upskey.h     #define UPSKEY_ISIN_CONFIG( flag ) (flag&0x00001000 ? 1 : 0)
+UPSKEY_ISIN_TABLE macro       138 inc/upskey.h     #define UPSKEY_ISIN_TABLE( flag ) (flag&0x00000010 ? 1 : 0)
+UPSKEY_ISIN_VERSION macro       137 inc/upskey.h     #define UPSKEY_ISIN_VERSION( flag ) (flag&0x00000001 ? 1 : 0)
+UPSKEY_PROD2ARR  macro       133 inc/upskey.h     #define UPSKEY_PROD2ARR( prod ) (((t_upskey_product_u *)prod)->arr)
+UPSKEY_TRY_TRANSLATE macro       141 inc/upskey.h     #define UPSKEY_TRY_TRANSLATE( flag ) (flag&0x00010000 ? 1 : 0)
 _UPSKEY_H_       macro        23 inc/upskey.h     #define _UPSKEY_H_
-arr              member      117 inc/upskey.h     char *arr[e_key_count];
-arr              member      122 inc/upskey.h     char *arr[e_key_count];
-arr              member      127 inc/upskey.h     char *arr[e_key_count];
-c_index          member      111 inc/upskey.h     int c_index; /* index into config structure (t_upstyp_config) */
-conf             member      126 inc/upskey.h     t_upstyp_config conf;
+arr              member      118 inc/upskey.h     char *arr[e_key_count];
+arr              member      123 inc/upskey.h     char *arr[e_key_count];
+arr              member      128 inc/upskey.h     char *arr[e_key_count];
+c_index          member      112 inc/upskey.h     int c_index; /* index into config structure (t_upstyp_config) */
+conf             member      127 inc/upskey.h     t_upstyp_config conf;
 e_key_action     enumerator   77 inc/upskey.h     e_key_action,
 e_key_archive_file enumerator   64 inc/upskey.h     e_key_archive_file,
 e_key_authorized_nodes enumerator   65 inc/upskey.h     e_key_authorized_nodes,
 e_key_catman_source_dir enumerator   70 inc/upskey.h     e_key_catman_source_dir,
 e_key_catman_target_dir enumerator   82 inc/upskey.h     e_key_catman_target_dir,
 e_key_chain      enumerator   43 inc/upskey.h     e_key_chain,
-e_key_common     enumerator   93 inc/upskey.h     e_key_common,
+e_key_common     enumerator   94 inc/upskey.h     e_key_common,
 e_key_compile_dir enumerator   68 inc/upskey.h     e_key_compile_dir,
 e_key_compile_file enumerator   69 inc/upskey.h     e_key_compile_file,
-e_key_count      enumerator   99 inc/upskey.h     e_key_count
+e_key_count      enumerator  100 inc/upskey.h     e_key_count
 e_key_db_dir     enumerator   76 inc/upskey.h     e_key_db_dir,
 e_key_declared   enumerator   56 inc/upskey.h     e_key_declared,
 e_key_declarer   enumerator   55 inc/upskey.h     e_key_declarer,
 e_key_description enumerator   66 inc/upskey.h     e_key_description,
-e_key_end        enumerator   94 inc/upskey.h     e_key_end,
+e_key_end        enumerator   95 inc/upskey.h     e_key_end,
 e_key_file       enumerator   40 inc/upskey.h     e_key_file = 0,
 e_key_flavor     enumerator   49 inc/upskey.h     e_key_flavor,
-e_key_group      enumerator   92 inc/upskey.h     e_key_group,
+e_key_group      enumerator   93 inc/upskey.h     e_key_group,
 e_key_html_source_dir enumerator   71 inc/upskey.h     e_key_html_source_dir,
 e_key_html_target_dir enumerator   85 inc/upskey.h     e_key_html_target_dir,
 e_key_info_source_dir enumerator   72 inc/upskey.h     e_key_info_source_dir,
@@ -803,7 +807,7 @@ e_key_modifier   enumerator   57 inc/upskey.h     e_key_modifier,
 e_key_news_source_dir enumerator   74 inc/upskey.h     e_key_news_source_dir,
 e_key_news_target_dir enumerator   84 inc/upskey.h     e_key_news_target_dir,
 e_key_origin     enumerator   59 inc/upskey.h     e_key_origin,
-e_key_osalias    enumerator   96 inc/upskey.h     e_key_osalias,
+e_key_osalias    enumerator   97 inc/upskey.h     e_key_osalias,
 e_key_prod_dir   enumerator   60 inc/upskey.h     e_key_prod_dir,
 e_key_prod_dir_prefix enumerator   80 inc/upskey.h     e_key_prod_dir_prefix,
 e_key_product    enumerator   41 inc/upskey.h     e_key_product,
@@ -812,28 +816,29 @@ e_key_setups_dir enumerator   87 inc/upskey.h     e_key_setups_dir,
 e_key_statistics enumerator   67 inc/upskey.h     e_key_statistics,
 e_key_table_dir  enumerator   62 inc/upskey.h     e_key_table_dir,
 e_key_table_file enumerator   63 inc/upskey.h     e_key_table_file,
-e_key_unknown    enumerator   98 inc/upskey.h     e_key_unknown,
+e_key_unknown    enumerator   99 inc/upskey.h     e_key_unknown,
 e_key_upd_usercode_dir enumerator   86 inc/upskey.h     e_key_upd_usercode_dir,
 e_key_ups_db_version enumerator   44 inc/upskey.h     e_key_ups_db_version,
 e_key_ups_dir    enumerator   61 inc/upskey.h     e_key_ups_dir,
 e_key_user_defined enumerator   78 inc/upskey.h     e_key_user_defined,
 e_key_version    enumerator   42 inc/upskey.h     e_key_version,
+e_key_version_subdir enumerator   88 inc/upskey.h     e_key_version_subdir,
 e_upskey_key     enum         39 inc/upskey.h     enum e_upskey_key {
-flag             member      112 inc/upskey.h     unsigned int flag; /* flags, see ups_keys.c */
-i_index          member      110 inc/upskey.h     int i_index; /* index into instance structure (t_upstyp_instance) */
-ikey             member      107 inc/upskey.h     int ikey; /* enum of key (corresponding to e_upskey_key) */
-inst             member      121 inc/upskey.h     t_upstyp_instance inst;
-key              member      108 inc/upskey.h     char *key; /* string of key */
-p_index          member      109 inc/upskey.h     int p_index; /* index into product structure (t_upstyp_product) */
-prod             member      116 inc/upskey.h     t_upstyp_product prod;
-t_upskey_config_u typedef     128 inc/upskey.h     } t_upskey_config_u;
-t_upskey_instance_u typedef     123 inc/upskey.h     } t_upskey_instance_u;
-t_upskey_map     typedef     113 inc/upskey.h     } t_upskey_map;
-t_upskey_product_u typedef     118 inc/upskey.h     } t_upskey_product_u;
-upskey_config_u  union       125 inc/upskey.h     typedef union upskey_config_u {
-upskey_instance_u union       120 inc/upskey.h     typedef union upskey_instance_u {
-upskey_map       struct      106 inc/upskey.h     typedef struct upskey_map {
-upskey_product_u union       115 inc/upskey.h     typedef union upskey_product_u {
+flag             member      113 inc/upskey.h     unsigned int flag; /* flags, see ups_keys.c */
+i_index          member      111 inc/upskey.h     int i_index; /* index into instance structure (t_upstyp_instance) */
+ikey             member      108 inc/upskey.h     int ikey; /* enum of key (corresponding to e_upskey_key) */
+inst             member      122 inc/upskey.h     t_upstyp_instance inst;
+key              member      109 inc/upskey.h     char *key; /* string of key */
+p_index          member      110 inc/upskey.h     int p_index; /* index into product structure (t_upstyp_product) */
+prod             member      117 inc/upskey.h     t_upstyp_product prod;
+t_upskey_config_u typedef     129 inc/upskey.h     } t_upskey_config_u;
+t_upskey_instance_u typedef     124 inc/upskey.h     } t_upskey_instance_u;
+t_upskey_map     typedef     114 inc/upskey.h     } t_upskey_map;
+t_upskey_product_u typedef     119 inc/upskey.h     } t_upskey_product_u;
+upskey_config_u  union       126 inc/upskey.h     typedef union upskey_config_u {
+upskey_instance_u union       121 inc/upskey.h     typedef union upskey_instance_u {
+upskey_map       struct      107 inc/upskey.h     typedef struct upskey_map {
+upskey_product_u union       116 inc/upskey.h     typedef union upskey_product_u {
 _UPS_LIST_H_     macro        23 inc/ups_list.h   #define _UPS_LIST_H_
 UPSCPY_PARAMS    macro        40 inc/upscpy.h     #define UPSCPY_PARAMS \
 _UPSCPY_H_       macro        23 inc/upscpy.h     #define _UPSCPY_H_
@@ -1205,91 +1210,92 @@ e_ups_file       enum         65 inc/upsfil.h     enum e_ups_file {
 _UPS_UNCONFIGURE_H_ macro        23 inc/ups_unconfigure.h #define _UPS_UNCONFIGURE_H_
 _UPS_MODIFY_H_   macro        21 inc/ups_modify.h #define _UPS_MODIFY_H_
 _UPS_UNDECLARE_H_ macro        22 inc/ups_undeclare.h #define _UPS_UNDECLARE_H_
-ANY_FLAVOR       macro       170 inc/upstyp.h     #define ANY_FLAVOR "ANY"
-ANY_MATCH        macro       167 inc/upstyp.h     #define ANY_MATCH "*"
-INVALID_INDEX    macro       172 inc/upstyp.h     #define INVALID_INDEX -1
-JOURNAL          macro       174 inc/upstyp.h     #define JOURNAL 1
-MAX_LINE_LEN     macro       171 inc/upstyp.h     #define MAX_LINE_LEN 1024
-NOJOURNAL        macro       175 inc/upstyp.h     #define NOJOURNAL 0
-NOT_EQUAL_ANY_MATCH macro       168 inc/upstyp.h     #define NOT_EQUAL_ANY_MATCH(string) (*(string) - '*')
-UPSRELATIVE      macro       177 inc/upstyp.h     #define UPSRELATIVE(dir) ((dir && (dir[0] && (dir[0] != '/') && (dir[0] != '.'))))
+ANY_FLAVOR       macro       171 inc/upstyp.h     #define ANY_FLAVOR "ANY"
+ANY_MATCH        macro       168 inc/upstyp.h     #define ANY_MATCH "*"
+INVALID_INDEX    macro       173 inc/upstyp.h     #define INVALID_INDEX -1
+JOURNAL          macro       175 inc/upstyp.h     #define JOURNAL 1
+MAX_LINE_LEN     macro       172 inc/upstyp.h     #define MAX_LINE_LEN 1024
+NOJOURNAL        macro       176 inc/upstyp.h     #define NOJOURNAL 0
+NOT_EQUAL_ANY_MATCH macro       169 inc/upstyp.h     #define NOT_EQUAL_ANY_MATCH(string) (*(string) - '*')
+UPSRELATIVE      macro       178 inc/upstyp.h     #define UPSRELATIVE(dir) ((dir && (dir[0] && (dir[0] != '/') && (dir[0] != '.'))))
 _UPSTYP_H_       macro        34 inc/upstyp.h     #define _UPSTYP_H_
-action           member      139 inc/upstyp.h     char *action;
-action_list      member      115 inc/upstyp.h     t_upslst_item *action_list;
-archive_file     member      101 inc/upstyp.h     char *archive_file;
+action           member      140 inc/upstyp.h     char *action;
+action_list      member      116 inc/upstyp.h     t_upslst_item *action_list;
+archive_file     member      102 inc/upstyp.h     char *archive_file;
 authorized_nodes member       53 inc/upstyp.h     char *authorized_nodes;
-authorized_nodes member      102 inc/upstyp.h     char *authorized_nodes;
-catman_source_dir member      107 inc/upstyp.h     char *catman_source_dir;
+authorized_nodes member      103 inc/upstyp.h     char *authorized_nodes;
+catman_source_dir member      108 inc/upstyp.h     char *catman_source_dir;
 catman_target_dir member       56 inc/upstyp.h     char *catman_target_dir;
-chain            member       91 inc/upstyp.h     char *chain;
-chain            member      127 inc/upstyp.h     t_upstyp_instance *chain;
-chain            member      149 inc/upstyp.h     char *chain;
-command_list     member      140 inc/upstyp.h     t_upslst_item *command_list;
-comment_list     member      155 inc/upstyp.h     t_upslst_item *comment_list;
-compile_dir      member      105 inc/upstyp.h     char *compile_dir;
-compile_file     member      106 inc/upstyp.h     char *compile_file;
-config           member       70 inc/upstyp.h     t_upstyp_config *config;
-config           member      156 inc/upstyp.h     t_upstyp_config *config;
-db_dir           member      113 inc/upstyp.h     char *db_dir; 
-db_info          member       77 inc/upstyp.h     t_upstyp_db *db_info;
-declared         member       93 inc/upstyp.h     char *declared;
-declarer         member       92 inc/upstyp.h     char *declarer;
-description      member      103 inc/upstyp.h     char *description; 
-description      member      151 inc/upstyp.h     char *description; 
-file             member      146 inc/upstyp.h     char *file;
-flag             member      120 inc/upstyp.h     int flag; /* used by verify in upsmat */
-flavor           member       88 inc/upstyp.h     char *flavor;
-html_source_dir  member      108 inc/upstyp.h     char *html_source_dir;
+chain            member       92 inc/upstyp.h     char *chain;
+chain            member      128 inc/upstyp.h     t_upstyp_instance *chain;
+chain            member      150 inc/upstyp.h     char *chain;
+command_list     member      141 inc/upstyp.h     t_upslst_item *command_list;
+comment_list     member      156 inc/upstyp.h     t_upslst_item *comment_list;
+compile_dir      member      106 inc/upstyp.h     char *compile_dir;
+compile_file     member      107 inc/upstyp.h     char *compile_file;
+config           member       71 inc/upstyp.h     t_upstyp_config *config;
+config           member      157 inc/upstyp.h     t_upstyp_config *config;
+db_dir           member      114 inc/upstyp.h     char *db_dir; 
+db_info          member       78 inc/upstyp.h     t_upstyp_db *db_info;
+declared         member       94 inc/upstyp.h     char *declared;
+declarer         member       93 inc/upstyp.h     char *declarer;
+description      member      104 inc/upstyp.h     char *description; 
+description      member      152 inc/upstyp.h     char *description; 
+file             member      147 inc/upstyp.h     char *file;
+flag             member      121 inc/upstyp.h     int flag; /* used by verify in upsmat */
+flavor           member       89 inc/upstyp.h     char *flavor;
+html_source_dir  member      109 inc/upstyp.h     char *html_source_dir;
 html_target_dir  member       58 inc/upstyp.h     char *html_target_dir;
-info_source_dir  member      109 inc/upstyp.h     char *info_source_dir;
+info_source_dir  member      110 inc/upstyp.h     char *info_source_dir;
 info_target_dir  member       57 inc/upstyp.h     char *info_target_dir;
-instance_list    member      154 inc/upstyp.h     t_upslst_item *instance_list;
-invalid_instance member      133 inc/upstyp.h     int invalid_instance;
-journal          member      158 inc/upstyp.h     int journal;
-man_source_dir   member      110 inc/upstyp.h     char *man_source_dir;
+instance_list    member      155 inc/upstyp.h     t_upslst_item *instance_list;
+invalid_instance member      134 inc/upstyp.h     int invalid_instance;
+journal          member      159 inc/upstyp.h     int journal;
+man_source_dir   member      111 inc/upstyp.h     char *man_source_dir;
 man_target_dir   member       55 inc/upstyp.h     char *man_target_dir;
-minst_list       member       80 inc/upstyp.h     t_upslst_item *minst_list;
-modified         member       95 inc/upstyp.h     char *modified;
-modifier         member       94 inc/upstyp.h     char *modifier;
-name             member       69 inc/upstyp.h     char *name;
-news_source_dir  member      111 inc/upstyp.h     char *news_source_dir;
+minst_list       member       81 inc/upstyp.h     t_upslst_item *minst_list;
+modified         member       96 inc/upstyp.h     char *modified;
+modifier         member       95 inc/upstyp.h     char *modifier;
+name             member       70 inc/upstyp.h     char *name;
+news_source_dir  member      112 inc/upstyp.h     char *news_source_dir;
 news_target_dir  member       59 inc/upstyp.h     char *news_target_dir;
-origin           member       96 inc/upstyp.h     char *origin;
-prod_dir         member       97 inc/upstyp.h     char *prod_dir;
+origin           member       97 inc/upstyp.h     char *origin;
+prod_dir         member       98 inc/upstyp.h     char *prod_dir;
 prod_dir_prefix  member       52 inc/upstyp.h     char *prod_dir_prefix;
-product          member       78 inc/upstyp.h     char *product;
-product          member       86 inc/upstyp.h     char *product;
-product          member      147 inc/upstyp.h     char *product;
-qualifiers       member       89 inc/upstyp.h     char *qualifiers;
-sav_inst         member      119 inc/upstyp.h     struct upstyp_instance *sav_inst;
+product          member       79 inc/upstyp.h     char *product;
+product          member       87 inc/upstyp.h     char *product;
+product          member      148 inc/upstyp.h     char *product;
+qualifiers       member       90 inc/upstyp.h     char *qualifiers;
+sav_inst         member      120 inc/upstyp.h     struct upstyp_instance *sav_inst;
 setups_dir       member       61 inc/upstyp.h     char *setups_dir;
 statistics       member       54 inc/upstyp.h     char *statistics;
-statistics       member      104 inc/upstyp.h     char *statistics;
-t_upstyp_action  typedef     141 inc/upstyp.h     } t_upstyp_action;
-t_upstyp_config  typedef      62 inc/upstyp.h     } t_upstyp_config;
-t_upstyp_db      typedef      71 inc/upstyp.h     } t_upstyp_db;
-t_upstyp_instance typedef     122 inc/upstyp.h     } t_upstyp_instance;
-t_upstyp_matched_instance typedef     134 inc/upstyp.h     } t_upstyp_matched_instance;
-t_upstyp_matched_product typedef      81 inc/upstyp.h     } t_upstyp_matched_product;
-t_upstyp_product typedef     159 inc/upstyp.h     } t_upstyp_product;
-table            member      129 inc/upstyp.h     t_upstyp_instance *table;
-table_dir        member       99 inc/upstyp.h     char *table_dir;
-table_file       member      100 inc/upstyp.h     char *table_file;
+statistics       member      105 inc/upstyp.h     char *statistics;
+t_upstyp_action  typedef     142 inc/upstyp.h     } t_upstyp_action;
+t_upstyp_config  typedef      63 inc/upstyp.h     } t_upstyp_config;
+t_upstyp_db      typedef      72 inc/upstyp.h     } t_upstyp_db;
+t_upstyp_instance typedef     123 inc/upstyp.h     } t_upstyp_instance;
+t_upstyp_matched_instance typedef     135 inc/upstyp.h     } t_upstyp_matched_instance;
+t_upstyp_matched_product typedef      82 inc/upstyp.h     } t_upstyp_matched_product;
+t_upstyp_product typedef     160 inc/upstyp.h     } t_upstyp_product;
+table            member      130 inc/upstyp.h     t_upstyp_instance *table;
+table_dir        member      100 inc/upstyp.h     char *table_dir;
+table_file       member      101 inc/upstyp.h     char *table_file;
 upd_usercode_dir member       60 inc/upstyp.h     char *upd_usercode_dir;
 ups_db_version   member       51 inc/upstyp.h     char *ups_db_version;
-ups_db_version   member      150 inc/upstyp.h     char *ups_db_version;
-ups_dir          member       98 inc/upstyp.h     char *ups_dir;
-upstyp_action    struct      137 inc/upstyp.h     typedef struct upstyp_action
+ups_db_version   member      151 inc/upstyp.h     char *ups_db_version;
+ups_dir          member       99 inc/upstyp.h     char *ups_dir;
+upstyp_action    struct      138 inc/upstyp.h     typedef struct upstyp_action
 upstyp_config    struct       50 inc/upstyp.h     typedef struct upstyp_config {
-upstyp_db        struct       67 inc/upstyp.h     typedef struct upstyp_db
-upstyp_instance  struct       84 inc/upstyp.h     typedef struct upstyp_instance
-upstyp_matched_instance struct      125 inc/upstyp.h     typedef struct upstyp_matched_instance
-upstyp_matched_product struct       75 inc/upstyp.h     typedef struct upstyp_matched_product
-upstyp_product   struct      144 inc/upstyp.h     typedef struct upstyp_product
-user_list        member      117 inc/upstyp.h     t_upslst_item *user_list;
-user_list        member      152 inc/upstyp.h     t_upslst_item *user_list;
-version          member       87 inc/upstyp.h     char *version;
-version          member      128 inc/upstyp.h     t_upstyp_instance *version;
-version          member      148 inc/upstyp.h     char *version;
-xtra_chains      member      131 inc/upstyp.h     t_upslst_item *xtra_chains;
+upstyp_db        struct       68 inc/upstyp.h     typedef struct upstyp_db
+upstyp_instance  struct       85 inc/upstyp.h     typedef struct upstyp_instance
+upstyp_matched_instance struct      126 inc/upstyp.h     typedef struct upstyp_matched_instance
+upstyp_matched_product struct       76 inc/upstyp.h     typedef struct upstyp_matched_product
+upstyp_product   struct      145 inc/upstyp.h     typedef struct upstyp_product
+user_list        member      118 inc/upstyp.h     t_upslst_item *user_list;
+user_list        member      153 inc/upstyp.h     t_upslst_item *user_list;
+version          member       88 inc/upstyp.h     char *version;
+version          member      129 inc/upstyp.h     t_upstyp_instance *version;
+version          member      149 inc/upstyp.h     char *version;
+version_subdir   member       62 inc/upstyp.h     char *version_subdir;
+xtra_chains      member      132 inc/upstyp.h     t_upslst_item *xtra_chains;
 _UPS_TOUCH_H_    macro        22 inc/ups_touch.h  #define _UPS_TOUCH_H_

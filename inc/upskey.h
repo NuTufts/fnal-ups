@@ -85,6 +85,7 @@ enum e_upskey_key {
   e_key_html_target_dir,
   e_key_upd_usercode_dir,
   e_key_setups_dir,
+  e_key_version_subdir,
   
   /* it's importend that the keys below are not part of
      any ups product or instance or like */

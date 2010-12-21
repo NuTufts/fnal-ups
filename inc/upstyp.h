@@ -59,6 +59,7 @@ typedef struct upstyp_config {
   char             *news_target_dir;
   char             *upd_usercode_dir;
   char             *setups_dir;
+  char             *version_subdir;
 } t_upstyp_config;
 
 /* database information.  this includes the name (location) of the database

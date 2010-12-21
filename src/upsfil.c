@@ -333,7 +333,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
   }
 
   res = stat(ups_file, &statbuf);
-  if (S_ISDIR(statbuf.st_mode)) {
+  if (res == 0 && S_ISDIR(statbuf.st_mode)) {
     upsfil_read_dir(ups_file);
 
     /* add product to cache */

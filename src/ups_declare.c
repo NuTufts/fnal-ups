@@ -125,6 +125,20 @@ t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
      }
    }
    vinst->authorized_nodes=allauthnodes;
+   if (db_info && db_info->config && 
+      db_info->config->version_subdir &&  
+      db_info->config->version_subdir[0] == '1') {
+
+       extern int g_subdir_files_flag;
+       g_subdir_files_flag = 1;
+       upserr_add(UPS_PRODUCT_INFO, UPS_INFORMATIONAL, 
+               "Turning on subdir flag...",
+	       " ");
+       
+   } else {
+       extern int g_subdir_files_flag;
+       g_subdir_files_flag = 0;
+   }
    /* If no ups_dir specified on command line add ups if it exists */
    if ((! vinst->ups_dir) && vinst->prod_dir)
    { if (!(tmp_ptr = upsget_translation_env(vinst->prod_dir)))

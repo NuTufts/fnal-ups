@@ -121,6 +121,7 @@ t_upskey_map g_key_info[] =
   { e_key_news_target_dir,  "NEWS_TARGET_DIR",  NO,   NO,    8, 0x00011000 },
   { e_key_upd_usercode_dir, "UPD_USERCODE_DIR", NO,   NO,    9, 0x00011000 },
   { e_key_setups_dir,       "SETUPS_DIR",       NO,   NO,   10, 0x00011000 },
+  { e_key_version_subdir,   "VERSION_SUBDIR",   NO,   NO,   11, 0x00011000 },
 
   { e_key_group,            "GROUP:",           NO,   NO,   NO, 0x00000010 },
   { e_key_common,           "COMMON:",          NO,   NO,   NO, 0x00000010 },
