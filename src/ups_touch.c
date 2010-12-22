@@ -159,6 +159,17 @@ t_upslst_item *ups_touch( t_upsugo_command * const uc,
   { db_list = upslst_first(uc->ugo_db);
     db_info = (t_upstyp_db *)db_list->data;
   } 
+  if (db_info && db_info->config && 
+      db_info->config->version_subdir &&  
+      db_info->config->version_subdir[0] == '1') {
+
+       extern int g_subdir_files_flag;
+       g_subdir_files_flag = 1;
+       
+  } else {
+       extern int g_subdir_files_flag;
+       g_subdir_files_flag = 0;
+  }
 /* restore everything */
   uc->ugo_chain=upslst_free(uc->ugo_chain,'d');
   uc->ugo_chain=save_chain;

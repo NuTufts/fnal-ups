@@ -245,6 +245,17 @@ t_upslst_item *ups_copy(const t_upsugo_command * const a_command_line,
 	  }
 	}
       }
+      if (new_db_info_ptr && new_db_info_ptr->config && 
+         new_db_info_ptr->config->version_subdir &&  
+         new_db_info_ptr->config->version_subdir[0] == '1') {
+
+          extern int g_subdir_files_flag;
+          g_subdir_files_flag = 1;
+       
+      } else {
+          extern int g_subdir_files_flag;
+          g_subdir_files_flag = 0;
+      }
       /*         if the user did not enter any -O options and does not want a
 		 merge with the environment then we have nothing to do */
       if (new_command_line || a_command_line->ugo_W) {

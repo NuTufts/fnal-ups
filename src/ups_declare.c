@@ -131,9 +131,6 @@ t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
 
        extern int g_subdir_files_flag;
        g_subdir_files_flag = 1;
-       upserr_add(UPS_PRODUCT_INFO, UPS_INFORMATIONAL, 
-               "Turning on subdir flag...",
-	       " ");
        
    } else {
        extern int g_subdir_files_flag;

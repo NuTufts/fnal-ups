@@ -273,7 +273,9 @@ t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
 	  }
 	  P_VERB_s( 1, "Open file for read" );
           res &= read_file();
-          (void) fclose( g_fh );
+          g_fh &&  fclose( g_fh );
+          g_fh = 0;
+  
        }
     }
   }
@@ -374,7 +376,8 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
     }
   }
   
-  (void) fclose( g_fh );
+  g_fh && fclose( g_fh );
+  g_fh = 0;
 
   /* add product to cache */
 
@@ -383,7 +386,6 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
   P_VERB_s_i_s( 1, "Read", g_item_count, "item(s)" );
 
-  g_fh = 0;
 
   return g_pd;
 }
@@ -507,7 +509,7 @@ start_file(const char *ups_file) {
     P_VERB_s( 1, "Open file for write ERROR" );
     upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "fopen", strerror(errno));
     upserr_vplace(); upserr_add( UPS_OPEN_FILE, UPS_FATAL, ups_file );
-    return UPS_OPEN_FILE;
+    return;
   }    
   P_VERB_s( 1, "Open file for write" );
 
@@ -519,8 +521,6 @@ start_file(const char *ups_file) {
   for( ; l_ptr; l_ptr = l_ptr->next ) {
     (void) fprintf( g_fh, "%s\n", (char *)l_ptr->data );
   }    
-
-  return 0;
 
 }
 
@@ -551,7 +551,6 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   struct dirent *de;
   
 
-  t_upslst_item *l_ptr = 0;
   (void) strcpy( g_filename, ups_file );
   g_item_count = 0;
   g_line_count = 0;
@@ -701,7 +700,8 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   }
 
   
-  (void) fclose( g_fh );
+  g_fh && fclose( g_fh );
+  g_fh = 0;
 
   P_VERB_s_i_s( 1, "Write", g_item_count, "item(s)" );
 
@@ -816,7 +816,6 @@ int write_version_file( void )
 {
   t_upslst_item *l_ptr = 0;
   t_upstyp_instance *inst_ptr = 0;
-  int *hkeys=0;
   int *ikeys=0;
   int o_imargin = g_imargin;
 
@@ -843,8 +842,9 @@ int write_version_file( void )
 
     if (g_subdir_files_flag) {
       g_fh && fclose(g_fh);
+      g_fh = 0;
 
-      sprintf(g_subdir_buf, "%s/%s", g_subdir_base, inst_ptr->flavor );
+      sprintf(g_subdir_buf, "%s/%s_%s", g_subdir_base, inst_ptr->flavor, inst_ptr->qualifiers );
   
       g_fh = fopen( g_subdir_buf, "w" );
  
@@ -898,6 +898,7 @@ int write_chain_file( void )
 
     if (g_subdir_files_flag) {
       g_fh && fclose(g_fh);
+      g_fh = 0;
       sprintf(g_subdir_buf, "%s/%s", g_subdir_base, inst_ptr-> flavor );
 
       g_fh = fopen( g_subdir_buf, "w" );
