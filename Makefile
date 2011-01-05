@@ -78,7 +78,7 @@ VERSIONFILES=Makefile README $(UPS_SUBDIR)/INSTALL_NOTE $(UPS_SUBDIR)/Version
 UPSDBG=
 INSURE=
 
-all: 	proddir_is_set cvswebtags
+all: 	proddir_is_set 
 	cd src; ../bin/upspremake $(UPSDBG) $(INSURE)
 	cd test; ../bin/upspremake $(UPSDBG) $(INSURE)
 	cd doc; ../bin/upspremake $(UPSDBG) $(INSURE)
