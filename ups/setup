@@ -64,20 +64,27 @@ setenv UPS_SHELL $ss
 
 test -n "$db"        && set_ pdp=`sed -n '/^ *PROD_DIR_PREFIX/{s/.*= *//;s|${UPS_THIS_DB}|'"$db|;p;}" $db/.upsfiles/dbconfig`
 # the following assumes VERSION immediately follows FLAVOR in the current.chain file
-set_ ver= flv= chainf=$db/ups/current.chain
-test -n "$db" -a -f $chainf              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl1
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl2
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl3
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl4
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl5
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl6
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl7
-test -n "$db" -a -f $chainf -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl8
+set_ ver= flv= chainf=
+test                 -d $db/ups/current.chain && set_ chainf=`echo $db/ups/current.chain/*`
+test -z "$chainf" -a -f $db/ups/current.chain && set_ chainf=$db/ups/current.chain
+test -n "$db" -a -n "$chainf"              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl1
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl2
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl3
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl4
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl5
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl6
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl7
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl8
 
 test -n "$db" && vecho_ "the current version of ups for this flavor is $ver "`test -n "$ver" && vecho_ "flv=$flv"`
 
 # now get the prddir and exe
-test -n "$ver" && set_ prddir=`sed -n -e "/[ 	]*$flv"'$/,/PROD_DIR/{' -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` \
+set_ prddir=
+test -n "$ver"                 -a -d $db/ups/$ver.version \
+    && set_ prddir=`sed -n -e "/[ 	]*$flv"'$/,/PROD_DIR/{' -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version/${flv}_` \
+    && vecho_ "prddir=$prddir"
+test -n "$ver" -a -z "$prddir" -a -f $db/ups/$ver.version \
+    && set_ prddir=`sed -n -e "/[ 	]*$flv"'$/,/PROD_DIR/{' -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` \
     && vecho_ "prddir=$prddir"
 # NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin /bin/ls is smart).
 tnotnull prddir && nullout /bin/ls $prddir/bin/ups      && set_ exe=$prddir/bin/ups      || set_ exe=
