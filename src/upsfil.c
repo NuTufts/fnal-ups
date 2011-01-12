@@ -96,6 +96,8 @@ static int g_groups[ e_group_count ][ e_group_items ] =
   },
 };
 
+static char g_subdir_buf[PATH_MAX];
+static const char *g_subdir_base;
 /*
  * Declaration of private functions
  */
@@ -395,6 +397,10 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
 
 void write_journal_file( const void *key, void ** prod, void *cl ) 
 {
+  int res;
+  DIR *dd;
+  struct stat statbuf;
+  struct dirent *de;
   /* a little helper for upsfil_write_journal_files */
 
   /* we will check that the product list is not empty before writing
@@ -417,6 +423,18 @@ void write_journal_file( const void *key, void ** prod, void *cl )
       /* remove file */
 
       P_VERB_s( 1, "Removing empty journal file" );
+
+      res = stat(key, &statbuf);
+      if (S_ISDIR(statbuf.st_mode)) {
+	dd = opendir(key);
+	while (0 != (de = readdir(dd))) {
+	   if (de->d_name[0] != '.') {
+	      sprintf(g_subdir_buf, "%s/%s", key, de->d_name);
+	      remove(g_subdir_buf);
+	   }
+	}
+      }
+
       if (remove( key ) != 0)
       {
         P_VERB_s( 1, "Removing journal file ERROR" );
@@ -524,8 +542,6 @@ start_file(const char *ups_file) {
 
 }
 
-static char g_subdir_buf[PATH_MAX];
-static const char *g_subdir_base;
 /*-----------------------------------------------------------------------
  * upsfil_write_file
  *
