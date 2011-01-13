@@ -65,7 +65,7 @@ setenv UPS_SHELL $ss
 test -n "$db"        && set_ pdp=`sed -n '/^ *PROD_DIR_PREFIX/{s/.*= *//;s|${UPS_THIS_DB}|'"$db|;p;}" $db/.upsfiles/dbconfig`
 # the following assumes VERSION immediately follows FLAVOR in the current.chain file
 set_ ver= flv= chainf=
-test                 -d $db/ups/current.chain && set_ chainf=`echo $db/ups/current.chain/*`
+test                 -d $db/ups/current.chain && set_ chainf="`echo $db/ups/current.chain/*`"
 test -z "$chainf" -a -f $db/ups/current.chain && set_ chainf=$db/ups/current.chain
 test -n "$db" -a -n "$chainf"              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl1
 test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl2
