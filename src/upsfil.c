@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <limits.h>				/* PATH_MAX */
 
 /* ups specific include files */
 #include "upsutl.h"
