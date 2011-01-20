@@ -74,7 +74,7 @@ ups_have_flavor_override() {
 }
 
 static
-char *default_machines[5][2] = {
+char *default_machines[6][2] = {
   {"Linux", "86"},
   {"Darwin", "86"},
   {"SunOS", "sun"},
