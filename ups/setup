@@ -22,9 +22,9 @@ test $?shell = 1 && set ss=csh || ss=sh
 #       as at the start of the function (which most likely is the result of a back-tick expression
 test "$ss" = csh && alias set_ set && alias vecho_ 'if ($?vv == 1) echo \!*' || eval 'vecho_() { test -n "${vv-}" && echo "$@";}'
 test "$ss" =  sh && eval 'set_() { ss=$?;for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`;val=`expr "$xx" : "[^=]*=\(.*\)"`;eval "$var=\"$val\"";done;return $ss; }'
-test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\${2-}\""; }' && eval 'source() { file=$1; shift; . $file "$@"; }' && eval 'unsetenv() { unset "$@"; }'
-test "$ss" =  sh && eval 'tnotnull() { eval "test -n \"\${$1-}\""; }'                             && eval 'nullout() { "$@" >/dev/null 2>&1; }'
-test "$ss" = csh && alias tnotnull "eval '"'test $?'"\!* -eq 1' && eval '"'test -n "$'"\!*"'"'"'" && alias nullout "\!* >& /dev/null"
+test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\${2-}\""; }; source() { file=$1; shift; . $file "$@"; }; unsetenv_() { unset "$@"; }'
+test "$ss" =  sh && eval 'tnotnull() { eval "test -n \"\${$1-}\""; }'                                   && eval 'nullout() { "$@" >/dev/null 2>&1; }'
+test "$ss" = csh && alias tnotnull "eval '"'test $?'"\!* -eq 1'       && eval '"'test -n "$'"\!*"'"'"'" && alias nullout "\!* >& /dev/null" && alias unsetenv_ unsetenv
 
 # now is if we were passed a path or if not, if we can figure it out (maybe if we are interactive)
 #   bash, zsh, ksh and tcsh pass params to a source file, csh does not. but someone will be writing csh scripts
@@ -67,14 +67,14 @@ test -n "$db"        && set_ pdp=`sed -n '/^ *PROD_DIR_PREFIX/{s/.*= *//;s|${UPS
 set_ ver= flv= chainf=
 test                 -d $db/ups/current.chain && set_ chainf="`echo $db/ups/current.chain/*`"
 test -z "$chainf" -a -f $db/ups/current.chain && set_ chainf=$db/ups/current.chain
-test -n "$db" -a -n "$chainf"              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl1
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl2
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl3
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl4
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl5
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl6
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl7
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |grep .` && set_ flv=$fl8
+test -n "$db" -a -n "$chainf"              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl1
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl2
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl3
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl4
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl5
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl6
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl7
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl8
 
 test -n "$db" && vecho_ "the current version of ups for this flavor is $ver "`test -n "$ver" && vecho_ "flv=$flv"`
 
@@ -92,7 +92,7 @@ tnotnull prddir && test -z "$exe"  && nullout /bin/ls $prddir/$flv/bin/ups && se
 test -z "$exe"  && set_ exe=`which ups`
 test -z "$exe"  && echo "ERROR: did not find ups binary" || vecho_ "using ups exe $exe"
 tnotnull PRODUCTS && set_ products=$PRODUCTS || set_ products=$db; expr ":${products}:" : ".*:${db}:" >/dev/null || set_ products=${db}:$products
-tnotnull UPS_DIR && setenv PATH `echo :${PATH}: | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv SETUP_UPS UPS_DIR
+tnotnull UPS_DIR && setenv PATH `echo :${PATH}: | sed -e "s|:${UPS_DIR}/*bin:|:|" -e 's|^:||;s|:$||'`; unsetenv_ SETUP_UPS UPS_DIR
 test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
 
 #tnotnull prddir && set_ ovexe=`sh -c 'for ff in '$prddir'/.ups_OVERRIDE $UPS_DIR/ups/ups_OVERRIDE;do if [ -x $ff ];then echo $ff;exit;fi;done;exit 1'`
@@ -100,6 +100,6 @@ test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
 
 test -n "$exe" && test -f "$db/setup.initial" && source "$db/setup.initial"
 
-test "$ss" = csh && unalias tnotnull nullout set_ vecho_ 
+test "$ss" = csh && unalias tnotnull nullout set_ vecho_ unsetenv_
 unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 fl7 fl8 pdp ver flv chainf prddir prdbin exe products olddb
-unset set_ setenv unsetenv tnotnull source nullout ovexe ov vecho_
+unset set_ setenv unsetenv_ tnotnull source nullout ovexe ov vecho_
