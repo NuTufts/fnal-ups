@@ -21,7 +21,7 @@ test $?shell = 1 && set ss=csh || ss=sh
 # Note: perhaps the trickiest thing in this file is the sh set_ function tries to return the same status
 #       as at the start of the function (which most likely is the result of a back-tick expression
 test "$ss" = csh && alias set_ set && alias vecho_ 'if ($?vv == 1) echo \!*' || eval 'vecho_() { test -n "${vv-}" && echo "$@"; return 0; }'
-test "$ss" =  sh && eval 'set_() { ss=$?;for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`;val=`expr "$xx" : "[^=]*=\(.*\)"`;eval "$var=\"$val\"";done;return $ss; }'
+test "$ss" =  sh && eval 'set_() { sts=$?;for xx in "$@";do var=`expr "$xx" : "\([^=]*\)"`;val=`expr "$xx" : "[^=]*=\(.*\)"`;eval "$var=\"$val\"";done;return $sts; }'
 test "$ss" =  sh && eval 'setenv() { export $1;eval "$1=\"\${2-}\""; }; source() { file=$1; shift; . $file "$@"; }; unsetenv_() { unset "$@"; }'
 test "$ss" =  sh && eval 'tnotnull() { eval "test -n \"\${$1-}\""; }'                                   && eval 'nullout() { "$@" >/dev/null 2>&1; }'
 test "$ss" = csh && alias tnotnull "eval '"'test $?'"\!* -eq 1'       && eval '"'test -n "$'"\!*"'"'"'" && alias nullout "\!* >& /dev/null" && alias unsetenv_ unsetenv
@@ -101,5 +101,5 @@ test -n "$exe" && setenv PRODUCTS $products && source `$exe setup ups $ver`
 test -n "$exe" && test -f "$db/setup.initial" && source "$db/setup.initial"
 
 test "$ss" = csh && unalias tnotnull nullout set_ vecho_ unsetenv_
-unset ss msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 fl7 fl8 pdp ver flv chainf prddir prdbin exe products olddb
+unset ss sts msg db me os os_rev1 os_rev2 mach libc1 libc2 b64 fl1 fl2 fl3 fl4 fl5 fl6 fl7 fl8 pdp ver flv chainf prddir prdbin exe products olddb
 unset set_ setenv unsetenv_ tnotnull source nullout ovexe ov vecho_
