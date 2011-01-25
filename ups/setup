@@ -81,10 +81,10 @@ test -n "$db" && vecho_ "the current version of ups for this flavor is $ver "`te
 # now get the prddir and exe
 set_ prddir=
 test -n "$ver"                 -a -d $db/ups/$ver.version \
-    && set_ prddir=`sed -n -e "/[ 	]*$flv"'$/,/PROD_DIR/{' -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version/${flv}_` \
+    && set_ prddir=`sed -n -e "/[ 	]*$flv"'$/,/PROD_DIR/{' -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e '}' $db/ups/$ver.version/${flv}_` \
     && vecho_ "prddir=$prddir"
 test -n "$ver" -a -z "$prddir" -a -f $db/ups/$ver.version \
-    && set_ prddir=`sed -n -e "/[ 	]*$flv"'$/,/PROD_DIR/{' -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e } $db/ups/$ver.version` \
+    && set_ prddir=`sed -n -e "/[ 	]*$flv"'$/,/PROD_DIR/{' -e "/PROD_DIR/{s/.*= *//;s|^\([^/]\)|$pdp/\1|;p;}" -e '}' $db/ups/$ver.version` \
     && vecho_ "prddir=$prddir"
 # NOTE: PROD_DIR (in .version file) may/should already have flv. CYGWIN test -x .../bin/ups does not work b/c the file is ups.exe (cygwin /bin/ls is smart).
 tnotnull prddir && nullout /bin/ls $prddir/bin/ups      && set_ exe=$prddir/bin/ups      || set_ exe=
