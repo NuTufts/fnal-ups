@@ -47,7 +47,7 @@ reqarg='test -z "${1+1}" && echo opt $op requires arg. &&echo "$USAGE" && exit'
 while [ "${1-}" ];do
     if expr "x${1-}" : 'x-' >/dev/null;then
         leq=`expr "x$1" : 'x--[^=]*=\(.*\)'` op=`echo "$1"|sed 's/^-//'`
-        shift;test "$leq" &&set -- "$leq" "$@" && op=`expr "$op" : '\([^=]*\)'`
+        shift;test -n "$leq" &&set -- "$leq" "$@" && op=`expr "x$op" : 'x\([^=]*\)'`
         case "$op" in
         -prod)               eval $reqarg; opt_prod=$1; shift;;
         -ver)                eval $reqarg; opt_ver=$1; shift;;
