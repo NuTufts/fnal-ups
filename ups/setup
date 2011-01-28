@@ -67,14 +67,14 @@ test -n "$db"        && set_ pdp=`sed -n '/^ *PROD_DIR_PREFIX/{s/.*= *//;s|${UPS
 set_ ver= flv= chainf=
 test                 -d $db/ups/current.chain && set_ chainf="`echo $db/ups/current.chain/*`"
 test -z "$chainf" -a -f $db/ups/current.chain && set_ chainf=$db/ups/current.chain
-test -n "$db" -a -n "$chainf"              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl1
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl2
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl3
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl4
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl5
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl6
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl7
-test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf |/bin/grep .` && set_ flv=$fl8
+test -n "$db" -a -n "$chainf"              && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl1}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl1
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl2}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl2
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl3}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl3
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl4}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl4
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl5}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl5
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl6}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl6
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl7}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl7
+test -n "$db" -a -n "$chainf" -a -z "$ver" && set_ ver=`sed -n "/^[^#]*=[ 	]*${fl8}[ 	]*"'$/{n;s/.*=[ 	]*//;p;}' $chainf | env grep .` && set_ flv=$fl8
 
 test -n "$db" && vecho_ "the current version of ups for this flavor is $ver "`test -n "$ver" && vecho_ "flv=$flv"`
 
