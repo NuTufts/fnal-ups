@@ -12,7 +12,7 @@ Date (mm/dd/yyyy):      11/06/1998
                         ======
 Product Contact
 
-    User Application Support Group
+    REX Department
     Fermi National Accelerator Laboratory - Mail Station 369
     P.O Box 500
     Batavia, IL 60510
@@ -28,14 +28,17 @@ Acknowledgements
 
     UPS has had a long history at Fermilab.  Many individuals from
     several groups within the Fermilab Computing Division have
-    assisted in the development of ups.  Among the groups participating
-    in the development from the design phase on are:
+    assisted in the development of ups.  Among the (now defunct) groups 
+    participating in the development from the design phase on are:
 
         The Computing Division Online Support group (CD/OLS)
 
         The Computing Division User Applications Support group (CD/UAS)
 
-        The, now defunct, Computing Division ACCESS group.
+        Computing Division ACCESS group.
+
+    The software is currently maintained under the Running Experiments
+    (REX) department.
                                                              
 
 ------------------------------------------------------------------------

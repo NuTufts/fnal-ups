@@ -670,97 +670,97 @@ upsact_print_item function    925 src/upsact.c     void upsact_print_item( const
 upsact_process_commands function   2448 src/upsact.c     void upsact_process_commands( const t_upslst_item * const a_cmd_list,
 upsact_trim_unsetup function    767 src/upsact.c     t_upslst_item *upsact_trim_unsetup( t_upslst_item * const act_list,
 ups_unconfigure  function     61 src/ups_unconfigure.c t_upslst_item *ups_unconfigure( const t_upsugo_command * const a_command_line,
-P_VERB           macro       210 src/upsfil.c     #define P_VERB( iver, str ) \
-P_VERB_s         macro       214 src/upsfil.c     #define P_VERB_s( iver, str ) \
-P_VERB_s_i       macro       218 src/upsfil.c     #define P_VERB_s_i( iver, str1, num ) \
-P_VERB_s_i_s     macro       222 src/upsfil.c     #define P_VERB_s_i_s( iver, str1, num, str2 ) \
-P_VERB_s_i_s_nn  macro       226 src/upsfil.c     #define P_VERB_s_i_s_nn( iver, str1, num, str2 ) \
-P_VERB_s_i_s_s_s macro       230 src/upsfil.c     #define P_VERB_s_i_s_s_s( iver, str1, num, str2, str3, str4 ) \
-QUOTES           macro       184 src/upsfil.c     #define QUOTES "\"\'"
-SEPARATION_LINE  macro       187 src/upsfil.c     #define SEPARATION_LINE "#*************************************************\n#"
-WCHARS           macro       183 src/upsfil.c     #define WCHARS " \t\n\r\f"
-WCHARSQ          macro       185 src/upsfil.c     #define WCHARSQ " \t\n\r\f\"\'"
-action_cmp       function   2398 src/upsfil.c     int action_cmp ( const void * const d1, 
-add_to_action_list function   2294 src/upsfil.c     t_upslst_item *add_to_action_list( t_upslst_item * const list_to,
-add_to_instance  function   2246 src/upsfil.c     int add_to_instance( t_upstyp_instance * const inst,
-cfilei           function   2192 src/upsfil.c     int cfilei( void )
-clear_journal_file function    469 src/upsfil.c     void clear_journal_file( const void *key, void ** prod, void *cl ) 
-cmp_actions      function   2409 src/upsfil.c     int cmp_actions( t_upslst_item *l_ptr1, 
+P_VERB           macro       212 src/upsfil.c     #define P_VERB( iver, str ) \
+P_VERB_s         macro       216 src/upsfil.c     #define P_VERB_s( iver, str ) \
+P_VERB_s_i       macro       220 src/upsfil.c     #define P_VERB_s_i( iver, str1, num ) \
+P_VERB_s_i_s     macro       224 src/upsfil.c     #define P_VERB_s_i_s( iver, str1, num, str2 ) \
+P_VERB_s_i_s_nn  macro       228 src/upsfil.c     #define P_VERB_s_i_s_nn( iver, str1, num, str2 ) \
+P_VERB_s_i_s_s_s macro       232 src/upsfil.c     #define P_VERB_s_i_s_s_s( iver, str1, num, str2, str3, str4 ) \
+QUOTES           macro       186 src/upsfil.c     #define QUOTES "\"\'"
+SEPARATION_LINE  macro       189 src/upsfil.c     #define SEPARATION_LINE "#*************************************************\n#"
+WCHARS           macro       185 src/upsfil.c     #define WCHARS " \t\n\r\f"
+WCHARSQ          macro       187 src/upsfil.c     #define WCHARSQ " \t\n\r\f\"\'"
+action_cmp       function   2414 src/upsfil.c     int action_cmp ( const void * const d1, 
+add_to_action_list function   2310 src/upsfil.c     t_upslst_item *add_to_action_list( t_upslst_item * const list_to,
+add_to_instance  function   2262 src/upsfil.c     int add_to_instance( t_upstyp_instance * const inst,
+cfilei           function   2208 src/upsfil.c     int cfilei( void )
+clear_journal_file function    487 src/upsfil.c     void clear_journal_file( const void *key, void ** prod, void *cl ) 
+cmp_actions      function   2425 src/upsfil.c     int cmp_actions( t_upslst_item *l_ptr1, 
 e_group_count    enumerator   63 src/upsfil.c     e_group_count = 9,
 e_group_items    enumerator   64 src/upsfil.c     e_group_items = 7
-e_key_eof        enumerator  180 src/upsfil.c     e_key_eof = -1
-e_key_eol        enumerator  179 src/upsfil.c     e_key_eol = -2,
-find_common_mask function   2356 src/upsfil.c     int *find_common_mask( t_upstyp_instance * const inst1,
-find_common_mask_list function   2316 src/upsfil.c     int *find_common_mask_list( t_upslst_item *l_inst,
-find_group       function   2464 src/upsfil.c     t_upslst_item *find_group( t_upslst_item * const list_ptr, 
-find_start_key   function   1721 src/upsfil.c     int find_start_key( void )
-flush_product    function    760 src/upsfil.c     void flush_product( const void *key, void ** prod, void *cl ) 
-g_call_cache_count variable    207 src/upsfil.c     static int g_call_cache_count = 0; /* # times cache is used */
-g_call_count     variable    208 src/upsfil.c     static int g_call_count = 0; /* # times read_file is called */
-g_fh             variable    190 src/upsfil.c     static FILE *g_fh = 0; /* file handle */
-g_file_cache     function    809 src/upsfil.c     t_upstbl *g_file_cache( void )
-g_filename       variable    201 src/upsfil.c     static char g_filename[MAX_LINE_LEN] = "";
-g_ft             variable    206 src/upsfil.c     static t_upstbl *g_ft = 0; /* pointer to file cache */
+e_key_eof        enumerator  182 src/upsfil.c     e_key_eof = -1
+e_key_eol        enumerator  181 src/upsfil.c     e_key_eol = -2,
+find_common_mask function   2372 src/upsfil.c     int *find_common_mask( t_upstyp_instance * const inst1,
+find_common_mask_list function   2332 src/upsfil.c     int *find_common_mask_list( t_upslst_item *l_inst,
+find_group       function   2480 src/upsfil.c     t_upslst_item *find_group( t_upslst_item * const list_ptr, 
+find_start_key   function   1737 src/upsfil.c     int find_start_key( void )
+flush_product    function    776 src/upsfil.c     void flush_product( const void *key, void ** prod, void *cl ) 
+g_call_cache_count variable    209 src/upsfil.c     static int g_call_cache_count = 0; /* # times cache is used */
+g_call_count     variable    210 src/upsfil.c     static int g_call_count = 0; /* # times read_file is called */
+g_fh             variable    192 src/upsfil.c     static FILE *g_fh = 0; /* file handle */
+g_file_cache     function    825 src/upsfil.c     t_upstbl *g_file_cache( void )
+g_filename       variable    203 src/upsfil.c     static char g_filename[MAX_LINE_LEN] = "";
+g_ft             variable    208 src/upsfil.c     static t_upstbl *g_ft = 0; /* pointer to file cache */
 g_groups         variable     66 src/upsfil.c     static int g_groups[ e_group_count ][ e_group_items ] = 
-g_ifile          variable    198 src/upsfil.c     static int g_ifile = e_file_unknown; /* current file type as enum */
-g_ikey           variable    197 src/upsfil.c     static int g_ikey = e_key_unknown; /* current key as enum */ 
-g_imargin        variable    200 src/upsfil.c     static int g_imargin = 0;
-g_item_count     variable    202 src/upsfil.c     static int g_item_count = 0;
-g_key            variable    193 src/upsfil.c     static char g_key[MAX_LINE_LEN] = ""; /* current key */
-g_line           variable    192 src/upsfil.c     static char g_line[MAX_LINE_LEN] = ""; /* current line */
-g_line_count     variable    203 src/upsfil.c     static int g_line_count = 0;
-g_mkey           variable    196 src/upsfil.c     static t_upskey_map *g_mkey = 0; /* current map */
-g_pd             variable    189 src/upsfil.c     static t_upstyp_product *g_pd = 0; /* current product to fill */
-g_print_product  function   2624 src/upsfil.c     void g_print_product( t_upstyp_product * const prod_ptr )
-g_subdir_base    variable    528 src/upsfil.c     static const char *g_subdir_base;
-g_subdir_buf     variable    527 src/upsfil.c     static char g_subdir_buf[PATH_MAX];
-g_subdir_files_flag variable    172 src/upsfil.c     int g_subdir_files_flag = 0;
-g_tval           variable    195 src/upsfil.c     static char *g_tval = 0; /* current translated value */
-g_use_cache      variable    205 src/upsfil.c     static int g_use_cache = 1; /* turn on/off use of cache */
-g_val            variable    194 src/upsfil.c     static char g_val[MAX_LINE_LEN] = ""; /* current value */
-get_key          function   1798 src/upsfil.c     int get_key( void )
-is_start_key     function   2158 src/upsfil.c     int is_start_key( void )
-is_stop_key      function   2176 src/upsfil.c     int is_stop_key( void )
-next_key         function   1744 src/upsfil.c     int next_key( int ignore_unknown )
-print_action     function   2604 src/upsfil.c     void print_action( t_upstyp_action * const act_ptr )
-print_instance   function   2555 src/upsfil.c     void print_instance( t_upstyp_instance * const inst_ptr )
-put_group        function   1878 src/upsfil.c     int put_group( t_upslst_item * const l_inst, 
-put_head_keys    function   1925 src/upsfil.c     int put_head_keys( int * ikeys ) 
-put_inst_keys    function   1964 src/upsfil.c     int put_inst_keys( int * ikeys, 
-put_inst_keys_mask function   2042 src/upsfil.c     int put_inst_keys_mask( int * ikeys, 
-put_key          function   2126 src/upsfil.c     int put_key( const char * const key, const char * const val )
-read_action      function   1530 src/upsfil.c     t_upstyp_action *read_action( void )
-read_actions     function   1502 src/upsfil.c     t_upslst_item *read_actions( void )
-read_comments    function   1086 src/upsfil.c     t_upslst_item *read_comments( void )
-read_common      function   1409 src/upsfil.c     t_upstyp_instance *read_common( void )
-read_config      function   1570 src/upsfil.c     t_upstyp_config *read_config( void )
-read_file        function   1023 src/upsfil.c     int read_file( void )
-read_file_desc   function   1150 src/upsfil.c     int read_file_desc( void )
-read_file_type   function   1115 src/upsfil.c     int read_file_type( void )
-read_group       function   1651 src/upsfil.c     t_upslst_item *read_group( void )
-read_groups      function   1616 src/upsfil.c     t_upslst_item *read_groups( void )
-read_instance    function   1290 src/upsfil.c     t_upstyp_instance *read_instance( void )
-read_instances   function   1258 src/upsfil.c     t_upslst_item *read_instances( void )
-start_file       function    505 src/upsfil.c     start_file(const char *ups_file) {
-trim_cache       function   2220 src/upsfil.c     void trim_cache( void )
-trim_qualifiers  function   2226 src/upsfil.c     int trim_qualifiers( char * const str )
-upsfil_clear_journal_files function    494 src/upsfil.c     int upsfil_clear_journal_files( void )
-upsfil_exist     function    746 src/upsfil.c     int upsfil_exist( const char * const ups_file )
-upsfil_flush     function    775 src/upsfil.c     void upsfil_flush( void )
-upsfil_is_in_cache function    729 src/upsfil.c     t_upstyp_product *upsfil_is_in_cache( const char * const ups_file )
-upsfil_last_file function    722 src/upsfil.c     const char *upsfil_last_file( void )
-upsfil_read_dir  function    242 src/upsfil.c     t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
-upsfil_read_file function    300 src/upsfil.c     t_upstyp_product *upsfil_read_file( const char * const ups_file )
-upsfil_stat      function    794 src/upsfil.c     void upsfil_stat( const int iopt )
-upsfil_write_file function    541 src/upsfil.c     int upsfil_write_file( t_upstyp_product * const prod_ptr,
-upsfil_write_journal_files function    452 src/upsfil.c     int upsfil_write_journal_files( void )
-verify_groups    function   1216 src/upsfil.c     void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
-verify_keys      function   1183 src/upsfil.c     void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
-write_action     function    994 src/upsfil.c     int write_action( t_upstyp_action * const act_ptr )
-write_chain_file function    873 src/upsfil.c     int write_chain_file( void )
-write_journal_file function    396 src/upsfil.c     void write_journal_file( const void *key, void ** prod, void *cl ) 
-write_table_file function    926 src/upsfil.c     int write_table_file( void )
-write_version_file function    815 src/upsfil.c     int write_version_file( void )
+g_ifile          variable    200 src/upsfil.c     static int g_ifile = e_file_unknown; /* current file type as enum */
+g_ikey           variable    199 src/upsfil.c     static int g_ikey = e_key_unknown; /* current key as enum */ 
+g_imargin        variable    202 src/upsfil.c     static int g_imargin = 0;
+g_item_count     variable    204 src/upsfil.c     static int g_item_count = 0;
+g_key            variable    195 src/upsfil.c     static char g_key[MAX_LINE_LEN] = ""; /* current key */
+g_line           variable    194 src/upsfil.c     static char g_line[MAX_LINE_LEN] = ""; /* current line */
+g_line_count     variable    205 src/upsfil.c     static int g_line_count = 0;
+g_mkey           variable    198 src/upsfil.c     static t_upskey_map *g_mkey = 0; /* current map */
+g_pd             variable    191 src/upsfil.c     static t_upstyp_product *g_pd = 0; /* current product to fill */
+g_print_product  function   2640 src/upsfil.c     void g_print_product( t_upstyp_product * const prod_ptr )
+g_subdir_base    variable    100 src/upsfil.c     static const char *g_subdir_base;
+g_subdir_buf     variable     99 src/upsfil.c     static char g_subdir_buf[PATH_MAX];
+g_subdir_files_flag variable    174 src/upsfil.c     int g_subdir_files_flag = 0;
+g_tval           variable    197 src/upsfil.c     static char *g_tval = 0; /* current translated value */
+g_use_cache      variable    207 src/upsfil.c     static int g_use_cache = 1; /* turn on/off use of cache */
+g_val            variable    196 src/upsfil.c     static char g_val[MAX_LINE_LEN] = ""; /* current value */
+get_key          function   1814 src/upsfil.c     int get_key( void )
+is_start_key     function   2174 src/upsfil.c     int is_start_key( void )
+is_stop_key      function   2192 src/upsfil.c     int is_stop_key( void )
+next_key         function   1760 src/upsfil.c     int next_key( int ignore_unknown )
+print_action     function   2620 src/upsfil.c     void print_action( t_upstyp_action * const act_ptr )
+print_instance   function   2571 src/upsfil.c     void print_instance( t_upstyp_instance * const inst_ptr )
+put_group        function   1894 src/upsfil.c     int put_group( t_upslst_item * const l_inst, 
+put_head_keys    function   1941 src/upsfil.c     int put_head_keys( int * ikeys ) 
+put_inst_keys    function   1980 src/upsfil.c     int put_inst_keys( int * ikeys, 
+put_inst_keys_mask function   2058 src/upsfil.c     int put_inst_keys_mask( int * ikeys, 
+put_key          function   2142 src/upsfil.c     int put_key( const char * const key, const char * const val )
+read_action      function   1546 src/upsfil.c     t_upstyp_action *read_action( void )
+read_actions     function   1518 src/upsfil.c     t_upslst_item *read_actions( void )
+read_comments    function   1102 src/upsfil.c     t_upslst_item *read_comments( void )
+read_common      function   1425 src/upsfil.c     t_upstyp_instance *read_common( void )
+read_config      function   1586 src/upsfil.c     t_upstyp_config *read_config( void )
+read_file        function   1039 src/upsfil.c     int read_file( void )
+read_file_desc   function   1166 src/upsfil.c     int read_file_desc( void )
+read_file_type   function   1131 src/upsfil.c     int read_file_type( void )
+read_group       function   1667 src/upsfil.c     t_upslst_item *read_group( void )
+read_groups      function   1632 src/upsfil.c     t_upslst_item *read_groups( void )
+read_instance    function   1306 src/upsfil.c     t_upstyp_instance *read_instance( void )
+read_instances   function   1274 src/upsfil.c     t_upslst_item *read_instances( void )
+start_file       function    523 src/upsfil.c     start_file(const char *ups_file) {
+trim_cache       function   2236 src/upsfil.c     void trim_cache( void )
+trim_qualifiers  function   2242 src/upsfil.c     int trim_qualifiers( char * const str )
+upsfil_clear_journal_files function    512 src/upsfil.c     int upsfil_clear_journal_files( void )
+upsfil_exist     function    762 src/upsfil.c     int upsfil_exist( const char * const ups_file )
+upsfil_flush     function    791 src/upsfil.c     void upsfil_flush( void )
+upsfil_is_in_cache function    745 src/upsfil.c     t_upstyp_product *upsfil_is_in_cache( const char * const ups_file )
+upsfil_last_file function    738 src/upsfil.c     const char *upsfil_last_file( void )
+upsfil_read_dir  function    244 src/upsfil.c     t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
+upsfil_read_file function    302 src/upsfil.c     t_upstyp_product *upsfil_read_file( const char * const ups_file )
+upsfil_stat      function    810 src/upsfil.c     void upsfil_stat( const int iopt )
+upsfil_write_file function    557 src/upsfil.c     int upsfil_write_file( t_upstyp_product * const prod_ptr,
+upsfil_write_journal_files function    470 src/upsfil.c     int upsfil_write_journal_files( void )
+verify_groups    function   1232 src/upsfil.c     void verify_groups(t_upslst_item *l_ptr,t_upslst_item *n_ptr)
+verify_keys      function   1199 src/upsfil.c     void verify_keys(t_upslst_item *l_ptr, t_upstyp_instance *inst_ptr)
+write_action     function   1010 src/upsfil.c     int write_action( t_upstyp_action * const act_ptr )
+write_chain_file function    889 src/upsfil.c     int write_chain_file( void )
+write_journal_file function    398 src/upsfil.c     void write_journal_file( const void *key, void ** prod, void *cl ) 
+write_table_file function    942 src/upsfil.c     int write_table_file( void )
+write_version_file function    831 src/upsfil.c     int write_version_file( void )
 _UPS_START_H_    macro        23 inc/ups_start.h  #define _UPS_START_H_
 _UPS_TAILOR_H_   macro        23 inc/ups_tailor.h #define _UPS_TAILOR_H_
 _UPS_CONFIGURE_H_ macro        23 inc/ups_configure.h #define _UPS_CONFIGURE_H_
