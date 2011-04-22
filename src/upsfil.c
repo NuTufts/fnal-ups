@@ -625,17 +625,17 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     /* remove product from cache */
     if ( g_ft ) 
       (void) upstbl_remove( g_ft, key );
-    /* remove file */
+  }
+    /* remove file and rewrite it , always... */
     
-    res = stat(ups_file, &statbuf);
-    if (S_ISDIR(statbuf.st_mode)) {
-      dd = opendir(ups_file);
-      while (0 != (de = readdir(dd))) {
+  res = stat(ups_file, &statbuf);
+  if (S_ISDIR(statbuf.st_mode)) {
+    dd = opendir(ups_file);
+    while (0 != (de = readdir(dd))) {
 	 if (de->d_name[0] != '.') {
             sprintf(g_subdir_buf, "%s/%s", ups_file, de->d_name);
 	    remove(g_subdir_buf);
-         }
-      }
+       }
     }
 
     if (remove( ups_file ) != 0)

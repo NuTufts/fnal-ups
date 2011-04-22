@@ -125,17 +125,6 @@ t_upstyp_instance *upsdcl_new_version(t_upsugo_command * const uc,
      }
    }
    vinst->authorized_nodes=allauthnodes;
-   if (db_info && db_info->config && 
-      db_info->config->version_subdir &&  
-      db_info->config->version_subdir[0] == '1') {
-
-       extern int g_subdir_files_flag;
-       g_subdir_files_flag = 1;
-       
-   } else {
-       extern int g_subdir_files_flag;
-       g_subdir_files_flag = 0;
-   }
    /* If no ups_dir specified on command line add ups if it exists */
    if ((! vinst->ups_dir) && vinst->prod_dir)
    { if (!(tmp_ptr = upsget_translation_env(vinst->prod_dir)))
@@ -314,6 +303,23 @@ t_upslst_item *ups_declare( t_upsugo_command * const uc ,
   { db_list = upslst_first(uc->ugo_db);
     db_info = (t_upstyp_db *)db_list->data;
   } 
+  /* need to read dbconfig here! */
+
+   if (db_info && !db_info->config ) {
+      db_info->config =  upsutl_get_config(db_info->name)->config;
+   } 
+
+   if (db_info && db_info->config && 
+      db_info->config->version_subdir &&  
+      db_info->config->version_subdir[0] == '1') {
+
+       extern int g_subdir_files_flag;
+       g_subdir_files_flag = 1;
+       
+   } else {
+       extern int g_subdir_files_flag;
+       g_subdir_files_flag = 0;
+   }
 /* restore everything */
 /*  uc->ugo_version=save_version; */
   uc->ugo_flavor=upslst_free(uc->ugo_flavor,'d');
