@@ -625,18 +625,18 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
     /* remove product from cache */
     if ( g_ft ) 
       (void) upstbl_remove( g_ft, key );
-  }
     /* remove file and rewrite it , always... */
     
-  res = stat(ups_file, &statbuf);
-  if (S_ISDIR(statbuf.st_mode)) {
-    dd = opendir(ups_file);
-    while (0 != (de = readdir(dd))) {
-	 if (de->d_name[0] != '.') {
-            sprintf(g_subdir_buf, "%s/%s", ups_file, de->d_name);
-	    remove(g_subdir_buf);
-       }
-    }
+    res = stat(ups_file, &statbuf);
+    if (S_ISDIR(statbuf.st_mode)) {
+      dd = opendir(ups_file);
+      while (0 != (de = readdir(dd))) {
+	   if (de->d_name[0] != '.') {
+	      sprintf(g_subdir_buf, "%s/%s", ups_file, de->d_name);
+	      remove(g_subdir_buf);
+	 }
+	}
+      }
 
     if (remove( ups_file ) != 0)
     {
@@ -677,6 +677,24 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
 
   if (g_subdir_files_flag && ( g_ifile == e_file_version || g_ifile == e_file_chain )) {
 
+    res = stat(ups_file, &statbuf);
+    if (S_ISDIR(statbuf.st_mode)) {
+      dd = opendir(ups_file);
+      while (0 != (de = readdir(dd))) {
+	   if (de->d_name[0] != '.') {
+	      sprintf(g_subdir_buf, "%s/%s", ups_file, de->d_name);
+	      remove(g_subdir_buf);
+	 }
+        }
+      }
+
+      if (remove( ups_file ) != 0)
+      {
+	P_VERB_s( 1, "Removing file ERROR" );
+	upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "remove", strerror(errno));
+	upserr_vplace(); upserr_add( UPS_REMOVE_FILE, UPS_FATAL, ups_file );
+	return UPS_REMOVE_FILE;
+      }
      g_subdir_base = ups_file;
      mkdir( g_subdir_base, 0775 );
 

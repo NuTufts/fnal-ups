@@ -154,17 +154,27 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
    } db_info=0;
   } 
 
-  if (db_info && db_info->config && 
+  /* need to read dbconfig here! */
+
+   if (db_info && !db_info->config ) {
+      t_upstyp_product *p;
+      p =  upsutl_get_config(db_info->name)->config;
+      if (p && p->config) {
+        db_info->config = p->config;
+      }
+   } 
+
+   if (db_info && db_info->config && 
       db_info->config->version_subdir &&  
       db_info->config->version_subdir[0] == '1') {
 
        extern int g_subdir_files_flag;
        g_subdir_files_flag = 1;
        
-  } else {
+   } else {
        extern int g_subdir_files_flag;
        g_subdir_files_flag = 0;
-  }
+   }
 /************************************************************************
  *
  * If there was any chain specified at all we need to look at chain files
