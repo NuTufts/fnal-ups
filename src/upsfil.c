@@ -688,15 +688,11 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
         }
       }
 
-      if (remove( ups_file ) != 0)
-      {
-	P_VERB_s( 1, "Removing file ERROR" );
-	upserr_add( UPS_SYSTEM_ERROR, UPS_FATAL, "remove", strerror(errno));
-	upserr_vplace(); upserr_add( UPS_REMOVE_FILE, UPS_FATAL, ups_file );
-	return UPS_REMOVE_FILE;
-      }
-     g_subdir_base = ups_file;
-     mkdir( g_subdir_base, 0775 );
+    if ( res == 0 )
+       remove( ups_file );
+
+    g_subdir_base = ups_file;
+    mkdir( g_subdir_base, 0775 );
 
   } else {
 

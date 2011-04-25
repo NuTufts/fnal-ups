@@ -158,7 +158,7 @@ t_upslst_item *ups_undeclare( t_upsugo_command * const uc ,
 
    if (db_info && !db_info->config ) {
       t_upstyp_product *p;
-      p =  upsutl_get_config(db_info->name)->config;
+      p =  upsutl_get_config(db_info->name);
       if (p && p->config) {
         db_info->config = p->config;
       }
