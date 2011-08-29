@@ -234,6 +234,26 @@ static int               g_call_count = 0;           /* # times read_file is cal
   if( UPS_VERBOSE ) upsver_mes( iver, "UPSFIL: %s - %s %d %s %s %s\n", \
 			       g_filename, (str1), (num), (str2), (str3), (str4))
 
+
+/* fix up qualifier strings when making filenames */
+
+char *
+without_colons( char *s ) {
+    static char colonbuf[MAX_LINE_LEN];
+    char *r = colonbuf;
+    printf("without_colons( %s ) -> ", s);
+    if (!s) 
+        return "";
+    while (0 != (*r = *s)) {
+        if (':' == *r) {
+            *r = '_';
+        }
+        r++;
+        s++;
+    }
+    printf("%s\n", colonbuf);
+    return colonbuf;
+}
 /*
  * Definition of public functions
  */
@@ -430,7 +450,7 @@ void write_journal_file( const void *key, void ** prod, void *cl )
 	dd = opendir(key);
 	while (0 != (de = readdir(dd))) {
 	   if (de->d_name[0] != '.') {
-	      sprintf(g_subdir_buf, "%s/%s", key, de->d_name);
+	      sprintf(g_subdir_buf, "%s/%s", (char *)key, de->d_name);
 	      remove(g_subdir_buf);
 	   }
 	}
@@ -875,7 +895,7 @@ int write_version_file( void )
       g_fh && fclose(g_fh);
       g_fh = 0;
 
-      sprintf(g_subdir_buf, "%s/%s_%s", g_subdir_base, inst_ptr->flavor, inst_ptr->qualifiers );
+      sprintf(g_subdir_buf, "%s/%s_%s", g_subdir_base, inst_ptr->flavor, without_colons(inst_ptr->qualifiers) );
   
       g_fh = fopen( g_subdir_buf, "w" );
  
