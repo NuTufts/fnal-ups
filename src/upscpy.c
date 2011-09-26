@@ -75,7 +75,7 @@ static char get_man_subdir(char * const a_man_file);
 static void shutup(UPSCPY_PARAMS);
 
 #define SHUTUP \
-  if ((&bit_bucket == 0) && 0) shutup (a_minst, a_db_info, a_command_line, a_stream);
+  if ((&bit_bucket + bit_bucket_offset == 0) && 0) shutup (a_minst, a_db_info, a_command_line, a_stream);
 
 /* functions to handle specific action commands */
 
@@ -96,6 +96,7 @@ static void shutup(UPSCPY_PARAMS);
 
 static char g_buff[MAX_LINE_LEN];
 static long bit_bucket = 0;
+static long bit_bucket_offset = 0;
 
 /*=======================================================================
  *

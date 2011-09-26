@@ -47,13 +47,14 @@ int verify_file( char * const file_name );
 static void shutup(const FILE * const tmpfile, const int ups_command);
 
 #define SHUTUP \
-  if ((&bit_bucket == 0) && 0) shutup (tmpfile, ups_command);
+  if ((&bit_bucket+bit_bucket_offset == 0) && 0) shutup (tmpfile, ups_command);
 
 /*
  * Definition of global variables.
  */
 
 static long bit_bucket = 0;
+static long bit_bucket_offset = 0;
 
 #define DEFAULT_EDITOR "vi"
 #define NOT_UNIQUE 1

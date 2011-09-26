@@ -60,13 +60,14 @@ static void ups_verify_generic_instance(VERIFY_INST_PARAMS,
 
 static void shutup(VERIFY_INST_PARAMS);		/* pretend to use all of the parameters we've defined */
 #define SHUTUP \
-  if ((&bit_bucket == 0) && 0) shutup (a_inst, a_db, a_minst, a_command_line);
+  if ((&bit_bucket + bit_bucket_offset == 0) && 0) shutup (a_inst, a_db, a_minst, a_command_line);
 
 /*
  * Definition of global variables.
  */
 static char *g_dollarsign = "$";
 static long bit_bucket = 0;
+static long bit_bucket_offset = 0;
 
 #define VERIFY_DIR_SPEC(dir, tran)   \
     if (dir && (dir[0] != '\0')) {                                          \

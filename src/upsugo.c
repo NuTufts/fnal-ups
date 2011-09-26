@@ -150,6 +150,7 @@ flavor_sub(struct ups_command * uc)
 /* Single flag set cases */
 #define case_help case '?': uc->ugo_help = 1; break;
 #define case_a case 'a': uc->ugo_a = 1; break;
+#define case_B case 'B': uc->ugo_B = 1; break;
 #define case_C case 'C': uc->ugo_C = 1; break;
 #define case_e case 'e': uc->ugo_e = 1; break;
 #define case_E case 'E': uc->ugo_E = 1; break;
@@ -1607,6 +1608,7 @@ t_upsugo_command *upsugo_next(const int old_argc,
         }
         switch(*(arg_str+1))      /* which flag was specified */
         { /* Single flag cases */
+          case_B
           case_a case_C case_e case_E case_F 
           case_j case_k case_l case_L case_P 
           case_R case_s case_S case_v case_V 

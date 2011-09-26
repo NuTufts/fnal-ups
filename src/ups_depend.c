@@ -40,13 +40,14 @@
 static void shutup (const char * const s_cmd);
 
 #define SHUTUP \
-  if ((&bit_bucket == 0) && 0) shutup (s_cmd);
+  if ((&bit_bucket + bit_bucket_offset == 0) && 0) shutup (s_cmd);
 
 /*
  * Definition of global variables.
  */
 
 static long bit_bucket = 0;
+static long bit_bucket_offset = 0;
 
 /*
  * Definition of public functions.

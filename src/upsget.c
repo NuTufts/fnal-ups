@@ -45,13 +45,14 @@ static void shutup (const t_upstyp_db * const db_info_ptr,
                     const t_upsugo_command * const command_line);
 
 #define SHUTUP \
-  if ((&bit_bucket == 0) && 0) shutup (db_info_ptr, instance, command_line);
+  if ((&bit_bucket + bit_bucket_offset == 0) && 0) shutup (db_info_ptr, instance, command_line);
 
 /*
  * Definition of global variables.
  */
 
 static long bit_bucket = 0;
+static long bit_bucket_offset = 0;
 
 /*
  * Definition of public variables.

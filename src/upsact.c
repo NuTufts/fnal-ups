@@ -47,6 +47,7 @@
 #include "upskey.h"
 #include "upsugo.h"
 #include "upsget.h"
+#include "ups_main.h"
 
 extern void list_K( const t_upstyp_matched_instance * const instance, 
 		    const t_upsugo_command * const command, 
@@ -121,6 +122,7 @@ static t_upsugo_command *get_dependent( t_upsact_cmd * const p_cmd,
 				  int is_act_build,
 				  int * const unsetup_flag );
 static int is_prod_done( const char *const prod_name );
+static int is_prod_clash( const t_upsugo_command *const initial);
 static t_upsact_item *find_prod_name( t_upslst_item *const dep_list,
 				      const char *const prod_name );
 static t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
@@ -194,7 +196,7 @@ static void f_unless( ACTION_PARAMS);
 static void shutup( ACTION_PARAMS);
 /* pretend to use all of the parameters we've defined */
 #define SHUTUP \
-  if ((&bit_bucket == 0) && 0) shutup (a_minst, a_db_info, a_command_line, a_stream, a_cmd);
+  if ((&bit_bucket + bit_bucket_offset == 0) && 0) shutup (a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
 #define OUTPUT_ACTION_INFO(severity, minst) \
     if (minst->version && minst->version->product &&                  \
@@ -362,6 +364,7 @@ static char *g_cshPath = "path";
 static char *g_shDelimiter = ":";
 static char *g_cshDelimiter = " ";
 static long bit_bucket = 0;
+static long bit_bucket_offset = 0;
 
 /* this one, is a pointer to the ugo_command from the command line */
 static t_upsugo_command *g_ugo_cmd = 0;
@@ -397,14 +400,14 @@ t_cmd_info g_cmd_info[] = {
   {e_unold,         "unold", 0, 0x00000010, e_old},
   {e_untest,        "untest", 0, 0x00000010, e_test},
   {e_unchain,       "unchain", 0, 0x00000010, e_chain},
-  {e_setup,       "setup",       "?cdef:g:H:jkm:M:noO:Pq:r:RstU:vVz:Z01234567567.", 0x00000011, e_invalid_action},
+  {e_setup,       "setup",       "?Bcdef:g:H:jkm:M:noO:Pq:r:RstU:vVz:Z01234567567.", 0x00000011, e_invalid_action},
   {e_unsetup,     "unsetup",     "?cdef:g:H:jm:M:noO:Pq:r:stU:vVz:Z01234567.", 0x00000011, e_setup},
   {e_list,        "list",        "?acdf:g:H:K:lm:M:noq:r:tU:vz:Z01234567.", 0x00000010, e_invalid_action},
   {e_parent,        "parent",    "?acdf:g:H:K:lm:M:noq:r:tU:vz:Z01234567", 0x00000010, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z01234567.", 0x00000010, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:G:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z01234567", 0x00000010, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vz:Z01234567", 0x00000010, e_declare},
-  {e_depend,      "depend",      "?cdf:g:H:jK:lm:M:noOq:r:RtU:vVz:Z01234567", 0x00000010, e_invalid_action},
+  {e_depend,      "depend",      "?Bcdf:g:H:jK:lm:M:noOq:r:RtU:vVz:Z01234567", 0x00000010, e_invalid_action},
   {e_exist,       "exist",       "?cdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z01234567", 0x00000010, e_invalid_action},
 /*  {e_modify,      "modify",      "?aA:E:f:H:m:M:Np:q:r:T:U:vVz:Z", 0x00000010, e_invalid_action},	*/
   {e_modify,      "modify",      "?Acd:E:f:H:m:M:nNop:q:r:tT:U:vVz:Z", 0x00000010, e_invalid_action},
@@ -1351,7 +1354,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
   /* add product to list of products we have done */
 
-  g_prod_done = upslst_add( g_prod_done, p_act_itm->ugo->ugo_product );
+  g_prod_done = upslst_add( g_prod_done, p_act_itm->ugo );
 
   if ( !p_act_itm->act ) {
     if ( copt == 'd' ) {
@@ -1517,6 +1520,20 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	continue;
       */
 
+
+      /* if product is already in our setup list, go to next product */
+
+      if ( new_ugo ) {
+	if ( is_prod_done( new_ugo->ugo_product ) ) {
+           if ( g_ugo_cmd->ugo_B && is_prod_clash( new_ugo ) ) {
+               upserr_vplace();
+               /* XXX need new error code... sigh. */
+               upserr_add( UPS_NO_MATCH, UPS_FATAL, new_ugo->ugo_product );
+           }
+	  continue;
+	}
+      }
+
       /* if product is at the top level always use that instance */
       
       if ( new_ugo ) {
@@ -1525,15 +1542,6 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  /*	  (void) upsugo_free( new_ugo );
 		  new_ugo = new_act_itm->ugo */
 	}
-      }
-
-      /* if product is already in our setup list, go to next product */
-
-      if ( new_ugo ) {
-	if ( is_prod_done( new_ugo->ugo_product ) ) {
-	  continue;
-	}
-	
       }
 
       /*
@@ -1997,11 +2005,37 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
   return act_itm;
 }
 
+/* 
+ * if it has the same product name, but not the same version
+ * and qualifiers as one we've already done, it is a clash.
+ */
+int is_prod_clash( const t_upsugo_command *const initial)
+{
+  t_upslst_item *l_ptr = upslst_first( g_prod_done );
+  t_upslst_item *p1, *p2;
+  
+  for ( ; l_ptr; l_ptr = l_ptr->next ) {
+printf("Here1\n");
+    if ( upsutl_stricmp( initial->ugo_product, ((t_upsugo_command*)l_ptr->data)->ugo_product ) == 0 ) {
+         if ( upsutl_stricmp( initial->ugo_version, ((t_upsugo_command*)l_ptr->data)->ugo_version ) == 0 ) {
+             for (p1 = initial->ugo_qualifiers, p2=((t_upsugo_command*)l_ptr->data)->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
+                 if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
+                     return 1;
+                 }
+             }
+             return 0;
+         }
+         return 1;
+     }
+  }
+  return 0;      
+}
+
 int is_prod_done( const char *const prod_name )
 {
   t_upslst_item *l_ptr = upslst_first( g_prod_done );
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
-    if ( upsutl_stricmp( prod_name, (char *)l_ptr->data ) == 0 )
+    if ( upsutl_stricmp( prod_name, ((t_upsugo_command*)l_ptr->data)->ugo_product ) == 0 )
       return 1;
   }
   return 0;      
