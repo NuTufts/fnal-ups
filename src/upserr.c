@@ -133,6 +133,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 72 */  "%s: The following product has a \'%s\' chain instance but no matching version.\n",
 /* 73 */  "%s: Unable to remove file %s.\n",
 /* 74 */  "%s: Mismatched EndIf condition '%s' does not match If condition '%s'.\n",
+/* 75 */  "%s: Version conflict -- different branches of dependency tree require conflicting versions of product %s: %s %s vs %s\n",
 };
 
 char *g_error_ascii[] = {
@@ -211,7 +212,8 @@ char *g_error_ascii[] = {
    /* UPS_DANGLING_CHAIN      72 */ "UPS_DANGLING_CHAIN",
    /* UPS_REMOVE_FILE         73 */ "UPS_REMOVE_FILE", 
    /* UPS_MISMATCHED_ENDIF    74 */ "UPS_MISMATCHED_ENDIF",
-   /* UPS_NERR                75 */ "UPS_NERR",
+   /* UPS_DEP_CONFLICT        75 */ "UPS_DEP_CONFLICT",
+   /* UPS_NERR                76 */ "UPS_NERR",
    0 };
 
 /*

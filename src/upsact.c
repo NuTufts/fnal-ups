@@ -1525,18 +1525,24 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       if ( new_ugo ) {
 	if ( is_prod_done( new_ugo->ugo_product ) ) {
-           if ( g_ugo_cmd->ugo_B && is_prod_clash( new_ugo ) ) {
-               upserr_vplace();
-               /* XXX need new error code... sigh. */
-               upserr_add( UPS_NO_MATCH, UPS_FATAL, new_ugo->ugo_product );
+           if ( g_ugo_cmd->ugo_B ) {
+              if (is_prod_clash( new_ugo ) &&  'c' == copt) {
+		   upserr_output();
+                   unlink(g_temp_file_name);
+                   printf("/dev/null\n");
+                   exit(1);
+              }
+           } else {
+	      continue;
            }
-	  continue;
 	}
       }
 
       /* if product is at the top level always use that instance */
+      /* -- unless we're doing -B, otherwise the tree won't show the */
+      /*    clashing versions ... */
       
-      if ( new_ugo ) {
+      if ( new_ugo && ! g_ugo_cmd->ugo_B ) {
 	if ( (new_act_itm = 
 	      find_prod_name( top_list, new_ugo->ugo_product ) ) ) {
 	  /*	  (void) upsugo_free( new_ugo );
@@ -2015,16 +2021,19 @@ int is_prod_clash( const t_upsugo_command *const initial)
   t_upslst_item *p1, *p2;
   
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
-printf("Here1\n");
     if ( upsutl_stricmp( initial->ugo_product, ((t_upsugo_command*)l_ptr->data)->ugo_product ) == 0 ) {
          if ( upsutl_stricmp( initial->ugo_version, ((t_upsugo_command*)l_ptr->data)->ugo_version ) == 0 ) {
              for (p1 = initial->ugo_qualifiers, p2=((t_upsugo_command*)l_ptr->data)->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
                  if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
+		     upserr_vplace();
+		     upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "qualifiers", p1->data, p2->data  );
                      return 1;
                  }
              }
              return 0;
          }
+	 upserr_vplace();
+	 upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "versions", initial->ugo_version,  ((t_upsugo_command*)l_ptr->data)->ugo_version );
          return 1;
      }
   }
