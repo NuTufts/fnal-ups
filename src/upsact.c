@@ -400,14 +400,14 @@ t_cmd_info g_cmd_info[] = {
   {e_unold,         "unold", 0, 0x00000010, e_old},
   {e_untest,        "untest", 0, 0x00000010, e_test},
   {e_unchain,       "unchain", 0, 0x00000010, e_chain},
-  {e_setup,       "setup",       "?Bcdef:g:H:jkm:M:noO:Pq:r:RstU:vVz:Z01234567567.", 0x00000011, e_invalid_action},
+  {e_setup,       "setup",       "?cdef:g:H:jkm:M:noO:Pq:r:RsStU:vVz:Z01234567567.", 0x00000011, e_invalid_action},
   {e_unsetup,     "unsetup",     "?cdef:g:H:jm:M:noO:Pq:r:stU:vVz:Z01234567.", 0x00000011, e_setup},
   {e_list,        "list",        "?acdf:g:H:K:lm:M:noq:r:tU:vz:Z01234567.", 0x00000010, e_invalid_action},
   {e_parent,        "parent",    "?acdf:g:H:K:lm:M:noq:r:tU:vz:Z01234567", 0x00000010, e_invalid_action},
   {e_configure,   "configure",   "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z01234567.", 0x00000010, e_invalid_action},
   {e_copy,        "copy",        "?A:b:cCdD:f:g:G:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z01234567", 0x00000010, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vz:Z01234567", 0x00000010, e_declare},
-  {e_depend,      "depend",      "?Bcdf:g:H:jK:lm:M:noOq:r:RtU:vVz:Z01234567", 0x00000010, e_invalid_action},
+  {e_depend,      "depend",      "?cdf:g:H:jK:lm:M:noOq:r:RStU:vVz:Z01234567", 0x00000010, e_invalid_action},
   {e_exist,       "exist",       "?cdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z01234567", 0x00000010, e_invalid_action},
 /*  {e_modify,      "modify",      "?aA:E:f:H:m:M:Np:q:r:T:U:vVz:Z", 0x00000010, e_invalid_action},	*/
   {e_modify,      "modify",      "?Acd:E:f:H:m:M:nNop:q:r:tT:U:vVz:Z", 0x00000010, e_invalid_action},
@@ -1525,8 +1525,12 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       if ( new_ugo ) {
 	if ( is_prod_done( new_ugo->ugo_product ) ) {
-           if ( g_ugo_cmd->ugo_B ) {
+           if ( g_ugo_cmd->ugo_S ) {
               if (is_prod_clash( new_ugo ) &&  'c' == copt) {
+                   /*
+ 	            * if we're doing a setup and there is a clash, 
+ 		    * fail the setup
+ 		    */
 		   upserr_output();
                    unlink(g_temp_file_name);
                    printf("/dev/null\n");
@@ -1542,7 +1546,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       /* -- unless we're doing -B, otherwise the tree won't show the */
       /*    clashing versions ... */
       
-      if ( new_ugo && ! g_ugo_cmd->ugo_B ) {
+      if ( new_ugo && ! g_ugo_cmd->ugo_S ) {
 	if ( (new_act_itm = 
 	      find_prod_name( top_list, new_ugo->ugo_product ) ) ) {
 	  /*	  (void) upsugo_free( new_ugo );
@@ -1886,7 +1890,7 @@ t_upsugo_command *get_dependent( t_upsact_cmd *const p_cmd,
 	  a_ugo->ugo_v = temp_ugo->ugo_v;
 
 	(void) upsugo_free( temp_ugo );
-      }
+      } 
 
       *unsetup_flag = 1;
     }
