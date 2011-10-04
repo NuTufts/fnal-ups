@@ -134,6 +134,7 @@ static char *g_error_messages[UPS_NERR] = {
 /* 73 */  "%s: Unable to remove file %s.\n",
 /* 74 */  "%s: Mismatched EndIf condition '%s' does not match If condition '%s'.\n",
 /* 75 */  "%s: Version conflict -- different branches of dependency tree require conflicting versions of product %s: %s %s vs %s\n",
+/* 76 */  "%s: Version conflict -- dependency tree requires versions conflicting with current setup of product %s: %s %s vs %s\n",
 };
 
 char *g_error_ascii[] = {
@@ -213,7 +214,8 @@ char *g_error_ascii[] = {
    /* UPS_REMOVE_FILE         73 */ "UPS_REMOVE_FILE", 
    /* UPS_MISMATCHED_ENDIF    74 */ "UPS_MISMATCHED_ENDIF",
    /* UPS_DEP_CONFLICT        75 */ "UPS_DEP_CONFLICT",
-   /* UPS_NERR                76 */ "UPS_NERR",
+   /* UPS_SETUP_CONFLICT      76 */ "UPS_SETUP_CONFLICT",
+   /* UPS_NERR                77 */ "UPS_NERR",
    0 };
 
 /*

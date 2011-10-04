@@ -1318,6 +1318,41 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
   return upslst_first( top_list );
 }
 
+
+int
+check_setup_already_die_if_clash(t_upsugo_command *new_ugo) {
+    t_upsugo_command *setup_ugo_cmd = 0;
+    t_upslst_item *p1, *p2;
+
+    P_VERB_s_s( 1, "checking for setups", new_ugo->ugo_product );
+
+    setup_ugo_cmd = upsugo_env( new_ugo->ugo_product , g_cmd_info[e_setup].valid_opts );
+    if (setup_ugo_cmd) {
+	/* compare versions */
+	if ( 0 != upsutl_stricmp(new_ugo->ugo_version, setup_ugo_cmd->ugo_version)) {
+	   upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "version", new_ugo->ugo_version, setup_ugo_cmd->ugo_version  );
+	}
+	/* compare qualifiers */
+	for (p1 = new_ugo->ugo_qualifiers, p2=setup_ugo_cmd->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
+	   if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
+	       upserr_vplace();
+	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
+	   }
+       }
+       /* if it is setup and it matches, we need do nothing... */
+       if (UPS_ERROR == UPS_SUCCESS) {
+	  P_VERB_s_s( 1, "trying to skip already setup", new_ugo->ugo_product );
+	  return 1;
+       } else {
+	  upserr_output();
+	  unlink(g_temp_file_name);
+	  printf("/dev/null\n");
+          exit(1);
+       }
+    }
+    return 0;
+}
+
 /*-----------------------------------------------------------------------
  * next_cmd
  *
@@ -1514,6 +1549,12 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
       new_ugo = get_dependent( p_cmd, is_act_build, &unsetup_flag ); 
 
+      if ( g_ugo_cmd->ugo_S && 'c' == copt  ) {
+          if (check_setup_already_die_if_clash(new_ugo)) {
+            /* already setup, we need do nothing with it... */
+            continue;
+          }
+      }
       /* new_ugo can be null if doing unsetup
 	 not any more !!!
       if ( ! new_ugo && (i_cmd & 2) )
@@ -1526,12 +1567,11 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       if ( new_ugo ) {
 	if ( is_prod_done( new_ugo->ugo_product ) ) {
            if ( g_ugo_cmd->ugo_S ) {
-              if (is_prod_clash( new_ugo ) &&  'c' == copt) {
+              if (is_prod_clash( new_ugo ) &&  'd' != copt) {
                    /*
  	            * if we're doing a setup and there is a clash, 
  		    * fail the setup
  		    */
-		   upserr_output();
                    unlink(g_temp_file_name);
                    printf("/dev/null\n");
                    exit(1);
@@ -2019,10 +2059,13 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
  * if it has the same product name, but not the same version
  * and qualifiers as one we've already done, it is a clash.
  */
-int is_prod_clash( const t_upsugo_command *const initial)
+int 
+is_prod_clash( const t_upsugo_command *const initial)
 {
   t_upslst_item *l_ptr = upslst_first( g_prod_done );
   t_upslst_item *p1, *p2;
+
+  P_VERB_s_s( 1, "checking for product clash", initial->ugo_product );
   
   for ( ; l_ptr; l_ptr = l_ptr->next ) {
     if ( upsutl_stricmp( initial->ugo_product, ((t_upsugo_command*)l_ptr->data)->ugo_product ) == 0 ) {
