@@ -144,6 +144,7 @@ static t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 					 /* const int i_act, */
 					 const int i_build );
 static int do_exit_action( const t_upsact_cmd * const a_cmd );
+static int check_setup_clash(t_upsugo_command *new_ugo);
 
 /* functions to handle specific action commands */
 
@@ -1524,18 +1525,20 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       /* if product is already in our setup list, go to next product */
 
       if ( new_ugo ) {
-	if ( is_prod_done( new_ugo->ugo_product ) ) {
-           if ( g_ugo_cmd->ugo_B ) {
-              if (is_prod_clash( new_ugo ) &&  'c' == copt) {
-		   upserr_output();
-                   unlink(g_temp_file_name);
-                   printf("/dev/null\n");
-                   exit(1);
-              }
-           } else {
+	 if ( g_ugo_cmd->ugo_B ) {
+	    int flag1 = is_prod_clash( new_ugo );
+	    int flag2 = 'c' == copt && check_setup_clash( new_ugo );
+	    if ((flag1 || flag2 ) &&  'c' == copt) {
+                 fprintf(stderr, "here, bailing cause I think its setup\n");
+		 upserr_output();
+		 unlink(g_temp_file_name);
+		 printf("/dev/null\n");
+		 exit(1);
+	    }
+	 }
+	 if ( is_prod_done( new_ugo->ugo_product ) ) {
 	      continue;
-           }
-	}
+         }
       }
 
       /* if product is at the top level always use that instance */
@@ -2009,6 +2012,35 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
   g_top_unsetup = unsetup_flag;
 
   return act_itm;
+}
+
+int
+check_setup_clash(t_upsugo_command *new_ugo) {
+    t_upsugo_command *setup_ugo_cmd = 0;
+    t_upslst_item *p1, *p2;
+
+    P_VERB_s_s( 1, "checking for setups", new_ugo->ugo_product );
+
+    setup_ugo_cmd = upsugo_env( new_ugo->ugo_product , g_cmd_info[e_setup].valid_opts );
+    if (setup_ugo_cmd) {
+	/* compare versions */
+	if ( 0 != upsutl_stricmp(new_ugo->ugo_version, setup_ugo_cmd->ugo_version)) {
+	   upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "version", new_ugo->ugo_version, setup_ugo_cmd->ugo_version  );
+	}
+	/* compare qualifiers */
+	for (p1 = new_ugo->ugo_qualifiers, p2=setup_ugo_cmd->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
+	   if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
+	       upserr_vplace();
+	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
+	   }
+       }
+       /* if it is setup and it matches, we need do nothing... */
+       if (UPS_ERROR == UPS_SUCCESS) {
+	  P_VERB_s_s( 1, "trying to skip already setup", new_ugo->ugo_product );
+	  return 0;
+       }
+    }
+    return 1;
 }
 
 /* 
