@@ -552,6 +552,9 @@ int upsugo_ifornota(struct ups_command * const uc)
      uc->ugo_q = 1;
      upsugo_bldqual(uc, "");
    }
+   if (!uc->ugo_B && ups_get_default_B()) {
+     uc->ugo_B = 1;
+   }
    if (!uc->ugo_product)                        /* no product                */
    { addr=upsutl_str_create("*",' ');           /* wildcard product name     */
      upsver_mes(3,"%sNo product specified set to %s\n",UPSUGO,addr); 

@@ -15,7 +15,7 @@ extern char *getenv(const char *);
 char **
 ups_have_flavor_override() {
     static char **res = 0;
-    static char *parts[3] = {0,0,0};
+    static char *parts[4] = {0,0,0,0};
     char *override;
     char *scan;
     extern char *getenv();
@@ -60,6 +60,10 @@ ups_have_flavor_override() {
 		   *scan = 0;
 		    scan++;
 		}
+            } else if (0 == strncmp("-B", scan, 2)) {
+                scan +=2;
+                parts[3] = "-B";
+                res = parts;
             } else {
 		while( !isspace(*scan) && *scan ) {
 		    scan++;
@@ -233,6 +237,17 @@ ups_make_default_quals_optional() {
         }
         *(s-offset) = *(s);
      }
+}
+
+char *
+ups_get_default_B() {
+   char **p;
+
+   if (0 != (p = ups_have_flavor_override()) && p[3]) {
+       return p[3];
+   } else {
+	return 0;
+   }
 }
 
 char *
