@@ -728,6 +728,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   if ( !ugo_cmd || !act_name )
     return 0;
 
+
   /* create a partial action structure for top product */
 
   if ( !(act_itm = get_top_item( ugo_cmd, mat_prod, act_name )) ) {
@@ -736,6 +737,14 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
     return 0;
   }
 
+  if (g_ugo_cmd->ugo_B && check_setup_match_clash( mat_prod )) {
+     upserr_output();
+     unlink(g_temp_file_name);
+     printf("/dev/null\n");
+     fflush(stdout);
+     fflush(stderr);
+     exit(!(UPS_ERROR==UPS_SUCCESS));
+  }
   /* create a list of 1'st level dependecies,
      these instances have precedence over products at lower (higher ?) levels */
 
@@ -743,6 +752,8 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   top_list = next_top_prod( top_list, act_itm, act_name );
   
   /* get the dependency list */
+
+  
 
   dep_list = next_cmd( top_list, dep_list, act_itm, act_name, 'c' );
 
@@ -1522,20 +1533,30 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
       */
 
 
-      /* if product is already in our setup list, go to next product */
 
       if ( new_ugo ) {
+ 
+         /* if -B do extra dependency check stuff */
+
 	 if ( g_ugo_cmd->ugo_B ) {
 	    int flag1 = is_prod_clash( new_ugo );
-	    int flag2 = 'c' == copt && check_setup_clash( new_ugo );
-	    if ((flag1 || flag2 ) &&  'c' == copt) {
-                 fprintf(stderr, "here, bailing cause I think its setup\n");
+	    int flag2 = ('c' == copt) && check_setup_clash( new_ugo );
+	    if ((flag1 || flag2 == 1 ) &&  'c' == copt) {
 		 upserr_output();
 		 unlink(g_temp_file_name);
 		 printf("/dev/null\n");
+                 fflush(stderr);
+                 fflush(stdout);
 		 exit(1);
 	    }
+            if (flag2 == 2) {
+               /* already setup, and matches, so skip it... */
+               continue;
+            }
 	 }
+
+         /* if product is already in our setup list, go to next product */
+
 	 if ( is_prod_done( new_ugo->ugo_product ) ) {
 	      continue;
          }
@@ -2015,7 +2036,33 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 }
 
 int
-check_setup_clash(t_upsugo_command *new_ugo) {
+check_setup_match_clash(t_upstyp_matched_product * const mat_prod ) {
+    t_upsugo_command *setup_ugo_cmd = 0;
+    t_upslst_item *p1, *p2;
+
+    t_upstyp_matched_instance *minst = mat_prod->minst_list->data;
+    t_upstyp_instance *inst = minst->version;
+
+    P_VERB_s_s( 1, "checking for setups", mat_prod->product );
+
+    setup_ugo_cmd = upsugo_env( inst->product , g_cmd_info[e_setup].valid_opts );
+    if (setup_ugo_cmd) {
+      P_VERB_s_s( 1, "want version", inst->version );
+      P_VERB_s_s( 1, "have version", setup_ugo_cmd->ugo_version );
+
+      if (setup_ugo_cmd->ugo_version && (!inst->version || 0 != upsutl_stricmp(setup_ugo_cmd->ugo_version, inst->version))) {
+	     upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, inst->product, "version", inst->version, setup_ugo_cmd->ugo_version  );
+      }
+      /* XXX check qualifiers? */
+      upserr_output();
+      upserr_clear();
+      return 1;
+    } 
+    return 0;
+}
+
+int
+check_setup_clash(t_upsugo_command *new_ugo ) {
     t_upsugo_command *setup_ugo_cmd = 0;
     t_upslst_item *p1, *p2;
 
@@ -2024,7 +2071,8 @@ check_setup_clash(t_upsugo_command *new_ugo) {
     setup_ugo_cmd = upsugo_env( new_ugo->ugo_product , g_cmd_info[e_setup].valid_opts );
     if (setup_ugo_cmd) {
 	/* compare versions */
-	if ( 0 != upsutl_stricmp(new_ugo->ugo_version, setup_ugo_cmd->ugo_version)) {
+	if ( new_ugo->ugo_version && (!setup_ugo_cmd->ugo_version || 0 != upsutl_stricmp(new_ugo->ugo_version, setup_ugo_cmd->ugo_version))) {
+           upserr_vplace();
 	   upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "version", new_ugo->ugo_version, setup_ugo_cmd->ugo_version  );
 	}
 	/* compare qualifiers */
@@ -2034,13 +2082,15 @@ check_setup_clash(t_upsugo_command *new_ugo) {
 	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
 	   }
        }
+       upserr_output();
+       upserr_clear();
        /* if it is setup and it matches, we need do nothing... */
        if (UPS_ERROR == UPS_SUCCESS) {
 	  P_VERB_s_s( 1, "trying to skip already setup", new_ugo->ugo_product );
-	  return 0;
+	  return 2;
        }
     }
-    return 1;
+    return 0;
 }
 
 /* 
@@ -2059,13 +2109,18 @@ int is_prod_clash( const t_upsugo_command *const initial)
                  if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
 		     upserr_vplace();
 		     upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "qualifiers", p1->data, p2->data  );
+                     upserr_output();
+                     upserr_clear();
                      return 1;
                  }
              }
              return 0;
          }
+         fflush(stderr);
 	 upserr_vplace();
 	 upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "versions", initial->ugo_version,  ((t_upsugo_command*)l_ptr->data)->ugo_version );
+         upserr_output();
+         upserr_clear();
          return 1;
      }
   }

@@ -116,7 +116,7 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
 	  if ((UPS_ERROR == UPS_SUCCESS) && cmd_list) {
 	    cmd_list = upsact_trim_unsetup(cmd_list, &top_unsetup);
 	  }
-	  if ((UPS_ERROR == UPS_SUCCESS) && cmd_list) {
+	  if ((UPS_ERROR == UPS_SUCCESS) && cmd_list && !a_command_line->ugo_B) {
 	    upsact_process_commands(cmd_list, a_temp_file);
 	  }
 	  /* now clean up the memory that we used */
