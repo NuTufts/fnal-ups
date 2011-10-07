@@ -3,20 +3,8 @@ DATABASE=db1
 	Product=jessie	Version=v2_0	Flavor=NULL
 		Qualifiers="red"	Chain=""
 
-	Product=lassie	Version=v1_0	Flavor=NULL
-		Qualifiers="nodbg:opt"	Chain=""
-
-	Product=lassie	Version=v1_0	Flavor=IRIX+5.3
-		Qualifiers="nodbg:opt"	Chain=""
-
-	Product=lassie	Version=v1_0	Flavor=IRIX+6.2
-		Qualifiers=""	Chain=""
-
-	Product=lassie	Version=v1_0	Flavor=OSF1
-		Qualifiers=""	Chain=current
-
 	Product=lassie	Version=v2_0	Flavor=NULL
-		Qualifiers="nodbg:opt"	Chains=current,mydog,test
+		Qualifiers="nodbg:opt"	Chains=test,mydog,current
 
 	Product=lassie	Version=v2_0	Flavor=IRIX+5.3
 		Qualifiers="nodbg:opt"	Chain=""
@@ -29,6 +17,18 @@ DATABASE=db1
 
 	Product=lassie	Version=v2_0	Flavor=OSF1
 		Qualifiers=""	Chain=test
+
+	Product=lassie	Version=v1_0	Flavor=NULL
+		Qualifiers="nodbg:opt"	Chain=""
+
+	Product=lassie	Version=v1_0	Flavor=IRIX+5.3
+		Qualifiers="nodbg:opt"	Chain=""
+
+	Product=lassie	Version=v1_0	Flavor=IRIX+6.2
+		Qualifiers=""	Chain=""
+
+	Product=lassie	Version=v1_0	Flavor=OSF1
+		Qualifiers=""	Chain=current
 
 	Product=rover	Version=v2_0	Flavor=NULL
 		Qualifiers="nodbg:opt"	Chain=""
