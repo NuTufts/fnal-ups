@@ -289,7 +289,42 @@ static int g_MATCH_DONE = 0;
 
 /* int list_error=UPS_SUCCESS;  */
 
-int product_cmp ( const void * const d1, const void * const d2 )
+int 
+minst_full_cmp ( const void * const d1, const void * const d2 )
+{
+  const t_upstyp_matched_instance *a1 = d1;
+  const t_upstyp_matched_instance *a2 = d2;
+  int res;
+
+  if (!a1 || !a2 || (long)d2 < 1000 ) {
+     return a1 == 0 ?  -1 : 0;
+  }
+  (0 == (res = upsutl_stricmp( a1->version->product, a2->version->product ))) &&
+  (0 == (res = upsutl_stricmp( a1->version->version, a2->version->version ))) &&
+  (0 == (res = upsutl_stricmp( a1->version->flavor, a2->version->flavor ))) &&
+  (0 == (res = upsutl_stricmp( a1->version->qualifiers, a2->version->qualifiers ))) &&
+  (0 == (res = upsutl_stricmp( a1->version->chain, a2->version->chain ))) &&
+  (0 == (res = upsutl_stricmp( a1->version->declarer, a2->version->declarer ))) &&
+  (0 == (res = upsutl_stricmp( a1->version->declared, a2->version->declared )));
+
+  return res;
+}
+int 
+product_full_cmp ( const void * const d1, const void * const d2 )
+{
+  t_upstyp_product *a1 = (t_upstyp_product *)d1;
+  t_upstyp_product *a2 = (t_upstyp_product *)d2;
+  int res;
+
+  (0 == (res = upsutl_stricmp( a1->product, a2->product ))) &&
+  (0 == (res = upsutl_stricmp( a1->version, a2->version ))) &&
+  (0 == (res = upsutl_stricmp( a1->chain, a2->chain ))) &&
+  (0 == (res = upsutl_stricmp( a1->ups_db_version, a2->ups_db_version )));
+
+  return res;
+}
+int 
+product_cmp ( const void * const d1, const void * const d2 )
 {
   t_upstyp_product *a1 = (t_upstyp_product *)d1;
   t_upstyp_product *a2 = (t_upstyp_product *)d2;
@@ -426,6 +461,16 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
            upsutl_stricmp(key->data,"upd_usercode_dir"))) 
 */
 
+t_upslst_item *
+uniq_instances(t_upslst_item *mproduct_list){
+    t_upslst_item *l_ptr;
+    t_upstyp_matched_product *mproduct;
+    for( l_ptr=upslst_first(mproduct_list); l_ptr; l_ptr = l_ptr->next) {
+        mproduct = l_ptr->data;
+        mproduct->minst_list = upslst_uniq(upslst_sort0(mproduct->minst_list,minst_full_cmp),minst_full_cmp);
+    }
+    return mproduct_list;
+}
 /*-----------------------------------------------------------------------
  * ups_list_core
  *
@@ -482,13 +527,15 @@ t_upslst_item *ups_list_core(t_upsugo_command * const a_command_line ,
     /* Get all the instances that the user requested */
     mproduct_list = upsmat_instance(a_command_line, db_list , need_unique);
     if (UPS_ERROR != UPS_SUCCESS) { upserr_output(); upserr_clear(); }
-/*  sorted before now... 
-    mproduct_list = upslst_first(mproduct_list);   point to the start
+    mproduct_list = uniq_instances(mproduct_list);
+#if 0
+    mproduct_list = upslst_first(mproduct_list);   /* point to the start */
     upsver_mes(2,"%sStarting sort of product list\n",VPREFIX);
-    mproduct_list = upslst_sort0( mproduct_list , product_cmp );
+    mproduct_list = upslst_uniq(upslst_sort0( mproduct_list , product_cmp ),product_full_cmp);
+    mproduct_list = upslst_uniq(upslst_sort0( mproduct_list , product_full_cmp ),product_full_cmp);
     upsver_mes(2,"%sEnding sort of product list\n",VPREFIX);
-    mproduct_list = upslst_first(mproduct_list);   point to the start
-*/
+    mproduct_list = upslst_first(mproduct_list);   /* point to the start */
+#endif
   } else {
     g_MATCH_DONE = 0;
     cli_db = (t_upstyp_db *)db_list->data;

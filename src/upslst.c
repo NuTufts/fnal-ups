@@ -512,6 +512,37 @@ t_upslst_item *upslst_sort0( t_upslst_item * const list_ptr,
   return upslst_first( l2 );
 }
 
+t_upslst_item *upslst_uniq( t_upslst_item * const list_ptr,
+			     int (* const cmp)(const void * const, const void * const) )
+{
+  t_upslst_item *l1 = upslst_first( list_ptr ), *l2 = 0, *ltmp=0;
+  void *data;
+
+  if (!l1 || !l1->next) 
+     return l1;
+
+  l2 = l1;
+  l1 = l1->next;
+  while( l1 ) {
+    if (0 == cmp(l1->data, l1->prev->data)) {
+      l1->prev->next = l1->next;
+      if (l1->next) {
+          l1->next->prev = l1->prev;
+      }
+      l1 = l1->next;
+      ltmp = l1;
+      if (ltmp) { 
+         if (ltmp->data)
+          upsmem_free ( ltmp->data );
+        free(ltmp);
+      }
+    } else {
+      l1 = l1->next;
+    }
+  }
+  return l2;
+}
+
 /*
  * Definition of private functions.
  */

@@ -897,6 +897,15 @@ int upsutl_stricmp( const char *s1, const char *s2 )
   register unsigned int u1, u2;
   register int result;
 
+  if (0 == s1)
+    if (s2 == s1)
+       return 0;
+    else
+       return -1;
+
+  if (0 == s2)
+    return 1;
+
   for (;;) {
     u1 = (unsigned char) *s1++;
     u2 = (unsigned char) *s2++;
