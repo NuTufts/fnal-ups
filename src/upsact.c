@@ -1540,7 +1540,10 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
 	 if ( g_ugo_cmd->ugo_B ) {
 	    int flag1 = is_prod_clash( new_ugo );
-	    int flag2 = ('c' == copt) && check_setup_clash( new_ugo );
+	    int flag2 = 0;
+            if ('c' == copt) {
+               flag2 = check_setup_clash( new_ugo );
+            }
 	    if ((flag1 || flag2 == 1 ) &&  'c' == copt) {
 		 upserr_output();
 		 unlink(g_temp_file_name);
@@ -1557,9 +1560,6 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
          /* if product is already in our setup list, go to next product */
 
-	 if ( is_prod_done( new_ugo->ugo_product ) ) {
-	      continue;
-         }
       }
 
       /* if product is at the top level always use that instance */
@@ -1572,6 +1572,10 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	  /*	  (void) upsugo_free( new_ugo );
 		  new_ugo = new_act_itm->ugo */
 	}
+      }
+
+      if ( (!g_ugo_cmd->ugo_B || 'c' == copt) && new_ugo && is_prod_done( new_ugo->ugo_product ) ) {
+        continue;
       }
 
       /*
