@@ -531,11 +531,13 @@ t_upslst_item *upslst_uniq( t_upslst_item * const list_ptr,
       }
       l1 = l1->next;
       ltmp = l1;
+#if 0
       if (ltmp) { 
-         if (ltmp->data)
-          upsmem_free ( ltmp->data );
+        if (ltmp->data)
+          upsmem_free ( ltmp->data ); 
         free(ltmp);
       }
+#endif
     } else {
       l1 = l1->next;
     }
