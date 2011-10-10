@@ -95,19 +95,22 @@ expand_flavorlist(struct ups_command * uc) {
 static void
 flavor_sub(struct ups_command * uc)
 {  
-   char *addr;
+   char *addr, *addr2;
    char *loc;
    int found1;
    char *flavor;
    t_upslst_item *l_ptr;
+   t_upslst_item *copy_osname = 0;
 
    for ( l_ptr = upslst_first(uc->ugo_osname); 
 	       l_ptr; l_ptr = l_ptr->next) {
        flavor = l_ptr->data;
         addr=upsutl_str_create(flavor,' ');
+        addr2=upsutl_str_create(flavor,' ');
         uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+        copy_osname = upslst_add(copy_osname,addr2);
    }
-   for ( l_ptr = upslst_first(uc->ugo_osname); 
+   for ( l_ptr = upslst_first(copy_osname); 
 	       l_ptr; l_ptr = l_ptr->next) {
        flavor = l_ptr->data;
    if ((loc = strrchr(flavor,'-')))
@@ -120,7 +123,7 @@ flavor_sub(struct ups_command * uc)
    found1 = 1;
    while (found1) {
    found1 = 0;
-   for ( l_ptr = upslst_first(uc->ugo_osname); 
+   for ( l_ptr = upslst_first(copy_osname); 
 	       l_ptr; l_ptr = l_ptr->next) {
        flavor = l_ptr->data;
    if ((loc = strrchr(flavor,'.')))
@@ -132,7 +135,7 @@ flavor_sub(struct ups_command * uc)
       }
    }
    }
-   for ( l_ptr = upslst_first(uc->ugo_osname); 
+   for ( l_ptr = upslst_first(copy_osname); 
 	       l_ptr; l_ptr = l_ptr->next) { 
        flavor = l_ptr->data;
    if ((loc = strrchr(flavor,'+')))
@@ -145,6 +148,7 @@ flavor_sub(struct ups_command * uc)
    addr=upsutl_str_create("NULL",' ');
    upsver_mes(3,"%sAdding flavor %s to flavor list\n",UPSUGO,addr);
    uc->ugo_flavor = upslst_add(uc->ugo_flavor,addr);
+   upslst_free(copy_osname,'d');
 }
 
 /* Single flag set cases */
