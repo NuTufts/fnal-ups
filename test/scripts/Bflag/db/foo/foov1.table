@@ -1,0 +1,6 @@
+File=table
+Product=foo
+Flavor=ANY
+Qualifiers=
+Action=setup
+                   SetupEnv()

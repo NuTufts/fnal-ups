@@ -63,7 +63,7 @@ upsugo_env -out bismark.out -diff bismark.in bismark
 #
 # test upsugo_bldcmd
 #
-upsugo_bldcmd -out titanic.out -diff titanic.in "doomed -H IRIX+5"
+upsugo_bldcmd -out titanic2.out -diff titanic2.in "doomed -H IRIX+5"
 upsugo_bldcmd -out lusitania.out -diff lusitania.in "lusitania -f CHERRY v1_0"
 upsugo_bldcmd -out bismark.out -diff bismark.in "bismark -g current -q +a?b?c -f RUM_RAISIN"
 

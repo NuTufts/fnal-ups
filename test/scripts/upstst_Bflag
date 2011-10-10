@@ -1,0 +1,40 @@
+#!/bin/sh
+# ============================================================================
+# test ups depend
+# ============================================================================
+cd $UPS_DIR/test/scripts/bflag
+$UPS_DIR/test/ups_test << EOD 
+depend bleem v1 -f NULL -z ./db -K DECLARER:VERSION:PRODUCT -out bleemv1.out -diff bleemv1.in
+depend bleem v1 -B -f NULL -z ./db -K DECLARER:VERSION:PRODUCT -out bleemBv1.out -diff bleemBv1.in
+quit
+EOD
+
+sfile=`ups setup -z ./db -B bleem v1`
+[ $sfile = /dev/null ] || echo "Ouch! setup -B bleem v1 should failed"
+
+sfile=`ups setup -z ./db -B bleem v2`
+[ $sfile = /dev/null ] &&  echo "Ouch! setup -B bleem v2 should worked"
+
+: should have FOO BAR and BAZ
+grep SETUP_ $sfile
+
+rm $sfile
+
+. `ups setup -z ./db foo v1`
+sfile=`ups setup -B bleem v1`
+[ $sfile = /dev/null ] || echo "Ouch! setup -B bleem v1 should failed"
+
+. `ups unsetup -z ./db foo`
+. `ups setup -z ./db foo v2`
+
+sfile=`ups setup -z ./db -B bleem v2`
+: should have BAR and BAZ but not FOO
+[ $sfile = /dev/null ] &&  echo "Ouch! setup -B bleem v2 should worked"
+grep SETUP_ $sfile
+
+. $sfile
+
+sfile=`ups setup -B bleem v2`
+: should have nothing -- bleem is already setup
+grep SETUP_ $sfile
+

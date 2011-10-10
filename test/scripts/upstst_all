@@ -53,3 +53,6 @@ upstst_stop
 echo "======================================================================"
 echo "Testing exist command"
 upstst_exist
+echo "======================================================================"
+echo "Testing -B flag"
+upstst_Bflag

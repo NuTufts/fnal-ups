@@ -1,0 +1,13 @@
+FILE = version
+PRODUCT = foo
+VERSION = v2
+
+#*************************************************
+#
+FLAVOR = NULL
+QUALIFIERS = ""
+  DECLARER = mengel
+  DECLARED = 2011-10-10 21.43.18 GMT
+  MODIFIER = mengel
+  MODIFIED = 2011-10-10 21.43.18 GMT
+  TABLE_FILE = foov2.table
