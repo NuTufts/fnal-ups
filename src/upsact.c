@@ -2069,32 +2069,33 @@ int
 check_setup_clash(t_upsugo_command *new_ugo ) {
     t_upsugo_command *setup_ugo_cmd = 0;
     t_upslst_item *p1, *p2;
+    int res = 0;
 
     P_VERB_s_s( 1, "checking for setups", new_ugo->ugo_product );
 
     setup_ugo_cmd = upsugo_env( new_ugo->ugo_product , g_cmd_info[e_setup].valid_opts );
     if (setup_ugo_cmd) {
+        res = 2;
 	/* compare versions */
 	if ( new_ugo->ugo_version && (!setup_ugo_cmd->ugo_version || 0 != upsutl_stricmp(new_ugo->ugo_version, setup_ugo_cmd->ugo_version))) {
            upserr_vplace();
 	   upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "version", new_ugo->ugo_version, setup_ugo_cmd->ugo_version  );
+           res = 1;
 	}
 	/* compare qualifiers */
 	for (p1 = new_ugo->ugo_qualifiers, p2=setup_ugo_cmd->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
 	   if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
 	       upserr_vplace();
 	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
+               res = 1;
 	   }
        }
        upserr_output();
        upserr_clear();
        /* if it is setup and it matches, we need do nothing... */
-       if (UPS_ERROR == UPS_SUCCESS) {
-	  P_VERB_s_s( 1, "trying to skip already setup", new_ugo->ugo_product );
-	  return 2;
-       }
+
     }
-    return 0;
+    return res;
 }
 
 /* 
