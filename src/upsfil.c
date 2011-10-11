@@ -241,7 +241,7 @@ char *
 without_colons( char *s ) {
     static char colonbuf[MAX_LINE_LEN];
     char *r = colonbuf;
-    printf("without_colons( %s ) -> ", s);
+    /* printf("without_colons( %s ) -> ", s); debug line */
     if (!s) 
         return "";
     while (0 != (*r = *s)) {
