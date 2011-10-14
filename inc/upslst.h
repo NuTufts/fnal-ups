@@ -87,6 +87,8 @@ t_upslst_item *upslst_find( t_upslst_item * const list_ptr,
 int           upslst_count( t_upslst_item * const list_ptr );
 t_upslst_item *upslst_sort0( t_upslst_item * const c,
 			     int (* const cmp)(const void * const, const void * const) );
+t_upslst_item *upslst_uniq( t_upslst_item * const c,
+			     int (* const cmp)(const void * const, const void * const) );
      
 /*
  * Declaration of private globals.
