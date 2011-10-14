@@ -145,6 +145,7 @@ static t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 					 const int i_build );
 static int do_exit_action( const t_upsact_cmd * const a_cmd );
 static int check_setup_clash(t_upsugo_command *new_ugo);
+static int check_setup_match_clash(t_upstyp_matched_product * const mat_prod );
 
 /* functions to handle specific action commands */
 
