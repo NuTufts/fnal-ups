@@ -1546,6 +1546,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	    }
             if (flag2 == 2) {
                /* already setup, and matches, so skip it... */
+               UPS_ERROR = UPS_SUCCESS;
                continue;
             }
 	 }
