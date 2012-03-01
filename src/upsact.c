@@ -28,6 +28,7 @@
  ***********************************************************************/
 
 /* standard include files */
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -363,8 +364,6 @@ static int g_top_unsetup = 0;
 static char g_buff[MAX_LINE_LEN];
 static char *g_shPath = "PATH";
 static char *g_cshPath = "path";
-static char *g_shDelimiter = ":";
-static char *g_cshDelimiter = " ";
 static long bit_bucket = 0;
 static long bit_bucket_offset = 0;
 
@@ -741,7 +740,7 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   if (g_ugo_cmd->ugo_B && check_setup_match_clash( mat_prod )) {
      upserr_output();
      unlink(g_temp_file_name);
-     printf("/dev/null\n");
+     (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
      fflush(stdout);
      fflush(stderr);
      exit(!(UPS_ERROR==UPS_SUCCESS));
@@ -952,7 +951,7 @@ void upsact_print_item( const t_upsact_item *const act_itm,
   if ( strchr( sopt, 't' ) ) for ( i=0; i<act_itm->level; i++ ) { (void) printf( "   " ); }
   (void) printf( "%s", actitem2str( act_itm ) );
   if ( strchr( sopt, 'l' ) ) {
-    (void) printf( ":" );
+    (void) printf( g_default_delimiter );
     upsact_print_cmd( act_itm->cmd );
   }
   else 
@@ -1548,7 +1547,7 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 	    if ((flag1 || flag2 == 1 ) &&  'c' == copt) {
 		 upserr_output();
 		 unlink(g_temp_file_name);
-		 printf("/dev/null\n");
+	         (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
                  fflush(stderr);
                  fflush(stdout);
 		 exit(1);
@@ -1933,7 +1932,7 @@ t_upsugo_command *get_dependent( t_upsact_cmd *const p_cmd,
       for ( ; l_itm; l_itm = l_itm->next ) {
 	(void) strcat( g_buff, l_itm->data );
 	if ( l_itm->next )
-	  (void) strcat( g_buff, ":" );
+	  (void) strcat( g_buff, g_default_delimiter );
       }
     }      
 
@@ -2043,7 +2042,6 @@ t_upsact_item *get_top_item( t_upsugo_command * const ugo_cmd,
 int
 check_setup_match_clash(t_upstyp_matched_product * const mat_prod ) {
     t_upsugo_command *setup_ugo_cmd = 0;
-    t_upslst_item *p1, *p2;
 
     t_upstyp_matched_instance *minst = mat_prod->minst_list->data;
     t_upstyp_instance *inst = minst->version;
@@ -2561,7 +2559,7 @@ char *actitem2str( const t_upsact_item *const p_act_itm )
 
     for ( l_item = l_item->next; l_item; l_item = l_item->next ) {
       if ( l_item->data ) {
-	(void) strcat( buf, ":" );
+	(void) strcat( buf, g_default_delimiter );
 	(void) strcat( buf, (char *)l_item->data );
       }
     } 
@@ -3136,8 +3134,8 @@ static void f_filetest( ACTION_PARAMS)
 
 static void f_pathappend( ACTION_PARAMS)
 {
-    if (0 == strcmp(a_cmd->argv[0],"path")) {
-        (void)strcpy(a_cmd->argv[0],"PATH");
+    if (0 == strcmp(a_cmd->argv[0],g_cshPath)) {
+        (void)strcpy(a_cmd->argv[0],g_shPath);
     }
     f_envappend(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
@@ -3152,8 +3150,8 @@ static void f_pathappend( ACTION_PARAMS)
 
 static void f_pathprepend( ACTION_PARAMS)
 {
-    if (0 == strcmp(a_cmd->argv[0],"path")) {
-        (void)strcpy(a_cmd->argv[0],"PATH");
+    if (0 == strcmp(a_cmd->argv[0],g_cshPath)) {
+        (void)strcpy(a_cmd->argv[0],g_shPath);
     }
     f_envprepend(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
@@ -3168,8 +3166,8 @@ static void f_pathprepend( ACTION_PARAMS)
 
 static void f_pathremove( ACTION_PARAMS)
 {
-    if (0 == strcmp(a_cmd->argv[0],"path")) {
-        (void)strcpy(a_cmd->argv[0],"PATH");
+    if (0 == strcmp(a_cmd->argv[0],g_cshPath)) {
+        (void)strcpy(a_cmd->argv[0],g_shPath);
     }
     f_envremove(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
@@ -3183,8 +3181,8 @@ static void f_pathremove( ACTION_PARAMS)
 }
 static void f_pathset( ACTION_PARAMS)
 {
-    if (0 == strcmp(a_cmd->argv[0],"path")) {
-        (void)strcpy(a_cmd->argv[0],"PATH");
+    if (0 == strcmp(a_cmd->argv[0],g_cshPath)) {
+        (void)strcpy(a_cmd->argv[0],g_shPath);
     }
     f_envset(a_minst, a_db_info, a_command_line, a_stream, a_cmd);
 
@@ -3346,7 +3344,7 @@ static int sh_output_next_part(const FILE * const a_stream,
 /*      } */
     }
   }
-  if ((&bit_bucket == 0) && 0) bit_bucket ^= (long) a_exit_flag;
+  if ((bit_bucket == 0)) bit_bucket ^= (long) a_exit_flag;
   return(status);
 }
 
@@ -3404,7 +3402,7 @@ static int csh_output_next_part(const FILE * const a_stream,
 /*       } */
     }
   }
-  if ((&bit_bucket == 0) && 0) bit_bucket ^= (long) a_exit_flag;
+  if ((bit_bucket == 0) && 0) bit_bucket ^= (long) a_exit_flag;
   return(status);
 }
 

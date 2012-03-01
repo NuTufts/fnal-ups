@@ -73,7 +73,7 @@ all : library main old
 tag_file : 
 	$(EMACS_DIR)/bin/etags -t *.c ../inc/*.h
 
-main : $(BIN)/ups $(BIN)/ups_parent
+main : $(BIN)/ups $(BIN)/ups_parent $(BIN)/setup_fail $(BIN)/setup_win
 
 # Old stuff people just expect to work that really isn't part of ups
 old: $(BIN)/funame \
@@ -93,6 +93,12 @@ $(BIN)/ups : ups_main.o library
 $(BIN)/ups_parent : ups_parent.pl
 	cp ups_parent.pl $@
 	chmod +x $@
+
+$(BIN)/setup_fail:
+	echo "false" > $@
+
+$(BIN)/setup_win:
+	echo "true" > $@
 
 #
 # Build the old products people expect that arn't really dependencies

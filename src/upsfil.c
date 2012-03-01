@@ -296,7 +296,7 @@ t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
 	  }
 	  P_VERB_s( 1, "Open file for read" );
           res &= read_file();
-          g_fh &&  fclose( g_fh );
+          if (g_fh) (void) fclose( g_fh );
           g_fh = 0;
   
        }
@@ -399,7 +399,7 @@ t_upstyp_product *upsfil_read_file( const char * const ups_file )
     }
   }
   
-  g_fh && fclose( g_fh );
+  if (g_fh) (void)fclose( g_fh );
   g_fh = 0;
 
   /* add product to cache */
@@ -471,7 +471,7 @@ void write_journal_file( const void *key, void ** prod, void *cl )
 
   {                             /* Bogus block that pretends to use unused arguments */
     static long bit_bucket;
-    if (&bit_bucket == 0)
+    if (bit_bucket == 0)
     {
       bit_bucket ^= (long) cl;
     }
@@ -513,7 +513,7 @@ void clear_journal_file( const void *key, void ** prod, void *cl )
 
   {                             /* Bogus block that pretends to use unused arguments */
     static long bit_bucket;
-    if (&bit_bucket == 0)
+    if (bit_bucket == 0)
     {
       bit_bucket ^= (long) cl;
       bit_bucket ^= (long) key;
@@ -751,7 +751,7 @@ int upsfil_write_file( t_upstyp_product * const prod_ptr,
   }
 
   
-  g_fh && fclose( g_fh );
+  if(g_fh) (void) fclose( g_fh );
   g_fh = 0;
 
   P_VERB_s_i_s( 1, "Write", g_item_count, "item(s)" );
@@ -892,7 +892,7 @@ int write_version_file( void )
     }
 
     if (g_subdir_files_flag) {
-      g_fh && fclose(g_fh);
+      if(g_fh) (void) fclose(g_fh);
       g_fh = 0;
 
       sprintf(g_subdir_buf, "%s/%s_%s", g_subdir_base, inst_ptr->flavor, without_colons(inst_ptr->qualifiers) );
@@ -948,7 +948,7 @@ int write_chain_file( void )
     }
 
     if (g_subdir_files_flag) {
-      g_fh && fclose(g_fh);
+      if(g_fh) (void) fclose(g_fh);
       g_fh = 0;
       sprintf(g_subdir_buf, "%s/%s", g_subdir_base, inst_ptr-> flavor );
 

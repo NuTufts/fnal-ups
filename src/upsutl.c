@@ -144,7 +144,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
       case e_unsetup: 
 	/* output the name of the a null file so the automatic sourcing does
 	   not give an error */
-	(void) printf("/dev/null\n");
+        (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
 	break;
       }
       /* flush the journaling cache of files so the changes made internally are
@@ -160,7 +160,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	  /* see if this is only a simulation first */
 	  if (a_simulate_flag) {
 	    /* yes, output this to short circuit the automatic sourcing */
-	    (void) printf("/dev/null\n");
+	    (void) printf("%s/bin/setup_win\n", getenv("UPS_DIR"));
 	    upserr_add(UPS_TEMP_FILE, UPS_INFORMATIONAL, g_temp_file_name);
 	  } else {
 	    /* output the name of the temp file that was created */
@@ -226,7 +226,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	     environment */
 	  (void) remove(g_temp_file_name);
 	  /* print the following so automatic sourcing does'nt give an error */
-	  (void) printf("/dev/null\n");
+	  (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
 	  break;
 	default:
 	  /* keep the file if we were asked to */
@@ -245,7 +245,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
     switch (g_cmd_info[a_command_index].cmd_index) {
     case e_setup:
     case e_unsetup:
-      (void) printf("/dev/null\n");
+      (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
       break;
     }
   }
@@ -897,11 +897,12 @@ int upsutl_stricmp( const char *s1, const char *s2 )
   register unsigned int u1, u2;
   register int result;
 
-  if (0 == s1)
+  if (0 == s1) {
     if (s2 == s1)
        return 0;
     else
        return -1;
+  }
 
   if (0 == s2)
     return 1;
