@@ -145,6 +145,7 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
 	/* output the name of the a null file so the automatic sourcing does
 	   not give an error */
         (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
+        UPS_ERROR = UPS_NO_PRODUCT;
 	break;
       }
       /* flush the journaling cache of files so the changes made internally are
@@ -721,6 +722,9 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
   char *time_date, *user, *ptr;
   mode_t old_umask;
   int len;
+  int save_error;
+
+  save_error = UPS_ERROR;
 
   /* Get the current time and date (with spaces) */
   time_date = upsutl_time_date(STR_TRIM_DEFAULT);
@@ -836,7 +840,7 @@ void upsutl_statistics(t_upslst_item const * const a_mproduct_list,
 
   /* reset UPS_ERROR because we do not want any errors here to cause
      damage anywhere else. */
-  UPS_ERROR = UPS_SUCCESS;
+  UPS_ERROR = save_error;
 }
 
 /*

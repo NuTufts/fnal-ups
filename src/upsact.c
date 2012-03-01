@@ -2103,6 +2103,7 @@ int is_prod_clash( const t_upsugo_command *const initial)
              for (p1 = initial->ugo_qualifiers, p2=((t_upsugo_command*)l_ptr->data)->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
                  if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
 		     upserr_vplace();
+                     UPS_ERROR = UPS_DEP_CONFLICT;
 		     upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "qualifiers", p1->data, p2->data  );
                      return 1;
                  }
@@ -2112,6 +2113,7 @@ int is_prod_clash( const t_upsugo_command *const initial)
          fflush(stderr);
 	 upserr_vplace();
 	 upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "versions", initial->ugo_version,  ((t_upsugo_command*)l_ptr->data)->ugo_version );
+         UPS_ERROR = UPS_DEP_CONFLICT;
          return 1;
      }
   }
