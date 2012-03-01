@@ -409,7 +409,7 @@ t_cmd_info g_cmd_info[] = {
   {e_copy,        "copy",        "?A:b:cCdD:f:g:G:H:m:M:noO:p:q:r:tT:u:U:vVWXz:Z01234567", 0x00000010, e_invalid_action},
   {e_declare,     "declare",     "?A:b:cCdD:f:g:H:Lm:M:noO:q:r:tT:u:U:vz:Z01234567", 0x00000010, e_declare},
   {e_depend,      "depend",      "?Bcdf:g:H:jK:lm:M:noOq:r:RtU:vVz:Z01234567", 0x00000010, e_invalid_action},
-  {e_exist,       "exist",       "?cdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z01234567", 0x00000010, e_invalid_action},
+  {e_exist,       "exist",       "?Bcdef:g:H:jkm:M:noO:Pq:r:tU:vVz:Z01234567", 0x00000010, e_invalid_action},
 /*  {e_modify,      "modify",      "?aA:E:f:H:m:M:Np:q:r:T:U:vVz:Z", 0x00000010, e_invalid_action},	*/
   {e_modify,      "modify",      "?Acd:E:f:H:m:M:nNop:q:r:tT:U:vVz:Z", 0x00000010, e_invalid_action},
   {e_start,       "start",       "?cdf:g:H:m:M:noO:Pq:r:stU:vVwz:Z01234567.", 0x00000010, e_invalid_action},
@@ -738,12 +738,8 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   }
 
   if (g_ugo_cmd->ugo_B && check_setup_match_clash( mat_prod )) {
-     upserr_output();
-     unlink(g_temp_file_name);
-     (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
-     fflush(stdout);
-     fflush(stderr);
-     exit(!(UPS_ERROR==UPS_SUCCESS));
+     UPS_ERROR = UPS_SETUP_CONFLICT;
+     return 0;
   }
   /* create a list of 1'st level dependecies,
      these instances have precedence over products at lower (higher ?) levels */
@@ -1545,12 +1541,8 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
                flag2 = check_setup_clash( new_ugo );
             }
 	    if ((flag1 || flag2 == 1 ) &&  'c' == copt) {
-		 upserr_output();
-		 unlink(g_temp_file_name);
-	         (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
-                 fflush(stderr);
-                 fflush(stdout);
-		 exit(1);
+                 UPS_ERROR = UPS_SETUP_CONFLICT;
+                 return 0; 
 	    }
             if (flag2 == 2) {
                /* already setup, and matches, so skip it... */
@@ -2048,17 +2040,17 @@ check_setup_match_clash(t_upstyp_matched_product * const mat_prod ) {
 
     P_VERB_s_s( 1, "checking for setups", mat_prod->product );
 
+    if (!inst) {
+        return 0;
+    }
     setup_ugo_cmd = upsugo_env( inst->product , g_cmd_info[e_setup].valid_opts );
     if (setup_ugo_cmd) {
       P_VERB_s_s( 1, "want version", inst->version );
       P_VERB_s_s( 1, "have version", setup_ugo_cmd->ugo_version );
 
-      if (setup_ugo_cmd->ugo_version && (!inst->version || 0 != upsutl_stricmp(setup_ugo_cmd->ugo_version, inst->version))) {
+      if (!setup_ugo_cmd->ugo_version || (setup_ugo_cmd->ugo_version && (!inst->version || 0 != upsutl_stricmp(setup_ugo_cmd->ugo_version, inst->version)))) {
 	     upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, inst->product, "version", inst->version, setup_ugo_cmd->ugo_version  );
       }
-      /* XXX check qualifiers? */
-      upserr_output();
-      upserr_clear();
       return 1;
     } 
     return 0;
@@ -2089,8 +2081,6 @@ check_setup_clash(t_upsugo_command *new_ugo ) {
                res = 1;
 	   }
        }
-       upserr_output();
-       upserr_clear();
        /* if it is setup and it matches, we need do nothing... */
 
     }
@@ -2113,8 +2103,6 @@ int is_prod_clash( const t_upsugo_command *const initial)
                  if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
 		     upserr_vplace();
 		     upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "qualifiers", p1->data, p2->data  );
-                     upserr_output();
-                     upserr_clear();
                      return 1;
                  }
              }
@@ -2123,8 +2111,6 @@ int is_prod_clash( const t_upsugo_command *const initial)
          fflush(stderr);
 	 upserr_vplace();
 	 upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "versions", initial->ugo_version,  ((t_upsugo_command*)l_ptr->data)->ugo_version );
-         upserr_output();
-         upserr_clear();
          return 1;
      }
   }
@@ -2251,6 +2237,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 
       upserr_vplace();
       upserr_add( UPS_NO_MATCH, UPS_FATAL, ugo_cmd->ugo_product );
+      upserr_output();
       return 0;
     }
     
