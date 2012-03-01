@@ -19,10 +19,10 @@ EOD
 
 echo "Expect: ERROR: Version conflict -- different branches of dependency tree require conflicting versions of product foo: versions v2 vs v1"
 sfile=`ups setup -z ./db -B bleem v1 `
-[ $sfile = /dev/null ] || echo "Ouch! setup -B bleem v1 should failed"
+[ $sfile = $UPS_DIR/bin/setup_fail ] || echo "Ouch! setup -B bleem v1 should failed"
 
 sfile=`ups setup -z ./db -B bleem v2 `
-[ $sfile = /dev/null ] &&  echo "Ouch! setup -B bleem v2 should worked"
+[ $sfile = $UPS_DIR/bin/setup_fail ] &&  echo "Ouch! setup -B bleem v2 should have worked"
 
 : should have SETUP_ BLEEM FOO BAR and BAZ
 if [ `grep SETUP_ $sfile | wc -l` != 4 ]
@@ -37,7 +37,7 @@ rm $sfile
 
 echo "Expect: ERROR: Version conflict -- dependency tree requires versions conflicting with current setup of product foo: version v2 vs v1"
 sfile=`ups setup -z ./db -B bleem v2`
-[ $sfile = /dev/null ] || echo "Ouch! setup -B bleem v2 should have failed"
+[ $sfile = $UPS_DIR/bin/setup_fail ] || echo "Ouch! setup -B bleem v2 should have failed"
 
 : $SETUP_FOO
 
@@ -46,7 +46,7 @@ sfile=`ups setup -z ./db -B bleem v2`
 
 sfile=`ups setup -z ./db -B bleem v2`
 : should have BAR and BAZ but not FOO
-[ $sfile = /dev/null ] &&  echo "Ouch! setup -B bleem v2 should have worked"
+[ $sfile = $UPS_DIR/bin/setup_fail ] &&  echo "Ouch! setup -B bleem v2 should have worked"
 if [ `grep SETUP_ $sfile | wc -l` != 3 ]
 then 
     echo FAILED -- wrong dependency count
@@ -56,7 +56,7 @@ fi
 
 sfile=`ups setup -z ./db -B bleem v2`
 : should have nothing -- bleem is already setup
-if [ $sfile != /dev/null ]
+if [ $sfile != $UPS_DIR/bin/setup_fail ]
 then
     echo FAILED -- wrong dependency count
 fi

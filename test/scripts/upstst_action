@@ -34,6 +34,7 @@ upsact_process_commands -out ite1.out -diff ite1.in setup ite v1_0
 #  where there is no current chain for product for the 
 #  unsetup before setting up product.
 # 
+
 setup oregano v1_0 -out oregano.out -diff oregano.in
 quit
 EOD
