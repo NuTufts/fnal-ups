@@ -1255,6 +1255,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
       /* quit if option P set and optional command */
 
       if ( p_act_itm->ugo->ugo_R && !(i_cmd & 1) )
+	upserr_backup();
 	continue;
 
       new_act_itm = new_act_item( p_act_itm->ugo, p_act_itm->mat,  
@@ -2240,7 +2241,7 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
 
       upserr_vplace();
       upserr_add( UPS_NO_MATCH, UPS_FATAL, ugo_cmd->ugo_product );
-      upserr_output();
+      /* upserr_output(); */
       return 0;
     }
     
