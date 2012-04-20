@@ -73,7 +73,7 @@ all : library main old
 tag_file : 
 	$(EMACS_DIR)/bin/etags -t *.c ../inc/*.h
 
-main : $(BIN)/ups $(BIN)/ups_parent $(BIN)/setup_fail $(BIN)/setup_win
+main : $(BIN)/ups $(BIN)/ups_active $(BIN)/ups_parent $(BIN)/setup_fail $(BIN)/setup_win
 
 # Old stuff people just expect to work that really isn't part of ups
 old: $(BIN)/funame \
@@ -89,6 +89,10 @@ cia :	$(CIAOBJECTS)
 #
 $(BIN)/ups : ups_main.o library
 	$(LD) ups_main.o -o $@  $(LDFLAGS)
+
+$(BIN)/ups_active : ups_active.pl
+	cp ups_active.pl $@
+	chmod +x $@
 
 $(BIN)/ups_parent : ups_parent.pl
 	cp ups_parent.pl $@

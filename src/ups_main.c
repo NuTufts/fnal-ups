@@ -110,6 +110,14 @@ int main(int argc, char *argv[])
       snprintf(upsact_dropit_buf, 2048, "%s/bin/dropit -e", UPS_DIR);
   }
 
+  if (argv[1] && (0 == strcmp(argv[1],"active")) && (!argv[2] || 0 != strcmp(argv[2],"-?"))) {
+
+      /* ups active is an external perl script */
+      argv[1] = "ups_active";
+      execvp( "ups_active", argv+1 );
+      exit(1);
+  }
+
   if (argv[1] && (0 == strcmp(argv[1],"parent")) && (!argv[2] || 0 != strcmp(argv[2],"-?"))) {
 
       /* ups parent is an external perl script */
