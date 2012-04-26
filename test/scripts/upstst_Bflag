@@ -28,6 +28,8 @@ sfile=`ups setup -z ./db -B bleem v2 `
 if [ `grep SETUP_ $sfile | wc -l` != 4 ]
 then 
     echo FAILED -- wrong dependency count
+    echo "got:"
+    cat $sfile
 fi
 
 rm $sfile
@@ -50,14 +52,18 @@ sfile=`ups setup -z ./db -B bleem v2`
 if [ `grep SETUP_ $sfile | wc -l` != 3 ]
 then 
     echo FAILED -- wrong dependency count
+    echo "got:"
+    cat $sfile
 fi
 
 . $sfile
 
 sfile=`ups setup -z ./db -B bleem v2`
 : should have nothing -- bleem is already setup
-if [ $sfile != $UPS_DIR/bin/setup_fail ]
+if [ $sfile != $UPS_DIR/bin/setup_win ]
 then
     echo FAILED -- wrong dependency count
+    echo "got:"
+    cat $sfile
 fi
 
