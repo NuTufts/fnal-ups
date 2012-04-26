@@ -738,7 +738,6 @@ t_upslst_item *upsact_get_cmd( t_upsugo_command * const ugo_cmd,
   }
 
   if (g_ugo_cmd->ugo_B && check_setup_match_clash( mat_prod )) {
-     UPS_ERROR = UPS_SETUP_CONFLICT;
      return 0;
   }
   /* create a list of 1'st level dependecies,

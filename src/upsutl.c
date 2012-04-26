@@ -144,8 +144,11 @@ int upsutl_finish_up(const FILE * const a_stream, const int a_shell,
       case e_unsetup: 
 	/* output the name of the a null file so the automatic sourcing does
 	   not give an error */
-        (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
-        UPS_ERROR = UPS_NO_PRODUCT;
+        if (UPS_ERROR) {
+            (void) printf("%s/bin/setup_fail\n", getenv("UPS_DIR"));
+        } else {
+            (void) printf("%s/bin/setup_win\n", getenv("UPS_DIR"));
+        }
 	break;
       }
       /* flush the journaling cache of files so the changes made internally are
