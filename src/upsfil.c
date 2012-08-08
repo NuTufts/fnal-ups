@@ -950,7 +950,7 @@ int write_chain_file( void )
     if (g_subdir_files_flag) {
       if(g_fh) (void) fclose(g_fh);
       g_fh = 0;
-      sprintf(g_subdir_buf, "%s/%s", g_subdir_base, inst_ptr-> flavor );
+      sprintf(g_subdir_buf, "%s/%s_%s", g_subdir_base, inst_ptr->flavor, without_colons(inst_ptr->qualifiers) );
 
       g_fh = fopen( g_subdir_buf, "w" );
  
