@@ -268,6 +268,7 @@ t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
   DIR *dd;
   struct dirent *de;
   int res = 1;
+  int count = 0;
 
   dlen=strlen(ups_dir)+1;
   strcpy(namebuf,ups_dir);
@@ -281,6 +282,7 @@ t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
   if ( g_pd ) {       
     while (0 != (de = readdir(dd))) {
        if (de->d_name[0] != '.') {
+          count = count + 1;
 	  namebuf[dlen] = 0;
 	  strcat(namebuf, de->d_name);
 	  g_fh = fopen ( namebuf, "r" );
@@ -302,7 +304,7 @@ t_upstyp_product *upsfil_read_dir( const char * const ups_dir ) {
        }
     }
   }
-  if (!res) {
+  if (!res || count == 0) {
     (void) ups_free_product( g_pd );
     g_pd = 0;
     g_item_count = 0;
