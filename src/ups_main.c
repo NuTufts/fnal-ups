@@ -159,6 +159,7 @@ int main(int argc, char *argv[])
 	g_simulate = command_line->ugo_s;
       }
 
+      g_command_ugoB = command_line->ugo_B;
 
       if (!command_line->ugo_help && (g_cmd_info[i].cmd_index != e_help)) {
 	/* no help requested - do the command */

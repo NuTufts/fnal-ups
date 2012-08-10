@@ -327,6 +327,10 @@ static void shutup( ACTION_PARAMS);
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s\n", \
 				  (str != 0) ? str : "(null)" )
 
+#define P_VERB_s_i( iver, str1, ival ) \
+  if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %d\n", \
+				  (str1 != 0) ? str1 : "(null)", \
+				  ival )
 #define P_VERB_s_s( iver, str1, str2 ) \
   if( (UPS_VERBOSE) ) upsver_mes( iver, "UPSACT: %s %s\n", \
 				  (str1 != 0) ? str1 : "(null)", \
@@ -1531,16 +1535,21 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
 
 
       if ( new_ugo ) {
+	 P_VERB_s( 3, "new_ugo set");
  
          /* if -B do extra dependency check stuff */
 
-	 if ( g_ugo_cmd->ugo_B ) {
+	 if ( g_ugo_cmd->ugo_B || g_command_ugoB ) {
+
 	    int flag1 = is_prod_clash( new_ugo );
 	    int flag2 = 0;
+            P_VERB_s( 3, "Doing -B check...");
             if ('c' == copt) {
                flag2 = check_setup_clash( new_ugo );
+               P_VERB_s_i( 3, "Saw check_setup_clash returns", flag2);
             }
 	    if ((flag1 || flag2 == 1 ) &&  'c' == copt) {
+                 P_VERB_s( 3, "Saw setup conflict...");
                  UPS_ERROR = UPS_SETUP_CONFLICT;
                  return 0; 
 	    }
@@ -1549,7 +1558,9 @@ t_upslst_item *next_cmd( t_upslst_item * const top_list,
                UPS_ERROR = UPS_SUCCESS;
                continue;
             }
-	 }
+	 } else {
+            P_VERB_s( 3, "No -B flag...");
+         }
 
          /* if product is already in our setup list, go to next product */
 
@@ -2067,8 +2078,12 @@ check_setup_clash(t_upsugo_command *new_ugo ) {
 
     setup_ugo_cmd = upsugo_env( new_ugo->ugo_product , g_cmd_info[e_setup].valid_opts );
     if (setup_ugo_cmd) {
-        res = 2;
+        if (new_ugo->ugo_version) {
+            /* only say we know it matches if we're being specific */
+            res = 2; 
+        }
 	/* compare versions */
+        P_VERB_s_s_s(3, "comparing versions: ",new_ugo->ugo_version, setup_ugo_cmd->ugo_version);
 	if ( new_ugo->ugo_version && (!setup_ugo_cmd->ugo_version || 0 != upsutl_stricmp(new_ugo->ugo_version, setup_ugo_cmd->ugo_version))) {
            upserr_vplace();
 	   upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "version", new_ugo->ugo_version, setup_ugo_cmd->ugo_version  );
@@ -2076,6 +2091,7 @@ check_setup_clash(t_upsugo_command *new_ugo ) {
 	}
 	/* compare qualifiers */
 	for (p1 = new_ugo->ugo_qualifiers, p2=setup_ugo_cmd->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
+           P_VERB_s_s_s(3, "comparing qualifiers: ",new_ugo->ugo_version, setup_ugo_cmd->ugo_version);
 	   if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
 	       upserr_vplace();
 	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
@@ -2110,7 +2126,6 @@ int is_prod_clash( const t_upsugo_command *const initial)
              }
              return 0;
          }
-         fflush(stderr);
 	 upserr_vplace();
 	 upserr_add( UPS_DEP_CONFLICT, UPS_FATAL, initial->ugo_product, "versions", initial->ugo_version,  ((t_upsugo_command*)l_ptr->data)->ugo_version );
          UPS_ERROR = UPS_DEP_CONFLICT;

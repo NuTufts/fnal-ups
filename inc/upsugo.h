@@ -125,6 +125,7 @@ typedef struct ups_command
 /* 
  * Public variables
  */
+extern int g_command_ugoB;
 enum e_shell_type {
   e_INVALID_SHELL = -1,
   e_MIN_SHELL = 0,

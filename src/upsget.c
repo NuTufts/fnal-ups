@@ -245,6 +245,7 @@ void upsget_envout(const FILE * const stream,
    /* put out info here !!! */
   }
   name = upsutl_upcase( name );
+  if( (UPS_VERBOSE) ) upsver_mes( 3, "UPSGET: got upcased product name %s\n", name);
   switch (command_line->ugo_shell) {
   case e_BOURNE:
     (void) fprintf((FILE *)stream,"SETUP_%s='%s'; export SETUP_%s\n#\n",
@@ -260,6 +261,18 @@ void upsget_envout(const FILE * const stream,
   }
 }
  
+char *
+setup_var(char *name) {
+  static char svarbuf[1024];
+  char *pc;
+  sprintf(svarbuf, "SETUP_%s", name);
+  for (pc = svarbuf; *pc; pc++) {
+     *pc = (char )toupper((int )*pc);
+  }
+  if( (UPS_VERBOSE) ) upsver_mes( 3, "UPSGET: made setup var %s from %s\n", svarbuf, name);
+  return svarbuf;
+}
+
 void upsget_allout(const FILE * const stream, 
                     const t_upstyp_db * const db,
                     const t_upstyp_matched_instance * const instance,
@@ -631,6 +644,7 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
 {
   static char newstr[4096];
   static char *string = 0;
+  char *current_setup;
   get_element(string,product);
   if (!string)
   { string=command_line->ugo_product;
@@ -638,6 +652,7 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
                "PRODUCT", string );
    /* put out info here !!! */
   }
+  current_setup = getenv(setup_var(string));
   (void) strcpy(newstr,string);
   (void) strcat(newstr," ");
   get_element(string,version);
@@ -681,6 +696,11 @@ char *upsget_envstr(const t_upstyp_db * const db_info_ptr,
   }
   if ( command_line->ugo_e)
   { (void) strcat(newstr," -e"); }
+
+  if( (UPS_VERBOSE) ) upsver_mes( 3, "UPSGET: ugoB %d new %s setup %s\n", g_command_ugoB, current_setup ? current_setup : "(null)", newstr);
+  if ( g_command_ugoB && current_setup && 0 != strcmp(current_setup, newstr)) {
+    upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, string, "full descriptions", current_setup, newstr);
+  }
   return newstr;
 }
 

@@ -52,6 +52,7 @@ extern char *get_current_dir_name(void);
 #endif
 
 int g_command_verb = 0;
+int g_command_ugoB = 0;
 
 int UPS_NEED_DB=1;
 
