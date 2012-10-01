@@ -46,6 +46,8 @@ extern char *get_current_dir_name(void);
 
 #include "ups.h"
 #include "upsuname.h"
+#include "upsact.h"
+extern t_cmd_info g_cmd_info[];
 
 #ifdef UPS_ID
 	char	UPS_UGO_ID[] = "@(#)upsugo.c	4.00";
@@ -564,6 +566,9 @@ int upsugo_ifornota(struct ups_command * const uc)
    { addr=upsutl_str_create("*",' ');           /* wildcard product name     */
      upsver_mes(3,"%sNo product specified set to %s\n",UPSUGO,addr); 
      uc->ugo_product = addr;                   /* put in command as specified*/
+     if ( g_cmd_info[g_command_verb].valid_opts[1] != 'a' ) 
+     { upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, "\" <-- no product name given, cannot find \"");  
+     }
    }
    if (uc->ugo_a)                               /* did the user specify -a */
    { if (!uc->ugo_chain && !uc->ugo_version)    /* If no chain all chains  */
