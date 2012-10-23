@@ -1,3 +1,10 @@
+Changes made in the v4_9_7 release of ups:
+
+    * improve setup -B check
+    * fix bug in declare when using version directory
+    * fix chain file declare problem
+    * report an error when product name is required but not specified
+
 Changes made in the v4_9_6 release of ups:
 
     * new ups active command
