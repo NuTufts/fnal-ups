@@ -422,10 +422,11 @@ t_cmd_info g_cmd_info[] = {
   {e_touch,       "touch",       "?cdf:g:H:noq:tvz:Z01234567", 0x00000010, e_invalid_action},
   {e_unconfigure, "unconfigure", "?cdf:g:H:m:M:noO:Pq:r:stU:vVz:Z01234567.", 0x00000010, e_configure},
   {e_undeclare,   "undeclare",   "?cCdf:g:H:m:M:noO:q:r:tU:vVyYz:Z01234567", 0x00000010, e_undeclare},
+  {e_create,   "_",   "", 0x00000000, e_invalid_action}, /* no longer used */
   {e_get,         "get",         "?cdf:Fg:H:m:M:noq:r:tU:vz:Z", 0x00000010, e_invalid_action},
   {e_flavor,      "flavor",      "?f:H:lvZ01234567", 0x00000000, e_invalid_action},
-  {e_verify,      "verify",      "?acdf:g:H:m:M:noq:r:tU:vz:Z01234567", 0x00000010, e_invalid_action},
   {e_help,        "help",        "?v", 0x00000000, e_invalid_action},
+  {e_verify,      "verify",      "?acdf:g:H:m:M:noq:r:tU:vz:Z01234567", 0x00000010, e_invalid_action},
   /* the following one must always be at the end and contains all options */
   {e_unk,         NULL,          "?aA:b:B:cCdD:eE:f:Fg:G:H:jkK:lm:M:nNoO:Pp:q:r:sStRT:u:U:vVwW:XyYz:Z01234567.",
                                   0x00000010, e_invalid_action}
