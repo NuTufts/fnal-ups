@@ -301,7 +301,7 @@ minst_full_cmp ( const void * const d1, const void * const d2 )
   }
   (0 == (res = upsutl_stricmp( a1->version->product, a2->version->product ))) &&
   (0 == (res = upsutl_stricmp( a1->version->version, a2->version->version ))) &&
-  (0 == (res = upsutl_stricmp( a1->version->flavor, a2->version->flavor ))) &&
+  (0 == (res = -upsutl_stricmp( a1->version->flavor, a2->version->flavor ))) &&
   (0 == (res = upsutl_stricmp( a1->version->qualifiers, a2->version->qualifiers ))) &&
   (0 == (res = upsutl_stricmp( a1->version->chain, a2->version->chain ))) &&
   (0 == (res = upsutl_stricmp( a1->version->declarer, a2->version->declarer ))) &&
