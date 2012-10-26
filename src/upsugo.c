@@ -566,7 +566,7 @@ int upsugo_ifornota(struct ups_command * const uc)
    { addr=upsutl_str_create("*",' ');           /* wildcard product name     */
      upsver_mes(3,"%sNo product specified set to %s\n",UPSUGO,addr); 
      uc->ugo_product = addr;                   /* put in command as specified*/
-     if ( ( g_cmd_info[g_command_verb].valid_opts[1] != 'a' ) && !uc->ugo_help && g_command_verb != e_help && g_command_verb != e_flavor ) 
+     if ( (g_cmd_info[g_command_verb].valid_opts &&  g_cmd_info[g_command_verb].valid_opts[1] != 'a' ) && !uc->ugo_help && g_command_verb != e_help && g_command_verb != e_flavor ) 
      { upserr_add(UPS_INVALID_ARGUMENT, UPS_FATAL, "\" <-- no product name given, cannot find \"");  
        printf( "g_command_verb is %s: %d/%d \n", g_cmd_info[g_command_verb].cmd, g_command_verb, e_flavor);
      }
