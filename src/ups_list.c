@@ -301,7 +301,7 @@ minst_full_cmp ( const void * const d1, const void * const d2 )
   }
   (0 == (res = upsutl_stricmp( a1->version->product, a2->version->product ))) &&
   (0 == (res = upsutl_stricmp( a1->version->version, a2->version->version ))) &&
-  (0 == (res = -upsutl_stricmp( a1->version->flavor, a2->version->flavor ))) &&
+  (0 == (res = upsutl_stricmp( a1->version->flavor, a2->version->flavor ))) &&
   (0 == (res = upsutl_stricmp( a1->version->qualifiers, a2->version->qualifiers ))) &&
   (0 == (res = upsutl_stricmp( a1->version->chain, a2->version->chain ))) &&
   (0 == (res = upsutl_stricmp( a1->version->declarer, a2->version->declarer ))) &&
@@ -309,6 +309,15 @@ minst_full_cmp ( const void * const d1, const void * const d2 )
 
   return res;
 }
+
+int
+minst_flag_cmp ( const void * const d1, const void * const d2 )
+{
+  const t_upstyp_matched_instance *a1 = d1;
+  const t_upstyp_matched_instance *a2 = d2;
+  return a2->version->flag - a1->version->flag;
+}
+
 int 
 product_full_cmp ( const void * const d1, const void * const d2 )
 {
@@ -461,13 +470,35 @@ t_upslst_item *ups_list( t_upsugo_command * const a_command_line ,
            upsutl_stricmp(key->data,"upd_usercode_dir"))) 
 */
 
+/*
+ * This is used to prune duplicates out of the list results, 
+ * especially when upd ends us invoking us with 
+ * -H x64bit+y:x+1:x64bit:x
+ * to handle machines that prefer 64bit.
+ * It's funky because we want to preserve the
+ * best-flavor-first order.  So first we 
+ * number them by their position in the list
+ * (in the flag field), then sort & uniq them
+ * by all the usual fields, and then finally
+ * re-sort them by the flag field order.
+ * so if you take the second sort out, it breaks upd 
+ * preferring the 64bit version appropriately.
+ */
+
 t_upslst_item *
 uniq_instances(t_upslst_item *mproduct_list){
     t_upslst_item *l_ptr;
+    t_upslst_item *prd;
+    int i;
     t_upstyp_matched_product *mproduct;
     for( l_ptr=upslst_first(mproduct_list); l_ptr; l_ptr = l_ptr->next) {
         mproduct = l_ptr->data;
+        i = 0;
+        for (prd = upslst_first(mproduct->minst_list); prd; prd = prd->next ){
+            ((t_upstyp_matched_instance *)(prd->data))->version->flag = i++;
+        }
         mproduct->minst_list = upslst_uniq(upslst_sort0(mproduct->minst_list,minst_full_cmp),minst_full_cmp);
+        mproduct->minst_list = upslst_sort0(mproduct->minst_list,minst_flag_cmp);
     }
     return mproduct_list;
 }
