@@ -1311,7 +1311,7 @@ t_upslst_item *next_top_prod( t_upslst_item * top_list,
 	new_act_itm = new_act_item( new_ugo, 0, 1, i_cmd, "setup");
 
       if ( !new_act_itm ) {
-	if ( i_cmd & 1 ) {
+	if ( i_cmd & 1 && ! i_cmd & 2 ) {
 	  SET_PARSE_ERROR( p_line );
 	}
 	else {
@@ -2254,9 +2254,10 @@ t_upsact_item *new_act_item( t_upsugo_command * const ugo_cmd,
     t_upslst_item *l_mproduct = upsmat_instance( ugo_cmd, NULL, 1 );
     if ( !l_mproduct || !l_mproduct->data ) {
 
-      upserr_vplace();
-      upserr_add( UPS_NO_MATCH, UPS_FATAL, ugo_cmd->ugo_product );
-      /* upserr_output(); */
+      if ( 0 != strcmp(act_name, "unsetup") ) {
+          upserr_vplace();
+          upserr_add( UPS_NO_MATCH, UPS_FATAL, ugo_cmd->ugo_product );
+      }
       return 0;
     }
     

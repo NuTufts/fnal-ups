@@ -145,5 +145,9 @@ OPTIONS     :
 -0 :Pick flavor for operating system generic to any UNIX or comparable 
 -1 :Pick flavor for operating system generic to the vendor
 -2 :Pick flavor for operating system to level of major version number
--3 :Pick most specific flavor for operating system (includes minor 
-:version numbers)
+-3 :Pick more specific flavor for operating system (includes start of 
+:minor version numbers)
+-4 :Pick still more specific flavor for operating system (includes more
+:of minor version numbers)
+-5 :Pick most specific flavor for operating system (includes all of
+:minor version numbers)
