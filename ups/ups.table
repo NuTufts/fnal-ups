@@ -13,20 +13,21 @@ Common:
    Action=install_init_d
      Execute(${UPS_UPS_DIR}/install_init_d.sh, UPS_ENV)
 
-   Action=configure
-     envSet(Ups_DB_Path, ${UPS_THIS_DB})
-     execute(${UPS_UPS_DIR}/configure, UPS_ENV)
-
    Action=current
-     envSet(Ups_DB_Path, ${UPS_THIS_DB})
-     exeActionRequired(configure)
-     execute(${UPS_THIS_DB}/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/current, UPS_ENV)
+     Execute( mkdir ${SETUPS_DIR}/.old				, NO_UPS_ENV)
+     Execute( mv -f  ${SETUPS_DIR}/setups* ${SETUPS_DIR}/.old	, NO_UPS_ENV)
+     Execute( cp ${UPS_UPS_DIR}/setups    ${SETUPS_DIR}		, NO_UPS_ENV)
+     Execute( cp ${UPS_UPS_DIR}/setups.p* ${SETUPS_DIR}		, NO_UPS_ENV)
+     Execute( ln ${SETUPS_DIR}/setups  ${SETUPS_DIR}/setups.sh	, NO_UPS_ENV)
+     Execute( ln ${SETUPS_DIR}/setups  ${SETUPS_DIR}/setups.csh	, NO_UPS_ENV)
+     Execute( ln ${SETUPS_DIR}/setups  ${SETUPS_DIR}/setup	, NO_UPS_ENV)
+     # now execute it to update SETUPS_SAVE...
+     Execute( /bin/sh ${SETUPS_DIR}/setups 			, NO_UPS_ENV)
 
    Action=uncurrent
-     execute(${UPS_THIS_DB}/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/uncurrent, UPS_ENV)
+     Execute( mv ${SETUPS_DIR}/.old/* ${SETUPS_DIR}		, NO_UPS_ENV)
 
    Action=unconfigure
-     execute(${UPS_THIS_DB}/.upsfiles/configure/${UPS_PROD_VERSION}_${UPS_PROD_FLAVOR}_${UPS_PROD_QUALIFIERS}/unconfigure, UPS_ENV)
 
    Action=setup
      setupenv()

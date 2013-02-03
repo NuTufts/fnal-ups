@@ -1,0 +1,118 @@
+# 
+# ostensibly shell independant setups for relocatable ups
+#
+
+# Black Magic here:
+# use $_ to fake BASH_SOURCE for interactive csh shells  
+# It's off by one, so do a : command first...
+# 
+: $_
+
+#
+# figure out which shell we are, using the fact that
+# in csh $?argv is a boolean, and in bash it is 0argv or 1argv 
+# then establish:
+# - UPS_SHELL
+# - s_setenv
+# - s_source
+# - s_unsetenv
+#
+echo $?argv | grep argv > /dev/null && \
+  eval 's_setenv() { eval $1=\"$2\"; export $1; }; s_setenv UPS_SHELL sh; s_unsetenv() { unset $1; }; s_source() { . $1; }' || \
+  eval 'set BASH_SOURCE=`echo $_ | sed -e '"'"'s/source *//'"'"' -e '"'"'s/ *\$//'"'"'` && alias s_setenv setenv; setenv UPS_SHELL csh; alias s_source source; alias s_unsetenv unsetenv' 
+
+: $BASH_SOURCE
+
+# if they passed us our path as an argument in csh, use that
+test x$BASH_SOURCE = x -a $UPS_SHELL = csh -a $# -gt 0 && setenv BASH_SOURCE=$1
+
+#
+# if $BASH_SOURCE isn't readable, it's not valid...
+#
+test -r "$BASH_SOURCE" || s_setenv BASH_SOURCE ""
+
+s_setenv SETUPS_SAVE  nosuch
+
+# 
+# our first guess of where we are is in $BASH_SOURCE
+#
+s_setenv SETUPS_FILE "$BASH_SOURCE"
+
+s_setenv SETUPS_GREP "$SETUPS_FILE"
+test x$SETUPS_GREP = x && s_setenv SETUPS_GREP /dev/null
+
+#
+# update $SETUPS_FILE for SETUPS_SAVE, if it:
+#
+# * look like a setups file
+# * is writable
+# * $SETUPS_SAVE differs from $SETUPS_FILE
+#
+grep  SETUPS_FILE $SETUPS_GREP > /dev/null && test -w $SETUPS_FILE -a "$SETUPS_FILE" != "$SETUPS_SAVE" && sed -e "s;^\(s_setenv SETUPS_SAVE \).*;\1 $SETUPS_FILE;" < $SETUPS_FILE > $SETUPS_FILE.new && mv $SETUPS_FILE.new $SETUPS_FILE
+#
+# if $SETUPS_FILE wasn't found and we have a SETUPS_SAVE, take that value
+#
+grep SETUPS_FILE $SETUPS_GREP > /dev/null || test -r "$SETUPS_SAVE" && grep SETUPS_FILE $SETUPS_GREP > /dev/null || grep SETUPS_FILE $SETUPS_SAVE > /dev/null &&grep SETUPS_FILE $SETUPS_GREP > /dev/null || s_setenv SETUPS_FILE "$SETUPS_SAVE"
+
+test x$SETUPS_FILE = x && echo "setups: failed to find myself"
+
+# handle symlinks to the Real Path
+expr "` ls -l $SETUPS_FILE`" : ".* -> "  > /dev/null && s_setenv SETUPS_FILE `ls -l $SETUPS_FILE | sed -e 's/.* -> //'`
+#
+# if sourced without full path, stick pwd output on the front
+# 
+expr $SETUPS_FILE : '[^/]' > /dev/null && s_setenv SETUPS_FILE `pwd`/${SETUPS_FILE}
+
+s_setenv SETUPS_DIR  `dirname $SETUPS_FILE`
+
+#
+# source setups_layout, which will set 
+# UPS_THIS_DB and PROD_DIR_PREFIX based on SETUPS_DIR
+#
+s_source $SETUPS_DIR/setups_layout
+
+test $UPS_SHELL = csh && \
+     eval 'test $?PRODUCTS = 0      && s_setenv PRODUCTS ""'
+
+test $UPS_SHELL = sh  && \
+     eval 'test ${PRODUCTS:-0} = 0  && s_setenv PRODUCTS ""'
+
+test "x$PRODUCTS" != x && \
+      s_setenv PRODUCTS "${UPS_THIS_DB}:${PRODUCTS}"
+
+test "x$PRODUCTS" = x && \
+      s_setenv PRODUCTS "${UPS_THIS_DB}"
+
+#
+# turn list of ups binaries into:
+#  /x/y/z/ups setup ups ||  /x/y/w/ups setup ups || ... || :
+# then run that with /bin/sh -c
+#
+/bin/sh -c "( `echo ${PROD_DIR_PREFIX}/ups/*/*/bin/ups : | sed -e 's/ / setup ups ||/g'` ) 2>/dev/null" > /tmp/t$$ 
+
+s_source `cat /tmp/t$$`
+
+rm -f /tmp/t$$
+
+# handle upsdb_list if present
+# since we already setup ups, we can trim it to existing directories with dropit.
+test -r $SETUPS_DIR/upsdb_list && s_setenv PRODUCTS `grep -v '^#' $SETUPS_DIR/upsdb_list | perl -pe 's/\n/:/g'`
+
+#
+# if there is a setproducts.table, set it up to set PRODUCTS
+#
+test -r $SETUPS_DIR/setproducts.table && \
+	setup -M $SETUPS_DIR -m setproducts.table setproducts
+
+s_setenv PRODUCTS `dropit -DEe -p${PRODUCTS} .`
+
+#
+# clean up
+#
+s_unsetenv UPS_THIS_DB
+s_unsetenv PROD_DIR_PREFIX
+s_unsetenv SETUPS_FILE
+s_unsetenv SETUPS_GREP
+s_unsetenv SETUPS_SAVE
+
+test x$UPS_DIR != x
