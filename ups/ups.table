@@ -14,6 +14,7 @@ Common:
      Execute(${UPS_UPS_DIR}/install_init_d.sh, UPS_ENV)
 
    Action=current
+    If( test -n "${SETUPS_DIR}" && test -w ${SETUPS_DIR} )
      Execute( mkdir ${SETUPS_DIR}/.old				, NO_UPS_ENV)
      Execute( mv -f  ${SETUPS_DIR}/setups* ${SETUPS_DIR}/.old	, NO_UPS_ENV)
      Execute( cp ${UPS_UPS_DIR}/setups    ${SETUPS_DIR}		, NO_UPS_ENV)
@@ -23,6 +24,9 @@ Common:
      Execute( ln ${SETUPS_DIR}/setups  ${SETUPS_DIR}/setup	, NO_UPS_ENV)
      # now execute it to update SETUPS_SAVE...
      Execute( /bin/sh ${SETUPS_DIR}/setups 			, NO_UPS_ENV)
+    Else()
+     Execute( test -n "${SETUPS_DIR}" && echo "${SETUPS_DIR not writable", NO_UPS_ENV)
+    EndIf( test -n "${SETUPS_DIR}" && test -w ${SETUPS_DIR} )
 
    Action=uncurrent
      Execute( mv ${SETUPS_DIR}/.old/* ${SETUPS_DIR}		, NO_UPS_ENV)
