@@ -12,7 +12,7 @@ setup_test_db() {
    SETUPS_DIR=$workdir
    mkdir -p  $workdir/ups/devel
    cp -r $UPS_DIR $workdir/ups/devel/Linux+2
-   ups declare -r $workdir/ups/devel/Linux+2 -C -M ups -m ups.table ups devel -2 > /dev/null
+   ups declare -r $workdir/ups/devel/Linux+2 -C -M ups -m ups.table ups devel -2 
 }
 
 teardown_test_db() {
@@ -28,11 +28,13 @@ test_env() {
 }
 
 test_current() {
+   rm $SETUPS_DIR/setups_layout
    ups declare -c ups devel -2 || true
 
    ls -al $workdir
    ups list -a 
 
+   [ -r $SETUPS_DIR/setups_layout ] &&
    [ `ls -l $workdir/set* | wc -l` = 7 ] &&
    [ `ups list -K+ ups | wc -l` = 1 ]
 }
@@ -74,8 +76,7 @@ testsuite setups_suite \
 	test_env   	\
 	test_current	\
 	test_empty_sh	\
-	test_empty_csh  \
-        test_over_old
+	test_empty_csh  
 
 setups_suite "$@"
 

@@ -71,6 +71,10 @@ s_setenv SETUPS_DIR  `dirname $SETUPS_FILE`
 #
 s_source $SETUPS_DIR/setups_layout
 
+# clean out /xxx/../ bits
+s_setenv UPS_THIS_DB `echo $UPS_THIS_DB | sed -e 's;/[a-z]*/\.\./;/;g'`
+s_setenv PROD_DIR_PREFIX `echo $PROD_DIR_PREFIX | sed -e 's;/[a-z]*/\.\./;/;g'`
+
 test $UPS_SHELL = csh && \
      eval 'test $?PRODUCTS = 0      && s_setenv PRODUCTS ""'
 

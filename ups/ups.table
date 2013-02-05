@@ -24,6 +24,10 @@ Common:
      Execute( ln -s setups  ${SETUPS_DIR}/setups.sh		, NO_UPS_ENV)
      Execute( ln -s setups  ${SETUPS_DIR}/setups.csh		, NO_UPS_ENV)
      Execute( ln -s setups  ${SETUPS_DIR}/setup			, NO_UPS_ENV)
+
+     # make sure there is a setups_layout scriptlet
+     Execute( test -r ${SETUPS_DIR}/setups_layout || sh ${UPS_UPS_DIR}/find_layout.sh, UPS_ENV)
+
      # now execute it to update SETUPS_SAVE...
      Execute( /bin/bash -c ". ${SETUPS_DIR}/setups" 		, NO_UPS_ENV)
     Else()

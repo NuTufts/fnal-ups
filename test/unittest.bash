@@ -35,7 +35,7 @@ testsuite() {
                then
 	           printf '%s \t...' \$_t
                fi
-	       \$${suitename}_test_setup
+	       \$${suitename}_test_setup > /dev/null 2>&1
 	       if \$_t > ${TMPDIR:-/tmp}/test_case_out_\$\$ 2>&1
                then
                    if [ x\$verbose = "x-v" ]
@@ -58,7 +58,7 @@ testsuite() {
                    cat  ${TMPDIR:-/tmp}/test_case_out_\$\$ >> ${TMPDIR:-/tmp}/test_out_$$
                    echo ---------------- >> ${TMPDIR:-/tmp}/test_out_$$
                fi
-	       \$${suitename}_test_teardown
+	       \$${suitename}_test_teardown > /dev/null 2>&1
             done
             echo
             cat /tmp/test_out_$$
