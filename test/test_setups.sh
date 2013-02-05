@@ -37,6 +37,45 @@ test_current() {
    [ `ups list -K+ ups | wc -l` = 1 ]
 }
 
-testsuite setups_suite -s setup_test_db -t teardown_test_db test_env  test_current
+test_empty_sh() {
+   ups declare -c ups devel -2 || true
+   cat << EOF
+   env - /bin/sh << EOF
+       PATH=/bin:/usr/bin
+       export PATH
+       . $workdir/setups
+       test  \`ups list -aK+ ups | wc -l\` = 1 
+EOF
+}
 
-setups_suite
+test_empty_csh() {
+   ups declare -c ups devel -2 || true
+   env - /bin/csh << EOF
+       set path=(/bin /usr/bin)
+       source  $workdir/setups
+       test  \`ups list -aK+ ups | wc -l\` = 1 
+EOF
+}
+
+test_over_old() {
+    upd install -G -c ups v4_7
+    ups declare -c ups devel -2
+    
+   ls -l $workdir/set*
+   ls -l $workdir/.old
+
+   [ `ls -l $workdir/set* | wc -l` = 7 ] &&
+   [ `ups list -K+ ups | wc -l` = 1 ]
+}
+
+testsuite setups_suite \
+        -s setup_test_db \
+	-t teardown_test_db \
+	test_env   	\
+	test_current	\
+	test_empty_sh	\
+	test_empty_csh  \
+        test_over_old
+
+setups_suite "$@"
+
