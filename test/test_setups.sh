@@ -68,6 +68,7 @@ test_over_old() {
 
    [ `ls -l $workdir/set* | wc -l` = 7 ] &&
    [ `ups list -K+ ups | wc -l` = 1 ]
+
 }
 
 testsuite setups_suite \
