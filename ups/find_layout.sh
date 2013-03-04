@@ -16,7 +16,7 @@ ups list -Ksetups_dir:db:prod_dir_prefix |
 
        if [ "$setups_dir" = "$db" -a "$db" = "$prod_dir_prefix" ]
        then
-	   cat > $SETUPS_DIR/setup_layout <<EOF 
+	   cat > setups_layout <<EOF 
 s_setenv UPS_THIS_DB \$SETUPS_DIR
 s_setenv PROD_DIR_PREFIX \$SETUPS_DIR
 EOF
@@ -32,11 +32,11 @@ EOF
        $base/*)  echo s_setenv UPS_THIS_DB \$SETUPS_DIR/../`basename $db`;;
        $base2/*) echo s_setenv UPS_THIS_DB \$SETUPS_DIR/../../`basename $dbbase`/`basename $db`;;
        *)       echo s_setenv UPS_THIS_DB $db
-       esac > ./setup_layout
+       esac > ./setups_layout
 
        case "$prod_dir_prefix" in
        $base/*)  echo s_setenv PROD_DIR_PREFIX \$SETUPS_DIR/../`basename $prod_dir_prefix`;;
        $base2/*) echo s_setenv PROD_DIR_PREFIX \$SETUPS_DIR/../../`basename $pdpbase`/`basename $prod_dir_prefix`;;
        *)       echo s_setenv PROD_DIR_PREFIX $prod_dir_prefix
-       esac >> ./setup_layout
+       esac >> ./setups_layout
   )

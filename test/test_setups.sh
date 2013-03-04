@@ -41,21 +41,19 @@ test_current() {
 
 test_empty_sh() {
    ups declare -c ups devel -2 || true
-   cat << EOF
-   env - /bin/sh << EOF
-       PATH=/bin:/usr/bin
-       export PATH
-       . $workdir/setups
-       test  \`ups list -aK+ ups | wc -l\` = 1 
+   env -i - PATH=/bin:/usr/bin HOME=$HOME /bin/sh << EOF
+       . $workdir/setups.sh
+       ups list -aK+ ups
+       [  \`ups list -aK+ ups | wc -l\` = 1  ]
 EOF
 }
 
 test_empty_csh() {
    ups declare -c ups devel -2 || true
-   env - /bin/csh << EOF
-       set path=(/bin /usr/bin)
-       source  $workdir/setups
-       test  \`ups list -aK+ ups | wc -l\` = 1 
+   env -i - PATH=/bin:/usr/bin HOME=$HOME /bin/csh << EOF
+       source  $workdir/setups.csh
+       ups list -aK+ ups
+       [  \`ups list -aK+ ups | wc -l\` = 1  ]
 EOF
 }
 
