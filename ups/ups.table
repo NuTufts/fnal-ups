@@ -20,11 +20,11 @@ Common:
      #Execute( set -x , NO_UPS_ENV)
      Execute( test -d ${SETUPS_DIR}/.old || mkdir ${SETUPS_DIR}/.old, NO_UPS_ENV)
      Execute( mv -f  ${SETUPS_DIR}/setup ${SETUPS_DIR}/setups.* ${SETUPS_DIR}/.old	, NO_UPS_ENV)
-     Execute( cp ${UPS_UPS_DIR}/setups    ${SETUPS_DIR}		, NO_UPS_ENV)
-     Execute( cp ${UPS_UPS_DIR}/setups.p* ${SETUPS_DIR}		, NO_UPS_ENV)
-     Execute( ln -s setups  ${SETUPS_DIR}/setups.sh		, NO_UPS_ENV)
-     Execute( ln -s setups  ${SETUPS_DIR}/setups.csh		, NO_UPS_ENV)
-     Execute( ln -s setups  ${SETUPS_DIR}/setup			, NO_UPS_ENV)
+     Execute( cp ${UPS_UPS_DIR}/setups    ${SETUPS_DIR}	          , NO_UPS_ENV)
+     Execute( cp ${UPS_UPS_DIR}/setups.p* ${SETUPS_DIR}	          , NO_UPS_ENV)
+     Execute( ln -s ${SETUPS_DIR}/setups  ${SETUPS_DIR}/setups.sh , NO_UPS_ENV)
+     Execute( ln -s ${SETUPS_DIR}/setups  ${SETUPS_DIR}/setups.csh, NO_UPS_ENV)
+     Execute( ln -s ${SETUPS_DIR}/setups  ${SETUPS_DIR}/setup	  , NO_UPS_ENV)
 
      # make sure there is a setups_layout scriptlet
      Execute( test -r ${SETUPS_DIR}/setups_layout || (cd ${SETUPS_DIR} && sh ${UPS_UPS_DIR}/find_layout.sh), UPS_ENV)

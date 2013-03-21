@@ -42,14 +42,6 @@ s_setenv SETUPS_GREP "$SETUPS_FILE"
 test x$SETUPS_GREP = x && s_setenv SETUPS_GREP /dev/null
 
 #
-# update $SETUPS_FILE for SETUPS_SAVE, if it:
-#
-# * look like a setups file
-# * is writable
-# * $SETUPS_SAVE differs from $SETUPS_FILE
-#
-grep  SETUPS_FILE $SETUPS_GREP > /dev/null && test -w $SETUPS_FILE -a "$SETUPS_FILE" != "$SETUPS_SAVE" && sed -e "s;^\(s_setenv SETUPS_SAVE \).*;\1 $SETUPS_FILE;" < $SETUPS_FILE > $SETUPS_FILE.new && mv $SETUPS_FILE.new $SETUPS_FILE
-#
 # if $SETUPS_FILE wasn't found and we have a SETUPS_SAVE, take that value
 #
 grep SETUPS_FILE $SETUPS_GREP > /dev/null || test -r "$SETUPS_SAVE" && grep SETUPS_FILE $SETUPS_GREP > /dev/null || grep SETUPS_FILE $SETUPS_SAVE > /dev/null &&grep SETUPS_FILE $SETUPS_GREP > /dev/null || s_setenv SETUPS_FILE "$SETUPS_SAVE"
@@ -63,6 +55,14 @@ expr "` ls -l $SETUPS_FILE`" : ".* -> "  > /dev/null && s_setenv SETUPS_FILE `ls
 # 
 expr $SETUPS_FILE : '[^/]' > /dev/null && s_setenv SETUPS_FILE `pwd`/${SETUPS_FILE}
 
+#
+# update $SETUPS_FILE for SETUPS_SAVE, if it:
+#
+# * look like a setups file
+# * is writable
+# * $SETUPS_SAVE differs from $SETUPS_FILE
+#
+grep  SETUPS_FILE $SETUPS_GREP > /dev/null && test -w $SETUPS_FILE -a "$SETUPS_FILE" != "$SETUPS_SAVE" && sed -e "s;^\(s_setenv SETUPS_SAVE \).*;\1 $SETUPS_FILE;" < $SETUPS_FILE > $SETUPS_FILE.new && mv $SETUPS_FILE.new $SETUPS_FILE
 s_setenv SETUPS_DIR  `dirname $SETUPS_FILE`
 
 #
