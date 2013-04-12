@@ -145,7 +145,7 @@ static t_upsugo_command *get_SETUP_prod( t_upsact_cmd * const p_cmd,
 					 /* const int i_act, */
 					 const int i_build );
 static int do_exit_action( const t_upsact_cmd * const a_cmd );
-static int check_setup_clash(t_upsugo_command *new_ugo);
+       int check_setup_clash(t_upsugo_command *new_ugo);
 static int check_setup_match_clash(t_upstyp_matched_product * const mat_prod );
 
 /* functions to handle specific action commands */
@@ -2092,12 +2092,18 @@ check_setup_clash(t_upsugo_command *new_ugo ) {
 	}
 	/* compare qualifiers */
 	for (p1 = new_ugo->ugo_qualifiers, p2=setup_ugo_cmd->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
-           P_VERB_s_s_s(3, "comparing qualifiers: ",new_ugo->ugo_version, setup_ugo_cmd->ugo_version);
+           P_VERB_s_s_s(3, "comparing qualifiers: ",(char *)(p1->data), (char *)(p2->data));
 	   if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
 	       upserr_vplace();
 	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
                res = 1;
 	   }
+          
+       }
+       if (p1 != p2) { /* should both be zero */
+	       upserr_vplace();
+	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
+               res = 1;
        }
        /* if it is setup and it matches, we need do nothing... */
 

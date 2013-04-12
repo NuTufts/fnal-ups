@@ -13,7 +13,7 @@ SHELL = /bin/sh
 # CCCHK=     A set of compiler flags which check ANSI C strictly
 #
 
-.SUFFIXES :	.A
+.SUFFIXES : .c .o .A
 
 .c.o :
 	$(CC) -c -o $@ $(CCCHK) $(CFLAGS) $*.c

@@ -48,6 +48,7 @@ extern t_cmd_info g_cmd_info[];
 /*
  * Definition of public functions.
  */
+extern int check_setup_clash(const t_upsugo_command*);
 
 /*-----------------------------------------------------------------------
  * ups_setup
@@ -70,6 +71,15 @@ t_upslst_item *ups_setup(const t_upsugo_command * const a_command_line,
   t_upsugo_command* prod_only_ugo;
   char *dummy = NULL;
   int need_unique = 1, top_unsetup = 0;
+
+
+  if (a_command_line->ugo_B ) {
+      check_setup_clash(a_command_line);
+  
+      if (UPS_ERROR != UPS_SUCCESS) {	  
+         return 0;
+      }
+  }
 
   /* get the requested instance */
   mproduct_list = upsmat_instance((t_upsugo_command *)a_command_line,
