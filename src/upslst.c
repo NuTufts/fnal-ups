@@ -500,6 +500,7 @@ t_upslst_item *upslst_sort0( t_upslst_item * const list_ptr,
     return l1;
   
   for ( l1 = l1->next; l1; l1 = l1->next ) {
+    /* invariant: list up through l1->prev is sorted */
     data = l1->data;
     l2 = l1;
     while ( l2->prev && cmp( l2->prev->data, data ) > 0 ) {
@@ -541,7 +542,7 @@ t_upslst_item *upslst_uniq( t_upslst_item * const list_ptr,
       l1 = l1->next;
     }
   }
-  return l2;
+  return upslst_first( l2 );
 }
 
 /*

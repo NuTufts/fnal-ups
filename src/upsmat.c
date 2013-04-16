@@ -1305,6 +1305,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	  /* They do - now compare the qualifiers */
 	  if (want_all_q || (! strcmp(instance->qualifiers, quals))) {
 	    /* They do. Save the instances in the order they came in. */
+            upsver_mes(MATVLEVEL, "Found one!\n");
 	    if (a_file_type == e_file_chain) {
 	      /* this instance was read in from a chain file, create a new
 	         matched instance structure and start to fill it */
@@ -1320,6 +1321,7 @@ static int get_instance(const t_upslst_item * const a_read_instances,
 	    if (first_matched_inst == NULL) {
 	      /* Save this so we can return it - this is the first new instance
 	         we added to the list this time */
+              upsver_mes(MATVLEVEL, "First post!\n");
 	      first_matched_inst = *a_minst_list;
 	    }
 	    ++num_matches;

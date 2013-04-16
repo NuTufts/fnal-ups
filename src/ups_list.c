@@ -311,11 +311,11 @@ minst_full_cmp ( const void * const d1, const void * const d2 )
 }
 
 int
-minst_flag_cmp ( const void * const d1, const void * const d2 )
+minst_orig_slot_cmp ( const void * const d1, const void * const d2 )
 {
   const t_upstyp_matched_instance *a1 = d1;
   const t_upstyp_matched_instance *a2 = d2;
-  return a2->version->flag - a1->version->flag;
+  return a1->orig_slot - a2->orig_slot;
 }
 
 int 
@@ -495,10 +495,10 @@ uniq_instances(t_upslst_item *mproduct_list){
         mproduct = l_ptr->data;
         i = 0;
         for (prd = upslst_first(mproduct->minst_list); prd; prd = prd->next ){
-            ((t_upstyp_matched_instance *)(prd->data))->version->flag = i++;
+            ((t_upstyp_matched_instance *)(prd->data))->orig_slot = i++;
         }
         mproduct->minst_list = upslst_uniq(upslst_sort0(mproduct->minst_list,minst_full_cmp),minst_full_cmp);
-        mproduct->minst_list = upslst_sort0(mproduct->minst_list,minst_flag_cmp);
+        mproduct->minst_list = upslst_sort0(mproduct->minst_list,minst_orig_slot_cmp);
     }
     return mproduct_list;
 }
