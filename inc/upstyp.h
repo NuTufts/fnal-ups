@@ -132,6 +132,7 @@ typedef struct upstyp_matched_instance
   t_upslst_item *xtra_chains;
 
   int invalid_instance;
+  int orig_slot;
 } t_upstyp_matched_instance;
 
 /* an action */
