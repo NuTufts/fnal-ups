@@ -23,14 +23,6 @@ echo $?argv | grep argv > /dev/null && \
 
 : $BASH_SOURCE
 
-# if they passed us our path as an argument in csh, use that
-test x$BASH_SOURCE = x -a $UPS_SHELL = csh -a $# -gt 0 && setenv BASH_SOURCE=$1
-
-#
-# if $BASH_SOURCE isn't readable, it's not valid...
-#
-test -r "$BASH_SOURCE" || s_setenv BASH_SOURCE ""
-
 s_setenv SETUPS_SAVE  nosuch
 
 # 
@@ -118,7 +110,6 @@ s_setenv PRODUCTS `dropit -DEe -p${PRODUCTS} .`
 #
 # clean up
 #
-s_unsetenv BASH_SOURCE
 s_unsetenv UPS_THIS_DB
 s_unsetenv PROD_DIR_PREFIX
 s_unsetenv SETUPS_FILE
