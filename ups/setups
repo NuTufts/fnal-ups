@@ -98,6 +98,11 @@ s_source `cat /tmp/t$$`
 
 rm -f /tmp/t$$
 
+# bail out if we don't have a UPS_DIR now..
+# note that in csh this bails becuase the $UPS_DIR is not set
+# while in bash we echo that it isn't defined and return
+[ x$UPS_DIR = x ] && echo "UPS_DIR: undefined variable" && return
+
 # handle upsdb_list if present
 # since we already setup ups, we can trim it to existing directories with dropit.
 test -r $SETUPS_DIR/upsdb_list && s_setenv PRODUCTS `grep -v '^#' $SETUPS_DIR/upsdb_list | perl -pe 's/\n/:/g'`
