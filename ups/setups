@@ -118,6 +118,7 @@ s_setenv PRODUCTS `dropit -DEe -p${PRODUCTS} .`
 #
 # clean up
 #
+s_unsetenv BASH_SOURCE
 s_unsetenv UPS_THIS_DB
 s_unsetenv PROD_DIR_PREFIX
 s_unsetenv SETUPS_FILE
