@@ -2102,7 +2102,7 @@ check_setup_clash(t_upsugo_command *new_ugo ) {
        }
        if (p1 != p2) { /* should both be zero */
 	       upserr_vplace();
-	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1->data, p2->data  );
+	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1 ? p1->data:"", p2 ? p2->data: ""  );
                res = 1;
        }
        /* if it is setup and it matches, we need do nothing... */
