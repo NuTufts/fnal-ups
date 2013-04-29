@@ -2091,7 +2091,9 @@ check_setup_clash(t_upsugo_command *new_ugo ) {
            res = 1;
 	}
 	/* compare qualifiers */
-	for (p1 = new_ugo->ugo_qualifiers, p2=setup_ugo_cmd->ugo_qualifiers; p1 && p2 ; p1 = p1->next, p2 = p2->next) {
+	p1 = new_ugo->ugo_qualifiers;
+        p2=setup_ugo_cmd->ugo_qualifiers;
+        if (p1 && p2 ) {
            P_VERB_s_s_s(3, "comparing qualifiers: ",(char *)(p1->data), (char *)(p2->data));
 	   if ( 0 != upsutl_stricmp( p1->data, p2->data )) {
 	       upserr_vplace();
@@ -2099,8 +2101,7 @@ check_setup_clash(t_upsugo_command *new_ugo ) {
                res = 1;
 	   }
           
-       }
-       if (p1 != p2) { /* should both be zero */
+       } else {
 	       upserr_vplace();
 	       upserr_add( UPS_SETUP_CONFLICT, UPS_FATAL, new_ugo->ugo_product, "qualifiers", p1 ? p1->data:"", p2 ? p2->data: ""  );
                res = 1;
