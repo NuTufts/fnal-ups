@@ -18,8 +18,8 @@
 # - s_unsetenv
 #
 echo $?argv | grep argv > /dev/null && \
-  eval 's_setenv() { eval $1=\"$2\"; export $1; }; s_setenv UPS_SHELL sh; s_unsetenv() { unset $1; }; s_source() { . $1; }' || \
-  eval 'set BASH_SOURCE=`echo $_ | sed -e '"'"'s/source *//'"'"' -e '"'"'s/ *\$//'"'"'` && alias s_setenv setenv; setenv UPS_SHELL csh; alias s_source source; alias s_unsetenv unsetenv' 
+  eval 's_setenv() { eval $1=\"$2\"; export $1; }; s_setenv UPS_SHELL sh; s_unsetenv() { unset $1; }; s_source() { . $1; }; s_bail="return"' || \
+  eval 'set BASH_SOURCE=`echo $_ | sed -e '"'"'s/source *//'"'"' -e '"'"'s/ *\$//'"'"'` && alias s_setenv setenv; setenv UPS_SHELL csh; alias s_source source; alias s_unsetenv unsetenv; set s_bail="goto endlabel"' 
 
 : $BASH_SOURCE
 
@@ -41,7 +41,7 @@ grep SETUPS_FILE $SETUPS_GREP > /dev/null || test -r "$SETUPS_SAVE" && grep SETU
 test x$SETUPS_FILE = x && echo "setups: failed to find myself"
 
 # handle symlinks to the Real Path
-expr "` ls -l $SETUPS_FILE`" : ".* -> "  > /dev/null && s_setenv SETUPS_FILE `ls -l $SETUPS_FILE | sed -e 's/.* -> //'`
+expr "` /bin/ls -l $SETUPS_FILE`" : ".* -> "  > /dev/null && s_setenv SETUPS_FILE `ls -l $SETUPS_FILE | sed -e 's/.* -> //'`
 #
 # if sourced without full path, stick pwd output on the front
 # 
@@ -74,10 +74,27 @@ test $UPS_SHELL = sh  && \
      eval 'test ${PRODUCTS:-0} = 0  && s_setenv PRODUCTS ""'
 
 test "x$PRODUCTS" != x && \
-      s_setenv PRODUCTS "${UPS_THIS_DB}:${PRODUCTS}"
+      (expr "$PRODUCTS" : "${UPS_THIS_DB}" || \
+       s_setenv PRODUCTS "${UPS_THIS_DB}:${PRODUCTS}")
 
 test "x$PRODUCTS" = x && \
       s_setenv PRODUCTS "${UPS_THIS_DB}"
+
+# if UPS_DIR is already set, clean up & bail
+#   in this case, we don't do anything to PRODUCTS except
+#   add this ups database to it.
+
+test $UPS_SHELL = csh && \
+     eval 'test $?UPS_DIR = 0      && s_setenv UPS_DIR ""'
+test $UPS_SHELL = sh  && \
+     eval 'test ${UPS_DIR:-0} = 0  && s_setenv UPS_DIR ""'
+
+test x$UPS_DIR != x && s_unsetenv UPS_THIS_DB
+test x$UPS_DIR != x && s_unsetenv PROD_DIR_PREFIX
+test x$UPS_DIR != x && s_unsetenv SETUPS_FILE
+test x$UPS_DIR != x && s_unsetenv SETUPS_GREP
+test x$UPS_DIR != x && s_unsetenv SETUPS_SAVE
+test x$UPS_DIR != x && $s_bail
 
 #
 # turn list of ups binaries into:
@@ -117,3 +134,6 @@ s_unsetenv SETUPS_GREP
 s_unsetenv SETUPS_SAVE
 
 test x$UPS_DIR != x
+
+$s_bail
+endlabel:
