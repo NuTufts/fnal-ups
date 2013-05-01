@@ -101,11 +101,12 @@ test x$UPS_DIR != x && $s_bail
 #  /x/y/z/ups setup ups ||  /x/y/w/ups setup ups || ... || :
 # then run that with /bin/sh -c
 #
-/bin/sh -c "( `echo ${PROD_DIR_PREFIX}/ups/*/*/bin/ups : | sed -e 's/ / setup ups ||/g'` ) 2>/dev/null" > /tmp/t$$ 
+s_setenv UPS_OR_LIST "`echo ${PROD_DIR_PREFIX}/ups/*/*/bin/ups : | sed -e 's/ / setup ups ||/g'`"
+s_setenv UPS_SETUP_FILE `/bin/sh -c "( $UPS_OR_LIST ) 2>/dev/null"`
+s_source $UPS_SETUP_FILE
 
-s_source `cat /tmp/t$$`
-
-rm -f /tmp/t$$
+s_unsetenv UPS_OR_LIST
+s_unsetenv UPS_SETUP_FILE
 
 # bail out if we don't have a UPS_DIR now..
 # note that in csh this bails becuase the $UPS_DIR is not set
