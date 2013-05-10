@@ -108,6 +108,34 @@ test_triple_csh() {
 EOF
 }
 
+
+test_quiet_sh() {
+   ups list -aK+ ups
+   #ups declare -c ups devel -2 || true
+   ups declare -c -r $workdir/ups/devel/Linux+2 -M ups -m ups.table ups devel -2 
+   env -i - PATH=/bin:/usr/bin HOME=$HOME /bin/sh > /tmp/out$$ 2>&1 << EOF
+       . $workdir/setups.sh
+       . $workdir/setups.sh
+       . $workdir/setups.sh
+EOF
+   echo "output: "
+   cat /tmp/out$$
+   [ `wc -c < /tmp/out$$` = 0 ]
+}
+
+test_quiet_csh() {
+   #ups declare -c ups devel -2 || true
+   ups declare -c -r $workdir/ups/devel/Linux+2 -M ups -m ups.table ups devel -2 
+   env -i - PATH=/bin:/usr/bin HOME=$HOME /bin/csh -f > /tmp/out$$ 2>&1  << EOF
+       source  $workdir/setups.csh
+       source  $workdir/setups.csh
+       source  $workdir/setups.csh
+EOF
+   echo "output: "
+   cat /tmp/out$$
+   [ `wc -c < /tmp/out$$` = 0 ]
+}
+
 testsuite setups_suite \
         -s setup_test_db \
 	-t teardown_test_db \
@@ -116,7 +144,9 @@ testsuite setups_suite \
 	test_empty_sh	\
 	test_empty_csh  \
         test_triple_sh  \
-        test_triple_csh
+        test_triple_csh \
+        test_quiet_sh   \
+        test_quiet_csh 
 
 setups_suite "$@"
 
