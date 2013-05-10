@@ -74,7 +74,7 @@ test $UPS_SHELL = sh  && \
      eval 'test ${PRODUCTS:-0} = 0  && s_setenv PRODUCTS ""'
 
 test "x$PRODUCTS" != x && \
-      (expr "$PRODUCTS" : "${UPS_THIS_DB}" || \
+      (expr "$PRODUCTS" : "${UPS_THIS_DB}" > /dev/null || \
        s_setenv PRODUCTS "${UPS_THIS_DB}:${PRODUCTS}")
 
 test "x$PRODUCTS" = x && \
@@ -124,6 +124,9 @@ test -r $SETUPS_DIR/setproducts.table && \
 	setup -M $SETUPS_DIR -m setproducts.table setproducts
 
 s_setenv PRODUCTS `dropit -DEe -p${PRODUCTS} .`
+
+# now setup the RIGHT ups 
+. `ups setup ups`
 
 #
 # clean up
