@@ -94,6 +94,7 @@ test x$UPS_DIR != x && s_unsetenv PROD_DIR_PREFIX
 test x$UPS_DIR != x && s_unsetenv SETUPS_FILE
 test x$UPS_DIR != x && s_unsetenv SETUPS_GREP
 test x$UPS_DIR != x && s_unsetenv SETUPS_SAVE
+test x$UPS_DIR != x && s_source `ups setup $SETUP_UPS`
 test x$UPS_DIR != x && $s_bail
 
 #
