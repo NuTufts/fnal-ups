@@ -126,8 +126,6 @@ test -r $SETUPS_DIR/setproducts.table && \
 
 s_setenv PRODUCTS `dropit -DEe -p${PRODUCTS} .`
 
-# now setup the RIGHT ups 
-s_source `ups setup ups`
 
 #
 # clean up
@@ -137,6 +135,9 @@ s_unsetenv PROD_DIR_PREFIX
 s_unsetenv SETUPS_FILE
 s_unsetenv SETUPS_GREP
 s_unsetenv SETUPS_SAVE
+
+# now setup the RIGHT ups 
+s_source `ups setup ups`
 
 test x$UPS_DIR != x
 
