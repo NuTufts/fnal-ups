@@ -102,7 +102,8 @@ test x$UPS_DIR != x && $s_bail
 #  /x/y/z/ups setup ups ||  /x/y/w/ups setup ups || ... || :
 # then run that with /bin/sh -c
 #
-s_setenv UPS_OR_LIST "`/bin/ls -t ${PROD_DIR_PREFIX}/ups/*/*/bin/ups  | tr '\n' ' ' | sed -e 's/ / setup ups ||/g'`"':'
+s_setenv UPS_OR_LIST "`/bin/ls -t ${PROD_DIR_PREFIX}/ups/*/*/bin/ups  | tr '\n' ' '`"
+s_setenv UPS_OR_LIST "`echo $UPS_OR_LIST : | sed -e 's/ / setup ups ||/g'`"
 s_setenv UPS_SETUP_FILE `/bin/sh -c "( $UPS_OR_LIST ) 2>/dev/null"`
 s_source $UPS_SETUP_FILE
 
