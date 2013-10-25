@@ -86,6 +86,10 @@ t_upslst_item *ups_unsetup( const t_upsugo_command * const a_command_line,
       if (new_command_line)      /* Use the command line's -j setting */
         new_command_line->ugo_j = a_command_line->ugo_j;
     }
+
+    /* silently ignore -B if we are a command-line unsetup */
+    new_command_line->ugo_B = 0;
+    
     if (new_command_line) {
       /* get all the requested instances */
       mproduct_list = upsmat_instance((t_upsugo_command *)new_command_line,
