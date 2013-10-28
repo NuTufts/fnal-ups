@@ -40,8 +40,9 @@ grep SETUPS_FILE $SETUPS_GREP > /dev/null || test -r "$SETUPS_SAVE" && grep SETU
 
 test x$SETUPS_FILE = x && echo "setups: failed to find myself"
 
-# handle symlinks to the Real Path
-expr "` /bin/ls -l $SETUPS_FILE`" : ".* -> "  > /dev/null && s_setenv SETUPS_FILE `ls -l $SETUPS_FILE | sed -e 's/.* -> //'`
+# handle symlinks to the Real Path -- full path and relative
+expr "` /bin/ls -l $SETUPS_FILE`" : ".* -> /"  > /dev/null && s_setenv SETUPS_FILE `ls -l $SETUPS_FILE | sed -e 's/.* -> //'`
+expr "` /bin/ls -l $SETUPS_FILE`" : ".* -> [^/]"  > /dev/null && s_setenv SETUPS_FILE `dirname $SETUPS_FILE`/`ls -l $SETUPS_FILE | sed -e 's/.* -> //'`
 #
 # if sourced without full path, stick pwd output on the front
 # 
