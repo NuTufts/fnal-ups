@@ -1109,12 +1109,7 @@ char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
                        const t_upstyp_matched_instance * const instance,
                        const t_upsugo_command * const command_line )
 {  
-   static char uname_flavor[80];
-   uname_flavor[0] = 0;
-   ups_append_OS(uname_flavor);		/* get IRIX part */
-   strcat(uname_flavor, "+");		/* append "+" */
-   ups_append_release(uname_flavor);	/* append 6.5 part */
-   return uname_flavor;
+   return command_line->ugo_osname->data;
 }
 
 /*  upsget_chain_file
