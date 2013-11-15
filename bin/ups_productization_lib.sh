@@ -7,8 +7,7 @@
 #  $RCSfile$
 #  rev='$Revision$$Date$'
 
-
-
+test "`basename $0`" = ups_productization_lib.sh && echov() { if [ "${opt_v-}" ];then echo "`date`: $*";fi; }
 echov "hello from ups_productization_lib.sh"
 
 # NOTE: all "stages" (build,install,install_fix,and declare) are run in a
@@ -226,6 +225,23 @@ ups_install_fix()
     fi
 }   # ups_install_fix
 
+ups_init_db() # $1=$PRODS_RT
+{   mkdir -p $1/.upsfiles
+    if [ -f $1/.upsfiles/dbconfig ];then
+        echov $1/.upsfiles/dbconfig already exists
+    else
+            cat >$1/.upsfiles/dbconfig <<"EOF"
+FILE = DBCONFIG
+AUTHORIZED_NODES = *
+PROD_DIR_PREFIX = ${UPS_THIS_DB}
+#MAN_TARGET_DIR = /usr/local/man
+#CATMAN_TARGET_DIR = /usr/local/catman
+#SETUPS_DIR = /usr/local/etc
+UPD_USERCODE_DIR = ${UPS_THIS_DB}/.updfiles
+EOF
+    fi
+}
+
 ups_declare()
 {
     ups_flv=`get_flv_64_to_32`
@@ -236,18 +252,7 @@ ups_declare()
     else
 
         # ups is special -- see if db is initializaed
-        mkdir -p $PRODS_RT/.upsfiles
-        if [ ! -f $PRODS_RT/.upsfiles/dbconfig ];then
-            cat >$PRODS_RT/.upsfiles/dbconfig <<"EOF"
-FILE = DBCONFIG
-AUTHORIZED_NODES = *
-PROD_DIR_PREFIX = ${UPS_THIS_DB}
-#MAN_TARGET_DIR = /usr/local/man
-#CATMAN_TARGET_DIR = /usr/local/catman
-#SETUPS_DIR = /usr/local/etc
-UPD_USERCODE_DIR = ${UPS_THIS_DB}/.updfiles
-EOF
-        fi
+        ups_init_db $PRODS_RT
 
         cd build-$ups_flv
         # ups_flavor not ready on SunOS inst_flv=`ups_flavor.sh --ups | sed 's/flavor=//;s/ .*//'`
@@ -760,7 +765,10 @@ lndir()
 
 #------------------------------------------------------------------------------
 # allow for testing of some functions...
+test "x${1-}" = x-v && opt_v=1 && shift
 case "${1-}" in
+'-?'|-h|--help) echo "usage: `basename $0` flavor|cp_with_vars|init_db";;
 flavor)  shift; flavor "$@";;
 cp_with_vars) shift; cp_with_vars 'ROOTSYS=${UPS_PROD_DIR}' "$@";;
+init_db) shift; if [ $# -eq 1 ];then ups_init_db $1;else echo 'init_db needs 1 arg (prod/db root)';exit 1;fi;;
 esac
