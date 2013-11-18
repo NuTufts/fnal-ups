@@ -1109,7 +1109,9 @@ char *upsget_OS_flavor(const t_upstyp_db * const db_info_ptr,
                        const t_upstyp_matched_instance * const instance,
                        const t_upsugo_command * const command_line )
 {  
-   return command_line->ugo_osname->data;
+    if (command_line->ugo_osname == 0)
+	upsugo_bldfvr( command_line );
+    return command_line->ugo_osname->data;
 }
 
 /*  upsget_chain_file
