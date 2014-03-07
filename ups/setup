@@ -52,7 +52,8 @@ test -z "$db" && echo "$msg" || vecho_ "db=$db"
 #  full flavor matching but I _will_ support the 64/32 matching, and the backward
 # compatible os+majRev.
 set_ os=`uname -s` os_rev1=`uname -r |cut -d. -f1-2` os_rev2=`uname -r |cut -d. -f1` mach=`uname -m` libc1= libc2=
-test $os = Linux && set_ libc1=-`/bin/ls /lib*/libc-* /lib/*/libc-* 2>/dev/null|sed '{s/.*libc-//;s/[^0-9]*$//;q}'` libc2=-`/bin/ls /lib*/libc-* /lib/*/libc-* 2>/dev/null|sed 's/.*libc-\([0-9]*\.[0-9]*\).*/\1/;q'`
+test $os = Linux && set_ libc1=-`sh -c "/bin/ls /lib*/libc-* /lib/*/libc-* 2>/dev/null"|sed 's/.*libc-//;s/[^0-9]*$//;q'`
+test $os = Linux && set_ libc2=-`sh -c "/bin/ls /lib*/libc-* /lib/*/libc-* 2>/dev/null"|sed 's/.*libc-\([0-9]*\.[0-9]*\).*/\1/;q'`
 set_ b64=`sh -c "case $mach in x86_64|sun*) echo 64bit;;*) :;;esac"`
 set_ mach=`sh -c "case $mach in *86*|sun*) :;; *) echo $mach;;esac"`
 set_ fl1=$os$mach$b64+$os_rev1$libc1 fl2=$os$mach+$os_rev1$libc1 fl3=$os$mach$b64+$os_rev1$libc2 fl4=$os$mach+$os_rev1$libc2
