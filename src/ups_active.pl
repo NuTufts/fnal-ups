@@ -3,7 +3,7 @@
 # this little script just lists the ups products which are currently setup.
 
 printf( "Active ups products:\n");
-open(QL, "printenv | grep SETUP | grep -v SETUPS_DIR | sort |") || die "Failed: $!\n";
+open(QL, "printenv | grep '^SETUP_' | grep -v SETUPS_DIR | sort |") || die "Failed: $!\n";
 while( $line = <QL> ) {
     chop($line);
     @words=split(/=/,$line);
